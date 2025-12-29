@@ -5,13 +5,6 @@ import CardContent from '@mui/material/CardContent'
 import Typography from '@mui/material/Typography'
 import Button from '@mui/material/Button'
 import Box from '@mui/material/Box'
-import Table from '@mui/material/Table'
-import TableBody from '@mui/material/TableBody'
-import TableCell from '@mui/material/TableCell'
-import TableContainer from '@mui/material/TableContainer'
-import TableHead from '@mui/material/TableHead'
-import TableRow from '@mui/material/TableRow'
-import Chip from '@mui/material/Chip'
 import { useTheme } from '@mui/material/styles'
 import {
   ResponsiveContainer,
@@ -39,7 +32,6 @@ const emptyAnalytics = {
   performance: { avg_score: null, avg_attempt: null, correct_rate: null, first_try_correct_rate: null },
   time: { avg_minutes_per_question: null },
   submissionCount: 0,
-  recentSubmissions: [],
 }
 
 export default function Dashboard() {
@@ -155,20 +147,6 @@ export default function Dashboard() {
       : 0
     return { correctFirstTry, incorrectFirstTry, averageAttempts }
   }, [analytics.performance])
-
-  const recentSubmissions = useMemo(
-    () =>
-      analytics.recentSubmissions.map((item) => ({
-        id: item.id,
-        assignment: item.assignment_title || 'Assignment',
-        submitted: item.submitted_at ? formatDate(item.submitted_at) : '—',
-        grade: item.score,
-        status: item.is_correct ? 'Correct' : 'Incorrect',
-        color: item.is_correct ? 'success' : 'warning',
-        assignmentId: item.assignment_id,
-      })),
-    [analytics.recentSubmissions]
-  )
 
   const mainChartData = useMemo(
     () =>
@@ -523,119 +501,6 @@ export default function Dashboard() {
                 />
               </LineChart>
             </ResponsiveContainer>
-          </CardContent>
-        </ThemedCard>
-      </Grid>
-
-      <Grid size={12}>
-        <ThemedCard sx={{ height: '100%' }}>
-          <CardContent>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-              <Box>
-                <Typography variant="h6" fontWeight="medium">
-                  Recent Submissions
-                </Typography>
-                <Typography variant="caption" color="text.secondary">
-                  {recentSubmissions.length} recent submissions
-                </Typography>
-              </Box>
-            </Box>
-            <TableContainer
-              sx={(theme) => ({
-                backgroundColor: theme.palette.background.paper,
-                borderRadius: 2,
-                border: `1px solid ${theme.palette.divider}`,
-              })}
-            >
-              <Table sx={{ minWidth: 650, color: 'text.primary' }}>
-                <TableHead
-                  sx={(theme) => ({
-                    backgroundColor: theme.palette.background.paper,
-                    '& .MuiTableCell-root': {
-                      color: theme.palette.text.secondary,
-                      borderColor: theme.palette.divider,
-                    },
-                  })}
-                >
-                  <TableRow>
-                    <TableCell>
-                      <Typography variant="caption" fontWeight="bold" textTransform="uppercase" color="text.secondary">
-                        Assignment
-                      </Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Typography variant="caption" fontWeight="bold" textTransform="uppercase" color="text.secondary">
-                        Submitted
-                      </Typography>
-                    </TableCell>
-                    <TableCell align="center">
-                      <Typography variant="caption" fontWeight="bold" textTransform="uppercase" color="text.secondary">
-                        Grade
-                      </Typography>
-                    </TableCell>
-                    <TableCell align="center">
-                      <Typography variant="caption" fontWeight="bold" textTransform="uppercase" color="text.secondary">
-                        Status
-                      </Typography>
-                    </TableCell>
-                    <TableCell align="center">
-                      <Typography variant="caption" fontWeight="bold" textTransform="uppercase" color="text.secondary">
-                        Action
-                      </Typography>
-                    </TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody
-                  sx={(theme) => ({
-                    backgroundColor: theme.palette.background.paper,
-                    '& .MuiTableCell-root': {
-                      color: theme.palette.text.primary,
-                      borderColor: theme.palette.divider,
-                    },
-                  })}
-                >
-                  {recentSubmissions.map((row) => (
-                    <TableRow
-                      key={row.id}
-                      hover
-                      sx={(theme) => ({
-                        '&:hover': { backgroundColor: theme.palette.action.hover },
-                      })}
-                    >
-                      <TableCell>
-                        <Typography variant="body2" fontWeight="medium" color="text.primary">
-                          {row.assignment}
-                        </Typography>
-                      </TableCell>
-                      <TableCell>
-                        <Typography variant="body2" color="text.secondary">
-                          {row.submitted}
-                        </Typography>
-                      </TableCell>
-                      <TableCell align="center">
-                        {row.grade !== null && row.grade !== undefined ? (
-                          <Typography variant="body2" fontWeight="bold" color="text.primary">
-                            {row.grade}
-                          </Typography>
-                        ) : (
-                          <Typography variant="body2" color="text.secondary">
-                            -
-                          </Typography>
-                        )}
-                      </TableCell>
-                      <TableCell align="center">
-                        <Chip label={row.status} color={row.color} size="small" />
-                      </TableCell>
-                      <TableCell align="center">
-                        <Button size="small" variant="outlined" component={Link} to={`/assignment/${row.assignmentId}`}>
-                          View
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
           </CardContent>
         </ThemedCard>
       </Grid>

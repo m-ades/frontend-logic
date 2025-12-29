@@ -18,7 +18,6 @@ function TabPanel({ children, value, index }) {
 
 export default function Assignments() {
   const [tabValue, setTabValue] = useState(0)
-  const [recentSubmissions, setRecentSubmissions] = useState([])
   const [averagePercent, setAveragePercent] = useState(null)
   const navigate = useNavigate()
 
@@ -77,14 +76,9 @@ export default function Assignments() {
 
     const loadSummary = async () => {
       try {
-        const [grades, analytics] = await Promise.all([
-          fetchJson(`/api/users/${API_CONFIG.userId}/grades`),
-          fetchJson(`/api/analytics/student?userId=${API_CONFIG.userId}&courseId=${API_CONFIG.courseId}`),
-        ])
+        const grades = await fetchJson(`/api/users/${API_CONFIG.userId}/grades`)
 
         if (!isMounted) return
-
-        setRecentSubmissions(analytics.recentSubmissions || [])
 
         const totalPoints = grades.reduce(
           (sum, grade) => sum + (grade.max_score || grade.Assignment?.total_points || 0),
@@ -96,7 +90,6 @@ export default function Assignments() {
       } catch (error) {
         if (isMounted) {
           console.warn('Failed to load assignment summary', error)
-          setRecentSubmissions([])
           setAveragePercent(null)
         }
       }
@@ -193,40 +186,6 @@ export default function Assignments() {
               <Typography variant="h4" fontWeight={600} sx={{ mb: 3 }}>
                 {averagePercent !== null ? `${averagePercent.toFixed(2)}%` : '—'}
               </Typography>
-              <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 1 }}>
-                Recent Activity
-              </Typography>
-              <ThemedCard
-                sx={(theme) => ({
-                  backgroundColor: theme.palette.action.hover,
-                  color: theme.palette.text.secondary,
-                  borderRadius: 1,
-                  border: `1px solid ${theme.palette.divider}`,
-                  minHeight: 300
-                })}
-              >
-                <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
-                  {recentSubmissions.length === 0 ? (
-                    <Typography variant="body2" color="text.secondary">
-                      No recent submissions
-                    </Typography>
-                  ) : (
-                    <Stack spacing={1}>
-                      {recentSubmissions.map((submission) => (
-                        <Box key={submission.id}>
-                          <Typography variant="body2" fontWeight="medium" color="text.primary">
-                            {submission.assignment_title || 'Assignment'}
-                          </Typography>
-                          <Typography variant="caption" color="text.secondary">
-                            {submission.submitted_at ? formatDate(submission.submitted_at) : '—'} • Score{' '}
-                            {submission.score ?? '—'}
-                          </Typography>
-                        </Box>
-                      ))}
-                    </Stack>
-                  )}
-                </CardContent>
-              </ThemedCard>
             </CardContent>
           </ThemedCard>
         </Grid>
