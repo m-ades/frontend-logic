@@ -1,0 +1,576 @@
+
+/* INPUT FIELDS */
+
+.logicpenguin .derivationline input.justification,
+.logicpenguin .derivationline input.formulainput {
+    --border-height: 1px;
+    --border-before-color: rgba(221, 221, 221, 0.39);
+    --border-after-color: var(--lpgray4);
+    --input-hovered-color: rgba(240, 240, 240, 0.5);
+    
+    position: relative;
+    color: var(--lpblack);
+    font-size: inherit;
+    width: 100%;
+    box-sizing: border-box;
+    padding-inline: 0.5em;
+    padding-block: 0.5em;
+    border: none;
+    border-bottom: var(--border-height) solid var(--border-before-color);
+    outline: none;
+    font-family: "IBM Plex Sans", sans-serif;
+    transition: background-size 0.3s ease, background-color 0.3s ease;
+    background-color: transparent;
+    background-image: linear-gradient(var(--border-after-color), var(--border-after-color));
+    background-size: 0% 2px;
+    background-repeat: no-repeat;
+    background-position: bottom left;
+    height: 2.5em;
+    line-height: 2.5em;
+}
+
+.logicpenguin .derivationline input.justification:focus,
+.logicpenguin .derivationline input.formulainput:focus {
+    outline: none;
+    background-size: 100% 2px;
+}
+
+.logicpenguin .derivationline input.justification {
+    width: 4.5em;
+    min-width: 4.5em;
+    flex-shrink: 0;
+    font-size: inherit;
+    padding: 0.5em;
+    height: 2.5em;
+    line-height: 2.5em;
+    max-width: none;
+}
+
+.logicpenguin .derivationline.lastpremise input.justification {
+    width: auto !important;
+    min-width: 4.5em;
+    max-width: none !important;
+}
+
+.logicpenguin .derivationline input.justification:hover,
+.logicpenguin .derivationline input.formulainput:hover {
+    background-color: var(--input-hovered-color);
+}
+
+.logicpenguin .derivationline input.formulainput:read-only:hover:focus,
+.logicpenguin .derivationline input.formulainput:read-only:focus,
+.logicpenguin .derivationline input.formulainput:hover:focus,
+.logicpenguin .derivationline input.justification:read-only:hover:focus,
+.logicpenguin .derivationline input.justification:read-only:focus,
+.logicpenguin .derivationline input.justification:hover:focus {
+    outline: none;
+}
+
+.logicpenguin .derivationline input.formulainput:read-only:hover,
+.logicpenguin .derivationline input.justification:read-only:hover {
+    background: var(--input-hovered-color);
+}
+
+.logicpenguin .derivationline input.justification:read-only,
+.logicpenguin .derivationline input.formulainput:read-only {
+    cursor: default;
+}
+
+/* SUBDERIVATION BUTTONS */
+
+
+.logicpenguin sub-derivation .subderivbuttons {
+    margin-top: 1ex;
+}
+
+.logicpenguin sub-derivation.closed > div > .innersubderiv > .subderivbuttons {
+        display: none;
+}
+
+.logicpenguin sub-derivation .subderivbuttons > div {
+    margin-right: 1ex;
+    background: transparent;
+    color: rgba(0, 0, 0, 0.9);
+    padding: 0.2ex;
+    border-radius: 50px;
+    cursor: pointer;
+    user-select: none;
+    margin-bottom: 0.3ex;
+    border: none;
+    box-shadow: none;
+    transition: all 0.6s ease;
+    font-weight: 700;
+    opacity: 0.9;
+}
+
+.logicpenguin sub-derivation .subderivbuttons > div.material-symbols-outlined {
+    font-family: 'Material Symbols Outlined', sans-serif;
+    font-variation-settings: 'FILL' 0, 'wght' 100, 'GRAD' 0, 'opsz' 24;
+    font-weight: 100;
+}
+
+.logicpenguin sub-derivation .subderivbuttons > div:hover {
+    opacity: 0.9;
+    box-shadow: 1.5px 1.5px 4px rgba(190, 190, 190, 0.3), -1.5px -1.5px 4px rgba(255, 255, 255, 0.5);
+    color: #2f6bff;
+}
+
+.logicpenguin sub-derivation .subderivbuttons > div:focus,
+.logicpenguin sub-derivation .subderivbuttons > div:active {
+    opacity: 0.85;
+    box-shadow: 1px 1px 3px rgba(190, 190, 190, 0.3), -1px -1px 3px rgba(255, 255, 255, 0.5);
+}
+
+/* check toggle button */
+.logicpenguin sub-derivation .subderivbuttons > div.derivchecklinestoggle:hover,
+.logicpenguin sub-derivation .subderivbuttons > div.derivchecklinestoggle.autocheckoff:hover {
+    background-color: #6ba3f0;
+}
+
+.logicpenguin sub-derivation .subderivbuttons > div.derivchecklinestoggle.autocheckon {
+    background-color: var(--lpgreen);
+}
+
+.logicpenguin sub-derivation .subderivbuttons > div.derivchecklinestoggle.autocheckon:hover {
+    color: var(--lpgray5);
+    background-color: var(--lpbgwhite)
+}
+
+/* LINE NUMBERS */
+
+.logicpenguin .derivationlinenumber {
+    position: relative;
+    padding-right: 0.5em;
+    padding-top: 0.7em;
+    cursor: pointer;
+    user-select: none;
+    text-align: right;
+}
+
+/* right side for justifications */
+
+.logicpenguin sub-derivation .derivationline .jbwrap {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    height: 2.5em;
+    overflow-y: visible;
+    margin-left: 0.5em;
+    flex-shrink: 0;
+}
+
+/* LINE BUTTONS */
+
+/* common */
+.logicpenguin sub-derivation .derivlinebuttons .derivlinecheck div {
+    border-radius: 5px;
+    padding: 2px;
+    user-select: none;
+    font-variation-settings: 'FILL' 0, 'wght' 100, 'GRAD' 0, 'opsz' 24;
+    font-weight: 100;
+}
+
+.logicpenguin sub-derivation .derivationline .jbwrap div {
+    display: inline-block;
+    white-space: nowrap;
+}
+
+/* line action buttons */
+
+.logicpenguin sub-derivation .derivationline .jbwrap div .derivlineactionbutton {
+    position: relative;
+    padding-left: 0.3ex;
+    top: 0.2rem;
+    user-select: none;
+    display: none;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.logicpenguin sub-derivation .derivationline:hover .jbwrap div .derivlineactionbutton {
+    display: inline-block;
+    opacity: 1;
+}
+
+.logicpenguin sub-derivation .derivationline .derivlineactionbutton > .material-symbols-outlined {
+    cursor: pointer;
+    color: rgba(0, 0, 0, 0.7);
+    background: transparent;
+    border: none;
+    border-radius: 4px;
+    padding: 2px;
+    transition: all 0.2s ease;
+    font-family: 'Material Symbols Outlined', sans-serif;
+    font-variation-settings: 'FILL' 0, 'wght' 100, 'GRAD' 0, 'opsz' 20;
+    font-weight: 100;
+    font-size: 16px;
+    width: 18px;
+    height: 18px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.logicpenguin sub-derivation .derivationline .derivlineactionbutton:hover > .material-symbols-outlined {
+    color: rgba(0, 0, 0, 0.9);
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+.logicpenguin sub-derivation .derivationline .derivlineactionbutton:active > .material-symbols-outlined {
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+.logicpenguin .subderivsymbolbar {
+    display: inline-flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    align-items: center;
+    margin-left: -4px;
+}
+
+.logicpenguin .subderivsymbolbar__btn {
+    padding: 2px 6px;
+    border: none;
+    border-radius: 6px;
+    background-color: var(--lpbgwhite);
+    font-size: 0.9em;
+    line-height: 1.2;
+    color: var(--lpgray1);
+    cursor: pointer;
+    user-select: none;
+}
+
+.logicpenguin .subderivsymbolbar__btn:hover {
+    color: var(--lpblack);
+    background-color: var(--lpgray7);
+}
+
+
+/* CHECK "BUTTON" (really an indicator, meant as a button originally) */
+
+.logicpenguin sub-derivation .derivlinebuttons .derivlinecheck {
+    font-size: 125%;
+    position: relative;
+    top: 0.2rem;
+    padding-left: 0.2rem;
+}
+
+/* colors, etc., for line check icon */
+.logicpenguin sub-derivation .derivlinebuttons .derivlinecheck .baddependency {
+    color: var(--lpyellow);
+}
+.logicpenguin sub-derivation .derivlinebuttons .derivlinecheck .checking {
+    color: var(--lpgray3);
+}
+
+.logicpenguin sub-derivation .derivlinebuttons .derivlinecheck svg {
+    width: 1.2em;
+    height: 1.2em;
+    transform-origin: center;
+    animation: rotate4 2s linear infinite;
+}
+
+.logicpenguin sub-derivation .derivlinebuttons .derivlinecheck svg circle {
+    fill: none;
+    stroke: hsl(214, 97%, 59%);
+    stroke-width: 2;
+    stroke-dasharray: 1, 200;
+    stroke-dashoffset: 0;
+    stroke-linecap: round;
+    animation: dash4 1.5s ease-in-out infinite;
+}
+
+@keyframes rotate4 {
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes dash4 {
+    0% {
+        stroke-dasharray: 1, 200;
+        stroke-dashoffset: 0;
+    }
+    50% {
+        stroke-dasharray: 90, 200;
+        stroke-dashoffset: -35px;
+    }
+    100% {
+        stroke-dashoffset: -125px;
+    }
+}
+.logicpenguin sub-derivation .derivlinebuttons .derivlinecheck .good {
+    color: #76b947;
+}
+.logicpenguin sub-derivation .derivlinebuttons .derivlinecheck .incomplete {
+    color: var(--lpgray4);
+}
+.logicpenguin sub-derivation .derivlinebuttons .derivlinecheck .multierror,
+.logicpenguin sub-derivation .derivlinebuttons .derivlinecheck .justificationerror,
+.logicpenguin sub-derivation .derivlinebuttons .derivlinecheck .ruleerror,
+.logicpenguin sub-derivation .derivlinebuttons .derivlinecheck .syntaxerror {
+    background-color: transparent;
+    color: #e45649;
+}
+.logicpenguin sub-derivation .derivlinebuttons .derivlinecheck .malfunction {
+    color: #ffffff;
+    background-color: var(--lpred);
+}
+.logicpenguin sub-derivation .derivlinebuttons .derivlinecheck .turnedoff {
+    color: var(--lpbgwhite);
+    background-color: var(--lpgray5);
+}
+.logicpenguin sub-derivation .derivlinebuttons .derivlinecheck div.turnedoff:hover {
+    color: var(--lpwhite);
+    background-color: var(--lpgreen);
+}
+.logicpenguin sub-derivation .derivlinebuttons .derivlinecheck .unchecked {
+    display: none;
+}
+.logicpenguin sub-derivation .derivlinebuttons .derivlinecheck.hideunchecked .unchecked {
+    display: none;
+}
+
+.logicpenguin.rulepanel {
+    display: inline-block;
+    position: fixed;
+    right: 5px;
+    bottom: 5px;
+    background-color: var(--lpgray1);
+    color: var(--lpbgwhite);
+    padding: 1ex;
+    border-radius: 10px;
+}
+.logicpenguin.rulepanel .derivchartlabel {
+    text-align: center;
+    width: 100%;
+    cursor: pointer;
+}
+.logicpenguin.rulepanel .derivhidewidget {
+    float: right;
+    margin-right: 2px;
+    margin-left: 1.5em;
+    margin-bottom: -30px;
+    font-size: 150%;
+    display: inline-block;
+    top: -5px;
+}
+.logicpenguin.rulepanel .derivchartlabel:hover {
+    color: var(--lpbgmagenta);
+}
+.logicpenguin.rulepanel table.ruleclicktable {
+    border-spacing: 0;
+    border-collapse: collapse;
+    display: inline-table;
+}
+
+.logicpenguin.rulepanel.minimized table.ruleclicktable {
+    display: none;
+}
+
+.logicpenguin.rulepanel .ruleclicktable > thead {
+    cursor: pointer;
+}
+
+.logicpenguin.rulepanel .ruleclicktable > thead > tr > th {
+    padding-bottom: 2ex;
+    font-weight: normal;
+}
+
+.logicpenguin.rulepanel .ruleclicktable > thead > tr > th:first-child {
+    font-weight: bold;
+}
+
+.logicpenguin.rulepanel table.ruleclicktable > tbody > tr > td {
+    text-align: center;
+    vertical-align: middle;
+    /* width: 2.8em; height: 2.4em; */
+    padding: 10px 5px 10px 5px;
+    border: none;
+    cursor: pointer;
+    background-color: #2f6bff;
+    color: #ffffff;
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 2px rgba(69, 69, 70, 0.4);
+    transition: all 0.6s ease;
+    font-weight: 700;
+    font-family: "IBM Plex Sans", sans-serif;
+}
+.logicpenguin.rulepanel table.ruleclicktable > tbody > tr > td:hover {
+    opacity: 0.9;
+    box-shadow: 0 2px 4px rgba(129, 85, 186, 0.25);
+}
+.logicpenguin.rulepanel table.ruleclicktable > tbody > tr > td:focus,
+.logicpenguin.rulepanel table.ruleclicktable > tbody > tr > td:active {
+    opacity: 0.85;
+    box-shadow: 0 1px 1px rgba(129, 85, 186, 0.15);
+}
+
+.logicpenguin.rulepanel table.ruleclicktable > tbody > tr > td.blank {
+    cursor: default;
+    background-color: transparent;
+    color: inherit;
+}
+
+.logicpenguin.rulepanel table.ruleclicktable > tbody > tr > td.blank:hover {
+    background-color: transparent;
+}
+
+.logicpenguin.rulepanel table.ruleclicktable > tbody > tr > td.meinongian:hover {
+    background-color: var(--lpgray1);
+    color: var(--lpgray4);
+}
+.logicpenguin.rulepanel table.ruleclicktable > tbody > tr > td > div {
+    position: relative;
+}
+.logicpenguin.rulepanel table.ruleclicktable > tbody > tr > td.meinongian {
+    color: var(--lpgray4);
+    cursor: not-allowed;
+}
+.logicpenguin.rulepanel table.ruleclicktable > tbody > tr > td.meinongian span {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: -5px;
+    margin-left: auto;
+    margin-right: auto;
+    color: var(--lpred);
+    font-size: 170%;
+    cursor: not-allowed;
+}
+
+.logicpenguin.rulepanel table.ruleclicktable > tbody > tr > td.meinongian.excluded:hover span,
+.logicpenguin.rulepanel table.ruleclicktable > tbody > tr > td.meinongian.excluded span {
+    color: var(--lpblack);
+    cursor: default;
+}
+
+.logicpenguin.rulepanel table.ruleclicktable > tbody > tr > td.meinongian:hover span {
+    color: var(--lpred);
+}
+
+.logicpenguin.rulepanel table.ruleclicktable > tbody > tr > td.excluded {
+    color: var(--lpbgblack);
+    cursor: default;
+}
+
+.logicpenguin.rulepanel table.ruleclicktable > tbody > tr > td.excluded:hover {
+    color: var(--lpbgblack);
+    background-color: var(--lpgray1);
+}
+
+.logicpenguin.rulepanel .ruledisplayform {
+    display: inline-block;
+    text-align: left;
+    padding: 1ex 1em 1ex 1em;
+    border-radius: 15px;
+    background-color: var(--lpgray6);
+    color: var(--lpblack);
+    margin-top: 1ex;
+    margin-left: 1em;
+}
+
+.logicpenguin.rulepanel table > thead:hover .ruledisplayform {
+    background-color: var(--lpbgblue);
+}
+
+.logicpenguin.rulepanel .ruledisplayform:first-child  {
+    margin-left: 0;
+}
+
+.logicpenguin.rulepanel .ruledisplayargtbl tr:last-child td {
+    border-top: none;
+}
+
+.logicpenguin.rulepanel .ruledisplayshowline span:first-child {
+    text-decoration: line-through;
+    text-decoration-thickness: 3px;
+    margin-right: 0.5em;
+}
+
+.logicpenguin.rulepanel .ruledisplaydrop {
+    margin-top: 6ex;
+}
+
+.logicpenguin .ruledisplayform .ruledisplaysubderiv {
+    border: none;
+    padding: 1ex;
+}
+
+.logicpenguin .ruledisplayform .ruledisplaysubderiv.withblank {
+    min-height: 3ex;
+}
+
+.logicpenguin .ruledisplayform .rulenote {
+    font-size: 80%;
+}
+
+.logicpenguin .derivationcomment {
+    border-radius: 8px;
+    padding: 1ex;
+    background-color: transparent;
+    margin-bottom: 2ex;
+    margin-top: 2ex;
+}
+.logicpenguin .derivationcomment .errortable {
+    border-spacing: 0;
+    border-collapse: collapse;
+}
+
+.logicpenguin .derivationcomment .errortable td:first-child {
+    padding-right: 1em;
+    white-space: nowrap;
+    vertical-align: text-top;
+}
+
+
+.logicpenguin .derivationcomment .errortable td:last-child span {
+    color: var(--lpred);
+}
+
+.logicpenguin .derivationcomment .errortable td:last-child span.dependency {
+    color: var(--lpyellow);
+}
+
+/* mobile */
+@media (max-width: 900px) {
+    .logicpenguin .derivationline {
+        align-items: center !important;
+    }
+    
+    .logicpenguin .derivationline input.justification,
+    .logicpenguin .derivationline input.formulainput {
+        font-size: 14px !important;
+        height: 2em !important;
+        line-height: 2em !important;
+        padding: 0 !important;
+        padding-inline: 0.4em !important;
+        vertical-align: top !important;
+    }
+    
+    .logicpenguin .derivationline input.justification {
+        width: 3.5em !important;
+        min-width: 3.5em !important;
+        max-width: 3.5em !important;
+        padding-inline: 0.3em !important;
+    }
+    
+    .logicpenguin .derivationline .jbwrap {
+        height: 2em !important;
+        align-items: center !important;
+        display: flex !important;
+    }
+    
+    .logicpenguin .derivationline .jbwrap > div {
+        height: 2em !important;
+        display: flex !important;
+        align-items: center !important;
+    }
+    
+    .logicpenguin derivation-hurley {
+        font-size: 14px !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        overflow-x: hidden !important;
+    }
+}

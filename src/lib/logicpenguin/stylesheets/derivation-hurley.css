@@ -1,0 +1,282 @@
+@charset 'utf-8';
+@import './derivations.css';
+
+.logicpenguin {
+    counter-reset: probnum;
+}
+
+.logicpenguin  ol.derivation-hurley-list {
+    list-style-type: none;
+    padding-left: 0;
+    margin-right: 0;
+}
+
+.logicpenguin .derivation-hurley-list li::before {
+    counter-increment: probnum;
+    content: "Question #" counter(probnum);
+}
+
+.logicpenguin  .sampleproblem .derivation-hurley-list li::before {
+    counter-increment: probnum;
+    content: "";
+}
+
+
+.logicpenguin derivation-hurley {
+    vertical-align: text-top;
+    margin-top: 1ex;
+}
+
+/* mobile */
+@media (max-width: 900px) {
+    .logicpenguin derivation-hurley {
+        width: 100% !important;
+        max-width: 100% !important;
+        overflow-x: hidden !important;
+    }
+    
+    .logicpenguin derivation-hurley .derivationline {
+        width: 100% !important;
+        max-width: 100% !important;
+        align-items: center !important;
+    }
+    
+    .logicpenguin derivation-hurley .derivationline input.formulainput {
+        font-size: 14px !important;
+        min-width: 0 !important;
+        padding: 0 !important;
+        padding-inline: 0.5em !important;
+        height: 2em !important;
+        line-height: 2em !important;
+        vertical-align: top !important;
+    }
+    
+    .logicpenguin derivation-hurley .derivationline input.justification {
+        font-size: 14px !important;
+        width: 3.5em !important;
+        min-width: 3.5em !important;
+        max-width: 3.5em !important;
+        padding: 0 !important;
+        padding-inline: 0.3em !important;
+        height: 2em !important;
+        line-height: 2em !important;
+        vertical-align: top !important;
+    }
+    
+    .logicpenguin derivation-hurley .derivationcore {
+        width: 100% !important;
+        max-width: 100% !important;
+        font-size: 14px !important;
+    }
+    
+    .logicpenguin derivation-hurley .derivationline .derivationlinenumber {
+        font-size: 14px !important;
+    }
+    
+    .logicpenguin derivation-hurley .innersubderiv {
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+    
+    .logicpenguin derivation-hurley .derivationline .jbwrap {
+        height: 2em !important;
+        align-items: center !important;
+        display: flex !important;
+    }
+    
+    .logicpenguin derivation-hurley .derivationline .jbwrap > div {
+        height: 2em !important;
+        display: flex !important;
+        align-items: center !important;
+    }
+}
+
+.logicpenguin derivation-hurley .derivationline {
+    width: max-content !important;
+    min-width: fit-content;
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+    max-width: none;
+}
+
+.logicpenguin derivation-hurley .derivationline .derivationlinenumber {
+    order: 0;
+    flex-shrink: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    display: flex;
+    align-items: center;
+}
+
+.logicpenguin derivation-hurley .derivationline input.formulainput {
+    flex: 0 1 auto;
+    min-width: 15em;
+    width: auto !important;
+    max-width: none !important;
+    order: 1;
+}
+
+.logicpenguin derivation-hurley .derivationline .jbwrap {
+    order: 2;
+    flex-shrink: 0;
+    min-width: fit-content;
+}
+
+.logicpenguin derivation-hurley .derivationline.derivationshowline .bottombar {
+    display: none !important;
+}
+
+.logicpenguin derivation-hurley .derivationline.derivationshowline .showlineshow {
+    display: inline-block;
+    color: var(--lpmagenta);
+    cursor: pointer;
+    padding-left: 4px;
+}
+
+.logicpenguin derivation-hurley .derivationline .showlineshow {
+    display: inline-block;
+    width: 3.5em;
+    color: var(--lpmagenta);
+    cursor: pointer;
+}
+
+.logicpenguin derivation-hurley sub-derivation.closed
+    > div > .derivationline .showlineshow {
+    text-decoration: line-through;
+    text-decoration-color: var(--lpmagenata);
+    text-decoration-thickness: 3px;
+    color: var(--lpgray3);
+}
+
+.logicpenguin derivation-hurley .derivationline .showlineshow:hover {
+    background-color: var(--lpbgmagenta);
+    text-decoration: line-through;
+    text-decoration-color: var(--lpblack);
+    text-decoration-thickness: 3px;
+}
+
+.logicpenguin derivation-hurley sub-derivation.closed > div >
+    .derivationline .showlineshow:hover {
+    background-color: var(--lpbgmagenta);
+    color: var(--lpmagenta);
+    text-decoration: none;
+}
+
+
+.logicpenguin derivation-hurley .derivationline.derivationshowline input.formulainput {
+    flex: 0 1 auto;
+    min-width: 15em;
+    width: auto;
+    max-width: none;
+}
+
+.logicpenguin derivation-hurley .derivationcore {
+    position: relative;
+    margin-left: 0;
+    display: block;
+    min-width: 21em;
+    width: max-content !important;
+    max-width: none !important;
+    border-left: 1px solid rgba(221, 221, 221, 0.39);
+    padding-left: 0.2em;
+    background-color: white !important;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    box-shadow: 0 7px 12px -3px rgba(0, 0, 0, 0.08), 0 3px 5px -2px rgba(0, 0, 0, 0.04);
+}
+
+body[data-theme='dark'] .logicpenguin derivation-hurley .derivationcore {
+    background-color: #1f222b !important;
+    border-color: #343a46 !important;
+}
+
+.logicpenguin derivation-hurley .derivationlinenumber {
+    color: var(--lpblack);
+    font-family: "IBM Plex Sans", sans-serif;
+    font-size: inherit;
+    font-weight: inherit;
+    line-height: inherit;
+    display: inline-block;
+    min-width: 2.5em;
+    text-align: right;
+}
+
+.logicpenguin derivation-hurley .derivationlinenumber::before {
+    content: '';
+}
+
+.logicpenguin derivation-hurley .derivationlinenumber::after {
+    content: '';
+}
+
+.logicpenguin derivation-hurley .innersubderiv {
+    border: none;
+    margin-left: 0.7em;
+    margin-right: 0.1em;
+    margin-top: 0.5ex;
+    margin-bottom: 0.5ex;
+    padding: 0.5ex;
+    width: max-content;
+    min-width: fit-content;
+    max-width: none;
+}
+
+.logicpenguin derivation-hurley sub-derivation.closed > div > .innersubderiv {
+    border: none;
+}
+
+.logicpenguin derivation-hurley sub-derivation.premiseroot > div >
+    .innersubderiv {
+    border: none;
+    margin-left: 0;
+    margin-top: 0;
+    padding: 0;
+}
+
+/* Remove indentation for mainderivation lines (user's proof lines) */
+.logicpenguin derivation-hurley sub-derivation.mainderivation > div >
+    .innersubderiv {
+    border: none;
+    margin-left: 0;
+    margin-right: 0.1em;
+    margin-top: 0;
+    margin-bottom: 0.5ex;
+    padding: 0;
+}
+
+/* hide the pr justification for premise */
+.logicpenguin derivation-hurley .derivationline.premiseline .jbwrap.premisejwrap {
+    display: none !important;
+}
+
+/* display conclusion */
+.logicpenguin derivation-hurley .derivationline.lastpremise .jbwrap {
+    display: block !important;
+}
+
+.logicpenguin derivation-hurley .derivationline.lastpremise .jbwrap input.justification {
+    pointer-events: none;
+    cursor: default;
+    user-select: none;
+}
+
+/* hide the mainderivation showline from appearing as a numbered proof line */
+.logicpenguin sub-derivation.mainderivation div.derivationshowline {
+    display: none !important;
+}
+
+/* show line check button only for main showline */
+.logicpenguin sub-derivation.mainderivation div.derivationshowline div.derivlinebuttons.invisible {
+    visibility: visible !important;
+    cursor: default !important;
+}
+
+.logicpenguin sub-derivation.mainderivation div.derivationshowline div.derivlinebuttons.invisible div.derivlineactionbutton {
+    visibility: hidden !important;
+}
+
+.logicpenguin sub-derivation.mainderivation div.derivationshowline div.derivlinebuttons.invisible div.derivlinecheck {
+    visibility: visible !important;
+    cursor: default !important;
+}

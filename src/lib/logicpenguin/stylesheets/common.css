@@ -1,0 +1,899 @@
+@charset 'utf-8';
+
+
+/* simple animations */
+
+@keyframes spin {
+  from {transform:rotate(0deg);}
+  to {transform:rotate(360deg);}
+}
+
+.logicpenguin .spinning {
+  animation: spin 3s infinite linear;
+  animation-direction: reverse;
+}
+
+@keyframes fade {
+  from {color:transparent;}
+  to {color:inherit;}
+}
+
+@keyframes flip {
+  from {transform:rotateX(0deg);}
+  to {transform:rotateX(180deg);}
+}
+
+/*//////////////////*/
+/* color variables */
+/*////////////////*/
+
+:root {
+  --lpblack:       rgba(0, 0, 0, 0.9);   --lpbgblack:   #282c34;
+  --lpred:         #e45649;   --lpbgred:     #f6d3d6;
+  --lpgreen:       #76b947;   --lpbggreen:   #e0edd7;
+  --lpyellow:      #c18401;   --lpbgyellow:  #ecdab3;
+  --lpblue:        #beafc2;   --lpbgblue:    #e8f4fd;
+  --lpmagenta:     #a626a4;   --lpbgmagenta: #eed7f5;
+  --lpcyan:        #0997b3;   --lpbgcyan:    #cce9ed;
+  --lpwhite:       #fafafa;   --lpbgwhite:   #e4e5e6;
+  --lpgray1:       #464950;   --lpgray4:     #a0a2a5;
+  --lpgray2:       #64676d;   --lpgray5:     #bebfc1;
+  --lpgray3:       #828489;   --lpgray6:     #dcdddd;
+}
+/*////////////////////////////////*/
+/* basic settings universal to LP */
+/*////////////////////////////////*/
+
+.logicpenguin {
+  all: revert-layer;
+  font-size: 20px;
+  font-family: 'IBM Plex Sans', sans-serif;
+  background-color: transparent;
+  color: var(--lpblack);
+}
+
+.logicpenguin .lp-problem-card {
+  background-color: white;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  box-shadow: 0 7px 12px -3px rgba(0, 0, 0, 0.08), 0 3px 5px -2px rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  width: max-content;
+  min-width: 28em;
+  max-width: 100%;
+}
+
+.logicpenguin .tt-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.logicpenguin .tt-table {
+  border-collapse: collapse;
+  width: max-content;
+  max-width: 100%;
+  background: #fff;
+  border: 1px solid var(--lpgray6);
+  font-size: 0.9rem;
+}
+
+.logicpenguin .tt-table th,
+.logicpenguin .tt-table td {
+  border: 1px solid var(--lpgray6);
+  padding: 0.35rem 0.55rem;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.logicpenguin .tt-head {
+  background: var(--lpbgblue);
+}
+
+.logicpenguin .tt-group-row th {
+  background: #e8f1ff;
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+.logicpenguin .tt-token-row th {
+  background: #f4f7ff;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.logicpenguin .tt-cell {
+  min-width: 2.2rem;
+}
+
+.logicpenguin .tt-divider {
+  border-right: 2px solid var(--lpgray4) !important;
+}
+
+.logicpenguin .tt-row:nth-child(even) {
+  background: #f9fafc;
+}
+
+.logicpenguin .tt-row-ok {
+  background: #f3fbf1;
+}
+
+.logicpenguin .tt-conclusion {
+  border-left: 2px solid var(--lpgray4) !important;
+  background: #f1f4ff;
+}
+
+.logicpenguin .tt-conclusion-cell {
+  border-left: 2px solid var(--lpgray4) !important;
+  background: #f7f9ff;
+}
+
+
+@media (max-width: 900px) {
+  .logicpenguin .lp-problem-card {
+    width: 100%;
+  }
+}
+
+.logicpenguin #savenotice {
+  margin-top: 4ex;
+  font-size: 90%;
+  color: var(--lpgray1);
+}
+
+.logicpenguin.symbolinsertwidget {
+  background-color: transparent;
+  z-index: 10;
+}
+
+/* link color */
+.logicpenguin a,
+.logicpenguin a:link,
+.logicpenguin a:visited {
+  color: var(--lpblue);
+}
+
+.logicpenguin a:hover,
+.logicpenguin a:link:hover,
+.logicpenguin a:visited:hover {
+  color: var(--lpcyan);
+}
+
+.logicpenguin a.fakebutton {
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.logicpenguin a.fakebutton:hover {
+  color: var(--lpcyan);
+}
+
+.logicpenguin button {
+  font-family: 'IBM Plex Sans', sans-serif;
+}
+
+.logicpenguin .math,
+.logicpenguin .symbolic {
+  font-family: 'IBM Plex Sans', sans-serif;
+}
+
+/* material icons generally */
+.logicpenguin span.material-symbols-outlined {
+  cursor: default;
+  user-select: none;
+}
+
+/* hidden elements */
+.logicpenguin .hidden {
+  display: none !important;
+}
+.logicpenguin .invisible {
+  visibility: hidden !important;
+  cursor: none !important;
+}
+
+/*////////////////////////////////*/
+/* PARTICULAR ELEMENTS            */
+/*////////////////////////////////*/
+
+/* logo */
+a#lplogo, a#lplogo:link, a#lplogo:visited, a#lplogo:active {
+  float: right;
+  display: inline-block;
+  margin-right: 1em;
+  margin-left: 1em;
+  text-decoration: none;
+  color: var(--lpmagenta);
+  cursor: pointer;
+  font-size: 130%;
+  font-weight: 200;
+  vertical-align: middle;
+}
+
+a#lplogo img {
+  width: 100px;
+}
+
+a#lplogo span {
+  display: none;
+  position: relative;
+  right: -100px;
+  bottom: 10px;
+}
+
+a#lplogo:hover span {
+  display: inline;
+}
+
+/* exercise title */
+.logicpenguin h1 {
+  font-weight: 900;
+  font-size: 200%;
+  color: var(--lpmagenta);
+  text-shadow: 4px 4px 15px var(--lpgray5);
+  text-decoration: underline;
+  text-decoration-color: var(--lpgray4);
+  text-decoration-thickness: 1px;
+}
+
+/* exercise set description */
+.logicpenguin h2 {
+  font-style: italic;
+  font-weight: 200;
+  font-size: 180%;
+  color: var(--lpyellow);
+}
+
+.logicpenguin h3 {
+  color: var(--lpblue);
+  margin-bottom: 1ex;
+  font-weight: 500;
+}
+
+/* lecture links */
+.logicpenguin .lecturelink {
+  margin-top: 2ex;
+  margin-bottom: 2ex;
+}
+
+/* instructions */
+.logicpenguin .instructions::before {
+  content: 'Instructions: ';
+  font-style: italic;
+  color: var(--lpgray2);
+}
+
+.logicpenguin .problem {
+  display: block;
+}
+
+.logicpenguin .problemlist li {
+  margin-bottom: 4ex;
+}
+
+.logicpenguin.sampleproblem ol,
+.logicpenguin .sampleproblem ol {
+  list-style-type: none;
+  margin-left: 0;
+  padding-left: 0;
+}
+
+
+/*//////////////////////*/
+/* status indicators   */
+/*////////////////////*/
+
+.logicpenguin .problemstatusindicator {
+  text-align: center;
+  margin-top: 0.7ex;
+  border: 2px solid var(--lpgray4);
+  background-color: var(--lpgray6);
+  border-radius: 5ex;
+  padding-left: 0.5em;
+  padding-right: 0.5em;
+  padding-bottom: 0.65ex;
+  padding-top: 0.4ex;
+  font-size: 75%;
+  min-height: 3ex;
+  color: var(--lpgray2);
+  text-transform: uppercase;
+  transition: background-color 1s;
+}
+
+.logicpenguin .problemstatusindicator span.material-symbols-outlined {
+  font-size: 180%;
+}
+
+/** COLOR OF INDICATOR **/
+
+/* when saved only */
+.logicpenguin .saved.unknown .problemstatusindicator,
+.logicpenguin .unknown .problemstatusindicator,
+.logicpenguin .saved .problemstatusindicator {
+  background-color: transparent;
+}
+
+/* when correct or saved+correct */
+.logicpenguin .saved.correct .problemstatusindicator,
+.logicpenguin .correct .problemstatusindicator {
+  background-color: var(--lpbggreen);
+}
+
+/* when incorrect or saved+incorrect */
+.logicpenguin .saved.incorrect .problemstatusindicator,
+.logicpenguin .incorrect .problemstatusindicator {
+  background-color: var(--lpbgred);
+}
+
+/* when malfunctioning */
+.logicpenguin .malfunction .problemstatusindicator {
+  background-color: var(--lpred);
+  color: var(--lpwhite);
+}
+
+/* when saved indeterminate */
+.logicpenguin .indeterminate .problemstatusindicator,
+.logicpenguin .saved.indeterminate .problemstatusindicator {
+  background-color: var(--lpbgmagenta);
+}
+
+/* when error saving */
+.logicpenguin .saveerror .problemstatusindicator {
+  background-color: var(--lpred);
+  color: var(--lpwhite);
+}
+
+/* point indicator */
+.logicpenguin .problempointsindicator {
+  padding-left: 0.5em;
+  padding-right: 0.5em;
+  position: relative;
+  top: 0.63ex;
+}
+
+/* message */
+.logicpenguin .problemindicatormessage {
+  text-transform: none;
+  position: relative;
+  top: 0.63ex;
+}
+
+/* SUCCESS INDICATOR */
+
+.logicpenguin .problemsuccessindicator {
+  color: var(--lpgray3);
+  display: inline-block;
+  float: left;
+  margin-left: 0.5em;
+  margin-right: 0.5em;
+}
+
+/* when unanswered */
+.logicpenguin .problemsuccessindicator span {
+  color: var(--lpgray6);
+}
+
+.logicpenguin .problemsuccessindicator::after {
+  content: 'unanswered';
+  position: relative;
+  bottom: 1.05ex;
+  left: 0.5em;
+}
+
+/* when processing */
+.logicpenguin .checking .problemsuccessindicator span {
+  color: var(--lpblue);
+  animation: flip 1s infinite linear;
+  animation-direction: alternate;
+}
+
+.logicpenguin .checking .problemsuccessindicator::after {
+  content: 'checking';
+}
+
+.logicpenguin .unknown .problemsuccessindicator::after {
+  content: 'score tbd';
+}
+
+.logicpenguin .unknown .problemsuccessindicator span {
+  color: var(--lpgray4);
+}
+
+/* when correct */
+.logicpenguin .correct .problemsuccessindicator span {
+  color: #beafc2;
+}
+
+.logicpenguin .correct .problemsuccessindicator::after {
+  content: 'correct';
+}
+
+/* when edited */
+.logicpenguin .edited .problemsuccessindicator span {
+  color: var(--lpwhite);
+}
+
+.logicpenguin .edited .problemsuccessindicator::after {
+  content: 'edited';
+}
+
+.logicpenguin .edited.saveerror .problemsuccessindicator::after {
+  color: var(--lpwhite);
+}
+
+/* when incorrect */
+.logicpenguin .incorrect .problemsuccessindicator span {
+  color: var(--lpred);
+}
+
+.logicpenguin .incorrect .problemsuccessindicator::after {
+  content: 'incorrect';
+}
+
+/* when indeterminate */
+.logicpenguin .indeterminate .problemsuccessindicator span {
+  color: var(--lpmagenta);
+}
+
+.logicpenguin .indeterminate .problemsuccessindicator::after {
+  content: 'computer could not determine';
+  color: var(--lpmagenta);
+}
+
+/* when malfunctioning */
+.logicpenguin .malfunction .problemsuccessindicator span {
+  color: var(--lpbgyellow);
+  background-color: var(--lpred);
+}
+
+.logicpenguin .malfunction .problemsuccessindicator::after {
+  content: 'malfunction';
+  color: var(--lpbgyellow);
+}
+
+/* SAVED INDICATOR */
+
+.logicpenguin .problemsavedindicator {
+  color: var(--lpgray2);
+  display: inline-block;
+  float: right;
+  margin-left: 0.5em;
+  margin-right: 0.5em;
+
+}
+
+/* when unsaved */
+.logicpenguin .problemsavedindicator span {
+  color: var(--lpgray6);
+}
+
+.logicpenguin .problemsavedindicator::before {
+  content: 'unsaved';
+  position: relative;
+  bottom: 1.05ex;
+  right: 0.5em;
+}
+
+/* when malfunctioning */
+.logicpenguin .malfunction .problemsavedindicator span {
+  color: var(--lpbgyellow);
+  background-color: var(--lpred);
+}
+
+.logicpenguin .malfunction .problemsavedindicator::before {
+  color: var(--lpbgyellow);
+  content: 'malfunction';
+}
+
+/* when saved */
+.logicpenguin .saved .problemsavedindicator span {
+  color: var(--lpgray2);
+}
+
+.logicpenguin .saved .problemsavedindicator::before {
+  content: 'saved'
+}
+
+/* when error saving */
+.logicpenguin .saveerror .problemsavedindicator span {
+  color: var(--lpbgred);
+}
+
+.logicpenguin .saveerror .problemsavedindicator::before {
+  content: 'error saving';
+  color: var(--lpbgred);
+}
+
+/* when save processing */
+.logicpenguin .saving .problemsavedindicator span {
+  color: var(--lpblue);
+  animation: spin 1s infinite linear;
+}
+
+.logicpenguin .saving .problemsavedindicator::before {
+  content: 'saving';
+}
+
+/* when cannot be saved */
+.logicpenguin .unsavable .problemsavedindicator span {
+  color: var(--lpgray3);
+}
+
+.logicpenguin .unsavable .problemsavedindicator::before {
+  content: '';
+}
+
+.logicpenguin input[type="checkbox"],
+.logicpenguin input[type="radio"] {
+  width: 1.5rem;
+  height: 1.5rem;
+  accent-color: var(--lpblue);
+  cursor: pointer;
+}
+
+.logicpenguin input[type="radio"] {
+  position: relative;
+  top: 0.25ex;
+  margin-right: 0.8rem;
+}
+
+.logicpenguin input[type="radio"] + label {
+  cursor: pointer;
+}
+
+.logicpenguin .infobox table {
+  border-collapse: collapse;
+  border-style: solid;
+  border-width: 2px;
+}
+
+.logicpenguin .infobox table.info {
+  border-color: var(--lpcyan);
+}
+
+.logicpenguin .infobox table.warning {
+  border-color: var(--lpyellow);
+}
+
+.logicpenguin .infobox table.error {
+  border-color: var(--lpred);
+}
+
+.logicpenguin .infobox table td:first-child {
+  padding-left: 0.5em;
+  padding-right: 0.5em;
+  vertical-align: middle;
+}
+
+.logicpenguin .infobox table td:first-child span.material-symbols-outlined {
+  font-size: 180%;
+}
+
+.logicpenguin .infobox table.info td:first-child {
+  color: var(--lpblue);
+  background-color: var(--lpbgcyan);
+}
+
+.logicpenguin .infobox table.warning td:first-child {
+  color: var(--lpred);
+  background-color: transparent;
+}
+
+.logicpenguin .infobox table.error td:first-child {
+  color: #ffffff;
+  background-color: var(--lpred);
+}
+
+.logicpenguin .infobox table.error td:first-child span.material-symbols-outlined {
+  animation: fade 0.8s infinite ease-out;
+  animation-direction: alternate;
+  animation-delay: 1s;
+}
+
+.logicpenguin .infobox table td:first-child {
+  padding-top: 0.5ex;
+}
+
+.logicpenguin .infobox table td:last-child {
+  padding-left: 0.5em;
+  padding-right: 0.5em;
+  padding-top: 1ex;
+  padding-bottom: 0.5ex;
+  color: var(--lpgray2);
+}
+
+.logicpenguin .buttondiv {
+  display: flex;
+  flex-direction: row;
+  gap: 12px;
+  align-items: center;
+  margin-top: 16px;
+  padding: 0;
+  overflow: visible;
+}
+
+.logicpenguin button,
+.logicpenguin .buttondiv button {
+  font-family: 'Roboto', 'Helvetica', 'Arial', sans-serif;
+  font-weight: 500;
+  font-size: 0.875rem;
+  line-height: 1.75;
+  letter-spacing: 0.02857em;
+  text-transform: uppercase;
+  min-width: 64px;
+  padding: 6px 16px;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  vertical-align: middle;
+  position: relative;
+  box-sizing: border-box;
+  outline: 0;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: background-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,
+              box-shadow 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,
+              border-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,
+              color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+  color: #fff;
+  background-color: #536DFE;
+  box-shadow: 0px 3px 1px -2px rgba(0, 0, 0, 0.2),
+              0px 2px 2px 0px rgba(0, 0, 0, 0.14),
+              0px 1px 5px 0px rgba(0, 0, 0, 0.12);
+  opacity: 1;
+}
+
+.logicpenguin .buttondiv button {
+  padding: 6px 16px;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.02857em;
+  font-weight: 500;
+}
+
+.logicpenguin .buttondiv button:first-of-type {
+  color: #536DFE;
+  background-color: transparent;
+  border: 1px solid rgba(83, 109, 254, 0.5);
+  box-shadow: none;
+}
+
+.logicpenguin .symbolicargumentinput td button {
+  padding-left: 0.3em;
+  padding-right: 0.3em;
+  padding-top: 0.1em;
+  padding-bottom: 0.1em;
+  margin-right: 0.5em;
+}
+
+.logicpenguin button:hover,
+.logicpenguin .buttondiv button:hover {
+  background-color: #3d5afe;
+  box-shadow: 0px 2px 4px -1px rgba(0, 0, 0, 0.2),
+              0px 4px 5px 0px rgba(0, 0, 0, 0.14),
+              0px 1px 10px 0px rgba(0, 0, 0, 0.12);
+  opacity: 1;
+}
+
+.logicpenguin .buttondiv button:first-of-type:hover {
+  background-color: rgba(83, 109, 254, 0.04);
+  border-color: #536DFE;
+  box-shadow: none;
+}
+
+.logicpenguin button:focus,
+.logicpenguin button:active,
+.logicpenguin .buttondiv button:focus,
+.logicpenguin .buttondiv button:active {
+  box-shadow: 0px 5px 5px -3px rgba(0, 0, 0, 0.2),
+              0px 8px 10px 1px rgba(0, 0, 0, 0.14),
+              0px 3px 14px 2px rgba(0, 0, 0, 0.12);
+  opacity: 1;
+}
+
+.logicpenguin .buttondiv button:first-of-type:active {
+  box-shadow: none;
+}
+
+.logicpenguin button:disabled,
+.logicpenguin button:disabled:hover,
+.logicpenguin button[disabled]:hover,
+.logicpenguin .buttondiv button:disabled,
+.logicpenguin .buttondiv button:disabled:hover,
+.logicpenguin .buttondiv button[disabled]:hover {
+  color: rgba(0, 0, 0, 0.26);
+  background-color: rgba(0, 0, 0, 0.12);
+  box-shadow: none;
+  cursor: default;
+  opacity: 1;
+}
+
+.logicpenguin button svg,
+.logicpenguin .buttondiv button svg {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.logicpenguin input {
+  background-color: var(--lpwhite);
+  color: var(--lpblack);
+}
+
+.logicpenguin input.formulainput {
+  font-size: inherit;
+  padding: 4px;
+  min-width: 22em;
+  width: auto;
+  max-width: none;
+  border: 2px solid var(--lpgray4);
+  outline: 1px solid transparent;
+}
+
+.logicpenguin input.formulainput:focus {
+  border: 2px solid var(--lpblue);
+  outline: 1px solid var(--lpblue);
+  background-color: var(--lpbgblue);
+}
+
+
+
+.logicpenguin.symbolinsertwidget {
+  display: none !important;
+}
+
+.symbolinsertwidget table {
+  border-spacing: 4px;
+  border-collapse: separate;
+}
+
+.symbolinsertwidget td {
+  width: 1.4em;
+  height: 1.4em;
+  text-align: center;
+  vertical-align: middle;
+  border-radius: 6px;
+  cursor: pointer;
+  background-color: var(--lpgray1);
+  color: var(--lpbgwhite);
+}
+
+.symbolinsertwidget td:hover {
+  background-color: var(--lpblack);
+  color: var(--lpbgmagenta);
+}
+
+/* progress bar */
+
+.logicpenguin .lpprogressbar table {
+  border-spacing: 0;
+  border-collapse: collapse;
+  width: 100%;
+  border: 2px ridge var(--lpgray3);
+}
+
+.logicpenguin .lpprogressbar table td {
+  height: 3ex;
+  color: var(--lpbgwhite);
+  text-align: center;
+  vertical-align: middle;
+}
+
+.logicpenguin .lpprogressbar table .pbcorrectcell {
+  background-color: var(--lpgreen);
+}
+.logicpenguin .lpprogressbar table .pbincorrectcell {
+  background-color: var(--lpred);
+}
+.logicpenguin .lpprogressbar table .pbsavedcell {
+  background-color: var(--lpyellow);
+}
+.logicpenguin .lpprogressbar table .pbunansweredcell {
+  background-color: var(--lpgray6);
+}
+
+/* Download button animation styles - From Uiverse.io by ilkhoeri */
+.action_has {
+  --color: 0 0% 60%;
+  --color-has: 220deg 100% 59%;
+  --sz: 1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: calc(var(--sz) * 2.5);
+  width: calc(var(--sz) * 2.5);
+  padding: 0.4rem 0.5rem;
+  border-radius: 0.375rem;
+  border: none;
+  background: transparent;
+  transition: all 0.3s ease;
+}
+
+.has_saved:hover {
+  border-color: transparent;
+}
+
+.has_liked:hover svg,
+.has_saved:hover svg {
+  color: hsl(var(--color-has));
+}
+
+.has_liked svg,
+.has_saved svg {
+  overflow: visible;
+  height: calc(var(--sz) * 1.75);
+  width: calc(var(--sz) * 1.75);
+  --ease: cubic-bezier(0.5, 0, 0.25, 1);
+  --zoom-from: 1.75;
+  --zoom-via: 0.75;
+  --zoom-to: 1;
+  --duration: 1s;
+}
+
+.has_saved:hover path[data-path="box"] {
+  transition: all 0.3s var(--ease);
+  animation: has-saved var(--duration) var(--ease) forwards;
+  fill: hsl(var(--color-has) / 0.35);
+}
+
+.has_saved:hover path[data-path="line-top"] {
+  animation: has-saved-line-top var(--duration) var(--ease) forwards;
+}
+
+.has_saved:hover path[data-path="line-bottom"] {
+  animation: has-saved-line-bottom var(--duration) var(--ease) forwards,
+    has-saved-line-bottom-2 calc(var(--duration) * 1) var(--ease)
+      calc(var(--duration) * 0.75);
+}
+
+@keyframes has-saved-line-top {
+  33.333% {
+    transform: rotate(0deg) translate(1px, 2px) scale(var(--zoom-from));
+    d: path("M 3 5 L 3 8 L 3 8");
+  }
+  66.666% {
+    transform: rotate(20deg) translate(2px, -2px) scale(var(--zoom-via));
+  }
+  99.999% {
+    transform: rotate(0deg) translate(0px, 0px) scale(var(--zoom-to));
+  }
+}
+
+@keyframes has-saved-line-bottom {
+  33.333% {
+    transform: rotate(0deg) translate(1px, 2px) scale(var(--zoom-from));
+    d: path("M 17 20 L 17 13 L 7 13 L 7 20");
+  }
+  66.666% {
+    transform: rotate(20deg) translate(2px, -2px) scale(var(--zoom-via));
+  }
+  99.999% {
+    transform: rotate(0deg) translate(0px, 0px) scale(var(--zoom-to));
+    d: path("M 17 21 L 17 21 L 7 21 L 7 21");
+  }
+}
+
+@keyframes has-saved-line-bottom-2 {
+  from {
+    d: path("M 17 21 L 17 21 L 7 21 L 7 21");
+  }
+  to {
+    transform: rotate(0deg) translate(0px, 0px) scale(var(--zoom-to));
+    d: path("M 17 20 L 17 13 L 7 13 L 7 20");
+    fill: white;
+  }
+}
+
+@keyframes has-saved {
+  33.333% {
+    transform: rotate(0deg) translate(1px, 2px) scale(var(--zoom-from));
+  }
+  66.666% {
+    transform: rotate(20deg) translate(2px, -2px) scale(var(--zoom-via));
+  }
+  99.999% {
+    transform: rotate(0deg) translate(0px, 0px) scale(var(--zoom-to));
+  }
+}

@@ -1,0 +1,97 @@
+@keyframes pop {
+  0% { transform: scale(0.7); }
+  100% { transform: scale(1); }
+}
+
+html, body {
+  overflow: auto;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+#root {
+  height: 100%;
+  overflow: auto;
+}
+
+.logicpenguin .derivationcomment .derivationstatus {
+  font-weight: 600;
+  margin-bottom: 0.5ex;
+}
+
+.logicpenguin .derivationcomment .derivationstatus.success {
+  color: var(--lpgreen);
+}
+
+.logicpenguin .derivationcomment .derivationstatus.error {
+  color: var(--lpred);
+}
+
+body[data-theme='dark'] .logicpenguin {
+  --lpblack: rgba(255, 255, 255, 0.92);
+  --lpwhite: #0f1116;
+  --lpgray1: #c7c9d1;
+  --lpgray2: #a6abba;
+  --lpgray3: #8a909b;
+  --lpgray4: #6c7380;
+  --lpgray5: #474c59;
+  --lpgray6: #2e3340;
+  --lpred: #ff8a8a;
+  --lpgreen: #7cd992;
+  --lpyellow: #f0c27a;
+  --lpblue: #9db0ff;
+  --lpmagenta: #d18cff;
+  --lpcyan: #74d4e6;
+  --lpbggreen: rgba(124, 217, 146, 0.16);
+  --lpbgred: rgba(255, 138, 138, 0.16);
+  --lpbgyellow: rgba(240, 194, 122, 0.18);
+  --lpbgblue: rgba(157, 176, 255, 0.15);
+  --lpbgmagenta: rgba(209, 140, 255, 0.16);
+  --lpbgcyan: rgba(116, 212, 230, 0.16);
+  --lpbgwhite: #1f222b;
+}
+
+body[data-theme='dark'] .logicpenguin .lp-problem-card,
+body[data-theme='dark'] .logicpenguin .derivationcore,
+body[data-theme='dark'] .logicpenguin .tt-table {
+  background-color: #1f222b !important;
+  border-color: #343a46 !important;
+}
+
+body[data-theme='dark'] .logicpenguin .tt-head {
+  background: #272b36;
+}
+
+body[data-theme='dark'] .logicpenguin .tt-group-row th {
+  background: #2d3342;
+}
+
+body[data-theme='dark'] .logicpenguin .tt-token-row th {
+  background: #232734;
+}
+
+body[data-theme='dark'] .logicpenguin .tt-row:nth-child(even) {
+  background: #1c202a;
+}
+
+body[data-theme='dark'] .logicpenguin .tt-row-ok {
+  background: #203226;
+}
+
+body[data-theme='dark'] .logicpenguin .tt-conclusion,
+body[data-theme='dark'] .logicpenguin .tt-conclusion-cell {
+  background: #242a38;
+}
+
+body[data-theme='dark'] .logicpenguin .derivationline input.justification,
+body[data-theme='dark'] .logicpenguin .derivationline input.formulainput {
+  color: var(--lpblack);
+  --border-before-color: rgba(255, 255, 255, 0.2);
+  --border-after-color: rgba(157, 176, 255, 0.6);
+  --input-hovered-color: rgba(255, 255, 255, 0.06);
+}
+
+body[data-theme='dark'] .logicpenguin .derivationcomment {
+  color: var(--lpblack);
+}
