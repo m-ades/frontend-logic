@@ -1,3 +1,6 @@
+// safety net to prevent ui from crashing if a component 
+// throws a runtime error/bad render/crashes
+
 import React from 'react'
 import { Box, Typography, Button } from '@mui/material'
 

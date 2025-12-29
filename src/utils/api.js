@@ -7,7 +7,12 @@ export const API_CONFIG = {
 };
 
 export async function fetchJson(path, options = {}) {
-  const res = await fetch(`${API_CONFIG.baseUrl}${path}`, options);
+  const apiKey = import.meta.env.VITE_API_KEY;
+  const headers = {
+    ...(options.headers || {}),
+    ...(apiKey ? { "x-api-key": apiKey } : {}),
+  };
+  const res = await fetch(`${API_CONFIG.baseUrl}${path}`, { ...options, headers });
   if (!res.ok) {
     const text = await res.text();
     throw new Error(text || `Request failed: ${res.status}`);
