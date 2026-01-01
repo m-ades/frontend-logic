@@ -29,9 +29,9 @@ import CalendarTodayIcon from '@mui/icons-material/CalendarToday'
 import AssignmentIcon from '@mui/icons-material/Assignment'
 import TrendingUpIcon from '@mui/icons-material/TrendingUp'
 import BookIcon from '@mui/icons-material/Book'
-import { formatDate } from '../../utils/formatting.js'
-import { API_CONFIG, fetchJson } from '../../utils/api.js'
-import ThemedCard from '../../components/ui/ThemedCard.jsx'
+import { formatDate } from '../utils/formatting.js'
+import { API_CONFIG, fetchJson } from '../utils/api.js'
+import ThemedCard from '../components/ui/ThemedCard.jsx'
 
 const emptyAnalytics = {
   assignments: { upcoming: 0, pending: 0, overdue: 0, upcomingList: [] },
