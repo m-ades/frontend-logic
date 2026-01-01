@@ -6,13 +6,17 @@ import { useThemeState } from './context/ThemeContext.jsx'
 import { LayoutProvider } from './context/LayoutContext.jsx'
 import ErrorBoundary from './components/ui/ErrorBoundary.jsx'
 import AppLayout from './components/layout/AppLayout.jsx'
-import Dashboard from './pages/dashboard/Dashboard.jsx'
+import Dashboard from './pages/Dashboard.jsx'
 import Worksheet from './pages/Worksheet.jsx'
 import Assignments from './pages/Assignments.jsx'
 import Practice from './pages/Practice.jsx'
 import Grades from './pages/Grades.jsx'
 import Contact from './pages/Contact.jsx'
 import Settings from './pages/Settings.jsx'
+import InstructorDashboard from './pages/instructor/InstructorDashboard.jsx'
+import InstructorGradebook from './pages/instructor/InstructorGradebook.jsx'
+import InstructorControls from './pages/instructor/InstructorControls.jsx'
+import Login from './pages/Login.jsx'
 
 function AppContent() {
   const theme = useThemeState()
@@ -72,6 +76,7 @@ function AppContent() {
                   </AppLayout>
                 }
               />
+              <Route path="/login" element={<Login />} />
               <Route
                 path="/assignment/:assignmentId"
                 element={
@@ -85,6 +90,30 @@ function AppContent() {
                 element={
                   <AppLayout>
                     <Worksheet />
+                  </AppLayout>
+                }
+              />
+              <Route
+                path="/instructor/dashboard"
+                element={
+                  <AppLayout>
+                    <InstructorDashboard />
+                  </AppLayout>
+                }
+              />
+              <Route
+                path="/instructor/gradebook"
+                element={
+                  <AppLayout>
+                    <InstructorGradebook />
+                  </AppLayout>
+                }
+              />
+              <Route
+                path="/instructor/controls"
+                element={
+                  <AppLayout>
+                    <InstructorControls />
                   </AppLayout>
                 }
               />

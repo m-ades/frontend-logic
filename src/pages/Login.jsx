@@ -1,4 +1,4 @@
-import { Box, Typography, CardContent, Stack, TextField, Button } from '@mui/material'
+import { Box, Typography, CardContent } from '@mui/material'
 import ThemedCard from '../components/ui/ThemedCard.jsx'
 
 export default function Login() {
@@ -10,13 +10,9 @@ export default function Login() {
 
       <ThemedCard>
         <CardContent>
-          <Stack spacing={2}>
-            <TextField label="Username" fullWidth />
-            <TextField label="Password" type="password" fullWidth />
-            <Button variant="contained" size="large">
-              Sign in
-            </Button>
-          </Stack>
+          <Typography variant="body1" color="text.secondary">
+            placeholder
+          </Typography>
         </CardContent>
       </ThemedCard>
     </Box>
