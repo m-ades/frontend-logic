@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import WorksheetLayout from '../components/layout/WorksheetLayout.jsx'
 import WorksheetTabs from '../components/problems/WorksheetTabs.jsx'
@@ -14,6 +14,8 @@ export default function Worksheet() {
   const [worksheets, setWorksheets] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const [loadError, setLoadError] = useState('')
+  const sessionId = useRef(null)
+  const questionSessionId = useRef(null)
   
   // support both /assignment/:id and /worksheet/:id routes
   // assignmentId will be used when backend is implemented
@@ -29,6 +31,106 @@ export default function Worksheet() {
   
   const { completedProofs, score, scoreStyle, handleProofComplete } = useScoring(currentWorksheet)
   const { getSavedProofState, handleProofStateChange } = useProofState()
+
+  useEffect(() => {
+    let keepGoing = true
+
+    const startSession = async () => {
+      if (!currentWorksheet?.id) return
+      try {
+        const session = await fetchJson('/api/assignment-sessions', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            assignment_id: currentWorksheet.id,
+            user_id: API_CONFIG.userId,
+            started_at: new Date().toISOString(),
+          }),
+        })
+        if (keepGoing) {
+          sessionId.current = session?.id ?? null
+        }
+      } catch (err) {
+        // ignore for now
+      }
+    }
+
+    const endSession = async () => {
+      if (!sessionId.current) return
+      try {
+        await fetchJson(`/api/assignment-sessions/${sessionId.current}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ended_at: new Date().toISOString() }),
+        })
+      } catch (err) {
+        // ignore for now
+      } finally {
+        sessionId.current = null
+      }
+    }
+
+    // start a session when this assignment loads
+    if (currentWorksheet?.id) {
+      startSession()
+    }
+
+    // end it when leaving this assignment
+    return () => {
+      keepGoing = false
+      endSession()
+    }
+  }, [currentWorksheet?.id])
+
+  useEffect(() => {
+    let keepGoing = true
+
+    const startQuestion = async () => {
+      if (!currentProof?.questionId) return
+      try {
+        const session = await fetchJson('/api/question-sessions', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            assignment_question_id: currentProof.questionId,
+            user_id: API_CONFIG.userId,
+            started_at: new Date().toISOString(),
+          }),
+        })
+        if (keepGoing) {
+          questionSessionId.current = session?.id ?? null
+        }
+      } catch (err) {
+        // ignore for now
+      }
+    }
+
+    const endQuestion = async () => {
+      if (!questionSessionId.current) return
+      try {
+        await fetchJson(`/api/question-sessions/${questionSessionId.current}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ended_at: new Date().toISOString() }),
+        })
+      } catch (err) {
+        // ignore for now
+      } finally {
+        questionSessionId.current = null
+      }
+    }
+
+    // start session when a question becomes 'active'
+    if (currentProof?.questionId) {
+      startQuestion()
+    }
+
+    // end it upon any nav away from the question
+    return () => {
+      keepGoing = false
+      endQuestion()
+    }
+  }, [currentProof?.questionId])
 
   useEffect(() => {
     let isMounted = true
@@ -193,7 +295,6 @@ export default function Worksheet() {
           liveState = derivEl.getState()
         }
       } catch (err) {
-        // silently fail - use saved state instead
       }
 
       const allStates = currentWorksheet.proofs.map((proof) => ({
