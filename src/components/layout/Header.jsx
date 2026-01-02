@@ -11,11 +11,7 @@ import {
   useTheme,
   useMediaQuery,
 } from "@mui/material";
-import {
-  Menu as MenuIcon,
-  ArrowBack as ArrowBackIcon,
-  Person as AccountIcon,
-} from "@mui/icons-material";
+import { Person as AccountIcon } from "@mui/icons-material";
 import {
   useLayoutState,
   useLayoutDispatch,
@@ -29,16 +25,6 @@ export default function Header({ onSignOut }) {
   const { isSidebarOpened } = useLayoutState();
   const layoutDispatch = useLayoutDispatch();
   const [profileMenu, setProfileMenu] = useState(null);
-  const [isSmall, setSmall] = useState(false);
-
-  useEffect(() => {
-    const handleResize = () => {
-      setSmall(window.innerWidth < theme.breakpoints.values.md);
-    };
-    window.addEventListener("resize", handleResize);
-    handleResize();
-    return () => window.removeEventListener("resize", handleResize);
-  }, [theme.breakpoints.values.md]);
 
   return (
     <AppBar
@@ -52,18 +38,6 @@ export default function Header({ onSignOut }) {
       }}
     >
       <Toolbar>
-        <IconButton
-          color="inherit"
-          onClick={() => toggleSidebar(layoutDispatch)}
-          edge="start"
-          sx={{ mr: 2 }}
-        >
-          {(!isSidebarOpened && isSmall) || (isSidebarOpened && !isSmall) ? (
-            <ArrowBackIcon />
-          ) : (
-            <MenuIcon />
-          )}
-        </IconButton>
         <Typography
           variant="h6"
           noWrap

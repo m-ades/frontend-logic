@@ -9,7 +9,10 @@ import {
   Box,
   Typography,
 } from "@mui/material";
-import { ArrowBack as ArrowBackIcon } from "@mui/icons-material";
+import {
+  ChevronLeft as ChevronLeftIcon,
+  ChevronRight as ChevronRightIcon,
+} from "@mui/icons-material";
 import {
   useLayoutState,
   useLayoutDispatch,
@@ -69,7 +72,7 @@ export default function Sidebar({ structure, location }) {
         sx={{
           display: "flex",
           alignItems: "center",
-          justifyContent: "center",
+          justifyContent: "space-between",
           minHeight: 64,
           px: 2,
           borderBottom: "1px solid",
@@ -82,10 +85,17 @@ export default function Sidebar({ structure, location }) {
             fontWeight: 700,
             color: "primary.main",
             letterSpacing: 1,
+            display: isSidebarOpened ? "block" : "none",
           }}
         >
           LOGO
         </Typography>
+        <IconButton
+          onClick={handleDrawerToggle}
+          sx={{ display: { xs: "none", md: "flex" } }}
+        >
+          {isSidebarOpened ? <ChevronLeftIcon /> : <ChevronRightIcon />}
+        </IconButton>
       </Box>
       {!isPermanent && (
         <Box sx={{ mt: 0.5, ml: 3, display: { md: "none" } }}>
