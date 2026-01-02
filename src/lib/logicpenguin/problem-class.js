@@ -7,6 +7,7 @@
 //////////////////////////////////////////////////////////////////////////
 
 import { addelem, byid, sendAnswerToServer, localCheck } from './common.js';
+import { API_CONFIG, fetchJson } from '../../utils/api.js';
 import { randomString } from './misc.js';
 
 // the problem is its HTML element, so we extend it
@@ -211,6 +212,47 @@ export default class LogicPenguinProblem extends HTMLElement {
                 successstatus: 'malfunction',
                 points: -1,
                 message: 'Could not determine answer state.'
+            });
+            return;
+        }
+
+        // submit to our api when this problem is tied to an assignment question
+        const assignmentQuestionId = Number(this.dataset?.assignmentQuestionId || 0);
+        if (assignmentQuestionId) {
+            this.setIndicator({
+                savestatus: 'saving',
+                successstatus: 'checking',
+                points: -1,
+                message: ''
+            });
+
+            // for derivations we only want the proof structure
+            const submissionData = (this.myproblemtype === 'derivation-hurley' || this.myproblemtype === 'derivation')
+                ? state.ans
+                : state;
+
+            fetchJson('/api/validate/submission', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    assignment_question_id: assignmentQuestionId,
+                    user_id: API_CONFIG.userId,
+                    submission_data: submissionData
+                })
+            }).then((resp) => {
+                const validation = resp?.validation || {};
+                this.setIndicator({
+                    ...validation,
+                    savestatus: 'saved',
+                    points: validation.points ?? resp?.submission?.score ?? -1
+                });
+            }).catch((err) => {
+                this.setIndicator({
+                    savestatus: 'saveerror',
+                    successstatus: 'malfunction',
+                    points: -1,
+                    message: 'Error saving answer: ' + err.toString()
+                });
             });
             return;
         }
@@ -434,4 +476,3 @@ export default class LogicPenguinProblem extends HTMLElement {
         unsaved: 'circle'
     }
 }
-

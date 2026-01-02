@@ -1,7 +1,7 @@
 import { useEffect, useRef, useMemo } from "react"
 import "../../lib/logicpenguin/problemtypes/derivation-hurley.js"
 
-export default function LogicPenguinProof({ premises, conclusion, savedState, onStateChange }) {
+export default function LogicPenguinProof({ premises, conclusion, questionId, savedState, onStateChange }) {
   const ref = useRef(null)
 
   const problemKey = useMemo(
@@ -38,6 +38,7 @@ export default function LogicPenguinProof({ premises, conclusion, savedState, on
     <div className="logicpenguin" style={{ width: "100%", overflowX: "auto", minWidth: 0 }}>
       <derivation-hurley
         ref={ref}
+        data-assignment-question-id={questionId ?? ''}
         style={{ display: "block", width: "100%", maxWidth: "100%" }}
       />
     </div>

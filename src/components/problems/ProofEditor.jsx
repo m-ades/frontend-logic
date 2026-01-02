@@ -62,6 +62,7 @@ export default function ProofEditor({ proof, onProofComplete, savedState, onStat
       <LogicPenguinProof 
         premises={proof.premises} 
         conclusion={proof.conclusion}
+        questionId={proof.questionId}
         savedState={savedState}
         onStateChange={onStateChange}
       />
