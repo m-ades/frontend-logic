@@ -1,31 +1,7 @@
-import { useState, useEffect } from "react";
-import {
-  AppBar,
-  Toolbar,
-  IconButton,
-  Typography,
-  Avatar,
-  Menu,
-  MenuItem,
-  Box,
-  useTheme,
-  useMediaQuery,
-} from "@mui/material";
-import { Person as AccountIcon } from "@mui/icons-material";
-import {
-  useLayoutState,
-  useLayoutDispatch,
-  toggleSidebar,
-} from "../../context/LayoutContext.jsx";
+import { AppBar, Toolbar, Typography, Box } from "@mui/material";
 import ThemeToggle from "./ThemeToggle.jsx";
 
-export default function Header({ onSignOut }) {
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
-  const { isSidebarOpened } = useLayoutState();
-  const layoutDispatch = useLayoutDispatch();
-  const [profileMenu, setProfileMenu] = useState(null);
-
+export default function Header() {
   return (
     <AppBar
       position="sticky"
@@ -42,36 +18,11 @@ export default function Header({ onSignOut }) {
           variant="h6"
           noWrap
           component="div"
-          sx={{ fontWeight: 600, flexGrow: 0 }}
+          sx={{ fontWeight: 600, flexGrow: 1 }}
         >
           PHILO/MATH/CSCI 275 Symbolic Logic
         </Typography>
-        <Box sx={{ flexGrow: 1 }} />
         <ThemeToggle />
-        <IconButton
-          onClick={(e) => setProfileMenu(e.currentTarget)}
-          sx={{ ml: 2 }}
-        >
-          <Avatar sx={{ width: 32, height: 32, bgcolor: "primary.main" }}>
-            <AccountIcon />
-          </Avatar>
-        </IconButton>
-        <Menu
-          anchorEl={profileMenu}
-          open={Boolean(profileMenu)}
-          onClose={() => setProfileMenu(null)}
-          anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-          transformOrigin={{ vertical: "top", horizontal: "right" }}
-        >
-          <MenuItem
-            onClick={() => {
-              onSignOut?.();
-              setProfileMenu(null);
-            }}
-          >
-            Sign Out
-          </MenuItem>
-        </Menu>
       </Toolbar>
     </AppBar>
   );

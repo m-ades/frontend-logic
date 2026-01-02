@@ -4,12 +4,16 @@ import Sidebar from "./Sidebar.jsx";
 import SidebarStructure from "./SidebarStructure.jsx";
 import { useLocation } from "react-router-dom";
 
-export default function AppLayout({ children }) {
+export default function AppLayout({ children, onSignOut }) {
   const location = useLocation();
 
   return (
     <Box sx={{ display: "flex", minHeight: "100vh" }}>
-      <Sidebar structure={SidebarStructure} location={location} />
+      <Sidebar
+        structure={SidebarStructure}
+        location={location}
+        onSignOut={onSignOut}
+      />
       <Box sx={{ display: "flex", flexDirection: "column", flexGrow: 1 }}>
         <Header />
         <Box
