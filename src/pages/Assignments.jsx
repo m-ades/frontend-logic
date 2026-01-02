@@ -8,6 +8,38 @@ import { formatDate } from '../utils/formatting.js'
 import { getStoredBoolean } from '../placeholder/storage.js'
 import { API_CONFIG, fetchJson } from '../utils/api.js'
 
+const buildCourseStructure = (assignments, sectionTitle) => {
+  const chapters = new Map()
+
+  assignments.forEach((assignment) => {
+    const chapterLabel = assignment.chapter ? `Chapter ${assignment.chapter}` : 'Other'
+    const subLabel = assignment.subchapter || sectionTitle
+    const chapterEntry = chapters.get(chapterLabel) || new Map()
+    const items = chapterEntry.get(subLabel) || []
+    items.push({
+      id: assignment.id,
+      title: assignment.title,
+      description: assignment.description || '',
+      dueDate: assignment.due_date,
+      points: assignment.total_points,
+      type: ACTIVITY_TYPES.HOMEWORK,
+      worksheet: { id: assignment.id, proofs: [] },
+    })
+    chapterEntry.set(subLabel, items)
+    chapters.set(chapterLabel, chapterEntry)
+  })
+
+  return Array.from(chapters.entries()).map(([chapterLabel, subMap]) => ({
+    id: chapterLabel,
+    title: chapterLabel,
+    subchapters: Array.from(subMap.entries()).map(([subLabel, items]) => ({
+      id: `${chapterLabel}-${subLabel}`,
+      title: subLabel,
+      activities: items,
+    })),
+  }))
+}
+
 function TabPanel({ children, value, index }) {
   return (
     <div role="tabpanel" hidden={value !== index}>
@@ -36,29 +68,7 @@ export default function Assignments() {
         const gradedAssignments = assignments.filter((assignment) => assignment.kind !== 'practice')
         if (!isMounted) return
 
-        const activities = gradedAssignments.map((assignment) => ({
-          id: assignment.id,
-          title: assignment.title,
-          description: assignment.description || '',
-          dueDate: assignment.due_date,
-          points: assignment.total_points,
-          type: ACTIVITY_TYPES.HOMEWORK,
-          worksheet: { id: assignment.id, proofs: [] },
-        }))
-
-        setCourseStructure([
-          {
-            id: 'assignments',
-            title: 'Assignments',
-            subchapters: [
-              {
-                id: 'assignments-default',
-                title: 'All',
-                activities,
-              },
-            ],
-          },
-        ])
+        setCourseStructure(buildCourseStructure(gradedAssignments, 'Assignments'))
       } catch (error) {
         if (isMounted) {
           console.warn('Failed to load assignments', error)
