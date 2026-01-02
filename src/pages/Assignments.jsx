@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { Box, Grid, Tabs, Tab, Typography, CardContent, Chip, Stack } from '@mui/material'
 import ThemedCard from '../components/ui/ThemedCard.jsx'
 import ActivityAccordion from '../components/ui/ActivityAccordion.jsx'
-import { getCourseStructureByTypes, ACTIVITY_TYPES } from '../placeholder/courseActivities.js'
+import { ACTIVITY_TYPES } from '../placeholder/courseActivities.js'
 import { formatDate } from '../utils/formatting.js'
 import { getStoredBoolean } from '../placeholder/storage.js'
 import { API_CONFIG, fetchJson } from '../utils/api.js'
@@ -19,6 +19,7 @@ function TabPanel({ children, value, index }) {
 export default function Assignments() {
   const [tabValue, setTabValue] = useState(0)
   const [averagePercent, setAveragePercent] = useState(null)
+  const [courseStructure, setCourseStructure] = useState([])
   const navigate = useNavigate()
 
   const getCompletionStatus = useCallback(
@@ -26,10 +27,52 @@ export default function Assignments() {
     []
   )
 
-  const baseStructure = useMemo(
-    () => getCourseStructureByTypes([ACTIVITY_TYPES.HOMEWORK, ACTIVITY_TYPES.QUIZ, ACTIVITY_TYPES.EXAM]),
-    []
-  )
+  useEffect(() => {
+    let isMounted = true
+
+    const loadAssignments = async () => {
+      try {
+        const assignments = await fetchJson(`/api/courses/${API_CONFIG.courseId}/assignments`)
+        const gradedAssignments = assignments.filter((assignment) => assignment.kind !== 'practice')
+        if (!isMounted) return
+
+        const activities = gradedAssignments.map((assignment) => ({
+          id: assignment.id,
+          title: assignment.title,
+          description: assignment.description || '',
+          dueDate: assignment.due_date,
+          points: assignment.total_points,
+          type: ACTIVITY_TYPES.HOMEWORK,
+          worksheet: { id: assignment.id, proofs: [] },
+        }))
+
+        setCourseStructure([
+          {
+            id: 'assignments',
+            title: 'Assignments',
+            subchapters: [
+              {
+                id: 'assignments-default',
+                title: 'All',
+                activities,
+              },
+            ],
+          },
+        ])
+      } catch (error) {
+        if (isMounted) {
+          console.warn('Failed to load assignments', error)
+          setCourseStructure([])
+        }
+      }
+    }
+
+    loadAssignments()
+
+    return () => {
+      isMounted = false
+    }
+  }, [])
 
   const filterStructure = useCallback((structure, predicate) => {
     return structure.map((chapter) => {
@@ -58,8 +101,8 @@ export default function Assignments() {
           return true
       }
     }
-    return filterStructure(baseStructure, predicate)
-  }, [baseStructure, filterStructure, getCompletionStatus, tabValue])
+    return filterStructure(courseStructure, predicate)
+  }, [courseStructure, filterStructure, getCompletionStatus, tabValue])
 
   const handleTabChange = (e, newValue) => {
     setTabValue(newValue)
