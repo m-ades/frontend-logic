@@ -1,17 +1,62 @@
-import { useMemo } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Box, Typography, CardContent, Chip, Stack } from '@mui/material'
 import ThemedCard from '../components/ui/ThemedCard.jsx'
 import ActivityAccordion from '../components/ui/ActivityAccordion.jsx'
-import { getCourseStructureByTypes, ACTIVITY_TYPES } from '../placeholder/courseActivities.js'
+import { ACTIVITY_TYPES } from '../placeholder/courseActivities.js'
+import { API_CONFIG, fetchJson } from '../utils/api.js'
 
 export default function Practice() {
   const navigate = useNavigate()
+  const [courseStructure, setCourseStructure] = useState([])
 
-  const practiceStructure = useMemo(
-    () => getCourseStructureByTypes([ACTIVITY_TYPES.PRACTICE]),
-    []
-  )
+  useEffect(() => {
+    let isMounted = true
+
+    const loadPractice = async () => {
+      try {
+        const assignments = await fetchJson(`/api/courses/${API_CONFIG.courseId}/assignments`)
+        if (!isMounted) return
+
+        const activities = assignments
+          .filter((assignment) => assignment.kind === 'practice')
+          .map((assignment) => ({
+            id: assignment.id,
+            title: assignment.title,
+            description: assignment.description || '',
+            dueDate: assignment.due_date,
+            points: assignment.total_points,
+            type: ACTIVITY_TYPES.PRACTICE,
+            worksheet: { id: assignment.id, proofs: [] },
+          }))
+
+        setCourseStructure([
+          {
+            id: 'practice',
+            title: 'Practice',
+            subchapters: [
+              {
+                id: 'practice-default',
+                title: 'All',
+                activities,
+              },
+            ],
+          },
+        ])
+      } catch (error) {
+        if (isMounted) {
+          console.warn('Failed to load practice assignments', error)
+          setCourseStructure([])
+        }
+      }
+    }
+
+    loadPractice()
+
+    return () => {
+      isMounted = false
+    }
+  }, [])
 
   const handleActivityClick = (activity) => {
     if (activity.worksheet) {
@@ -23,7 +68,7 @@ export default function Practice() {
     <Box>
       <ActivityAccordion
         title="Practice Problems"
-        courseStructure={practiceStructure}
+        courseStructure={courseStructure}
         emptyText="No practice problems available"
         renderActivity={(activity, { chapter, subchapter }) => (
           <ThemedCard            key={activity.id}
