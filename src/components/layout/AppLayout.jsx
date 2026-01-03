@@ -19,8 +19,8 @@ export default function AppLayout({ children }) {
 
   // Check if current path includes /assignments or /practice
   const showToolbar =
-    location.pathname.includes("/assignments") ||
-    location.pathname.includes("/practice");
+    location.pathname.includes("/assignments/") ||
+    location.pathname.includes("/practice/");
 
   // Choose sidebar structure based on user role
   const sidebarStructure =
