@@ -25,6 +25,7 @@ import {
   useLayoutState,
   useLayoutDispatch,
   toggleSidebar,
+  setSidebar,
 } from "../../context/LayoutContext.jsx";
 import SidebarLink from "./SidebarLink.jsx";
 
@@ -33,10 +34,12 @@ const DRAWER_WIDTH = 240;
 export default function Sidebar({ structure, location, onSignOut }) {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
-  const { isSidebarOpened } = useLayoutState();
+  const { isSidebarOpened, sidebarHoverEnabled } = useLayoutState();
   const layoutDispatch = useLayoutDispatch();
   const [isPermanent, setPermanent] = useState(true);
   const [profileMenu, setProfileMenu] = useState(null);
+  const [isHovering, setIsHovering] = useState(false);
+  const [manuallyOpened, setManuallyOpened] = useState(false);
 
   useEffect(() => {
     const handleResize = () => {
@@ -50,14 +53,45 @@ export default function Sidebar({ structure, location, onSignOut }) {
   }, [theme.breakpoints.values.md]);
 
   const handleDrawerToggle = () => {
-    toggleSidebar(layoutDispatch);
+    if (sidebarHoverEnabled) {
+      // In hover mode, manual toggle sets the manually opened state
+      setManuallyOpened(!manuallyOpened);
+      toggleSidebar(layoutDispatch);
+    } else {
+      // In manual mode, just toggle normally
+      toggleSidebar(layoutDispatch);
+    }
   };
+
+  const handleMouseEnter = () => {
+    if (sidebarHoverEnabled && isPermanent && !manuallyOpened) {
+      setIsHovering(true);
+      setSidebar(layoutDispatch, true);
+    }
+  };
+
+  const handleMouseLeave = () => {
+    if (sidebarHoverEnabled && isPermanent && isHovering && !manuallyOpened) {
+      setIsHovering(false);
+      setSidebar(layoutDispatch, false);
+    }
+  };
+
+  // Reset manually opened state when hover mode is disabled
+  useEffect(() => {
+    if (!sidebarHoverEnabled) {
+      setManuallyOpened(false);
+      setIsHovering(false);
+    }
+  }, [sidebarHoverEnabled]);
 
   return (
     <Drawer
       variant={isPermanent ? "permanent" : "temporary"}
       open={isSidebarOpened}
       onClose={handleDrawerToggle}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
       sx={{
         width: isSidebarOpened ? DRAWER_WIDTH : 85,
         flexShrink: 0,
@@ -94,10 +128,9 @@ export default function Sidebar({ structure, location, onSignOut }) {
             fontWeight: 700,
             color: "primary.main",
             letterSpacing: 1,
-            display: isSidebarOpened ? "block" : "none",
           }}
         >
-          LOGO
+          {isSidebarOpened ? "LOGO" : "L"}
         </Typography>
       </Box>
 
@@ -117,31 +150,33 @@ export default function Sidebar({ structure, location, onSignOut }) {
         <Box sx={{ px: 1, pb: 2 }}>
           <Divider sx={{ mb: 1 }} />
 
-          <ListItem disablePadding>
-            <ListItemButton
-              onClick={handleDrawerToggle}
-              sx={{
-                minHeight: 48,
-                justifyContent: isSidebarOpened ? "initial" : "center",
-                px: 2.5,
-                borderRadius: 1,
-              }}
-            >
-              <ListItemIcon
+          {!sidebarHoverEnabled && (
+            <ListItem disablePadding>
+              <ListItemButton
+                onClick={handleDrawerToggle}
                 sx={{
-                  minWidth: 0,
-                  mr: isSidebarOpened ? 3 : "auto",
-                  justifyContent: "center",
+                  minHeight: 48,
+                  justifyContent: isSidebarOpened ? "initial" : "center",
+                  px: 2.5,
+                  borderRadius: 1,
                 }}
               >
-                {isSidebarOpened ? <ChevronLeftIcon /> : <ChevronRightIcon />}
-              </ListItemIcon>
-              <ListItemText
-                primary={isSidebarOpened ? "Collapse Sidebar" : ""}
-                sx={{ opacity: isSidebarOpened ? 1 : 0 }}
-              />
-            </ListItemButton>
-          </ListItem>
+                <ListItemIcon
+                  sx={{
+                    minWidth: 0,
+                    mr: isSidebarOpened ? 3 : "auto",
+                    justifyContent: "center",
+                  }}
+                >
+                  {isSidebarOpened ? <ChevronLeftIcon /> : <ChevronRightIcon />}
+                </ListItemIcon>
+                <ListItemText
+                  primary={isSidebarOpened ? "Collapse Sidebar" : ""}
+                  sx={{ opacity: isSidebarOpened ? 1 : 0 }}
+                />
+              </ListItemButton>
+            </ListItem>
+          )}
 
           <ListItem disablePadding>
             <ListItemButton
