@@ -8,9 +8,16 @@ export const API_CONFIG = {
 
 export async function fetchJson(path, options = {}) {
   const apiKey = import.meta.env.VITE_API_KEY;
+  const authToken = typeof localStorage !== 'undefined'
+    ? localStorage.getItem('auth_token')
+    : null;
   const headers = {
     ...(options.headers || {}),
+    // api key is still required for backend requests
     ...(apiKey ? { "x-api-key": apiKey } : {}),
+    
+    // jwt is optional due to login
+    ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}),
   };
   const res = await fetch(`${API_CONFIG.baseUrl}${path}`, { ...options, headers });
   if (!res.ok) {
