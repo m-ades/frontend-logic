@@ -1,23 +1,44 @@
 import { Box, Toolbar } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 import Header from "./Header.jsx";
 import Sidebar from "./Sidebar.jsx";
-import SidebarStructure from "./SidebarStructure.jsx";
+import StudentSidebarStructure from "./SidebarStructure.jsx";
+import InstructorSidebarStructure from "./InstructorSidebarStructure.jsx";
 import { useLocation } from "react-router-dom";
+import {
+  useAuthState,
+  useAuthDispatch,
+  logout,
+} from "../../context/AuthContext";
 
-export default function AppLayout({ children, onSignOut }) {
+export default function AppLayout({ children }) {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { user } = useAuthState();
+  const dispatch = useAuthDispatch();
 
   // Check if current path includes /assignments or /practice
   const showToolbar =
     location.pathname.includes("/assignments") ||
     location.pathname.includes("/practice");
 
+  // Choose sidebar structure based on user role
+  const sidebarStructure =
+    user?.role === "instructor"
+      ? InstructorSidebarStructure
+      : StudentSidebarStructure;
+
+  const handleSignOut = () => {
+    logout(dispatch);
+    navigate("/login");
+  };
+
   return (
     <Box sx={{ display: "flex", minHeight: "100vh" }}>
       <Sidebar
-        structure={SidebarStructure}
+        structure={sidebarStructure}
         location={location}
-        onSignOut={onSignOut}
+        onSignOut={handleSignOut}
       />
       <Box sx={{ display: "flex", flexDirection: "column", flexGrow: 1 }}>
         <Header />
