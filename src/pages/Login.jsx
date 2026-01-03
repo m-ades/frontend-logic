@@ -29,7 +29,7 @@ export default function Login() {
   useEffect(() => {
     if (isAuthenticated && user) {
       if (user.role === "instructor") {
-        navigate("/instructor");
+        navigate("/instructor/dashboard");
       } else {
         navigate("/dashboard");
       }

@@ -124,9 +124,7 @@ function AppContent() {
                   path="/instructor"
                   element={
                     <ProtectedRoute allowedRoles={["instructor"]}>
-                      <AppLayout>
-                        <InstructorDashboard />
-                      </AppLayout>
+                      <Navigate to="/instructor/dashboard" replace />
                     </ProtectedRoute>
                   }
                 />

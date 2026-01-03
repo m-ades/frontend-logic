@@ -10,7 +10,7 @@ export default [
   {
     id: 0,
     label: "Dashboard",
-    link: "/instructor/",
+    link: "/instructor/dashboard",
     icon: <DashboardIcon />,
   },
   {
