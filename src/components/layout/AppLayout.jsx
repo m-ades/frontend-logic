@@ -7,6 +7,11 @@ import { useLocation } from "react-router-dom";
 export default function AppLayout({ children, onSignOut }) {
   const location = useLocation();
 
+  // Check if current path includes /assignments or /practice
+  const showToolbar =
+    location.pathname.includes("/assignments") ||
+    location.pathname.includes("/practice");
+
   return (
     <Box sx={{ display: "flex", minHeight: "100vh" }}>
       <Sidebar
@@ -26,7 +31,7 @@ export default function AppLayout({ children, onSignOut }) {
             overflow: "auto",
           }}
         >
-          <Toolbar />
+          {showToolbar && <Toolbar />}
           {children}
         </Box>
       </Box>
