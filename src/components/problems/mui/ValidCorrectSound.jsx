@@ -12,7 +12,9 @@ export default function ValidCorrectSound({
   savedState,
   assignmentQuestionId,
   attemptLimit,
-  solution,
+  readOnly = false,
+  hideActions = false,
+  suppressReveal = false,
 }) {
   const [answers, setAnswers] = useState({
     correct: savedState?.ans?.correct !== undefined ? String(savedState.ans.correct) : '',
@@ -20,7 +22,7 @@ export default function ValidCorrectSound({
     sound: savedState?.ans?.sound !== undefined ? String(savedState.ans.sound) : ''
   })
   
-  const { status, message, isChecking, handleCheck: baseHandleCheck, handleStartOver, getStatusColor, setStatus, setMessage, attemptCount } = useProblemChecker({
+  const { status, message, isChecking, handleCheck: baseHandleCheck, handleStartOver, getStatusColor, setStatus, setMessage, attemptCount, maxAttempts, isLocked } = useProblemChecker({
     answer,
     problemType: 'valid-correct-sound',
     question: problem,
@@ -34,9 +36,10 @@ export default function ValidCorrectSound({
     resetInput: () => setAnswers({ correct: '', valid: '', sound: '' }),
     onStateChange,
     assignmentQuestionId,
-    attemptLimit
+    attemptLimit,
+    initialAttemptCount: savedState?.attemptCount ?? 0,
   })
-  const showSolution = attemptCount >= (attemptLimit ?? 3)
+  const showSolution = isLocked
   
   const handleCheck = async () => {
     const ans = {
@@ -52,6 +55,7 @@ export default function ValidCorrectSound({
   }
 
   useEffect(() => {
+    if (readOnly) return
     if (Object.values(answers).some(v => v !== '')) {
       const ans = {
         correct: answers.correct === '' ? -2 : (answers.correct === 'true' ? true : false),
@@ -60,14 +64,41 @@ export default function ValidCorrectSound({
       }
       onStateChange?.({ ans })
     }
-  }, [answers, onStateChange])
+  }, [readOnly, answers, onStateChange])
 
   const handleChange = (question, value) => {
+    if (readOnly) return
     setAnswers(prev => ({ ...prev, [question]: value }))
     setStatus('unanswered')
     setMessage('')
   }
 
+  const renderAnswerTable = (values, tableReadOnly) => (
+    <Table sx={{ mb: 2 }}>
+      <TableBody>
+        {['correct', 'valid', 'sound'].map((q) => (
+          <TableRow key={q}>
+            <TableCell sx={{ border: 'none', py: 1 }}>
+              <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                {q === 'correct' ? 'Factually correct?' : q === 'valid' ? 'Valid?' : 'Sound?'}
+              </Typography>
+            </TableCell>
+            <TableCell sx={{ border: 'none', py: 1 }}>
+              <RadioGroup
+                row
+                value={values[q]}
+                onChange={(e) => handleChange(q, e.target.value)}
+                name={q}
+              >
+                <FormControlLabel value="true" control={<Radio size="small" disabled={tableReadOnly} />} label="Yes" />
+                <FormControlLabel value="false" control={<Radio size="small" disabled={tableReadOnly} />} label="No" />
+              </RadioGroup>
+            </TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
+  )
 
   const isComplete = answers.correct !== '' && answers.valid !== '' && answers.sound !== ''
 
@@ -84,30 +115,7 @@ export default function ValidCorrectSound({
         <Typography variant="body2">{problem.conc}</Typography>
       </Paper>
 
-      <Table sx={{ mb: 2 }}>
-        <TableBody>
-          {['correct', 'valid', 'sound'].map((q) => (
-            <TableRow key={q}>
-              <TableCell sx={{ border: 'none', py: 1 }}>
-                <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                  {q === 'correct' ? 'Factually correct?' : q === 'valid' ? 'Valid?' : 'Sound?'}
-                </Typography>
-              </TableCell>
-              <TableCell sx={{ border: 'none', py: 1 }}>
-                <RadioGroup
-                  row
-                  value={answers[q]}
-                  onChange={(e) => handleChange(q, e.target.value)}
-                  name={q}
-                >
-                  <FormControlLabel value="true" control={<Radio size="small" />} label="Yes" />
-                  <FormControlLabel value="false" control={<Radio size="small" />} label="No" />
-                </RadioGroup>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+      {renderAnswerTable(answers, readOnly)}
 
       {message && (
         <Alert 
@@ -119,18 +127,23 @@ export default function ValidCorrectSound({
         </Alert>
       )}
 
-      <ProblemSetButtons
-        onCheck={handleCheck}
-        onStartOver={handleStartOver}
-        isChecking={isChecking}
-        isDisabled={!isComplete}
-      />
-      <SolutionReveal
-        type="valid-correct-sound"
-        solution={solution}
-        answer={answer}
-        show={showSolution}
-      />
+      {!hideActions && (
+        <ProblemSetButtons
+          onCheck={handleCheck}
+          onStartOver={handleStartOver}
+          isChecking={isChecking}
+          isDisabled={!isComplete || isLocked}
+        />
+      )}
+      {!suppressReveal && (
+        <SolutionReveal show={showSolution}>
+          {renderAnswerTable({
+            correct: answer?.correct === true ? 'true' : answer?.correct === false ? 'false' : '',
+            valid: answer?.valid === true ? 'true' : answer?.valid === false ? 'false' : '',
+            sound: answer?.sound === true ? 'true' : answer?.sound === false ? 'false' : '',
+          }, true)}
+        </SolutionReveal>
+      )}
     </Box>
   )
 }

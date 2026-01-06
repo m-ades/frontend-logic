@@ -18,14 +18,17 @@ export function useProblemChecker({
   onStateChange,
   assignmentQuestionId,
   attemptLimit = 3,
+  initialAttemptCount = 0,
 }) {
   const [status, setStatus] = useState('unanswered')
   const [message, setMessage] = useState('')
   const [isChecking, setIsChecking] = useState(false)
-  const [attemptCount, setAttemptCount] = useState(0)
+  const [attemptCount, setAttemptCount] = useState(initialAttemptCount)
+  const [maxAttempts, setMaxAttempts] = useState(attemptLimit)
+  const isLocked = attemptCount >= maxAttempts
 
   const handleCheck = async () => {
-    if (isChecking || isDisabled()) return
+    if (isChecking || isDisabled() || isLocked) return
     setIsChecking(true)
     try {
       if (assignmentQuestionId) {
@@ -40,6 +43,9 @@ export function useProblemChecker({
         })
         const validation = resp?.validation || {}
         const successstatus = validation.successstatus || 'incorrect'
+        if (typeof resp?.attempt_limit === 'number') {
+          setMaxAttempts(resp.attempt_limit)
+        }
         setAttemptCount((prev) => resp?.submission?.attempt ?? prev + 1)
         if (successstatus === 'correct') {
           setStatus('correct')
@@ -64,7 +70,7 @@ export function useProblemChecker({
           setMessage('Error checking answer')
           return
         }
-        setAttemptCount((prev) => Math.min(prev + 1, attemptLimit))
+        setAttemptCount((prev) => Math.min(prev + 1, maxAttempts))
         if (result.successstatus === 'correct') {
           setStatus('correct')
           setMessage('Correct!')
@@ -75,8 +81,15 @@ export function useProblemChecker({
         }
       }
     } catch (err) {
-      setStatus('malfunction')
-      setMessage('Error checking answer')
+      const errText = String(err || '')
+      if (errText.includes('Attempt limit exceeded')) {
+        setAttemptCount((prev) => Math.max(prev, maxAttempts))
+        setStatus('incorrect')
+        setMessage('Attempt limit reached.')
+      } else {
+        setStatus('malfunction')
+        setMessage('Error checking answer')
+      }
     } finally {
       setIsChecking(false)
     }
@@ -98,5 +111,5 @@ export function useProblemChecker({
     }
   }
 
-  return { status, message, isChecking, handleCheck, handleStartOver, getStatusColor, setStatus, setMessage, attemptCount }
+  return { status, message, isChecking, handleCheck, handleStartOver, getStatusColor, setStatus, setMessage, attemptCount, maxAttempts, isLocked }
 }

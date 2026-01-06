@@ -5,8 +5,17 @@ import SolutionReveal from './SolutionReveal.jsx'
 export default function ProofEditor({ proof, onProofComplete, savedState, onStateChange }) {
   const completionRef = useRef(false)
   const proofRef = useRef(null)
-  const [attemptCount, setAttemptCount] = useState(0)
+  const [attemptCount, setAttemptCount] = useState(proof?.attemptCount ?? 0)
   const [attemptLimit, setAttemptLimit] = useState(proof?.attemptLimit ?? 3)
+
+  useEffect(() => {
+    if (typeof proof?.attemptCount === 'number') {
+      setAttemptCount(proof.attemptCount)
+    }
+    if (typeof proof?.attemptLimit === 'number') {
+      setAttemptLimit(proof.attemptLimit)
+    }
+  }, [proof?.attemptCount, proof?.attemptLimit])
 
   const handleAttempt = useCallback((detail) => {
     setAttemptCount((prev) => {
@@ -81,9 +90,10 @@ export default function ProofEditor({ proof, onProofComplete, savedState, onStat
         savedState={savedState}
         onStateChange={onStateChange}
         onAttempt={handleAttempt}
+        attemptCount={attemptCount}
+        attemptLimit={attemptLimit}
       />
       <SolutionReveal
-        type={proof.type}
         solution={proof.solution}
         show={attemptCount >= attemptLimit}
       />

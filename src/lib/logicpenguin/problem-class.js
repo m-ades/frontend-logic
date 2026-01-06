@@ -216,6 +216,19 @@ export default class LogicPenguinProblem extends HTMLElement {
             return;
         }
 
+        if (this.attemptLimit && this.attemptCount >= this.attemptLimit) {
+            this.setIndicator({
+                savestatus: 'saved',
+                successstatus: 'incorrect',
+                points: -1,
+                message: 'Attempt limit reached.'
+            });
+            if (this.checksaveButton) {
+                this.checksaveButton.disabled = true;
+            }
+            return;
+        }
+
         // submit to our api when this problem is tied to an assignment question
         const assignmentQuestionId = Number(this.dataset?.assignmentQuestionId || 0);
         if (assignmentQuestionId) {
@@ -246,6 +259,17 @@ export default class LogicPenguinProblem extends HTMLElement {
                     savestatus: 'saved',
                     points: validation.points ?? resp?.submission?.score ?? -1
                 });
+                if (typeof resp?.attempt_limit === 'number') {
+                    this.attemptLimit = resp.attempt_limit;
+                }
+                if (typeof resp?.submission?.attempt === 'number') {
+                    this.attemptCount = resp.submission.attempt;
+                }
+                if (this.attemptLimit && this.attemptCount >= this.attemptLimit) {
+                    if (this.checksaveButton) {
+                        this.checksaveButton.disabled = true;
+                    }
+                }
                 this.dispatchEvent(new CustomEvent('lp-submission', {
                     detail: {
                         assignmentQuestionId,
@@ -255,6 +279,20 @@ export default class LogicPenguinProblem extends HTMLElement {
                     }
                 }));
             }).catch((err) => {
+                if (err?.message?.includes('Attempt limit exceeded')) {
+                    this.attemptLimit = this.attemptLimit || 0;
+                    this.attemptCount = this.attemptLimit;
+                    if (this.checksaveButton) {
+                        this.checksaveButton.disabled = true;
+                    }
+                    this.setIndicator({
+                        savestatus: 'saved',
+                        successstatus: 'incorrect',
+                        points: -1,
+                        message: 'Attempt limit reached.'
+                    });
+                    return;
+                }
                 this.setIndicator({
                     savestatus: 'saveerror',
                     successstatus: 'malfunction',

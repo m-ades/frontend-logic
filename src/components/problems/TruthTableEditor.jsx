@@ -155,7 +155,7 @@ export default function TruthTableEditor({ proof, savedState, onStateChange, onP
   const [status, setStatus] = React.useState('unanswered')
   const [message, setMessage] = React.useState('')
   const [isChecking, setIsChecking] = React.useState(false)
-  const [attemptCount, setAttemptCount] = React.useState(0)
+  const [attemptCount, setAttemptCount] = React.useState(savedState?.attemptCount ?? 0)
   const attemptLimit = proof?.attemptLimit ?? 3
   const assignmentQuestionId = Number(proof?.questionId || 0)
 
@@ -304,7 +304,7 @@ export default function TruthTableEditor({ proof, savedState, onStateChange, onP
   }
 
   const handleCheck = async () => {
-    if (isChecking) return
+    if (isChecking || attemptCount >= attemptLimit) return
     setIsChecking(true)
     try {
       if (assignmentQuestionId) {
@@ -384,7 +384,7 @@ export default function TruthTableEditor({ proof, savedState, onStateChange, onP
   }, [proof])
   const showSolution = attemptCount >= attemptLimit && solutionTables.length > 0
 
-  const renderTableSet = (tablesToRender, tableInputsToRender, combined, readOnly, onCellChange) => {
+  const renderTableSet = (tablesToRender, tableInputsToRender, combined, readOnly, onCellChange, showConclusionMarker) => {
     if (combined) {
       return (
         <Box className="tt-table-wrap">
@@ -395,7 +395,7 @@ export default function TruthTableEditor({ proof, savedState, onStateChange, onP
             <Box component="thead" className="tt-head">
               <Box component="tr" className="tt-group-row">
                 {tablesToRender.map((table, tableIndex) => {
-                  const isConclusion = combined && tableIndex === tablesToRender.length - 1 && tablesToRender.length > 1
+                  const isConclusion = showConclusionMarker && tableIndex === tablesToRender.length - 1 && tablesToRender.length > 1
                   return (
                     <Box
                       component="th"
@@ -409,7 +409,7 @@ export default function TruthTableEditor({ proof, savedState, onStateChange, onP
                             : 'tt-group'
                       }
                     >
-                      {isConclusion && tablesToRender.length > 1 ? '// ' : ''}
+                      {isConclusion ? '// ' : ''}
                       {table.label || ''}
                     </Box>
                   )
@@ -417,7 +417,7 @@ export default function TruthTableEditor({ proof, savedState, onStateChange, onP
               </Box>
               <Box component="tr" className="tt-token-row">
                 {tablesToRender.map((table, tableIndex) => {
-                  const isConclusion = combined && tableIndex === tablesToRender.length - 1 && tablesToRender.length > 1
+                  const isConclusion = showConclusionMarker && tableIndex === tablesToRender.length - 1 && tablesToRender.length > 1
                   return (
                     <React.Fragment key={`solution-tokenfrag-${tableIndex}`}>
                       {(table.headerTokens && table.headerTokens.length > 0 ? table.headerTokens : table.tokens).map((token, tokenIndex) => {
@@ -451,21 +451,21 @@ export default function TruthTableEditor({ proof, savedState, onStateChange, onP
                   className="tt-row"
                 >
                   {tablesToRender.map((table, tableIndex) => {
-                    const isConclusion = combined && tableIndex === tablesToRender.length - 1 && tablesToRender.length > 1
+                    const isConclusion = showConclusionMarker && tableIndex === tablesToRender.length - 1 && tablesToRender.length > 1
                     return (
                       <React.Fragment key={`solution-rowfrag-${tableIndex}`}>
                         {table.rows[rowIndex].map((_, colIndex) => (
                           <Box
                             component="td"
                             key={`solution-cell-${tableIndex}-${rowIndex}-${colIndex}`}
-                            className={
-                              isConclusion
-                                ? 'tt-cell tt-conclusion-cell'
-                                : colIndex === table.tokens.length - 1 &&
-                                  tableIndex < tablesToRender.length - 1
+                              className={
+                                isConclusion
+                                  ? 'tt-cell tt-conclusion-cell'
+                                  : colIndex === table.tokens.length - 1 &&
+                                    tableIndex < tablesToRender.length - 1
                                     ? 'tt-cell tt-divider'
                                     : 'tt-cell'
-                            }
+                              }
                           >
                             <TruthToggle
                               value={tableInputsToRender[tableIndex]?.[rowIndex]?.[colIndex]}
@@ -592,7 +592,7 @@ export default function TruthTableEditor({ proof, savedState, onStateChange, onP
           className="lp-problem-card"
         >
           <Stack spacing={3} sx={{ p: { xs: 2, md: 2 } }}>
-            {renderTableSet(tables, tableInputs, useCombinedTable, false, handleCellChange)}
+            {renderTableSet(tables, tableInputs, useCombinedTable, false, handleCellChange, kind === 'argument')}
           </Stack>
         </Box>
       </Box>
@@ -621,7 +621,7 @@ export default function TruthTableEditor({ proof, savedState, onStateChange, onP
         onCheck={handleCheck}
         onStartOver={handleStartOver}
         isChecking={isChecking}
-        isDisabled={!tableFilled}
+        isDisabled={!tableFilled || attemptCount >= attemptLimit}
       />
       {showSolution && renderAnswerCard(
         'Correct Answer',
@@ -630,7 +630,8 @@ export default function TruthTableEditor({ proof, savedState, onStateChange, onP
           solutionTables.map((table) => table.rows),
           solutionTables.length > 1,
           true,
-          null
+          null,
+          kind === 'argument'
         )
       )}
     </Stack>

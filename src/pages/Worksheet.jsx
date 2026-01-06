@@ -30,7 +30,7 @@ export default function Worksheet() {
   const currentProof = currentWorksheet?.proofs[currentProofIndex]
   
   const { completedProofs, score, scoreStyle, handleProofComplete } = useScoring(currentWorksheet)
-  const { getSavedProofState, handleProofStateChange } = useProofState()
+  const { getSavedProofState, handleProofStateChange, initializeSavedProofStates } = useProofState()
 
   useEffect(() => {
     let keepGoing = true
@@ -231,6 +231,109 @@ export default function Worksheet() {
       }
     }
 
+    const buildTruthTableState = (lefts, right) => {
+      const toSymbol = (value) => (value === true ? 'T' : value === false ? 'F' : '')
+      const mapRows = (rows = []) => rows.map((row) => row.map(toSymbol))
+      return ({
+        tables: [
+          ...lefts.map((table) => ({ rows: mapRows(table.rows) })),
+          { rows: mapRows(right.rows) }
+        ]
+      })
+    }
+
+    const loadSavedStates = async (worksheetData) => {
+      const questionIds = new Set()
+      const proofMeta = {}
+
+      worksheetData.forEach((worksheet) => {
+        worksheet.proofs.forEach((proof) => {
+          if (proof.questionId) {
+            questionIds.add(proof.questionId)
+            proofMeta[proof.questionId] = proof
+          }
+        })
+      })
+
+      const draftMap = new Map()
+      try {
+        const drafts = await fetchJson('/api/assignment-drafts')
+        drafts.forEach((draft) => {
+          if (draft.user_id !== API_CONFIG.userId) return
+          if (!questionIds.has(draft.assignment_question_id)) return
+          draftMap.set(draft.assignment_question_id, draft.draft_data)
+        })
+      } catch (err) {
+        // ignore draft load errors for now
+      }
+
+      const submissionMap = new Map()
+      const attemptCountMap = new Map()
+      await Promise.all(
+        worksheetData.map(async (worksheet) => {
+          try {
+            const submissions = await fetchJson(
+              `/api/assignments/${worksheet.id}/submissions?userId=${API_CONFIG.userId}`
+            )
+            submissions.forEach((submission) => {
+              const existing = submissionMap.get(submission.assignment_question_id)
+              if (!existing || new Date(submission.submitted_at) > new Date(existing.submitted_at)) {
+                submissionMap.set(submission.assignment_question_id, submission)
+              }
+              const currentAttempt = attemptCountMap.get(submission.assignment_question_id) || 0
+              if (submission.attempt > currentAttempt) {
+                attemptCountMap.set(submission.assignment_question_id, submission.attempt)
+              }
+            })
+          } catch (err) {
+            // ignore submission load errors for now
+          }
+        })
+      )
+
+      const initialStates = {}
+      questionIds.forEach((questionId) => {
+        const proof = proofMeta[questionId]
+        if (!proof) return
+        if (draftMap.has(questionId)) {
+          initialStates[proof.id] = draftMap.get(questionId)
+          return
+        }
+
+        const submission = submissionMap.get(questionId)
+        if (!submission?.submission_data) return
+        const data = submission.submission_data
+
+        if (proof.type === 'truth-table') {
+          const truthTable = proof.truthTable || {}
+          const kind = truthTable.kind || 'formula'
+          if (kind === 'formula' && data.right) {
+            initialStates[proof.id] = buildTruthTableState([], data.right)
+          } else if (kind === 'equivalence' && data.lefts?.length && data.right) {
+            initialStates[proof.id] = buildTruthTableState(data.lefts, data.right)
+          } else if (kind === 'argument' && data.lefts?.length && data.right) {
+            initialStates[proof.id] = buildTruthTableState(data.lefts, data.right)
+          }
+          return
+        }
+
+        if (proof.type === 'valid-correct-sound') {
+          initialStates[proof.id] = { ans: data }
+          return
+        }
+
+        if (proof.type === 'derivation' || proof.type === 'derivation-hurley') {
+          initialStates[proof.id] = data.ans || data.ind ? data : { ans: data }
+          return
+        }
+
+        initialStates[proof.id] = { ans: data }
+      })
+
+      initializeSavedProofStates(initialStates)
+      return attemptCountMap
+    }
+
     const loadWorksheets = async () => {
       setIsLoading(true)
       setLoadError('')
@@ -253,7 +356,15 @@ export default function Worksheet() {
         )
 
         if (isMounted) {
-          setWorksheets(worksheetData)
+          const attemptCountMap = await loadSavedStates(worksheetData)
+          const worksheetDataWithAttempts = worksheetData.map((worksheet) => ({
+            ...worksheet,
+            proofs: worksheet.proofs.map((proof) => ({
+              ...proof,
+              attemptCount: attemptCountMap?.get(proof.questionId) ?? 0,
+            })),
+          }))
+          setWorksheets(worksheetDataWithAttempts)
         }
       } catch (error) {
         if (isMounted) {

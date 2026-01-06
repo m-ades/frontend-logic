@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react'
 import { Box, Radio, RadioGroup, FormControlLabel, FormControl, Typography, Alert } from '@mui/material'
 import ProblemSetButtons from './ProblemSetButtons.jsx'
 import { useProblemChecker } from '../../../hooks/useProblemChecker.js'
-import SolutionReveal from '../SolutionReveal.jsx'
 
 export default function EvaluateTruth({ 
   problem, 
@@ -12,33 +11,36 @@ export default function EvaluateTruth({
   savedState,
   assignmentQuestionId,
   attemptLimit,
-  solution,
+  readOnly = false,
+  hideActions = false,
 }) {
   const [selectedValue, setSelectedValue] = useState(
     savedState?.ans !== undefined ? (savedState.ans ? 'true' : 'false') : ''
   )
   
-  const { status, message, isChecking, handleCheck, handleStartOver, getStatusColor, setStatus, setMessage, attemptCount } = useProblemChecker({
+  const { status, message, isChecking, handleCheck, handleStartOver, getStatusColor, setStatus, setMessage, isLocked } = useProblemChecker({
     answer,
     problemType: 'evaluate-truth',
     question: problem,
-    getAnswer: () => selectedValue === 'true' ? 0 : 1,
+    getAnswer: () => selectedValue === 'true',
     onComplete,
     isDisabled: () => selectedValue === '',
     resetInput: () => setSelectedValue(''),
     onStateChange,
     assignmentQuestionId,
-    attemptLimit
+    attemptLimit,
+    initialAttemptCount: savedState?.attemptCount ?? 0,
   })
-  const showSolution = attemptCount >= (attemptLimit ?? 3)
 
   useEffect(() => {
+    if (readOnly) return
     if (selectedValue !== '') {
       onStateChange?.({ ans: selectedValue === 'true' })
     }
-  }, [selectedValue, onStateChange])
+  }, [readOnly, selectedValue, onStateChange])
 
   const handleChange = (event) => {
+    if (readOnly) return
     setSelectedValue(event.target.value)
     setStatus('unanswered')
     setMessage('')
@@ -67,7 +69,7 @@ export default function EvaluateTruth({
         >
           <FormControlLabel
             value="true"
-            control={<Radio />}
+            control={<Radio disabled={readOnly} />}
             label="True"
             sx={{
               mb: 1,
@@ -78,7 +80,7 @@ export default function EvaluateTruth({
           />
           <FormControlLabel
             value="false"
-            control={<Radio />}
+            control={<Radio disabled={readOnly} />}
             label="False"
             sx={{
               '& .MuiFormControlLabel-label': {
@@ -99,18 +101,14 @@ export default function EvaluateTruth({
         </Alert>
       )}
 
-      <ProblemSetButtons
-        onCheck={handleCheck}
-        onStartOver={handleStartOver}
-        isChecking={isChecking}
-        isDisabled={selectedValue === ''}
-      />
-      <SolutionReveal
-        type="evaluate-truth"
-        solution={solution}
-        answer={answer}
-        show={showSolution}
-      />
+      {!hideActions && (
+        <ProblemSetButtons
+          onCheck={handleCheck}
+          onStartOver={handleStartOver}
+          isChecking={isChecking}
+          isDisabled={selectedValue === '' || isLocked}
+        />
+      )}
     </Box>
   )
 }

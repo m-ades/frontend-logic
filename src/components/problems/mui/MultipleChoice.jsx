@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
 import { Box, Radio, RadioGroup, FormControlLabel, FormControl, Typography, Alert } from '@mui/material'
-import { useTheme } from '@mui/material/styles'
 import ProblemSetButtons from './ProblemSetButtons.jsx'
 import { useProblemChecker } from '../../../hooks/useProblemChecker.js'
 import SolutionReveal from '../SolutionReveal.jsx'
@@ -13,12 +12,13 @@ export default function MultipleChoice({
   savedState,
   assignmentQuestionId,
   attemptLimit,
-  solution,
+  readOnly = false,
+  hideActions = false,
+  suppressReveal = false,
 }) {
-  const theme = useTheme()
   const [selectedValue, setSelectedValue] = useState(savedState?.ans !== undefined ? String(savedState.ans) : '')
   
-  const { status, message, isChecking, handleCheck, handleStartOver, getStatusColor, setStatus, setMessage, attemptCount } = useProblemChecker({
+  const { status, message, isChecking, handleCheck, handleStartOver, getStatusColor, setStatus, setMessage, attemptCount, maxAttempts, isLocked } = useProblemChecker({
     answer,
     problemType: 'multiple-choice',
     question: problem,
@@ -28,17 +28,20 @@ export default function MultipleChoice({
     resetInput: () => setSelectedValue(''),
     onStateChange,
     assignmentQuestionId,
-    attemptLimit
+    attemptLimit,
+    initialAttemptCount: savedState?.attemptCount ?? 0,
   })
-  const showSolution = attemptCount >= (attemptLimit ?? 3)
+  const showSolution = isLocked && typeof answer === 'number'
 
   useEffect(() => {
+    if (readOnly) return
     if (selectedValue !== '') {
       onStateChange?.({ ans: parseInt(selectedValue) })
     }
-  }, [selectedValue, onStateChange])
+  }, [readOnly, selectedValue, onStateChange])
 
   const handleChange = (event) => {
+    if (readOnly) return
     setSelectedValue(event.target.value)
     setStatus('unanswered')
     setMessage('')
@@ -60,7 +63,7 @@ export default function MultipleChoice({
             <FormControlLabel
               key={index}
               value={String(index)}
-              control={<Radio />}
+              control={<Radio disabled={readOnly} />}
               label={choice}
               sx={{
                 mb: 1,
@@ -83,19 +86,36 @@ export default function MultipleChoice({
         </Alert>
       )}
 
-      <ProblemSetButtons
-        onCheck={handleCheck}
-        onStartOver={handleStartOver}
-        isChecking={isChecking}
-        isDisabled={selectedValue === ''}
-      />
-      <SolutionReveal
-        type="multiple-choice"
-        solution={solution}
-        answer={answer}
-        question={problem}
-        show={showSolution}
-      />
+      {!hideActions && (
+        <ProblemSetButtons
+          onCheck={handleCheck}
+          onStartOver={handleStartOver}
+          isChecking={isChecking}
+          isDisabled={selectedValue === '' || isLocked}
+        />
+      )}
+      {!suppressReveal && (
+        <SolutionReveal show={showSolution}>
+          <FormControl component="fieldset" sx={{ width: '100%', mb: 2 }}>
+            <RadioGroup value={String(answer ?? '')} name="multiple-choice-reveal">
+              {problem.choices.map((choice, index) => (
+                <FormControlLabel
+                  key={`${choice}-${index}`}
+                  value={String(index)}
+                  control={<Radio disabled />}
+                  label={choice}
+                  sx={{
+                    mb: 1,
+                    '& .MuiFormControlLabel-label': {
+                      fontSize: '1rem'
+                    }
+                  }}
+                />
+              ))}
+            </RadioGroup>
+          </FormControl>
+        </SolutionReveal>
+      )}
     </Box>
   )
 }

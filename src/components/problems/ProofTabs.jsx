@@ -75,7 +75,9 @@ export default function ProofTabs({
         const derivEl = proofEditorRef.querySelector('derivation-hurley')
         if (derivEl?.getState && !derivEl._isRestoring) {
           try {
-            handleProofStateChange(currentProof.id, derivEl.getState())
+            handleProofStateChange(currentProof.id, derivEl.getState(), {
+              assignmentQuestionId: currentProof.questionId
+            })
           } catch (err) {
             // ignore
           }
@@ -179,7 +181,9 @@ export default function ProofTabs({
                   <TruthTableEditor
                     proof={proof}
                     savedState={getSavedProofState(proof.id)}
-                    onStateChange={(state) => handleProofStateChange(proof.id, state)}
+                    onStateChange={(state) => handleProofStateChange(proof.id, state, {
+                      assignmentQuestionId: proof.questionId
+                    })}
                     onProofComplete={onProofComplete}
                   />
                 ) : proof.type === 'derivation' || !proof.type ? (
@@ -190,7 +194,9 @@ export default function ProofTabs({
                     proof={proof} 
                     onProofComplete={onProofComplete}
                     savedState={getSavedProofState(proof.id)}
-                    onStateChange={(state) => handleProofStateChange(proof.id, state)}
+                    onStateChange={(state) => handleProofStateChange(proof.id, state, {
+                      assignmentQuestionId: proof.questionId
+                    })}
                   />
                 ) : (
                   // all other problem types use LogicPenguinProblem
@@ -199,7 +205,9 @@ export default function ProofTabs({
                     proof={proof}
                     onProofComplete={onProofComplete}
                     savedState={getSavedProofState(proof.id)}
-                    onStateChange={(state) => handleProofStateChange(proof.id, state)}
+                    onStateChange={(state) => handleProofStateChange(proof.id, state, {
+                      assignmentQuestionId: proof.questionId
+                    })}
                   />
                 )}
               </div>

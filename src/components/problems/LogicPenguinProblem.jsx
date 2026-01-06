@@ -45,7 +45,6 @@ export default function LogicPenguinProblem({
       <SymbolicTranslation
         problem={problemData}
         answer={proof.answer}
-        solution={proof.solution}
         attemptLimit={proof.attemptLimit}
         assignmentQuestionId={proof.questionId}
         onStateChange={handleStateChange}
@@ -62,7 +61,6 @@ export default function LogicPenguinProblem({
       <MultipleChoice
         problem={problemData}
         answer={proof.answer}
-        solution={proof.solution}
         attemptLimit={proof.attemptLimit}
         assignmentQuestionId={proof.questionId}
         onStateChange={handleStateChange}
@@ -78,7 +76,6 @@ export default function LogicPenguinProblem({
       <TrueFalse
         problem={problemData}
         answer={proof.answer}
-        solution={proof.solution}
         attemptLimit={proof.attemptLimit}
         assignmentQuestionId={proof.questionId}
         onStateChange={handleStateChange}
@@ -92,7 +89,6 @@ export default function LogicPenguinProblem({
       <EvaluateTruth
         problem={problemData}
         answer={proof.answer}
-        solution={proof.solution}
         attemptLimit={proof.attemptLimit}
         assignmentQuestionId={proof.questionId}
         onStateChange={handleStateChange}
@@ -110,7 +106,6 @@ export default function LogicPenguinProblem({
       <ValidCorrectSound
         problem={problemData}
         answer={proof.answer}
-        solution={proof.solution}
         attemptLimit={proof.attemptLimit}
         assignmentQuestionId={proof.questionId}
         onStateChange={handleStateChange}
