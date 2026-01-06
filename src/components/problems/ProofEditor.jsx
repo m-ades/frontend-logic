@@ -1,9 +1,24 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState, useCallback } from 'react'
 import LogicPenguinProof from './LogicPenguinProof.jsx'
+import SolutionReveal from './SolutionReveal.jsx'
 
 export default function ProofEditor({ proof, onProofComplete, savedState, onStateChange }) {
   const completionRef = useRef(false)
   const proofRef = useRef(null)
+  const [attemptCount, setAttemptCount] = useState(0)
+  const [attemptLimit, setAttemptLimit] = useState(proof?.attemptLimit ?? 3)
+
+  const handleAttempt = useCallback((detail) => {
+    setAttemptCount((prev) => {
+      if (typeof detail?.attempt === 'number') {
+        return detail.attempt
+      }
+      return prev + 1
+    })
+    if (typeof detail?.attemptLimit === 'number') {
+      setAttemptLimit(detail.attemptLimit)
+    }
+  }, [])
 
   useEffect(() => {
     if (!proof || !onProofComplete) return
@@ -65,6 +80,12 @@ export default function ProofEditor({ proof, onProofComplete, savedState, onStat
         questionId={proof.questionId}
         savedState={savedState}
         onStateChange={onStateChange}
+        onAttempt={handleAttempt}
+      />
+      <SolutionReveal
+        type={proof.type}
+        solution={proof.solution}
+        show={attemptCount >= attemptLimit}
       />
     </div>
   )

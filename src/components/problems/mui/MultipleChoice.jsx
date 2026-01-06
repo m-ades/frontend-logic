@@ -3,18 +3,22 @@ import { Box, Radio, RadioGroup, FormControlLabel, FormControl, Typography, Aler
 import { useTheme } from '@mui/material/styles'
 import ProblemSetButtons from './ProblemSetButtons.jsx'
 import { useProblemChecker } from '../../../hooks/useProblemChecker.js'
+import SolutionReveal from '../SolutionReveal.jsx'
 
 export default function MultipleChoice({ 
   problem, 
   answer, 
   onStateChange, 
   onComplete,
-  savedState 
+  savedState,
+  assignmentQuestionId,
+  attemptLimit,
+  solution,
 }) {
   const theme = useTheme()
   const [selectedValue, setSelectedValue] = useState(savedState?.ans !== undefined ? String(savedState.ans) : '')
   
-  const { status, message, isChecking, handleCheck, handleStartOver, getStatusColor, setStatus, setMessage } = useProblemChecker({
+  const { status, message, isChecking, handleCheck, handleStartOver, getStatusColor, setStatus, setMessage, attemptCount } = useProblemChecker({
     answer,
     problemType: 'multiple-choice',
     question: problem,
@@ -22,8 +26,11 @@ export default function MultipleChoice({
     onComplete,
     isDisabled: () => selectedValue === '',
     resetInput: () => setSelectedValue(''),
-    onStateChange
+    onStateChange,
+    assignmentQuestionId,
+    attemptLimit
   })
+  const showSolution = attemptCount >= (attemptLimit ?? 3)
 
   useEffect(() => {
     if (selectedValue !== '') {
@@ -81,6 +88,13 @@ export default function MultipleChoice({
         onStartOver={handleStartOver}
         isChecking={isChecking}
         isDisabled={selectedValue === ''}
+      />
+      <SolutionReveal
+        type="multiple-choice"
+        solution={solution}
+        answer={answer}
+        question={problem}
+        show={showSolution}
       />
     </Box>
   )

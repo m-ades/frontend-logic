@@ -2,13 +2,17 @@ import { useState, useEffect } from 'react'
 import { Box, Radio, RadioGroup, FormControlLabel, FormControl, Typography, Alert, Paper, Table, TableBody, TableRow, TableCell } from '@mui/material'
 import ProblemSetButtons from './ProblemSetButtons.jsx'
 import { useProblemChecker } from '../../../hooks/useProblemChecker.js'
+import SolutionReveal from '../SolutionReveal.jsx'
 
 export default function ValidCorrectSound({ 
   problem, 
   answer, 
   onStateChange, 
   onComplete,
-  savedState 
+  savedState,
+  assignmentQuestionId,
+  attemptLimit,
+  solution,
 }) {
   const [answers, setAnswers] = useState({
     correct: savedState?.ans?.correct !== undefined ? String(savedState.ans.correct) : '',
@@ -16,7 +20,7 @@ export default function ValidCorrectSound({
     sound: savedState?.ans?.sound !== undefined ? String(savedState.ans.sound) : ''
   })
   
-  const { status, message, isChecking, handleCheck: baseHandleCheck, handleStartOver, getStatusColor, setStatus, setMessage } = useProblemChecker({
+  const { status, message, isChecking, handleCheck: baseHandleCheck, handleStartOver, getStatusColor, setStatus, setMessage, attemptCount } = useProblemChecker({
     answer,
     problemType: 'valid-correct-sound',
     question: problem,
@@ -28,8 +32,11 @@ export default function ValidCorrectSound({
     onComplete,
     isDisabled: () => false, // Custom validation in handleCheck
     resetInput: () => setAnswers({ correct: '', valid: '', sound: '' }),
-    onStateChange
+    onStateChange,
+    assignmentQuestionId,
+    attemptLimit
   })
+  const showSolution = attemptCount >= (attemptLimit ?? 3)
   
   const handleCheck = async () => {
     const ans = {
@@ -117,6 +124,12 @@ export default function ValidCorrectSound({
         onStartOver={handleStartOver}
         isChecking={isChecking}
         isDisabled={!isComplete}
+      />
+      <SolutionReveal
+        type="valid-correct-sound"
+        solution={solution}
+        answer={answer}
+        show={showSolution}
       />
     </Box>
   )

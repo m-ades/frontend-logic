@@ -1,7 +1,7 @@
 import { useEffect, useRef, useMemo } from "react"
 import "../../lib/logicpenguin/problemtypes/derivation-hurley.js"
 
-export default function LogicPenguinProof({ premises, conclusion, questionId, savedState, onStateChange }) {
+export default function LogicPenguinProof({ premises, conclusion, questionId, savedState, onStateChange, onAttempt }) {
   const ref = useRef(null)
 
   const problemKey = useMemo(
@@ -33,6 +33,20 @@ export default function LogicPenguinProof({ premises, conclusion, questionId, sa
     el.addEventListener("LP-ready", handleReady)
     return () => el.removeEventListener("LP-ready", handleReady)
   }, [problemKey, savedState, premises, conclusion])
+
+  useEffect(() => {
+    const el = ref.current
+    if (!el || !onAttempt) return
+
+    const handleAttempt = (event) => {
+      onAttempt(event?.detail)
+    }
+
+    el.addEventListener('lp-submission', handleAttempt)
+    return () => {
+      el.removeEventListener('lp-submission', handleAttempt)
+    }
+  }, [onAttempt])
 
   return (
     <div className="logicpenguin" style={{ width: "100%", overflowX: "auto", minWidth: 0 }}>

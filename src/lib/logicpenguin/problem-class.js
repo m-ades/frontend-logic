@@ -246,6 +246,14 @@ export default class LogicPenguinProblem extends HTMLElement {
                     savestatus: 'saved',
                     points: validation.points ?? resp?.submission?.score ?? -1
                 });
+                this.dispatchEvent(new CustomEvent('lp-submission', {
+                    detail: {
+                        assignmentQuestionId,
+                        attempt: resp?.submission?.attempt,
+                        attemptLimit: resp?.attempt_limit,
+                        isCorrect: validation.successstatus === 'correct'
+                    }
+                }));
             }).catch((err) => {
                 this.setIndicator({
                     savestatus: 'saveerror',

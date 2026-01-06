@@ -4,20 +4,24 @@ import { useTheme } from '@mui/material/styles'
 import ProblemSetButtons from './ProblemSetButtons.jsx'
 import FormulaInput from '../../ui/logicpenguin/formula-input.js'
 import { useProblemChecker } from '../../../hooks/useProblemChecker.js'
+import SolutionReveal from '../SolutionReveal.jsx'
 
 export default function SymbolicTranslation({ 
   problem, 
   answer, 
   onStateChange, 
   onComplete,
-  savedState 
+  savedState,
+  assignmentQuestionId,
+  attemptLimit,
+  solution,
 }) {
   const theme = useTheme()
   const [inputValue, setInputValue] = useState(savedState?.ans || '')
   const inputRef = useRef(null)
   const formulaInputRef = useRef(null)
   
-  const { status, message, isChecking, handleCheck, handleStartOver, getStatusColor, setStatus, setMessage } = useProblemChecker({
+  const { status, message, isChecking, handleCheck, handleStartOver, getStatusColor, setStatus, setMessage, attemptCount } = useProblemChecker({
     answer,
     problemType: 'symbolic-translation',
     question: problem,
@@ -30,8 +34,11 @@ export default function SymbolicTranslation({
         formulaInputRef.current.value = ''
       }
     },
-    onStateChange
+    onStateChange,
+    assignmentQuestionId,
+    attemptLimit
   })
+  const showSolution = attemptCount >= (attemptLimit ?? 3)
 
   useEffect(() => { // only runs once on mount
     if (inputRef.current && !formulaInputRef.current) {
@@ -137,6 +144,12 @@ export default function SymbolicTranslation({
         onStartOver={handleStartOver}
         isChecking={isChecking}
         isDisabled={!inputValue.trim()}
+      />
+      <SolutionReveal
+        type="symbolic-translation"
+        solution={solution}
+        answer={answer}
+        show={showSolution}
       />
     </Box>
   )

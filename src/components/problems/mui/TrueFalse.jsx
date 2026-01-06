@@ -2,19 +2,23 @@ import { useState, useEffect } from 'react'
 import { Box, Radio, RadioGroup, FormControlLabel, FormControl, Typography, Alert } from '@mui/material'
 import ProblemSetButtons from './ProblemSetButtons.jsx'
 import { useProblemChecker } from '../../../hooks/useProblemChecker.js'
+import SolutionReveal from '../SolutionReveal.jsx'
 
 export default function TrueFalse({ 
   problem, 
   answer, 
   onStateChange, 
   onComplete,
-  savedState 
+  savedState,
+  assignmentQuestionId,
+  attemptLimit,
+  solution,
 }) {
   const [selectedValue, setSelectedValue] = useState(
     savedState?.ans !== undefined ? (savedState.ans ? 'true' : 'false') : ''
   )
   
-  const { status, message, isChecking, handleCheck, handleStartOver, getStatusColor, setStatus, setMessage } = useProblemChecker({
+  const { status, message, isChecking, handleCheck, handleStartOver, getStatusColor, setStatus, setMessage, attemptCount } = useProblemChecker({
     answer,
     problemType: 'true-false',
     question: problem,
@@ -22,8 +26,11 @@ export default function TrueFalse({
     onComplete,
     isDisabled: () => selectedValue === '',
     resetInput: () => setSelectedValue(''),
-    onStateChange
+    onStateChange,
+    assignmentQuestionId,
+    attemptLimit
   })
+  const showSolution = attemptCount >= (attemptLimit ?? 3)
 
   useEffect(() => {
     if (selectedValue !== '') {
@@ -88,6 +95,12 @@ export default function TrueFalse({
         onStartOver={handleStartOver}
         isChecking={isChecking}
         isDisabled={selectedValue === ''}
+      />
+      <SolutionReveal
+        type="true-false"
+        solution={solution}
+        answer={answer}
+        show={showSolution}
       />
     </Box>
   )

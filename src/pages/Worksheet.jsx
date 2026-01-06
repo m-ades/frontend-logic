@@ -144,10 +144,14 @@ export default function Worksheet() {
       const type = normalizeType(snapshot)
       const description = snapshot.prompt || snapshot.description || snapshot.text || 'Solve.'
       const proofId = `${assignment.id}-${question.id}`
+      const solution = snapshot.solution
+      const attemptLimit = question?.attempt_limit ?? 3
       const proofBase = {
         id: proofId,
         questionId: question.id,
         description,
+        solution,
+        attemptLimit,
       }
 
       if (type === 'derivation' || type === 'derivation-hurley') {
