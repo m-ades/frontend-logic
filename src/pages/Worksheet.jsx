@@ -468,7 +468,6 @@ export default function Worksheet() {
 
   return (
     <WorksheetLayout
-      title="PHILO 275"
       subtitle={currentWorksheet.title || "Predicate Logic: Natural Deduction"}
       score={score}
       total={currentWorksheet.proofs.length || 0}
