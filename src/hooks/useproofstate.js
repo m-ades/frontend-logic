@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react'
-import { API_CONFIG, fetchJson } from '../utils/api.js'
+import { fetchJson, getActiveUserId } from '../utils/api.js'
 
-export function useProofState({ userId = API_CONFIG.userId } = {}) {
+export function useProofState({ userId = getActiveUserId() } = {}) {
   const [savedProofStates, setSavedProofStates] = useState({})
   const saveTimersRef = useRef({})
 

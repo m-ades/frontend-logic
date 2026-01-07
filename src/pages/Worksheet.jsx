@@ -5,7 +5,7 @@ import WorksheetTabs from '../components/problems/WorksheetTabs.jsx'
 import { useScoring } from '../hooks/usescoring.js'
 import { useProofState } from '../hooks/useproofstate.js'
 import { exportWorksheetPDF } from '../utils/exportPDF.js'
-import { API_CONFIG, fetchJson } from '../utils/api.js'
+import { API_CONFIG, fetchJson, getActiveUserId } from '../utils/api.js'
 
 export default function Worksheet() {
   const { worksheetId, assignmentId } = useParams()
@@ -16,6 +16,7 @@ export default function Worksheet() {
   const [loadError, setLoadError] = useState('')
   const sessionId = useRef(null)
   const questionSessionId = useRef(null)
+  const activeUserId = getActiveUserId()
   
   // support both /assignment/:id and /worksheet/:id routes
   // assignmentId will be used when backend is implemented
@@ -43,7 +44,7 @@ export default function Worksheet() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             assignment_id: currentWorksheet.id,
-            user_id: API_CONFIG.userId,
+            user_id: activeUserId,
             started_at: new Date().toISOString(),
           }),
         })
@@ -93,7 +94,7 @@ export default function Worksheet() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             assignment_question_id: currentProof.questionId,
-            user_id: API_CONFIG.userId,
+            user_id: activeUserId,
             started_at: new Date().toISOString(),
           }),
         })
@@ -271,7 +272,7 @@ export default function Worksheet() {
       try {
         const drafts = await fetchJson('/api/assignment-drafts')
         drafts.forEach((draft) => {
-          if (draft.user_id !== API_CONFIG.userId) return
+          if (draft.user_id !== activeUserId) return
           if (!questionIds.has(draft.assignment_question_id)) return
           draftMap.set(draft.assignment_question_id, draft.draft_data)
         })
@@ -285,7 +286,7 @@ export default function Worksheet() {
         worksheetData.map(async (worksheet) => {
           try {
             const submissions = await fetchJson(
-              `/api/assignments/${worksheet.id}/submissions?userId=${API_CONFIG.userId}`
+              `/api/assignments/${worksheet.id}/submissions?userId=${activeUserId}`
             )
             submissions.forEach((submission) => {
               const existing = submissionMap.get(submission.assignment_question_id)
@@ -363,7 +364,7 @@ export default function Worksheet() {
         const worksheetData = await Promise.all(
           assignments.map(async (assignment) => {
             const response = await fetchJson(
-              `/api/assignments/${assignment.id}?userId=${API_CONFIG.userId}`
+              `/api/assignments/${assignment.id}?userId=${activeUserId}`
             )
             const questions = response.questions || []
             return {

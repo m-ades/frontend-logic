@@ -7,7 +7,7 @@
 //////////////////////////////////////////////////////////////////////////
 
 import { addelem, byid, sendAnswerToServer, localCheck } from './common.js';
-import { API_CONFIG, fetchJson } from '../../utils/api.js';
+import { fetchJson, getActiveUserId } from '../../utils/api.js';
 import { randomString } from './misc.js';
 
 // the problem is its HTML element, so we extend it
@@ -249,7 +249,7 @@ export default class LogicPenguinProblem extends HTMLElement {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     assignment_question_id: assignmentQuestionId,
-                    user_id: API_CONFIG.userId,
+                    user_id: getActiveUserId(),
                     submission_data: submissionData
                 })
             }).then((resp) => {

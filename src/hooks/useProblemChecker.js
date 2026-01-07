@@ -4,7 +4,7 @@
  */
 import { useState } from 'react'
 import { localCheck } from '../lib/logicpenguin/common.js'
-import { API_CONFIG, fetchJson } from '../utils/api.js'
+import { fetchJson, getActiveUserId } from '../utils/api.js'
 
 export function useProblemChecker({
   answer,
@@ -37,7 +37,7 @@ export function useProblemChecker({
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             assignment_question_id: assignmentQuestionId,
-            user_id: API_CONFIG.userId,
+            user_id: getActiveUserId(),
             submission_data: getAnswer(),
           }),
         })

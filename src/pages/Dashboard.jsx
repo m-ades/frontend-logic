@@ -30,7 +30,7 @@ import AssignmentIcon from '@mui/icons-material/Assignment'
 import TrendingUpIcon from '@mui/icons-material/TrendingUp'
 import BookIcon from '@mui/icons-material/Book'
 import { formatDate } from '../utils/formatting.js'
-import { API_CONFIG, fetchJson } from '../utils/api.js'
+import { API_CONFIG, fetchJson, getActiveUserId } from '../utils/api.js'
 import ThemedCard from '../components/ui/ThemedCard.jsx'
 
 const emptyAnalytics = {
@@ -67,8 +67,8 @@ export default function Dashboard() {
     const loadAnalytics = async () => {
       try {
         const [analyticsData, grades] = await Promise.all([
-          fetchJson(`/api/analytics/student?userId=${API_CONFIG.userId}&courseId=${API_CONFIG.courseId}`),
-          fetchJson(`/api/users/${API_CONFIG.userId}/grades`),
+          fetchJson(`/api/analytics/student?userId=${getActiveUserId()}&courseId=${API_CONFIG.courseId}`),
+          fetchJson(`/api/users/${getActiveUserId()}/grades`),
         ])
         if (isMounted) {
           setAnalytics({ ...emptyAnalytics, ...analyticsData })

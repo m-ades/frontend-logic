@@ -5,7 +5,7 @@ import getSyntax from '../../lib/logicpenguin/symbolic/libsyntax.js'
 import { multiTables } from '../../lib/logicpenguin/symbolic/libsemantics.js'
 import { fullTableMatch } from '../../lib/logicpenguin/checkers/truth-tables.js'
 import ProblemSetButtons from './mui/ProblemSetButtons.jsx'
-import { API_CONFIG, fetchJson } from '../../utils/api.js'
+import { fetchJson, getActiveUserId } from '../../utils/api.js'
 
 function TruthToggle({ value, onChange, ariaLabel, accent, readOnly = false }) {
   const cycleValue = (current) => {
@@ -313,7 +313,7 @@ export default function TruthTableEditor({ proof, savedState, onStateChange, onP
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             assignment_question_id: assignmentQuestionId,
-            user_id: API_CONFIG.userId,
+            user_id: getActiveUserId(),
             submission_data: buildSubmissionData(),
           }),
         })

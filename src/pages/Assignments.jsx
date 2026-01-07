@@ -6,7 +6,7 @@ import ActivityAccordion from '../components/ui/ActivityAccordion.jsx'
 import { ACTIVITY_TYPES } from '../placeholder/courseActivities.js'
 import { formatDate } from '../utils/formatting.js'
 import { getStoredBoolean } from '../placeholder/storage.js'
-import { API_CONFIG, fetchJson } from '../utils/api.js'
+import { API_CONFIG, fetchJson, getActiveUserId } from '../utils/api.js'
 
 const buildCourseStructure = (assignments, sectionTitle) => {
   const chapters = new Map()
@@ -129,7 +129,7 @@ export default function Assignments() {
 
     const loadSummary = async () => {
       try {
-        const grades = await fetchJson(`/api/users/${API_CONFIG.userId}/grades`)
+        const grades = await fetchJson(`/api/users/${getActiveUserId()}/grades`)
 
         if (!isMounted) return
 
