@@ -1,13 +1,14 @@
 import { Box, Toolbar } from '@mui/material'
 import Header from './Header.jsx'
 import Sidebar from './Sidebar.jsx'
-import SidebarStructure from './SidebarStructure.jsx'
+import { useSidebarStructure } from './SidebarStructure.jsx'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { fetchJson } from '../../utils/api.js'
 
 export default function AppLayout({ children }) {
   const location = useLocation()
   const navigate = useNavigate()
+  const sidebarStructure = useSidebarStructure()
 
   const handleSignOut = async () => {
     try {
@@ -22,7 +23,7 @@ export default function AppLayout({ children }) {
   return (
     <Box sx={{ display: 'flex', minHeight: '100vh' }}>
       <Header onSignOut={handleSignOut} />
-      <Sidebar structure={SidebarStructure} location={location} />
+      <Sidebar structure={sidebarStructure} location={location} />
       <Box
         component="main"
         sx={{
