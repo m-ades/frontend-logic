@@ -225,14 +225,26 @@ export default function Worksheet() {
         }
       }
 
+      if (type === 'single-row-truth-table') {
+        return {
+          ...proofBase,
+          type: 'single-row-truth-table',
+          singleRowTruthTable: {
+            statement: snapshot.statement || snapshot.evaluateTruth || snapshot.prompt || '',
+            interpretation: snapshot.interpretation || {},
+            prompt: snapshot.prompt || snapshot.description || '',
+          },
+        }
+      }
+
       return {
         ...proofBase,
         type,
       }
     }
 
+    const toSymbol = (value) => (value === true ? 'T' : value === false ? 'F' : '')
     const buildTruthTableState = (lefts, right) => {
-      const toSymbol = (value) => (value === true ? 'T' : value === false ? 'F' : '')
       const mapRows = (rows = []) => rows.map((row) => row.map(toSymbol))
       return ({
         tables: [
@@ -313,6 +325,15 @@ export default function Worksheet() {
             initialStates[proof.id] = buildTruthTableState(data.lefts, data.right)
           } else if (kind === 'argument' && data.lefts?.length && data.right) {
             initialStates[proof.id] = buildTruthTableState(data.lefts, data.right)
+          }
+          return
+        }
+
+        if (proof.type === 'single-row-truth-table') {
+          if (Array.isArray(data.row)) {
+            initialStates[proof.id] = {
+              row: data.row.map(toSymbol),
+            }
           }
           return
         }

@@ -4,6 +4,7 @@ import MultipleChoice from './mui/MultipleChoice.jsx'
 import TrueFalse from './mui/TrueFalse.jsx'
 import EvaluateTruth from './mui/EvaluateTruth.jsx'
 import ValidCorrectSound from './mui/ValidCorrectSound.jsx'
+import SingleRowTruthTable from './mui/SingleRowTruthTable.jsx'
 
 export default function LogicPenguinProblem({ 
   proof, 
@@ -106,6 +107,22 @@ export default function LogicPenguinProblem({
       <ValidCorrectSound
         problem={problemData}
         answer={proof.answer}
+        attemptLimit={proof.attemptLimit}
+        assignmentQuestionId={proof.questionId}
+        onStateChange={handleStateChange}
+        onComplete={handleComplete}
+        savedState={localState}
+      />
+    )
+  } else if (proof.type === 'single-row-truth-table') {
+    problemData = proof.singleRowTruthTable || {
+      statement: proof.description || '',
+      interpretation: {},
+      prompt: proof.description || '',
+    }
+    return (
+      <SingleRowTruthTable
+        problem={problemData}
         attemptLimit={proof.attemptLimit}
         assignmentQuestionId={proof.questionId}
         onStateChange={handleStateChange}
