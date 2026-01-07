@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { Box, Radio, RadioGroup, FormControlLabel, FormControl, Typography, Alert } from '@mui/material'
 import ProblemSetButtons from './ProblemSetButtons.jsx'
 import { useProblemChecker } from '../../../hooks/useProblemChecker.js'
+import SolutionReveal from '../SolutionReveal.jsx'
 
 export default function EvaluateTruth({ 
   problem, 
@@ -31,6 +32,7 @@ export default function EvaluateTruth({
     attemptLimit,
     initialAttemptCount: savedState?.attemptCount ?? 0,
   })
+  const showSolution = isLocked && typeof answer === 'boolean'
 
   useEffect(() => {
     if (readOnly) return
@@ -109,6 +111,14 @@ export default function EvaluateTruth({
           isDisabled={selectedValue === '' || isLocked}
         />
       )}
+      <SolutionReveal show={showSolution}>
+        <FormControl component="fieldset" sx={{ width: '100%', mb: 2 }}>
+          <RadioGroup value={answer ? 'true' : 'false'} name="evaluate-truth-reveal">
+            <FormControlLabel value="true" control={<Radio disabled />} label="True" />
+            <FormControlLabel value="false" control={<Radio disabled />} label="False" />
+          </RadioGroup>
+        </FormControl>
+      </SolutionReveal>
     </Box>
   )
 }

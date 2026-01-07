@@ -167,7 +167,7 @@ export default function ProofTabs({
           />
         ))}
       </Tabs>
-      {proofs.map((proof, idx) => (
+        {proofs.map((proof, idx) => (
         <TabPanel key={proof.id} value={currentProofIndex} index={idx} direction={direction}>
           <Stack spacing={3} sx={{ minWidth: 0 }}>
             <Box sx={{ minWidth: 0 }}>
@@ -177,39 +177,54 @@ export default function ProofTabs({
                 </Typography>
               )}
               <div ref={el => { if (el) proofRefs.current[proof.id] = el }}>
-                {proof.type === 'truth-table' ? (
-                  <TruthTableEditor
-                    proof={proof}
-                    savedState={getSavedProofState(proof.id)}
-                    onStateChange={(state) => handleProofStateChange(proof.id, state, {
-                      assignmentQuestionId: proof.questionId
-                    })}
-                    onProofComplete={onProofComplete}
-                  />
-                ) : proof.type === 'derivation' || !proof.type ? (
-                  // only worksheets 14-16 and practice set (17) use derivation
-                  // default to derivation if type is not specified (backwards compatibility)
-                  <ProofEditor 
-                    key={`proof-${proof.id}`} 
-                    proof={proof} 
-                    onProofComplete={onProofComplete}
-                    savedState={getSavedProofState(proof.id)}
-                    onStateChange={(state) => handleProofStateChange(proof.id, state, {
-                      assignmentQuestionId: proof.questionId
-                    })}
-                  />
-                ) : (
-                  // all other problem types use LogicPenguinProblem
-                  <LogicPenguinProblem
-                    key={`proof-${proof.id}`}
-                    proof={proof}
-                    onProofComplete={onProofComplete}
-                    savedState={getSavedProofState(proof.id)}
-                    onStateChange={(state) => handleProofStateChange(proof.id, state, {
-                      assignmentQuestionId: proof.questionId
-                    })}
-                  />
-                )}
+                {(() => {
+                  const savedState = getSavedProofState(proof.id)
+                  const shouldAttachAttempts = proof.type !== 'derivation' && proof.type !== 'derivation-hurley' && proof.type
+                  const savedStateWithAttempts = shouldAttachAttempts
+                    ? { ...(savedState || {}), attemptCount: proof.attemptCount ?? 0 }
+                    : savedState
+
+                  if (proof.type === 'truth-table') {
+                    return (
+                      <TruthTableEditor
+                        proof={proof}
+                        savedState={savedStateWithAttempts}
+                        onStateChange={(state) => handleProofStateChange(proof.id, state, {
+                          assignmentQuestionId: proof.questionId
+                        })}
+                        onProofComplete={onProofComplete}
+                      />
+                    )
+                  }
+
+                  if (proof.type === 'derivation' || !proof.type) {
+                    // only worksheets 14-16 and practice set (17) use derivation
+                    // default to derivation if type is not specified (backwards compatibility)
+                    return (
+                      <ProofEditor 
+                        key={`proof-${proof.id}`} 
+                        proof={proof} 
+                        onProofComplete={onProofComplete}
+                        savedState={savedStateWithAttempts}
+                        onStateChange={(state) => handleProofStateChange(proof.id, state, {
+                          assignmentQuestionId: proof.questionId
+                        })}
+                      />
+                    )
+                  }
+
+                  return (
+                    <LogicPenguinProblem
+                      key={`proof-${proof.id}`}
+                      proof={proof}
+                      onProofComplete={onProofComplete}
+                      savedState={savedStateWithAttempts}
+                      onStateChange={(state) => handleProofStateChange(proof.id, state, {
+                        assignmentQuestionId: proof.questionId
+                      })}
+                    />
+                  )
+                })()}
               </div>
             </Box>
           </Stack>
