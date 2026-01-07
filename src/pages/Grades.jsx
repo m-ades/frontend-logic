@@ -3,7 +3,7 @@ import { Box, Typography, CardContent, Stack } from '@mui/material'
 import { DataGrid } from '@mui/x-data-grid'
 import ThemedCard from '../components/ui/ThemedCard.jsx'
 import { formatDate } from '../utils/formatting.js'
-import { API_CONFIG, fetchJson } from '../utils/api.js'
+import { API_CONFIG, fetchJson, getActiveUserId } from '../utils/api.js'
 
 function NoRowsOverlay() {
   return (
@@ -16,21 +16,45 @@ function NoRowsOverlay() {
 }
 
 export default function Grades() {
-  const [grades, setGrades] = useState([])
+  const [gradeEntries, setGradeEntries] = useState([])
 
   useEffect(() => {
     let isMounted = true
 
     const loadGrades = async () => {
       try {
-        const data = await fetchJson(`/api/users/${API_CONFIG.userId}/grades`)
+        const userId = getActiveUserId()
+        const [assignments, grades] = await Promise.all([
+          fetchJson(`/api/courses/${API_CONFIG.courseId}/assignments`),
+          fetchJson(`/api/users/${userId}/grades`),
+        ])
+        const gradedAssignments = (assignments || []).filter((assignment) => assignment.kind !== 'practice')
+        const gradeMap = new Map((grades || []).map((grade) => [grade.assignment_id, grade]))
+        const assignmentIds = new Set(gradedAssignments.map((assignment) => assignment.id))
+        const entries = gradedAssignments.map((assignment) => ({
+          assignment,
+          grade: gradeMap.get(assignment.id) || null,
+        }))
+        const extraGrades = (grades || []).filter((grade) => !assignmentIds.has(grade.assignment_id))
+        const withExtras = [
+          ...entries,
+          ...extraGrades.map((grade) => ({ assignment: grade.Assignment || null, grade })),
+        ]
+        const sorted = withExtras.sort((a, b) => {
+          const aDate = a.assignment?.due_date || a.grade?.graded_at
+          const bDate = b.assignment?.due_date || b.grade?.graded_at
+          if (!aDate && !bDate) return 0
+          if (!aDate) return 1
+          if (!bDate) return -1
+          return new Date(aDate) - new Date(bDate)
+        })
         if (isMounted) {
-          setGrades(data)
+          setGradeEntries(sorted)
         }
       } catch (error) {
         console.warn('Failed to load grades', error)
         if (isMounted) {
-          setGrades([])
+          setGradeEntries([])
         }
       }
     }
@@ -42,34 +66,43 @@ export default function Grades() {
     }
   }, [])
 
+  const gradedEntries = useMemo(
+    () => gradeEntries.filter((entry) => entry.grade),
+    [gradeEntries]
+  )
   const totalPoints = useMemo(
-    () => grades.reduce((sum, grade) => sum + (grade.max_score || grade.Assignment?.total_points || 0), 0),
-    [grades]
+    () =>
+      gradedEntries.reduce(
+        (sum, entry) => sum + (entry.grade?.max_score || entry.assignment?.total_points || 0),
+        0
+      ),
+    [gradedEntries]
   )
   const earnedPoints = useMemo(
-    () => grades.reduce((sum, grade) => sum + (grade.final_score || 0), 0),
-    [grades]
+    () => gradedEntries.reduce((sum, entry) => sum + (entry.grade?.final_score || 0), 0),
+    [gradedEntries]
   )
   const overallPercentage = totalPoints > 0 ? (earnedPoints / totalPoints) * 100 : 0
 
   const rows = useMemo(
     () =>
-      grades.map((grade, index) => {
-        const assignment = grade.Assignment || {}
-        const total = grade.max_score || assignment.total_points || 0
-        const score = grade.final_score ?? grade.raw_score ?? null
+      gradeEntries.map((entry, index) => {
+        const assignment = entry.assignment || entry.grade?.Assignment || {}
+        const grade = entry.grade
+        const total = grade?.max_score || assignment.total_points || 0
+        const score = grade?.final_score ?? grade?.raw_score ?? null
         const percentage = total > 0 && score !== null ? (score / total) * 100 : null
 
         return {
-          id: grade.id ?? `${assignment.id ?? 'grade'}-${index}`,
+          id: assignment.id ?? entry.grade?.id ?? `grade-${index}`,
           assignment: assignment.title || 'Assignment',
           due: assignment.due_date ? formatDate(assignment.due_date) : '—',
-          submitted: grade.graded_at ? formatDate(grade.graded_at) : '—',
+          submitted: grade?.graded_at ? formatDate(grade.graded_at) : '—',
           score: score !== null ? `${score.toFixed(1)} / ${total.toFixed(1)}` : '—',
           percent: percentage !== null ? `${percentage.toFixed(1)}%` : '—'
         }
       }),
-    [grades]
+    [gradeEntries]
   )
 
   const columns = useMemo(

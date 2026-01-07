@@ -3,7 +3,7 @@ import Header from './Header.jsx'
 import Sidebar from './Sidebar.jsx'
 import { useSidebarStructure } from './SidebarStructure.jsx'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { fetchJson } from '../../utils/api.js'
+import { clearStoredUser, fetchJson } from '../../utils/api.js'
 
 export default function AppLayout({ children }) {
   const location = useLocation()
@@ -16,6 +16,7 @@ export default function AppLayout({ children }) {
     } catch (error) {
       console.warn('Signing out failed', error)
     } finally {
+      clearStoredUser()
       navigate('/login')
     }
   }

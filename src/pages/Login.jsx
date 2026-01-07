@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Box, Typography, CardContent, TextField, Button, Alert, Stack } from '@mui/material'
 import ThemedCard from '../components/ui/ThemedCard.jsx'
-import { fetchJson } from '../utils/api.js'
+import { fetchJson, setStoredUser } from '../utils/api.js'
 
 export default function Login() {
   const [username, setUsername] = useState('')
@@ -16,11 +16,12 @@ export default function Login() {
     setError('')
     setIsSubmitting(true)
     try {
-      await fetchJson('/api/auth/login', {
+      const data = await fetchJson('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password }),
       })
+      setStoredUser(data?.user)
       navigate('/assignments')
     } catch (err) {
       setError(err?.message || 'Login failed.')
