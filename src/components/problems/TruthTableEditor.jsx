@@ -150,6 +150,19 @@ export default function TruthTableEditor({ proof, savedState, onStateChange, onP
       ),
     [expectedTables, isAtomicToken, savedState, tables]
   )
+  const resetTables = React.useMemo(
+    () =>
+      tables.map((table, tableIndex) =>
+        table.rows.map((row, rowIndex) =>
+          row.map((_, colIndex) =>
+            isAtomicToken(table.tokens[colIndex])
+              ? expectedTables?.[tableIndex]?.[rowIndex]?.[colIndex]
+              : ''
+          )
+        )
+      ),
+    [expectedTables, isAtomicToken, tables]
+  )
 
   const [tableInputs, setTableInputs] = React.useState(derivedInitialTables)
   const [status, setStatus] = React.useState('unanswered')
@@ -348,9 +361,9 @@ export default function TruthTableEditor({ proof, savedState, onStateChange, onP
   }
 
   const handleStartOver = () => {
-    setTableInputs(derivedInitialTables)
+    setTableInputs(resetTables)
     onStateChange?.({
-      tables: derivedInitialTables.map((rows) => ({ rows })),
+      tables: resetTables.map((rows) => ({ rows })),
     })
     setStatus('unanswered')
     setMessage('')

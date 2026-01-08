@@ -140,6 +140,8 @@ export default function SingleRowTruthTable({
       }
       return ''
     })
+  const buildResetRow = () =>
+    tokens.map((token) => (isAtomicToken(token) ? toSymbol(interpretation?.[token]) : ''))
 
   const [rowInputs, setRowInputs] = useState(buildInitialRow)
 
@@ -161,7 +163,7 @@ export default function SingleRowTruthTable({
     onComplete,
     isDisabled,
     resetInput: () => {
-      const reset = buildInitialRow()
+      const reset = buildResetRow()
       setRowInputs(reset)
       onStateChange?.({ row: reset })
     },

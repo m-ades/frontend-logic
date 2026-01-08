@@ -20,13 +20,14 @@ export default function SymbolicTranslation({
 }) {
   const theme = useTheme()
   const [inputValue, setInputValue] = useState(savedState?.ans || '')
+  const formulaInputRef = useRef(null)
+  const solutionInputRef = useRef(null)
 
-  const FormulaInputField = ({ value, onValueChange, fieldReadOnly }) => {
-    const inputRef = useRef(null)
-    const formulaInputRef = useRef(null)
+  const FormulaInputField = ({ value, onValueChange, fieldReadOnly, formulaInputRef }) => {
+    const containerRef = useRef(null)
 
     useEffect(() => {
-      if (!inputRef.current || formulaInputRef.current) return
+      if (!containerRef.current || formulaInputRef.current) return
       const formulaInput = FormulaInput.getnew({})
       formulaInput.readOnly = fieldReadOnly
       formulaInputRef.current = formulaInput
@@ -40,7 +41,7 @@ export default function SymbolicTranslation({
       formulaInput.style.backgroundColor = theme.palette.background.paper
       formulaInput.style.color = theme.palette.text.primary
 
-      inputRef.current.appendChild(formulaInput)
+      containerRef.current.appendChild(formulaInput)
 
       const handleChange = () => {
         if (fieldReadOnly) return
@@ -65,17 +66,17 @@ export default function SymbolicTranslation({
           formulaInputRef.current = null
         }
       }
-    }, [fieldReadOnly, onValueChange])
+    }, [fieldReadOnly, onValueChange, formulaInputRef])
 
     useEffect(() => {
       if (formulaInputRef.current && value !== undefined) {
         formulaInputRef.current.value = value
       }
-    }, [value])
+    }, [value, formulaInputRef])
 
     return (
       <Box
-        ref={inputRef}
+        ref={containerRef}
         sx={{
           width: '100%',
           minHeight: '56px',
@@ -131,6 +132,7 @@ export default function SymbolicTranslation({
             onStateChange?.({ ans: value })
           }}
           fieldReadOnly={readOnly}
+          formulaInputRef={formulaInputRef}
         />
       </Box>
 
@@ -158,6 +160,7 @@ export default function SymbolicTranslation({
             value={answer ?? ''}
             onValueChange={null}
             fieldReadOnly
+            formulaInputRef={solutionInputRef}
           />
         </SolutionReveal>
       )}
