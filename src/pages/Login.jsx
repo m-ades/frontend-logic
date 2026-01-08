@@ -29,7 +29,7 @@ export default function Login() {
   useEffect(() => {
     if (!isLoading && isAuthenticated && user) {
       if (user.role === "instructor") {
-        navigate("/instructor/dashboard", { replace: true });
+        navigate("/instructor/courses", { replace: true });
       } else {
         navigate("/student/dashboard", { replace: true });
       }
@@ -43,7 +43,7 @@ export default function Login() {
 
   const handleInstructorLogin = () => {
     login(dispatch, MOCK_USERS.instructor);
-    navigate("/instructor/dashboard");
+    navigate("/instructor/courses");
   };
 
   // Don't render anything while checking auth state

@@ -5,6 +5,7 @@ import { ThemeProvider } from "./context/ThemeContext.jsx";
 import { useThemeState } from "./context/ThemeContext.jsx";
 import { LayoutProvider } from "./context/LayoutContext.jsx";
 import { AuthProvider } from "./context/AuthContext.jsx";
+import { CoursesProvider } from "./context/CoursesContext.jsx";
 import ErrorBoundary from "./components/ui/ErrorBoundary.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import AppLayout from "./components/layout/AppLayout.jsx";
@@ -18,6 +19,7 @@ import Settings from "./pages/Settings.jsx";
 import InstructorDashboard from "./pages/instructor/InstructorDashboard.jsx";
 import InstructorGradebook from "./pages/instructor/InstructorGradebook.jsx";
 import InstructorControls from "./pages/instructor/InstructorControls.jsx";
+import InstructorCourses from "./pages/instructor/InstructorCourses.jsx";
 import Login from "./pages/Login.jsx";
 
 function AppRoutes() {
@@ -139,6 +141,16 @@ function AppRoutes() {
         }
       />
       <Route
+        path="/instructor/courses"
+        element={
+          <ProtectedRoute allowedRoles={["instructor"]}>
+            <AppLayout>
+              <InstructorCourses />
+            </AppLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
         path="/instructor/gradebook"
         element={
           <ProtectedRoute allowedRoles={["instructor"]}>
@@ -178,30 +190,36 @@ function AppRoutes() {
           </ProtectedRoute>
         }
       />
-
+      <Route
+        path="/instructor"
+        element={
+          <ProtectedRoute allowedRoles={["instructor"]}>
+            <Navigate to="/instructor/courses" replace />
+          </ProtectedRoute>
+        }
+      />
       {/* Catch all */}
       <Route path="*" element={<Navigate to="/login" replace />} />
     </Routes>
   );
 }
-
 function AppContent() {
   const theme = useThemeState();
-
   return (
     <MuiThemeProvider theme={theme}>
       <CssBaseline />
       <BrowserRouter>
         <AuthProvider>
-          <LayoutProvider>
-            <AppRoutes />
-          </LayoutProvider>
+          <CoursesProvider>
+            <LayoutProvider>
+              <AppRoutes />
+            </LayoutProvider>
+          </CoursesProvider>
         </AuthProvider>
       </BrowserRouter>
     </MuiThemeProvider>
   );
 }
-
 export default function App() {
   return (
     <ErrorBoundary>

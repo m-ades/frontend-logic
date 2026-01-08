@@ -27,7 +27,9 @@ import {
   toggleSidebar,
   setSidebar,
 } from "../../context/LayoutContext.jsx";
+import { useAuthState } from "../../context/AuthContext.jsx";
 import SidebarLink from "./SidebarLink.jsx";
+import CourseSelector from "../ui/CourseSelector.jsx";
 
 const DRAWER_WIDTH = 240;
 
@@ -35,11 +37,14 @@ export default function Sidebar({ structure, location, onSignOut }) {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const { isSidebarOpened, sidebarHoverEnabled } = useLayoutState();
+  const { user } = useAuthState();
   const layoutDispatch = useLayoutDispatch();
   const [isPermanent, setPermanent] = useState(true);
   const [profileMenu, setProfileMenu] = useState(null);
   const [isHovering, setIsHovering] = useState(false);
   const [manuallyOpened, setManuallyOpened] = useState(false);
+
+  const isInstructor = user?.role === "instructor";
 
   useEffect(() => {
     const handleResize = () => {
@@ -54,11 +59,9 @@ export default function Sidebar({ structure, location, onSignOut }) {
 
   const handleDrawerToggle = () => {
     if (sidebarHoverEnabled) {
-      // In hover mode, manual toggle sets the manually opened state
       setManuallyOpened(!manuallyOpened);
       toggleSidebar(layoutDispatch);
     } else {
-      // In manual mode, just toggle normally
       toggleSidebar(layoutDispatch);
     }
   };
@@ -77,7 +80,6 @@ export default function Sidebar({ structure, location, onSignOut }) {
     }
   };
 
-  // Reset manually opened state when hover mode is disabled
   useEffect(() => {
     if (!sidebarHoverEnabled) {
       setManuallyOpened(false);
@@ -133,6 +135,8 @@ export default function Sidebar({ structure, location, onSignOut }) {
           {isSidebarOpened ? "LOGO" : "L"}
         </Typography>
       </Box>
+
+      {isInstructor && <CourseSelector isSidebarOpened={isSidebarOpened} />}
 
       <Box sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
         <List sx={{ mt: 1, px: 1, flexGrow: 1 }}>
