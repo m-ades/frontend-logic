@@ -40,6 +40,16 @@ const emptyAnalytics = {
   submissionCount: 0,
 }
 
+const median = (values) => {
+  if (!values.length) return null
+  const sorted = [...values].sort((a, b) => a - b)
+  const mid = Math.floor(sorted.length / 2)
+  if (sorted.length % 2 === 0) {
+    return (sorted[mid - 1] + sorted[mid]) / 2
+  }
+  return sorted[mid]
+}
+
 export default function Dashboard() {
   const theme = useTheme()
   const [analytics, setAnalytics] = useState(emptyAnalytics)
@@ -66,28 +76,84 @@ export default function Dashboard() {
 
     const loadAnalytics = async () => {
       try {
-        const [analyticsData, grades] = await Promise.all([
+        const [analyticsData, grades, gradebook] = await Promise.all([
           fetchJson(`/api/analytics/student?userId=${getActiveUserId()}&courseId=${API_CONFIG.courseId}`),
           fetchJson(`/api/users/${getActiveUserId()}/grades`),
+          fetchJson(`/api/analytics/gradebook?courseId=${API_CONFIG.courseId}`).catch(() => null),
         ])
         if (isMounted) {
           setAnalytics({ ...emptyAnalytics, ...analyticsData })
-          const timeline = (grades || [])
-            .map((grade) => {
-              const assignment = grade.Assignment || {}
-              const total = grade.max_score || assignment.total_points || 0
-              const score = grade.final_score ?? grade.raw_score ?? null
-              const percent = total > 0 && score !== null ? (score / total) * 100 : null
-              const date = assignment.due_date || grade.graded_at
-              return {
-                id: grade.id,
-                title: assignment.title || 'Assignment',
-                date,
-                percent,
-              }
-            })
-            .filter((item) => item.percent !== null)
-            .sort((a, b) => new Date(a.date) - new Date(b.date))
+          const userId = getActiveUserId()
+          const gradeMap = new Map(
+            (grades || []).map((grade) => [
+              grade.assignment_id ?? grade.Assignment?.id,
+              grade,
+            ])
+          )
+          const timeline = gradebook?.assignments?.length
+            ? gradebook.assignments
+                .slice()
+                .sort((a, b) => {
+                  const aDate = a.due_date ? new Date(a.due_date) : null
+                  const bDate = b.due_date ? new Date(b.due_date) : null
+                  if (aDate && bDate) return aDate - bDate
+                  if (aDate) return -1
+                  if (bDate) return 1
+                  return (a.id ?? 0) - (b.id ?? 0)
+                })
+                .map((assignment) => {
+                  const studentRow = gradebook.students?.find(
+                    (student) => Number(student.user_id) === Number(userId)
+                  )
+                  const studentPercent = studentRow?.assignments?.find(
+                    (item) => item.assignment_id === assignment.id
+                  )?.percent
+                  const percents = (gradebook.students || [])
+                    .map((student) =>
+                      student.assignments?.find(
+                        (item) => item.assignment_id === assignment.id
+                      )?.percent
+                    )
+                    .filter((value) => typeof value === 'number')
+                  const avgPercent = percents.length
+                    ? percents.reduce((sum, value) => sum + value, 0) / percents.length
+                    : null
+                  const medianPercent = median(percents)
+                  const grade = gradeMap.get(assignment.id)
+                  const total = grade?.max_score || assignment.total_points || 0
+                  const score = grade?.final_score ?? grade?.raw_score ?? null
+                  const fallbackPercent = total > 0 && score !== null ? score / total : null
+                  return {
+                    id: assignment.id,
+                    title: assignment.title || 'Assignment',
+                    avgPercent: avgPercent !== null ? avgPercent * 100 : null,
+                    medianPercent: medianPercent !== null ? medianPercent * 100 : null,
+                    studentPercent:
+                      studentPercent !== undefined && studentPercent !== null
+                        ? studentPercent * 100
+                        : fallbackPercent !== null
+                          ? fallbackPercent * 100
+                          : null,
+                  }
+                })
+            : (grades || [])
+                .map((grade) => {
+                  const assignment = grade.Assignment || {}
+                  const total = grade.max_score || assignment.total_points || 0
+                  const score = grade.final_score ?? grade.raw_score ?? null
+                  const percent = total > 0 && score !== null ? (score / total) * 100 : null
+                  const date = assignment.due_date || grade.graded_at
+                  return {
+                    id: grade.id,
+                    title: assignment.title || 'Assignment',
+                    studentPercent: percent,
+                    avgPercent: null,
+                    medianPercent: null,
+                    date,
+                  }
+                })
+                .filter((item) => item.studentPercent !== null)
+                .sort((a, b) => new Date(a.date) - new Date(b.date))
           setGradeTimeline(timeline)
         }
       } catch (error) {
@@ -158,7 +224,9 @@ export default function Dashboard() {
     () =>
       gradeTimeline.map((item) => ({
         name: item.title,
-        percent: Number(item.percent.toFixed(1)),
+        studentPercent: item.studentPercent !== null ? Number(item.studentPercent.toFixed(1)) : null,
+        avgPercent: item.avgPercent !== null ? Number(item.avgPercent.toFixed(1)) : null,
+        medianPercent: item.medianPercent !== null ? Number(item.medianPercent.toFixed(1)) : null,
       })),
     [gradeTimeline]
   )
@@ -481,7 +549,15 @@ export default function Dashboard() {
               <Box sx={{ display: 'flex', gap: 3, alignItems: 'center', flexWrap: 'wrap' }}>
                 <Box display="flex" alignItems="center" gap={1}>
                   <Box sx={{ width: 12, height: 12, borderRadius: '50%', bgcolor: 'primary.main' }} />
-                  <Typography variant="body2">Score %</Typography>
+                  <Typography variant="body2">Your score %</Typography>
+                </Box>
+                <Box display="flex" alignItems="center" gap={1}>
+                  <Box sx={{ width: 12, height: 12, borderRadius: '50%', bgcolor: 'secondary.main' }} />
+                  <Typography variant="body2">Class average %</Typography>
+                </Box>
+                <Box display="flex" alignItems="center" gap={1}>
+                  <Box sx={{ width: 12, height: 12, borderRadius: '50%', bgcolor: 'success.main' }} />
+                  <Typography variant="body2">Class median %</Typography>
                 </Box>
               </Box>
             </Box>
@@ -497,13 +573,33 @@ export default function Dashboard() {
                   stroke={theme.palette.divider}
                   domain={[0, 100]}
                 />
-                <Tooltip />
+                <Tooltip
+                  formatter={(value) =>
+                    value === null || value === undefined ? '—' : `${Number(value).toFixed(1)}%`
+                  }
+                />
                 <Line
                   type="monotone"
-                  dataKey="percent"
+                  dataKey="studentPercent"
                   stroke={theme.palette.primary.main}
                   strokeWidth={2}
                   dot={{ r: 3 }}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="avgPercent"
+                  stroke={theme.palette.secondary.main}
+                  strokeWidth={2}
+                  dot={{ r: 3 }}
+                  connectNulls
+                />
+                <Line
+                  type="monotone"
+                  dataKey="medianPercent"
+                  stroke={theme.palette.success.main}
+                  strokeWidth={2}
+                  dot={{ r: 3 }}
+                  connectNulls
                 />
               </LineChart>
             </ResponsiveContainer>

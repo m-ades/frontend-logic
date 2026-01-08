@@ -635,6 +635,7 @@ export default function TruthTableEditor({ proof, savedState, onStateChange, onP
         onStartOver={handleStartOver}
         isChecking={isChecking}
         isDisabled={!tableFilled || attemptCount >= attemptLimit}
+        align="flex-start"
       />
       {showSolution && renderAnswerCard(
         'Correct Answer',
