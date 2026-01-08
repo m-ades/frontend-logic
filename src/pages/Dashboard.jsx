@@ -105,16 +105,20 @@ export default function Dashboard() {
                   const studentRow = gradebook.students?.find(
                     (student) => Number(student.user_id) === Number(userId)
                   )
-                  const studentPercent = studentRow?.assignments?.find(
+                  const studentAssignment = studentRow?.assignments?.find(
                     (item) => item.assignment_id === assignment.id
-                  )?.percent
+                  )
+                  const studentPercent = studentAssignment?.has_grade
+                    ? studentAssignment?.percent
+                    : null
                   const percents = (gradebook.students || [])
                     .map((student) =>
                       student.assignments?.find(
                         (item) => item.assignment_id === assignment.id
-                      )?.percent
+                      )
                     )
-                    .filter((value) => typeof value === 'number')
+                    .filter((item) => item?.has_grade && typeof item?.percent === 'number')
+                    .map((item) => item.percent)
                   const avgPercent = percents.length
                     ? percents.reduce((sum, value) => sum + value, 0) / percents.length
                     : null
