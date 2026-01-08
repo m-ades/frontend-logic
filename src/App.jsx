@@ -16,6 +16,7 @@ import Practice from "./pages/Practice.jsx";
 import Grades from "./pages/Grades.jsx";
 import Contact from "./pages/Contact.jsx";
 import Settings from "./pages/Settings.jsx";
+import StudentCourses from "./pages/StudentCourses.jsx";
 import InstructorDashboard from "./pages/instructor/InstructorDashboard.jsx";
 import InstructorGradebook from "./pages/instructor/InstructorGradebook.jsx";
 import InstructorControls from "./pages/instructor/InstructorControls.jsx";
@@ -36,7 +37,17 @@ function AppRoutes() {
         path="/student"
         element={
           <ProtectedRoute allowedRoles={["student"]}>
-            <Navigate to="/student/dashboard" replace />
+            <Navigate to="/student/courses" replace />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/student/courses"
+        element={
+          <ProtectedRoute allowedRoles={["student"]}>
+            <AppLayout>
+              <StudentCourses />
+            </AppLayout>
           </ProtectedRoute>
         }
       />

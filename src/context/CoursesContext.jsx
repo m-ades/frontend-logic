@@ -21,8 +21,8 @@ function coursesReducer(state, action) {
   }
 }
 
-// Mock courses data
-const MOCK_COURSES = [
+// Mock courses data for instructors
+const MOCK_INSTRUCTOR_COURSES = [
   {
     id: "1",
     name: "PHILO/MATH/CSCI 275 - Spring 2025",
@@ -61,27 +61,44 @@ const MOCK_COURSES = [
   },
 ];
 
+// Mock courses data for students
+const MOCK_STUDENT_COURSES = [
+  {
+    id: "1",
+    name: "PHILO/MATH/CSCI 275 - Spring 2025",
+    code: "PHIL275-01",
+    semester: "Spring 2025",
+    status: "current",
+    instructor: "Dr. Smith",
+    color: "#1976d2",
+  },
+  {
+    id: "3",
+    name: "Logic & Critical Thinking - Spring 2025",
+    code: "PHIL101-01",
+    semester: "Spring 2025",
+    status: "current",
+    instructor: "Prof. Johnson",
+    color: "#ed6c02",
+  },
+  {
+    id: "5",
+    name: "Introduction to Philosophy - Fall 2024",
+    code: "PHIL100-01",
+    semester: "Fall 2024",
+    status: "past",
+    instructor: "Dr. Williams",
+    color: "#2e7d32",
+  },
+];
+
 const initialState = {
-  courses: MOCK_COURSES,
+  courses: [],
   activeCourseId: null,
 };
 
 export function CoursesProvider({ children }) {
   const [state, dispatch] = useReducer(coursesReducer, initialState);
-
-  // Load active course from localStorage on mount
-  useEffect(() => {
-    const storedCourseId = localStorage.getItem("activeCourseId");
-    if (storedCourseId) {
-      dispatch({ type: "SET_ACTIVE_COURSE", payload: storedCourseId });
-    } else if (MOCK_COURSES.length > 0) {
-      // Default to first current course
-      const firstCurrent = MOCK_COURSES.find((c) => c.status === "current");
-      if (firstCurrent) {
-        dispatch({ type: "SET_ACTIVE_COURSE", payload: firstCurrent.id });
-      }
-    }
-  }, []);
 
   return (
     <CoursesStateContext.Provider value={state}>
@@ -114,4 +131,21 @@ export function setActiveCourse(dispatch, courseId) {
 
 export function setCourses(dispatch, courses) {
   dispatch({ type: "SET_COURSES", payload: courses });
+}
+
+export function initializeCourses(dispatch, userRole) {
+  const courses =
+    userRole === "instructor" ? MOCK_INSTRUCTOR_COURSES : MOCK_STUDENT_COURSES;
+  dispatch({ type: "SET_COURSES", payload: courses });
+
+  // Load active course from localStorage or default to first current course
+  const storedCourseId = localStorage.getItem("activeCourseId");
+  if (storedCourseId && courses.find((c) => c.id === storedCourseId)) {
+    dispatch({ type: "SET_ACTIVE_COURSE", payload: storedCourseId });
+  } else if (courses.length > 0) {
+    const firstCurrent = courses.find((c) => c.status === "current");
+    if (firstCurrent) {
+      dispatch({ type: "SET_ACTIVE_COURSE", payload: firstCurrent.id });
+    }
+  }
 }

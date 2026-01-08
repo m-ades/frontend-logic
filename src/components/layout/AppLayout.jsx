@@ -1,5 +1,6 @@
 import { Box, Toolbar } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 import Header from "./Header.jsx";
 import Sidebar from "./Sidebar.jsx";
 import StudentSidebarStructure from "./SidebarStructure.jsx";
@@ -10,17 +11,29 @@ import {
   useAuthDispatch,
   logout,
 } from "../../context/AuthContext";
+import {
+  useCoursesDispatch,
+  initializeCourses,
+} from "../../context/CoursesContext";
 
 export default function AppLayout({ children }) {
   const location = useLocation();
   const navigate = useNavigate();
   const { user } = useAuthState();
-  const dispatch = useAuthDispatch();
+  const authDispatch = useAuthDispatch();
+  const coursesDispatch = useCoursesDispatch();
 
-  // Check if current path includes /assignments or /practice
+  // Initialize courses when user is loaded
+  useEffect(() => {
+    if (user?.role) {
+      initializeCourses(coursesDispatch, user.role);
+    }
+  }, [user?.role, coursesDispatch]);
+
+  // Check if current path includes /assignment or /worksheet (for both student and instructor)
   const showToolbar =
-    location.pathname.includes("/assignments/") ||
-    location.pathname.includes("/practice/");
+    location.pathname.includes("/assignment/") ||
+    location.pathname.includes("/worksheet/");
 
   // Choose sidebar structure based on user role
   const sidebarStructure =
@@ -29,7 +42,7 @@ export default function AppLayout({ children }) {
       : StudentSidebarStructure;
 
   const handleSignOut = () => {
-    logout(dispatch);
+    logout(authDispatch);
     navigate("/login");
   };
 

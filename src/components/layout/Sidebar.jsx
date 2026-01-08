@@ -44,8 +44,6 @@ export default function Sidebar({ structure, location, onSignOut }) {
   const [isHovering, setIsHovering] = useState(false);
   const [manuallyOpened, setManuallyOpened] = useState(false);
 
-  const isInstructor = user?.role === "instructor";
-
   useEffect(() => {
     const handleResize = () => {
       const isSmallScreen = window.innerWidth < theme.breakpoints.values.md;
@@ -136,7 +134,7 @@ export default function Sidebar({ structure, location, onSignOut }) {
         </Typography>
       </Box>
 
-      {isInstructor && <CourseSelector isSidebarOpened={isSidebarOpened} />}
+      <CourseSelector isSidebarOpened={isSidebarOpened} />
 
       <Box sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
         <List sx={{ mt: 1, px: 1, flexGrow: 1 }}>

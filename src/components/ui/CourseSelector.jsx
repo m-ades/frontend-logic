@@ -17,6 +17,7 @@ import {
   Circle as CircleIcon,
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
+import { useAuthState } from "../../context/AuthContext";
 import {
   useCoursesState,
   useCoursesDispatch,
@@ -25,9 +26,13 @@ import {
 
 export default function CourseSelector({ isSidebarOpened }) {
   const [anchorEl, setAnchorEl] = useState(null);
+  const { user } = useAuthState();
   const { courses, activeCourseId } = useCoursesState();
   const dispatch = useCoursesDispatch();
   const navigate = useNavigate();
+
+  const isInstructor = user?.role === "instructor";
+  const coursesPath = isInstructor ? "/instructor/courses" : "/student/courses";
 
   const activeCourse = courses.find((c) => c.id === activeCourseId);
   const currentCourses = courses.filter((c) => c.status === "current");
@@ -47,7 +52,7 @@ export default function CourseSelector({ isSidebarOpened }) {
   };
 
   const handleViewAllCourses = () => {
-    navigate("/instructor/courses");
+    navigate(coursesPath);
     handleClose();
   };
 

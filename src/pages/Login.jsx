@@ -31,14 +31,14 @@ export default function Login() {
       if (user.role === "instructor") {
         navigate("/instructor/courses", { replace: true });
       } else {
-        navigate("/student/dashboard", { replace: true });
+        navigate("/student/courses", { replace: true });
       }
     }
   }, [isAuthenticated, user, isLoading, navigate]);
 
   const handleStudentLogin = () => {
     login(dispatch, MOCK_USERS.student);
-    navigate("/student/dashboard");
+    navigate("/student/courses");
   };
 
   const handleInstructorLogin = () => {
