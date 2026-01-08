@@ -5,58 +5,82 @@ import {
   Grade as GradeIcon,
   Message as MessageIcon,
   Settings as SettingsIcon,
-} from '@mui/icons-material'
-import { getCourseStructureByTypes, ACTIVITY_TYPES } from '../../placeholder/courseActivities.js'
+} from "@mui/icons-material";
+import {
+  getCourseStructureByTypes,
+  ACTIVITY_TYPES,
+} from "../../placeholder/courseActivities.js";
 
 const generateSidebarStructure = () => {
   const assignmentStructure = getCourseStructureByTypes([
     ACTIVITY_TYPES.HOMEWORK,
     ACTIVITY_TYPES.QUIZ,
     ACTIVITY_TYPES.EXAM,
-  ])
+  ]);
 
-  const practiceStructure = getCourseStructureByTypes([ACTIVITY_TYPES.PRACTICE])
+  const practiceStructure = getCourseStructureByTypes([
+    ACTIVITY_TYPES.PRACTICE,
+  ]);
 
   const mapStructure = (structure, baseLink) => {
-    const children = []
+    const children = [];
     structure.forEach((chapter) => {
-      const subchapterChildren = (chapter.subchapters || []).map((subchapter) => ({
-        label: subchapter.title,
-        children: (subchapter.activities || []).map((activity) => ({
-          label: activity.title,
-          link: activity.worksheet ? `/assignment/${activity.worksheet.id}` : baseLink,
-        })),
-      }))
+      const subchapterChildren = (chapter.subchapters || []).map(
+        (subchapter) => ({
+          label: subchapter.title,
+          children: (subchapter.activities || []).map((activity) => ({
+            label: activity.title,
+            link: activity.worksheet
+              ? `/student/assignment/${activity.worksheet.id}`
+              : baseLink,
+          })),
+        })
+      );
 
       children.push({
         label: chapter.title,
         children: subchapterChildren,
-      })
-    })
-    return children
-  }
+      });
+    });
+    return children;
+  };
 
   return [
-    { id: 0, label: 'Dashboard', link: '/', icon: <DashboardIcon /> },
-    { id: 1, type: 'divider' },
+    {
+      id: 0,
+      label: "Dashboard",
+      link: "/student/dashboard",
+      icon: <DashboardIcon />,
+    },
+    { id: 1, type: "divider" },
     {
       id: 2,
-      label: 'Assignments',
-      link: '/assignments',
+      label: "Assignments",
+      link: "/student/assignments",
       icon: <AssignmentIcon />,
-      children: mapStructure(assignmentStructure, '/assignments'),
+      children: mapStructure(assignmentStructure, "/student/assignments"),
     },
     {
       id: 3,
-      label: 'Practice',
-      link: '/practice',
+      label: "Practice",
+      link: "/student/practice",
       icon: <SchoolIcon />,
-      children: mapStructure(practiceStructure, '/practice'),
+      children: mapStructure(practiceStructure, "/student/practice"),
     },
-    { id: 4, label: 'Grades', link: '/grades', icon: <GradeIcon /> },
-    { id: 5, label: 'Contact', link: '/contact', icon: <MessageIcon /> },
-    { id: 6, label: 'Settings', link: '/settings', icon: <SettingsIcon /> },
-  ]
-}
+    { id: 4, label: "Grades", link: "/student/grades", icon: <GradeIcon /> },
+    {
+      id: 5,
+      label: "Contact",
+      link: "/student/contact",
+      icon: <MessageIcon />,
+    },
+    {
+      id: 6,
+      label: "Settings",
+      link: "/student/settings",
+      icon: <SettingsIcon />,
+    },
+  ];
+};
 
-export default generateSidebarStructure()
+export default generateSidebarStructure();

@@ -10,17 +10,24 @@ function authReducer(state, action) {
         ...state,
         isAuthenticated: true,
         user: action.payload,
+        isLoading: false,
       };
     case "LOGOUT":
       return {
         ...state,
         isAuthenticated: false,
         user: null,
+        isLoading: false,
       };
     case "UPDATE_USER":
       return {
         ...state,
         user: { ...state.user, ...action.payload },
+      };
+    case "SET_LOADING":
+      return {
+        ...state,
+        isLoading: action.payload,
       };
     default:
       throw new Error(`Unhandled action type: ${action.type}`);
@@ -30,6 +37,7 @@ function authReducer(state, action) {
 const initialState = {
   isAuthenticated: false,
   user: null,
+  isLoading: true, // Start with loading true
 };
 
 export function AuthProvider({ children }) {
@@ -45,7 +53,10 @@ export function AuthProvider({ children }) {
       } catch (error) {
         console.error("Failed to parse stored user:", error);
         localStorage.removeItem("user");
+        dispatch({ type: "SET_LOADING", payload: false });
       }
+    } else {
+      dispatch({ type: "SET_LOADING", payload: false });
     }
   }, []);
 

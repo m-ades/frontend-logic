@@ -23,28 +23,38 @@ import {
 export default function Login() {
   const navigate = useNavigate();
   const dispatch = useAuthDispatch();
-  const { isAuthenticated, user } = useAuthState();
+  const { isAuthenticated, user, isLoading } = useAuthState();
 
   // Redirect if already logged in
   useEffect(() => {
-    if (isAuthenticated && user) {
+    if (!isLoading && isAuthenticated && user) {
       if (user.role === "instructor") {
-        navigate("/instructor/dashboard");
+        navigate("/instructor/dashboard", { replace: true });
       } else {
-        navigate("/dashboard");
+        navigate("/student/dashboard", { replace: true });
       }
     }
-  }, [isAuthenticated, user, navigate]);
+  }, [isAuthenticated, user, isLoading, navigate]);
 
   const handleStudentLogin = () => {
     login(dispatch, MOCK_USERS.student);
-    navigate("/dashboard");
+    navigate("/student/dashboard");
   };
 
   const handleInstructorLogin = () => {
     login(dispatch, MOCK_USERS.instructor);
-    navigate("/instructor");
+    navigate("/instructor/dashboard");
   };
+
+  // Don't render anything while checking auth state
+  if (isLoading) {
+    return null;
+  }
+
+  // Don't render login form if already authenticated (prevents flash during redirect)
+  if (isAuthenticated) {
+    return null;
+  }
 
   return (
     <Container maxWidth="sm">
@@ -64,7 +74,7 @@ export default function Login() {
               gutterBottom
               sx={{ fontWeight: 600, mb: 1 }}
             >
-              Login
+              Development Login
             </Typography>
             <Typography
               variant="body1"
@@ -72,7 +82,7 @@ export default function Login() {
               color="text.secondary"
               sx={{ mb: 4 }}
             >
-              Symbolic Logic App
+              PHILO/MATH/CSCI 275 Symbolic Logic
             </Typography>
 
             <Stack spacing={3}>
@@ -106,7 +116,7 @@ export default function Login() {
               color="text.secondary"
               sx={{ mt: 3, display: "block" }}
             >
-              Development mode (Click a button to assume a role)
+              Development mode - Click a button to assume a role
             </Typography>
           </CardContent>
         </Card>

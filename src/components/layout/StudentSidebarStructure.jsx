@@ -11,37 +11,37 @@ export default [
   {
     id: 0,
     label: "Dashboard",
-    link: "/dashboard",
+    link: "/student/dashboard",
     icon: <DashboardIcon />,
   },
   {
     id: 1,
     label: "Assignments",
-    link: "/assignments",
+    link: "/student/assignments",
     icon: <AssignmentIcon />,
   },
   {
     id: 2,
     label: "Practice",
-    link: "/practice",
+    link: "/student/practice",
     icon: <PracticeIcon />,
   },
   {
     id: 3,
     label: "Grades",
-    link: "/grades",
+    link: "/student/grades",
     icon: <GradeIcon />,
   },
   {
     id: 4,
     label: "Settings",
-    link: "/settings",
+    link: "/student/settings",
     icon: <SettingsIcon />,
   },
   {
     id: 5,
     label: "Contact",
-    link: "/contact",
+    link: "/student/contact",
     icon: <ContactIcon />,
   },
 ];
