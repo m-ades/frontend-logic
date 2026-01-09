@@ -5,6 +5,7 @@ import {
   Grade as GradeIcon,
   Message as MessageIcon,
   Settings as SettingsIcon,
+  AdminPanelSettings as AdminPanelSettingsIcon,
 } from '@mui/icons-material'
 import { useEffect, useMemo, useState } from 'react'
 import { API_CONFIG, fetchJson } from '../../utils/api.js'
@@ -25,7 +26,7 @@ const instructorStructure = [
   { id: 2, label: 'Assignments', link: '/assignments', icon: <AssignmentIcon />, children: [] },
   { id: 3, label: 'Practice', link: '/practice', icon: <SchoolIcon />, children: [] },
   { id: 4, label: 'Gradebook', link: '/instructor/gradebook', icon: <GradeIcon /> },
-  { id: 5, label: 'Controls', link: '/instructor/controls', icon: <SettingsIcon /> },
+  { id: 5, label: 'Controls', link: '/instructor/controls', icon: <AdminPanelSettingsIcon /> },
   { id: 6, label: 'Contact', link: '/contact', icon: <MessageIcon /> },
   { id: 7, label: 'Settings', link: '/settings', icon: <SettingsIcon /> },
 ]
