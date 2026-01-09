@@ -17,6 +17,15 @@ import InstructorDashboard from './pages/instructor/InstructorDashboard.jsx'
 import InstructorGradebook from './pages/instructor/InstructorGradebook.jsx'
 import InstructorControls from './pages/instructor/InstructorControls.jsx'
 import Login from './pages/Login.jsx'
+import { getStoredUser } from './utils/api.js'
+
+function RequireAuth({ children }) {
+  const user = getStoredUser()
+  if (!user) {
+    return <Navigate to="/login" replace />
+  }
+  return children
+}
 
 function AppContent() {
   const theme = useThemeState()
@@ -31,90 +40,112 @@ function AppContent() {
               <Route
                 path="/"
                 element={
-                  <AppLayout>
-                    <Dashboard />
-                  </AppLayout>
+                  <RequireAuth>
+                    <AppLayout>
+                      <Dashboard />
+                    </AppLayout>
+                  </RequireAuth>
                 }
               />
               <Route
                 path="/assignments"
                 element={
-                  <AppLayout>
-                    <Assignments />
-                  </AppLayout>
+                  <RequireAuth>
+                    <AppLayout>
+                      <Assignments />
+                    </AppLayout>
+                  </RequireAuth>
                 }
               />
               <Route
                 path="/practice"
                 element={
-                  <AppLayout>
-                    <Practice />
-                  </AppLayout>
+                  <RequireAuth>
+                    <AppLayout>
+                      <Practice />
+                    </AppLayout>
+                  </RequireAuth>
                 }
               />
               <Route
                 path="/grades"
                 element={
-                  <AppLayout>
-                    <Grades />
-                  </AppLayout>
+                  <RequireAuth>
+                    <AppLayout>
+                      <Grades />
+                    </AppLayout>
+                  </RequireAuth>
                 }
               />
               <Route
                 path="/contact"
                 element={
-                  <AppLayout>
-                    <Contact />
-                  </AppLayout>
+                  <RequireAuth>
+                    <AppLayout>
+                      <Contact />
+                    </AppLayout>
+                  </RequireAuth>
                 }
               />
               <Route
                 path="/settings"
                 element={
-                  <AppLayout>
-                    <Settings />
-                  </AppLayout>
+                  <RequireAuth>
+                    <AppLayout>
+                      <Settings />
+                    </AppLayout>
+                  </RequireAuth>
                 }
               />
               <Route path="/login" element={<Login />} />
               <Route
                 path="/assignment/:assignmentId"
                 element={
-                  <AppLayout>
-                    <Worksheet />
-                  </AppLayout>
+                  <RequireAuth>
+                    <AppLayout>
+                      <Worksheet />
+                    </AppLayout>
+                  </RequireAuth>
                 }
               />
               <Route
                 path="/worksheet/:worksheetId"
                 element={
-                  <AppLayout>
-                    <Worksheet />
-                  </AppLayout>
+                  <RequireAuth>
+                    <AppLayout>
+                      <Worksheet />
+                    </AppLayout>
+                  </RequireAuth>
                 }
               />
               <Route
                 path="/instructor/dashboard"
                 element={
-                  <AppLayout>
-                    <InstructorDashboard />
-                  </AppLayout>
+                  <RequireAuth>
+                    <AppLayout>
+                      <InstructorDashboard />
+                    </AppLayout>
+                  </RequireAuth>
                 }
               />
               <Route
                 path="/instructor/gradebook"
                 element={
-                  <AppLayout>
-                    <InstructorGradebook />
-                  </AppLayout>
+                  <RequireAuth>
+                    <AppLayout>
+                      <InstructorGradebook />
+                    </AppLayout>
+                  </RequireAuth>
                 }
               />
               <Route
                 path="/instructor/controls"
                 element={
-                  <AppLayout>
-                    <InstructorControls />
-                  </AppLayout>
+                  <RequireAuth>
+                    <AppLayout>
+                      <InstructorControls />
+                    </AppLayout>
+                  </RequireAuth>
                 }
               />
               <Route path="*" element={<Navigate to="/" replace />} />

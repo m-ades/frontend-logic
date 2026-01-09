@@ -22,7 +22,7 @@ export default function Login() {
         body: JSON.stringify({ username, password }),
       })
       setStoredUser(data?.user)
-      let landingPath = '/assignments'
+      let landingPath = '/'
       try {
         const enrollments = await fetchJson('/api/course-enrollments')
         const courseEnrollment = (enrollments || []).find(
