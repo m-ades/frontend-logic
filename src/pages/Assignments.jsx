@@ -4,7 +4,7 @@ import { Box, Grid, Tabs, Tab, Typography, CardContent, Chip, Stack } from '@mui
 import ThemedCard from '../components/ui/ThemedCard.jsx'
 import ActivityAccordion from '../components/ui/ActivityAccordion.jsx'
 import { ACTIVITY_TYPES } from '../placeholder/courseActivities.js'
-import { formatDate } from '../utils/formatting.js'
+import { formatDateTime } from '../utils/formatting.js'
 import { getStoredBoolean } from '../placeholder/storage.js'
 import { API_CONFIG, fetchJson, getActiveUserId } from '../utils/api.js'
 
@@ -183,7 +183,7 @@ export default function Assignments() {
               variant="outlined"
             />
             <Typography variant="body2" color="text.secondary">
-              {datePrefix}{formatDate(activity.dueDate)}
+              {datePrefix}{formatDateTime(activity.dueDate) || 'No due date'}
             </Typography>
             <Typography variant="body2" color="text.secondary">
               {activity.points} points

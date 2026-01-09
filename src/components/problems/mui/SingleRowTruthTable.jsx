@@ -262,22 +262,10 @@ export default function SingleRowTruthTable({
   const tableFilled = rowInputs.length > 0 && !isDisabled()
 
   return (
-    <Stack spacing={2} sx={{ px: 0, width: '100%', alignItems: 'stretch', flexGrow: 1 }}>
-      <Typography variant="h5" sx={{ fontWeight: 600, color: '#2f6bff' }}>
-        Truth Table Task
-      </Typography>
-      {(prompt || statement) && (
-        <Typography variant="body1" sx={{ fontSize: { xs: '0.95rem', md: '1rem' } }}>
-          {prompt || statement}
-        </Typography>
-      )}
-      <Typography variant="body2" sx={{ color: '#2f6bff' }}>
-        Fill in the single row to match the expected truth values.
-      </Typography>
+    <Stack spacing={3} sx={{ px: 0, width: '100%', alignItems: 'stretch', flexGrow: 1 }}>
       <Box className="logicpenguin" sx={{ width: '100%', flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
         <Box
           sx={{
-            mt: 1,
             overflow: 'visible',
             minHeight: '260px',
             flexGrow: 1,
@@ -285,22 +273,11 @@ export default function SingleRowTruthTable({
           }}
           className="lp-problem-card"
         >
-          <Stack spacing={2} sx={{ p: { xs: 2, md: 2 } }}>
+          <Stack spacing={3} sx={{ p: { xs: 2, md: 2 } }}>
             {renderTableSet(tableRows, tableRows, false)}
           </Stack>
         </Box>
       </Box>
-
-      {!hideActions && (
-        <ProblemSetButtons
-          onCheck={handleCheck}
-          onStartOver={handleStartOver}
-          isChecking={isChecking}
-          isDisabled={!tableFilled || isLocked}
-          align="flex-start"
-          sx={{ mt: 1 }}
-        />
-      )}
       <Typography
         variant="body2"
         sx={{
@@ -321,6 +298,16 @@ export default function SingleRowTruthTable({
         >
           {message}
         </Alert>
+      )}
+
+      {!hideActions && (
+        <ProblemSetButtons
+          onCheck={handleCheck}
+          onStartOver={handleStartOver}
+          isChecking={isChecking}
+          isDisabled={!tableFilled || isLocked}
+          align="flex-start"
+        />
       )}
 
       {isLocked && expectedRow.length > 0 && renderAnswerCard(

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Box, Radio, RadioGroup, FormControlLabel, FormControl, Typography, Alert, Paper, Table, TableBody, TableRow, TableCell } from '@mui/material'
+import { Box, Stack, Radio, RadioGroup, FormControlLabel, FormControl, Typography, Alert, Table, TableBody, TableRow, TableCell } from '@mui/material'
 import ProblemSetButtons from './ProblemSetButtons.jsx'
 import { useProblemChecker } from '../../../hooks/useProblemChecker.js'
 import SolutionReveal from '../SolutionReveal.jsx'
@@ -48,6 +48,7 @@ export default function ValidCorrectSound({
       sound: answers.sound === '' ? -2 : (answers.sound === 'true' ? true : false)
     }
     if (ans.correct === -2 || ans.valid === -2 || ans.sound === -2) {
+      setStatus('unanswered')
       setMessage('Please answer all questions')
       return
     }
@@ -74,7 +75,7 @@ export default function ValidCorrectSound({
   }
 
   const renderAnswerTable = (values, tableReadOnly) => (
-    <Table sx={{ mb: 2 }}>
+    <Table>
       <TableBody>
         {['correct', 'valid', 'sound'].map((q) => (
           <TableRow key={q}>
@@ -103,24 +104,36 @@ export default function ValidCorrectSound({
   const isComplete = answers.correct !== '' && answers.valid !== '' && answers.sound !== ''
 
   return (
-    <Box sx={{ width: '100%', maxWidth: '800px', mx: 'auto' }}>
-      <Paper variant="outlined" sx={{ p: 3, mb: 3, bgcolor: 'background.default' }}>
-        <Typography variant="body2" sx={{ mb: 1, fontWeight: 600 }}>Premises:</Typography>
-        {problem.prems.map((prem, idx) => (
-          <Typography key={idx} variant="body2" sx={{ mb: 0.5 }}>
-            {idx + 1}. {prem}
-          </Typography>
-        ))}
-        <Typography variant="body2" sx={{ mt: 2, fontWeight: 600 }}>Conclusion:</Typography>
-        <Typography variant="body2">{problem.conc}</Typography>
-      </Paper>
-
-      {renderAnswerTable(answers, readOnly)}
+    <Stack spacing={3} sx={{ px: 0, width: '100%', alignItems: 'stretch', flexGrow: 1 }}>
+      <Box className="logicpenguin" sx={{ width: '100%', flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
+        <Box
+          sx={{
+            overflow: 'visible',
+            minHeight: '250px',
+            flexGrow: 1,
+            alignSelf: { xs: 'stretch', md: 'flex-start' },
+          }}
+          className="lp-problem-card"
+        >
+          <Stack spacing={3} sx={{ p: { xs: 2, md: 2 } }}>
+            <Box>
+              <Typography variant="body2" sx={{ mb: 1, fontWeight: 600 }}>Premises:</Typography>
+              {problem.prems.map((prem, idx) => (
+                <Typography key={idx} variant="body2" sx={{ mb: 0.5 }}>
+                  {idx + 1}. {prem}
+                </Typography>
+              ))}
+              <Typography variant="body2" sx={{ mt: 2, fontWeight: 600 }}>Conclusion:</Typography>
+              <Typography variant="body2">{problem.conc}</Typography>
+            </Box>
+            {renderAnswerTable(answers, readOnly)}
+          </Stack>
+        </Box>
+      </Box>
 
       {message && (
         <Alert 
           severity={getStatusColor()} 
-          sx={{ mb: 2 }}
           onClose={() => setMessage('')}
         >
           {message}
@@ -133,6 +146,7 @@ export default function ValidCorrectSound({
           onStartOver={handleStartOver}
           isChecking={isChecking}
           isDisabled={!isComplete || isLocked}
+          align="flex-start"
         />
       )}
       {!suppressReveal && (
@@ -144,6 +158,6 @@ export default function ValidCorrectSound({
           }, true)}
         </SolutionReveal>
       )}
-    </Box>
+    </Stack>
   )
 }

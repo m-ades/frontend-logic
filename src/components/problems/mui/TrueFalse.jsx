@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Box, Radio, RadioGroup, FormControlLabel, FormControl, Typography, Alert } from '@mui/material'
+import { Box, Stack, Radio, RadioGroup, FormControlLabel, FormControl, Alert } from '@mui/material'
 import ProblemSetButtons from './ProblemSetButtons.jsx'
 import { useProblemChecker } from '../../../hooks/useProblemChecker.js'
 import SolutionReveal from '../SolutionReveal.jsx'
@@ -49,45 +49,54 @@ export default function TrueFalse({
   }
 
   return (
-    <Box sx={{ width: '100%', maxWidth: '800px', mx: 'auto' }}>
-      <Typography variant="body1" sx={{ mb: 3, fontWeight: 500, textAlign: 'center' }}>
-        {problem.prompt}
-      </Typography>
-
-      <FormControl component="fieldset" sx={{ width: '100%', mb: 2 }}>
-        <RadioGroup
-          value={selectedValue}
-          onChange={handleChange}
-          name="true-false"
+    <Stack spacing={3} sx={{ px: 0, width: '100%', alignItems: 'stretch', flexGrow: 1 }}>
+      <Box className="logicpenguin" sx={{ width: '100%', flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
+        <Box
+          sx={{
+            overflow: 'visible',
+            minHeight: '150px',
+            flexGrow: 1,
+            alignSelf: { xs: 'stretch', md: 'flex-start' },
+          }}
+          className="lp-problem-card"
         >
-          <FormControlLabel
-            value="true"
-            control={<Radio disabled={readOnly} />}
-            label="True"
-            sx={{
-              mb: 1,
-              '& .MuiFormControlLabel-label': {
-                fontSize: '1rem'
-              }
-            }}
-          />
-          <FormControlLabel
-            value="false"
-            control={<Radio disabled={readOnly} />}
-            label="False"
-            sx={{
-              '& .MuiFormControlLabel-label': {
-                fontSize: '1rem'
-              }
-            }}
-          />
-        </RadioGroup>
-      </FormControl>
+          <Stack spacing={3} sx={{ p: { xs: 2, md: 2 } }}>
+            <FormControl component="fieldset" sx={{ width: '100%' }}>
+              <RadioGroup
+                value={selectedValue}
+                onChange={handleChange}
+                name="true-false"
+              >
+                <FormControlLabel
+                  value="true"
+                  control={<Radio disabled={readOnly} />}
+                  label="True"
+                  sx={{
+                    mb: 1,
+                    '& .MuiFormControlLabel-label': {
+                      fontSize: '1rem'
+                    }
+                  }}
+                />
+                <FormControlLabel
+                  value="false"
+                  control={<Radio disabled={readOnly} />}
+                  label="False"
+                  sx={{
+                    '& .MuiFormControlLabel-label': {
+                      fontSize: '1rem'
+                    }
+                  }}
+                />
+              </RadioGroup>
+            </FormControl>
+          </Stack>
+        </Box>
+      </Box>
 
       {message && (
         <Alert 
           severity={getStatusColor()} 
-          sx={{ mb: 2 }}
           onClose={() => setMessage('')}
         >
           {message}
@@ -100,16 +109,17 @@ export default function TrueFalse({
           onStartOver={handleStartOver}
           isChecking={isChecking}
           isDisabled={selectedValue === '' || isLocked}
+          align="flex-start"
         />
       )}
       <SolutionReveal show={showSolution}>
-        <FormControl component="fieldset" sx={{ width: '100%', mb: 2 }}>
+        <FormControl component="fieldset" sx={{ width: '100%' }}>
           <RadioGroup value={answer ? 'true' : 'false'} name="true-false-reveal">
             <FormControlLabel value="true" control={<Radio disabled />} label="True" />
             <FormControlLabel value="false" control={<Radio disabled />} label="False" />
           </RadioGroup>
         </FormControl>
       </SolutionReveal>
-    </Box>
+    </Stack>
   )
 }

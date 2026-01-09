@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Box, Typography, CardContent, Stack } from '@mui/material'
 import { DataGrid } from '@mui/x-data-grid'
 import ThemedCard from '../components/ui/ThemedCard.jsx'
-import { formatDate } from '../utils/formatting.js'
+import { formatDateTime } from '../utils/formatting.js'
 import { API_CONFIG, fetchJson, getActiveUserId } from '../utils/api.js'
 
 function NoRowsOverlay() {
@@ -96,8 +96,8 @@ export default function Grades() {
         return {
           id: assignment.id ?? entry.grade?.id ?? `grade-${index}`,
           assignment: assignment.title || 'Assignment',
-          due: assignment.due_date ? formatDate(assignment.due_date) : '—',
-          submitted: grade?.graded_at ? formatDate(grade.graded_at) : '—',
+          due: assignment.due_date ? formatDateTime(assignment.due_date) : '—',
+          submitted: grade?.graded_at ? formatDateTime(grade.graded_at) : '—',
           score: score !== null ? `${score.toFixed(1)} / ${total.toFixed(1)}` : '—',
           percent: percentage !== null ? `${percentage.toFixed(1)}%` : '—'
         }

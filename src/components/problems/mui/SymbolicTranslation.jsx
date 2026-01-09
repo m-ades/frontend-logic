@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { Box, Typography, Alert } from '@mui/material'
+import { Box, Stack, Typography, Alert } from '@mui/material'
 import { useTheme } from '@mui/material/styles'
 import ProblemSetButtons from './ProblemSetButtons.jsx'
 import FormulaInput from '../../ui/logicpenguin/formula-input.js'
@@ -25,45 +25,62 @@ export default function SymbolicTranslation({
 
   const FormulaInputField = ({ value, onValueChange, fieldReadOnly, formulaInputRef }) => {
     const containerRef = useRef(null)
+    const changeHandlerRef = useRef(null)
 
     useEffect(() => {
-      if (!containerRef.current || formulaInputRef.current) return
-      const formulaInput = FormulaInput.getnew({})
-      formulaInput.readOnly = fieldReadOnly
-      formulaInputRef.current = formulaInput
-
-      formulaInput.style.width = '100%'
-      formulaInput.style.padding = theme.spacing(1.5)
-      formulaInput.style.border = `1px solid ${theme.palette.divider}`
-      formulaInput.style.borderRadius = theme.shape.borderRadius
-      formulaInput.style.fontSize = '1rem'
-      formulaInput.style.fontFamily = 'monospace'
-      formulaInput.style.backgroundColor = theme.palette.background.paper
-      formulaInput.style.color = theme.palette.text.primary
-
-      containerRef.current.appendChild(formulaInput)
-
-      const handleChange = () => {
-        if (fieldReadOnly) return
-        const nextValue = formulaInput.value
-        onValueChange?.(nextValue)
+      if (!containerRef.current) return
+      if (!formulaInputRef.current) {
+        const formulaInput = FormulaInput.getnew({})
+        formulaInputRef.current = formulaInput
+        formulaInput.style.width = '100%'
+        formulaInput.style.padding = theme.spacing(1.5)
+        formulaInput.style.border = `1px solid ${theme.palette.divider}`
+        formulaInput.style.borderRadius = theme.shape.borderRadius
+        formulaInput.style.fontSize = '1rem'
+        formulaInput.style.fontFamily = 'monospace'
+        formulaInput.style.backgroundColor = theme.palette.background.paper
+        formulaInput.style.color = theme.palette.text.primary
+        containerRef.current.appendChild(formulaInput)
       }
+      return () => {
+        if (formulaInputRef.current) {
+          if (changeHandlerRef.current) {
+            formulaInputRef.current.removeEventListener('input', changeHandlerRef.current)
+            formulaInputRef.current.removeEventListener('change', changeHandlerRef.current)
+            changeHandlerRef.current = null
+          }
+          if (formulaInputRef.current.parentNode) {
+            formulaInputRef.current.parentNode.removeChild(formulaInputRef.current)
+          }
+          formulaInputRef.current = null
+        }
+      }
+    }, [formulaInputRef, theme])
 
+    useEffect(() => {
+      const formulaInput = formulaInputRef.current
+      if (!formulaInput) return
+      formulaInput.readOnly = fieldReadOnly
+      if (changeHandlerRef.current) {
+        formulaInput.removeEventListener('input', changeHandlerRef.current)
+        formulaInput.removeEventListener('change', changeHandlerRef.current)
+        changeHandlerRef.current = null
+      }
       if (!fieldReadOnly) {
+        const handleChange = () => {
+          if (fieldReadOnly) return
+          const nextValue = formulaInput.value
+          onValueChange?.(nextValue)
+        }
+        changeHandlerRef.current = handleChange
         formulaInput.addEventListener('input', handleChange)
         formulaInput.addEventListener('change', handleChange)
       }
-
       return () => {
-        if (formulaInputRef.current) {
-          if (!fieldReadOnly) {
-            formulaInput.removeEventListener('input', handleChange)
-            formulaInput.removeEventListener('change', handleChange)
-          }
-          if (formulaInput.parentNode) {
-            formulaInput.parentNode.removeChild(formulaInput)
-          }
-          formulaInputRef.current = null
+        if (changeHandlerRef.current) {
+          formulaInput.removeEventListener('input', changeHandlerRef.current)
+          formulaInput.removeEventListener('change', changeHandlerRef.current)
+          changeHandlerRef.current = null
         }
       }
     }, [fieldReadOnly, onValueChange, formulaInputRef])
@@ -87,7 +104,7 @@ export default function SymbolicTranslation({
     )
   }
   
-  const { status, message, isChecking, handleCheck, handleStartOver, getStatusColor, setStatus, setMessage, attemptCount, maxAttempts, isLocked } = useProblemChecker({
+  const { message, isChecking, handleCheck, handleStartOver, getStatusColor, setMessage, isLocked } = useProblemChecker({
     answer,
     problemType: 'symbolic-translation',
     question: problem,
@@ -115,31 +132,40 @@ export default function SymbolicTranslation({
 
 
   return (
-    <Box sx={{ width: '100%', maxWidth: '800px', mx: 'auto' }}>
-      <Typography variant="body1" sx={{ mb: 3, fontWeight: 500, textAlign: 'center' }}>
-        {problem}
-      </Typography>
-
-      <Box sx={{ mb: 2 }}>
-        <Typography variant="body2" sx={{ mb: 1, color: 'text.secondary' }}>
-          Your translation:
-        </Typography>
-        <FormulaInputField
-          value={inputValue}
-          onValueChange={(value) => {
-            if (readOnly) return
-            setInputValue(value)
-            onStateChange?.({ ans: value })
+    <Stack spacing={3} sx={{ px: 0, width: '100%', alignItems: 'stretch', flexGrow: 1 }}>
+      <Box className="logicpenguin" sx={{ width: '100%', flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
+        <Box
+          sx={{
+            overflow: 'visible',
+            minHeight: '150px',
+            flexGrow: 1,
+            alignSelf: { xs: 'stretch', md: 'flex-start' },
           }}
-          fieldReadOnly={readOnly}
-          formulaInputRef={formulaInputRef}
-        />
+          className="lp-problem-card"
+        >
+          <Stack spacing={3} sx={{ p: { xs: 2, md: 2 } }}>
+            <Box>
+              <Typography variant="body2" sx={{ mb: 1, color: 'text.secondary' }}>
+                Your translation:
+              </Typography>
+              <FormulaInputField
+                value={inputValue}
+                onValueChange={(value) => {
+                  if (readOnly) return
+                  setInputValue(value)
+                  onStateChange?.({ ans: value })
+                }}
+                fieldReadOnly={readOnly}
+                formulaInputRef={formulaInputRef}
+              />
+            </Box>
+          </Stack>
+        </Box>
       </Box>
 
       {message && (
         <Alert 
           severity={getStatusColor()} 
-          sx={{ mb: 2 }}
           onClose={() => setMessage('')}
         >
           {message}
@@ -152,6 +178,7 @@ export default function SymbolicTranslation({
           onStartOver={handleStartOver}
           isChecking={isChecking}
           isDisabled={!inputValue.trim() || isLocked}
+          align="flex-start"
         />
       )}
       {!suppressReveal && (
@@ -164,6 +191,6 @@ export default function SymbolicTranslation({
           />
         </SolutionReveal>
       )}
-    </Box>
+    </Stack>
   )
 }

@@ -40,6 +40,7 @@ export default function Layout({
           {onBackToLMS && (
             <IconButton
               onClick={onBackToLMS}
+              aria-label="Back to dashboard"
               sx={{
                 color: 'text.secondary',
                 '&:hover': { backgroundColor: 'action.hover' }

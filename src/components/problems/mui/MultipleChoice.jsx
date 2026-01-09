@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Box, Radio, RadioGroup, FormControlLabel, FormControl, Typography, Alert } from '@mui/material'
+import { Box, Stack, Radio, RadioGroup, FormControlLabel, FormControl, Alert } from '@mui/material'
 import ProblemSetButtons from './ProblemSetButtons.jsx'
 import { useProblemChecker } from '../../../hooks/useProblemChecker.js'
 import SolutionReveal from '../SolutionReveal.jsx'
@@ -18,7 +18,7 @@ export default function MultipleChoice({
 }) {
   const [selectedValue, setSelectedValue] = useState(savedState?.ans !== undefined ? String(savedState.ans) : '')
   
-  const { status, message, isChecking, handleCheck, handleStartOver, getStatusColor, setStatus, setMessage, attemptCount, maxAttempts, isLocked } = useProblemChecker({
+  const { message, isChecking, handleCheck, handleStartOver, getStatusColor, setStatus, setMessage, isLocked } = useProblemChecker({
     answer,
     problemType: 'multiple-choice',
     question: problem,
@@ -48,38 +48,47 @@ export default function MultipleChoice({
   }
 
   return (
-    <Box sx={{ width: '100%', maxWidth: '800px', mx: 'auto' }}>
-      <Typography variant="body1" sx={{ mb: 3, fontWeight: 500, textAlign: 'center' }}>
-        {problem.prompt}
-      </Typography>
-
-      <FormControl component="fieldset" sx={{ width: '100%', mb: 2 }}>
-        <RadioGroup
-          value={selectedValue}
-          onChange={handleChange}
-          name="multiple-choice"
+    <Stack spacing={3} sx={{ px: 0, width: '100%', alignItems: 'stretch', flexGrow: 1 }}>
+      <Box className="logicpenguin" sx={{ width: '100%', flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
+        <Box
+          sx={{
+            overflow: 'visible',
+            minHeight: '200px',
+            flexGrow: 1,
+            alignSelf: { xs: 'stretch', md: 'flex-start' },
+          }}
+          className="lp-problem-card"
         >
-          {problem.choices.map((choice, index) => (
-            <FormControlLabel
-              key={index}
-              value={String(index)}
-              control={<Radio disabled={readOnly} />}
-              label={choice}
-              sx={{
-                mb: 1,
-                '& .MuiFormControlLabel-label': {
-                  fontSize: '1rem'
-                }
-              }}
-            />
-          ))}
-        </RadioGroup>
-      </FormControl>
+          <Stack spacing={3} sx={{ p: { xs: 2, md: 2 } }}>
+            <FormControl component="fieldset" sx={{ width: '100%' }}>
+              <RadioGroup
+                value={selectedValue}
+                onChange={handleChange}
+                name="multiple-choice"
+              >
+                {problem.choices.map((choice, index) => (
+                  <FormControlLabel
+                    key={index}
+                    value={String(index)}
+                    control={<Radio disabled={readOnly} />}
+                    label={choice}
+                    sx={{
+                      mb: 1,
+                      '& .MuiFormControlLabel-label': {
+                        fontSize: '1rem'
+                      }
+                    }}
+                  />
+                ))}
+              </RadioGroup>
+            </FormControl>
+          </Stack>
+        </Box>
+      </Box>
 
       {message && (
         <Alert 
           severity={getStatusColor()} 
-          sx={{ mb: 2 }}
           onClose={() => setMessage('')}
         >
           {message}
@@ -92,11 +101,12 @@ export default function MultipleChoice({
           onStartOver={handleStartOver}
           isChecking={isChecking}
           isDisabled={selectedValue === '' || isLocked}
+          align="flex-start"
         />
       )}
       {!suppressReveal && (
         <SolutionReveal show={showSolution}>
-          <FormControl component="fieldset" sx={{ width: '100%', mb: 2 }}>
+          <FormControl component="fieldset" sx={{ width: '100%' }}>
             <RadioGroup value={String(answer ?? '')} name="multiple-choice-reveal">
               {problem.choices.map((choice, index) => (
                 <FormControlLabel
@@ -116,6 +126,6 @@ export default function MultipleChoice({
           </FormControl>
         </SolutionReveal>
       )}
-    </Box>
+    </Stack>
   )
 }

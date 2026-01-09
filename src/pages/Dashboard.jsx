@@ -29,7 +29,7 @@ import CalendarTodayIcon from '@mui/icons-material/CalendarToday'
 import AssignmentIcon from '@mui/icons-material/Assignment'
 import TrendingUpIcon from '@mui/icons-material/TrendingUp'
 import BookIcon from '@mui/icons-material/Book'
-import { formatDate } from '../utils/formatting.js'
+import { formatDateTime } from '../utils/formatting.js'
 import { API_CONFIG, fetchJson, getActiveUserId } from '../utils/api.js'
 import ThemedCard from '../components/ui/ThemedCard.jsx'
 
@@ -435,7 +435,7 @@ export default function Dashboard() {
                         {assignment.title}
                       </Typography>
                       <Typography variant="caption" color="text.secondary">
-                        Due {formatDate(assignment.due_date)}
+                        Due {formatDateTime(assignment.due_date) || '—'}
                       </Typography>
                     </Box>
                     <Button
