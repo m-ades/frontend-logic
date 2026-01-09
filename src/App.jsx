@@ -21,6 +21,7 @@ import InstructorDashboard from "./pages/instructor/InstructorDashboard.jsx";
 import InstructorGradebook from "./pages/instructor/InstructorGradebook.jsx";
 import InstructorControls from "./pages/instructor/InstructorControls.jsx";
 import InstructorCourses from "./pages/instructor/InstructorCourses.jsx";
+import InstructorAssignments from "./pages/instructor/InstructorAssignments";
 import Login from "./pages/Login.jsx";
 
 function AppRoutes() {
@@ -138,6 +139,16 @@ function AppRoutes() {
         element={
           <ProtectedRoute allowedRoles={["instructor"]}>
             <Navigate to="/instructor/dashboard" replace />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/instructor/assignments"
+        element={
+          <ProtectedRoute allowedRoles={["instructor"]}>
+            <AppLayout>
+              <InstructorAssignments />
+            </AppLayout>
           </ProtectedRoute>
         }
       />

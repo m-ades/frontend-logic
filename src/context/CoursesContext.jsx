@@ -19,18 +19,102 @@ const MOCK_INSTRUCTOR_COURSES = [
 
 const MOCK_ASSIGNMENTS_BY_COURSE = {
   1: [
-    { id: "a1", name: "Assignment 1" },
-    { id: "a2", name: "Assignment 2" },
-    { id: "a3", name: "Assignment 3" },
-    { id: "a4", name: "Assignment 4" },
-    { id: "a5", name: "Assignment 5" },
-    { id: "a6", name: "Assignment 6" },
-    { id: "a7", name: "Assignment 7" },
-    { id: "a8", name: "Assignment 8" },
-    { id: "a9", name: "Assignment 9" },
-    { id: "a10", name: "Assignment 10" },
-    { id: "a11", name: "Assignment 11" },
-    { id: "a12", name: "Assignment 12" },
+    {
+      id: "a1",
+      name: "Assignment 1",
+      dueDate: "Jan 15, 2026",
+      totalStudents: 30,
+      submissions: 28,
+      lateSubmissions: 3,
+    },
+    {
+      id: "a2",
+      name: "Assignment 2",
+      dueDate: "Jan 22, 2026",
+      totalStudents: 30,
+      submissions: 29,
+      lateSubmissions: 5,
+    },
+    {
+      id: "a3",
+      name: "Assignment 3",
+      dueDate: "Jan 29, 2026",
+      totalStudents: 30,
+      submissions: 27,
+      lateSubmissions: 2,
+    },
+    {
+      id: "a4",
+      name: "Assignment 4",
+      dueDate: "Feb 5, 2026",
+      totalStudents: 30,
+      submissions: 30,
+      lateSubmissions: 7,
+    },
+    {
+      id: "a5",
+      name: "Assignment 5",
+      dueDate: "Feb 12, 2026",
+      totalStudents: 30,
+      submissions: 26,
+      lateSubmissions: 4,
+    },
+    {
+      id: "a6",
+      name: "Assignment 6",
+      dueDate: "Feb 19, 2026",
+      totalStudents: 30,
+      submissions: 28,
+      lateSubmissions: 1,
+    },
+    {
+      id: "a7",
+      name: "Assignment 7",
+      dueDate: "Feb 26, 2026",
+      totalStudents: 30,
+      submissions: 29,
+      lateSubmissions: 3,
+    },
+    {
+      id: "a8",
+      name: "Assignment 8",
+      dueDate: "Mar 5, 2026",
+      totalStudents: 30,
+      submissions: 28,
+      lateSubmissions: 2,
+    },
+    {
+      id: "a9",
+      name: "Assignment 9",
+      dueDate: "Mar 12, 2026",
+      totalStudents: 30,
+      submissions: 30,
+      lateSubmissions: 4,
+    },
+    {
+      id: "a10",
+      name: "Assignment 10",
+      dueDate: "Mar 19, 2026",
+      totalStudents: 30,
+      submissions: 27,
+      lateSubmissions: 1,
+    },
+    {
+      id: "a11",
+      name: "Assignment 11",
+      dueDate: "Mar 26, 2026",
+      totalStudents: 30,
+      submissions: 29,
+      lateSubmissions: 5,
+    },
+    {
+      id: "a12",
+      name: "Assignment 12",
+      dueDate: "Apr 2, 2026",
+      totalStudents: 30,
+      submissions: 28,
+      lateSubmissions: 2,
+    },
   ],
 };
 
@@ -578,6 +662,85 @@ const MOCK_GRADEBOOK_BY_COURSE = {
     },
   ],
 };
+
+// Mock data generators (replace with API calls later)
+// Average time to complete assignments - generates mock data
+export function generateAvgTime(assignmentId) {
+  const times = ["2.5 hrs", "3.2 hrs", "1.8 hrs", "4.1 hrs", "2.9 hrs"];
+  return times[assignmentId % times.length];
+}
+
+// Calculate assignment average from gradebook
+export function calculateAssignmentAverage(assignmentId, students) {
+  const grades = students
+    .map((student) => student.grades[assignmentId])
+    .filter((grade) => grade !== undefined);
+
+  if (grades.length === 0) return 0;
+  return Math.round(
+    grades.reduce((sum, grade) => sum + grade, 0) / grades.length
+  );
+}
+
+// Calculate grade distribution
+export function calculateGradeDistribution(students) {
+  const distribution = [
+    { grade: "A", range: "90-100", count: 0, color: "#10b981" },
+    { grade: "B", range: "80-89", count: 0, color: "#6366f1" },
+    { grade: "C", range: "70-79", count: 0, color: "#f59e0b" },
+    { grade: "D", range: "60-69", count: 0, color: "#f97316" },
+    { grade: "F", range: "0-59", count: 0, color: "#ef4444" },
+  ];
+
+  students.forEach((student) => {
+    const grades = Object.values(student.grades).filter((g) => g !== undefined);
+    if (grades.length === 0) return;
+
+    const average = Math.round(
+      grades.reduce((sum, g) => sum + g, 0) / grades.length
+    );
+
+    if (average >= 90) distribution[0].count++;
+    else if (average >= 80) distribution[1].count++;
+    else if (average >= 70) distribution[2].count++;
+    else if (average >= 60) distribution[3].count++;
+    else distribution[4].count++;
+  });
+
+  return distribution;
+}
+
+// Calculate students at risk (below 70%)
+export function getStudentsAtRisk(students, assignments) {
+  return students
+    .map((student) => {
+      const grades = Object.values(student.grades).filter(
+        (g) => g !== undefined
+      );
+      const avg =
+        grades.length > 0
+          ? Math.round(grades.reduce((sum, g) => sum + g, 0) / grades.length)
+          : 0;
+      const missing = assignments.length - grades.length;
+      return { ...student, avg, missing };
+    })
+    .filter((s) => s.avg < 70 && s.avg > 0)
+    .sort((a, b) => a.avg - b.avg);
+}
+
+// Get upcoming deadlines (within 7 days)
+export function getUpcomingDeadlines(assignments) {
+  return assignments
+    .map((a) => {
+      const dueDate = new Date(a.dueDate);
+      const today = new Date();
+      const diffTime = dueDate - today;
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      return { ...a, daysLeft: diffDays };
+    })
+    .filter((a) => a.daysLeft >= 0 && a.daysLeft <= 7)
+    .sort((a, b) => a.daysLeft - b.daysLeft);
+}
 
 // Initial state
 const initialState = {

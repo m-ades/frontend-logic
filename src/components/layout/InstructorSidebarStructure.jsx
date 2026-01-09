@@ -4,6 +4,7 @@ import {
   Settings as SettingsIcon,
   ContactSupport as ContactIcon,
   AdminPanelSettings as ControlsIcon,
+  Assignment as AssignmentIcon,
 } from "@mui/icons-material";
 
 export default [
@@ -15,24 +16,30 @@ export default [
   },
   {
     id: 1,
+    label: "Assignments",
+    link: "/instructor/assignments",
+    icon: <AssignmentIcon />,
+  },
+  {
+    id: 2,
     label: "Gradebook",
     link: "/instructor/gradebook",
     icon: <GradebookIcon />,
   },
   {
-    id: 2,
+    id: 3,
     label: "Controls",
     link: "/instructor/controls",
     icon: <ControlsIcon />,
   },
   {
-    id: 3,
+    id: 4,
     label: "Settings",
     link: "/instructor/settings",
     icon: <SettingsIcon />,
   },
   {
-    id: 4,
+    id: 5,
     label: "Contact",
     link: "/instructor/contact",
     icon: <ContactIcon />,
