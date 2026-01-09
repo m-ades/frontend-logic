@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Box, Typography, CardContent, TextField, Button, Alert, Stack } from '@mui/material'
 import ThemedCard from '../components/ui/ThemedCard.jsx'
-import { fetchJson, setStoredUser } from '../utils/api.js'
+import { API_CONFIG, fetchJson, setStoredUser } from '../utils/api.js'
 
 export default function Login() {
   const [username, setUsername] = useState('')
@@ -22,7 +22,19 @@ export default function Login() {
         body: JSON.stringify({ username, password }),
       })
       setStoredUser(data?.user)
-      navigate('/assignments')
+      let landingPath = '/assignments'
+      try {
+        const enrollments = await fetchJson('/api/course-enrollments')
+        const courseEnrollment = (enrollments || []).find(
+          (enrollment) => Number(enrollment.course_id) === Number(API_CONFIG.courseId)
+        )
+        if (courseEnrollment && ['instructor', 'ta'].includes(courseEnrollment.role)) {
+          landingPath = '/instructor/dashboard'
+        }
+      } catch (enrollmentError) {
+        console.warn('Failed to load enrollments for role routing', enrollmentError)
+      }
+      navigate(landingPath)
     } catch (err) {
       setError(err?.message || 'Login failed.')
     } finally {

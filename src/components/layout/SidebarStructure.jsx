@@ -9,7 +9,7 @@ import {
 import { useEffect, useMemo, useState } from 'react'
 import { API_CONFIG, fetchJson } from '../../utils/api.js'
 
-const baseStructure = [
+const studentStructure = [
   { id: 0, label: 'Dashboard', link: '/', icon: <DashboardIcon /> },
   { id: 1, type: 'divider' },
   { id: 2, label: 'Assignments', link: '/assignments', icon: <AssignmentIcon />, children: [] },
@@ -17,6 +17,17 @@ const baseStructure = [
   { id: 4, label: 'Grades', link: '/grades', icon: <GradeIcon /> },
   { id: 5, label: 'Contact', link: '/contact', icon: <MessageIcon /> },
   { id: 6, label: 'Settings', link: '/settings', icon: <SettingsIcon /> },
+]
+
+const instructorStructure = [
+  { id: 0, label: 'Dashboard', link: '/instructor/dashboard', icon: <DashboardIcon /> },
+  { id: 1, type: 'divider' },
+  { id: 2, label: 'Assignments', link: '/assignments', icon: <AssignmentIcon />, children: [] },
+  { id: 3, label: 'Practice', link: '/practice', icon: <SchoolIcon />, children: [] },
+  { id: 4, label: 'Gradebook', link: '/instructor/gradebook', icon: <GradeIcon /> },
+  { id: 5, label: 'Controls', link: '/instructor/controls', icon: <SettingsIcon /> },
+  { id: 6, label: 'Contact', link: '/contact', icon: <MessageIcon /> },
+  { id: 7, label: 'Settings', link: '/settings', icon: <SettingsIcon /> },
 ]
 
 const buildCourseStructure = (assignments) => {
@@ -62,6 +73,7 @@ const mapStructure = (structure, baseLink) => {
 export function useSidebarStructure() {
   const [assignmentStructure, setAssignmentStructure] = useState([])
   const [practiceStructure, setPracticeStructure] = useState([])
+  const [isInstructor, setIsInstructor] = useState(false)
 
   useEffect(() => {
     let isMounted = true
@@ -85,13 +97,29 @@ export function useSidebarStructure() {
     }
 
     loadAssignments()
+    const loadRole = async () => {
+      try {
+        const enrollments = await fetchJson('/api/course-enrollments')
+        if (!isMounted) return
+        const enrollment = (enrollments || []).find(
+          (item) => Number(item.course_id) === Number(API_CONFIG.courseId)
+        )
+        setIsInstructor(Boolean(enrollment && ['instructor', 'ta'].includes(enrollment.role)))
+      } catch (error) {
+        if (isMounted) {
+          setIsInstructor(false)
+        }
+      }
+    }
+    loadRole()
     return () => {
       isMounted = false
     }
   }, [])
 
   return useMemo(() => {
-    return baseStructure.map((item) => {
+    const structure = isInstructor ? instructorStructure : studentStructure
+    return structure.map((item) => {
       if (item.id === 2) {
         return { ...item, children: mapStructure(assignmentStructure, '/assignments') }
       }
@@ -100,5 +128,5 @@ export function useSidebarStructure() {
       }
       return item
     })
-  }, [assignmentStructure, practiceStructure])
+  }, [assignmentStructure, practiceStructure, isInstructor])
 }
