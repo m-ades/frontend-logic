@@ -40,16 +40,6 @@ const emptyAnalytics = {
   submissionCount: 0,
 }
 
-const median = (values) => {
-  if (!values.length) return null
-  const sorted = [...values].sort((a, b) => a - b)
-  const mid = Math.floor(sorted.length / 2)
-  if (sorted.length % 2 === 0) {
-    return (sorted[mid - 1] + sorted[mid]) / 2
-  }
-  return sorted[mid]
-}
-
 export default function Dashboard() {
   const theme = useTheme()
   const [analytics, setAnalytics] = useState(emptyAnalytics)
@@ -76,11 +66,11 @@ export default function Dashboard() {
 
     const loadAnalytics = async () => {
       try {
-        const [analyticsData, grades, gradebook] = await Promise.all([
-          fetchJson(`/api/analytics/student?userId=${getActiveUserId()}&courseId=${API_CONFIG.courseId}`),
-          fetchJson(`/api/users/${getActiveUserId()}/grades`),
-          fetchJson(`/api/analytics/gradebook?courseId=${API_CONFIG.courseId}`).catch(() => null),
-        ])
+          const [analyticsData, grades, gradebookSummary] = await Promise.all([
+            fetchJson(`/api/analytics/student?userId=${getActiveUserId()}&courseId=${API_CONFIG.courseId}`),
+            fetchJson(`/api/users/${getActiveUserId()}/grades`),
+            fetchJson(`/api/analytics/gradebook-summary?courseId=${API_CONFIG.courseId}`).catch(() => null),
+          ])
         if (isMounted) {
           setAnalytics({ ...emptyAnalytics, ...analyticsData })
           const userId = getActiveUserId()
@@ -90,8 +80,8 @@ export default function Dashboard() {
               grade,
             ])
           )
-          const timeline = gradebook?.assignments?.length
-            ? gradebook.assignments
+          const timeline = gradebookSummary?.length
+            ? gradebookSummary
                 .slice()
                 .sort((a, b) => {
                   const aDate = a.due_date ? new Date(a.due_date) : null
@@ -102,27 +92,6 @@ export default function Dashboard() {
                   return (a.id ?? 0) - (b.id ?? 0)
                 })
                 .map((assignment) => {
-                  const studentRow = gradebook.students?.find(
-                    (student) => Number(student.user_id) === Number(userId)
-                  )
-                  const studentAssignment = studentRow?.assignments?.find(
-                    (item) => item.assignment_id === assignment.id
-                  )
-                  const studentPercent = studentAssignment?.has_grade
-                    ? studentAssignment?.percent
-                    : null
-                  const percents = (gradebook.students || [])
-                    .map((student) =>
-                      student.assignments?.find(
-                        (item) => item.assignment_id === assignment.id
-                      )
-                    )
-                    .filter((item) => item?.has_grade && typeof item?.percent === 'number')
-                    .map((item) => item.percent)
-                  const avgPercent = percents.length
-                    ? percents.reduce((sum, value) => sum + value, 0) / percents.length
-                    : null
-                  const medianPercent = median(percents)
                   const grade = gradeMap.get(assignment.id)
                   const total = grade?.max_score || assignment.total_points || 0
                   const score = grade?.final_score ?? grade?.raw_score ?? null
@@ -130,12 +99,14 @@ export default function Dashboard() {
                   return {
                     id: assignment.id,
                     title: assignment.title || 'Assignment',
-                    avgPercent: avgPercent !== null ? avgPercent * 100 : null,
-                    medianPercent: medianPercent !== null ? medianPercent * 100 : null,
+                    avgPercent: assignment.avg_percent !== null && assignment.avg_percent !== undefined
+                      ? assignment.avg_percent * 100
+                      : null,
+                    medianPercent: assignment.median_percent !== null && assignment.median_percent !== undefined
+                      ? assignment.median_percent * 100
+                      : null,
                     studentPercent:
-                      studentPercent !== undefined && studentPercent !== null
-                        ? studentPercent * 100
-                        : fallbackPercent !== null
+                      fallbackPercent !== null
                           ? fallbackPercent * 100
                           : null,
                   }
