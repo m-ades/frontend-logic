@@ -16,7 +16,11 @@ import {
   ListItemText,
   ListItemIcon,
   ListItemSecondaryAction,
-  Chip
+  Chip,
+  Dialog,          
+  DialogTitle,     
+  DialogContent,   
+  DialogActions    
 } from '@mui/material'
 import ThemedCard from '../components/ui/ThemedCard.jsx'
 import { useThemeState, useThemeDispatch } from '../context/ThemeContext.jsx'
@@ -29,6 +33,7 @@ import DesktopWindowsIcon from '@mui/icons-material/DesktopWindows'
 import LaptopIcon from '@mui/icons-material/Laptop'
 import LogoutIcon from '@mui/icons-material/Logout'
 import DeleteIcon from '@mui/icons-material/Delete'
+import WarningIcon from '@mui/icons-material/Warning'
 
 export default function Settings() {
   const theme = useThemeState()
@@ -50,6 +55,13 @@ export default function Settings() {
   const handleThemeToggle = () => {
     changeTheme(isDark ? 'default' : 'dark')
   }
+
+  const [confirmationDialog, setConfirmationDialog] = useState({
+    open: false,
+    type: '', 
+    deviceId: null,
+    deviceName: ''
+  })
 
   //mock data for devices 
   const [devices, setDevices] = useState([
@@ -212,25 +224,65 @@ export default function Settings() {
     }
   }
 
-  const handleLogoutDevice = (deviceId) => {
+  const openSingleLogoutDialog = (deviceId, deviceName) => {
+    setConfirmationDialog({
+      open: true,
+      type: 'single',
+      deviceId,
+      deviceName
+    })
+  }
+
+  const openAllLogoutDialog = () => {
+    setConfirmationDialog({
+      open: true,
+      type: 'all',
+      deviceId: null,
+      deviceName: ''
+    })
+  }
+
+  const closeConfirmationDialog = () => {
+    setConfirmationDialog(prev => ({
+      ...prev,
+      open: false
+    }))
+    
+    setTimeout(() => {
+      setConfirmationDialog({
+        open: false,
+        type: '',
+        deviceId: null,
+        deviceName: ''
+      })
+    }, 150) 
+  }
+
+  const handleConfirmLogoutDevice = () => {
+    const { deviceId } = confirmationDialog
+    
     //need to be implemented with backend
     console.log('Logging out device:', deviceId)
     
     setDevices(prev => prev.filter(device => device.id !== deviceId))
     
     setLogoutSuccess(true)
+    closeConfirmationDialog()
+    
     setTimeout(() => {
       setLogoutSuccess(false)
     }, 3000)
   }
 
-  const handleLogoutAllDevices = () => {
+  const handleConfirmLogoutAllDevices = () => {
     //need to be implemented with backend
     console.log('Logging out all devices')
     
     setDevices(prev => prev.filter(device => device.currentDevice))
     
     setLogoutSuccess(true)
+    closeConfirmationDialog()
+    
     setTimeout(() => {
       setLogoutSuccess(false)
     }, 3000)
@@ -452,7 +504,7 @@ export default function Settings() {
                 variant="outlined"
                 color="error"
                 startIcon={<LogoutIcon />}
-                onClick={handleLogoutAllDevices}
+                onClick={openAllLogoutDialog}
                 size="small"
               >
                 Log out all devices
@@ -526,7 +578,7 @@ export default function Settings() {
                       <IconButton
                         edge="end"
                         aria-label="logout device"
-                        onClick={() => handleLogoutDevice(device.id)}
+                        onClick={() => openSingleLogoutDialog(device.id, device.name)}
                         color="error"
                         size="small"
                       >
@@ -552,6 +604,47 @@ export default function Settings() {
           </Stack>
         </CardContent>
       </ThemedCard>
+
+      <Dialog
+        open={confirmationDialog.open}
+        onClose={closeConfirmationDialog}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <WarningIcon color="warning" />
+          Confirm Logout
+        </DialogTitle>
+        <DialogContent>
+          {confirmationDialog.type === 'single' ? (
+            <Typography variant="body1">
+              Are you sure you want to log out from <strong>{confirmationDialog.deviceName}</strong>?
+              You will need to log in again on that device.
+            </Typography>
+          ) : (
+            <Typography variant="body1">
+              Are you sure you want to log out from <strong>all devices</strong> except this one?
+              You will need to log in again on all other devices.
+            </Typography>
+          )}
+        </DialogContent>
+        <DialogActions sx={{ p: 3, pt: 2 }}>
+          <Button onClick={closeConfirmationDialog} variant="outlined">
+            Cancel
+          </Button>
+          <Button 
+            onClick={
+              confirmationDialog.type === 'single' 
+                ? handleConfirmLogoutDevice 
+                : handleConfirmLogoutAllDevices
+            } 
+            variant="contained" 
+            color="error"
+          >
+            Yes, Log Out
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   )
 }
