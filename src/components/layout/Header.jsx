@@ -1,7 +1,44 @@
-import { AppBar, Toolbar, Typography, Box } from "@mui/material";
+import {
+  AppBar,
+  Toolbar,
+  Typography,
+  Box,
+  Breadcrumbs,
+  Link,
+} from "@mui/material";
+import { ChevronRight } from "lucide-react";
+import { useLocation } from "react-router-dom";
+import { useCoursesState } from "../../context/CoursesContext";
 import ThemeToggle from "./ThemeToggle.jsx";
 
+// Map routes to readable page names
+const getPageName = (pathname) => {
+  const routes = {
+    "/instructor/dashboard": "Dashboard",
+    "/instructor/courses": "All Courses",
+    "/instructor/assignments": "Assignments",
+    "/instructor/gradebook": "Gradebook",
+    "/instructor/controls": "Course Controls",
+    "/instructor/contact": "Contact",
+    "/instructor/assignment-builder": "Assignment Builder",
+    "/instructor/roster": "Roster",
+    "/instructor/settings": "Settings",
+    "/student/dashboard": "Dashboard",
+    "/student/courses": "My Courses",
+    "/student/assignments": "Assignments",
+    "/student/grades": "Grades",
+  };
+
+  return routes[pathname] || "Dashboard";
+};
+
 export default function Header() {
+  const location = useLocation();
+  const { courses, activeCourseId } = useCoursesState();
+
+  const activeCourse = courses.find((c) => c.id === activeCourseId);
+  const pageName = getPageName(location.pathname);
+
   return (
     <AppBar
       position="sticky"
@@ -14,14 +51,49 @@ export default function Header() {
       }}
     >
       <Toolbar>
-        <Typography
-          variant="h6"
-          noWrap
-          component="div"
-          sx={{ fontWeight: 600, flexGrow: 1 }}
+        <Box
+          sx={{ flexGrow: 1, display: "flex", alignItems: "center", gap: 1 }}
         >
-          PHILO/MATH/CSCI 275 Symbolic Logic
-        </Typography>
+          {activeCourse ? (
+            <Breadcrumbs
+              separator={<ChevronRight size={16} />}
+              sx={{
+                "& .MuiBreadcrumbs-separator": {
+                  mx: 1,
+                  color: "text.disabled",
+                },
+              }}
+            >
+              <Typography
+                variant="body1"
+                sx={{
+                  fontWeight: 600,
+                  color: "text.primary",
+                }}
+              >
+                {activeCourse.code}
+              </Typography>
+              <Typography
+                variant="body1"
+                sx={{
+                  color: "text.secondary",
+                }}
+              >
+                {pageName}
+              </Typography>
+            </Breadcrumbs>
+          ) : (
+            <Typography
+              variant="body1"
+              sx={{
+                fontWeight: 600,
+                color: "text.primary",
+              }}
+            >
+              {pageName}
+            </Typography>
+          )}
+        </Box>
         <ThemeToggle />
       </Toolbar>
     </AppBar>
