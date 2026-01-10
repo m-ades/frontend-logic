@@ -16,13 +16,13 @@ import Practice from "./pages/Practice.jsx";
 import Grades from "./pages/Grades.jsx";
 import Contact from "./pages/Contact.jsx";
 import Settings from "./pages/Settings.jsx";
-import StudentCourses from "./pages/StudentCourses.jsx";
 import InstructorDashboard from "./pages/instructor/InstructorDashboard.jsx";
 import InstructorGradebook from "./pages/instructor/InstructorGradebook.jsx";
 import InstructorControls from "./pages/instructor/InstructorControls.jsx";
-import InstructorCourses from "./pages/instructor/InstructorCourses.jsx";
 import InstructorAssignments from "./pages/instructor/InstructorAssignments";
+import AssignmentBuilder from "./pages/instructor/InstructorAssignmentBuilder.jsx";
 import Login from "./pages/Login.jsx";
+import Courses from "./pages/Courses.jsx";
 
 function AppRoutes() {
   return (
@@ -47,7 +47,7 @@ function AppRoutes() {
         element={
           <ProtectedRoute allowedRoles={["student"]}>
             <AppLayout>
-              <StudentCourses />
+              <Courses />
             </AppLayout>
           </ProtectedRoute>
         }
@@ -167,7 +167,7 @@ function AppRoutes() {
         element={
           <ProtectedRoute allowedRoles={["instructor"]}>
             <AppLayout>
-              <InstructorCourses />
+              <Courses />
             </AppLayout>
           </ProtectedRoute>
         }
@@ -220,6 +220,17 @@ function AppRoutes() {
           </ProtectedRoute>
         }
       />
+      <Route
+        path="/instructor/assignment-builder"
+        element={
+          <ProtectedRoute allowedRoles={["instructor"]}>
+            <AppLayout>
+              <AssignmentBuilder />
+            </AppLayout>
+          </ProtectedRoute>
+        }
+      />
+
       {/* Catch all */}
       <Route path="*" element={<Navigate to="/login" replace />} />
     </Routes>
