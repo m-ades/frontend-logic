@@ -35,15 +35,18 @@ export default function EvaluateTruth({
   const showSolution = isLocked && typeof answer === 'boolean'
 
   useEffect(() => {
-    if (readOnly) return
-    if (selectedValue !== '') {
-      onStateChange?.({ ans: selectedValue === 'true' })
+    if (savedState?.ans === undefined) {
+      setSelectedValue('')
+      return
     }
-  }, [readOnly, selectedValue, onStateChange])
+    setSelectedValue(savedState.ans ? 'true' : 'false')
+  }, [savedState?.ans])
 
   const handleChange = (event) => {
     if (readOnly) return
-    setSelectedValue(event.target.value)
+    const nextValue = event.target.value
+    setSelectedValue(nextValue)
+    onStateChange?.({ ans: nextValue === 'true' })
     setStatus('unanswered')
     setMessage('')
   }

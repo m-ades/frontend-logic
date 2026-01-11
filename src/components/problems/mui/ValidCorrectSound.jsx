@@ -21,6 +21,13 @@ export default function ValidCorrectSound({
     valid: savedState?.ans?.valid !== undefined ? String(savedState.ans.valid) : '',
     sound: savedState?.ans?.sound !== undefined ? String(savedState.ans.sound) : ''
   })
+
+  const buildAnswerPayload = (values) => ({
+    correct: values.correct === '' ? -2 : (values.correct === 'true' ? true : false),
+    valid: values.valid === '' ? -2 : (values.valid === 'true' ? true : false),
+    sound: values.sound === '' ? -2 : (values.sound === 'true' ? true : false)
+  })
+  const hasAnyAnswer = (values) => Object.values(values).some((value) => value !== '')
   
   const { status, message, isChecking, handleCheck: baseHandleCheck, handleStartOver, getStatusColor, setStatus, setMessage, attemptCount, maxAttempts, isLocked } = useProblemChecker({
     answer,
@@ -42,11 +49,7 @@ export default function ValidCorrectSound({
   const showSolution = isLocked
   
   const handleCheck = async () => {
-    const ans = {
-      correct: answers.correct === '' ? -2 : (answers.correct === 'true' ? true : false),
-      valid: answers.valid === '' ? -2 : (answers.valid === 'true' ? true : false),
-      sound: answers.sound === '' ? -2 : (answers.sound === 'true' ? true : false)
-    }
+    const ans = buildAnswerPayload(answers)
     if (ans.correct === -2 || ans.valid === -2 || ans.sound === -2) {
       setStatus('unanswered')
       setMessage('Please answer all questions')
@@ -56,20 +59,26 @@ export default function ValidCorrectSound({
   }
 
   useEffect(() => {
-    if (readOnly) return
-    if (Object.values(answers).some(v => v !== '')) {
-      const ans = {
-        correct: answers.correct === '' ? -2 : (answers.correct === 'true' ? true : false),
-        valid: answers.valid === '' ? -2 : (answers.valid === 'true' ? true : false),
-        sound: answers.sound === '' ? -2 : (answers.sound === 'true' ? true : false)
-      }
-      onStateChange?.({ ans })
+    if (savedState?.ans) {
+      setAnswers({
+        correct: savedState.ans.correct !== undefined ? String(savedState.ans.correct) : '',
+        valid: savedState.ans.valid !== undefined ? String(savedState.ans.valid) : '',
+        sound: savedState.ans.sound !== undefined ? String(savedState.ans.sound) : ''
+      })
+      return
     }
-  }, [readOnly, answers, onStateChange])
+    setAnswers({ correct: '', valid: '', sound: '' })
+  }, [savedState?.ans?.correct, savedState?.ans?.sound, savedState?.ans?.valid])
 
   const handleChange = (question, value) => {
     if (readOnly) return
-    setAnswers(prev => ({ ...prev, [question]: value }))
+    setAnswers((prev) => {
+      const nextAnswers = { ...prev, [question]: value }
+      if (hasAnyAnswer(nextAnswers)) {
+        onStateChange?.({ ans: buildAnswerPayload(nextAnswers) })
+      }
+      return nextAnswers
+    })
     setStatus('unanswered')
     setMessage('')
   }

@@ -34,15 +34,18 @@ export default function MultipleChoice({
   const showSolution = isLocked && typeof answer === 'number'
 
   useEffect(() => {
-    if (readOnly) return
-    if (selectedValue !== '') {
-      onStateChange?.({ ans: parseInt(selectedValue) })
+    if (savedState?.ans === undefined) {
+      setSelectedValue('')
+      return
     }
-  }, [readOnly, selectedValue, onStateChange])
+    setSelectedValue(String(savedState.ans))
+  }, [savedState?.ans])
 
   const handleChange = (event) => {
     if (readOnly) return
-    setSelectedValue(event.target.value)
+    const nextValue = event.target.value
+    setSelectedValue(nextValue)
+    onStateChange?.({ ans: parseInt(nextValue) })
     setStatus('unanswered')
     setMessage('')
   }
