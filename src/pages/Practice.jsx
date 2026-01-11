@@ -19,7 +19,6 @@ const buildCourseStructure = (assignments, sectionTitle) => {
       title: assignment.title,
       description: assignment.description || '',
       dueDate: assignment.due_date,
-      points: assignment.total_points,
       type: ACTIVITY_TYPES.PRACTICE,
       worksheet: { id: assignment.id, proofs: [] },
     })

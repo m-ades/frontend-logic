@@ -198,7 +198,7 @@ export default function Worksheet() {
             prompt: snapshot.prompt || '',
             choices: snapshot.choices || [],
           },
-          answer: snapshot.answerIndex ?? snapshot.answer,
+          answer: snapshot.answerIndices ?? snapshot.answerIndex ?? snapshot.answer,
         }
       }
 
@@ -222,6 +222,7 @@ export default function Worksheet() {
         }
       }
 
+      /*
       if (type === 'valid-correct-sound') {
         return {
           ...proofBase,
@@ -231,6 +232,7 @@ export default function Worksheet() {
           answer: snapshot.answer,
         }
       }
+      */
 
       if (type === 'single-row-truth-table') {
         return {

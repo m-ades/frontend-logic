@@ -3,7 +3,7 @@ import SymbolicTranslation from './mui/SymbolicTranslation.jsx'
 import MultipleChoice from './mui/MultipleChoice.jsx'
 import TrueFalse from './mui/TrueFalse.jsx'
 import EvaluateTruth from './mui/EvaluateTruth.jsx'
-import ValidCorrectSound from './mui/ValidCorrectSound.jsx'
+// import ValidCorrectSound from './mui/ValidCorrectSound.jsx'
 import SingleRowTruthTable from './mui/SingleRowTruthTable.jsx'
 
 export default function LogicPenguinProblem({ 
@@ -97,7 +97,7 @@ export default function LogicPenguinProblem({
         savedState={localState}
       />
     )
-  } else if (proof.type === 'valid-correct-sound') {
+  /* } else if (proof.type === 'valid-correct-sound') {
     const prems = Array.isArray(proof.premises) ? proof.premises : (proof.premises ? [proof.premises] : [])
     problemData = {
       prems: prems,
@@ -114,6 +114,7 @@ export default function LogicPenguinProblem({
         savedState={localState}
       />
     )
+  } else if (proof.type === 'single-row-truth-table') { */
   } else if (proof.type === 'single-row-truth-table') {
     problemData = proof.singleRowTruthTable || {
       statement: proof.description || '',

@@ -21,7 +21,6 @@ const buildCourseStructure = (assignments, sectionTitle) => {
       title: assignment.title,
       description: assignment.description || '',
       dueDate: assignment.due_date,
-      points: assignment.total_points,
       type: ACTIVITY_TYPES.HOMEWORK,
       worksheet: { id: assignment.id, proofs: [] },
     })
@@ -134,7 +133,7 @@ export default function Assignments() {
         if (!isMounted) return
 
         const totalPoints = grades.reduce(
-          (sum, grade) => sum + (grade.max_score || grade.Assignment?.total_points || 0),
+          (sum, grade) => sum + (grade.max_score || 0),
           0
         )
         const earnedPoints = grades.reduce((sum, grade) => sum + (grade.final_score || 0), 0)
@@ -184,9 +183,6 @@ export default function Assignments() {
             />
             <Typography variant="body2" color="text.secondary">
               {datePrefix}{formatDateTime(activity.dueDate) || 'No due date'}
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              {activity.points} points
             </Typography>
             {showCompletionChip && getCompletionStatus(activity.id) && (
               <Chip label="Completed" size="small" color="success" />

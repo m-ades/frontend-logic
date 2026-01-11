@@ -93,7 +93,7 @@ export default function Dashboard() {
                 })
                 .map((assignment) => {
                   const grade = gradeMap.get(assignment.id)
-                  const total = grade?.max_score || assignment.total_points || 0
+                  const total = grade?.max_score || 0
                   const score = grade?.final_score ?? grade?.raw_score ?? null
                   const fallbackPercent = total > 0 && score !== null ? score / total : null
                   return {
@@ -114,7 +114,7 @@ export default function Dashboard() {
             : (grades || [])
                 .map((grade) => {
                   const assignment = grade.Assignment || {}
-                  const total = grade.max_score || assignment.total_points || 0
+                  const total = grade.max_score || 0
                   const score = grade.final_score ?? grade.raw_score ?? null
                   const percent = total > 0 && score !== null ? (score / total) * 100 : null
                   const date = assignment.due_date || grade.graded_at

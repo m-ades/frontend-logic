@@ -189,17 +189,6 @@ export default function ActivityCard({ activity, onClick, completedProofs }) {
                       {stats.percentage}% submitted
                     </Typography>
                   )}
-                  {activity.points && (
-                    <Typography
-                      variant="caption"
-                      sx={{
-                        color: 'text.secondary',
-                        fontWeight: 500
-                      }}
-                    >
-                      {activity.points} points
-                    </Typography>
-                  )}
                   {activity.dueDate && (
                     <Typography
                       variant="caption"

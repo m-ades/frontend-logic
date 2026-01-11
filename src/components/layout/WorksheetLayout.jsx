@@ -24,6 +24,7 @@ export default function Layout({
   inModal = false 
 }) {
   const [dropdownOpen, setDropdownOpen] = useState(false)
+  const completionPercent = total > 0 ? Math.round((score / total) * 100) : 0
   const [isTouchDevice] = useState(() => {
     if (typeof window === 'undefined') return false
     return window.matchMedia && window.matchMedia('(hover: none)').matches
@@ -63,9 +64,9 @@ export default function Layout({
 
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap', mb: 2 }}>
           <Chip
-            label={`${score} / ${total}`}
-            color={score === total && total > 0 ? 'success' : 'default'}
-            icon={score === total && total > 0 ? <CheckCircleIcon /> : undefined}
+            label={`Completion: ${completionPercent}%`}
+            color={completionPercent === 100 && total > 0 ? 'success' : 'default'}
+            icon={completionPercent === 100 && total > 0 ? <CheckCircleIcon /> : undefined}
             sx={{
               fontSize: '0.875rem',
               fontWeight: 600,

@@ -70,26 +70,26 @@ export default function Grades() {
     () => gradeEntries.filter((entry) => entry.grade),
     [gradeEntries]
   )
-  const totalPoints = useMemo(
+  const totalMax = useMemo(
     () =>
       gradedEntries.reduce(
-        (sum, entry) => sum + (entry.grade?.max_score || entry.assignment?.total_points || 0),
+        (sum, entry) => sum + (entry.grade?.max_score || 0),
         0
       ),
     [gradedEntries]
   )
-  const earnedPoints = useMemo(
+  const totalFinal = useMemo(
     () => gradedEntries.reduce((sum, entry) => sum + (entry.grade?.final_score || 0), 0),
     [gradedEntries]
   )
-  const overallPercentage = totalPoints > 0 ? (earnedPoints / totalPoints) * 100 : 0
+  const overallPercentage = totalMax > 0 ? (totalFinal / totalMax) * 100 : 0
 
   const rows = useMemo(
     () =>
       gradeEntries.map((entry, index) => {
         const assignment = entry.assignment || entry.grade?.Assignment || {}
         const grade = entry.grade
-        const total = grade?.max_score || assignment.total_points || 0
+        const total = grade?.max_score || 0
         const score = grade?.final_score ?? grade?.raw_score ?? null
         const percentage = total > 0 && score !== null ? (score / total) * 100 : null
 
@@ -98,7 +98,6 @@ export default function Grades() {
           assignment: assignment.title || 'Assignment',
           due: assignment.due_date ? formatDateTime(assignment.due_date) : '—',
           submitted: grade?.graded_at ? formatDateTime(grade.graded_at) : '—',
-          score: score !== null ? `${score.toFixed(1)} / ${total.toFixed(1)}` : '—',
           percent: percentage !== null ? `${percentage.toFixed(1)}%` : '—'
         }
       }),
@@ -110,7 +109,6 @@ export default function Grades() {
       { field: 'assignment', headerName: 'Assignment', flex: 1, minWidth: 200 },
       { field: 'due', headerName: 'Due', minWidth: 140 },
       { field: 'submitted', headerName: 'Submitted', minWidth: 140 },
-      { field: 'score', headerName: 'Score', minWidth: 140, align: 'right', headerAlign: 'right' },
       { field: 'percent', headerName: 'Percent', minWidth: 110, align: 'right', headerAlign: 'right' }
     ],
     []
@@ -127,7 +125,7 @@ export default function Grades() {
           <Stack direction={{ xs: 'column', sm: 'row' }} justifyContent="space-between" sx={{ mb: 2 }}>
             <Typography variant="h6">Overall</Typography>
             <Typography variant="body2" color="text.secondary">
-              {earnedPoints.toFixed(1)} / {totalPoints.toFixed(1)} • {overallPercentage.toFixed(1)}%
+              {overallPercentage.toFixed(1)}%
             </Typography>
           </Stack>
           <DataGrid
