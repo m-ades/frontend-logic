@@ -19,7 +19,6 @@ import {
 import {
   ChevronLeft as ChevronLeftIcon,
   ChevronRight as ChevronRightIcon,
-  Person as AccountIcon,
 } from "@mui/icons-material";
 import {
   useLayoutState,
@@ -84,6 +83,22 @@ export default function Sidebar({ structure, location, onSignOut }) {
       setIsHovering(false);
     }
   }, [sidebarHoverEnabled]);
+
+  // Get user's initials for avatar
+  const getUserInitials = () => {
+    if (!user?.name) return "U";
+    const names = user.name.split(" ");
+    if (names.length >= 2) {
+      return `${names[0][0]}${names[names.length - 1][0]}`.toUpperCase();
+    }
+    return user.name.substring(0, 2).toUpperCase();
+  };
+
+  // Get display name
+  const getDisplayName = () => {
+    if (!user?.name) return "User";
+    return user.name;
+  };
 
   return (
     <Drawer
@@ -198,11 +213,13 @@ export default function Sidebar({ structure, location, onSignOut }) {
                 }}
               >
                 <Avatar sx={{ width: 32, height: 32, bgcolor: "primary.main" }}>
-                  <AccountIcon sx={{ fontSize: 20 }} />
+                  <Typography variant="caption" sx={{ fontWeight: 600 }}>
+                    {getUserInitials()}
+                  </Typography>
                 </Avatar>
               </ListItemIcon>
               <ListItemText
-                primary="Profile"
+                primary={getDisplayName()}
                 sx={{ opacity: isSidebarOpened ? 1 : 0 }}
               />
             </ListItemButton>
@@ -215,6 +232,18 @@ export default function Sidebar({ structure, location, onSignOut }) {
             anchorOrigin={{ vertical: "top", horizontal: "right" }}
             transformOrigin={{ vertical: "bottom", horizontal: "left" }}
           >
+            <MenuItem
+              onClick={() => {
+                // Navigate to profile page
+                window.location.href =
+                  user?.role === "instructor"
+                    ? "/instructor/profile"
+                    : "/student/profile";
+                setProfileMenu(null);
+              }}
+            >
+              Profile & Preferences
+            </MenuItem>
             <MenuItem
               onClick={() => {
                 onSignOut?.();

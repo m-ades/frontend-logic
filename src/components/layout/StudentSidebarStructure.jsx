@@ -3,7 +3,6 @@ import {
   Assignment as AssignmentIcon,
   Psychology as PracticeIcon,
   Grade as GradeIcon,
-  Settings as SettingsIcon,
   ContactSupport as ContactIcon,
 } from "@mui/icons-material";
 
@@ -34,12 +33,6 @@ export default [
   },
   {
     id: 4,
-    label: "Settings",
-    link: "/student/settings",
-    icon: <SettingsIcon />,
-  },
-  {
-    id: 5,
     label: "Contact",
     link: "/student/contact",
     icon: <ContactIcon />,

@@ -1,11 +1,12 @@
 import {
   Dashboard as DashboardIcon,
   MenuBook as GradebookIcon,
-  Settings as SettingsIcon,
   ContactSupport as ContactIcon,
   AdminPanelSettings as ControlsIcon,
   Assignment as AssignmentIcon,
+  FactCheck as RosterIcon,
 } from "@mui/icons-material";
+import { Brain } from "lucide-react";
 
 export default [
   {
@@ -22,26 +23,32 @@ export default [
   },
   {
     id: 2,
+    label: "Practice",
+    link: "/instructor/practice",
+    icon: <Brain />,
+  },
+  {
+    id: 3,
     label: "Gradebook",
     link: "/instructor/gradebook",
     icon: <GradebookIcon />,
   },
   {
-    id: 3,
-    label: "Controls",
-    link: "/instructor/controls",
-    icon: <ControlsIcon />,
-  },
-  {
     id: 4,
-    label: "Settings",
-    link: "/instructor/settings",
-    icon: <SettingsIcon />,
+    label: "Roster",
+    link: "/instructor/roster",
+    icon: <RosterIcon />,
   },
   {
     id: 5,
     label: "Contact",
     link: "/instructor/contact",
     icon: <ContactIcon />,
+  },
+  {
+    id: 6,
+    label: "Course Controls",
+    link: "/instructor/controls",
+    icon: <ControlsIcon />,
   },
 ];
