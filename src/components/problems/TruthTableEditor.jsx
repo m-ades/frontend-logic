@@ -8,6 +8,13 @@ import {
   InputLabel,
   Select,
   MenuItem,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
 } from '@mui/material'
 import getFormulaClass from '../../lib/logicpenguin/symbolic/formula.js'
 import getSyntax from '../../lib/logicpenguin/symbolic/libsyntax.js'
@@ -454,18 +461,14 @@ export default function TruthTableEditor({ proof, savedState, onStateChange, onP
   const renderTableSet = (tablesToRender, tableInputsToRender, combined, readOnly, onCellChange, showConclusionMarker) => {
     if (combined) {
       return (
-        <Box className="tt-table-wrap">
-          <Box
-            component="table"
-            className="tt-table"
-          >
-            <Box component="thead" className="tt-head">
-              <Box component="tr" className="tt-group-row">
+        <TableContainer component={Paper} className="tt-table-wrap" elevation={0}>
+          <Table className="tt-table">
+            <TableHead className="tt-head">
+              <TableRow className="tt-group-row">
                 {tablesToRender.map((table, tableIndex) => {
                   const isConclusion = showConclusionMarker && tableIndex === tablesToRender.length - 1 && tablesToRender.length > 1
                   return (
-                    <Box
-                      component="th"
+                    <TableCell
                       key={`solution-group-${tableIndex}`}
                       colSpan={table.tokens.length || 1}
                       className={
@@ -475,64 +478,59 @@ export default function TruthTableEditor({ proof, savedState, onStateChange, onP
                             ? 'tt-group tt-divider'
                             : 'tt-group'
                       }
+                      align="center"
                     >
                       {isConclusion ? '// ' : ''}
                       {table.label || ''}
-                    </Box>
+                    </TableCell>
                   )
                 })}
-              </Box>
-              <Box component="tr" className="tt-token-row">
+              </TableRow>
+              <TableRow className="tt-token-row">
                 {tablesToRender.map((table, tableIndex) => {
                   const isConclusion = showConclusionMarker && tableIndex === tablesToRender.length - 1 && tablesToRender.length > 1
+                  const headerTokens = table.headerTokens && table.headerTokens.length > 0 ? table.headerTokens : table.tokens
                   return (
                     <React.Fragment key={`solution-tokenfrag-${tableIndex}`}>
-                      {(table.headerTokens && table.headerTokens.length > 0 ? table.headerTokens : table.tokens).map((token, tokenIndex) => {
-                        const headerTokens = table.headerTokens && table.headerTokens.length > 0 ? table.headerTokens : table.tokens
-                        return (
-                          <Box
-                            component="th"
-                            key={`solution-header-${tableIndex}-${tokenIndex}`}
-                            className={
-                              isConclusion
-                                ? 'tt-token tt-conclusion'
-                                : tokenIndex === headerTokens.length - 1 && tableIndex < tablesToRender.length - 1
-                                  ? 'tt-token tt-divider'
-                                  : 'tt-token'
-                            }
-                          >
-                            {token}
-                          </Box>
-                        )
-                      })}
+                      {headerTokens.map((token, tokenIndex) => (
+                        <TableCell
+                          key={`solution-header-${tableIndex}-${tokenIndex}`}
+                          className={
+                            isConclusion
+                              ? 'tt-token tt-conclusion'
+                              : tokenIndex === headerTokens.length - 1 && tableIndex < tablesToRender.length - 1
+                                ? 'tt-token tt-divider'
+                                : 'tt-token'
+                          }
+                          align="center"
+                        >
+                          {token}
+                        </TableCell>
+                      ))}
                     </React.Fragment>
                   )
                 })}
-              </Box>
-            </Box>
-            <Box component="tbody">
+              </TableRow>
+            </TableHead>
+            <TableBody>
               {(tablesToRender[0]?.rows ?? []).map((_, rowIndex) => (
-                <Box
-                  component="tr"
-                  key={`solution-row-${rowIndex}`}
-                  className="tt-row"
-                >
+                <TableRow key={`solution-row-${rowIndex}`} className="tt-row">
                   {tablesToRender.map((table, tableIndex) => {
                     const isConclusion = showConclusionMarker && tableIndex === tablesToRender.length - 1 && tablesToRender.length > 1
                     return (
                       <React.Fragment key={`solution-rowfrag-${tableIndex}`}>
                         {table.rows[rowIndex].map((_, colIndex) => (
-                          <Box
-                            component="td"
+                          <TableCell
                             key={`solution-cell-${tableIndex}-${rowIndex}-${colIndex}`}
-                              className={
-                                isConclusion
-                                  ? 'tt-cell tt-conclusion-cell'
-                                  : colIndex === table.tokens.length - 1 &&
-                                    tableIndex < tablesToRender.length - 1
-                                    ? 'tt-cell tt-divider'
-                                    : 'tt-cell'
-                              }
+                            className={
+                              isConclusion
+                                ? 'tt-cell tt-conclusion-cell'
+                                : colIndex === table.tokens.length - 1 &&
+                                  tableIndex < tablesToRender.length - 1
+                                  ? 'tt-cell tt-divider'
+                                  : 'tt-cell'
+                            }
+                            align="center"
                           >
                             <TruthToggle
                               value={tableInputsToRender[tableIndex]?.[rowIndex]?.[colIndex]}
@@ -541,57 +539,53 @@ export default function TruthTableEditor({ proof, savedState, onStateChange, onP
                               accent={false}
                               readOnly={readOnly}
                             />
-                          </Box>
+                          </TableCell>
                         ))}
                       </React.Fragment>
                     )
                   })}
-                </Box>
+                </TableRow>
               ))}
-            </Box>
-          </Box>
-        </Box>
+            </TableBody>
+          </Table>
+        </TableContainer>
       )
     }
 
     return (
       <>
         {tablesToRender.map((table, tableIndex) => (
-          <Box key={`solution-tt-table-${tableIndex}`} className="tt-table-wrap">
+          <TableContainer component={Paper} key={`solution-tt-table-${tableIndex}`} className="tt-table-wrap" elevation={0}>
             {table.label && (
               <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 1 }}>
                 {table.label}
               </Typography>
             )}
-            <Box
-              component="table"
-              className="tt-table"
-            >
-              <Box component="thead" className="tt-head">
-                <Box component="tr" className="tt-token-row">
+            <Table className="tt-table">
+              <TableHead className="tt-head">
+                <TableRow className="tt-token-row">
                   {(table.headerTokens && table.headerTokens.length > 0 ? table.headerTokens : table.tokens).map((token, idx) => (
-                    <Box
-                      component="th"
+                    <TableCell
                       key={`solution-header-${tableIndex}-${idx}`}
                       className="tt-token"
+                      align="center"
                     >
                       {token}
-                    </Box>
+                    </TableCell>
                   ))}
-                </Box>
-              </Box>
-              <Box component="tbody">
+                </TableRow>
+              </TableHead>
+              <TableBody>
                 {table.rows.map((row, rowIndex) => (
-                  <Box
-                    component="tr"
+                  <TableRow
                     key={`solution-row-${tableIndex}-${rowIndex}`}
                     className="tt-row"
                   >
                     {row.map((_, colIndex) => (
-                      <Box
-                        component="td"
+                      <TableCell
                         key={`solution-cell-${tableIndex}-${rowIndex}-${colIndex}`}
                         className="tt-cell"
+                        align="center"
                       >
                         <TruthToggle
                           value={tableInputsToRender[tableIndex]?.[rowIndex]?.[colIndex]}
@@ -600,13 +594,13 @@ export default function TruthTableEditor({ proof, savedState, onStateChange, onP
                           accent={false}
                           readOnly={readOnly}
                         />
-                      </Box>
+                      </TableCell>
                     ))}
-                  </Box>
+                  </TableRow>
                 ))}
-              </Box>
-            </Box>
-          </Box>
+              </TableBody>
+            </Table>
+          </TableContainer>
         ))}
       </>
     )
