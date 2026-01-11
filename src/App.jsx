@@ -16,7 +16,6 @@ import Assignments from "./pages/Assignments.jsx";
 import Practice from "./pages/Practice.jsx";
 import Grades from "./pages/Grades.jsx";
 import Contact from "./pages/Contact.jsx";
-import Settings from "./pages/Settings.jsx";
 import InstructorDashboard from "./pages/instructor/InstructorDashboard.jsx";
 import InstructorGradebook from "./pages/instructor/InstructorGradebook.jsx";
 import InstructorControls from "./pages/instructor/InstructorControls.jsx";
@@ -116,16 +115,7 @@ function AppRoutes() {
           </ProtectedRoute>
         }
       />
-      <Route
-        path="/student/settings"
-        element={
-          <ProtectedRoute allowedRoles={["student"]}>
-            <AppLayout>
-              <Settings />
-            </AppLayout>
-          </ProtectedRoute>
-        }
-      />
+
       <Route
         path="/student/assignment/:assignmentId"
         element={
@@ -237,16 +227,6 @@ function AppRoutes() {
         }
       />
 
-      <Route
-        path="/instructor/settings"
-        element={
-          <ProtectedRoute allowedRoles={["instructor"]}>
-            <AppLayout>
-              <Settings />
-            </AppLayout>
-          </ProtectedRoute>
-        }
-      />
       <Route
         path="/instructor/contact"
         element={
