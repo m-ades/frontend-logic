@@ -3,7 +3,28 @@ import {
   MOCK_INSTRUCTOR_COURSES,
   MOCK_ASSIGNMENTS_BY_COURSE,
   MOCK_GRADEBOOK_BY_COURSE,
+  MOCK_PRACTICES_BY_COURSE,
 } from "./mockData/courses";
+
+// ============================================================================
+// CONSTANTS
+// ============================================================================
+
+// Default grading scale
+const DEFAULT_GRADING_SCALE = [
+  { letter: "A", minPercent: 90, maxPercent: 100, color: "#10b981" },
+  { letter: "B", minPercent: 80, maxPercent: 89, color: "#6366f1" },
+  { letter: "C", minPercent: 70, maxPercent: 79, color: "#f59e0b" },
+  { letter: "D", minPercent: 60, maxPercent: 69, color: "#f97316" },
+  { letter: "F", minPercent: 0, maxPercent: 59, color: "#ef4444" },
+];
+
+// Default late policy
+const DEFAULT_LATE_POLICY = {
+  enabled: true,
+  maxDaysLate: 7,
+  penalty: 20, // Flat 20% penalty for late submissions
+};
 
 // ============================================================================
 // CONTEXT CREATION
@@ -19,11 +40,6 @@ const CoursesDispatchContext = createContext();
 
 // Simulates: GET /api/instructor/courses
 export async function fetchInstructorCourses() {
-  // TODO: Replace with actual API call
-  // const response = await fetch('/api/instructor/courses');
-  // if (!response.ok) throw new Error('Failed to fetch courses');
-  // return response.json();
-
   return new Promise((resolve) => {
     setTimeout(() => resolve(MOCK_INSTRUCTOR_COURSES), 100);
   });
@@ -31,23 +47,20 @@ export async function fetchInstructorCourses() {
 
 // Simulates: GET /api/courses/:courseId/assignments
 export async function fetchCourseAssignments(courseId) {
-  // TODO: Replace with actual API call
-  // const response = await fetch(`/api/courses/${courseId}/assignments`);
-  // if (!response.ok) throw new Error('Failed to fetch assignments');
-  // return response.json();
-
   return new Promise((resolve) => {
     setTimeout(() => resolve(MOCK_ASSIGNMENTS_BY_COURSE[courseId] || []), 100);
   });
 }
 
+// Simulates: GET /api/courses/:courseId/practices
+export async function fetchCoursePractices(courseId) {
+  return new Promise((resolve) => {
+    setTimeout(() => resolve(MOCK_PRACTICES_BY_COURSE[courseId] || []), 100);
+  });
+}
+
 // Simulates: GET /api/courses/:courseId/gradebook
 export async function fetchCourseGradebook(courseId) {
-  // TODO: Replace with actual API call
-  // const response = await fetch(`/api/courses/${courseId}/gradebook`);
-  // if (!response.ok) throw new Error('Failed to fetch gradebook');
-  // return response.json();
-
   return new Promise((resolve) => {
     setTimeout(() => resolve(MOCK_GRADEBOOK_BY_COURSE[courseId] || []), 100);
   });
@@ -55,15 +68,6 @@ export async function fetchCourseGradebook(courseId) {
 
 // Simulates: PATCH /api/courses/:courseId
 export async function updateCourse(courseId, updates) {
-  // TODO: Replace with actual API call
-  // const response = await fetch(`/api/courses/${courseId}`, {
-  //   method: 'PATCH',
-  //   headers: { 'Content-Type': 'application/json' },
-  //   body: JSON.stringify(updates)
-  // });
-  // if (!response.ok) throw new Error('Failed to update course');
-  // return response.json();
-
   return new Promise((resolve) => {
     setTimeout(() => resolve({ ...updates, id: courseId }), 100);
   });
@@ -91,15 +95,37 @@ export function calculateAssignmentAverage(assignmentId, students) {
   );
 }
 
-// Calculate grade distribution
-export function calculateGradeDistribution(students) {
-  const distribution = [
-    { grade: "A", range: "90-100", count: 0, color: "#10b981" },
-    { grade: "B", range: "80-89", count: 0, color: "#6366f1" },
-    { grade: "C", range: "70-79", count: 0, color: "#f59e0b" },
-    { grade: "D", range: "60-69", count: 0, color: "#f97316" },
-    { grade: "F", range: "0-59", count: 0, color: "#ef4444" },
-  ];
+// Calculate practice completion rate
+export function calculatePracticeCompletion(practiceId, students) {
+  const completions = students.filter(
+    (student) => student.practices?.[practiceId]?.completed
+  ).length;
+
+  return {
+    completions,
+    attempts: students.reduce(
+      (sum, student) => sum + (student.practices?.[practiceId]?.attempts || 0),
+      0
+    ),
+  };
+}
+
+// Calculate grade distribution with custom grading scale
+export function calculateGradeDistribution(students, gradingScale) {
+  // Use default grading scale if none provided or if gradingScale is undefined
+  const scale =
+    gradingScale && Array.isArray(gradingScale)
+      ? gradingScale
+      : DEFAULT_GRADING_SCALE;
+
+  const distribution = scale.map((grade) => ({
+    grade: grade.letter,
+    range: `${grade.minPercent}-${grade.maxPercent}`,
+    count: 0,
+    color: grade.color,
+    minPercent: grade.minPercent,
+    maxPercent: grade.maxPercent,
+  }));
 
   students.forEach((student) => {
     const grades = Object.values(student.grades).filter(
@@ -111,11 +137,13 @@ export function calculateGradeDistribution(students) {
       grades.reduce((sum, g) => sum + g, 0) / grades.length
     );
 
-    if (average >= 90) distribution[0].count++;
-    else if (average >= 80) distribution[1].count++;
-    else if (average >= 70) distribution[2].count++;
-    else if (average >= 60) distribution[3].count++;
-    else distribution[4].count++;
+    const gradeIndex = distribution.findIndex(
+      (d) => average >= d.minPercent && average <= d.maxPercent
+    );
+
+    if (gradeIndex !== -1) {
+      distribution[gradeIndex].count++;
+    }
   });
 
   return distribution;
@@ -146,6 +174,16 @@ export function getUpcomingDeadlines(assignments) {
   return assignments
     .map((a) => {
       const dueDate = new Date(a.dueDate);
+
+      // If time is specified, set it
+      if (a.dueTime) {
+        const [hours, minutes] = a.dueTime.split(":");
+        dueDate.setHours(parseInt(hours), parseInt(minutes), 0, 0);
+      } else {
+        // Default to end of day if no time
+        dueDate.setHours(23, 59, 59, 999);
+      }
+
       const diffTime = dueDate - today;
       const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
       return { ...a, daysLeft: diffDays };
@@ -154,22 +192,45 @@ export function getUpcomingDeadlines(assignments) {
     .sort((a, b) => a.daysLeft - b.daysLeft);
 }
 
-// Helper function to calculate grade with late penalty
-export function calculateGradeWithLatePenalty(
-  earnedGrade,
-  daysLate,
-  latePolicy
-) {
-  if (!latePolicy.enabled || daysLate <= 0) {
+// Helper function to calculate grade with flat late penalty
+export function calculateGradeWithLatePenalty(earnedGrade, isLate, latePolicy) {
+  // If late policy is not enabled or submission is not late, return original grade
+  if (!latePolicy?.enabled || !isLate) {
     return earnedGrade;
   }
 
-  if (daysLate > latePolicy.maxDaysLate) {
-    return 0; // No credit if submitted beyond allowed window
+  // Apply flat penalty
+  const penalizedGrade = earnedGrade - latePolicy.penalty;
+
+  // Ensure grade doesn't go below 0
+  return Math.max(0, penalizedGrade);
+}
+
+// Helper function to check if submission is late
+export function isSubmissionLate(submissionDate, dueDate, dueTime, latePolicy) {
+  if (!latePolicy?.enabled) return false;
+
+  const deadline = new Date(dueDate);
+  if (dueTime) {
+    const [hours, minutes] = dueTime.split(":");
+    deadline.setHours(parseInt(hours), parseInt(minutes), 0, 0);
+  } else {
+    deadline.setHours(23, 59, 59, 999);
   }
 
-  const penalty = daysLate * latePolicy.penaltyPerDay;
-  return Math.max(0, earnedGrade - penalty);
+  const submission = new Date(submissionDate);
+
+  // Check if late
+  if (submission <= deadline) return false;
+
+  // Check if within allowed late window
+  const maxLateDate = new Date(deadline);
+  maxLateDate.setDate(maxLateDate.getDate() + latePolicy.maxDaysLate);
+
+  // If submitted beyond max late days, it should not be accepted (would be 0)
+  if (submission > maxLateDate) return false;
+
+  return true;
 }
 
 // ============================================================================
@@ -180,6 +241,7 @@ const initialState = {
   courses: [],
   activeCourseId: null,
   assignmentsByCourse: {},
+  practicesByCourse: {},
   gradebookByCourse: {},
   loading: false,
   error: null,
@@ -214,6 +276,15 @@ function coursesReducer(state, action) {
         },
       };
 
+    case "SET_PRACTICES":
+      return {
+        ...state,
+        practicesByCourse: {
+          ...state.practicesByCourse,
+          [action.courseId]: action.payload,
+        },
+      };
+
     case "SET_GRADEBOOK":
       return {
         ...state,
@@ -239,6 +310,16 @@ function coursesReducer(state, action) {
         courses: state.courses.map((course) =>
           course.id === action.courseId
             ? { ...course, latePolicy: action.payload }
+            : course
+        ),
+      };
+
+    case "UPDATE_GRADING_SCALE":
+      return {
+        ...state,
+        courses: state.courses.map((course) =>
+          course.id === action.courseId
+            ? { ...course, gradingScale: action.payload }
             : course
         ),
       };
@@ -296,12 +377,20 @@ export function useCoursesDispatch() {
 
 // Hook to get active course data
 export function useActiveCourse() {
-  const { courses, activeCourseId, assignmentsByCourse, gradebookByCourse } =
-    useCoursesState();
+  const {
+    courses,
+    activeCourseId,
+    assignmentsByCourse,
+    practicesByCourse,
+    gradebookByCourse,
+  } = useCoursesState();
 
   const activeCourse = courses.find((c) => c.id === activeCourseId);
   const assignments = activeCourseId
     ? assignmentsByCourse[activeCourseId] || []
+    : [];
+  const practices = activeCourseId
+    ? practicesByCourse[activeCourseId] || []
     : [];
   const gradebook = activeCourseId
     ? gradebookByCourse[activeCourseId] || []
@@ -310,6 +399,7 @@ export function useActiveCourse() {
   return {
     course: activeCourse,
     assignments,
+    practices,
     gradebook,
   };
 }
@@ -330,6 +420,10 @@ export function setAssignments(dispatch, courseId, assignments) {
   dispatch({ type: "SET_ASSIGNMENTS", courseId, payload: assignments });
 }
 
+export function setPractices(dispatch, courseId, practices) {
+  dispatch({ type: "SET_PRACTICES", courseId, payload: practices });
+}
+
 export function setGradebook(dispatch, courseId, gradebook) {
   dispatch({ type: "SET_GRADEBOOK", courseId, payload: gradebook });
 }
@@ -342,8 +436,49 @@ export function updateLatePolicy(dispatch, courseId, latePolicy) {
   dispatch({ type: "UPDATE_LATE_POLICY", courseId, payload: latePolicy });
 }
 
+export function updateGradingScale(dispatch, courseId, gradingScale) {
+  dispatch({ type: "UPDATE_GRADING_SCALE", courseId, payload: gradingScale });
+}
+
 export function updateCourseSettings(dispatch, courseId, settings) {
   dispatch({ type: "UPDATE_COURSE_SETTINGS", courseId, payload: settings });
+}
+
+// ============================================================================
+// STUDENT MANAGEMENT API FUNCTIONS
+// ============================================================================
+
+// Simulates: POST /api/courses/:courseId/students
+export async function createStudent(courseId, studentData) {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      const newStudent = {
+        id: `s${Date.now()}`,
+        name: studentData.name,
+        email: studentData.email,
+        // Password would be hashed on backend, not stored in gradebook
+        grades: {},
+        lateSubmissions: {},
+        submissionDates: {},
+        practices: {},
+      };
+      resolve(newStudent);
+    }, 100);
+  });
+}
+
+// Simulates: DELETE /api/courses/:courseId/students/:studentId
+export async function deleteStudent(courseId, studentId) {
+  return new Promise((resolve) => {
+    setTimeout(() => resolve({ id: studentId, deleted: true }), 100);
+  });
+}
+
+// Simulates: PATCH /api/courses/:courseId/students/:studentId
+export async function updateStudent(courseId, studentId, updates) {
+  return new Promise((resolve) => {
+    setTimeout(() => resolve({ id: studentId, ...updates }), 100);
+  });
 }
 
 // ============================================================================
@@ -359,15 +494,26 @@ export async function initializeCourses(dispatch) {
     const courses = await fetchInstructorCourses();
     dispatch({ type: "SET_COURSES", payload: courses });
 
-    // Set active course to first course
+    // Set active course - prioritize last created course
     if (courses.length > 0) {
-      dispatch({ type: "SET_ACTIVE_COURSE", payload: courses[0].id });
+      const sortedCourses = [...courses].sort((a, b) => {
+        if (a.createdAt && b.createdAt) {
+          return new Date(b.createdAt) - new Date(a.createdAt);
+        }
+        const idA = parseInt(a.id) || 0;
+        const idB = parseInt(b.id) || 0;
+        return idB - idA;
+      });
+
+      const mostRecentCourse = sortedCourses[0];
+      dispatch({ type: "SET_ACTIVE_COURSE", payload: mostRecentCourse.id });
 
       // Load data for all courses in parallel
       await Promise.all(
         courses.map(async (course) => {
-          const [assignments, gradebook] = await Promise.all([
+          const [assignments, practices, gradebook] = await Promise.all([
             fetchCourseAssignments(course.id),
+            fetchCoursePractices(course.id),
             fetchCourseGradebook(course.id),
           ]);
 
@@ -375,6 +521,11 @@ export async function initializeCourses(dispatch) {
             type: "SET_ASSIGNMENTS",
             courseId: course.id,
             payload: assignments,
+          });
+          dispatch({
+            type: "SET_PRACTICES",
+            courseId: course.id,
+            payload: practices,
           });
           dispatch({
             type: "SET_GRADEBOOK",
@@ -395,12 +546,14 @@ export async function loadCourseData(dispatch, courseId) {
   try {
     dispatch({ type: "SET_LOADING", payload: true });
 
-    const [assignments, gradebook] = await Promise.all([
+    const [assignments, practices, gradebook] = await Promise.all([
       fetchCourseAssignments(courseId),
+      fetchCoursePractices(courseId),
       fetchCourseGradebook(courseId),
     ]);
 
     dispatch({ type: "SET_ASSIGNMENTS", courseId, payload: assignments });
+    dispatch({ type: "SET_PRACTICES", courseId, payload: practices });
     dispatch({ type: "SET_GRADEBOOK", courseId, payload: gradebook });
     dispatch({ type: "SET_LOADING", payload: false });
   } catch (error) {
@@ -420,5 +573,98 @@ export async function saveCourseSettings(dispatch, courseId, settings) {
   } catch (error) {
     dispatch({ type: "SET_ERROR", payload: error.message });
     console.error(`Failed to update course ${courseId}:`, error);
+  }
+}
+
+// Add student to course
+export async function addStudentToCourse(dispatch, courseId, studentData) {
+  try {
+    dispatch({ type: "SET_LOADING", payload: true });
+
+    const newStudent = await createStudent(courseId, studentData);
+
+    // Get current gradebook
+    const currentGradebook = await fetchCourseGradebook(courseId);
+    const updatedGradebook = [...currentGradebook, newStudent];
+
+    dispatch({
+      type: "SET_GRADEBOOK",
+      courseId,
+      payload: updatedGradebook,
+    });
+
+    // Update student count in course
+    dispatch({
+      type: "UPDATE_COURSE_SETTINGS",
+      courseId,
+      payload: { studentCount: updatedGradebook.length },
+    });
+
+    dispatch({ type: "SET_LOADING", payload: false });
+  } catch (error) {
+    dispatch({ type: "SET_ERROR", payload: error.message });
+    console.error(`Failed to add student to course ${courseId}:`, error);
+  }
+}
+
+// Remove student from course
+export async function removeStudentFromCourse(dispatch, courseId, studentId) {
+  try {
+    dispatch({ type: "SET_LOADING", payload: true });
+
+    await deleteStudent(courseId, studentId);
+
+    // Get current gradebook and filter out student
+    const currentGradebook = await fetchCourseGradebook(courseId);
+    const updatedGradebook = currentGradebook.filter((s) => s.id !== studentId);
+
+    dispatch({
+      type: "SET_GRADEBOOK",
+      courseId,
+      payload: updatedGradebook,
+    });
+
+    // Update student count in course
+    dispatch({
+      type: "UPDATE_COURSE_SETTINGS",
+      courseId,
+      payload: { studentCount: updatedGradebook.length },
+    });
+
+    dispatch({ type: "SET_LOADING", payload: false });
+  } catch (error) {
+    dispatch({ type: "SET_ERROR", payload: error.message });
+    console.error(`Failed to remove student from course ${courseId}:`, error);
+  }
+}
+
+// Update student information
+export async function updateStudentInCourse(
+  dispatch,
+  courseId,
+  studentId,
+  updates
+) {
+  try {
+    dispatch({ type: "SET_LOADING", payload: true });
+
+    await updateStudent(courseId, studentId, updates);
+
+    // Get current gradebook and update student
+    const currentGradebook = await fetchCourseGradebook(courseId);
+    const updatedGradebook = currentGradebook.map((s) =>
+      s.id === studentId ? { ...s, ...updates } : s
+    );
+
+    dispatch({
+      type: "SET_GRADEBOOK",
+      courseId,
+      payload: updatedGradebook,
+    });
+
+    dispatch({ type: "SET_LOADING", payload: false });
+  } catch (error) {
+    dispatch({ type: "SET_ERROR", payload: error.message });
+    console.error(`Failed to update student in course ${courseId}:`, error);
   }
 }
