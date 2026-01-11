@@ -165,12 +165,18 @@ export default function Worksheet() {
       }
 
       if (type === 'truth-table') {
+        const ttOptions = snapshot.options || snapshot.truthTable?.options || {}
+        const ttSnapshot = snapshot.truthTable || {}
+        const ttKind = ttSnapshot.kind || snapshot.truthTable?.kind || 'formula'
         return {
           ...proofBase,
           type: 'truth-table',
-          truthTable: snapshot.truthTable || {
-            kind: snapshot.truthTable?.kind || 'formula',
-            statement: snapshot.statement || snapshot.formula || '',
+          options: ttOptions,
+          truthTable: {
+            ...ttSnapshot,
+            kind: ttKind,
+            statement: ttSnapshot.statement ?? snapshot.statement ?? snapshot.formula ?? '',
+            options: ttOptions,
           },
         }
       }

@@ -1,5 +1,14 @@
 import * as React from 'react'
-import { Alert, Box, Stack, Typography } from '@mui/material'
+import {
+  Alert,
+  Box,
+  Stack,
+  Typography,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+} from '@mui/material'
 import getFormulaClass from '../../lib/logicpenguin/symbolic/formula.js'
 import getSyntax from '../../lib/logicpenguin/symbolic/libsyntax.js'
 import { multiTables } from '../../lib/logicpenguin/symbolic/libsemantics.js'
@@ -71,6 +80,13 @@ export default function TruthTableEditor({ proof, savedState, onStateChange, onP
   const Formula = React.useMemo(() => getFormulaClass(), [])
   const kind = truthTable.kind
     ?? (truthTable.left && truthTable.right ? 'equivalence' : 'formula')
+  const classificationEnabled = React.useMemo(() => {
+    return Boolean(
+      truthTable?.options?.question ??
+      proof?.options?.question ??
+      false
+    )
+  }, [proof?.options?.question, truthTable?.options?.question])
   const operatorSet = React.useMemo(() => new Set(Object.keys(syntax.operators)), [syntax])
   const statements = React.useMemo(() => {
     if (Array.isArray(truthTable.statements) && truthTable.statements.length > 0) {
@@ -171,10 +187,16 @@ export default function TruthTableEditor({ proof, savedState, onStateChange, onP
   const [attemptCount, setAttemptCount] = React.useState(savedState?.attemptCount ?? 0)
   const attemptLimit = proof?.attemptLimit ?? 3
   const assignmentQuestionId = Number(proof?.questionId || 0)
+  const [mcans, setMcans] = React.useState(
+    savedState?.mcans ?? savedState?.classification?.mcans ?? -1
+  )
 
   React.useEffect(() => {
     setTableInputs(derivedInitialTables)
-  }, [derivedInitialTables])
+    if (savedState?.mcans !== undefined || savedState?.classification?.mcans !== undefined) {
+      setMcans(savedState?.mcans ?? savedState?.classification?.mcans ?? -1)
+    }
+  }, [derivedInitialTables, savedState?.classification?.mcans, savedState?.mcans])
 
   const handleCellChange = (tableIndex, rowIndex, colIndex, value) => {
     setTableInputs((prev) => {
@@ -189,6 +211,12 @@ export default function TruthTableEditor({ proof, savedState, onStateChange, onP
       )
       onStateChange?.({
         tables: next.map((rows) => ({ rows })),
+        ...(classificationEnabled ? {
+          mcans,
+          taut: mcans === 0,
+          contra: mcans === 2,
+          classification: { mcans, taut: mcans === 0, contra: mcans === 2 },
+        } : {}),
       })
       return next
     })
@@ -252,7 +280,8 @@ export default function TruthTableEditor({ proof, savedState, onStateChange, onP
           row.length === (tables[tIdx]?.rows?.[rIdx]?.length ?? 0) &&
           row.every((cell) => cell !== '')
       )
-    )
+    ) &&
+    (!classificationEnabled || mcans >= 0)
 
   const tableCorrect =
     hasTruthTable &&
@@ -263,13 +292,14 @@ export default function TruthTableEditor({ proof, savedState, onStateChange, onP
 
   React.useEffect(() => {
     if (!hasTruthTable) return
-    if (tableCorrect && !completionRef.current) {
+    const responseComplete = tableCorrect && (!classificationEnabled || mcans >= 0)
+    if (responseComplete && !completionRef.current) {
       completionRef.current = true
       onProofComplete?.(proof.id)
-    } else if (!tableCorrect && completionRef.current) {
+    } else if (!responseComplete && completionRef.current) {
       completionRef.current = false
     }
-  }, [hasTruthTable, tableCorrect, onProofComplete, proof.id])
+  }, [classificationEnabled, hasTruthTable, mcans, onProofComplete, proof.id, tableCorrect])
 
   if (!hasTruthTable) {
     return (
@@ -292,12 +322,20 @@ export default function TruthTableEditor({ proof, savedState, onStateChange, onP
       colhls: rows.length > 0 ? Array(rows[0].length).fill(false) : [],
     }))
 
+    const base = { lefts: [], right: { rows: [] }, rowhls: [] }
+
     if (tableData.length === 0) {
-      return { lefts: [], right: { rows: [] }, rowhls: [] }
+      return base
     }
 
     if (kind === 'formula') {
-      return { lefts: [], right: tableData[0], rowhls: [] }
+      const payload = { lefts: [], right: tableData[0], rowhls: [] }
+      if (classificationEnabled) {
+        payload.mcans = mcans
+        payload.taut = mcans === 0
+        payload.contra = mcans === 2
+      }
+      return payload
     }
 
     if (kind === 'equivalence') {
@@ -318,6 +356,14 @@ export default function TruthTableEditor({ proof, savedState, onStateChange, onP
 
   const handleCheck = async () => {
     if (isChecking || attemptCount >= attemptLimit) return
+    if (!tableFilled) {
+      setStatus('unanswered')
+      setMessage(classificationEnabled && mcans < 0
+        ? 'Select a classification before submitting.'
+        : 'Complete the table before submitting.'
+      )
+      return
+    }
     setIsChecking(true)
     try {
       if (assignmentQuestionId) {
@@ -343,13 +389,16 @@ export default function TruthTableEditor({ proof, savedState, onStateChange, onP
         }
       } else {
         setAttemptCount((prev) => Math.min(prev + 1, attemptLimit))
-        if (tableCorrect) {
+        if (tableCorrect && (!classificationEnabled || mcans >= 0)) {
           setStatus('correct')
           setMessage('Correct!')
           onProofComplete?.(proof.id)
         } else {
           setStatus('incorrect')
-          setMessage('Incorrect. Please try again.')
+          setMessage(classificationEnabled && mcans < 0
+            ? 'Select a classification before submitting.'
+            : 'Incorrect. Please try again.'
+          )
         }
       }
     } catch (err) {
@@ -364,7 +413,12 @@ export default function TruthTableEditor({ proof, savedState, onStateChange, onP
     setTableInputs(resetTables)
     onStateChange?.({
       tables: resetTables.map((rows) => ({ rows })),
+      mcans: -1,
+      taut: false,
+      contra: false,
+      classification: { mcans: -1, taut: false, contra: false },
     })
+    setMcans(-1)
     setStatus('unanswered')
     setMessage('')
   }
@@ -606,6 +660,41 @@ export default function TruthTableEditor({ proof, savedState, onStateChange, onP
         >
           <Stack spacing={3} sx={{ p: { xs: 2, md: 2 } }}>
             {renderTableSet(tables, tableInputs, useCombinedTable, false, handleCellChange, kind === 'argument')}
+            {kind === 'formula' && classificationEnabled && (
+              <Box sx={{ width: '100%', maxWidth: 360 }}>
+                <FormControl fullWidth size="small">
+                  <InputLabel id="tt-classify-label">Classification</InputLabel>
+                  <Select
+                    labelId="tt-classify-label"
+                    id="tt-classify"
+                    value={mcans >= 0 ? mcans : ''}
+                    label="Classification"
+                    onChange={(event) => {
+                      const val = event.target.value === '' ? -1 : Number(event.target.value)
+                      setMcans(val)
+                      onStateChange?.({
+                        tables: tableInputs.map((rows) => ({ rows })),
+                        mcans: val,
+                        taut: val === 0,
+                        contra: val === 2,
+                        classification: { mcans: val, taut: val === 0, contra: val === 2 },
+                      })
+                      if (status !== 'unanswered') {
+                        setStatus('unanswered')
+                        setMessage('')
+                      }
+                    }}
+                  >
+                    <MenuItem value="">
+                      <em>Select...</em>
+                    </MenuItem>
+                    <MenuItem value={0}>Tautology</MenuItem>
+                    <MenuItem value={1}>Contingent</MenuItem>
+                    <MenuItem value={2}>Self-contradiction</MenuItem>
+                  </Select>
+                </FormControl>
+              </Box>
+            )}
           </Stack>
         </Box>
       </Box>
