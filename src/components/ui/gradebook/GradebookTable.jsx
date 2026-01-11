@@ -12,12 +12,26 @@ import {
   Chip,
   alpha,
 } from "@mui/material";
+import { useCoursesState } from "../../../context/CoursesContext";
 import {
-  calculateAverage,
   getLetterGrade,
-} from "../../../utils/gradebookUtils";
-import StudentProfileModal from "./StudentProfileModal";
+  getGradeColorVariant,
+  isPassingGrade,
+  getDefaultGradingScale,
+} from "../../../utils/gradingUtils";
+import StudentProfileModal from "../StudentProfileModal";
 import EditGradeModal from "./EditGradeModal";
+
+// Helper function to calculate average
+function calculateAverage(grades) {
+  const validGrades = Object.values(grades).filter(
+    (g) => g !== undefined && g !== null && !isNaN(g)
+  );
+  if (validGrades.length === 0) return 0;
+  return Math.round(
+    validGrades.reduce((sum, grade) => sum + grade, 0) / validGrades.length
+  );
+}
 
 export default function GradebookTable({
   students,
@@ -26,6 +40,10 @@ export default function GradebookTable({
   sortDirection,
   handleSort,
 }) {
+  const { courses, activeCourseId } = useCoursesState();
+  const activeCourse = courses.find((c) => c.id === activeCourseId);
+  const gradingScale = activeCourse?.gradingScale || getDefaultGradingScale();
+
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [profileModalOpen, setProfileModalOpen] = useState(false);
 
@@ -122,8 +140,8 @@ export default function GradebookTable({
                   sx={{
                     fontWeight: 600,
                     backgroundColor: "background.paper",
-                    width: 120,
-                    minWidth: 120,
+                    width: 140,
+                    minWidth: 140,
                     position: "sticky",
                     left: 180,
                     zIndex: 3,
@@ -175,7 +193,11 @@ export default function GradebookTable({
             <TableBody>
               {students.map((student) => {
                 const average = calculateAverage(student.grades);
-                const letterGrade = getLetterGrade(average);
+                const letterGrade = getLetterGrade(average, gradingScale);
+                const gradeColorVariant = getGradeColorVariant(
+                  average,
+                  gradingScale
+                );
                 const isRowHovered = hoveredRow === student.id;
 
                 return (
@@ -219,7 +241,7 @@ export default function GradebookTable({
                       sx={{
                         position: "sticky",
                         left: 180,
-                        backgroundColor: "theme.palette.primary.main",
+                        backgroundColor: "background.paper",
                         backgroundImage: isRowHovered
                           ? (theme) =>
                               `linear-gradient(${alpha(
@@ -241,6 +263,7 @@ export default function GradebookTable({
                           alignItems: "center",
                           justifyContent: "center",
                           gap: 1,
+                          flexWrap: "wrap",
                         }}
                       >
                         <Typography variant="body2" fontWeight={600}>
@@ -248,6 +271,7 @@ export default function GradebookTable({
                         </Typography>
                         <Chip
                           label={letterGrade}
+                          color={gradeColorVariant}
                           size="small"
                           sx={{
                             height: 20,
@@ -260,6 +284,10 @@ export default function GradebookTable({
 
                     {assignments.map((assignment) => {
                       const grade = student.grades[assignment.id];
+                      const isPassing =
+                        grade !== undefined
+                          ? isPassingGrade(grade, gradingScale)
+                          : null;
 
                       return (
                         <TableCell
@@ -287,8 +315,8 @@ export default function GradebookTable({
                             sx={{
                               color:
                                 grade !== undefined
-                                  ? grade >= 70
-                                    ? ""
+                                  ? isPassing
+                                    ? "text.primary"
                                     : "error.main"
                                   : "text.secondary",
                               fontWeight: grade !== undefined ? 600 : 400,
