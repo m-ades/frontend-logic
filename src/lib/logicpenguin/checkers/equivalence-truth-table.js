@@ -8,6 +8,59 @@
 
 import { fullTableMatch } from './truth-tables.js';
 
+function normalizeSelection(givenans) {
+    if (Array.isArray(givenans?.mcans)) {
+        return new Set(givenans.mcans.map((v) => String(v)));
+    }
+    if (givenans?.mcans === 0) { return new Set(['equivalent']); }
+    if (givenans?.mcans === 1) { return new Set(['not-equivalent']); }
+    if (givenans?.equiv === true) { return new Set(['equivalent']); }
+    if (givenans?.equiv === false) { return new Set(['not-equivalent']); }
+    return new Set();
+}
+
+function sameSelection(a, b) {
+    if (a.size !== b.size) { return false; }
+    for (const v of a) {
+        if (!b.has(v)) { return false; }
+    }
+    return true;
+}
+
+function relationSet(rowsA, opspotA, rowsB, opspotB) {
+    let equiv = true;
+    let contra = true;
+    let consistent = false;
+    let comp = true;
+    for (let i = 0 ; i < rowsA.length ; i++) {
+        const tvA = rowsA[i][opspotA];
+        const tvB = rowsB[i][opspotB];
+        if ((tvA === -1) || (tvB === -1)) {
+            comp = false;
+            equiv = false;
+            contra = false;
+            break;
+        }
+        if (tvA !== tvB) {
+            equiv = false;
+        } else {
+            contra = false;
+        }
+        if (tvA && tvB) {
+            consistent = true;
+        }
+    }
+    const inconsistent = comp ? !consistent : false;
+    const labels = new Set();
+    if (equiv) { labels.add('equivalent'); }
+    if (contra) { labels.add('contradictory'); }
+    if (comp) {
+        if (consistent) { labels.add('consistent'); }
+        if (inconsistent) { labels.add('inconsistent'); }
+    }
+    return { labels, comp };
+}
+
 // determines whether according to the table they gave, they should
 // be equivalent
 function shouldBe(rowsA, opspotA, rowsB, opspotB) {
@@ -41,8 +94,10 @@ export default async function(
     let correct = true;
     // check table portion
     let offive = 0;
-    const tmResultA = fullTableMatch(answer.A.rows, givenans.lefts[0].rows);
-    const tmResultB = fullTableMatch(answer.B.rows, givenans.right.rows);
+    const givenLeftRows = givenans?.lefts?.[0]?.rows ?? [];
+    const givenRightRows = givenans?.right?.rows ?? [];
+    const tmResultA = fullTableMatch(answer.A.rows, givenLeftRows);
+    const tmResultB = fullTableMatch(answer.B.rows, givenRightRows);
     if ((tmResultA.rowdiff == 0) &&
         (tmResultA.offcells.length == 0) &&
         (tmResultB.offcells.length == 0)) {
@@ -71,29 +126,30 @@ export default async function(
     let qright = false;
     let awarded = 0;
     if (options.question) {
-        let oftwo = 0;
-        if ((answer.equiv == givenans.equiv) && (givenans.mcans !== -1)) {
-            oftwo = 2;
-            qright = true;
-        } else {
-            const theyshouldthink = shouldBe(
-                givenans.lefts[0].rows, answer.A.opspot,
-                givenans.right.rows, answer.B.opspot
-            );
-            if (theyshouldthink.comp) {
-                if (theyshouldthink.equiv == givenans.equiv) {
-                    oftwo = 2;
-                } else {
-                    oftwo = 0;
-                    correct = false;
+        const selection = normalizeSelection(givenans);
+        const expected = relationSet(
+            answer.A.rows, answer.A.opspot,
+            answer.B.rows, answer.B.opspot
+        );
+        qright = sameSelection(selection, expected.labels);
+        if (!qright) {
+            const leftRows = givenans?.lefts?.[0]?.rows;
+            const rightRows = givenans?.right?.rows;
+            if (leftRows && rightRows) {
+                const derived = relationSet(
+                    leftRows, answer.A.opspot,
+                    rightRows, answer.B.opspot
+                );
+                if (derived.comp) {
+                    qright = sameSelection(selection, derived.labels);
                 }
-            } else {
-                oftwo = 0;
-                correct = false;
             }
         }
+        if (!qright) { correct = false; }
         if (partialcredit) {
-            awarded = Math.floor(((oftwo + offive)/7) * points);
+            const tableScore = offive / 5;
+            const mcScore = qright ? 1 : 0;
+            awarded = Math.floor(points * (0.5 * tableScore + 0.5 * mcScore));
         } else {
             awarded = (correct) ? points : 0;
         }
@@ -122,4 +178,3 @@ export default async function(
     }
     return rv;
 }
-

@@ -5,9 +5,10 @@ import {
   Stack,
   Typography,
   FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
+  FormGroup,
+  FormControlLabel,
+  FormLabel,
+  Checkbox,
   Table,
   TableBody,
   TableCell,
@@ -94,6 +95,31 @@ export default function TruthTableEditor({ proof, savedState, onStateChange, onP
       false
     )
   }, [proof?.options?.question, truthTable?.options?.question])
+  const classificationOptions = React.useMemo(() => {
+    if (!classificationEnabled) { return []; }
+    if (kind === 'formula') {
+      return [
+        { value: 'tautology', label: 'Tautology' },
+        { value: 'contingent', label: 'Contingent' },
+        { value: 'self-contradiction', label: 'Self-contradiction' },
+      ];
+    }
+    if (kind === 'equivalence') {
+      return [
+        { value: 'equivalent', label: 'Logically equivalent' },
+        { value: 'contradictory', label: 'Contradictory' },
+        { value: 'consistent', label: 'Consistent' },
+        { value: 'inconsistent', label: 'Inconsistent' },
+      ];
+    }
+    if (kind === 'argument') {
+      return [
+        { value: 'valid', label: 'Valid' },
+        { value: 'invalid', label: 'Invalid' },
+      ];
+    }
+    return [];
+  }, [classificationEnabled, kind])
   const operatorSet = React.useMemo(() => new Set(Object.keys(syntax.operators)), [syntax])
   const statements = React.useMemo(() => {
     if (Array.isArray(truthTable.statements) && truthTable.statements.length > 0) {
@@ -194,20 +220,35 @@ export default function TruthTableEditor({ proof, savedState, onStateChange, onP
   const [attemptCount, setAttemptCount] = React.useState(savedState?.attemptCount ?? 0)
   const attemptLimit = proof?.attemptLimit ?? 3
   const assignmentQuestionId = Number(proof?.questionId || 0)
-  const [mcans, setMcans] = React.useState(
-    savedState?.mcans ?? savedState?.classification?.mcans ?? -1
-  )
+  const [mcSelection, setMcSelection] = React.useState([])
 
   React.useEffect(() => {
-    setTableInputs(derivedInitialTables)
-    if (savedState?.mcans !== undefined || savedState?.classification?.mcans !== undefined) {
-      setMcans(savedState?.mcans ?? savedState?.classification?.mcans ?? -1)
+    const normalizeSavedSelection = () => {
+      if (Array.isArray(savedState?.mcans)) {
+        return savedState.mcans.map((v) => String(v));
+      }
+      if (kind === 'formula') {
+        if (savedState?.taut) { return ['tautology']; }
+        if (savedState?.contra) { return ['self-contradiction']; }
+        if (savedState?.mcans === 1) { return ['contingent']; }
+      }
+      if (kind === 'argument') {
+        if (savedState?.valid === true || savedState?.mcans === 0) { return ['valid']; }
+        if (savedState?.valid === false || savedState?.mcans === 1) { return ['invalid']; }
+      }
+      if (kind === 'equivalence') {
+        if (savedState?.equiv === true || savedState?.mcans === 0) { return ['equivalent']; }
+      }
+      return [];
     }
-  }, [derivedInitialTables, savedState?.classification?.mcans, savedState?.mcans])
+    setTableInputs(derivedInitialTables)
+    setMcSelection(normalizeSavedSelection())
+  }, [derivedInitialTables, kind, savedState])
 
   const handleCellChange = (tableIndex, rowIndex, colIndex, value) => {
+    let nextTables = null
     setTableInputs((prev) => {
-      const next = prev.map((tableRows, tIdx) =>
+      nextTables = prev.map((tableRows, tIdx) =>
         tIdx === tableIndex
           ? tableRows.map((row, rIdx) =>
               rIdx === rowIndex
@@ -216,17 +257,25 @@ export default function TruthTableEditor({ proof, savedState, onStateChange, onP
             )
           : tableRows
       )
+      return nextTables
+    })
+    if (nextTables) {
       onStateChange?.({
-        tables: next.map((rows) => ({ rows })),
+        tables: nextTables.map((rows) => ({ rows })),
         ...(classificationEnabled ? {
-          mcans,
-          taut: mcans === 0,
-          contra: mcans === 2,
-          classification: { mcans, taut: mcans === 0, contra: mcans === 2 },
+          mcans: mcSelection,
+          taut: mcSelection.includes('tautology'),
+          contra: mcSelection.includes('self-contradiction'),
+          valid: mcSelection.includes('valid'),
+          equiv: mcSelection.includes('equivalent'),
+          classification: {
+            mcans: mcSelection,
+            taut: mcSelection.includes('tautology'),
+            contra: mcSelection.includes('self-contradiction'),
+          },
         } : {}),
       })
-      return next
-    })
+    }
     if (status !== 'unanswered') {
       setStatus('unanswered')
       setMessage('')
@@ -288,7 +337,7 @@ export default function TruthTableEditor({ proof, savedState, onStateChange, onP
           row.every((cell) => cell !== '')
       )
     ) &&
-    (!classificationEnabled || mcans >= 0)
+    (!classificationEnabled || mcSelection.length > 0)
 
   const tableCorrect =
     hasTruthTable &&
@@ -299,14 +348,14 @@ export default function TruthTableEditor({ proof, savedState, onStateChange, onP
 
   React.useEffect(() => {
     if (!hasTruthTable) return
-    const responseComplete = tableCorrect && (!classificationEnabled || mcans >= 0)
+    const responseComplete = tableCorrect && (!classificationEnabled || mcSelection.length > 0)
     if (responseComplete && !completionRef.current) {
       completionRef.current = true
       onProofComplete?.(proof.id)
     } else if (!responseComplete && completionRef.current) {
       completionRef.current = false
     }
-  }, [classificationEnabled, hasTruthTable, mcans, onProofComplete, proof.id, tableCorrect])
+  }, [classificationEnabled, hasTruthTable, mcSelection.length, onProofComplete, proof.id, tableCorrect])
 
   if (!hasTruthTable) {
     return (
@@ -338,10 +387,17 @@ export default function TruthTableEditor({ proof, savedState, onStateChange, onP
     if (kind === 'formula') {
       const payload = { lefts: [], right: tableData[0], rowhls: [] }
       if (classificationEnabled) {
-        payload.mcans = mcans
-        payload.taut = mcans === 0
-        payload.contra = mcans === 2
+        payload.mcans = mcSelection
+        payload.taut = mcSelection.includes('tautology')
+        payload.contra = mcSelection.includes('self-contradiction')
       }
+      return payload
+    }
+
+    if (kind === 'equivalence' && classificationEnabled) {
+      const payload = { lefts: [tableData[0]], right: tableData[1], rowhls: [] }
+      payload.mcans = mcSelection
+      payload.equiv = mcSelection.includes('equivalent')
       return payload
     }
 
@@ -355,6 +411,12 @@ export default function TruthTableEditor({ proof, savedState, onStateChange, onP
         lefts: tableData.slice(0, -1),
         right: tableData[tableData.length - 1],
         rowhls: [],
+        ...(classificationEnabled
+          ? {
+              mcans: mcSelection,
+              valid: mcSelection.includes('valid'),
+            }
+          : {}),
       }
     }
 
@@ -365,7 +427,7 @@ export default function TruthTableEditor({ proof, savedState, onStateChange, onP
     if (isChecking || attemptCount >= attemptLimit) return
     if (!tableFilled) {
       setStatus('unanswered')
-      setMessage(classificationEnabled && mcans < 0
+      setMessage(classificationEnabled && mcSelection.length === 0
         ? 'Select a classification before submitting.'
         : 'Complete the table before submitting.'
       )
@@ -396,13 +458,13 @@ export default function TruthTableEditor({ proof, savedState, onStateChange, onP
         }
       } else {
         setAttemptCount((prev) => Math.min(prev + 1, attemptLimit))
-        if (tableCorrect && (!classificationEnabled || mcans >= 0)) {
+        if (tableCorrect && (!classificationEnabled || mcSelection.length > 0)) {
           setStatus('correct')
           setMessage('Correct!')
           onProofComplete?.(proof.id)
         } else {
           setStatus('incorrect')
-          setMessage(classificationEnabled && mcans < 0
+          setMessage(classificationEnabled && mcSelection.length === 0
             ? 'Select a classification before submitting.'
             : 'Incorrect. Please try again.'
           )
@@ -420,12 +482,14 @@ export default function TruthTableEditor({ proof, savedState, onStateChange, onP
     setTableInputs(resetTables)
     onStateChange?.({
       tables: resetTables.map((rows) => ({ rows })),
-      mcans: -1,
+      mcans: [],
       taut: false,
       contra: false,
-      classification: { mcans: -1, taut: false, contra: false },
+      valid: false,
+      equiv: false,
+      classification: { mcans: [], taut: false, contra: false },
     })
-    setMcans(-1)
+    setMcSelection([])
     setStatus('unanswered')
     setMessage('')
   }
@@ -654,38 +718,47 @@ export default function TruthTableEditor({ proof, savedState, onStateChange, onP
         >
           <Stack spacing={3} sx={{ p: { xs: 2, md: 2 } }}>
             {renderTableSet(tables, tableInputs, useCombinedTable, false, handleCellChange, kind === 'argument')}
-            {kind === 'formula' && classificationEnabled && (
-              <Box sx={{ width: '100%', maxWidth: 360 }}>
-                <FormControl fullWidth size="small">
-                  <InputLabel id="tt-classify-label">Classification</InputLabel>
-                  <Select
-                    labelId="tt-classify-label"
-                    id="tt-classify"
-                    value={mcans >= 0 ? mcans : ''}
-                    label="Classification"
-                    onChange={(event) => {
-                      const val = event.target.value === '' ? -1 : Number(event.target.value)
-                      setMcans(val)
-                      onStateChange?.({
-                        tables: tableInputs.map((rows) => ({ rows })),
-                        mcans: val,
-                        taut: val === 0,
-                        contra: val === 2,
-                        classification: { mcans: val, taut: val === 0, contra: val === 2 },
-                      })
-                      if (status !== 'unanswered') {
-                        setStatus('unanswered')
-                        setMessage('')
-                      }
-                    }}
-                  >
-                    <MenuItem value="">
-                      <em>Select...</em>
-                    </MenuItem>
-                    <MenuItem value={0}>Tautology</MenuItem>
-                    <MenuItem value={1}>Contingent</MenuItem>
-                    <MenuItem value={2}>Self-contradiction</MenuItem>
-                  </Select>
+            {classificationEnabled && classificationOptions.length > 0 && (
+              <Box sx={{ width: '100%' }}>
+                <FormControl component="fieldset" variant="standard">
+                  <FormLabel component="legend">Select all that apply</FormLabel>
+                  <FormGroup>
+                    {classificationOptions.map((option) => (
+                      <FormControlLabel
+                        key={option.value}
+                        control={
+                          <Checkbox
+                            checked={mcSelection.includes(option.value)}
+                            onChange={(event) => {
+                              const checked = event.target.checked
+                              const next = checked
+                                ? [...mcSelection, option.value]
+                                : mcSelection.filter((v) => v !== option.value)
+                              setMcSelection(next)
+                              onStateChange?.({
+                                tables: tableInputs.map((rows) => ({ rows })),
+                                mcans: next,
+                                taut: next.includes('tautology'),
+                                contra: next.includes('self-contradiction'),
+                                valid: next.includes('valid'),
+                                equiv: next.includes('equivalent'),
+                                classification: {
+                                  mcans: next,
+                                  taut: next.includes('tautology'),
+                                  contra: next.includes('self-contradiction'),
+                                },
+                              })
+                              if (status !== 'unanswered') {
+                                setStatus('unanswered')
+                                setMessage('')
+                              }
+                            }}
+                          />
+                        }
+                        label={option.label}
+                      />
+                    ))}
+                  </FormGroup>
                 </FormControl>
               </Box>
             )}

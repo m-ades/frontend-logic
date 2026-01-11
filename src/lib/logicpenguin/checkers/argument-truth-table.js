@@ -8,6 +8,29 @@
 
 import { fullTableMatch } from './truth-tables.js';
 
+function normalizeSelection(givenans) {
+    if (Array.isArray(givenans?.mcans)) {
+        return new Set(givenans.mcans.map((v) => String(v)));
+    }
+    if (givenans?.mcans === 0) { return new Set(['valid']); }
+    if (givenans?.mcans === 1) { return new Set(['invalid']); }
+    if (givenans?.valid === true) { return new Set(['valid']); }
+    if (givenans?.valid === false) { return new Set(['invalid']); }
+    return new Set();
+}
+
+function correctSelection(answer) {
+    return new Set([answer.valid ? 'valid' : 'invalid']);
+}
+
+function sameSelection(a, b) {
+    if (a.size !== b.size) { return false; }
+    for (const v of a) {
+        if (!b.has(v)) { return false; }
+    }
+    return true;
+}
+
 // determines whether it should be valid or invalid depending on the
 // table given
 function shouldBe(prems, conc) {
@@ -86,13 +109,10 @@ export default async function(
     let qright = false;
     let awarded = 0;
     if (options.question) {
-        let oftwo = 0;
-        // award if actual right answer
-        if ((answer.valid == givenans.valid) && (givenans.mcans !== -1)) {
-            oftwo = 2;
-            qright = true;
-        } else {
-            // determine what answer their table reflects
+        const selection = normalizeSelection(givenans);
+        const expected = correctSelection(answer);
+        qright = sameSelection(selection, expected);
+        if (!qright) {
             const prems = [];
             for (let i =0 ; i < givenans.lefts.length ; i++) {
                 const prem = givenans.lefts[i];
@@ -101,24 +121,16 @@ export default async function(
             const theyshouldthink = shouldBe(prems,
                 { rows: givenans.right.rows, opspot: answer.conc.opspot }
             );
-            // if points for multiple choice if it's the right answer for
-            // their table
             if (theyshouldthink.comp) {
-                if (theyshouldthink.valid == givenans.valid) {
-                    oftwo = 2;
-                } else {
-                    oftwo = 0;
-                    correct = false;
-                }
-            // otherwise none of the two
-            } else {
-                oftwo = 0;
-                correct = false;
+                const derived = correctSelection(theyshouldthink);
+                qright = sameSelection(selection, derived);
             }
         }
-        // determine partial credit out of 7
+        if (!qright) { correct = false; }
         if (partialcredit) {
-            awarded = Math.floor(((oftwo + offive)/7) * points);
+            const tableScore = offive / 5;
+            const mcScore = qright ? 1 : 0;
+            awarded = Math.floor(points * (0.5 * tableScore + 0.5 * mcScore));
         } else {
             awarded = (correct) ? points : 0;
         }
@@ -150,4 +162,3 @@ export default async function(
     }
     return rv;
 }
-

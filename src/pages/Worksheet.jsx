@@ -251,14 +251,30 @@ export default function Worksheet() {
     }
 
     const toSymbol = (value) => (value === true ? 'T' : value === false ? 'F' : '')
-    const buildTruthTableState = (lefts, right) => {
+    const buildTruthTableState = (lefts, right, data) => {
       const mapRows = (rows = []) => rows.map((row) => row.map(toSymbol))
-      return ({
+      const state = ({
         tables: [
           ...lefts.map((table) => ({ rows: mapRows(table.rows) })),
           { rows: mapRows(right.rows) }
         ]
       })
+      if (Array.isArray(data?.mcans)) {
+        state.mcans = data.mcans
+      }
+      if (data?.taut !== undefined) {
+        state.taut = data.taut
+      }
+      if (data?.contra !== undefined) {
+        state.contra = data.contra
+      }
+      if (data?.valid !== undefined) {
+        state.valid = data.valid
+      }
+      if (data?.equiv !== undefined) {
+        state.equiv = data.equiv
+      }
+      return state
     }
 
     const loadSavedStates = async (worksheetData) => {
@@ -327,11 +343,11 @@ export default function Worksheet() {
           const truthTable = proof.truthTable || {}
           const kind = truthTable.kind || 'formula'
           if (kind === 'formula' && data.right) {
-            initialStates[proof.id] = buildTruthTableState([], data.right)
+            initialStates[proof.id] = buildTruthTableState([], data.right, data)
           } else if (kind === 'equivalence' && data.lefts?.length && data.right) {
-            initialStates[proof.id] = buildTruthTableState(data.lefts, data.right)
+            initialStates[proof.id] = buildTruthTableState(data.lefts, data.right, data)
           } else if (kind === 'argument' && data.lefts?.length && data.right) {
-            initialStates[proof.id] = buildTruthTableState(data.lefts, data.right)
+            initialStates[proof.id] = buildTruthTableState(data.lefts, data.right, data)
           }
           return
         }
