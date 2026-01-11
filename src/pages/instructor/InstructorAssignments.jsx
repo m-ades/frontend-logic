@@ -1,194 +1,183 @@
 import { useState } from "react";
+import { Box, Typography, Button, Alert } from "@mui/material";
+import { Plus } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import {
-  Box,
-  Typography,
-  Paper,
-  Button,
-  Table,
-  TableHead,
-  TableRow,
-  TableCell,
-  TableBody,
-  Chip,
-  IconButton,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  TextField,
-  Stack,
-  MenuItem,
-  Switch,
-  FormControlLabel,
-  Tooltip,
-  Menu,
-} from "@mui/material";
+  useCoursesState,
+  useCoursesDispatch,
+  calculateAssignmentAverage,
+} from "../../context/CoursesContext";
+import AssignmentTable from "../../components/ui/AssignmentTable";
+import AssignmentFormDialog from "../../components/ui/AssignmentFormDialog";
+import AssignmentContextMenu from "../../components/ui/AssignmentContextMenu";
 import {
-  Plus,
-  Eye,
-  Lock,
-  Unlock,
-  MoreVertical,
-  Edit,
-  Trash2,
-  Copy,
-  Calendar,
-  Users,
-  CheckCircle,
-} from "lucide-react";
+  getStatusColor,
+  getStatusText,
+  enhanceItems,
+} from "../../utils/assignmentStatus";
 
-// Mock assignments data - replace with context data
-const mockAssignments = [
-  {
-    id: "a1",
-    name: "Assignment 1",
-    dueDate: "2026-01-15",
-    publishDate: "2026-01-08",
-    isLocked: false,
-    isPublished: true,
-    totalPoints: 100,
-    submissions: 28,
-    totalStudents: 30,
-    averageGrade: 87,
-  },
-  {
-    id: "a2",
-    name: "Assignment 2",
-    dueDate: "2026-01-22",
-    publishDate: "2026-01-15",
-    isLocked: false,
-    isPublished: true,
-    totalPoints: 100,
-    submissions: 29,
-    totalStudents: 30,
-    averageGrade: 82,
-  },
-  {
-    id: "a3",
-    name: "Assignment 3",
-    dueDate: "2026-01-29",
-    publishDate: "2026-01-22",
-    isLocked: false,
-    isPublished: false,
-    totalPoints: 100,
-    submissions: 0,
-    totalStudents: 30,
-    averageGrade: 0,
-  },
-];
-
-const getStatusColor = (assignment) => {
-  const now = new Date();
-  const dueDate = new Date(assignment.dueDate);
-  const publishDate = new Date(assignment.publishDate);
-
-  if (assignment.isLocked) return "default";
-  if (!assignment.isPublished || publishDate > now) return "warning";
-  if (dueDate < now) return "error";
-  return "success";
+// Helper to get current date
+const getCurrentDate = () => {
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, "0");
+  const day = String(today.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
 };
 
-const getStatusText = (assignment) => {
-  const now = new Date();
-  const dueDate = new Date(assignment.dueDate);
-  const publishDate = new Date(assignment.publishDate);
-
-  if (assignment.isLocked) return "Locked";
-  if (!assignment.isPublished) return "Draft";
-  if (publishDate > now) return "Scheduled";
-  if (dueDate < now) return "Past Due";
-  return "Active";
+const INITIAL_FORM_DATA = {
+  name: "",
+  publishDate: getCurrentDate(),
+  publishTime: "00:00",
+  dueDate: getCurrentDate(),
+  dueTime: "23:59",
+  totalPoints: 100,
+  isPublished: true,
+  isLocked: false,
 };
 
 export default function InstructorAssignments() {
-  const [assignments, setAssignments] = useState(mockAssignments);
+  const { activeCourseId, assignmentsByCourse, gradebookByCourse, courses } =
+    useCoursesState();
+  const dispatch = useCoursesDispatch();
+  const navigate = useNavigate();
+
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [selectedAssignment, setSelectedAssignment] = useState(null);
   const [menuAnchor, setMenuAnchor] = useState(null);
   const [menuAssignment, setMenuAssignment] = useState(null);
+  const [formData, setFormData] = useState(INITIAL_FORM_DATA);
 
-  // Form state
-  const [formData, setFormData] = useState({
-    name: "",
-    dueDate: "",
-    publishDate: "",
-    totalPoints: 100,
-    isPublished: true,
-    isLocked: false,
+  // Get current course data
+  const activeCourse = courses.find((c) => c.id === activeCourseId);
+  const assignments = assignmentsByCourse[activeCourseId] || [];
+  const gradebook = gradebookByCourse[activeCourseId] || [];
+
+  // Enhance assignments with calculated data
+  const enhancedAssignments = enhanceItems(
+    assignments,
+    activeCourse,
+    gradebook,
+    false
+  ).map((assignment) => {
+    const average = calculateAssignmentAverage(assignment.id, gradebook);
+    const submissions = gradebook.filter(
+      (student) => student.grades[assignment.id] !== undefined
+    ).length;
+
+    return {
+      ...assignment,
+      averageGrade: average,
+      submissions,
+    };
   });
 
+  // Handlers
   const handleCreateOpen = () => {
     setFormData({
-      name: "",
-      dueDate: "",
-      publishDate: "",
-      totalPoints: 100,
-      isPublished: true,
-      isLocked: false,
+      ...INITIAL_FORM_DATA,
+      publishDate: getCurrentDate(),
+      dueDate: getCurrentDate(),
     });
     setCreateDialogOpen(true);
-  };
-
-  const handleCreateClose = () => {
-    setCreateDialogOpen(false);
   };
 
   const handleCreateSubmit = () => {
     const newAssignment = {
       id: `a${assignments.length + 1}`,
-      ...formData,
+      courseId: activeCourseId,
+      name: formData.name,
+      publishDate: formData.publishDate,
+      publishTime: formData.publishTime,
+      dueDate: formData.dueDate,
+      dueTime: formData.dueTime,
+      totalPoints: formData.totalPoints,
+      isPublished: formData.isPublished,
+      isLocked: formData.isLocked,
       submissions: 0,
-      totalStudents: 30,
-      averageGrade: 0,
+      lateSubmissions: 0,
     };
-    setAssignments([...assignments, newAssignment]);
+
+    dispatch({
+      type: "SET_ASSIGNMENTS",
+      courseId: activeCourseId,
+      payload: [...assignments, newAssignment],
+    });
+
     setCreateDialogOpen(false);
+    navigate("/instructor/assignment-builder", {
+      state: { assignmentId: newAssignment.id },
+    });
   };
 
   const handleEditOpen = (assignment) => {
     setSelectedAssignment(assignment);
+
     setFormData({
       name: assignment.name,
-      dueDate: assignment.dueDate,
-      publishDate: assignment.publishDate,
-      totalPoints: assignment.totalPoints,
-      isPublished: assignment.isPublished,
-      isLocked: assignment.isLocked,
+      publishDate: assignment.publishDate || getCurrentDate(),
+      publishTime: assignment.publishTime || "00:00",
+      dueDate: assignment.dueDate || getCurrentDate(),
+      dueTime: assignment.dueTime || "23:59",
+      totalPoints: assignment.totalPoints || 100,
+      isPublished: assignment.isPublished ?? true,
+      isLocked: assignment.isLocked ?? false,
     });
+
     setEditDialogOpen(true);
     setMenuAnchor(null);
   };
 
-  const handleEditClose = () => {
-    setEditDialogOpen(false);
-    setSelectedAssignment(null);
-  };
-
   const handleEditSubmit = () => {
-    setAssignments(
-      assignments.map((a) =>
-        a.id === selectedAssignment.id ? { ...a, ...formData } : a
-      )
+    const updatedAssignments = assignments.map((a) =>
+      a.id === selectedAssignment.id
+        ? {
+            ...a,
+            name: formData.name,
+            publishDate: formData.publishDate,
+            publishTime: formData.publishTime,
+            dueDate: formData.dueDate,
+            dueTime: formData.dueTime,
+            totalPoints: formData.totalPoints,
+            isPublished: formData.isPublished,
+            isLocked: formData.isLocked,
+          }
+        : a
     );
+
+    dispatch({
+      type: "SET_ASSIGNMENTS",
+      courseId: activeCourseId,
+      payload: updatedAssignments,
+    });
+
     setEditDialogOpen(false);
     setSelectedAssignment(null);
   };
 
   const handleToggleLock = (assignmentId) => {
-    setAssignments(
-      assignments.map((a) =>
-        a.id === assignmentId ? { ...a, isLocked: !a.isLocked } : a
-      )
+    const updatedAssignments = assignments.map((a) =>
+      a.id === assignmentId ? { ...a, isLocked: !a.isLocked } : a
     );
+
+    dispatch({
+      type: "SET_ASSIGNMENTS",
+      courseId: activeCourseId,
+      payload: updatedAssignments,
+    });
   };
 
   const handleTogglePublish = (assignmentId) => {
-    setAssignments(
-      assignments.map((a) =>
-        a.id === assignmentId ? { ...a, isPublished: !a.isPublished } : a
-      )
+    const updatedAssignments = assignments.map((a) =>
+      a.id === assignmentId ? { ...a, isPublished: !a.isPublished } : a
     );
+
+    dispatch({
+      type: "SET_ASSIGNMENTS",
+      courseId: activeCourseId,
+      payload: updatedAssignments,
+    });
   };
 
   const handleDuplicate = (assignment) => {
@@ -197,37 +186,61 @@ export default function InstructorAssignments() {
       id: `a${assignments.length + 1}`,
       name: `${assignment.name} (Copy)`,
       submissions: 0,
-      averageGrade: 0,
+      lateSubmissions: 0,
       isPublished: false,
     };
-    setAssignments([...assignments, newAssignment]);
+
+    dispatch({
+      type: "SET_ASSIGNMENTS",
+      courseId: activeCourseId,
+      payload: [...assignments, newAssignment],
+    });
+
     setMenuAnchor(null);
   };
 
   const handleDelete = (assignmentId) => {
     if (window.confirm("Are you sure you want to delete this assignment?")) {
-      setAssignments(assignments.filter((a) => a.id !== assignmentId));
+      const updatedAssignments = assignments.filter(
+        (a) => a.id !== assignmentId
+      );
+
+      dispatch({
+        type: "SET_ASSIGNMENTS",
+        courseId: activeCourseId,
+        payload: updatedAssignments,
+      });
     }
     setMenuAnchor(null);
   };
 
   const handleViewAssignment = (assignment) => {
-    console.log("View assignment:", assignment.id);
-    alert(`View ${assignment.name} - Navigate to assignment details page`);
+    navigate("/instructor/assignment-builder", {
+      state: { assignmentId: assignment.id },
+    });
   };
 
-  const handleMenuOpen = (event, assignment) => {
-    setMenuAnchor(event.currentTarget);
-    setMenuAssignment(assignment);
-  };
-
-  const handleMenuClose = () => {
+  const handleOpenBuilder = (assignment) => {
+    navigate("/instructor/assignment-builder", {
+      state: { assignmentId: assignment.id },
+    });
     setMenuAnchor(null);
-    setMenuAssignment(null);
   };
+
+  // Show message if no active course
+  if (!activeCourseId) {
+    return (
+      <Box sx={{ width: "100%", maxWidth: "100%" }}>
+        <Alert severity="info">
+          Please select a course to view and manage assignments.
+        </Alert>
+      </Box>
+    );
+  }
 
   return (
     <Box sx={{ width: "100%", maxWidth: "100%" }}>
+      {/* Header */}
       <Box
         sx={{
           display: "flex",
@@ -241,7 +254,7 @@ export default function InstructorAssignments() {
             Assignments
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            Create and manage course assignments
+            {activeCourse?.code} - Create and manage course assignments
           </Typography>
         </Box>
         <Button
@@ -253,393 +266,63 @@ export default function InstructorAssignments() {
         </Button>
       </Box>
 
-      {/* Assignments Table */}
-      <Paper elevation={2} sx={{ width: "100%", overflow: "hidden" }}>
-        <Box sx={{ width: "100%", overflowX: "auto" }}>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell sx={{ fontWeight: 600 }}>Assignment Name</TableCell>
-                <TableCell sx={{ fontWeight: 600 }}>Status</TableCell>
-                <TableCell align="center" sx={{ fontWeight: 600 }}>
-                  Published
-                </TableCell>
-                <TableCell align="center" sx={{ fontWeight: 600 }}>
-                  Publish Date
-                </TableCell>
-                <TableCell align="center" sx={{ fontWeight: 600 }}>
-                  Due Date
-                </TableCell>
-                <TableCell align="center" sx={{ fontWeight: 600 }}>
-                  Submissions
-                </TableCell>
-                <TableCell align="center" sx={{ fontWeight: 600 }}>
-                  Average
-                </TableCell>
-                <TableCell align="center" sx={{ fontWeight: 600 }}>
-                  Points
-                </TableCell>
-                <TableCell align="center" sx={{ fontWeight: 600 }}>
-                  Actions
-                </TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {assignments.map((assignment) => {
-                const statusColor = getStatusColor(assignment);
-                const statusText = getStatusText(assignment);
-                const completionRate = Math.round(
-                  (assignment.submissions / assignment.totalStudents) * 100
-                );
-
-                return (
-                  <TableRow key={assignment.id} hover>
-                    <TableCell>
-                      <Box
-                        sx={{ display: "flex", alignItems: "center", gap: 1 }}
-                      >
-                        <Typography variant="body2" fontWeight={500}>
-                          {assignment.name}
-                        </Typography>
-                        {assignment.isLocked && <Lock size={14} color="#666" />}
-                      </Box>
-                    </TableCell>
-                    <TableCell>
-                      <Chip
-                        label={statusText}
-                        color={statusColor}
-                        size="small"
-                        sx={{ fontWeight: 600 }}
-                      />
-                    </TableCell>
-                    <TableCell align="center">
-                      <Switch
-                        checked={assignment.isPublished}
-                        onChange={() => handleTogglePublish(assignment.id)}
-                        size="small"
-                        disabled={assignment.isLocked}
-                      />
-                    </TableCell>
-                    <TableCell align="center">
-                      <Typography variant="body2" color="text.secondary">
-                        {new Date(assignment.publishDate).toLocaleDateString()}
-                      </Typography>
-                    </TableCell>
-                    <TableCell align="center">
-                      <Typography variant="body2" color="text.secondary">
-                        {new Date(assignment.dueDate).toLocaleDateString()}
-                      </Typography>
-                    </TableCell>
-                    <TableCell align="center">
-                      <Box
-                        sx={{
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          gap: 1,
-                        }}
-                      >
-                        <Typography variant="body2">
-                          {assignment.submissions}/{assignment.totalStudents}
-                        </Typography>
-                        {completionRate === 100 && (
-                          <CheckCircle size={16} color="#4caf50" />
-                        )}
-                      </Box>
-                    </TableCell>
-                    <TableCell align="center">
-                      <Typography variant="body2" fontWeight={600}>
-                        {assignment.submissions > 0
-                          ? `${assignment.averageGrade}%`
-                          : "—"}
-                      </Typography>
-                    </TableCell>
-                    <TableCell align="center">
-                      <Typography variant="body2">
-                        {assignment.totalPoints}
-                      </Typography>
-                    </TableCell>
-                    <TableCell align="center">
-                      <Stack
-                        direction="row"
-                        spacing={0.5}
-                        justifyContent="center"
-                      >
-                        <Tooltip title="View Assignment">
-                          <IconButton
-                            size="small"
-                            onClick={() => handleViewAssignment(assignment)}
-                          >
-                            <Eye size={18} />
-                          </IconButton>
-                        </Tooltip>
-                        <Tooltip
-                          title={assignment.isLocked ? "Unlock" : "Lock"}
-                        >
-                          <IconButton
-                            size="small"
-                            onClick={() => handleToggleLock(assignment.id)}
-                            color={assignment.isLocked ? "warning" : "default"}
-                          >
-                            {assignment.isLocked ? (
-                              <Unlock size={18} />
-                            ) : (
-                              <Lock size={18} />
-                            )}
-                          </IconButton>
-                        </Tooltip>
-                        <Tooltip title="More Actions">
-                          <IconButton
-                            size="small"
-                            onClick={(e) => handleMenuOpen(e, assignment)}
-                          >
-                            <MoreVertical size={18} />
-                          </IconButton>
-                        </Tooltip>
-                      </Stack>
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
-        </Box>
-
-        {assignments.length === 0 && (
-          <Box sx={{ textAlign: "center", py: 8 }}>
-            <Typography variant="h6" color="text.secondary" gutterBottom>
-              No assignments yet
-            </Typography>
-            <Typography variant="body2" color="text.secondary" mb={2}>
-              Create your first assignment to get started
-            </Typography>
-            <Button
-              variant="contained"
-              startIcon={<Plus size={20} />}
-              onClick={handleCreateOpen}
-            >
-              Create Assignment
-            </Button>
-          </Box>
-        )}
-      </Paper>
+      {/* Table */}
+      <AssignmentTable
+        items={enhancedAssignments}
+        type="assignment"
+        onView={handleViewAssignment}
+        onToggleLock={handleToggleLock}
+        onTogglePublish={handleTogglePublish}
+        onMenuOpen={(e, assignment) => {
+          setMenuAnchor(e.currentTarget);
+          setMenuAssignment(assignment);
+        }}
+        onCreate={handleCreateOpen}
+        emptyMessage={{
+          title: "No assignments yet",
+          description: "Create your first assignment to get started",
+          buttonText: "Create Assignment",
+        }}
+        getStatusColor={(item) => getStatusColor(item, false)}
+        getStatusText={(item) => getStatusText(item, false)}
+      />
 
       {/* Context Menu */}
-      <Menu
+      <AssignmentContextMenu
         anchorEl={menuAnchor}
         open={Boolean(menuAnchor)}
-        onClose={handleMenuClose}
-      >
-        <MenuItem onClick={() => handleEditOpen(menuAssignment)}>
-          <Edit size={16} style={{ marginRight: 8 }} />
-          Edit
-        </MenuItem>
-        <MenuItem onClick={() => handleDuplicate(menuAssignment)}>
-          <Copy size={16} style={{ marginRight: 8 }} />
-          Duplicate
-        </MenuItem>
-        <MenuItem
-          onClick={() => handleDelete(menuAssignment?.id)}
-          sx={{ color: "error.main" }}
-        >
-          <Trash2 size={16} style={{ marginRight: 8 }} />
-          Delete
-        </MenuItem>
-      </Menu>
+        onClose={() => setMenuAnchor(null)}
+        item={menuAssignment}
+        onOpenBuilder={handleOpenBuilder}
+        onEdit={handleEditOpen}
+        onDuplicate={handleDuplicate}
+        onDelete={handleDelete}
+      />
 
-      {/* Create Assignment Dialog */}
-      <Dialog
+      {/* Create Dialog */}
+      <AssignmentFormDialog
         open={createDialogOpen}
-        onClose={handleCreateClose}
-        maxWidth="sm"
-        fullWidth
-      >
-        <DialogTitle>Create New Assignment</DialogTitle>
-        <DialogContent>
-          <Stack spacing={3} sx={{ mt: 2 }}>
-            <TextField
-              label="Assignment Name"
-              fullWidth
-              value={formData.name}
-              onChange={(e) =>
-                setFormData({ ...formData, name: e.target.value })
-              }
-              required
-            />
+        onClose={() => setCreateDialogOpen(false)}
+        onSubmit={handleCreateSubmit}
+        formData={formData}
+        setFormData={setFormData}
+        mode="create"
+        type="assignment"
+      />
 
-            <TextField
-              label="Total Points"
-              type="number"
-              fullWidth
-              value={formData.totalPoints}
-              onChange={(e) =>
-                setFormData({
-                  ...formData,
-                  totalPoints: parseInt(e.target.value) || 0,
-                })
-              }
-              required
-            />
-
-            <TextField
-              label="Publish Date"
-              type="date"
-              fullWidth
-              value={formData.publishDate}
-              onChange={(e) =>
-                setFormData({ ...formData, publishDate: e.target.value })
-              }
-              InputLabelProps={{ shrink: true }}
-              required
-            />
-
-            <TextField
-              label="Due Date"
-              type="date"
-              fullWidth
-              value={formData.dueDate}
-              onChange={(e) =>
-                setFormData({ ...formData, dueDate: e.target.value })
-              }
-              InputLabelProps={{ shrink: true }}
-              required
-            />
-
-            <FormControlLabel
-              control={
-                <Switch
-                  checked={formData.isPublished}
-                  onChange={(e) =>
-                    setFormData({ ...formData, isPublished: e.target.checked })
-                  }
-                />
-              }
-              label="Publish immediately"
-            />
-
-            <FormControlLabel
-              control={
-                <Switch
-                  checked={formData.isLocked}
-                  onChange={(e) =>
-                    setFormData({ ...formData, isLocked: e.target.checked })
-                  }
-                />
-              }
-              label="Lock assignment (prevent submissions)"
-            />
-          </Stack>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCreateClose}>Cancel</Button>
-          <Button
-            onClick={handleCreateSubmit}
-            variant="contained"
-            disabled={
-              !formData.name || !formData.dueDate || !formData.publishDate
-            }
-          >
-            Create Assignment
-          </Button>
-        </DialogActions>
-      </Dialog>
-
-      {/* Edit Assignment Dialog */}
-      <Dialog
+      {/* Edit Dialog */}
+      <AssignmentFormDialog
         open={editDialogOpen}
-        onClose={handleEditClose}
-        maxWidth="sm"
-        fullWidth
-      >
-        <DialogTitle>Edit Assignment</DialogTitle>
-        <DialogContent>
-          <Stack spacing={3} sx={{ mt: 2 }}>
-            <TextField
-              label="Assignment Name"
-              fullWidth
-              value={formData.name}
-              onChange={(e) =>
-                setFormData({ ...formData, name: e.target.value })
-              }
-              required
-            />
-
-            <TextField
-              label="Total Points"
-              type="number"
-              fullWidth
-              value={formData.totalPoints}
-              onChange={(e) =>
-                setFormData({
-                  ...formData,
-                  totalPoints: parseInt(e.target.value) || 0,
-                })
-              }
-              required
-            />
-
-            <TextField
-              label="Publish Date"
-              type="date"
-              fullWidth
-              value={formData.publishDate}
-              onChange={(e) =>
-                setFormData({ ...formData, publishDate: e.target.value })
-              }
-              InputLabelProps={{ shrink: true }}
-              required
-            />
-
-            <TextField
-              label="Due Date"
-              type="date"
-              fullWidth
-              value={formData.dueDate}
-              onChange={(e) =>
-                setFormData({ ...formData, dueDate: e.target.value })
-              }
-              InputLabelProps={{ shrink: true }}
-              required
-            />
-
-            <FormControlLabel
-              control={
-                <Switch
-                  checked={formData.isPublished}
-                  onChange={(e) =>
-                    setFormData({ ...formData, isPublished: e.target.checked })
-                  }
-                />
-              }
-              label="Published"
-            />
-
-            <FormControlLabel
-              control={
-                <Switch
-                  checked={formData.isLocked}
-                  onChange={(e) =>
-                    setFormData({ ...formData, isLocked: e.target.checked })
-                  }
-                />
-              }
-              label="Locked (prevent submissions)"
-            />
-          </Stack>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleEditClose}>Cancel</Button>
-          <Button
-            onClick={handleEditSubmit}
-            variant="contained"
-            disabled={
-              !formData.name || !formData.dueDate || !formData.publishDate
-            }
-          >
-            Save Changes
-          </Button>
-        </DialogActions>
-      </Dialog>
+        onClose={() => {
+          setEditDialogOpen(false);
+          setSelectedAssignment(null);
+        }}
+        onSubmit={handleEditSubmit}
+        formData={formData}
+        setFormData={setFormData}
+        mode="edit"
+        type="assignment"
+      />
     </Box>
   );
 }

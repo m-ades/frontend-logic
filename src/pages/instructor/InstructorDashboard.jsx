@@ -1,4 +1,4 @@
-import { Box, Typography } from "@mui/material";
+import { Box, Typography, Alert } from "@mui/material";
 import { TrendingUp, Users, CheckCircle, Calendar } from "lucide-react";
 import {
   useCoursesState,
@@ -6,7 +6,7 @@ import {
   generateAvgTime,
   calculateGradeDistribution,
 } from "../../context/CoursesContext";
-import { MetricCard } from "../../components/ui/dashboard/MetricCard";
+import { MetricCard } from "../../components/ui/MetricCard";
 import { PerformanceTrendsChart } from "../../components/ui/dashboard/PerformanceTrendsChart";
 import { GradeDistributionChart } from "../../components/ui/dashboard/GradeDistributionChart";
 import { StudentsAtRiskTable } from "../../components/ui/dashboard/StudentsAtRiskTable";
@@ -21,14 +21,31 @@ export default function InstructorDashboard() {
   const assignments = assignmentsByCourse[activeCourseId] || [];
   const students = gradebookByCourse[activeCourseId] || [];
 
-  // Use helper functions from context
-  const enrichedAssignments = assignments.map((assignment) => ({
-    ...assignment,
-    average: calculateAssignmentAverage(assignment.id, students),
-    avgTime: generateAvgTime(assignment.id),
-  }));
+  // Enrich assignments with calculated data
+  const enrichedAssignments = assignments.map((assignment) => {
+    const average = calculateAssignmentAverage(assignment.id, students);
+    const avgTime = generateAvgTime(assignment.id);
+    const submissions = students.filter(
+      (student) => student.grades[assignment.id] !== undefined
+    ).length;
+    const totalStudents = course?.studentCount || students.length || 0;
 
-  const gradeDistribution = calculateGradeDistribution(students);
+    return {
+      ...assignment,
+      average,
+      avgTime,
+      submissions,
+      totalStudents,
+      // Format due date for display
+      dueDate: new Date(assignment.dueDate).toLocaleDateString(),
+    };
+  });
+
+  // Pass the course's grading scale to calculateGradeDistribution
+  const gradeDistribution = calculateGradeDistribution(
+    students,
+    course?.gradingScale
+  );
 
   const totalAverage =
     enrichedAssignments.length > 0
@@ -52,16 +69,20 @@ export default function InstructorDashboard() {
       : 0;
 
   const handleAssignmentClick = (data) => {
-    alert(`Navigate to ${data.name} (ID: ${data.id})`);
+    // This can be used for chart clicks or other navigation
+    console.log("Assignment clicked:", data);
   };
 
-  if (!course) {
+  // Show message if no course selected
+  if (!activeCourseId || !course) {
     return (
       <Box sx={{ p: 4 }}>
         <Typography variant="h4" fontWeight={600} mb={2}>
           Dashboard
         </Typography>
-        <Typography color="text.secondary">No course selected</Typography>
+        <Alert severity="info">
+          Please select a course from the sidebar to view the dashboard.
+        </Alert>
       </Box>
     );
   }
@@ -70,7 +91,6 @@ export default function InstructorDashboard() {
     <Box
       sx={{
         width: "100%",
-        p: { xs: 2, md: 4 },
         display: "flex",
         flexDirection: "column",
         gap: 4,
@@ -150,7 +170,6 @@ export default function InstructorDashboard() {
         totalSubmissions={totalSubmissions}
         totalPossible={totalPossible}
         completionRate={completionRate}
-        onAssignmentClick={handleAssignmentClick}
       />
 
       {/* Students at Risk and Upcoming Deadlines Tables */}
