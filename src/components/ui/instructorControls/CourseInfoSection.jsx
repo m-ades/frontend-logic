@@ -9,7 +9,7 @@ import {
   Divider,
 } from "@mui/material";
 import { Save } from "lucide-react";
-import ThemedCard from "../../components/ui/ThemedCard.jsx";
+import ThemedCard from "../../../components/ui/ThemedCard.jsx";
 
 export default function CourseInfoSection({ course, onSave }) {
   const [courseName, setCourseName] = useState(course?.name || "");

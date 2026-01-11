@@ -12,7 +12,7 @@ import {
   Paper,
 } from "@mui/material";
 import { Save, Plus, Trash2, AlertCircle } from "lucide-react";
-import ThemedCard from "../../components/ui/ThemedCard.jsx";
+import ThemedCard from "../../../components/ui/ThemedCard.jsx";
 
 const DEFAULT_GRADING_SCALE = [
   { letter: "A", minPercent: 90, maxPercent: 100, color: "#10b981" },
@@ -123,7 +123,6 @@ export default function GradingScaleSection({ course, onSave, onError }) {
                 key={index}
                 sx={{
                   p: 2,
-                  backgroundColor: "action.hover",
                   border: "1px solid",
                   borderColor: "divider",
                 }}
@@ -141,7 +140,7 @@ export default function GradingScaleSection({ course, onSave, onError }) {
                       )
                     }
                     sx={{ width: 80 }}
-                    inputProps={{ maxLength: 2 }}
+                    slotProps={{ input: { maxLength: 2 } }}
                   />
 
                   <TextField
@@ -159,7 +158,7 @@ export default function GradingScaleSection({ course, onSave, onError }) {
                         )
                       )
                     }
-                    inputProps={{ min: 0, max: 100 }}
+                    slotProps={{ input: { min: 0, max: 100 } }}
                     sx={{ width: 100 }}
                   />
 
@@ -178,7 +177,7 @@ export default function GradingScaleSection({ course, onSave, onError }) {
                         )
                       )
                     }
-                    inputProps={{ min: 0, max: 100 }}
+                    slotProps={{ input: { min: 0, max: 100 } }}
                     sx={{ width: 100 }}
                   />
 

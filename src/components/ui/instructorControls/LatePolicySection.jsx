@@ -13,7 +13,7 @@ import {
   FormControlLabel,
 } from "@mui/material";
 import { Save, AlertCircle } from "lucide-react";
-import ThemedCard from "../../components/ui/ThemedCard.jsx";
+import ThemedCard from "../../../components/ui/ThemedCard.jsx";
 
 export default function LatePolicySection({ course, onSave }) {
   const [lateSubmissionsEnabled, setLateSubmissionsEnabled] = useState(
@@ -103,7 +103,7 @@ export default function LatePolicySection({ course, onSave }) {
                     Math.max(0, Math.min(100, parseInt(e.target.value) || 0))
                   )
                 }
-                InputProps={{
+                slotProps={{
                   endAdornment: (
                     <InputAdornment position="end">%</InputAdornment>
                   ),
