@@ -293,6 +293,15 @@ function coursesReducer(state, action) {
           [action.courseId]: action.payload,
         },
       };
+    case "ARCHIVE_COURSE":
+      return {
+        ...state,
+        courses: state.courses.map((course) =>
+          course.id === action.courseId
+            ? { ...course, status: action.archive ? "past" : "current" }
+            : course
+        ),
+      };
 
     case "UPDATE_COURSE_NAME":
       return {
@@ -332,6 +341,12 @@ function coursesReducer(state, action) {
             ? { ...course, ...action.payload }
             : course
         ),
+      };
+    case "ADD_COURSE":
+      return {
+        ...state,
+        courses: [...state.courses, action.payload],
+        activeCourseId: action.payload.id,
       };
 
     default:
@@ -442,6 +457,56 @@ export function updateGradingScale(dispatch, courseId, gradingScale) {
 
 export function updateCourseSettings(dispatch, courseId, settings) {
   dispatch({ type: "UPDATE_COURSE_SETTINGS", courseId, payload: settings });
+}
+
+// ============================================================================
+// ASYNC ACTION CREATOR
+// ============================================================================
+// Archive or unarchive a course
+export async function toggleArchiveCourse(dispatch, courseId, archive = true) {
+  try {
+    dispatch({ type: "SET_LOADING", payload: true });
+
+    await archiveCourse(courseId, archive);
+
+    dispatch({
+      type: "ARCHIVE_COURSE",
+      courseId,
+      archive,
+    });
+
+    dispatch({ type: "SET_LOADING", payload: false });
+  } catch (error) {
+    dispatch({ type: "SET_ERROR", payload: error.message });
+    console.error(
+      `Failed to ${archive ? "archive" : "unarchive"} course ${courseId}:`,
+      error
+    );
+  }
+}
+// Create a new course
+export async function addNewCourse(dispatch, courseData) {
+  try {
+    dispatch({ type: "SET_LOADING", payload: true });
+
+    const newCourse = await createCourse(courseData);
+
+    // Add course to state
+    dispatch({ type: "ADD_COURSE", payload: newCourse });
+
+    // Initialize empty data for the new course
+    dispatch({ type: "SET_ASSIGNMENTS", courseId: newCourse.id, payload: [] });
+    dispatch({ type: "SET_PRACTICES", courseId: newCourse.id, payload: [] });
+    dispatch({ type: "SET_GRADEBOOK", courseId: newCourse.id, payload: [] });
+
+    dispatch({ type: "SET_LOADING", payload: false });
+
+    return newCourse;
+  } catch (error) {
+    dispatch({ type: "SET_ERROR", payload: error.message });
+    console.error("Failed to create course:", error);
+    throw error;
+  }
 }
 
 // ============================================================================
@@ -667,4 +732,38 @@ export async function updateStudentInCourse(
     dispatch({ type: "SET_ERROR", payload: error.message });
     console.error(`Failed to update student in course ${courseId}:`, error);
   }
+}
+// ============================================================================
+// COURSE CREATION API FUNCTION
+// ============================================================================
+
+// Simulates: POST /api/instructor/courses
+export async function createCourse(courseData) {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      const newCourse = {
+        ...courseData,
+        id: `course_${Date.now()}`,
+        studentCount: 0,
+        createdAt: new Date().toISOString(),
+      };
+      resolve(newCourse);
+    }, 100);
+  });
+}
+
+// ============================================================================
+// ARCHIVE COURSE API FUNCTION
+// ============================================================================
+
+// Simulates: PATCH /api/courses/:courseId/archive
+export async function archiveCourse(courseId, archive = true) {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve({
+        id: courseId,
+        status: archive ? "past" : "current",
+      });
+    }, 100);
+  });
 }
