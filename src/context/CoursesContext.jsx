@@ -521,7 +521,9 @@ export async function createStudent(courseId, studentData) {
         id: `s${Date.now()}`,
         name: studentData.name,
         email: studentData.email,
-        // Password would be hashed on backend, not stored in gradebook
+        // Password would be hashed on backend before storage
+        // For mock data, we store it but in production it should never be in gradebook
+        // Only store password temporarily for account creation, then remove from gradebook
         grades: {},
         lateSubmissions: {},
         submissionDates: {},
