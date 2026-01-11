@@ -22,7 +22,7 @@ const getPageName = (pathname) => {
     "/instructor/contact": "Contact",
     "/instructor/assignment-builder": "Assignment Builder",
     "/instructor/roster": "Roster",
-    "/instructor/settings": "Settings",
+    "/instructor/profile": "Profile & Preferences",
     "/student/dashboard": "Dashboard",
     "/student/courses": "My Courses",
     "/student/assignments": "Assignments",
