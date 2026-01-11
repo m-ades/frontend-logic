@@ -141,7 +141,7 @@ export default function ProofTabs({
             key={proof.id}
             label={
               <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1, width: '100%' }}>
-                <span>Problem {proof.questionId || proof.id}</span>
+                <span>Problem {idx + 1}</span>
                 {completedProofs.has(proof.id) && (
                   <CheckCircleIcon sx={{ color: '#2f6bff', fontSize: 16 }} />
                 )}

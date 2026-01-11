@@ -121,7 +121,20 @@ export default function SingleRowTruthTable({
   }, [Formula, interpretation, statement, syntax])
 
   const tokens = evaluation?.tokens || []
+  const headerTokens = useMemo(() => {
+    if (!statement) return []
+    let rstr = '[(\\[{]*'
+    rstr += `[${syntax.notation.predicatesRange}`
+    for (const o in syntax.operators) { rstr += o }
+    rstr += `][${syntax.notation.constantsRange}${syntax.notation.variableRange}]*`
+    rstr += '[)\\]}]*'
+    const regex = new RegExp(rstr, 'g')
+    return Array.from(statement.replace(/\s/g, '').matchAll(regex)).map(
+      (match) => match[0]
+    )
+  }, [statement, syntax])
   const expectedRow = (evaluation?.row || []).map(toSymbol)
+  const expectedCompound = toSymbol(evaluation?.tv)
 
   const isAtomicToken = (token) => {
     if (!token) return false
@@ -144,14 +157,21 @@ export default function SingleRowTruthTable({
     tokens.map((token) => (isAtomicToken(token) ? toSymbol(interpretation?.[token]) : ''))
 
   const [rowInputs, setRowInputs] = useState(buildInitialRow)
+  const [compoundInput, setCompoundInput] = useState(
+    savedState?.compound !== undefined ? toSymbol(savedState.compound) : ''
+  )
 
   useEffect(() => {
     setRowInputs(buildInitialRow())
+    setCompoundInput(
+      savedState?.compound !== undefined ? toSymbol(savedState.compound) : ''
+    )
   }, [savedState, tokens, statement, interpretation])
 
   const isDisabled = () =>
     rowInputs.length === 0 ||
-    rowInputs.some((cell, idx) => cell === '' && !isAtomicToken(tokens[idx]))
+    rowInputs.some((cell, idx) => cell === '' && !isAtomicToken(tokens[idx])) ||
+    compoundInput === ''
 
   const { status, message, isChecking, handleCheck, handleStartOver, getStatusColor, setStatus, setMessage, isLocked } = useProblemChecker({
     answer: expectedRow,
@@ -159,13 +179,15 @@ export default function SingleRowTruthTable({
     question: problem,
     getAnswer: () => ({
       row: rowInputs.map(toBoolean),
+      compound: toBoolean(compoundInput),
     }),
     onComplete,
     isDisabled,
     resetInput: () => {
       const reset = buildResetRow()
       setRowInputs(reset)
-      onStateChange?.({ row: reset })
+      setCompoundInput('')
+      onStateChange?.({ row: reset, compound: '' })
     },
     onStateChange,
     assignmentQuestionId,
@@ -179,9 +201,18 @@ export default function SingleRowTruthTable({
     setRowInputs((prev) => {
       const next = [...prev]
       next[index] = value
-      onStateChange?.({ row: next })
+      onStateChange?.({ row: next, compound: toBoolean(compoundInput) })
       return next
     })
+    setStatus('unanswered')
+    setMessage('')
+  }
+
+  const handleCompoundChange = (value) => {
+    if (readOnly || isLocked) return
+    const nextValue = value || ''
+    setCompoundInput(nextValue)
+    onStateChange?.({ row: rowInputs, compound: toBoolean(nextValue) })
     setStatus('unanswered')
     setMessage('')
   }
@@ -199,7 +230,7 @@ export default function SingleRowTruthTable({
       <Box component="table" className="tt-table">
         <Box component="thead" className="tt-head">
           <Box component="tr" className="tt-token-row">
-            {tokens.map((token, idx) => (
+            {(headerTokens.length > 0 ? headerTokens : tokens).map((token, idx) => (
               <Box component="th" key={`single-row-header-${idx}`} className="tt-token">
                 {token}
               </Box>
@@ -275,6 +306,18 @@ export default function SingleRowTruthTable({
         >
           <Stack spacing={3} sx={{ p: { xs: 2, md: 2 } }}>
             {renderTableSet(tableRows, tableRows, false)}
+            <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mt: 2 }}>
+              <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                Truth value of compound statement:
+              </Typography>
+              <TruthToggle
+                value={compoundInput}
+                onChange={handleCompoundChange}
+                ariaLabel="Truth value of compound statement"
+                accent
+                readOnly={readOnly || isLocked}
+              />
+            </Stack>
           </Stack>
         </Box>
       </Box>
@@ -286,10 +329,10 @@ export default function SingleRowTruthTable({
         }}
       >
         {status === 'correct'
-          ? 'Row matches!'
+          ? 'Answer matches!'
           : tableFilled
-            ? 'Row filled. Check your values.'
-            : 'Complete every cell to finish.'}
+            ? 'Row and compound filled. Check your values.'
+            : 'Complete every cell and the compound value to finish.'}
       </Typography>
       {message && (
         <Alert
@@ -312,7 +355,21 @@ export default function SingleRowTruthTable({
 
       {isLocked && expectedRow.length > 0 && renderAnswerCard(
         'Correct Answer',
-        renderTableSet([expectedRow], [expectedRow], true)
+        <Stack spacing={2}>
+          {renderTableSet([expectedRow], [expectedRow], true)}
+          <Stack direction="row" spacing={1.5} alignItems="center">
+            <Typography variant="body2" sx={{ fontWeight: 600 }}>
+              Truth value of compound statement:
+            </Typography>
+            <TruthToggle
+              value={expectedCompound}
+              onChange={() => {}}
+              ariaLabel="Truth value of compound statement (answer)"
+              accent
+              readOnly
+            />
+          </Stack>
+        </Stack>
       )}
     </Stack>
   )
