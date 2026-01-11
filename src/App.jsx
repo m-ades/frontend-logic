@@ -8,6 +8,7 @@ import { AuthProvider } from "./context/AuthContext.jsx";
 import { CoursesProvider } from "./context/CoursesContext.jsx";
 import ErrorBoundary from "./components/ui/ErrorBoundary.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
+import ScrollToTop from "./components/layout/ScrollToTop.jsx";
 import AppLayout from "./components/layout/AppLayout.jsx";
 import Dashboard from "./pages/Dashboard.jsx";
 import Worksheet from "./pages/Worksheet.jsx";
@@ -23,6 +24,9 @@ import InstructorAssignments from "./pages/instructor/InstructorAssignments";
 import AssignmentBuilder from "./pages/instructor/InstructorAssignmentBuilder.jsx";
 import Login from "./pages/Login.jsx";
 import Courses from "./pages/Courses.jsx";
+import Profile from "./pages/Profile.jsx";
+import InstructorPractice from "./pages/instructor/InstructorPractice.jsx";
+import InstructorRoster from "./pages/instructor/InstructorRoster.jsx";
 
 function AppRoutes() {
   return (
@@ -78,6 +82,16 @@ function AppRoutes() {
           <ProtectedRoute allowedRoles={["student"]}>
             <AppLayout>
               <Practice />
+            </AppLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/student/profile"
+        element={
+          <ProtectedRoute allowedRoles={["student"]}>
+            <AppLayout>
+              <Profile />
             </AppLayout>
           </ProtectedRoute>
         }
@@ -173,6 +187,16 @@ function AppRoutes() {
         }
       />
       <Route
+        path="/instructor/profile"
+        element={
+          <ProtectedRoute allowedRoles={["instructor"]}>
+            <AppLayout>
+              <Profile />
+            </AppLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
         path="/instructor/gradebook"
         element={
           <ProtectedRoute allowedRoles={["instructor"]}>
@@ -192,6 +216,27 @@ function AppRoutes() {
           </ProtectedRoute>
         }
       />
+      <Route
+        path="/instructor/practice"
+        element={
+          <ProtectedRoute allowedRoles={["instructor"]}>
+            <AppLayout>
+              <InstructorPractice />
+            </AppLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/instructor/roster"
+        element={
+          <ProtectedRoute allowedRoles={["instructor"]}>
+            <AppLayout>
+              <InstructorRoster />
+            </AppLayout>
+          </ProtectedRoute>
+        }
+      />
+
       <Route
         path="/instructor/settings"
         element={
@@ -220,6 +265,7 @@ function AppRoutes() {
           </ProtectedRoute>
         }
       />
+
       <Route
         path="/instructor/assignment-builder"
         element={
@@ -236,12 +282,15 @@ function AppRoutes() {
     </Routes>
   );
 }
+
 function AppContent() {
   const theme = useThemeState();
   return (
     <MuiThemeProvider theme={theme}>
       <CssBaseline />
       <BrowserRouter>
+        <ScrollToTop />
+
         <AuthProvider>
           <CoursesProvider>
             <LayoutProvider>
@@ -253,6 +302,7 @@ function AppContent() {
     </MuiThemeProvider>
   );
 }
+
 export default function App() {
   return (
     <ErrorBoundary>
