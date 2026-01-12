@@ -442,7 +442,7 @@ export default function Dashboard() {
                       size="small"
                       variant="outlined"
                       component={Link}
-                      to={`/assignment/${assignment.id}`}
+                      to={`/student/assignment/${assignment.id}`}
                     >
                       Open
                     </Button>
@@ -701,7 +701,7 @@ export default function Dashboard() {
                 View upcoming and submitted assigments
               </Typography>
             </Box>
-            <Button variant="contained" onClick={() => navigate('/assignments')}>
+            <Button variant="contained" onClick={() => navigate('/student/assignments')}>
               View assignments
             </Button>
           </CardContent>
@@ -715,7 +715,7 @@ export default function Dashboard() {
                 Sharpen your skills with supplementary problem sets.
               </Typography>
             </Box>
-            <Button variant="contained" onClick={() => navigate('/practice')}>
+            <Button variant="contained" onClick={() => navigate('/student/practice')}>
               Start practice
             </Button>
           </CardContent>
@@ -729,7 +729,7 @@ export default function Dashboard() {
                 Track your progress.
               </Typography>
             </Box>
-            <Button variant="contained" onClick={() => navigate('/grades')}>
+            <Button variant="contained" onClick={() => navigate('/student/grades')}>
               View grades
             </Button>
           </CardContent>

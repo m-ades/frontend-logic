@@ -1,49 +1,66 @@
-import { createContext, useContext, useReducer } from 'react'
+import { createContext, useContext, useReducer } from "react";
 
-const LayoutStateContext = createContext()
-const LayoutDispatchContext = createContext()
+const LayoutStateContext = createContext();
+const LayoutDispatchContext = createContext();
 
 function layoutReducer(state, action) {
   switch (action.type) {
-    case 'TOGGLE_SIDEBAR':
-      return { ...state, isSidebarOpened: !state.isSidebarOpened }
+    case "TOGGLE_SIDEBAR":
+      return { ...state, isSidebarOpened: !state.isSidebarOpened };
+    case "SET_SIDEBAR":
+      return { ...state, isSidebarOpened: action.payload };
+    case "TOGGLE_SIDEBAR_HOVER":
+      return { ...state, sidebarHoverEnabled: !state.sidebarHoverEnabled };
     default:
-      throw new Error(`Unhandled action type: ${action.type}`)
+      throw new Error(`Unhandled action type: ${action.type}`);
   }
 }
 
 export function LayoutProvider({ children }) {
   const [state, dispatch] = useReducer(layoutReducer, {
-    isSidebarOpened: true,
-  })
+    isSidebarOpened: false, // Changed to false - start collapsed
+    sidebarHoverEnabled: true, // Default to hover enabled
+  });
   return (
     <LayoutStateContext.Provider value={state}>
       <LayoutDispatchContext.Provider value={dispatch}>
         {children}
       </LayoutDispatchContext.Provider>
     </LayoutStateContext.Provider>
-  )
+  );
 }
 
 export function useLayoutState() {
-  const context = useContext(LayoutStateContext)
+  const context = useContext(LayoutStateContext);
   if (context === undefined) {
-    throw new Error('useLayoutState must be used within a LayoutProvider')
+    throw new Error("useLayoutState must be used within a LayoutProvider");
   }
-  return context
+  return context;
 }
 
 export function useLayoutDispatch() {
-  const context = useContext(LayoutDispatchContext)
+  const context = useContext(LayoutDispatchContext);
   if (context === undefined) {
-    throw new Error('useLayoutDispatch must be used within a LayoutProvider')
+    throw new Error("useLayoutDispatch must be used within a LayoutProvider");
   }
-  return context
+  return context;
 }
 
 export function toggleSidebar(dispatch) {
   dispatch({
-    type: 'TOGGLE_SIDEBAR',
-  })
+    type: "TOGGLE_SIDEBAR",
+  });
 }
 
+export function setSidebar(dispatch, isOpen) {
+  dispatch({
+    type: "SET_SIDEBAR",
+    payload: isOpen,
+  });
+}
+
+export function toggleSidebarHover(dispatch) {
+  dispatch({
+    type: "TOGGLE_SIDEBAR_HOVER",
+  });
+}

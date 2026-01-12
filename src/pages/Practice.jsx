@@ -68,7 +68,7 @@ export default function Practice() {
 
   const handleActivityClick = (activity) => {
     if (activity.worksheet) {
-      navigate(`/assignment/${activity.worksheet.id}`)
+      navigate(`/student/assignment/${activity.worksheet.id}`)
     }
   }
 

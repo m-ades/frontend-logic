@@ -437,7 +437,7 @@ export default function Worksheet() {
     if (newWorksheet) {
       // use assignment route if we came from assignment route, otherwise worksheet route
       if (assignmentId) {
-        navigate(`/assignment/${newWorksheet.id}`)
+        navigate(`/student/assignment/${newWorksheet.id}`)
       } else {
         navigate(`/worksheet/${newWorksheet.id}`)
       }
