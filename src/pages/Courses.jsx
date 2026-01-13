@@ -1,4 +1,5 @@
-import { Box, Grid, Alert, LinearProgress, Typography } from "@mui/material";
+import { Box, Alert, LinearProgress, Typography } from "@mui/material";
+import Grid from "@mui/material/Grid";
 import {
   TrendingUp as TrendingUpIcon,
   School as SchoolIcon,
@@ -7,6 +8,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useAuthState } from "../context/AuthContext";
+import { isInstructorRole } from "../utils/auth.js";
 import {
   useCoursesState,
   useCoursesDispatch,
@@ -27,7 +29,7 @@ export default function Courses() {
   const navigate = useNavigate();
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
 
-  const isInstructor = user?.role === "instructor";
+  const isInstructor = isInstructorRole(user?.role);
   const dashboardPath = isInstructor
     ? "/instructor/dashboard"
     : "/student/dashboard";
@@ -103,7 +105,7 @@ export default function Courses() {
       {loading && !initialized && (
         <Grid container spacing={3}>
           {[1, 2, 3].map((i) => (
-            <Grid item xs={12} sm={6} md={4} key={i}>
+            <Grid size={{ xs: 12, sm: 6, md: 4 }} key={i}>
               <CourseCardSkeleton />
             </Grid>
           ))}

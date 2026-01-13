@@ -20,7 +20,6 @@ import {
   getDefaultGradingScale,
 } from "../../../utils/gradingUtils";
 import StudentProfileModal from "../StudentProfileModal";
-import EditGradeModal from "./EditGradeModal";
 
 // Helper function to calculate average
 function calculateAverage(grades) {
@@ -47,9 +46,6 @@ export default function GradebookTable({
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [profileModalOpen, setProfileModalOpen] = useState(false);
 
-  const [editGradeData, setEditGradeData] = useState(null);
-  const [editGradeModalOpen, setEditGradeModalOpen] = useState(false);
-
   // Track hovered column
   const [hoveredColumn, setHoveredColumn] = useState(null);
   // Track hovered row
@@ -64,35 +60,6 @@ export default function GradebookTable({
   const handleCloseProfileModal = () => {
     setProfileModalOpen(false);
     setSelectedStudent(null);
-  };
-
-  const handleGradeClick = (student, assignment, grade, event) => {
-    event.stopPropagation();
-    setEditGradeData({
-      student,
-      assignment,
-      currentGrade: grade,
-    });
-    setEditGradeModalOpen(true);
-  };
-
-  const handleCloseEditGradeModal = () => {
-    setEditGradeModalOpen(false);
-    setEditGradeData(null);
-  };
-
-  const handleSaveGrade = (gradeData) => {
-    // TODO: Dispatch action to update grade in context
-    console.log("Saving grade:", gradeData);
-    // You would call your context dispatch here:
-    // dispatch({ type: "UPDATE_STUDENT_GRADE", payload: gradeData });
-  };
-
-  const handleDeleteGrade = (deleteData) => {
-    // TODO: Dispatch action to delete grade from context
-    console.log("Deleting grade:", deleteData);
-    // You would call your context dispatch here:
-    // dispatch({ type: "DELETE_STUDENT_GRADE", payload: deleteData });
   };
 
   return (
@@ -296,7 +263,6 @@ export default function GradebookTable({
                           key={assignment.id}
                           align="center"
                           sx={{
-                            cursor: "pointer",
                             backgroundColor: isRowHovered
                               ? (theme) =>
                                   alpha(theme.palette.primary.main, 0.08)
@@ -306,9 +272,6 @@ export default function GradebookTable({
                               : "transparent",
                             transition: "background-color 0.1s",
                           }}
-                          onClick={(e) =>
-                            handleGradeClick(student, assignment, grade, e)
-                          }
                           onMouseEnter={() => setHoveredColumn(assignment.id)}
                           onMouseLeave={() => setHoveredColumn(null)}
                         >
@@ -343,17 +306,6 @@ export default function GradebookTable({
         onClose={handleCloseProfileModal}
         student={selectedStudent}
         assignments={assignments}
-      />
-
-      {/* Edit Grade Modal */}
-      <EditGradeModal
-        open={editGradeModalOpen}
-        onClose={handleCloseEditGradeModal}
-        student={editGradeData?.student}
-        assignment={editGradeData?.assignment}
-        currentGrade={editGradeData?.currentGrade}
-        onSave={handleSaveGrade}
-        onDelete={handleDeleteGrade}
       />
     </>
   );

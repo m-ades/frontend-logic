@@ -8,6 +8,7 @@ import InstructorSidebarStructure from "./InstructorSidebarStructure.jsx";
 import { useAuthState, useAuthDispatch, logout } from "../../context/AuthContext";
 import { useCoursesDispatch, initializeCourses } from "../../context/CoursesContext";
 import { clearStoredUser, fetchJson } from "../../utils/api.js";
+import { isInstructorRole } from "../../utils/auth.js";
 
 export default function AppLayout({ children }) {
   const location = useLocation();
@@ -76,10 +77,9 @@ export default function AppLayout({ children }) {
     location.pathname.includes("/assignment/") ||
     location.pathname.includes("/worksheet/");
 
-  const sidebarStructure =
-    user?.role === "instructor"
-      ? InstructorSidebarStructure
-      : StudentSidebarStructure;
+  const sidebarStructure = isInstructorRole(user?.role)
+    ? InstructorSidebarStructure
+    : StudentSidebarStructure;
 
   const handleSignOut = async () => {
     try {

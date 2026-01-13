@@ -31,6 +31,9 @@ import TrendingUpIcon from '@mui/icons-material/TrendingUp'
 import BookIcon from '@mui/icons-material/Book'
 import { formatDateTime } from '../utils/formatting.js'
 import { API_CONFIG, fetchJson, getActiveUserId } from '../utils/api.js'
+import { useCoursesState } from '../context/CoursesContext.jsx'
+import { useAuthState } from '../context/AuthContext.jsx'
+import { isInstructorRole } from '../utils/auth.js'
 import ThemedCard from '../components/ui/ThemedCard.jsx'
 
 const emptyAnalytics = {
@@ -42,6 +45,9 @@ const emptyAnalytics = {
 
 export default function Dashboard() {
   const theme = useTheme()
+  const { user } = useAuthState()
+  const { activeCourseId } = useCoursesState()
+  const courseId = activeCourseId ?? API_CONFIG.courseId
   const [analytics, setAnalytics] = useState(emptyAnalytics)
   const [gradeTimeline, setGradeTimeline] = useState([])
   const [instructorAnalytics, setInstructorAnalytics] = useState({
@@ -49,7 +55,11 @@ export default function Dashboard() {
     assignmentStats: [],
     timeByCategory: [],
   })
-  const dashboardMode = import.meta.env.VITE_DASHBOARD_MODE || 'student'
+  const envDashboardMode = import.meta.env.VITE_DASHBOARD_MODE || 'student'
+  const isInstructor = isInstructorRole(user?.role)
+  const dashboardMode = isInstructor && envDashboardMode === 'instructor'
+    ? 'instructor'
+    : 'student'
 
   const statCardSx = { height: '100%' }
   const statCardContentSx = {
@@ -65,11 +75,18 @@ export default function Dashboard() {
     let isMounted = true
 
     const loadAnalytics = async () => {
+      if (!courseId) {
+        if (isMounted) {
+          setAnalytics(emptyAnalytics)
+          setGradeTimeline([])
+        }
+        return
+      }
       try {
           const [analyticsData, grades, gradebookSummary] = await Promise.all([
-            fetchJson(`/api/analytics/student?userId=${getActiveUserId()}&courseId=${API_CONFIG.courseId}`),
+            fetchJson(`/api/analytics/student?userId=${getActiveUserId()}&courseId=${courseId}`),
             fetchJson(`/api/users/${getActiveUserId()}/grades`),
-            fetchJson(`/api/analytics/gradebook-summary?courseId=${API_CONFIG.courseId}`).catch(() => null),
+            fetchJson(`/api/analytics/gradebook-summary?courseId=${courseId}`).catch(() => null),
           ])
         if (isMounted) {
           setAnalytics({ ...emptyAnalytics, ...analyticsData })
@@ -145,7 +162,7 @@ export default function Dashboard() {
     return () => {
       isMounted = false
     }
-  }, [])
+  }, [courseId])
 
   useEffect(() => {
     if (dashboardMode !== 'instructor') {
@@ -156,7 +173,10 @@ export default function Dashboard() {
 
     const loadInstructorAnalytics = async () => {
       try {
-        const data = await fetchJson(`/api/analytics/instructor?courseId=${API_CONFIG.courseId}`)
+        if (!courseId) {
+          return
+        }
+        const data = await fetchJson(`/api/analytics/instructor?courseId=${courseId}`)
         if (isMounted) {
           setInstructorAnalytics(data)
         }

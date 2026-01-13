@@ -6,7 +6,9 @@ import {
   useCoursesState,
   useCoursesDispatch,
   calculateAssignmentAverage,
+  fetchCourseAssignments,
 } from "../../context/CoursesContext";
+import { fetchJson } from "../../utils/api.js";
 import AssignmentTable from "../../components/ui/AssignmentTable";
 import AssignmentFormDialog from "../../components/ui/AssignmentFormDialog";
 import AssignmentContextMenu from "../../components/ui/AssignmentContextMenu";
@@ -25,6 +27,30 @@ const getCurrentDate = () => {
   return `${year}-${month}-${day}`;
 };
 
+const toIsoDateTime = (date, time) => {
+  if (!date) return null;
+  const safeTime = time || "00:00";
+  return new Date(`${date}T${safeTime}:00`).toISOString();
+};
+
+const buildAssignmentPayload = (formData, courseId, overrides = {}) => {
+  const dueDate = toIsoDateTime(formData.dueDate, formData.dueTime || "23:59");
+  return {
+    course_id: courseId,
+    kind: "assignment",
+    title: formData.name,
+    description: formData.description || null,
+    is_locked: formData.isLocked || !formData.isPublished,
+    chapter: Number(formData.chapter) || 1,
+    subchapter: formData.subchapter || "A",
+    due_date: dueDate,
+    total_points: Number.isFinite(formData.totalPoints)
+      ? formData.totalPoints
+      : 0,
+    ...overrides,
+  };
+};
+
 const INITIAL_FORM_DATA = {
   name: "",
   publishDate: getCurrentDate(),
@@ -32,6 +58,8 @@ const INITIAL_FORM_DATA = {
   dueDate: getCurrentDate(),
   dueTime: "23:59",
   totalPoints: 100,
+  chapter: 1,
+  subchapter: "A",
   isPublished: true,
   isLocked: false,
 };
@@ -83,32 +111,27 @@ export default function InstructorAssignments() {
     setCreateDialogOpen(true);
   };
 
-  const handleCreateSubmit = () => {
-    const newAssignment = {
-      id: `a${assignments.length + 1}`,
-      courseId: activeCourseId,
-      name: formData.name,
-      publishDate: formData.publishDate,
-      publishTime: formData.publishTime,
-      dueDate: formData.dueDate,
-      dueTime: formData.dueTime,
-      totalPoints: formData.totalPoints,
-      isPublished: formData.isPublished,
-      isLocked: formData.isLocked,
-      submissions: 0,
-      lateSubmissions: 0,
-    };
-
-    dispatch({
-      type: "SET_ASSIGNMENTS",
-      courseId: activeCourseId,
-      payload: [...assignments, newAssignment],
-    });
-
-    setCreateDialogOpen(false);
-    navigate("/instructor/assignment-builder", {
-      state: { assignmentId: newAssignment.id },
-    });
+  const handleCreateSubmit = async () => {
+    try {
+      const payload = buildAssignmentPayload(formData, activeCourseId);
+      const created = await fetchJson("/api/assignments", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const refreshed = await fetchCourseAssignments(activeCourseId);
+      dispatch({
+        type: "SET_ASSIGNMENTS",
+        courseId: activeCourseId,
+        payload: refreshed,
+      });
+      setCreateDialogOpen(false);
+      navigate("/instructor/assignment-builder", {
+        state: { assignmentId: created?.id ?? payload.id },
+      });
+    } catch (error) {
+      console.error("Failed to create assignment", error);
+    }
   };
 
   const handleEditOpen = (assignment) => {
@@ -121,6 +144,8 @@ export default function InstructorAssignments() {
       dueDate: assignment.dueDate || getCurrentDate(),
       dueTime: assignment.dueTime || "23:59",
       totalPoints: assignment.totalPoints || 100,
+      chapter: assignment.chapter || 1,
+      subchapter: assignment.subchapter || "A",
       isPublished: assignment.isPublished ?? true,
       isLocked: assignment.isLocked ?? false,
     });
@@ -129,87 +154,119 @@ export default function InstructorAssignments() {
     setMenuAnchor(null);
   };
 
-  const handleEditSubmit = () => {
-    const updatedAssignments = assignments.map((a) =>
-      a.id === selectedAssignment.id
-        ? {
-            ...a,
-            name: formData.name,
-            publishDate: formData.publishDate,
-            publishTime: formData.publishTime,
-            dueDate: formData.dueDate,
-            dueTime: formData.dueTime,
-            totalPoints: formData.totalPoints,
-            isPublished: formData.isPublished,
-            isLocked: formData.isLocked,
-          }
-        : a
-    );
-
-    dispatch({
-      type: "SET_ASSIGNMENTS",
-      courseId: activeCourseId,
-      payload: updatedAssignments,
-    });
-
-    setEditDialogOpen(false);
-    setSelectedAssignment(null);
-  };
-
-  const handleToggleLock = (assignmentId) => {
-    const updatedAssignments = assignments.map((a) =>
-      a.id === assignmentId ? { ...a, isLocked: !a.isLocked } : a
-    );
-
-    dispatch({
-      type: "SET_ASSIGNMENTS",
-      courseId: activeCourseId,
-      payload: updatedAssignments,
-    });
-  };
-
-  const handleTogglePublish = (assignmentId) => {
-    const updatedAssignments = assignments.map((a) =>
-      a.id === assignmentId ? { ...a, isPublished: !a.isPublished } : a
-    );
-
-    dispatch({
-      type: "SET_ASSIGNMENTS",
-      courseId: activeCourseId,
-      payload: updatedAssignments,
-    });
-  };
-
-  const handleDuplicate = (assignment) => {
-    const newAssignment = {
-      ...assignment,
-      id: `a${assignments.length + 1}`,
-      name: `${assignment.name} (Copy)`,
-      submissions: 0,
-      lateSubmissions: 0,
-      isPublished: false,
-    };
-
-    dispatch({
-      type: "SET_ASSIGNMENTS",
-      courseId: activeCourseId,
-      payload: [...assignments, newAssignment],
-    });
-
-    setMenuAnchor(null);
-  };
-
-  const handleDelete = (assignmentId) => {
-    if (window.confirm("Are you sure you want to delete this assignment?")) {
-      const updatedAssignments = assignments.filter(
-        (a) => a.id !== assignmentId
-      );
-
+  const handleEditSubmit = async () => {
+    try {
+      const payload = buildAssignmentPayload(formData, activeCourseId);
+      await fetchJson(`/api/assignments/${selectedAssignment.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const refreshed = await fetchCourseAssignments(activeCourseId);
       dispatch({
         type: "SET_ASSIGNMENTS",
         courseId: activeCourseId,
-        payload: updatedAssignments,
+        payload: refreshed,
       });
+      setEditDialogOpen(false);
+      setSelectedAssignment(null);
+    } catch (error) {
+      console.error("Failed to update assignment", error);
+    }
+  };
+
+  const handleToggleLock = async (assignmentId) => {
+    const assignment = assignments.find((a) => a.id === assignmentId);
+    if (!assignment) return;
+    try {
+      await fetchJson(`/api/assignments/${assignmentId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ is_locked: !assignment.isLocked }),
+      });
+      const refreshed = await fetchCourseAssignments(activeCourseId);
+      dispatch({
+        type: "SET_ASSIGNMENTS",
+        courseId: activeCourseId,
+        payload: refreshed,
+      });
+    } catch (error) {
+      console.error("Failed to toggle lock", error);
+    }
+  };
+
+  const handleTogglePublish = async (assignmentId) => {
+    const assignment = assignments.find((a) => a.id === assignmentId);
+    if (!assignment) return;
+    const nextPublished = !assignment.isPublished;
+    try {
+      await fetchJson(`/api/assignments/${assignmentId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ is_locked: assignment.isLocked || !nextPublished }),
+      });
+      const refreshed = await fetchCourseAssignments(activeCourseId);
+      dispatch({
+        type: "SET_ASSIGNMENTS",
+        courseId: activeCourseId,
+        payload: refreshed,
+      });
+    } catch (error) {
+      console.error("Failed to toggle publish", error);
+    }
+  };
+
+  const handleDuplicate = async (assignment) => {
+    try {
+      const payload = {
+        course_id: activeCourseId,
+        kind: "assignment",
+        title: `${assignment.name} (Copy)`,
+        description: assignment.description || null,
+        is_locked: true,
+        chapter: assignment.chapter || 1,
+        subchapter: assignment.subchapter || "A",
+        due_date: assignment.dueDate
+          ? toIsoDateTime(assignment.dueDate, assignment.dueTime || "23:59")
+          : null,
+        total_points: Number.isFinite(assignment.totalPoints)
+          ? assignment.totalPoints
+          : 0,
+        late_window_days: assignment.lateWindowDays,
+        late_penalty_percent: assignment.latePenaltyPercent,
+      };
+      await fetchJson("/api/assignments", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const refreshed = await fetchCourseAssignments(activeCourseId);
+      dispatch({
+        type: "SET_ASSIGNMENTS",
+        courseId: activeCourseId,
+        payload: refreshed,
+      });
+      setMenuAnchor(null);
+    } catch (error) {
+      console.error("Failed to duplicate assignment", error);
+    }
+  };
+
+  const handleDelete = async (assignmentId) => {
+    if (window.confirm("Are you sure you want to delete this assignment?")) {
+      try {
+        await fetchJson(`/api/assignments/${assignmentId}`, {
+          method: "DELETE",
+        });
+        const refreshed = await fetchCourseAssignments(activeCourseId);
+        dispatch({
+          type: "SET_ASSIGNMENTS",
+          courseId: activeCourseId,
+          payload: refreshed,
+        });
+      } catch (error) {
+        console.error("Failed to delete assignment", error);
+      }
     }
     setMenuAnchor(null);
   };

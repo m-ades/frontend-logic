@@ -27,6 +27,7 @@ import {
   setSidebar,
 } from "../../context/LayoutContext.jsx";
 import { useAuthState } from "../../context/AuthContext.jsx";
+import { isInstructorRole } from "../../utils/auth.js";
 import SidebarLink from "./SidebarLink.jsx";
 import CourseSelector from "../ui/CourseSelector.jsx";
 
@@ -231,10 +232,9 @@ export default function Sidebar({ structure, location, onSignOut }) {
             <MenuItem
               onClick={() => {
                 // Navigate to profile page
-                window.location.href =
-                  user?.role === "instructor"
-                    ? "/instructor/profile"
-                    : "/student/profile";
+                window.location.href = isInstructorRole(user?.role)
+                  ? "/instructor/profile"
+                  : "/student/profile";
                 setProfileMenu(null);
               }}
             >

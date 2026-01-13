@@ -56,21 +56,47 @@ export default function AssignmentFormDialog({
             }
           />
 
-          {!isPractice && (
+          <Stack direction="row" spacing={2}>
             <TextField
-              label="Total Points"
+              label="Chapter"
               type="number"
               fullWidth
-              value={formData.totalPoints}
+              value={formData.chapter}
               onChange={(e) =>
                 setFormData({
                   ...formData,
-                  totalPoints: parseInt(e.target.value) || 0,
+                  chapter: parseInt(e.target.value) || 1,
                 })
               }
               required
             />
-          )}
+            <TextField
+              label="Subchapter"
+              fullWidth
+              value={formData.subchapter}
+              onChange={(e) =>
+                setFormData({
+                  ...formData,
+                  subchapter: e.target.value,
+                })
+              }
+              required
+            />
+          </Stack>
+
+          <TextField
+            label="Total Points"
+            type="number"
+            fullWidth
+            value={formData.totalPoints}
+            onChange={(e) =>
+              setFormData({
+                ...formData,
+                totalPoints: parseInt(e.target.value) || 0,
+              })
+            }
+            required
+          />
 
           <Box>
             <Typography
@@ -219,6 +245,10 @@ export default function AssignmentFormDialog({
           variant="contained"
           disabled={
             !formData.name ||
+            !formData.chapter ||
+            !formData.subchapter ||
+            formData.totalPoints === null ||
+            formData.totalPoints === undefined ||
             !formData.publishDate ||
             !formData.publishTime ||
             (!isPractice && (!formData.dueDate || !formData.dueTime))

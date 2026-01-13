@@ -50,13 +50,19 @@ function formatDateTime(dateString, timeString) {
   return `${dateFormatted} at ${timeFormatted}`;
 }
 
-export const AssignmentOverviewTable = () => {
+export const AssignmentOverviewTable = ({
+  assignments: assignmentsProp,
+  totalAverage: totalAverageProp,
+  totalSubmissions: totalSubmissionsProp,
+  totalPossible: totalPossibleProp,
+  completionRate: completionRateProp,
+} = {}) => {
   const { courses, activeCourseId, assignmentsByCourse, gradebookByCourse } =
     useCoursesState();
   const activeCourse = courses.find((c) => c.id === activeCourseId);
 
   // Get assignments and gradebook from context
-  const assignments = assignmentsByCourse[activeCourseId] || [];
+  const assignments = assignmentsProp ?? (assignmentsByCourse[activeCourseId] || []);
   const gradebook = gradebookByCourse[activeCourseId] || [];
   const totalStudents = activeCourse?.studentCount || gradebook.length || 0;
 
@@ -68,35 +74,42 @@ export const AssignmentOverviewTable = () => {
 
   // Calculate metrics from context
   const assignmentsWithMetrics = assignments.map((assignment) => {
-    const submissions = gradebook.filter(
-      (student) => student.grades[assignment.id] !== undefined
-    ).length;
+    const assignmentId = assignment?.id;
+    const submissions =
+      assignment.submissions ??
+      gradebook.filter((student) => student.grades[assignmentId] !== undefined)
+        .length;
 
     const grades = gradebook
-      .map((student) => student.grades[assignment.id])
+      .map((student) => student.grades[assignmentId])
       .filter((grade) => grade !== undefined && grade !== null);
 
     const average =
-      grades.length > 0
+      assignment.average ??
+      (grades.length > 0
         ? Math.round(
             grades.reduce((sum, grade) => sum + grade, 0) / grades.length
           )
-        : 0;
+        : 0);
 
-    // Count late submissions
-    const lateSubmissions = gradebook.filter(
-      (student) =>
-        student.grades[assignment.id] !== undefined &&
-        student.lateSubmissions?.[assignment.id]
-    ).length;
+    const lateSubmissions =
+      assignment.lateSubmissions ??
+      gradebook.filter(
+        (student) =>
+          student.grades[assignmentId] !== undefined &&
+          student.lateSubmissions?.[assignmentId]
+      ).length;
 
-    // Generate average time (you can replace this with real data from context)
-    const avgTime = ["2.5 hrs", "3.2 hrs", "1.8 hrs", "4.1 hrs", "2.9 hrs"][
-      parseInt(assignment.id.replace(/\D/g, "")) % 5
-    ];
+    const numericId = parseInt(String(assignmentId ?? "").replace(/\D/g, "")) || 0;
+    const avgTime =
+      assignment.avgTime ??
+      ["2.5 hrs", "3.2 hrs", "1.8 hrs", "4.1 hrs", "2.9 hrs"][numericId % 5];
 
     return {
       ...assignment,
+      name: assignment.name || assignment.title || "Assignment",
+      dueDate: assignment.dueDate || assignment.due_date,
+      dueTime: assignment.dueTime || assignment.due_time,
       submissions,
       average,
       lateSubmissions,
@@ -106,22 +119,24 @@ export const AssignmentOverviewTable = () => {
   });
 
   // Calculate totals
-  const totalSubmissions = assignmentsWithMetrics.reduce(
-    (sum, a) => sum + a.submissions,
-    0
-  );
-  const totalPossible = assignments.length * totalStudents;
+  const totalSubmissions =
+    totalSubmissionsProp ??
+    assignmentsWithMetrics.reduce((sum, a) => sum + a.submissions, 0);
+  const totalPossible =
+    totalPossibleProp ?? assignments.length * totalStudents;
   const totalAverage =
-    assignmentsWithMetrics.length > 0
+    totalAverageProp ??
+    (assignmentsWithMetrics.length > 0
       ? Math.round(
           assignmentsWithMetrics.reduce((sum, a) => sum + a.average, 0) /
             assignmentsWithMetrics.length
         )
-      : 0;
+      : 0);
   const completionRate =
-    totalPossible > 0
+    completionRateProp ??
+    (totalPossible > 0
       ? Math.round((totalSubmissions / totalPossible) * 100)
-      : 0;
+      : 0);
 
   const handleAssignmentClick = (assignment) => {
     setSelectedAssignmentId(assignment.id);

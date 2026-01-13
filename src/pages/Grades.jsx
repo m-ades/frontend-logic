@@ -4,6 +4,7 @@ import { DataGrid } from '@mui/x-data-grid'
 import ThemedCard from '../components/ui/ThemedCard.jsx'
 import { formatDateTime } from '../utils/formatting.js'
 import { API_CONFIG, fetchJson, getActiveUserId } from '../utils/api.js'
+import { useCoursesState } from '../context/CoursesContext.jsx'
 
 function NoRowsOverlay() {
   return (
@@ -17,15 +18,18 @@ function NoRowsOverlay() {
 
 export default function Grades() {
   const [gradeEntries, setGradeEntries] = useState([])
+  const { activeCourseId } = useCoursesState()
+  const courseId = activeCourseId ?? API_CONFIG.courseId
 
   useEffect(() => {
     let isMounted = true
 
     const loadGrades = async () => {
       try {
+        if (!courseId) return
         const userId = getActiveUserId()
         const [assignments, grades] = await Promise.all([
-          fetchJson(`/api/courses/${API_CONFIG.courseId}/assignments`),
+          fetchJson(`/api/courses/${courseId}/assignments`),
           fetchJson(`/api/users/${userId}/grades`),
         ])
         const gradedAssignments = (assignments || []).filter((assignment) => assignment.kind !== 'practice')
@@ -64,7 +68,7 @@ export default function Grades() {
     return () => {
       isMounted = false
     }
-  }, [])
+  }, [courseId])
 
   const gradedEntries = useMemo(
     () => gradeEntries.filter((entry) => entry.grade),

@@ -5,8 +5,8 @@ import ThemedCard from '../components/ui/ThemedCard.jsx'
 import ActivityAccordion from '../components/ui/ActivityAccordion.jsx'
 import { ACTIVITY_TYPES } from '../placeholder/courseActivities.js'
 import { formatDateTime } from '../utils/formatting.js'
-import { getStoredBoolean } from '../placeholder/storage.js'
 import { API_CONFIG, fetchJson, getActiveUserId } from '../utils/api.js'
+import { useCoursesState } from '../context/CoursesContext.jsx'
 
 const buildCourseStructure = (assignments, sectionTitle) => {
   const chapters = new Map()
@@ -51,11 +51,14 @@ export default function Assignments() {
   const [tabValue, setTabValue] = useState(0)
   const [averagePercent, setAveragePercent] = useState(null)
   const [courseStructure, setCourseStructure] = useState([])
+  const [completedAssignments, setCompletedAssignments] = useState(new Set())
+  const { activeCourseId } = useCoursesState()
+  const courseId = activeCourseId ?? API_CONFIG.courseId
   const navigate = useNavigate()
 
   const getCompletionStatus = useCallback(
-    (activityId) => getStoredBoolean(`completion-${activityId}`),
-    []
+    (activityId) => completedAssignments.has(activityId),
+    [completedAssignments]
   )
 
   useEffect(() => {
@@ -63,15 +66,37 @@ export default function Assignments() {
 
     const loadAssignments = async () => {
       try {
-        const assignments = await fetchJson(`/api/courses/${API_CONFIG.courseId}/assignments`)
+        if (!courseId) return
+        const assignments = await fetchJson(`/api/courses/${courseId}/assignments`)
         const gradedAssignments = assignments.filter((assignment) => assignment.kind !== 'practice')
         if (!isMounted) return
 
         setCourseStructure(buildCourseStructure(gradedAssignments, 'Assignments'))
+
+        const userId = getActiveUserId()
+        const completionResults = await Promise.all(
+          gradedAssignments.map(async (assignment) => {
+            try {
+              const submissions = await fetchJson(
+                `/api/assignments/${assignment.id}/submissions?userId=${userId}`
+              )
+              return Array.isArray(submissions) && submissions.length > 0
+                ? assignment.id
+                : null
+            } catch (submissionError) {
+              console.warn('Failed to load submissions', submissionError)
+              return null
+            }
+          })
+        )
+        if (isMounted) {
+          setCompletedAssignments(new Set(completionResults.filter(Boolean)))
+        }
       } catch (error) {
         if (isMounted) {
           console.warn('Failed to load assignments', error)
           setCourseStructure([])
+          setCompletedAssignments(new Set())
         }
       }
     }
@@ -81,7 +106,7 @@ export default function Assignments() {
     return () => {
       isMounted = false
     }
-  }, [])
+  }, [courseId])
 
   const filterStructure = useCallback((structure, predicate) => {
     return structure.map((chapter) => {

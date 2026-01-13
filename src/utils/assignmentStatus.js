@@ -6,12 +6,12 @@
  */
 export function getStatusColor(item, isPractice = false) {
   const now = new Date();
-  const dueDate = new Date(item.dueDate);
-  const publishDate = new Date(item.publishDate || item.dueDate);
+  const dueDate = item.dueDate ? new Date(item.dueDate) : null;
+  const publishDate = item.publishDate ? new Date(item.publishDate) : null;
 
   if (item.isLocked) return "default";
-  if (!item.isPublished || publishDate > now) return "warning";
-  if (dueDate < now) return isPractice ? "info" : "error";
+  if (!item.isPublished || (publishDate && publishDate > now)) return "warning";
+  if (dueDate && dueDate < now) return isPractice ? "info" : "error";
   return "success";
 }
 
@@ -23,13 +23,13 @@ export function getStatusColor(item, isPractice = false) {
  */
 export function getStatusText(item, isPractice = false) {
   const now = new Date();
-  const dueDate = new Date(item.dueDate);
-  const publishDate = new Date(item.publishDate || item.dueDate);
+  const dueDate = item.dueDate ? new Date(item.dueDate) : null;
+  const publishDate = item.publishDate ? new Date(item.publishDate) : null;
 
   if (item.isLocked) return "Locked";
   if (!item.isPublished) return "Draft";
-  if (publishDate > now) return "Scheduled";
-  if (dueDate < now) return isPractice ? "Available" : "Past Due";
+  if (publishDate && publishDate > now) return "Scheduled";
+  if (dueDate && dueDate < now) return isPractice ? "Available" : "Past Due";
   return "Active";
 }
 

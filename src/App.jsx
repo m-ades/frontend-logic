@@ -123,16 +123,6 @@ function AppRoutes() {
           </ProtectedRoute>
         }
       />
-      <Route
-        path="/student/worksheet/:worksheetId"
-        element={
-          <ProtectedRoute allowedRoles={["student"]}>
-            <AppLayout>
-              <Worksheet />
-            </AppLayout>
-          </ProtectedRoute>
-        }
-      />
 
       <Route
         path="/instructor"

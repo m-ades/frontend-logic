@@ -12,6 +12,7 @@ import {
 import ThemedCard from "../components/ui/ThemedCard.jsx";
 import { API_CONFIG, fetchJson, setStoredUser } from "../utils/api.js";
 import { useAuthState, useAuthDispatch, login } from "../context/AuthContext";
+import { isInstructorRole } from "../utils/auth.js";
 
 export default function Login() {
   const [username, setUsername] = useState("");
@@ -24,7 +25,7 @@ export default function Login() {
 
   useEffect(() => {
     if (!isLoading && isAuthenticated && user) {
-      if (user.role === "instructor") {
+      if (isInstructorRole(user.role)) {
         navigate("/instructor/dashboard", { replace: true });
       } else {
         navigate("/student/courses", { replace: true });

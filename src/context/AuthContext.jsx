@@ -1,5 +1,6 @@
 import { createContext, useContext, useReducer, useEffect } from "react";
 import { clearStoredUser, getStoredUser, setStoredUser } from "../utils/api.js";
+import { normalizeRole } from "../utils/auth.js";
 
 const AuthStateContext = createContext();
 const AuthDispatchContext = createContext();
@@ -47,7 +48,17 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     const storedUser = getStoredUser();
     if (storedUser) {
-      dispatch({ type: "LOGIN", payload: storedUser });
+      const normalizedRole = normalizeRole(storedUser.role);
+      if (!normalizedRole) {
+        clearStoredUser();
+        dispatch({ type: "SET_LOADING", payload: false });
+        return;
+      }
+      const normalizedUser = { ...storedUser, role: normalizedRole };
+      if (normalizedRole !== storedUser.role) {
+        setStoredUser(normalizedUser);
+      }
+      dispatch({ type: "LOGIN", payload: normalizedUser });
     } else {
       dispatch({ type: "SET_LOADING", payload: false });
     }

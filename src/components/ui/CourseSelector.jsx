@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Box,
   Button,
@@ -19,6 +19,7 @@ import {
 } from "@mui/icons-material";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuthState } from "../../context/AuthContext";
+import { isInstructorRole } from "../../utils/auth.js";
 import {
   useCoursesState,
   useCoursesDispatch,
@@ -33,7 +34,7 @@ export default function CourseSelector({ isSidebarOpened }) {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const isInstructor = user?.role === "instructor";
+  const isInstructor = isInstructorRole(user?.role);
   const coursesPath = isInstructor ? "/instructor/courses" : "/student/courses";
   const dashboardPath = isInstructor
     ? "/instructor/dashboard"
@@ -50,6 +51,16 @@ export default function CourseSelector({ isSidebarOpened }) {
   const handleClose = () => {
     setAnchorEl(null);
   };
+
+  useEffect(() => {
+    if (anchorEl && !anchorEl.isConnected) {
+      setAnchorEl(null);
+    }
+  }, [anchorEl]);
+
+  useEffect(() => {
+    setAnchorEl(null);
+  }, [isSidebarOpened]);
 
   const handleSelectCourse = (courseId) => {
     setActiveCourse(dispatch, courseId);

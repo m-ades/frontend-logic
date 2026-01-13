@@ -5,7 +5,9 @@ import { useNavigate } from "react-router-dom";
 import {
   useCoursesState,
   useCoursesDispatch,
+  fetchCoursePractices,
 } from "../../context/CoursesContext";
+import { fetchJson } from "../../utils/api.js";
 import AssignmentTable from "../../components/ui/AssignmentTable";
 import AssignmentFormDialog from "../../components/ui/AssignmentFormDialog";
 import AssignmentContextMenu from "../../components/ui/AssignmentContextMenu";
@@ -15,10 +17,23 @@ import {
   enhanceItems,
 } from "../../utils/assignmentStatus";
 
+const getCurrentDate = () => {
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, "0");
+  const day = String(today.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+};
+
 const INITIAL_FORM_DATA = {
   name: "",
   dueDate: "",
+  dueTime: "23:59",
   publishDate: "",
+  publishTime: "00:00",
+  totalPoints: 0,
+  chapter: 1,
+  subchapter: "A",
   isPublished: true,
   isLocked: false,
   allowRetakes: true,
@@ -44,125 +59,199 @@ export default function InstructorPractice() {
 
   // Handlers
   const handleCreateOpen = () => {
-    setFormData(INITIAL_FORM_DATA);
+    setFormData({
+      ...INITIAL_FORM_DATA,
+      publishDate: getCurrentDate(),
+    });
     setCreateDialogOpen(true);
   };
 
-  const handleCreateSubmit = () => {
-    const newPractice = {
-      id: `p${practices.length + 1}`,
-      courseId: activeCourseId,
-      ...formData,
-      attempts: 0,
-      completions: 0,
-      type: "practice",
-    };
-
-    dispatch({
-      type: "SET_PRACTICES",
-      courseId: activeCourseId,
-      payload: [...practices, newPractice],
-    });
-
-    setCreateDialogOpen(false);
-    navigate("/instructor/assignment-builder", {
-      state: { practiceId: newPractice.id },
-    });
+  const handleCreateSubmit = async () => {
+    try {
+      const payload = {
+        course_id: activeCourseId,
+        kind: "practice",
+        title: formData.name,
+        description: formData.description || null,
+        is_locked: formData.isLocked || !formData.isPublished,
+        chapter: Number(formData.chapter) || 1,
+        subchapter: formData.subchapter || "A",
+        due_date: null,
+        late_window_days: null,
+        late_penalty_percent: null,
+        total_points: Number.isFinite(formData.totalPoints)
+          ? formData.totalPoints
+          : 0,
+      };
+      const created = await fetchJson("/api/assignments", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const refreshed = await fetchCoursePractices(activeCourseId);
+      dispatch({
+        type: "SET_PRACTICES",
+        courseId: activeCourseId,
+        payload: refreshed,
+      });
+      setCreateDialogOpen(false);
+      navigate("/instructor/assignment-builder", {
+        state: { practiceId: created?.id ?? payload.id },
+      });
+    } catch (error) {
+      console.error("Failed to create practice", error);
+    }
   };
 
   const handleEditOpen = (practice) => {
     setSelectedPractice(practice);
     setFormData({
       name: practice.name,
-      dueDate: practice.dueDate.split("T")[0],
-      publishDate: practice.publishDate.split("T")[0],
-      isPublished: practice.isPublished,
-      isLocked: practice.isLocked,
-      allowRetakes: practice.allowRetakes,
-      showSolutions: practice.showSolutions,
+      dueDate: practice.dueDate || "",
+      dueTime: practice.dueTime || "23:59",
+      publishDate: practice.publishDate || getCurrentDate(),
+      publishTime: practice.publishTime || "00:00",
+      totalPoints: practice.totalPoints ?? 0,
+      chapter: practice.chapter || 1,
+      subchapter: practice.subchapter || "A",
+      isPublished: practice.isPublished ?? true,
+      isLocked: practice.isLocked ?? false,
+      allowRetakes: practice.allowRetakes ?? true,
+      showSolutions: practice.showSolutions ?? true,
     });
     setEditDialogOpen(true);
     setMenuAnchor(null);
   };
 
-  const handleEditSubmit = () => {
-    const updatedPractices = practices.map((p) =>
-      p.id === selectedPractice.id
-        ? {
-            ...p,
-            ...formData,
-            dueDate: `${formData.dueDate}T23:59:00Z`,
-            publishDate: `${formData.publishDate}T00:00:00Z`,
-          }
-        : p
-    );
-
-    dispatch({
-      type: "SET_PRACTICES",
-      courseId: activeCourseId,
-      payload: updatedPractices,
-    });
-
-    setEditDialogOpen(false);
-    setSelectedPractice(null);
+  const handleEditSubmit = async () => {
+    try {
+      const payload = {
+        course_id: activeCourseId,
+        kind: "practice",
+        title: formData.name,
+        description: formData.description || null,
+        is_locked: formData.isLocked || !formData.isPublished,
+        chapter: Number(formData.chapter) || 1,
+        subchapter: formData.subchapter || "A",
+        due_date: null,
+        late_window_days: null,
+        late_penalty_percent: null,
+        total_points: Number.isFinite(formData.totalPoints)
+          ? formData.totalPoints
+          : 0,
+      };
+      await fetchJson(`/api/assignments/${selectedPractice.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const refreshed = await fetchCoursePractices(activeCourseId);
+      dispatch({
+        type: "SET_PRACTICES",
+        courseId: activeCourseId,
+        payload: refreshed,
+      });
+      setEditDialogOpen(false);
+      setSelectedPractice(null);
+    } catch (error) {
+      console.error("Failed to update practice", error);
+    }
   };
 
-  const handleToggleLock = (practiceId) => {
-    const updatedPractices = practices.map((p) =>
-      p.id === practiceId ? { ...p, isLocked: !p.isLocked } : p
-    );
-
-    dispatch({
-      type: "SET_PRACTICES",
-      courseId: activeCourseId,
-      payload: updatedPractices,
-    });
+  const handleToggleLock = async (practiceId) => {
+    const practice = practices.find((p) => p.id === practiceId);
+    if (!practice) return;
+    try {
+      await fetchJson(`/api/assignments/${practiceId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ is_locked: !practice.isLocked }),
+      });
+      const refreshed = await fetchCoursePractices(activeCourseId);
+      dispatch({
+        type: "SET_PRACTICES",
+        courseId: activeCourseId,
+        payload: refreshed,
+      });
+    } catch (error) {
+      console.error("Failed to toggle lock", error);
+    }
   };
 
-  const handleTogglePublish = (practiceId) => {
-    const updatedPractices = practices.map((p) =>
-      p.id === practiceId ? { ...p, isPublished: !p.isPublished } : p
-    );
-
-    dispatch({
-      type: "SET_PRACTICES",
-      courseId: activeCourseId,
-      payload: updatedPractices,
-    });
+  const handleTogglePublish = async (practiceId) => {
+    const practice = practices.find((p) => p.id === practiceId);
+    if (!practice) return;
+    const nextPublished = !practice.isPublished;
+    try {
+      await fetchJson(`/api/assignments/${practiceId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ is_locked: practice.isLocked || !nextPublished }),
+      });
+      const refreshed = await fetchCoursePractices(activeCourseId);
+      dispatch({
+        type: "SET_PRACTICES",
+        courseId: activeCourseId,
+        payload: refreshed,
+      });
+    } catch (error) {
+      console.error("Failed to toggle publish", error);
+    }
   };
 
-  const handleDuplicate = (practice) => {
-    const newPractice = {
-      ...practice,
-      id: `p${practices.length + 1}`,
-      name: `${practice.name} (Copy)`,
-      attempts: 0,
-      completions: 0,
-      isPublished: false,
-    };
-
-    dispatch({
-      type: "SET_PRACTICES",
-      courseId: activeCourseId,
-      payload: [...practices, newPractice],
-    });
-
-    setMenuAnchor(null);
+  const handleDuplicate = async (practice) => {
+    try {
+      const payload = {
+        course_id: activeCourseId,
+        kind: "practice",
+        title: `${practice.name} (Copy)`,
+        description: practice.description || null,
+        is_locked: true,
+        chapter: practice.chapter || 1,
+        subchapter: practice.subchapter || "A",
+        due_date: null,
+        late_window_days: null,
+        late_penalty_percent: null,
+        total_points: Number.isFinite(practice.totalPoints)
+          ? practice.totalPoints
+          : 0,
+      };
+      await fetchJson("/api/assignments", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const refreshed = await fetchCoursePractices(activeCourseId);
+      dispatch({
+        type: "SET_PRACTICES",
+        courseId: activeCourseId,
+        payload: refreshed,
+      });
+      setMenuAnchor(null);
+    } catch (error) {
+      console.error("Failed to duplicate practice", error);
+    }
   };
 
-  const handleDelete = (practiceId) => {
+  const handleDelete = async (practiceId) => {
     if (
       window.confirm(
         "Are you sure you want to delete this practice assignment?"
       )
     ) {
-      const updatedPractices = practices.filter((p) => p.id !== practiceId);
-
-      dispatch({
-        type: "SET_PRACTICES",
-        courseId: activeCourseId,
-        payload: updatedPractices,
-      });
+      try {
+        await fetchJson(`/api/assignments/${practiceId}`, {
+          method: "DELETE",
+        });
+        const refreshed = await fetchCoursePractices(activeCourseId);
+        dispatch({
+          type: "SET_PRACTICES",
+          courseId: activeCourseId,
+          payload: refreshed,
+        });
+      } catch (error) {
+        console.error("Failed to delete practice", error);
+      }
     }
     setMenuAnchor(null);
   };

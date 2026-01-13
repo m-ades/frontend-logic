@@ -6,6 +6,7 @@ import { useScoring } from '../hooks/usescoring.js'
 import { useProofState } from '../hooks/useproofstate.js'
 import { exportWorksheetPDF } from '../utils/exportPDF.js'
 import { API_CONFIG, fetchJson, getActiveUserId } from '../utils/api.js'
+import { useCoursesState } from '../context/CoursesContext.jsx'
 
 export default function Worksheet() {
   const { worksheetId, assignmentId } = useParams()
@@ -14,6 +15,8 @@ export default function Worksheet() {
   const [worksheets, setWorksheets] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const [loadError, setLoadError] = useState('')
+  const { activeCourseId } = useCoursesState()
+  const courseId = activeCourseId ?? API_CONFIG.courseId
   const sessionId = useRef(null)
   const questionSessionId = useRef(null)
   const activeUserId = getActiveUserId()
@@ -384,7 +387,8 @@ export default function Worksheet() {
       setIsLoading(true)
       setLoadError('')
       try {
-        const assignments = await fetchJson(`/api/courses/${API_CONFIG.courseId}/assignments`)
+        if (!courseId) return
+        const assignments = await fetchJson(`/api/courses/${courseId}/assignments`)
         const worksheetData = await Promise.all(
           assignments.map(async (assignment) => {
             const response = await fetchJson(
@@ -430,17 +434,12 @@ export default function Worksheet() {
     return () => {
       isMounted = false
     }
-  }, [])
+  }, [activeUserId, courseId])
 
   const handleWorksheetChange = (newIndex) => {
     const newWorksheet = worksheets[newIndex]
     if (newWorksheet) {
-      // use assignment route if we came from assignment route, otherwise worksheet route
-      if (assignmentId) {
-        navigate(`/student/assignment/${newWorksheet.id}`)
-      } else {
-        navigate(`/worksheet/${newWorksheet.id}`)
-      }
+      navigate(`/student/assignment/${newWorksheet.id}`)
     }
   }
 

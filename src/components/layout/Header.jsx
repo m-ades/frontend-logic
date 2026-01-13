@@ -13,6 +13,12 @@ import ThemeToggle from "./ThemeToggle.jsx";
 
 // Map routes to readable page names
 const getPageName = (pathname) => {
+  if (pathname.startsWith("/student/assignment/")) {
+    return "Assignment";
+  }
+  if (pathname.startsWith("/student/worksheet/")) {
+    return "Worksheet";
+  }
   const routes = {
     "/instructor/dashboard": "Dashboard",
     "/instructor/courses": "All Courses",
@@ -23,10 +29,14 @@ const getPageName = (pathname) => {
     "/instructor/assignment-builder": "Assignment Builder",
     "/instructor/roster": "Roster",
     "/instructor/profile": "Profile & Preferences",
+    "/instructor/practice": "Practice",
     "/student/dashboard": "Dashboard",
     "/student/courses": "My Courses",
     "/student/assignments": "Assignments",
     "/student/grades": "Grades",
+    "/student/practice": "Practice",
+    "/student/contact": "Contact",
+    "/student/profile": "Profile & Preferences",
   };
 
   return routes[pathname] || "Dashboard";

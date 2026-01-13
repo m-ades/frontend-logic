@@ -21,6 +21,7 @@ import {
   toggleSidebarHover,
 } from "../context/LayoutContext.jsx";
 import { useAuthState } from "../context/AuthContext.jsx";
+import { normalizeRole } from "../utils/auth.js";
 
 export default function Profile() {
   const theme = useThemeState();
@@ -34,7 +35,7 @@ export default function Profile() {
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [profileData, setProfileData] = useState({
     username: user?.username || "username",
-    role: user?.role || "Student",
+    role: normalizeRole(user?.role) || "Student",
   });
 
   const handleThemeToggle = () => {
