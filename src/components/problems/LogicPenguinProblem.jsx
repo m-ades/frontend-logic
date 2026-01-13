@@ -5,6 +5,7 @@ import TrueFalse from './mui/TrueFalse.jsx'
 import EvaluateTruth from './mui/EvaluateTruth.jsx'
 // import ValidCorrectSound from './mui/ValidCorrectSound.jsx'
 import SingleRowTruthTable from './mui/SingleRowTruthTable.jsx'
+import ComboTranslationTruthTable from './mui/ComboTranslationTruthTable.jsx'
 
 export default function LogicPenguinProblem({ 
   proof, 
@@ -124,6 +125,17 @@ export default function LogicPenguinProblem({
     return (
       <SingleRowTruthTable
         problem={problemData}
+        attemptLimit={proof.attemptLimit}
+        assignmentQuestionId={proof.questionId}
+        onStateChange={handleStateChange}
+        onComplete={handleComplete}
+        savedState={localState}
+      />
+    )
+  } else if (proof.type === 'combo-translation-truth-table') {
+    return (
+      <ComboTranslationTruthTable
+        proof={proof}
         attemptLimit={proof.attemptLimit}
         assignmentQuestionId={proof.questionId}
         onStateChange={handleStateChange}

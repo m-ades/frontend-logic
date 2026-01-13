@@ -249,6 +249,17 @@ export default function Worksheet() {
         }
       }
 
+      if (type === 'combo-translation-truth-table') {
+        return {
+          ...proofBase,
+          description: '',
+          type: 'combo-translation-truth-table',
+          answer: snapshot.answer,
+          options: snapshot.options,
+          comboTranslationTruthTable: snapshot,
+        }
+      }
+
       return {
         ...proofBase,
         type,
@@ -363,6 +374,31 @@ export default function Worksheet() {
               row: data.row.map(toSymbol),
             }
           }
+          return
+        }
+
+        if (proof.type === 'combo-translation-truth-table') {
+          const translations = Array.isArray(data?.translations) ? data.translations : []
+          const chosenConclusion = data?.chosenConclusion ?? null
+          let argumentLine = data?.argumentLine ?? data?.argument ?? ''
+          if (!argumentLine && translations.length > 0 && chosenConclusion !== null) {
+            const premiseTranslations = translations.filter((_, idx) => idx !== chosenConclusion)
+            const conclusionTranslation = translations[chosenConclusion] ?? ''
+            if (premiseTranslations.length && conclusionTranslation) {
+              argumentLine = `${premiseTranslations.join(' / ')} // ${conclusionTranslation}`
+            }
+          }
+          const initial = {
+            argumentLine,
+          }
+          if (data?.tableAns?.lefts && data?.tableAns?.right) {
+            initial.tableState = buildTruthTableState(
+              data.tableAns.lefts,
+              data.tableAns.right,
+              data.tableAns
+            )
+          }
+          initialStates[proof.id] = initial
           return
         }
 

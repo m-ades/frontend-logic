@@ -82,7 +82,15 @@ function TruthToggle({ value, onChange, ariaLabel, accent, readOnly = false }) {
   )
 }
 
-export default function TruthTableEditor({ proof, savedState, onStateChange, onProofComplete }) {
+export default function TruthTableEditor({
+  proof,
+  savedState,
+  onStateChange,
+  onProofComplete,
+  hideActions = false,
+  suppressReveal = false,
+  embedded = false,
+}) {
   const truthTable = proof.truthTable ?? {}
   const syntax = React.useMemo(() => getSyntax(), [])
   const Formula = React.useMemo(() => getFormulaClass(), [])
@@ -360,9 +368,6 @@ export default function TruthTableEditor({ proof, savedState, onStateChange, onP
   if (!hasTruthTable) {
     return (
       <Stack spacing={2} sx={{ px: 0, width: '100%' }}>
-        <Typography variant="h5" sx={{ fontWeight: 600, color: '#2f6bff' }}>
-          Truth Table Task
-        </Typography>
         <Typography color="text.secondary">
           No truth-table metadata is available for this problem.
         </Typography>
@@ -692,79 +697,86 @@ export default function TruthTableEditor({ proof, savedState, onStateChange, onP
     </Box>
   )
 
+  const tableCard = (
+    <Box
+      sx={{
+        mt: embedded ? 0 : 1,
+        overflow: 'visible',
+        minHeight: embedded ? 'auto' : '420px',
+        flexGrow: 1,
+        alignSelf: { xs: 'stretch', md: 'flex-start' },
+      }}
+      className={embedded ? undefined : 'lp-problem-card'}
+    >
+      <Stack spacing={3} sx={{ p: { xs: embedded ? 0 : 2, md: embedded ? 0 : 2 } }}>
+        {renderTableSet(tables, tableInputs, useCombinedTable, false, handleCellChange, kind === 'argument')}
+        {classificationEnabled && classificationOptions.length > 0 && (
+          <Box sx={{ width: '100%' }}>
+            <FormControl component="fieldset" variant="standard">
+              <FormLabel component="legend">Select all that apply</FormLabel>
+              <FormGroup>
+                {classificationOptions.map((option) => (
+                  <FormControlLabel
+                    key={option.value}
+                    control={
+                      <Checkbox
+                        checked={mcSelection.includes(option.value)}
+                        onChange={(event) => {
+                          const checked = event.target.checked
+                          const next = checked
+                            ? [...mcSelection, option.value]
+                            : mcSelection.filter((v) => v !== option.value)
+                          setMcSelection(next)
+                          onStateChange?.({
+                            tables: tableInputs.map((rows) => ({ rows })),
+                            mcans: next,
+                            taut: next.includes('tautology'),
+                            contra: next.includes('self-contradiction'),
+                            valid: next.includes('valid'),
+                            equiv: next.includes('equivalent'),
+                            classification: {
+                              mcans: next,
+                              taut: next.includes('tautology'),
+                              contra: next.includes('self-contradiction'),
+                            },
+                          })
+                          if (status !== 'unanswered') {
+                            setStatus('unanswered')
+                            setMessage('')
+                          }
+                        }}
+                      />
+                    }
+                    label={option.label}
+                  />
+                ))}
+              </FormGroup>
+            </FormControl>
+          </Box>
+        )}
+      </Stack>
+    </Box>
+  )
+
   return (
     <Stack spacing={2} sx={{ px: 0, width: '100%', alignItems: 'stretch', flexGrow: 1 }}>
-      <Typography variant="h5" sx={{ fontWeight: 600, color: '#2f6bff' }}>
-        Truth Table Task
-      </Typography>
-      {(proof.description || truthTable.prompt) && (
+      {!embedded && (proof.description || truthTable.prompt) && (
         <Typography variant="body1" sx={{ fontSize: { xs: '0.95rem', md: '1rem' } }}>
           {truthTable.prompt || proof.description}
         </Typography>
       )}
-      <Typography variant="body2" sx={{ color: '#2f6bff' }}>
-        Fill in each column to match the expected truth values.
-      </Typography>
-      <Box className="logicpenguin" sx={{ width: '100%', flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
-        <Box
-          sx={{
-            mt: 1,
-            overflow: 'visible',
-            minHeight: '420px',
-            flexGrow: 1,
-            alignSelf: { xs: 'stretch', md: 'flex-start' },
-          }}
-          className="lp-problem-card"
-        >
-          <Stack spacing={3} sx={{ p: { xs: 2, md: 2 } }}>
-            {renderTableSet(tables, tableInputs, useCombinedTable, false, handleCellChange, kind === 'argument')}
-            {classificationEnabled && classificationOptions.length > 0 && (
-              <Box sx={{ width: '100%' }}>
-                <FormControl component="fieldset" variant="standard">
-                  <FormLabel component="legend">Select all that apply</FormLabel>
-                  <FormGroup>
-                    {classificationOptions.map((option) => (
-                      <FormControlLabel
-                        key={option.value}
-                        control={
-                          <Checkbox
-                            checked={mcSelection.includes(option.value)}
-                            onChange={(event) => {
-                              const checked = event.target.checked
-                              const next = checked
-                                ? [...mcSelection, option.value]
-                                : mcSelection.filter((v) => v !== option.value)
-                              setMcSelection(next)
-                              onStateChange?.({
-                                tables: tableInputs.map((rows) => ({ rows })),
-                                mcans: next,
-                                taut: next.includes('tautology'),
-                                contra: next.includes('self-contradiction'),
-                                valid: next.includes('valid'),
-                                equiv: next.includes('equivalent'),
-                                classification: {
-                                  mcans: next,
-                                  taut: next.includes('tautology'),
-                                  contra: next.includes('self-contradiction'),
-                                },
-                              })
-                              if (status !== 'unanswered') {
-                                setStatus('unanswered')
-                                setMessage('')
-                              }
-                            }}
-                          />
-                        }
-                        label={option.label}
-                      />
-                    ))}
-                  </FormGroup>
-                </FormControl>
-              </Box>
-            )}
-          </Stack>
+      {!embedded && (
+        <Typography variant="body2" sx={{ color: '#2f6bff' }}>
+          Fill in each column to match the expected truth values.
+        </Typography>
+      )}
+      {embedded ? (
+        tableCard
+      ) : (
+        <Box className="logicpenguin" sx={{ width: '100%', flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
+          {tableCard}
         </Box>
-      </Box>
+      )}
       <Typography
         variant="body2"
         sx={{
@@ -786,14 +798,16 @@ export default function TruthTableEditor({ proof, savedState, onStateChange, onP
           {message}
         </Alert>
       )}
-      <ProblemSetButtons
-        onCheck={handleCheck}
-        onStartOver={handleStartOver}
-        isChecking={isChecking}
-        isDisabled={!tableFilled || attemptCount >= attemptLimit}
-        align="flex-start"
-      />
-      {showSolution && renderAnswerCard(
+      {!hideActions && (
+        <ProblemSetButtons
+          onCheck={handleCheck}
+          onStartOver={handleStartOver}
+          isChecking={isChecking}
+          isDisabled={!tableFilled || attemptCount >= attemptLimit}
+          align="flex-start"
+        />
+      )}
+      {!hideActions && !suppressReveal && showSolution && renderAnswerCard(
         'Correct Answer',
         renderTableSet(
           solutionTables,
