@@ -1,11 +1,12 @@
 import { Box, Typography, Alert } from "@mui/material";
+import { useEffect, useMemo, useState } from "react";
 import { TrendingUp, Users, CheckCircle, Calendar } from "lucide-react";
 import {
   useCoursesState,
   calculateAssignmentAverage,
-  generateAvgTime,
   calculateGradeDistribution,
 } from "../../context/CoursesContext";
+import { fetchJson } from "../../utils/api.js";
 import { MetricCard } from "../../components/ui/MetricCard";
 import { PerformanceTrendsChart } from "../../components/ui/dashboard/PerformanceTrendsChart";
 import { GradeDistributionChart } from "../../components/ui/dashboard/GradeDistributionChart";
@@ -16,30 +17,81 @@ import { AssignmentOverviewTable } from "../../components/ui/dashboard/Assignmen
 export default function InstructorDashboard() {
   const { courses, activeCourseId, assignmentsByCourse, gradebookByCourse } =
     useCoursesState();
+  const [analytics, setAnalytics] = useState({
+    gradeSummary: null,
+    assignmentStats: [],
+    timeByCategory: [],
+  });
+  const [gradebookSummary, setGradebookSummary] = useState([]);
 
   const course = courses.find((c) => c.id === activeCourseId);
   const assignments = assignmentsByCourse[activeCourseId] || [];
   const students = gradebookByCourse[activeCourseId] || [];
+  const totalStudents = course?.studentCount || students.length || 0;
+
+  useEffect(() => {
+    let isMounted = true;
+    const loadAnalytics = async () => {
+      if (!activeCourseId) return;
+      try {
+        const [instructorAnalytics, summary] = await Promise.all([
+          fetchJson(`/api/analytics/instructor?courseId=${activeCourseId}`),
+          fetchJson(`/api/analytics/gradebook-summary?courseId=${activeCourseId}`),
+        ]);
+        if (isMounted) {
+          setAnalytics(instructorAnalytics);
+          setGradebookSummary(summary || []);
+        }
+      } catch (error) {
+        if (isMounted) {
+          console.warn("Failed to load instructor analytics", error);
+          setAnalytics({ gradeSummary: null, assignmentStats: [], timeByCategory: [] });
+          setGradebookSummary([]);
+        }
+      }
+    };
+
+    loadAnalytics();
+    return () => {
+      isMounted = false;
+    };
+  }, [activeCourseId]);
 
   // Enrich assignments with calculated data
-  const enrichedAssignments = assignments.map((assignment) => {
-    const average = calculateAssignmentAverage(assignment.id, students);
-    const avgTime = generateAvgTime(assignment.id);
-    const submissions = students.filter(
-      (student) => student.grades[assignment.id] !== undefined
-    ).length;
-    const totalStudents = course?.studentCount || students.length || 0;
+  const enrichedAssignments = useMemo(() => {
+    const summaryMap = new Map(
+      (gradebookSummary || []).map((item) => [item.id, item])
+    );
+    const statsMap = new Map(
+      (analytics.assignmentStats || []).map((item) => [item.id, item])
+    );
 
-    return {
-      ...assignment,
-      average,
-      avgTime,
-      submissions,
-      totalStudents,
-      // Format due date for display
-      dueDate: new Date(assignment.dueDate).toLocaleDateString(),
-    };
-  });
+    return assignments.map((assignment) => {
+      const summary = summaryMap.get(assignment.id);
+      const stats = statsMap.get(assignment.id);
+      const averagePercent = summary?.avg_percent ?? null;
+      const average =
+        averagePercent !== null && averagePercent !== undefined
+          ? Math.round(averagePercent * 100)
+          : calculateAssignmentAverage(assignment.id, students);
+      const submissions =
+        stats?.students_submitted ??
+        students.filter((student) => student.grades[assignment.id] !== undefined)
+          .length;
+
+      return {
+        ...assignment,
+        average,
+        avgAttempts: stats?.avg_attempt ?? null,
+        submissions,
+        totalStudents,
+        dueDate: assignment.dueDate
+          ? new Date(assignment.dueDate).toLocaleDateString()
+          : "—",
+        lateSubmissions: null,
+      };
+    });
+  }, [assignments, analytics.assignmentStats, gradebookSummary, students, totalStudents]);
 
   // Pass the course's grading scale to calculateGradeDistribution
   const gradeDistribution = calculateGradeDistribution(
@@ -47,22 +99,18 @@ export default function InstructorDashboard() {
     course?.gradingScale
   );
 
-  const totalAverage =
-    enrichedAssignments.length > 0
-      ? Math.round(
-          enrichedAssignments.reduce((sum, a) => sum + a.average, 0) /
-            enrichedAssignments.length
-        )
-      : 0;
+  const totalAverage = enrichedAssignments.length > 0
+    ? Math.round(
+        enrichedAssignments.reduce((sum, a) => sum + a.average, 0) /
+          enrichedAssignments.length
+      )
+    : 0;
 
   const totalSubmissions = enrichedAssignments.reduce(
     (sum, a) => sum + a.submissions,
     0
   );
-  const totalPossible = enrichedAssignments.reduce(
-    (sum, a) => sum + a.totalStudents,
-    0
-  );
+  const totalPossible = totalStudents * assignments.length;
   const completionRate =
     totalPossible > 0
       ? Math.round((totalSubmissions / totalPossible) * 100)
@@ -74,7 +122,7 @@ export default function InstructorDashboard() {
   };
 
   // Show message if no course selected
-  if (!activeCourseId || !course) {
+    if (!activeCourseId || !course) {
     return (
       <Box sx={{ p: 4 }}>
         <Typography variant="h4" fontWeight={600} mb={2}>
@@ -118,27 +166,27 @@ export default function InstructorDashboard() {
           gap: 3,
         }}
       >
-        <MetricCard
-          title="Class Average"
-          value={`${totalAverage}%`}
-          subtitle="Across all assignments"
-          icon={TrendingUp}
-          gradient={["#10b981", "#059669"]}
-        />
-        <MetricCard
-          title="Completion Rate"
-          value={`${completionRate}%`}
-          subtitle={`${totalSubmissions} of ${totalPossible}`}
-          icon={CheckCircle}
-          gradient={["#3b82f6", "#2563eb"]}
-        />
-        <MetricCard
-          title="Total Students"
-          value={students.length}
-          subtitle="Enrolled in course"
-          icon={Users}
-          gradient={["#8b5cf6", "#7c3aed"]}
-        />
+      <MetricCard
+        title="Class Average"
+        value={`${totalAverage}%`}
+        subtitle="Across all assignments"
+        icon={TrendingUp}
+        gradient={["#10b981", "#059669"]}
+      />
+      <MetricCard
+        title="Completion Rate"
+        value={`${completionRate}%`}
+        subtitle={`${totalSubmissions} of ${totalPossible}`}
+        icon={CheckCircle}
+        gradient={["#3b82f6", "#2563eb"]}
+      />
+      <MetricCard
+        title="Total Students"
+        value={totalStudents}
+        subtitle="Enrolled in course"
+        icon={Users}
+        gradient={["#8b5cf6", "#7c3aed"]}
+      />
         <MetricCard
           title="Assignments"
           value={assignments.length}

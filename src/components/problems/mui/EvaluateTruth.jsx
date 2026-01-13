@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useId } from 'react'
 import { Box, Stack, Radio, RadioGroup, FormControlLabel, FormControl, Alert } from '@mui/material'
 import ProblemSetButtons from './ProblemSetButtons.jsx'
 import { useProblemChecker } from '../../../hooks/useProblemChecker.js'
@@ -18,6 +18,10 @@ export default function EvaluateTruth({
   const [selectedValue, setSelectedValue] = useState(
     savedState?.ans !== undefined ? (savedState.ans ? 'true' : 'false') : ''
   )
+  const baseId = useId()
+  const groupName = assignmentQuestionId
+    ? `evaluate-truth-${assignmentQuestionId}`
+    : `evaluate-truth-${baseId}`
   
   const { status, message, isChecking, handleCheck, handleStartOver, getStatusColor, setStatus, setMessage, isLocked } = useProblemChecker({
     answer,
@@ -68,7 +72,7 @@ export default function EvaluateTruth({
               <RadioGroup
                 value={selectedValue}
                 onChange={handleChange}
-                name="evaluate-truth"
+                name={groupName}
               >
                 <FormControlLabel
                   value="true"
@@ -117,7 +121,7 @@ export default function EvaluateTruth({
       )}
       <SolutionReveal show={showSolution}>
         <FormControl component="fieldset" sx={{ width: '100%' }}>
-          <RadioGroup value={answer ? 'true' : 'false'} name="evaluate-truth-reveal">
+          <RadioGroup value={answer ? 'true' : 'false'} name={`${groupName}-reveal`}>
             <FormControlLabel value="true" control={<Radio disabled />} label="True" />
             <FormControlLabel value="false" control={<Radio disabled />} label="False" />
           </RadioGroup>

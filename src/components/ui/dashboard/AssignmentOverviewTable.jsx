@@ -100,10 +100,7 @@ export const AssignmentOverviewTable = ({
           student.lateSubmissions?.[assignmentId]
       ).length;
 
-    const numericId = parseInt(String(assignmentId ?? "").replace(/\D/g, "")) || 0;
-    const avgTime =
-      assignment.avgTime ??
-      ["2.5 hrs", "3.2 hrs", "1.8 hrs", "4.1 hrs", "2.9 hrs"][numericId % 5];
+    const avgAttempts = assignment.avgAttempts ?? null;
 
     return {
       ...assignment,
@@ -113,7 +110,7 @@ export const AssignmentOverviewTable = ({
       submissions,
       average,
       lateSubmissions,
-      avgTime,
+      avgAttempts,
       totalStudents,
     };
   });
@@ -267,7 +264,7 @@ export const AssignmentOverviewTable = ({
                   align="center"
                   sx={{ fontWeight: 600, fontSize: 13 }}
                 >
-                  Avg Time
+                  Avg Attempts
                 </TableCell>
                 <TableCell
                   align="center"
@@ -352,9 +349,11 @@ export const AssignmentOverviewTable = ({
                       </Box>
                     </TableCell>
                     <TableCell align="center">
-                      <MuiTooltip title="Average time students spent">
+                      <MuiTooltip title="Average attempts per student">
                         <Typography variant="body2" color="text.secondary">
-                          {assignment.avgTime}
+                          {assignment.avgAttempts !== null && assignment.avgAttempts !== undefined
+                            ? Number(assignment.avgAttempts).toFixed(1)
+                            : "—"}
                         </Typography>
                       </MuiTooltip>
                     </TableCell>

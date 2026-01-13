@@ -82,7 +82,7 @@ const CustomLineTooltip = ({ active, payload }) => {
               fontWeight={600}
               color={data.lateSubmissions > 0 ? "warning.main" : "text.primary"}
             >
-              {data.lateSubmissions}
+              {data.lateSubmissions ?? "—"}
             </Typography>
           </Box>
           <Box
@@ -93,10 +93,12 @@ const CustomLineTooltip = ({ active, payload }) => {
             }}
           >
             <Typography variant="body2" color="text.secondary">
-              Avg Time:
+              Avg attempts:
             </Typography>
             <Typography variant="body2" fontWeight={600}>
-              {data.avgTime || "N/A"}
+              {data.avgAttempts !== null && data.avgAttempts !== undefined
+                ? Number(data.avgAttempts).toFixed(1)
+                : "—"}
             </Typography>
           </Box>
         </Stack>
