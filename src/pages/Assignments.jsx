@@ -77,12 +77,20 @@ export default function Assignments() {
         const completionResults = await Promise.all(
           gradedAssignments.map(async (assignment) => {
             try {
-              const submissions = await fetchJson(
-                `/api/assignments/${assignment.id}/submissions?userId=${userId}`
+              const [submissions, assignmentDetail] = await Promise.all([
+                fetchJson(`/api/assignments/${assignment.id}/submissions?userId=${userId}`),
+                fetchJson(`/api/assignments/${assignment.id}?userId=${userId}`),
+              ])
+              const questionCount = Array.isArray(assignmentDetail?.questions)
+                ? assignmentDetail.questions.length
+                : 0
+              if (questionCount === 0) return null
+              const answered = new Set(
+                (Array.isArray(submissions) ? submissions : [])
+                  .map((submission) => submission.assignment_question_id)
+                  .filter(Boolean)
               )
-              return Array.isArray(submissions) && submissions.length > 0
-                ? assignment.id
-                : null
+              return answered.size >= questionCount ? assignment.id : null
             } catch (submissionError) {
               console.warn('Failed to load submissions', submissionError)
               return null
