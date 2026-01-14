@@ -205,6 +205,20 @@ export default function Worksheet() {
         }
       }
 
+      if (type === 'indirect-truth-table') {
+        return {
+          ...proofBase,
+          type: 'indirect-truth-table',
+          answer: snapshot.answerIndex ?? snapshot.answer,
+          indirectTruthTable: {
+            prompt: snapshot.prompt || '',
+            argument: snapshot.argument || {},
+            choices: snapshot.choices || ['Valid', 'Invalid'],
+            sandbox: snapshot.sandbox || {},
+          },
+        }
+      }
+
       if (type === 'true-false') {
         return {
           ...proofBase,
@@ -246,6 +260,14 @@ export default function Worksheet() {
             interpretation: snapshot.interpretation || {},
             prompt: snapshot.prompt || snapshot.description || '',
           },
+        }
+      }
+
+      if (type === 'partial-truth-table') {
+        return {
+          ...proofBase,
+          type: 'partial-truth-table',
+          partialTruthTable: snapshot,
         }
       }
 
@@ -377,6 +399,15 @@ export default function Worksheet() {
           return
         }
 
+        if (proof.type === 'partial-truth-table') {
+          if (Array.isArray(data.row)) {
+            initialStates[proof.id] = {
+              row: data.row.map(toSymbol),
+            }
+          }
+          return
+        }
+
         if (proof.type === 'combo-translation-truth-table') {
           const translations = Array.isArray(data?.translations) ? data.translations : []
           const chosenConclusion = data?.chosenConclusion ?? null
@@ -399,6 +430,18 @@ export default function Worksheet() {
             )
           }
           initialStates[proof.id] = initial
+          return
+        }
+
+        if (proof.type === 'indirect-truth-table') {
+          if (data && typeof data === 'object') {
+            initialStates[proof.id] = {
+              ans: data.ans ?? data.answer ?? '',
+              sandboxRow: Array.isArray(data.sandboxRow) ? data.sandboxRow : [],
+            }
+          } else {
+            initialStates[proof.id] = { ans: data }
+          }
           return
         }
 

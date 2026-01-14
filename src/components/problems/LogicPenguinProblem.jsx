@@ -6,6 +6,8 @@ import EvaluateTruth from './mui/EvaluateTruth.jsx'
 // import ValidCorrectSound from './mui/ValidCorrectSound.jsx'
 import SingleRowTruthTable from './mui/SingleRowTruthTable.jsx'
 import ComboTranslationTruthTable from './mui/ComboTranslationTruthTable.jsx'
+import IndirectTruthTable from './mui/IndirectTruthTable.jsx'
+import PartialTruthTable from './mui/PartialTruthTable.jsx'
 
 export default function LogicPenguinProblem({ 
   proof, 
@@ -136,6 +138,34 @@ export default function LogicPenguinProblem({
     return (
       <ComboTranslationTruthTable
         proof={proof}
+        attemptLimit={proof.attemptLimit}
+        assignmentQuestionId={proof.questionId}
+        onStateChange={handleStateChange}
+        onComplete={handleComplete}
+        savedState={localState}
+      />
+    )
+  } else if (proof.type === 'indirect-truth-table') {
+    const problemData = proof.indirectTruthTable || {
+      prompt: proof.description || '',
+      choices: proof.choices || [],
+    }
+    return (
+      <IndirectTruthTable
+        problem={problemData}
+        answer={proof.answer}
+        attemptLimit={proof.attemptLimit}
+        assignmentQuestionId={proof.questionId}
+        onStateChange={handleStateChange}
+        onComplete={handleComplete}
+        savedState={localState}
+      />
+    )
+  } else if (proof.type === 'partial-truth-table') {
+    const problemData = proof.partialTruthTable || proof.description || {}
+    return (
+      <PartialTruthTable
+        problem={problemData}
         attemptLimit={proof.attemptLimit}
         assignmentQuestionId={proof.questionId}
         onStateChange={handleStateChange}
