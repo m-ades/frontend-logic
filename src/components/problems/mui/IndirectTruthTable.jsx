@@ -15,6 +15,7 @@ import {
   RadioGroup,
   FormControlLabel,
   FormControl,
+  Button,
 } from '@mui/material'
 import getFormulaClass from '../../../lib/logicpenguin/symbolic/formula.js'
 import getSyntax from '../../../lib/logicpenguin/symbolic/libsyntax.js'
@@ -165,11 +166,16 @@ export default function IndirectTruthTable({
   const [selectedValue, setSelectedValue] = useState(
     savedState?.ans !== undefined ? String(savedState.ans) : ''
   )
-  const [sandboxRow, setSandboxRow] = useState(() => {
-    if (Array.isArray(savedState?.sandboxRow)) {
-      return defaultRow.map((_, idx) => toSymbol(savedState.sandboxRow[idx]) || '')
+  const [sandboxRows, setSandboxRows] = useState(() => {
+    if (Array.isArray(savedState?.sandboxRows) && savedState.sandboxRows.length > 0) {
+      return savedState.sandboxRows.map((row) =>
+        defaultRow.map((_, idx) => toSymbol(row?.[idx]) || '')
+      )
     }
-    return defaultRow
+    if (Array.isArray(savedState?.sandboxRow)) {
+      return [defaultRow.map((_, idx) => toSymbol(savedState.sandboxRow[idx]) || '')]
+    }
+    return [defaultRow]
   })
 
   useEffect(() => {
@@ -177,26 +183,43 @@ export default function IndirectTruthTable({
   }, [savedState?.ans])
 
   useEffect(() => {
-    if (Array.isArray(savedState?.sandboxRow)) {
-      setSandboxRow(defaultRow.map((_, idx) => toSymbol(savedState.sandboxRow[idx]) || ''))
-    } else {
-      setSandboxRow(defaultRow)
+    if (Array.isArray(savedState?.sandboxRows) && savedState.sandboxRows.length > 0) {
+      setSandboxRows(
+        savedState.sandboxRows.map((row) =>
+          defaultRow.map((_, idx) => toSymbol(row?.[idx]) || '')
+        )
+      )
+      return
     }
-  }, [defaultRow, savedState?.sandboxRow])
+    if (Array.isArray(savedState?.sandboxRow)) {
+      setSandboxRows([defaultRow.map((_, idx) => toSymbol(savedState.sandboxRow[idx]) || '')])
+    } else {
+      setSandboxRows([defaultRow])
+    }
+  }, [defaultRow, savedState?.sandboxRow, savedState?.sandboxRows])
 
   const handleChoiceChange = (event) => {
     if (readOnly) return
     const nextValue = event.target.value
     setSelectedValue(nextValue)
-    onStateChange?.({ ans: parseInt(nextValue), sandboxRow })
+    onStateChange?.({ ans: parseInt(nextValue), sandboxRows })
   }
 
-  const handleSandboxChange = (index, value) => {
+  const handleSandboxChange = (rowIndex, colIndex, value) => {
     if (readOnly) return
-    setSandboxRow((prev) => {
-      const next = [...prev]
-      next[index] = value
-      onStateChange?.({ ans: parseInt(selectedValue), sandboxRow: next })
+    setSandboxRows((prev) => {
+      const next = prev.map((row, idx) => (idx === rowIndex ? [...row] : row))
+      next[rowIndex][colIndex] = value
+      onStateChange?.({ ans: parseInt(selectedValue), sandboxRows: next })
+      return next
+    })
+  }
+
+  const handleAddRow = () => {
+    if (readOnly) return
+    setSandboxRows((prev) => {
+      const next = [...prev, [...defaultRow]]
+      onStateChange?.({ ans: parseInt(selectedValue), sandboxRows: next })
       return next
     })
   }
@@ -206,14 +229,14 @@ export default function IndirectTruthTable({
       answer,
       problemType: 'indirect-truth-table',
       question: problem,
-      getAnswer: () => ({ ans: parseInt(selectedValue), sandboxRow }),
+      getAnswer: () => ({ ans: parseInt(selectedValue), sandboxRows }),
       onComplete,
       isDisabled: () => selectedValue === '',
       resetInput: () => {
-        const reset = labels.map((_, idx) => defaultRow[idx] ?? '')
+        const reset = [labels.map((_, idx) => defaultRow[idx] ?? '')]
         setSelectedValue('')
-        setSandboxRow(reset)
-        onStateChange?.({ ans: '', sandboxRow: reset })
+        setSandboxRows(reset)
+        onStateChange?.({ ans: '', sandboxRows: reset })
       },
       onStateChange,
       assignmentQuestionId,
@@ -272,7 +295,7 @@ export default function IndirectTruthTable({
             {sandboxColumns.length > 0 && (
               <Box>
                 <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                  Sandbox row (not graded)
+                  Sandbox (not graded)
                 </Typography>
                 <TableContainer component={Paper} className="tt-table-wrap" elevation={0}>
                   <Table className="tt-table">
@@ -291,31 +314,38 @@ export default function IndirectTruthTable({
                       </TableRow>
                     </TableHead>
                     <TableBody>
-                      <TableRow className="tt-row">
-                        {sandboxColumns.map((col, idx) => {
-                          if (col.separator) {
+                      {sandboxRows.map((row, rowIndex) => (
+                        <TableRow key={`itt-row-${rowIndex}`} className="tt-row">
+                          {sandboxColumns.map((col, idx) => {
+                            if (col.separator) {
+                              return (
+                                <TableCell key={`itt-cell-${rowIndex}-${idx}`} className="tt-cell" align="center" />
+                              )
+                            }
+                            const dataIndex = sandboxColumns
+                              .slice(0, idx)
+                              .filter((c) => !c.separator).length
                             return (
-                              <TableCell key={`itt-cell-${idx}`} className="tt-cell" align="center" />
+                              <TableCell key={`itt-cell-${rowIndex}-${idx}`} className="tt-cell" align="center">
+                                <TruthToggle
+                                  value={row?.[dataIndex] ?? ''}
+                                  onChange={(value) => handleSandboxChange(rowIndex, dataIndex, value)}
+                                  ariaLabel={`Sandbox row ${rowIndex + 1} col ${dataIndex + 1}`}
+                                  readOnly={readOnly}
+                                />
+                              </TableCell>
                             )
-                          }
-                          const dataIndex = sandboxColumns
-                            .slice(0, idx)
-                            .filter((c) => !c.separator).length
-                          return (
-                            <TableCell key={`itt-cell-${idx}`} className="tt-cell" align="center">
-                              <TruthToggle
-                                value={sandboxRow[dataIndex] ?? ''}
-                                onChange={(value) => handleSandboxChange(dataIndex, value)}
-                                ariaLabel={`Sandbox row col ${dataIndex + 1}`}
-                                readOnly={readOnly}
-                              />
-                            </TableCell>
-                          )
-                        })}
-                      </TableRow>
+                          })}
+                        </TableRow>
+                      ))}
                     </TableBody>
                   </Table>
                 </TableContainer>
+                <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 1 }}>
+                  <Button size="small" variant="outlined" onClick={handleAddRow} disabled={readOnly}>
+                    + Add row
+                  </Button>
+                </Box>
               </Box>
             )}
 

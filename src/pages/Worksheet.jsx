@@ -438,6 +438,7 @@ export default function Worksheet() {
             initialStates[proof.id] = {
               ans: data.ans ?? data.answer ?? '',
               sandboxRow: Array.isArray(data.sandboxRow) ? data.sandboxRow : [],
+              sandboxRows: Array.isArray(data.sandboxRows) ? data.sandboxRows : [],
             }
           } else {
             initialStates[proof.id] = { ans: data }
