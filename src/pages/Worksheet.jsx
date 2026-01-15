@@ -16,6 +16,7 @@ export default function Worksheet() {
   const [isLoading, setIsLoading] = useState(true)
   const [loadError, setLoadError] = useState('')
   const [gradePercent, setGradePercent] = useState(null)
+  const [currentDueDate, setCurrentDueDate] = useState(null)
   const { activeCourseId } = useCoursesState()
   const courseId = activeCourseId ?? API_CONFIG.courseId
   const sessionId = useRef(null)
@@ -165,10 +166,12 @@ export default function Worksheet() {
         const percent = total > 0 && score !== null ? (score / total) * 100 : null
         if (isMounted) {
           setGradePercent(percent)
+          setCurrentDueDate(currentWorksheet?.due_date ?? null)
         }
       } catch (error) {
         if (isMounted) {
           setGradePercent(null)
+          setCurrentDueDate(null)
         }
       }
     }
@@ -529,6 +532,7 @@ export default function Worksheet() {
       const worksheet = {
         id: assignmentInfo.id,
         title: assignmentInfo.title,
+        due_date: assignmentInfo.due_date,
         proofs: questions.map((question, idx) =>
           mapQuestionToProof(question, assignmentInfo, idx)
         ),
@@ -675,6 +679,7 @@ export default function Worksheet() {
       score={score}
       total={currentWorksheet.proofs.length || 0}
       gradePercent={gradePercent}
+      dueDate={currentWorksheet?.due_date || currentDueDate}
       scoreStyle={scoreStyle}
       currentProofId={currentProof?.id}
       completedProofs={completedProofs}
