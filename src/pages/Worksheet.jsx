@@ -15,11 +15,13 @@ export default function Worksheet() {
   const [worksheets, setWorksheets] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const [loadError, setLoadError] = useState('')
+  const [gradePercent, setGradePercent] = useState(null)
   const { activeCourseId } = useCoursesState()
   const courseId = activeCourseId ?? API_CONFIG.courseId
   const sessionId = useRef(null)
   const questionSessionId = useRef(null)
   const activeUserId = getActiveUserId()
+  const gradesCache = useRef(null)
   
   // support both /assignment/:id and /worksheet/:id routes
   // assignmentId will be used when backend is implemented
@@ -33,7 +35,13 @@ export default function Worksheet() {
   const currentWorksheet = worksheets[currentWorksheetIndex]
   const currentProof = currentWorksheet?.proofs[currentProofIndex]
   
-  const { completedProofs, score, scoreStyle, handleProofComplete } = useScoring(currentWorksheet)
+  const {
+    completedProofs,
+    score,
+    scoreStyle,
+    handleProofComplete,
+    setCompletedProofs,
+  } = useScoring(currentWorksheet)
   const { getSavedProofState, handleProofStateChange, initializeSavedProofStates } = useProofState()
 
   useEffect(() => {
@@ -135,6 +143,42 @@ export default function Worksheet() {
       endQuestion()
     }
   }, [currentProof?.questionId])
+
+  useEffect(() => {
+    let isMounted = true
+
+    const loadGradePercent = async () => {
+      if (!currentWorksheet?.id || !activeUserId) return
+      try {
+        if (!gradesCache.current) {
+          const grades = await fetchJson(`/api/users/${activeUserId}/grades`)
+          gradesCache.current = new Map(
+            (grades || []).map((grade) => [
+              Number(grade.assignment_id ?? grade.Assignment?.id),
+              grade,
+            ])
+          )
+        }
+        const grade = gradesCache.current.get(Number(currentWorksheet.id))
+        const total = grade?.max_score || 0
+        const score = grade?.final_score ?? grade?.raw_score ?? null
+        const percent = total > 0 && score !== null ? (score / total) * 100 : null
+        if (isMounted) {
+          setGradePercent(percent)
+        }
+      } catch (error) {
+        if (isMounted) {
+          setGradePercent(null)
+        }
+      }
+    }
+
+    loadGradePercent()
+
+    return () => {
+      isMounted = false
+    }
+  }, [activeUserId, currentWorksheet?.id])
 
   useEffect(() => {
     let isMounted = true
@@ -341,6 +385,7 @@ export default function Worksheet() {
       }
 
       const submissionMap = new Map()
+      const submittedQuestionIds = new Set()
       const attemptCountMap = new Map()
       const worksheetsWithProofs = worksheetData.filter((worksheet) => worksheet.proofs.length)
       await Promise.all(
@@ -350,13 +395,15 @@ export default function Worksheet() {
               `/api/assignments/${worksheet.id}/submissions?userId=${activeUserId}`
             )
             submissions.forEach((submission) => {
-              const existing = submissionMap.get(submission.assignment_question_id)
+              const questionId = Number(submission.assignment_question_id)
+              const existing = submissionMap.get(questionId)
               if (!existing || new Date(submission.submitted_at) > new Date(existing.submitted_at)) {
-                submissionMap.set(submission.assignment_question_id, submission)
+                submissionMap.set(questionId, submission)
               }
-              const currentAttempt = attemptCountMap.get(submission.assignment_question_id) || 0
+              submittedQuestionIds.add(questionId)
+              const currentAttempt = attemptCountMap.get(questionId) || 0
               if (submission.attempt > currentAttempt) {
-                attemptCountMap.set(submission.assignment_question_id, submission.attempt)
+                attemptCountMap.set(questionId, submission.attempt)
               }
             })
           } catch (err) {
@@ -461,7 +508,14 @@ export default function Worksheet() {
       })
 
       initializeSavedProofStates(initialStates)
-      return attemptCountMap
+      const completedProofIds = new Set()
+      questionIds.forEach((questionId) => {
+        if (!submittedQuestionIds.has(questionId)) return
+        const proof = proofMeta[questionId]
+        if (!proof) return
+        completedProofIds.add(proof.id)
+      })
+      return { attemptCountMap, completedProofIds }
     }
 
     const loadWorksheetDetails = async (assignmentId, assignmentMeta) => {
@@ -479,7 +533,8 @@ export default function Worksheet() {
           mapQuestionToProof(question, assignmentInfo, idx)
         ),
       }
-      const attemptCountMap = await loadSavedStates([worksheet])
+      const { attemptCountMap, completedProofIds } = await loadSavedStates([worksheet])
+      setCompletedProofs(completedProofIds)
       return {
         ...worksheet,
         proofs: worksheet.proofs.map((proof) => ({
@@ -619,6 +674,7 @@ export default function Worksheet() {
       subtitle={currentWorksheet.title || "Predicate Logic: Natural Deduction"}
       score={score}
       total={currentWorksheet.proofs.length || 0}
+      gradePercent={gradePercent}
       scoreStyle={scoreStyle}
       currentProofId={currentProof?.id}
       completedProofs={completedProofs}

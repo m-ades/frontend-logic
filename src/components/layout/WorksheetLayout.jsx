@@ -12,6 +12,7 @@ export default function Layout({
   subtitle, 
   score, 
   total, 
+  gradePercent,
   scoreStyle, 
   currentProofId, 
   completedProofs, 
@@ -25,6 +26,9 @@ export default function Layout({
 }) {
   const [dropdownOpen, setDropdownOpen] = useState(false)
   const completionPercent = total > 0 ? Math.round((score / total) * 100) : 0
+  const gradeLabel = Number.isFinite(gradePercent)
+    ? `${gradePercent.toFixed(1)}%`
+    : '—'
   const [isTouchDevice] = useState(() => {
     if (typeof window === 'undefined') return false
     return window.matchMedia && window.matchMedia('(hover: none)').matches
@@ -64,7 +68,7 @@ export default function Layout({
 
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap', mb: 2 }}>
           <Chip
-            label={`Completion: ${completionPercent}%`}
+            label={`Total score: ${gradeLabel}`}
             color={completionPercent === 100 && total > 0 ? 'success' : 'default'}
             icon={completionPercent === 100 && total > 0 ? <CheckCircleIcon /> : undefined}
             sx={{
