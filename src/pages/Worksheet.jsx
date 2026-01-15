@@ -197,12 +197,14 @@ export default function Worksheet() {
       const proofId = `${assignment.id}-${question.id}`
       const solution = snapshot.solution
       const attemptLimit = question?.attempt_limit ?? 3
+      const legend = snapshot.legend || snapshot.legend_text || snapshot.legendText || ''
       const proofBase = {
         id: proofId,
         questionId: question.id,
         description,
         solution,
         attemptLimit,
+        legend,
       }
 
       if (type === 'derivation' || type === 'derivation-hurley') {
@@ -235,7 +237,11 @@ export default function Worksheet() {
         return {
           ...proofBase,
           type: 'symbolic-translation',
-          translation: snapshot.prompt || snapshot.statement || snapshot.question || '',
+          translation: {
+            legend: snapshot.legend || '',
+            prompt: snapshot.prompt || snapshot.statement || snapshot.question || '',
+            options: snapshot.options || {},
+          },
           answer: snapshot.answer,
         }
       }

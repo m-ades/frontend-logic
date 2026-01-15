@@ -22,6 +22,8 @@ export default function SymbolicTranslation({
   const [inputValue, setInputValue] = useState(savedState?.ans || '')
   const formulaInputRef = useRef(null)
   const solutionInputRef = useRef(null)
+  const hasHydratedRef = useRef(false)
+  const legend = problem?.legend || problem?.question_snapshot?.legend
 
   const FormulaInputField = ({ value, onValueChange, fieldReadOnly, formulaInputRef }) => {
     const containerRef = useRef(null)
@@ -117,7 +119,12 @@ export default function SymbolicTranslation({
         formulaInputRef.current.value = ''
       }
     },
-    onStateChange,
+    onStateChange: (state) => {
+      if (state?.ans !== undefined) {
+        setInputValue(state.ans)
+      }
+      onStateChange?.(state)
+    },
     assignmentQuestionId,
     attemptLimit,
     initialAttemptCount: savedState?.attemptCount ?? 0,
@@ -125,7 +132,9 @@ export default function SymbolicTranslation({
   const showSolution = isLocked
 
   useEffect(() => {
+    if (hasHydratedRef.current) return
     if (savedState?.ans !== undefined) {
+      hasHydratedRef.current = true
       setInputValue(savedState.ans)
     }
   }, [savedState?.ans])
@@ -145,6 +154,11 @@ export default function SymbolicTranslation({
         >
           <Stack spacing={3} sx={{ p: { xs: 2, md: 2 } }}>
             <Box>
+              {legend && (
+                <Typography variant="body2" sx={{ mb: 1, color: 'text.secondary', whiteSpace: 'pre-line' }}>
+                  {legend}
+                </Typography>
+              )}
               <Typography variant="body2" sx={{ mb: 1, color: 'text.secondary' }}>
                 Your translation:
               </Typography>
@@ -153,7 +167,6 @@ export default function SymbolicTranslation({
                 onValueChange={(value) => {
                   if (readOnly) return
                   setInputValue(value)
-                  onStateChange?.({ ans: value })
                 }}
                 fieldReadOnly={readOnly}
                 formulaInputRef={formulaInputRef}

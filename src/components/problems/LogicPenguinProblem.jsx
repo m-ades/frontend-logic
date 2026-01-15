@@ -45,6 +45,15 @@ export default function LogicPenguinProblem({
   
   if (proof.type === 'symbolic-translation') {
     problemData = proof.translation || proof.description || ''
+    if (typeof problemData === 'string') {
+      problemData = { prompt: problemData, legend: proof.legend || '' }
+    } else {
+      problemData = {
+        legend: proof.legend ?? problemData.legend ?? '',
+        prompt: problemData.prompt || proof.description || '',
+        question_snapshot: proof.snapshot || {},
+      }
+    }
     return (
       <SymbolicTranslation
         problem={problemData}
