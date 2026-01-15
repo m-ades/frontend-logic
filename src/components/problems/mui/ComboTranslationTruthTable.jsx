@@ -85,6 +85,9 @@ export default function ComboTranslationTruthTable({
   }
 
   const parseStatus = useMemo(() => {
+    if (!argumentLine) {
+      return { ok: false, reason: '', parsed: null }
+    }
     const parsed = parseArgumentLine(argumentLine)
     if (parsed.error) {
       return { ok: false, reason: parsed.error, parsed: null }
@@ -210,7 +213,9 @@ export default function ComboTranslationTruthTable({
         </Box>
       </Box>
 
-      {!parseStatus.ok && <Alert severity="info">{parseStatus.reason}</Alert>}
+      {!parseStatus.ok && parseStatus.reason && (
+        <Alert severity="info">{parseStatus.reason}</Alert>
+      )}
 
       {message && <Alert severity={getStatusColor()} onClose={() => setMessage('')}>{message}</Alert>}
 
