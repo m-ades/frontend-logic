@@ -6,7 +6,7 @@ import Sidebar from "./Sidebar.jsx";
 import StudentSidebarStructure from "./StudentSidebarStructure.jsx";
 import InstructorSidebarStructure from "./InstructorSidebarStructure.jsx";
 import { useAuthState, useAuthDispatch, logout } from "../../context/AuthContext";
-import { useCoursesDispatch, initializeCourses } from "../../context/CoursesContext";
+import { useCoursesDispatch, useCoursesState, initializeCourses } from "../../context/CoursesContext";
 import { clearStoredUser, fetchJson } from "../../utils/api.js";
 import { isInstructorRole } from "../../utils/auth.js";
 
@@ -16,13 +16,14 @@ export default function AppLayout({ children }) {
   const { user } = useAuthState();
   const authDispatch = useAuthDispatch();
   const coursesDispatch = useCoursesDispatch();
+  const { initialized } = useCoursesState();
   const mainContentRef = useRef(null);
 
   useEffect(() => {
-    if (user?.role) {
+    if (user?.role && !initialized) {
       initializeCourses(coursesDispatch);
     }
-  }, [user?.role, coursesDispatch]);
+  }, [user?.role, initialized, coursesDispatch]);
 
   useEffect(() => {
     const timer = setTimeout(() => {

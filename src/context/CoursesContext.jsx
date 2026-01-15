@@ -98,18 +98,49 @@ export async function fetchInstructorCourses() {
     .map((course, index) => mapCourseRecord(course, index));
 }
 
+const assignmentsListCache = new Map();
+
+async function fetchCourseAssignmentsList(courseId) {
+  const cached = getAssignmentsListCache(courseId);
+  if (cached) {
+    return cached;
+  }
+  const promise = fetchJson(`/api/courses/${courseId}/assignments`)
+    .finally(() => {
+      assignmentsListCache.delete(courseId);
+    });
+  assignmentsListCache.set(courseId, promise);
+  return promise;
+}
+
+function getAssignmentsListCache(courseId) {
+  if (!assignmentsListCache.has(courseId)) {
+    return null;
+  }
+  return assignmentsListCache.get(courseId);
+}
+
 export async function fetchCourseAssignments(courseId) {
-  const assignments = await fetchJson(`/api/courses/${courseId}/assignments`);
+  const assignments = await fetchCourseAssignmentsList(courseId);
   return (assignments || [])
     .filter((assignment) => assignment.kind !== "practice")
     .map((assignment) => mapAssignmentRecord(assignment));
 }
 
 export async function fetchCoursePractices(courseId) {
-  const assignments = await fetchJson(`/api/courses/${courseId}/assignments`);
+  const assignments = await fetchCourseAssignmentsList(courseId);
   return (assignments || [])
     .filter((assignment) => assignment.kind === "practice")
     .map((assignment) => mapAssignmentRecord(assignment));
+}
+
+export async function fetchCourseAssignmentsAndPractices(courseId) {
+  const assignments = await fetchCourseAssignmentsList(courseId);
+  const mapped = (assignments || []).map((assignment) => mapAssignmentRecord(assignment));
+  return {
+    assignments: mapped.filter((assignment) => assignment.kind !== "practice"),
+    practices: mapped.filter((assignment) => assignment.kind === "practice"),
+  };
 }
 
 export async function fetchCourseGradebook(courseId) {
@@ -642,76 +673,85 @@ export async function deleteStudent(courseId, studentId) {
 
 // Initialize all courses and data
 export async function initializeCourses(dispatch) {
-  try {
-    dispatch({ type: "SET_LOADING", payload: true });
+  if (initializeCourses.inFlight) {
+    return initializeCourses.inFlight;
+  }
 
-    const courses = await fetchInstructorCourses();
-    const storedUser = getStoredUser();
-    const isInstructor = isInstructorRole(storedUser?.role);
-    const coursesWithCounts = await Promise.all(
-      courses.map(async (course) => {
-        if (!isInstructor) {
-          return course;
-        }
-        try {
-          const enrollments = await fetchJson(`/api/courses/${course.id}/enrollments`);
-          const studentCount = (enrollments || []).filter(
-            (enrollment) => enrollment.role === "student"
-          ).length;
-          return { ...course, studentCount };
-        } catch (error) {
-          return course;
-        }
-      })
-    );
+  initializeCourses.inFlight = (async () => {
+    try {
+      dispatch({ type: "SET_LOADING", payload: true });
 
-    dispatch({ type: "SET_COURSES", payload: coursesWithCounts });
-
-    // Set active course - prioritize last created course
-    if (coursesWithCounts.length > 0) {
-      const sortedCourses = [...coursesWithCounts].sort((a, b) => {
-        if (a.createdAt && b.createdAt) {
-          return new Date(b.createdAt) - new Date(a.createdAt);
-        }
-        const idA = parseInt(a.id) || 0;
-        const idB = parseInt(b.id) || 0;
-        return idB - idA;
-      });
-
-      const mostRecentCourse = sortedCourses[0];
-      dispatch({ type: "SET_ACTIVE_COURSE", payload: mostRecentCourse.id });
-
-      // Load data for all courses in parallel
-      await Promise.all(
-        coursesWithCounts.map(async (course) => {
-          const [assignments, practices, gradebook] = await Promise.all([
-            fetchCourseAssignments(course.id),
-            fetchCoursePractices(course.id),
-            isInstructor ? fetchCourseGradebook(course.id) : Promise.resolve([]),
-          ]);
-
-          dispatch({
-            type: "SET_ASSIGNMENTS",
-            courseId: course.id,
-            payload: assignments,
-          });
-          dispatch({
-            type: "SET_PRACTICES",
-            courseId: course.id,
-            payload: practices,
-          });
-          dispatch({
-            type: "SET_GRADEBOOK",
-            courseId: course.id,
-            payload: gradebook,
-          });
+      const courses = await fetchInstructorCourses();
+      const storedUser = getStoredUser();
+      const isInstructor = isInstructorRole(storedUser?.role);
+      const coursesWithCounts = await Promise.all(
+        courses.map(async (course) => {
+          if (!isInstructor) {
+            return course;
+          }
+          try {
+            const enrollments = await fetchJson(`/api/courses/${course.id}/enrollments`);
+            const studentCount = (enrollments || []).filter(
+              (enrollment) => enrollment.role === "student"
+            ).length;
+            return { ...course, studentCount };
+          } catch (error) {
+            return course;
+          }
         })
       );
+
+      dispatch({ type: "SET_COURSES", payload: coursesWithCounts });
+
+      // Set active course - prioritize last created course
+      if (coursesWithCounts.length > 0) {
+        const sortedCourses = [...coursesWithCounts].sort((a, b) => {
+          if (a.createdAt && b.createdAt) {
+            return new Date(b.createdAt) - new Date(a.createdAt);
+          }
+          const idA = parseInt(a.id) || 0;
+          const idB = parseInt(b.id) || 0;
+          return idB - idA;
+        });
+
+        const mostRecentCourse = sortedCourses[0];
+        dispatch({ type: "SET_ACTIVE_COURSE", payload: mostRecentCourse.id });
+
+        // Load data for all courses in parallel
+        await Promise.all(
+          coursesWithCounts.map(async (course) => {
+            const [assignmentData, gradebook] = await Promise.all([
+              fetchCourseAssignmentsAndPractices(course.id),
+              isInstructor ? fetchCourseGradebook(course.id) : Promise.resolve([]),
+            ]);
+
+            dispatch({
+              type: "SET_ASSIGNMENTS",
+              courseId: course.id,
+              payload: assignmentData.assignments,
+            });
+            dispatch({
+              type: "SET_PRACTICES",
+              courseId: course.id,
+              payload: assignmentData.practices,
+            });
+            dispatch({
+              type: "SET_GRADEBOOK",
+              courseId: course.id,
+              payload: gradebook,
+            });
+          })
+        );
+      }
+    } catch (error) {
+      dispatch({ type: "SET_ERROR", payload: error.message });
+      console.error("Failed to initialize courses:", error);
+    } finally {
+      initializeCourses.inFlight = null;
     }
-  } catch (error) {
-    dispatch({ type: "SET_ERROR", payload: error.message });
-    console.error("Failed to initialize courses:", error);
-  }
+  })();
+
+  return initializeCourses.inFlight;
 }
 
 // Load data for a specific course
@@ -722,14 +762,13 @@ export async function loadCourseData(dispatch, courseId) {
     const storedUser = getStoredUser();
     const isInstructor = isInstructorRole(storedUser?.role);
 
-    const [assignments, practices, gradebook] = await Promise.all([
-      fetchCourseAssignments(courseId),
-      fetchCoursePractices(courseId),
+    const [assignmentData, gradebook] = await Promise.all([
+      fetchCourseAssignmentsAndPractices(courseId),
       isInstructor ? fetchCourseGradebook(courseId) : Promise.resolve([]),
     ]);
 
-    dispatch({ type: "SET_ASSIGNMENTS", courseId, payload: assignments });
-    dispatch({ type: "SET_PRACTICES", courseId, payload: practices });
+    dispatch({ type: "SET_ASSIGNMENTS", courseId, payload: assignmentData.assignments });
+    dispatch({ type: "SET_PRACTICES", courseId, payload: assignmentData.practices });
     dispatch({ type: "SET_GRADEBOOK", courseId, payload: gradebook });
     dispatch({ type: "SET_LOADING", payload: false });
   } catch (error) {
