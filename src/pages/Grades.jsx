@@ -39,12 +39,7 @@ export default function Grades() {
           assignment,
           grade: gradeMap.get(assignment.id) || null,
         }))
-        const extraGrades = (grades || []).filter((grade) => !assignmentIds.has(grade.assignment_id))
-        const withExtras = [
-          ...entries,
-          ...extraGrades.map((grade) => ({ assignment: grade.Assignment || null, grade })),
-        ]
-        const sorted = withExtras.sort((a, b) => {
+        const sorted = entries.sort((a, b) => {
           const aDate = a.assignment?.due_date || a.grade?.graded_at
           const bDate = b.assignment?.due_date || b.grade?.graded_at
           if (!aDate && !bDate) return 0
