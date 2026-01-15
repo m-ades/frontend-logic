@@ -108,6 +108,17 @@
 .logicpenguin .tt-divider {
   border-right: 2px solid var(--lpgray4) !important;
 }
+.logicpenguin .tt-separator {
+  background: #f0f0f0;
+  font-weight: 600;
+  color: inherit;
+}
+.logicpenguin .tt-separator-cell {
+  background: #f5f5f5;
+  font-weight: 600;
+  color: inherit;
+  user-select: none;
+}
 
 .logicpenguin .tt-row:nth-child(even) {
   background: #f9fafc;

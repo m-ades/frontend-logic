@@ -9,6 +9,8 @@ import {
   FormControlLabel,
   FormLabel,
   Checkbox,
+  RadioGroup,
+  Radio,
   Table,
   TableBody,
   TableCell,
@@ -229,6 +231,26 @@ export default function TruthTableEditor({
   const attemptLimit = proof?.attemptLimit ?? 3
   const assignmentQuestionId = Number(proof?.questionId || 0)
   const [mcSelection, setMcSelection] = React.useState([])
+  const updateClassificationSelection = React.useCallback((next) => {
+    setMcSelection(next)
+    onStateChange?.({
+      tables: tableInputs.map((rows) => ({ rows })),
+      mcans: next,
+      taut: next.includes('tautology'),
+      contra: next.includes('self-contradiction'),
+      valid: next.includes('valid'),
+      equiv: next.includes('equivalent'),
+      classification: {
+        mcans: next,
+        taut: next.includes('tautology'),
+        contra: next.includes('self-contradiction'),
+      },
+    })
+    if (status !== 'unanswered') {
+      setStatus('unanswered')
+      setMessage('')
+    }
+  }, [onStateChange, status, tableInputs])
 
   React.useEffect(() => {
     const normalizeSavedSelection = () => {
@@ -529,47 +551,28 @@ export default function TruthTableEditor({
 
   const renderTableSet = (tablesToRender, tableInputsToRender, combined, readOnly, onCellChange, showConclusionMarker) => {
     if (combined) {
+      const rowCount = tablesToRender[0]?.rows?.length || 0
       return (
         <TableContainer component={Paper} className="tt-table-wrap" elevation={0}>
           <Table className="tt-table">
             <TableHead className="tt-head">
-              <TableRow className="tt-group-row">
-                {tablesToRender.map((table, tableIndex) => {
-                  const isConclusion = showConclusionMarker && tableIndex === tablesToRender.length - 1 && tablesToRender.length > 1
-                  return (
-                    <TableCell
-                      key={`solution-group-${tableIndex}`}
-                      colSpan={table.tokens.length || 1}
-                      className={
-                        isConclusion
-                          ? 'tt-group tt-conclusion'
-                          : tableIndex < tablesToRender.length - 1
-                            ? 'tt-group tt-divider'
-                            : 'tt-group'
-                      }
-                      align="center"
-                    >
-                      {isConclusion ? '// ' : ''}
-                      {table.label || ''}
-                    </TableCell>
-                  )
-                })}
-              </TableRow>
               <TableRow className="tt-token-row">
                 {tablesToRender.map((table, tableIndex) => {
                   const isConclusion = showConclusionMarker && tableIndex === tablesToRender.length - 1 && tablesToRender.length > 1
+                  const isSeparator = tableIndex > 0
                   const headerTokens = table.headerTokens && table.headerTokens.length > 0 ? table.headerTokens : table.tokens
                   return (
                     <React.Fragment key={`solution-tokenfrag-${tableIndex}`}>
+                      {isSeparator && (
+                        <TableCell className="tt-token tt-separator" align="center">
+                          {isConclusion ? '//' : '/'}
+                        </TableCell>
+                      )}
                       {headerTokens.map((token, tokenIndex) => (
                         <TableCell
                           key={`solution-header-${tableIndex}-${tokenIndex}`}
                           className={
-                            isConclusion
-                              ? 'tt-token tt-conclusion'
-                              : tokenIndex === headerTokens.length - 1 && tableIndex < tablesToRender.length - 1
-                                ? 'tt-token tt-divider'
-                                : 'tt-token'
+                            isConclusion && tokenIndex === 0 ? 'tt-token tt-conclusion' : 'tt-token'
                           }
                           align="center"
                         >
@@ -582,22 +585,22 @@ export default function TruthTableEditor({
               </TableRow>
             </TableHead>
             <TableBody>
-              {(tablesToRender[0]?.rows ?? []).map((_, rowIndex) => (
+              {Array.from({ length: rowCount }, (_, rowIndex) => (
                 <TableRow key={`solution-row-${rowIndex}`} className="tt-row">
                   {tablesToRender.map((table, tableIndex) => {
                     const isConclusion = showConclusionMarker && tableIndex === tablesToRender.length - 1 && tablesToRender.length > 1
                     return (
                       <React.Fragment key={`solution-rowfrag-${tableIndex}`}>
+                        {tableIndex > 0 && (
+                          <TableCell className="tt-cell tt-separator-cell" align="center">
+                            {/* separator column intentionally blank */}
+                          </TableCell>
+                        )}
                         {table.rows[rowIndex].map((_, colIndex) => (
                           <TableCell
                             key={`solution-cell-${tableIndex}-${rowIndex}-${colIndex}`}
                             className={
-                              isConclusion
-                                ? 'tt-cell tt-conclusion-cell'
-                                : colIndex === table.tokens.length - 1 &&
-                                  tableIndex < tablesToRender.length - 1
-                                  ? 'tt-cell tt-divider'
-                                  : 'tt-cell'
+                              isConclusion && colIndex === 0 ? 'tt-cell tt-conclusion-cell' : 'tt-cell'
                             }
                             align="center"
                           >
@@ -713,44 +716,48 @@ export default function TruthTableEditor({
         {classificationEnabled && classificationOptions.length > 0 && (
           <Box sx={{ width: '100%' }}>
             <FormControl component="fieldset" variant="standard">
-              <FormLabel component="legend">Select all that apply</FormLabel>
-              <FormGroup>
-                {classificationOptions.map((option) => (
-                  <FormControlLabel
-                    key={option.value}
-                    control={
-                      <Checkbox
-                        checked={mcSelection.includes(option.value)}
-                        onChange={(event) => {
-                          const checked = event.target.checked
-                          const next = checked
-                            ? [...mcSelection, option.value]
-                            : mcSelection.filter((v) => v !== option.value)
-                          setMcSelection(next)
-                          onStateChange?.({
-                            tables: tableInputs.map((rows) => ({ rows })),
-                            mcans: next,
-                            taut: next.includes('tautology'),
-                            contra: next.includes('self-contradiction'),
-                            valid: next.includes('valid'),
-                            equiv: next.includes('equivalent'),
-                            classification: {
-                              mcans: next,
-                              taut: next.includes('tautology'),
-                              contra: next.includes('self-contradiction'),
-                            },
-                          })
-                          if (status !== 'unanswered') {
-                            setStatus('unanswered')
-                            setMessage('')
-                          }
-                        }}
-                      />
-                    }
-                    label={option.label}
-                  />
-                ))}
-              </FormGroup>
+              <FormLabel component="legend">
+                {kind === 'argument' ? 'Is this argument valid or invalid?' : 'Select all that apply'}
+              </FormLabel>
+              {kind === 'argument' ? (
+                <RadioGroup
+                  value={mcSelection[0] || ''}
+                  onChange={(event) => {
+                    const next = event.target.value ? [event.target.value] : []
+                    updateClassificationSelection(next)
+                  }}
+                >
+                  {classificationOptions.map((option) => (
+                    <FormControlLabel
+                      key={option.value}
+                      value={option.value}
+                      control={<Radio />}
+                      label={option.label}
+                    />
+                  ))}
+                </RadioGroup>
+              ) : (
+                <FormGroup>
+                  {classificationOptions.map((option) => (
+                    <FormControlLabel
+                      key={option.value}
+                      control={
+                        <Checkbox
+                          checked={mcSelection.includes(option.value)}
+                          onChange={(event) => {
+                            const checked = event.target.checked
+                            const next = checked
+                              ? [...mcSelection, option.value]
+                              : mcSelection.filter((v) => v !== option.value)
+                            updateClassificationSelection(next)
+                          }}
+                        />
+                      }
+                      label={option.label}
+                    />
+                  ))}
+                </FormGroup>
+              )}
             </FormControl>
           </Box>
         )}
