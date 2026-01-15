@@ -97,11 +97,21 @@ export default function Grades() {
         const score = grade?.final_score ?? grade?.raw_score ?? null
         const percentage = total > 0 && score !== null ? (score / total) * 100 : null
 
+        const noSubmission = grade
+          && (grade.final_score ?? 0) === 0
+          && (grade.raw_score ?? 0) === 0
+          && grade.graded_by == null
+        const submittedLabel = noSubmission
+          ? 'No submission'
+          : grade?.graded_at
+            ? formatDateTime(grade.graded_at)
+            : '—'
+
         return {
           id: assignment.id ?? entry.grade?.id ?? `grade-${index}`,
           assignment: assignment.title || 'Assignment',
           due: assignment.due_date ? formatDateTime(assignment.due_date) : '—',
-          submitted: grade?.graded_at ? formatDateTime(grade.graded_at) : '—',
+          submitted: submittedLabel,
           percent: percentage !== null ? `${percentage.toFixed(1)}%` : '—'
         }
       }),
