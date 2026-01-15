@@ -73,30 +73,17 @@ export default function Assignments() {
 
         setCourseStructure(buildCourseStructure(gradedAssignments, 'Assignments'))
 
-        const userId = getActiveUserId()
-        const completionResults = await Promise.all(
-          gradedAssignments.map(async (assignment) => {
-            try {
-              const [submissions, assignmentDetail] = await Promise.all([
-                fetchJson(`/api/assignments/${assignment.id}/submissions?userId=${userId}`),
-                fetchJson(`/api/assignments/${assignment.id}?userId=${userId}`),
-              ])
-              const questionCount = Array.isArray(assignmentDetail?.questions)
-                ? assignmentDetail.questions.length
-                : 0
-              if (questionCount === 0) return null
-              const answered = new Set(
-                (Array.isArray(submissions) ? submissions : [])
-                  .map((submission) => submission.assignment_question_id)
-                  .filter(Boolean)
-              )
-              return answered.size >= questionCount ? assignment.id : null
-            } catch (submissionError) {
-              console.warn('Failed to load submissions', submissionError)
-              return null
-            }
-          })
-        )
+        const completionResults = gradedAssignments.map((assignment) => {
+          const completedFlag = assignment.completed === true
+            || assignment.completed === 'true'
+            || assignment.completed === 1
+            || assignment.completed === 't'
+          if (completedFlag) return assignment.id
+          const questionCount = Number(assignment.question_count) || 0
+          const answeredCount = Number(assignment.answered_count) || 0
+          if (questionCount === 0) return null
+          return answeredCount >= questionCount ? assignment.id : null
+        })
         if (isMounted) {
           setCompletedAssignments(new Set(completionResults.filter(Boolean)))
         }
