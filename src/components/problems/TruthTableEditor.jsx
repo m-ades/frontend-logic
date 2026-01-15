@@ -459,7 +459,7 @@ export default function TruthTableEditor({
           onProofComplete?.(proof.id)
         } else {
           setStatus('incorrect')
-          setMessage(validation.message || validation.transmessage || 'Incorrect. Please try again.')
+          setMessage(validation.message || validation.transmessage || 'Incorrect.')
         }
       } else {
         setAttemptCount((prev) => Math.min(prev + 1, attemptLimit))
@@ -471,7 +471,7 @@ export default function TruthTableEditor({
           setStatus('incorrect')
           setMessage(classificationEnabled && mcSelection.length === 0
             ? 'Select a classification before submitting.'
-            : 'Incorrect. Please try again.'
+            : 'Incorrect.'
           )
         }
       }
@@ -780,12 +780,12 @@ export default function TruthTableEditor({
       <Typography
         variant="body2"
         sx={{
-          color: tableCorrect ? '#76b947' : tableFilled ? '#d58b00' : '#2f6bff',
+          color: tableCorrect ? '#2f6bff' : tableFilled ? '#d58b00' : '#2f6bff',
           fontWeight: tableFilled ? 600 : 500,
         }}
       >
         {tableCorrect
-          ? 'All rows match!'
+          ? 'All rows match.'
           : tableFilled
             ? 'Table filled. Check your rows.'
             : 'Complete every cell to finish.'}
