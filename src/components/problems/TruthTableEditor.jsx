@@ -800,6 +800,7 @@ export default function TruthTableEditor({
       {message && (
         <Alert
           severity={status === 'correct' ? 'success' : status === 'incorrect' ? 'error' : 'info'}
+          variant="filled"
           onClose={() => setMessage('')}
         >
           {message}

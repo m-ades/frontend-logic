@@ -210,9 +210,6 @@ export default function Profile() {
             <Button variant="outlined" color="primary">
               Change Password
             </Button>
-            <Button variant="outlined" color="error">
-              Delete Account
-            </Button>
           </Stack>
         </CardContent>
       </ThemedCard>

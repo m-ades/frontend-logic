@@ -105,9 +105,6 @@
   min-width: 2.2rem;
 }
 
-.logicpenguin .tt-divider {
-  border-right: 2px solid var(--lpgray4) !important;
-}
 .logicpenguin .tt-separator {
   background: #f0f0f0;
   font-weight: 600;
@@ -129,12 +126,10 @@
 }
 
 .logicpenguin .tt-conclusion {
-  border-left: 2px solid var(--lpgray4) !important;
   background: #f1f4ff;
 }
 
 .logicpenguin .tt-conclusion-cell {
-  border-left: 2px solid var(--lpgray4) !important;
   background: #f7f9ff;
 }
 
