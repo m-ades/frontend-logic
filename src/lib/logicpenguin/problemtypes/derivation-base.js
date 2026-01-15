@@ -643,7 +643,7 @@ export default class DerivationExercise extends LogicPenguinProblem {
             }
             if (ch != '') { ch += '</tbody></table>' };
             if (ind?.successstatus === 'incorrect' && ch != '' && !ind?.fromautocheck) {
-                ch = '<div class="derivationstatus error">Incorrect. Please try again.</div>' + ch;
+                ch = '<div class="derivationstatus error">Incorrect.</div>' + ch;
             }
             // don't report errors if they're only natural errors for an
             // incomplete problem

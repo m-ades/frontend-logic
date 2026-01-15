@@ -53,7 +53,7 @@ export function useProblemChecker({
           onComplete?.()
         } else {
           setStatus('incorrect')
-          setMessage(validation.message || validation.transmessage || 'Incorrect. Please try again.')
+          setMessage(validation.message || validation.transmessage || 'Incorrect.')
         }
       } else {
         const result = await localCheck({
@@ -77,7 +77,7 @@ export function useProblemChecker({
           onComplete?.()
         } else {
           setStatus('incorrect')
-          setMessage(result.message || result.transmessage || 'Incorrect. Please try again.')
+          setMessage(result.message || result.transmessage || 'Incorrect.')
         }
       }
     } catch (err) {
