@@ -195,12 +195,17 @@ export default function Assignments() {
             )}
           </Box>
           <Stack spacing={1} alignItems="flex-end">
-            <Chip
-              label={activity.type === ACTIVITY_TYPES.HOMEWORK ? 'Homework' : activity.type === ACTIVITY_TYPES.QUIZ ? 'Quiz' : 'Exam'}
-              size="small"
-              color="primary"
-              variant="outlined"
-            />
+            <Stack direction="row" spacing={1} alignItems="center">
+              <Chip
+                label={activity.type === ACTIVITY_TYPES.HOMEWORK ? 'Homework' : activity.type === ACTIVITY_TYPES.QUIZ ? 'Quiz' : 'Exam'}
+                size="small"
+                color="primary"
+                variant="outlined"
+              />
+              {activity.dueDate && new Date(activity.dueDate) < new Date() && (
+                <Chip label="Past due" size="small" color="error" />
+              )}
+            </Stack>
             <Typography variant="body2" color="text.secondary">
               {datePrefix}{formatDateTime(activity.dueDate) || 'No due date'}
             </Typography>
