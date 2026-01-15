@@ -107,12 +107,17 @@ export default function Sidebar({ structure, location, onSignOut }) {
       sx={{
         width: isSidebarOpened ? DRAWER_WIDTH : 85,
         flexShrink: 0,
+        transition: theme.transitions.create(["width", "transform"], {
+          easing: theme.transitions.easing.easeInOut,
+          duration: theme.transitions.duration.standard,
+        }),
         "& .MuiDrawer-paper": {
           width: isSidebarOpened ? DRAWER_WIDTH : 85,
-          transition: theme.transitions.create("width", {
-            easing: theme.transitions.easing.sharp,
-            duration: theme.transitions.duration.enteringScreen,
+          transition: theme.transitions.create(["width", "transform"], {
+            easing: theme.transitions.easing.easeInOut,
+            duration: theme.transitions.duration.standard,
           }),
+          willChange: "width, transform",
           overflowX: "hidden",
           borderRight: "1px solid",
           borderColor: "divider",
