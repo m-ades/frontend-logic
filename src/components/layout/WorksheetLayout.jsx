@@ -108,7 +108,9 @@ export default function Layout({
                 }}
               >
                 {worksheets.map((worksheet, idx) => {
-                  const worksheetCompleted = worksheet.proofs.every(p => completedProofs.has(p.id))
+                  const worksheetCompleted = worksheet.proofs.length > 0
+                    ? worksheet.proofs.every((p) => completedProofs.has(p.id))
+                    : false
                   return (
                     <MenuItem key={worksheet.id} value={idx}>
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, width: '100%' }}>

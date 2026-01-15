@@ -342,8 +342,9 @@ export default function Worksheet() {
 
       const submissionMap = new Map()
       const attemptCountMap = new Map()
+      const worksheetsWithProofs = worksheetData.filter((worksheet) => worksheet.proofs.length)
       await Promise.all(
-        worksheetData.map(async (worksheet) => {
+        worksheetsWithProofs.map(async (worksheet) => {
           try {
             const submissions = await fetchJson(
               `/api/assignments/${worksheet.id}/submissions?userId=${activeUserId}`
@@ -463,38 +464,81 @@ export default function Worksheet() {
       return attemptCountMap
     }
 
+    const loadWorksheetDetails = async (assignmentId, assignmentMeta) => {
+      const response = await fetchJson(
+        `/api/assignments/${assignmentId}?userId=${activeUserId}`
+      )
+      const questions = response.questions || []
+      const assignmentInfo = response.assignment
+        || assignmentMeta
+        || { id: assignmentId, title: 'Assignment' }
+      const worksheet = {
+        id: assignmentInfo.id,
+        title: assignmentInfo.title,
+        proofs: questions.map((question, idx) =>
+          mapQuestionToProof(question, assignmentInfo, idx)
+        ),
+      }
+      const attemptCountMap = await loadSavedStates([worksheet])
+      return {
+        ...worksheet,
+        proofs: worksheet.proofs.map((proof) => ({
+          ...proof,
+          attemptCount: attemptCountMap?.get(proof.questionId) ?? 0,
+        })),
+      }
+    }
+
     const loadWorksheets = async () => {
-      setIsLoading(true)
       setLoadError('')
       try {
         if (!courseId) return
-        const assignments = await fetchJson(`/api/courses/${courseId}/assignments`)
-        const worksheetData = await Promise.all(
-          assignments.map(async (assignment) => {
-            const response = await fetchJson(
-              `/api/assignments/${assignment.id}?userId=${activeUserId}`
-            )
-            const questions = response.questions || []
-            return {
-              id: assignment.id,
-              title: assignment.title,
-              proofs: questions.map((question, idx) =>
-                mapQuestionToProof(question, assignment, idx)
-              ),
+        const targetAssignmentId = Number.isFinite(worksheetIdNum) ? worksheetIdNum : null
+
+        if (worksheets.length && targetAssignmentId) {
+          const existingIndex = worksheets.findIndex((worksheet) => worksheet.id === targetAssignmentId)
+          if (existingIndex !== -1) {
+            const existing = worksheets[existingIndex]
+            if (existing.proofs.length) {
+              if (isMounted) {
+                setIsLoading(false)
+              }
+              return
             }
-          })
-        )
+            setIsLoading(true)
+            const loaded = await loadWorksheetDetails(targetAssignmentId, existing)
+            if (isMounted) {
+              setWorksheets((prev) => prev.map((worksheet, idx) => (
+                idx === existingIndex ? loaded : worksheet
+              )))
+              setIsLoading(false)
+            }
+            return
+          }
+        }
+
+        setIsLoading(true)
+        const assignments = await fetchJson(`/api/courses/${courseId}/assignments`)
+        const fallbackAssignmentId = targetAssignmentId || assignments?.[0]?.id
+        if (!fallbackAssignmentId) {
+          if (isMounted) {
+            setWorksheets([])
+            setIsLoading(false)
+          }
+          return
+        }
+        const assignmentMeta = assignments.find((assignment) => assignment.id === fallbackAssignmentId)
+        const loadedWorksheet = await loadWorksheetDetails(fallbackAssignmentId, assignmentMeta)
+        const worksheetData = assignments?.length
+          ? assignments.map((assignment) => (
+            assignment.id === fallbackAssignmentId
+              ? loadedWorksheet
+              : { id: assignment.id, title: assignment.title, proofs: [] }
+          ))
+          : [loadedWorksheet]
 
         if (isMounted) {
-          const attemptCountMap = await loadSavedStates(worksheetData)
-          const worksheetDataWithAttempts = worksheetData.map((worksheet) => ({
-            ...worksheet,
-            proofs: worksheet.proofs.map((proof) => ({
-              ...proof,
-              attemptCount: attemptCountMap?.get(proof.questionId) ?? 0,
-            })),
-          }))
-          setWorksheets(worksheetDataWithAttempts)
+          setWorksheets(worksheetData)
         }
       } catch (error) {
         if (isMounted) {
@@ -514,7 +558,7 @@ export default function Worksheet() {
     return () => {
       isMounted = false
     }
-  }, [activeUserId, courseId])
+  }, [activeUserId, courseId, worksheetIdNum, worksheets])
 
   const handleWorksheetChange = (newIndex) => {
     const newWorksheet = worksheets[newIndex]
