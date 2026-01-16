@@ -171,10 +171,23 @@ export default function LogicPenguinProblem({
       prompt: proof.description || '',
       choices: proof.choices || [],
     }
+    const questions = Array.isArray(problemData?.questions) && problemData.questions.length > 0
+      ? problemData.questions
+      : (Array.isArray(problemData?.choices) && problemData.choices.length > 0
+        ? [{
+            prompt: problemData?.choicePrompt || '',
+            choices: problemData.choices,
+            answerIndex: proof.answerIndex ?? proof.answer ?? (Array.isArray(proof.answerIndices) ? proof.answerIndices[0] : undefined),
+          }]
+        : [])
+    const derivedAnswer = questions.length
+      ? questions.map((q) => q.answerIndex ?? q.answer ?? q.correctIndex)
+      : proof.answer
+    const normalizedProblem = { ...problemData, questions, subquestions: questions }
     return (
       <IndirectTruthTable
-        problem={problemData}
-        answer={proof.answer}
+        problem={normalizedProblem}
+        answer={derivedAnswer}
         attemptLimit={proof.attemptLimit}
         assignmentQuestionId={proof.questionId}
         onStateChange={handleStateChange}

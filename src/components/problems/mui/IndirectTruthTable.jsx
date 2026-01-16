@@ -113,7 +113,19 @@ export default function IndirectTruthTable({
   const Formula = useMemo(() => getFormulaClass(), [])
   const prompt = problem?.prompt || ''
   const argument = problem?.argument || {}
-  const choices = problem?.choices || []
+  const mcQuestions = useMemo(() => {
+    if (Array.isArray(problem?.questions) && problem.questions.length > 0) {
+      return problem.questions
+    }
+    if (Array.isArray(problem?.choices) && problem.choices.length > 0) {
+      return [{
+        prompt: problem?.choicePrompt || '',
+        choices: problem.choices,
+        answerIndex: problem?.answerIndex ?? problem?.answer,
+      }]
+    }
+    return []
+  }, [problem?.answer, problem?.answerIndex, problem?.choicePrompt, problem?.choices, problem?.questions])
   const layout = argument?.layout
   const labels = useMemo(() => getArgumentLabels(argument), [argument])
   const sandboxColumns = useMemo(() => {
@@ -163,9 +175,20 @@ export default function IndirectTruthTable({
   )
   const defaultRow = useMemo(() => Array(sandboxCellCount).fill(''), [sandboxCellCount])
 
-  const [selectedValue, setSelectedValue] = useState(
-    savedState?.ans !== undefined ? String(savedState.ans) : ''
-  )
+  const buildInitialSelections = () => {
+    if (Array.isArray(savedState?.answers) && savedState.answers.length) {
+      return mcQuestions.map((_, idx) => {
+        const saved = savedState.answers[idx]
+        return saved !== undefined && saved !== null ? String(saved) : ''
+      })
+    }
+    if (savedState?.ans !== undefined && mcQuestions.length > 0) {
+      return mcQuestions.map((_, idx) => (idx === 0 ? String(savedState.ans) : ''))
+    }
+    return mcQuestions.map(() => '')
+  }
+
+  const [selectedValues, setSelectedValues] = useState(buildInitialSelections)
   const [sandboxRows, setSandboxRows] = useState(() => {
     if (Array.isArray(savedState?.sandboxRows) && savedState.sandboxRows.length > 0) {
       return savedState.sandboxRows.map((row) =>
@@ -179,8 +202,8 @@ export default function IndirectTruthTable({
   })
 
   useEffect(() => {
-    setSelectedValue(savedState?.ans !== undefined ? String(savedState.ans) : '')
-  }, [savedState?.ans])
+    setSelectedValues(buildInitialSelections())
+  }, [savedState?.ans, savedState?.answers, mcQuestions])
 
   useEffect(() => {
     if (Array.isArray(savedState?.sandboxRows) && savedState.sandboxRows.length > 0) {
@@ -198,11 +221,15 @@ export default function IndirectTruthTable({
     }
   }, [defaultRow, savedState?.sandboxRow, savedState?.sandboxRows])
 
-  const handleChoiceChange = (event) => {
+  const handleChoiceChange = (index, value) => {
     if (readOnly) return
-    const nextValue = event.target.value
-    setSelectedValue(nextValue)
-    onStateChange?.({ ans: parseInt(nextValue), sandboxRows })
+    setSelectedValues((prev) => {
+      const next = [...prev]
+      next[index] = value
+      const answers = next.map((val) => (val === '' ? '' : parseInt(val, 10)))
+      onStateChange?.({ answers, ans: answers[0] ?? '', sandboxRows })
+      return next
+    })
   }
 
   const handleSandboxChange = (rowIndex, colIndex, value) => {
@@ -210,7 +237,8 @@ export default function IndirectTruthTable({
     setSandboxRows((prev) => {
       const next = prev.map((row, idx) => (idx === rowIndex ? [...row] : row))
       next[rowIndex][colIndex] = value
-      onStateChange?.({ ans: parseInt(selectedValue), sandboxRows: next })
+      const answers = selectedValues.map((val) => (val === '' ? '' : parseInt(val, 10)))
+      onStateChange?.({ answers, ans: answers[0] ?? '', sandboxRows: next })
       return next
     })
   }
@@ -219,7 +247,8 @@ export default function IndirectTruthTable({
     if (readOnly) return
     setSandboxRows((prev) => {
       const next = [...prev, [...defaultRow]]
-      onStateChange?.({ ans: parseInt(selectedValue), sandboxRows: next })
+      const answers = selectedValues.map((val) => (val === '' ? '' : parseInt(val, 10)))
+      onStateChange?.({ answers, ans: answers[0] ?? '', sandboxRows: next })
       return next
     })
   }
@@ -229,14 +258,18 @@ export default function IndirectTruthTable({
       answer,
       problemType: 'indirect-truth-table',
       question: problem,
-      getAnswer: () => ({ ans: parseInt(selectedValue), sandboxRows }),
+      getAnswer: () => ({
+        answers: selectedValues.map((val) => (val === '' ? '' : parseInt(val, 10))),
+        ans: selectedValues[0] === '' ? '' : parseInt(selectedValues[0], 10),
+        sandboxRows,
+      }),
       onComplete,
-      isDisabled: () => selectedValue === '',
+      isDisabled: () => selectedValues.some((val) => val === '') || mcQuestions.length === 0,
       resetInput: () => {
-        const reset = [labels.map((_, idx) => defaultRow[idx] ?? '')]
-        setSelectedValue('')
+        const reset = [[...defaultRow]]
+        setSelectedValues(mcQuestions.map(() => ''))
         setSandboxRows(reset)
-        onStateChange?.({ ans: '', sandboxRows: reset })
+        onStateChange?.({ answers: mcQuestions.map(() => ''), ans: '', sandboxRows: reset })
       },
       onStateChange,
       assignmentQuestionId,
@@ -350,20 +383,35 @@ export default function IndirectTruthTable({
             )}
 
             <FormControl component="fieldset" sx={{ width: '100%' }}>
-              <RadioGroup value={selectedValue} onChange={handleChoiceChange} name="indirect-truth-table-choice">
-                {choices.map((choice, index) => (
-                  <FormControlLabel
-                    key={`${choice}-${index}`}
-                    value={String(index)}
-                    control={<Radio disabled={readOnly || isLocked} />}
-                    label={choice}
-                    sx={{
-                      mb: 1,
-                      '& .MuiFormControlLabel-label': { fontSize: '1rem' },
-                    }}
-                  />
+              <Stack spacing={2}>
+                {mcQuestions.map((mcq, qIdx) => (
+                  <Box key={`itt-mc-${qIdx}`} sx={{ width: '100%' }}>
+                    {mcq.prompt && (
+                      <Typography variant="body1" sx={{ mb: 1, fontWeight: 500 }}>
+                        {mcq.prompt}
+                      </Typography>
+                    )}
+                    <RadioGroup
+                      value={selectedValues[qIdx] ?? ''}
+                      onChange={(event) => handleChoiceChange(qIdx, event.target.value)}
+                      name={`indirect-truth-table-choice-${qIdx}`}
+                    >
+                      {(mcq.choices || []).map((choice, index) => (
+                        <FormControlLabel
+                          key={`${choice}-${index}`}
+                          value={String(index)}
+                          control={<Radio disabled={readOnly || isLocked} />}
+                          label={choice}
+                          sx={{
+                            mb: 1,
+                            '& .MuiFormControlLabel-label': { fontSize: '1rem' },
+                          }}
+                        />
+                      ))}
+                    </RadioGroup>
+                  </Box>
                 ))}
-              </RadioGroup>
+              </Stack>
             </FormControl>
           </Stack>
         </Box>
@@ -380,7 +428,7 @@ export default function IndirectTruthTable({
           onCheck={handleCheck}
           onStartOver={handleStartOver}
           isChecking={isChecking}
-          isDisabled={selectedValue === '' || isLocked}
+          isDisabled={mcQuestions.length === 0 || selectedValues.some((val) => val === '') || isLocked}
           align="flex-start"
         />
       )}

@@ -259,14 +259,30 @@ export default function Worksheet() {
       }
 
       if (type === 'indirect-truth-table') {
+        const snapshotQuestions = snapshot.questions || snapshot.subquestions || []
+        const choiceList = Array.isArray(snapshot.choices) ? snapshot.choices : []
+        const questions = Array.isArray(snapshotQuestions) && snapshotQuestions.length > 0
+          ? snapshotQuestions
+          : (choiceList.length > 0
+            ? [{
+                prompt: snapshot.choicePrompt || snapshot.question || '',
+                choices: choiceList,
+                answerIndex: snapshot.answerIndex ?? snapshot.answer ?? (Array.isArray(snapshot.answerIndices) ? snapshot.answerIndices[0] : undefined),
+              }]
+            : [])
+        const derivedAnswer = questions.length
+          ? questions.map((q) => q.answerIndex ?? q.answer ?? q.correctIndex)
+          : (snapshot.answerIndex ?? snapshot.answer ?? snapshot.answerIndices)
         return {
           ...proofBase,
           type: 'indirect-truth-table',
-          answer: snapshot.answerIndex ?? snapshot.answer,
+          answer: derivedAnswer,
           indirectTruthTable: {
             prompt: snapshot.prompt || '',
             argument: snapshot.argument || {},
-            choices: snapshot.choices || ['Valid', 'Invalid'],
+            questions,
+            subquestions: questions,
+            choices: choiceList,
             sandbox: snapshot.sandbox || {},
           },
         }
@@ -527,7 +543,8 @@ export default function Worksheet() {
         if (proof.type === 'indirect-truth-table') {
           if (data && typeof data === 'object') {
             initialStates[proof.id] = {
-              ans: data.ans ?? data.answer ?? '',
+              ans: data.ans ?? data.answer ?? (Array.isArray(data.answers) ? data.answers[0] : ''),
+              answers: Array.isArray(data.answers) ? data.answers : undefined,
               sandboxRow: Array.isArray(data.sandboxRow) ? data.sandboxRow : [],
               sandboxRows: Array.isArray(data.sandboxRows) ? data.sandboxRows : [],
             }
