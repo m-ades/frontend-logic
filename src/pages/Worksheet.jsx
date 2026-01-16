@@ -335,6 +335,17 @@ export default function Worksheet() {
         }
       }
 
+      if (type === 'combo-translation-derivation') {
+        return {
+          ...proofBase,
+          description: '',
+          type: 'combo-translation-derivation',
+          answer: snapshot.answer,
+          options: snapshot.options,
+          comboTranslationDerivation: snapshot,
+        }
+      }
+
       return {
         ...proofBase,
         type,
@@ -485,6 +496,29 @@ export default function Worksheet() {
               data.tableAns.right,
               data.tableAns
             )
+          }
+          initialStates[proof.id] = initial
+          return
+        }
+
+        if (proof.type === 'combo-translation-derivation') {
+          const translations = Array.isArray(data?.translations) ? data.translations : []
+          const chosenConclusion = data?.chosenConclusion ?? null
+          let argumentLine = data?.argumentLine ?? data?.argument ?? ''
+          if (!argumentLine && translations.length > 0 && chosenConclusion !== null) {
+            const premiseTranslations = translations.filter((_, idx) => idx !== chosenConclusion)
+            const conclusionTranslation = translations[chosenConclusion] ?? ''
+            if (premiseTranslations.length && conclusionTranslation) {
+              argumentLine = `${premiseTranslations.join(' / ')} // ${conclusionTranslation}`
+            }
+          }
+          const initial = { argumentLine }
+          if (data?.derivationState) {
+            initial.derivationState = data.derivationState
+          } else if (data?.proof) {
+            initial.derivationState = { ans: data.proof }
+          } else if (data?.ans) {
+            initial.derivationState = data.ans
           }
           initialStates[proof.id] = initial
           return

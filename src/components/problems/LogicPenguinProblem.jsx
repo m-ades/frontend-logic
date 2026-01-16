@@ -6,6 +6,7 @@ import EvaluateTruth from './mui/EvaluateTruth.jsx'
 // import ValidCorrectSound from './mui/ValidCorrectSound.jsx'
 import SingleRowTruthTable from './mui/SingleRowTruthTable.jsx'
 import ComboTranslationTruthTable from './mui/ComboTranslationTruthTable.jsx'
+import ComboTranslationDerivation from './mui/ComboTranslationDerivation.jsx'
 import IndirectTruthTable from './mui/IndirectTruthTable.jsx'
 import PartialTruthTable from './mui/PartialTruthTable.jsx'
 
@@ -146,6 +147,17 @@ export default function LogicPenguinProblem({
   } else if (proof.type === 'combo-translation-truth-table') {
     return (
       <ComboTranslationTruthTable
+        proof={proof}
+        attemptLimit={proof.attemptLimit}
+        assignmentQuestionId={proof.questionId}
+        onStateChange={handleStateChange}
+        onComplete={handleComplete}
+        savedState={localState}
+      />
+    )
+  } else if (proof.type === 'combo-translation-derivation') {
+    return (
+      <ComboTranslationDerivation
         proof={proof}
         attemptLimit={proof.attemptLimit}
         assignmentQuestionId={proof.questionId}

@@ -17,7 +17,7 @@ export function useProblemChecker({
   resetInput,
   onStateChange,
   assignmentQuestionId,
-  attemptLimit = 3,
+  attemptLimit = 10,
   initialAttemptCount = 0,
 }) {
   const [status, setStatus] = useState('unanswered')

@@ -6,7 +6,7 @@ export default function ProofEditor({ proof, onProofComplete, savedState, onStat
   const completionRef = useRef(false)
   const proofRef = useRef(null)
   const [attemptCount, setAttemptCount] = useState(proof?.attemptCount ?? 0)
-  const [attemptLimit, setAttemptLimit] = useState(proof?.attemptLimit ?? 3)
+  const [attemptLimit, setAttemptLimit] = useState(proof?.attemptLimit ?? 10)
 
   useEffect(() => {
     if (typeof proof?.attemptCount === 'number') {
