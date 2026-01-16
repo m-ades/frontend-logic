@@ -76,6 +76,7 @@ export default function Dashboard() {
     total: 0,
     lowestScore: null,
     lowestTitle: null,
+    lowestScores: [],
   })
   const [instructorAnalytics, setInstructorAnalytics] = useState({
     gradeSummary: null,
@@ -175,17 +176,24 @@ export default function Dashboard() {
                 .sort((a, b) => new Date(a.date) - new Date(b.date))
           setGradeTimeline(timeline)
 
+          const gradedPercents = (grades || []).reduce((list, grade) => {
+            const max = grade?.max_score || 0
+            const score = grade?.final_score ?? grade?.raw_score
+            if (!max || score === null || score === undefined) return list
+            list.push({
+              percent: (score / max) * 100,
+              title: grade?.Assignment?.title || grade?.title || 'Assignment',
+            })
+            return list
+          }, [])
+
           const totalMax = (grades || []).reduce((sum, grade) => sum + (grade.max_score || 0), 0)
           const totalFinal = (grades || []).reduce(
             (sum, grade) => sum + (grade.final_score ?? grade.raw_score ?? 0),
             0
           )
           const overallPercent = totalMax > 0 ? (totalFinal / totalMax) * 100 : null
-          const completedAssignments = (grades || []).filter((grade) => {
-            const max = grade?.max_score || 0
-            const score = grade?.final_score ?? grade?.raw_score
-            return max > 0 && score !== null
-          }).length
+          const completedAssignments = gradedPercents.length
           const totalAssignments = gradebookSummary?.length || grades?.length || 0
           const classAverageValues = (gradebookSummary || [])
             .map((assignment) => assignment.avg_percent)
@@ -194,22 +202,11 @@ export default function Dashboard() {
             classAverageValues.length > 0
               ? (classAverageValues.reduce((sum, value) => sum + value, 0) / classAverageValues.length) * 100
               : null
-          const lowestGrade = (grades || []).reduce(
-            (currentLowest, grade) => {
-              const max = grade?.max_score || 0
-              const score = grade?.final_score ?? grade?.raw_score
-              if (!max || score === null || score === undefined) return currentLowest
-              const percent = (score / max) * 100
-              if (!currentLowest || percent < currentLowest.percent) {
-                return {
-                  percent,
-                  title: grade?.Assignment?.title || grade?.title || 'Assignment',
-                }
-              }
-              return currentLowest
-            },
-            null
-          )
+          const lowestScores = gradedPercents
+            .slice()
+            .sort((a, b) => a.percent - b.percent)
+            .slice(0, 2)
+          const lowestGrade = lowestScores[0] ?? null
 
           setGradeOverview({
             percent: overallPercent,
@@ -219,6 +216,7 @@ export default function Dashboard() {
             total: totalAssignments,
             lowestScore: lowestGrade?.percent ?? null,
             lowestTitle: lowestGrade?.title ?? null,
+            lowestScores,
           })
         }
       } catch (error) {
@@ -323,9 +321,10 @@ export default function Dashboard() {
               <Box>
                 <Typography variant="h3" fontWeight="medium">
                   {formatPercent(gradeOverview.percent)}
+                  {gradeOverview.letter ? ` (${gradeOverview.letter})` : ''}
                 </Typography>
                 <Typography variant="body1" color="text.secondary">
-                  {gradeOverview.letter ?? '—'} (Class avg: {formatPercent(gradeOverview.classAverage)})
+                  Class avg: {formatPercent(gradeOverview.classAverage)}
                 </Typography>
               </Box>
               <Box
@@ -349,6 +348,12 @@ export default function Dashboard() {
                   Lowest score:{' '}
                   {gradeOverview.lowestScore !== null
                     ? `${gradeOverview.lowestScore.toFixed(1)}%${gradeOverview.lowestTitle ? ` (${gradeOverview.lowestTitle})` : ''}`
+                    : '—'}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Second lowest:{' '}
+                  {gradeOverview.lowestScores?.[1]
+                    ? `${gradeOverview.lowestScores[1].percent.toFixed(1)}%${gradeOverview.lowestScores[1].title ? ` (${gradeOverview.lowestScores[1].title})` : ''}`
                     : '—'}
                 </Typography>
               </Box>
