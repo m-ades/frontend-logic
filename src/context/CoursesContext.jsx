@@ -799,7 +799,11 @@ export async function addStudentToCourse(dispatch, courseId, studentData) {
     const newStudent = await createStudent(courseId, studentData);
 
     const currentGradebook = await fetchCourseGradebook(courseId);
-    const updatedGradebook = [...currentGradebook, newStudent];
+    const updatedGradebook = currentGradebook.some(
+      (student) => student.id === newStudent.id
+    )
+      ? currentGradebook
+      : [...currentGradebook, newStudent];
 
     dispatch({
       type: "SET_GRADEBOOK",

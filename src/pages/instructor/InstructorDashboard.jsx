@@ -57,28 +57,72 @@ export default function InstructorDashboard() {
     };
   }, [activeCourseId]);
 
+  const nonPracticeAssignments = useMemo(
+    () => assignments.filter((assignment) => assignment.kind !== "practice"),
+    [assignments]
+  );
+
+  const nonPracticeIds = useMemo(
+    () => new Set(nonPracticeAssignments.map((assignment) => Number(assignment.id))),
+    [nonPracticeAssignments]
+  );
+
+  const filteredGradebookSummary = useMemo(
+    () => (gradebookSummary || []).filter((item) => nonPracticeIds.has(Number(item.id))),
+    [gradebookSummary, nonPracticeIds]
+  );
+
+  const filteredAssignmentStats = useMemo(
+    () => (analytics.assignmentStats || []).filter((item) => nonPracticeIds.has(Number(item.id))),
+    [analytics.assignmentStats, nonPracticeIds]
+  );
+
+  const studentsForAssignments = useMemo(
+    () =>
+      students.map((student) => {
+        const filteredGrades = Object.entries(student.grades || {}).reduce(
+          (acc, [assignmentId, grade]) => {
+            const numericId = Number(assignmentId);
+            if (nonPracticeIds.has(numericId)) {
+              acc[assignmentId] = grade;
+            }
+            return acc;
+          },
+          {}
+        );
+        return { ...student, grades: filteredGrades };
+      }),
+    [students, nonPracticeIds]
+  );
+
   // Enrich assignments with calculated data
   const enrichedAssignments = useMemo(() => {
     const summaryMap = new Map(
-      (gradebookSummary || []).map((item) => [item.id, item])
+      (filteredGradebookSummary || []).map((item) => [Number(item.id), item])
     );
     const statsMap = new Map(
-      (analytics.assignmentStats || []).map((item) => [item.id, item])
+      (filteredAssignmentStats || []).map((item) => [Number(item.id), item])
     );
 
-    return assignments.map((assignment) => {
-      const summary = summaryMap.get(assignment.id);
-      const stats = statsMap.get(assignment.id);
+    return nonPracticeAssignments.map((assignment) => {
+      const summary = summaryMap.get(Number(assignment.id));
+      const stats = statsMap.get(Number(assignment.id));
       const averagePercent = summary?.avg_percent ?? null;
       const average =
         averagePercent !== null && averagePercent !== undefined
           ? Math.round(averagePercent * 100)
-          : calculateAssignmentAverage(assignment.id, students);
-      const submissions =
-        stats?.students_submitted ??
-        students.filter((student) => student.grades[assignment.id] !== undefined)
-          .length;
-
+          : calculateAssignmentAverage(assignment.id, studentsForAssignments);
+      const submissionsFallback = studentsForAssignments.filter(
+        (student) => student.grades[assignment.id] !== undefined
+      ).length;
+      const submissionsRaw =
+        stats?.students_submitted ?? submissionsFallback;
+      const submissions = totalStudents
+        ? Math.min(submissionsRaw, totalStudents)
+        : submissionsRaw;
+      const dueAt = assignment.dueDate
+        ? new Date(`${assignment.dueDate}T${assignment.dueTime || "23:59:59"}`)
+        : null;
       return {
         ...assignment,
         average,
@@ -88,21 +132,48 @@ export default function InstructorDashboard() {
         dueDate: assignment.dueDate
           ? new Date(assignment.dueDate).toLocaleDateString()
           : "—",
+        dueAt,
         lateSubmissions: null,
       };
     });
-  }, [assignments, analytics.assignmentStats, gradebookSummary, students, totalStudents]);
+  }, [
+    filteredAssignmentStats,
+    filteredGradebookSummary,
+    nonPracticeAssignments,
+    students,
+    studentsForAssignments,
+    totalStudents,
+  ]);
 
   // Pass the course's grading scale to calculateGradeDistribution
   const gradeDistribution = calculateGradeDistribution(
-    students,
+    studentsForAssignments,
     course?.gradingScale
   );
 
-  const totalAverage = enrichedAssignments.length > 0
+  const isGradedAndUnlocked = (assignment) => {
+    const hasSubmissions = assignment.submissions > 0;
+    const wasEverUnlocked = hasSubmissions || assignment.isLocked === false;
+    return hasSubmissions && wasEverUnlocked;
+  };
+
+  const gradedUnlockedAssignments = useMemo(
+    () => enrichedAssignments.filter(isGradedAndUnlocked),
+    [enrichedAssignments]
+  );
+
+  const gradedPastDueAssignments = useMemo(
+    () =>
+      gradedUnlockedAssignments.filter(
+        (assignment) => assignment.dueAt && assignment.dueAt <= new Date()
+      ),
+    [gradedUnlockedAssignments]
+  );
+
+  const totalAverage = gradedPastDueAssignments.length > 0
     ? Math.round(
-        enrichedAssignments.reduce((sum, a) => sum + a.average, 0) /
-          enrichedAssignments.length
+        gradedPastDueAssignments.reduce((sum, a) => sum + a.average, 0) /
+          gradedPastDueAssignments.length
       )
     : 0;
 
@@ -110,10 +181,10 @@ export default function InstructorDashboard() {
     (sum, a) => sum + a.submissions,
     0
   );
-  const totalPossible = totalStudents * assignments.length;
+  const totalPossible = totalStudents * nonPracticeAssignments.length;
   const completionRate =
     totalPossible > 0
-      ? Math.round((totalSubmissions / totalPossible) * 100)
+      ? Math.round((Math.min(totalSubmissions, totalPossible) / totalPossible) * 100)
       : 0;
 
   const handleAssignmentClick = (data) => {
@@ -166,30 +237,30 @@ export default function InstructorDashboard() {
           gap: 3,
         }}
       >
-      <MetricCard
-        title="Class Average"
-        value={`${totalAverage}%`}
-        subtitle="Across all assignments"
-        icon={TrendingUp}
-        gradient={["#10b981", "#059669"]}
-      />
-      <MetricCard
-        title="Completion Rate"
-        value={`${completionRate}%`}
-        subtitle={`${totalSubmissions} of ${totalPossible}`}
-        icon={CheckCircle}
-        gradient={["#3b82f6", "#2563eb"]}
-      />
-      <MetricCard
-        title="Total Students"
-        value={totalStudents}
-        subtitle="Enrolled in course"
-        icon={Users}
-        gradient={["#8b5cf6", "#7c3aed"]}
-      />
+        <MetricCard
+          title="Class Average"
+          value={`${totalAverage}%`}
+          subtitle="Across all assignments"
+          icon={TrendingUp}
+          gradient={["#10b981", "#059669"]}
+        />
+        <MetricCard
+          title="Completion Rate"
+          value={`${completionRate}%`}
+          subtitle={`${totalSubmissions} of ${totalPossible}`}
+          icon={CheckCircle}
+          gradient={["#3b82f6", "#2563eb"]}
+        />
+        <MetricCard
+          title="Total Students"
+          value={totalStudents}
+          subtitle="Enrolled in course"
+          icon={Users}
+          gradient={["#8b5cf6", "#7c3aed"]}
+        />
         <MetricCard
           title="Assignments"
-          value={assignments.length}
+          value={gradedUnlockedAssignments.length}
           subtitle="Total posted"
           icon={Calendar}
           gradient={["#ec4899", "#db2777"]}
@@ -228,9 +299,12 @@ export default function InstructorDashboard() {
           gap: 3,
         }}
       >
-        <StudentsAtRiskTable students={students} assignments={assignments} />
+        <StudentsAtRiskTable
+          students={studentsForAssignments}
+          assignments={nonPracticeAssignments}
+        />
         <UpcomingDeadlinesTable
-          assignments={assignments}
+          assignments={nonPracticeAssignments}
           onAssignmentClick={handleAssignmentClick}
         />
       </Box>

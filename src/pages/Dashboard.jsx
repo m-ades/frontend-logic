@@ -26,15 +26,33 @@ import {
   Area,
 } from 'recharts'
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday'
-import AssignmentIcon from '@mui/icons-material/Assignment'
 import TrendingUpIcon from '@mui/icons-material/TrendingUp'
 import BookIcon from '@mui/icons-material/Book'
+import LeaderboardIcon from '@mui/icons-material/Leaderboard'
 import { formatDateTime } from '../utils/formatting.js'
 import { API_CONFIG, fetchJson, getActiveUserId } from '../utils/api.js'
 import { useCoursesState } from '../context/CoursesContext.jsx'
 import { useAuthState } from '../context/AuthContext.jsx'
 import { isInstructorRole } from '../utils/auth.js'
 import ThemedCard from '../components/ui/ThemedCard.jsx'
+
+const formatPercent = (value) => (value === null || value === undefined ? '—' : `${value.toFixed(1)}%`)
+
+const getLetterGrade = (percent) => {
+  if (percent === null || percent === undefined) return null
+  if (percent >= 93) return 'A'
+  if (percent >= 90) return 'A-'
+  if (percent >= 87) return 'B+'
+  if (percent >= 83) return 'B'
+  if (percent >= 80) return 'B-'
+  if (percent >= 77) return 'C+'
+  if (percent >= 73) return 'C'
+  if (percent >= 70) return 'C-'
+  if (percent >= 67) return 'D+'
+  if (percent >= 63) return 'D'
+  if (percent >= 60) return 'D-'
+  return 'F'
+}
 
 const emptyAnalytics = {
   assignments: { upcoming: 0, pending: 0, overdue: 0, upcomingList: [] },
@@ -50,6 +68,15 @@ export default function Dashboard() {
   const courseId = activeCourseId ?? API_CONFIG.courseId
   const [analytics, setAnalytics] = useState(emptyAnalytics)
   const [gradeTimeline, setGradeTimeline] = useState([])
+  const [gradeOverview, setGradeOverview] = useState({
+    percent: null,
+    letter: null,
+    classAverage: null,
+    completed: 0,
+    total: 0,
+    lowestScore: null,
+    lowestTitle: null,
+  })
   const [instructorAnalytics, setInstructorAnalytics] = useState({
     gradeSummary: null,
     assignmentStats: [],
@@ -147,6 +174,52 @@ export default function Dashboard() {
                 .filter((item) => item.studentPercent !== null)
                 .sort((a, b) => new Date(a.date) - new Date(b.date))
           setGradeTimeline(timeline)
+
+          const totalMax = (grades || []).reduce((sum, grade) => sum + (grade.max_score || 0), 0)
+          const totalFinal = (grades || []).reduce(
+            (sum, grade) => sum + (grade.final_score ?? grade.raw_score ?? 0),
+            0
+          )
+          const overallPercent = totalMax > 0 ? (totalFinal / totalMax) * 100 : null
+          const completedAssignments = (grades || []).filter((grade) => {
+            const max = grade?.max_score || 0
+            const score = grade?.final_score ?? grade?.raw_score
+            return max > 0 && score !== null
+          }).length
+          const totalAssignments = gradebookSummary?.length || grades?.length || 0
+          const classAverageValues = (gradebookSummary || [])
+            .map((assignment) => assignment.avg_percent)
+            .filter((value) => value !== null && value !== undefined)
+          const classAverage =
+            classAverageValues.length > 0
+              ? (classAverageValues.reduce((sum, value) => sum + value, 0) / classAverageValues.length) * 100
+              : null
+          const lowestGrade = (grades || []).reduce(
+            (currentLowest, grade) => {
+              const max = grade?.max_score || 0
+              const score = grade?.final_score ?? grade?.raw_score
+              if (!max || score === null || score === undefined) return currentLowest
+              const percent = (score / max) * 100
+              if (!currentLowest || percent < currentLowest.percent) {
+                return {
+                  percent,
+                  title: grade?.Assignment?.title || grade?.title || 'Assignment',
+                }
+              }
+              return currentLowest
+            },
+            null
+          )
+
+          setGradeOverview({
+            percent: overallPercent,
+            letter: overallPercent !== null ? getLetterGrade(overallPercent) : null,
+            classAverage,
+            completed: completedAssignments,
+            total: totalAssignments,
+            lowestScore: lowestGrade?.percent ?? null,
+            lowestTitle: lowestGrade?.title ?? null,
+          })
         }
       } catch (error) {
         if (isMounted) {
@@ -241,118 +314,45 @@ export default function Dashboard() {
         <ThemedCard sx={statCardSx}>
           <CardContent sx={statCardContentSx}>
             <Box display="flex" alignItems="center" mb={2}>
-              <AssignmentIcon color="primary" sx={{ mr: 1 }} />
+              <LeaderboardIcon color="primary" sx={{ mr: 1 }} />
               <Typography variant="h6" component="h3">
-                Upcoming Assignments
+                Your Grade
               </Typography>
             </Box>
-            <Grid container spacing={2} alignItems="center">
-              <Grid size={{ xs: 6 }}>
-                <Box display="flex" alignItems="baseline">
-                  <Typography variant="h3" fontWeight="medium">
-                    {assignmentStats.upcoming}
-                  </Typography>
-                  <Typography variant="caption" color="text.secondary" sx={{ ml: 1 }}>
-                    Upcoming
-                  </Typography>
-                </Box>
-              </Grid>
-              <Grid size={{ xs: 6 }} sx={{ display: 'flex', justifyContent: 'center' }}>
-                <Box sx={{ position: 'relative', display: 'inline-flex' }}>
-                  <Typography
-                    variant="caption"
-                    fontWeight="medium"
-                    sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}
-                  >
-                    {practiceAccuracy.correctFirstTry}%
-                  </Typography>
-                  <PieChart width={miniChartSize} height={miniChartSize}>
-                      <Pie
-                        data={[
-                          { name: 'Upcoming', value: assignmentStats.upcoming, color: 'primary' },
-                          { name: 'Pending', value: assignmentStats.pending, color: 'warning' },
-                          { name: 'Overdue', value: assignmentStats.overdue, color: 'error' },
-                        ]}
-                        startAngle={90}
-                        endAngle={-270}
-                        innerRadius={25}
-                        outerRadius={35}
-                        dataKey="value"
-                      >
-                        {[
-                          { name: 'Upcoming', value: assignmentStats.upcoming, color: 'primary' },
-                          { name: 'Pending', value: assignmentStats.pending, color: 'warning' },
-                          { name: 'Overdue', value: assignmentStats.overdue, color: 'error' },
-                        ].map((entry, index) => (
-                          <Cell
-                            key={`cell-${index}`}
-                            fill={theme.palette[entry.color].main}
-                          />
-                        ))}
-                      </Pie>
-                    </PieChart>
-                </Box>
-              </Grid>
-            </Grid>
-            <Grid container spacing={2} sx={{ mt: 1 }}>
-              <Grid size={{ xs: 4 }}>
-                <Typography variant="caption" color="text.secondary" display="block">
-                  Upcoming
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+              <Box>
+                <Typography variant="h3" fontWeight="medium">
+                  {formatPercent(gradeOverview.percent)}
                 </Typography>
-                <Box display="flex" alignItems="center">
-                  <Typography variant="body2" fontWeight="medium">
-                    {assignmentStats.upcoming}
-                  </Typography>
-                  <Box
-                    sx={{
-                      width: 8,
-                      height: 8,
-                      borderRadius: '50%',
-                      bgcolor: 'primary.main',
-                      ml: 1,
-                    }}
-                  />
-                </Box>
-              </Grid>
-              <Grid size={{ xs: 4 }}>
-                <Typography variant="caption" color="text.secondary" display="block">
-                  Pending
+                <Typography variant="body1" color="text.secondary">
+                  {gradeOverview.letter ?? '—'} (Class avg: {formatPercent(gradeOverview.classAverage)})
                 </Typography>
-                <Box display="flex" alignItems="center">
-                  <Typography variant="body2" fontWeight="medium">
-                    {assignmentStats.pending}
-                  </Typography>
-                  <Box
-                    sx={{
-                      width: 8,
-                      height: 8,
-                      borderRadius: '50%',
-                      bgcolor: 'warning.main',
-                      ml: 1,
-                    }}
-                  />
-                </Box>
-              </Grid>
-              <Grid size={{ xs: 4 }}>
-                <Typography variant="caption" color="text.secondary" display="block">
-                  Overdue
+              </Box>
+              <Box
+                sx={(theme) => ({
+                  px: 2,
+                  py: 1.5,
+                  borderRadius: 1,
+                  border: `1px dashed ${theme.palette.divider}`,
+                  background:
+                    theme.palette.mode === 'light'
+                      ? 'linear-gradient(135deg, rgba(25, 118, 210, 0.06), rgba(0, 0, 0, 0.02))'
+                      : 'linear-gradient(135deg, rgba(144, 202, 249, 0.1), rgba(255, 255, 255, 0.04))',
+                })}
+              >
+                <Typography variant="body2">
+                  {gradeOverview.total
+                    ? `${gradeOverview.completed}/${gradeOverview.total} assignments complete`
+                    : 'No assignments graded yet'}
                 </Typography>
-                <Box display="flex" alignItems="center">
-                  <Typography variant="body2" fontWeight="medium">
-                    {assignmentStats.overdue}
-                  </Typography>
-                  <Box
-                    sx={{
-                      width: 8,
-                      height: 8,
-                      borderRadius: '50%',
-                      bgcolor: 'error.main',
-                      ml: 1,
-                    }}
-                  />
-                </Box>
-              </Grid>
-            </Grid>
+                <Typography variant="body2" color="text.secondary">
+                  Lowest score:{' '}
+                  {gradeOverview.lowestScore !== null
+                    ? `${gradeOverview.lowestScore.toFixed(1)}%${gradeOverview.lowestTitle ? ` (${gradeOverview.lowestTitle})` : ''}`
+                    : '—'}
+                </Typography>
+              </Box>
+            </Box>
           </CardContent>
         </ThemedCard>
       </Grid>
