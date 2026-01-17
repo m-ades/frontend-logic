@@ -18,6 +18,7 @@ import getFormulaClass from '../../../lib/logicpenguin/symbolic/formula.js'
 import { multiTables } from '../../../lib/logicpenguin/symbolic/libsemantics.js'
 import ProblemSetButtons from './ProblemSetButtons.jsx'
 import { useProblemChecker } from '../../../hooks/useProblemChecker.js'
+import RichText from '../../ui/RichText.jsx'
 
 const toTruth = (value) => {
   if (value === true || value === 'T' || value === 't' || value === 1) return true
@@ -111,60 +112,70 @@ export default function PartialTruthTable({
 
   return (
     <Stack spacing={2} sx={{ px: 0, width: '100%', alignItems: 'stretch', flexGrow: 1 }}>
-      {prompt && (
-        <Typography variant="body1" sx={{ fontSize: { xs: '0.95rem', md: '1rem' } }}>
-          {prompt}
-        </Typography>
-      )}
-      {statement && (
-        <Typography variant="body2" color="text.secondary">
-          {statement}
-        </Typography>
-      )}
-      <TableContainer component={Paper} className="tt-table-wrap" elevation={0}>
-        <Table className="tt-table">
-          <TableHead className="tt-head">
-            <TableRow className="tt-token-row">
-              {tokens.map((token, idx) => (
-                <TableCell key={`partial-tt-token-${idx}`} className="tt-token" align="center">
-                  {token}
-                </TableCell>
-              ))}
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            <TableRow className="tt-row">
-              {tokens.map((_, idx) => {
-                const isEditable = editableIndices[idx]
-                const value = rowInputs[idx] ?? ''
-                return (
-                  <TableCell key={`partial-tt-cell-${idx}`} className="tt-cell" align="center">
-                    {isEditable ? (
-                      <Select
-                        value={value}
-                        onChange={(event) => handleCellChange(idx, event.target.value)}
-                        size="small"
-                        displayEmpty
-                        disabled={readOnly}
-                        sx={{ minWidth: 64 }}
-                      >
-                        <MenuItem value="">
-                          <em>?</em>
-                        </MenuItem>
-                        <MenuItem value="T">T</MenuItem>
-                        <MenuItem value="F">F</MenuItem>
-                        <MenuItem value="U">U</MenuItem>
-                      </Select>
-                    ) : (
-                      <Typography sx={{ fontWeight: 700 }}>{value || toSymbol(givenRow[idx])}</Typography>
-                    )}
-                  </TableCell>
-                )
-              })}
-            </TableRow>
-          </TableBody>
-        </Table>
-      </TableContainer>
+      <Box className="logicpenguin" sx={{ width: '100%', flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
+        <Box
+          sx={{
+            overflow: 'visible',
+            minHeight: '200px',
+            flexGrow: 1,
+            alignSelf: { xs: 'stretch', md: 'flex-start' },
+          }}
+          className="lp-problem-card"
+        >
+          <Stack spacing={3} sx={{ p: { xs: 2, md: 2 } }}>
+            {prompt && (
+              <RichText content={prompt} variant="body1" sx={{ fontSize: { xs: '0.95rem', md: '1rem' } }} />
+            )}
+            {statement && (
+              <RichText content={statement} variant="body2" color="text.secondary" />
+            )}
+            <TableContainer component={Paper} className="tt-table-wrap" elevation={0}>
+              <Table className="tt-table">
+                <TableHead className="tt-head">
+                  <TableRow className="tt-token-row">
+                    {tokens.map((token, idx) => (
+                      <TableCell key={`partial-tt-token-${idx}`} className="tt-token" align="center">
+                        {token}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  <TableRow className="tt-row">
+                    {tokens.map((_, idx) => {
+                      const isEditable = editableIndices[idx]
+                      const value = rowInputs[idx] ?? ''
+                      return (
+                        <TableCell key={`partial-tt-cell-${idx}`} className="tt-cell" align="center">
+                          {isEditable ? (
+                            <Select
+                              value={value}
+                              onChange={(event) => handleCellChange(idx, event.target.value)}
+                              size="small"
+                              displayEmpty
+                              disabled={readOnly}
+                              sx={{ minWidth: 64 }}
+                            >
+                              <MenuItem value="">
+                                <em>?</em>
+                              </MenuItem>
+                              <MenuItem value="T">T</MenuItem>
+                              <MenuItem value="F">F</MenuItem>
+                              <MenuItem value="U">U</MenuItem>
+                            </Select>
+                          ) : (
+                            <Typography sx={{ fontWeight: 700 }}>{value || toSymbol(givenRow[idx])}</Typography>
+                          )}
+                        </TableCell>
+                      )
+                    })}
+                  </TableRow>
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </Stack>
+        </Box>
+      </Box>
       {message && (
         <Alert severity={getStatusColor()} onClose={() => setMessage('')}>
           {message}

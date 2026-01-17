@@ -25,6 +25,7 @@ import { multiTables } from '../../lib/logicpenguin/symbolic/libsemantics.js'
 import { fullTableMatch } from '../../lib/logicpenguin/checkers/truth-tables.js'
 import ProblemSetButtons from './mui/ProblemSetButtons.jsx'
 import { fetchJson, getActiveUserId } from '../../utils/api.js'
+import RichText from '../ui/RichText.jsx'
 
 function TruthToggle({ value, onChange, ariaLabel, accent, readOnly = false }) {
   const cycleValue = (current) => {
@@ -700,6 +701,16 @@ export default function TruthTableEditor({
     </Box>
   )
 
+  const promptContent = !embedded && (proof.description || truthTable.prompt)
+    ? (
+        <RichText
+          content={truthTable.prompt || proof.description}
+          variant="body1"
+          sx={{ fontSize: { xs: '0.95rem', md: '1rem' } }}
+        />
+      )
+    : null
+
   const tableCard = (
     <Box
       sx={{
@@ -712,6 +723,12 @@ export default function TruthTableEditor({
       className={embedded ? undefined : 'lp-problem-card'}
     >
       <Stack spacing={3} sx={{ p: { xs: embedded ? 0 : 2, md: embedded ? 0 : 2 } }}>
+        {promptContent}
+        {!embedded && (
+          <Typography variant="body2" sx={{ color: '#2f6bff' }}>
+            Fill in each column to match the expected truth values.
+          </Typography>
+        )}
         {renderTableSet(tables, tableInputs, useCombinedTable, false, handleCellChange, kind === 'argument')}
         {classificationEnabled && classificationOptions.length > 0 && (
           <Box sx={{ width: '100%' }}>
@@ -767,16 +784,6 @@ export default function TruthTableEditor({
 
   return (
     <Stack spacing={2} sx={{ px: 0, width: '100%', alignItems: 'stretch', flexGrow: 1 }}>
-      {!embedded && (proof.description || truthTable.prompt) && (
-        <Typography variant="body1" sx={{ fontSize: { xs: '0.95rem', md: '1rem' } }}>
-          {truthTable.prompt || proof.description}
-        </Typography>
-      )}
-      {!embedded && (
-        <Typography variant="body2" sx={{ color: '#2f6bff' }}>
-          Fill in each column to match the expected truth values.
-        </Typography>
-      )}
       {embedded ? (
         tableCard
       ) : (

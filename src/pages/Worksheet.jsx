@@ -4,7 +4,7 @@ import WorksheetLayout from '../components/layout/WorksheetLayout.jsx'
 import WorksheetTabs from '../components/problems/WorksheetTabs.jsx'
 import { useScoring } from '../hooks/usescoring.js'
 import { useProofState } from '../hooks/useproofstate.js'
-import { exportWorksheetPDF } from '../utils/exportPDF.js'
+// import { exportWorksheetPDF } from '../utils/exportPDF.js'
 import { API_CONFIG, fetchJson, getActiveUserId } from '../utils/api.js'
 import { useCoursesState } from '../context/CoursesContext.jsx'
 
@@ -194,13 +194,14 @@ export default function Worksheet() {
       const snapshot = question?.question_snapshot || {}
       const type = normalizeType(snapshot)
       const description = snapshot.prompt || snapshot.description || snapshot.text || 'Solve.'
-      const proofId = `${assignment.id}-${question.id}`
+      const questionId = question?.id ?? question?.assignment_question_id ?? question?.assignmentQuestionId ?? null
+      const proofId = `${assignment.id}-${questionId ?? index}`
       const solution = snapshot.solution
       const attemptLimit = question?.attempt_limit ?? 3
       const legend = snapshot.legend || snapshot.legend_text || snapshot.legendText || ''
       const proofBase = {
         id: proofId,
-        questionId: question.id,
+        questionId,
         description,
         solution,
         attemptLimit,
@@ -247,14 +248,21 @@ export default function Worksheet() {
       }
 
       if (type === 'multiple-choice') {
+        const subquestions = snapshot.subquestions || snapshot.questions || []
+        const hasSubquestions = Array.isArray(subquestions) && subquestions.length > 0
+        const baseMultipleChoice = snapshot.multipleChoice || {
+          prompt: snapshot.prompt || '',
+          choices: snapshot.choices || [],
+        }
+        const normalizedMultipleChoice = {
+          ...baseMultipleChoice,
+          subquestions: baseMultipleChoice.subquestions || subquestions,
+        }
         return {
           ...proofBase,
           type: 'multiple-choice',
-          multipleChoice: snapshot.multipleChoice || {
-            prompt: snapshot.prompt || '',
-            choices: snapshot.choices || [],
-          },
-          answer: snapshot.answerIndices ?? snapshot.answerIndex ?? snapshot.answer,
+          multipleChoice: normalizedMultipleChoice,
+          answer: hasSubquestions ? null : (snapshot.answerIndices ?? snapshot.answerIndex ?? snapshot.answer),
         }
       }
 
@@ -683,40 +691,41 @@ export default function Worksheet() {
     }
   }
 
-  const handleExport = async () => {
-    if (!currentWorksheet) return
-    if (!window.confirm('Download your answers as PDF?')) return
-    
-    try {
-      let liveState = null
-      try {
-        const derivEl = document.querySelector('derivation-hurley')
-        if (derivEl?.getState && !derivEl._isRestoring) {
-          liveState = derivEl.getState()
-        }
-      } catch (err) {
-      }
+  // Temporarily disabled export PDF feature
+  // const handleExport = async () => {
+  //   if (!currentWorksheet) return
+  //   if (!window.confirm('Download your answers as PDF?')) return
+  //   
+  //   try {
+  //     let liveState = null
+  //     try {
+  //       const derivEl = document.querySelector('derivation-hurley')
+  //       if (derivEl?.getState && !derivEl._isRestoring) {
+  //         liveState = derivEl.getState()
+  //       }
+  //     } catch (err) {
+  //     }
 
-      const allStates = currentWorksheet.proofs.map((proof) => ({
-        id: proof.id,
-        questionId: proof.questionId,
-        premises: proof.premises,
-        conclusion: proof.conclusion,
-        savedState: proof.id === currentProof?.id && liveState
-          ? liveState
-          : getSavedProofState(proof.id)
-      }))
-      
-      await exportWorksheetPDF({
-        worksheet: currentWorksheet.title,
-        worksheetId: currentWorksheet.id,
-        exportedAt: new Date().toISOString(),
-        proofs: allStates
-      })
-    } catch (error) {
-      alert(`Export failed: ${error?.message || 'Unknown error'}`)
-    }
-  }
+  //     const allStates = currentWorksheet.proofs.map((proof) => ({
+  //       id: proof.id,
+  //       questionId: proof.questionId,
+  //       premises: proof.premises,
+  //       conclusion: proof.conclusion,
+  //       savedState: proof.id === currentProof?.id && liveState
+  //         ? liveState
+  //         : getSavedProofState(proof.id)
+  //     }))
+  //     
+  //     await exportWorksheetPDF({
+  //       worksheet: currentWorksheet.title,
+  //       worksheetId: currentWorksheet.id,
+  //       exportedAt: new Date().toISOString(),
+  //       proofs: allStates
+  //     })
+  //   } catch (error) {
+  //     alert(`Export failed: ${error?.message || 'Unknown error'}`)
+  //   }
+  // }
 
   if (isLoading) {
     return <div>Loading assignment...</div>
@@ -743,7 +752,7 @@ export default function Worksheet() {
       worksheets={worksheets}
       currentWorksheetIndex={currentWorksheetIndex}
       onWorksheetIndexChange={handleWorksheetChange}
-      onExportClick={handleExport}
+      onExportClick={null}
       onBackToLMS={() => navigate('/')}
     >
       <WorksheetTabs
@@ -756,6 +765,13 @@ export default function Worksheet() {
         onProofComplete={handleProofComplete}
         getSavedProofState={getSavedProofState}
         handleProofStateChange={handleProofStateChange}
+        gradePercent={gradePercent}
+        total={currentWorksheet.proofs.length || 0}
+        score={score}
+        dueDate={currentWorksheet?.due_date || currentDueDate}
+        completionPercent={currentWorksheet.proofs.length > 0 ? Math.round((score / (currentWorksheet.proofs.length || 0)) * 100) : 0}
+        gradeLabel={Number.isFinite(gradePercent) ? `${gradePercent.toFixed(1)}%` : '—'}
+        isOverdue={currentWorksheet?.due_date ? new Date(currentWorksheet.due_date) < new Date() : false}
       />
     </WorksheetLayout>
   )

@@ -1,10 +1,95 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { Box, Stack, Typography, Alert } from '@mui/material'
 import { useTheme } from '@mui/material/styles'
 import ProblemSetButtons from './ProblemSetButtons.jsx'
 import FormulaInput from '../../ui/logicpenguin/formula-input.js'
 import { useProblemChecker } from '../../../hooks/useProblemChecker.js'
 import SolutionReveal from '../SolutionReveal.jsx'
+import RichText from '../../ui/RichText.jsx'
+
+function FormulaInputField({ value, onValueChange, fieldReadOnly, formulaInputRef }) {
+  const theme = useTheme()
+  const containerRef = useRef(null)
+  const changeHandlerRef = useRef(null)
+
+  useEffect(() => {
+    if (!containerRef.current) return
+    if (!formulaInputRef.current) {
+      const formulaInput = FormulaInput.getnew({})
+      formulaInputRef.current = formulaInput
+      formulaInput.style.width = '100%'
+      formulaInput.style.padding = theme.spacing(1.5)
+      formulaInput.style.border = `1px solid ${theme.palette.divider}`
+      formulaInput.style.borderRadius = theme.shape.borderRadius
+      formulaInput.style.fontSize = '1rem'
+      formulaInput.style.fontFamily = 'monospace'
+      formulaInput.style.backgroundColor = theme.palette.background.paper
+      formulaInput.style.color = theme.palette.text.primary
+      containerRef.current.appendChild(formulaInput)
+    } else if (!containerRef.current.contains(formulaInputRef.current)) {
+      containerRef.current.appendChild(formulaInputRef.current)
+    }
+    return () => {
+      if (formulaInputRef.current) {
+        if (changeHandlerRef.current) {
+          formulaInputRef.current.removeEventListener('input', changeHandlerRef.current)
+          formulaInputRef.current.removeEventListener('change', changeHandlerRef.current)
+          changeHandlerRef.current = null
+        }
+        if (formulaInputRef.current.parentNode) {
+          formulaInputRef.current.parentNode.removeChild(formulaInputRef.current)
+        }
+        formulaInputRef.current = null
+      }
+    }
+  }, [formulaInputRef, theme])
+
+  useEffect(() => {
+    const formulaInput = formulaInputRef.current
+    if (!formulaInput) return
+    formulaInput.readOnly = fieldReadOnly
+    if (changeHandlerRef.current) {
+      formulaInput.removeEventListener('input', changeHandlerRef.current)
+      formulaInput.removeEventListener('change', changeHandlerRef.current)
+      changeHandlerRef.current = null
+    }
+    if (!fieldReadOnly && onValueChange) {
+      const handleChange = () => {
+        if (fieldReadOnly) return
+        const nextValue = formulaInput.value
+        onValueChange(nextValue)
+      }
+      changeHandlerRef.current = handleChange
+      formulaInput.addEventListener('input', handleChange)
+      formulaInput.addEventListener('change', handleChange)
+    }
+    return () => {
+      if (changeHandlerRef.current) {
+        formulaInput.removeEventListener('input', changeHandlerRef.current)
+        formulaInput.removeEventListener('change', changeHandlerRef.current)
+        changeHandlerRef.current = null
+      }
+    }
+  }, [fieldReadOnly, onValueChange, formulaInputRef])
+
+  useEffect(() => {
+    if (formulaInputRef.current && value !== undefined && formulaInputRef.current.value !== value) {
+      formulaInputRef.current.value = value
+    }
+  }, [value, formulaInputRef])
+
+  return (
+    <Box
+      ref={containerRef}
+      sx={{
+        width: '100%',
+        minHeight: '56px',
+        display: 'flex',
+        alignItems: 'center'
+      }}
+    />
+  )
+}
 
 export default function SymbolicTranslation({ 
   problem, 
@@ -18,93 +103,26 @@ export default function SymbolicTranslation({
   hideActions = false,
   suppressReveal = false,
 }) {
-  const theme = useTheme()
   const [inputValue, setInputValue] = useState(savedState?.ans || '')
   const formulaInputRef = useRef(null)
   const solutionInputRef = useRef(null)
   const hasHydratedRef = useRef(false)
+  const saveTimerRef = useRef(null)
+  const lastSavedValueRef = useRef(null)
   const legend = problem?.legend || problem?.question_snapshot?.legend
+  const prompt = problem?.prompt || ''
 
-  const FormulaInputField = ({ value, onValueChange, fieldReadOnly, formulaInputRef }) => {
-    const containerRef = useRef(null)
-    const changeHandlerRef = useRef(null)
-
-    useEffect(() => {
-      if (!containerRef.current) return
-      if (!formulaInputRef.current) {
-        const formulaInput = FormulaInput.getnew({})
-        formulaInputRef.current = formulaInput
-        formulaInput.style.width = '100%'
-        formulaInput.style.padding = theme.spacing(1.5)
-        formulaInput.style.border = `1px solid ${theme.palette.divider}`
-        formulaInput.style.borderRadius = theme.shape.borderRadius
-        formulaInput.style.fontSize = '1rem'
-        formulaInput.style.fontFamily = 'monospace'
-        formulaInput.style.backgroundColor = theme.palette.background.paper
-        formulaInput.style.color = theme.palette.text.primary
-        containerRef.current.appendChild(formulaInput)
-      }
-      return () => {
-        if (formulaInputRef.current) {
-          if (changeHandlerRef.current) {
-            formulaInputRef.current.removeEventListener('input', changeHandlerRef.current)
-            formulaInputRef.current.removeEventListener('change', changeHandlerRef.current)
-            changeHandlerRef.current = null
-          }
-          if (formulaInputRef.current.parentNode) {
-            formulaInputRef.current.parentNode.removeChild(formulaInputRef.current)
-          }
-          formulaInputRef.current = null
-        }
-      }
-    }, [formulaInputRef, theme])
-
-    useEffect(() => {
-      const formulaInput = formulaInputRef.current
-      if (!formulaInput) return
-      formulaInput.readOnly = fieldReadOnly
-      if (changeHandlerRef.current) {
-        formulaInput.removeEventListener('input', changeHandlerRef.current)
-        formulaInput.removeEventListener('change', changeHandlerRef.current)
-        changeHandlerRef.current = null
-      }
-      if (!fieldReadOnly) {
-        const handleChange = () => {
-          if (fieldReadOnly) return
-          const nextValue = formulaInput.value
-          onValueChange?.(nextValue)
-        }
-        changeHandlerRef.current = handleChange
-        formulaInput.addEventListener('input', handleChange)
-        formulaInput.addEventListener('change', handleChange)
-      }
-      return () => {
-        if (changeHandlerRef.current) {
-          formulaInput.removeEventListener('input', changeHandlerRef.current)
-          formulaInput.removeEventListener('change', changeHandlerRef.current)
-          changeHandlerRef.current = null
-        }
-      }
-    }, [fieldReadOnly, onValueChange, formulaInputRef])
-
-    useEffect(() => {
-      if (formulaInputRef.current && value !== undefined) {
-        formulaInputRef.current.value = value
-      }
-    }, [value, formulaInputRef])
-
-    return (
-      <Box
-        ref={containerRef}
-        sx={{
-          width: '100%',
-          minHeight: '56px',
-          display: 'flex',
-          alignItems: 'center'
-        }}
-      />
-    )
-  }
+  const scheduleStateSave = useCallback((nextValue) => {
+    if (!onStateChange) return
+    if (saveTimerRef.current) {
+      clearTimeout(saveTimerRef.current)
+    }
+    saveTimerRef.current = setTimeout(() => {
+      if (lastSavedValueRef.current === nextValue) return
+      lastSavedValueRef.current = nextValue
+      onStateChange({ ans: nextValue })
+    }, 200)
+  }, [onStateChange])
   
   const { message, isChecking, handleCheck, handleStartOver, getStatusColor, setMessage, isLocked } = useProblemChecker({
     answer,
@@ -118,10 +136,12 @@ export default function SymbolicTranslation({
       if (formulaInputRef.current) {
         formulaInputRef.current.value = ''
       }
+      lastSavedValueRef.current = ''
     },
     onStateChange: (state) => {
       if (state?.ans !== undefined) {
         setInputValue(state.ans)
+        lastSavedValueRef.current = state.ans
       }
       onStateChange?.(state)
     },
@@ -136,8 +156,16 @@ export default function SymbolicTranslation({
     if (savedState?.ans !== undefined) {
       hasHydratedRef.current = true
       setInputValue(savedState.ans)
+      lastSavedValueRef.current = savedState.ans
     }
   }, [savedState?.ans])
+
+  useEffect(() => () => {
+    if (saveTimerRef.current) {
+      clearTimeout(saveTimerRef.current)
+      saveTimerRef.current = null
+    }
+  }, [])
 
 
   return (
@@ -154,10 +182,11 @@ export default function SymbolicTranslation({
         >
           <Stack spacing={3} sx={{ p: { xs: 2, md: 2 } }}>
             <Box>
+              {prompt && (
+                <RichText content={prompt} variant="body1" sx={{ mb: 1, fontSize: '1rem' }} />
+              )}
               {legend && (
-                <Typography variant="body2" sx={{ mb: 1, color: 'text.secondary', whiteSpace: 'pre-line' }}>
-                  {legend}
-                </Typography>
+                <RichText content={legend} variant="body2" sx={{ mb: 1, color: 'text.secondary' }} />
               )}
               <Typography variant="body2" sx={{ mb: 1, color: 'text.secondary' }}>
                 Your translation:
@@ -167,6 +196,7 @@ export default function SymbolicTranslation({
                 onValueChange={(value) => {
                   if (readOnly) return
                   setInputValue(value)
+                  scheduleStateSave(value)
                 }}
                 fieldReadOnly={readOnly}
                 formulaInputRef={formulaInputRef}

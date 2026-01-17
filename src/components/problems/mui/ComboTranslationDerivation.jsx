@@ -6,6 +6,7 @@ import FormulaInput from '../../ui/logicpenguin/formula-input.js'
 import LogicPenguinProof from '../LogicPenguinProof.jsx'
 import getFormulaClass from '../../../lib/logicpenguin/symbolic/formula.js'
 import { useProblemChecker } from '../../../hooks/useProblemChecker.js'
+import RichText from '../../ui/RichText.jsx'
 
 const parseArgumentLine = (line) => {
   if (!line || typeof line !== 'string') {
@@ -180,13 +181,7 @@ export default function ComboTranslationDerivation({
         <Box className="lp-problem-card">
           <Stack spacing={3} sx={{ p: { xs: 2, md: 2 } }}>
             {promptText && (
-              <Typography
-                variant="body2"
-                color="text.secondary"
-                sx={{ whiteSpace: 'pre-line' }}
-              >
-                {promptText}
-              </Typography>
+              <RichText content={promptText} variant="body1" sx={{ fontSize: '1rem' }} />
             )}
             <Typography variant="body2" color="text.secondary">
               Enter the argument as a single line, then build a derivation for it.

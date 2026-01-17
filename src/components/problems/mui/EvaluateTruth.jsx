@@ -3,6 +3,7 @@ import { Box, Stack, Radio, RadioGroup, FormControlLabel, FormControl, Alert } f
 import ProblemSetButtons from './ProblemSetButtons.jsx'
 import { useProblemChecker } from '../../../hooks/useProblemChecker.js'
 import SolutionReveal from '../SolutionReveal.jsx'
+import RichText from '../../ui/RichText.jsx'
 
 export default function EvaluateTruth({ 
   problem, 
@@ -15,6 +16,7 @@ export default function EvaluateTruth({
   readOnly = false,
   hideActions = false,
 }) {
+  const prompt = problem?.prompt || ''
   const [selectedValue, setSelectedValue] = useState(
     savedState?.ans !== undefined ? (savedState.ans ? 'true' : 'false') : ''
   )
@@ -68,6 +70,9 @@ export default function EvaluateTruth({
           className="lp-problem-card"
         >
           <Stack spacing={3} sx={{ p: { xs: 2, md: 2 } }}>
+            {prompt && (
+              <RichText content={prompt} variant="body1" sx={{ fontSize: '1rem' }} />
+            )}
             <FormControl component="fieldset" sx={{ width: '100%' }}>
               <RadioGroup
                 value={selectedValue}

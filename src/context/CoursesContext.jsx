@@ -31,6 +31,28 @@ const COURSE_COLORS = [
   "#0ea5e9",
 ];
 
+const activeCourseStorageKey = (userId) => `logicapp_active_course_id_${userId || "anon"}`;
+
+const readStoredActiveCourseId = (userId) => {
+  if (typeof window === "undefined" || !userId) return null;
+  try {
+    const raw = window.localStorage.getItem(activeCourseStorageKey(userId));
+    const id = Number(raw);
+    return Number.isFinite(id) ? id : null;
+  } catch (error) {
+    return null;
+  }
+};
+
+const writeStoredActiveCourseId = (userId, courseId) => {
+  if (typeof window === "undefined" || !userId) return;
+  try {
+    window.localStorage.setItem(activeCourseStorageKey(userId), String(courseId));
+  } catch (error) {
+    // ignore storage errors
+  }
+};
+
 const splitDateTime = (isoString) => {
   if (!isoString) return { date: null, time: null };
   const date = new Date(isoString);
@@ -363,6 +385,9 @@ const initialState = {
 
 function coursesReducer(state, action) {
   switch (action.type) {
+    case "RESET_COURSES_STATE":
+      return { ...initialState };
+
     case "SET_LOADING":
       return { ...state, loading: action.payload };
 
@@ -537,11 +562,17 @@ export function useActiveCourse() {
 // ============================================================================
 
 export function setActiveCourse(dispatch, courseId) {
+  const storedUser = getStoredUser();
+  writeStoredActiveCourseId(storedUser?.id, courseId);
   dispatch({ type: "SET_ACTIVE_COURSE", payload: courseId });
 }
 
 export function setCourses(dispatch, courses) {
   dispatch({ type: "SET_COURSES", payload: courses });
+}
+
+export function resetCourses(dispatch) {
+  dispatch({ type: "RESET_COURSES_STATE" });
 }
 
 export function setAssignments(dispatch, courseId, assignments) {
@@ -705,6 +736,8 @@ export async function initializeCourses(dispatch) {
 
       // Set active course - prioritize last created course
       if (coursesWithCounts.length > 0) {
+        const storedUser = getStoredUser();
+        const storedActiveCourseId = readStoredActiveCourseId(storedUser?.id);
         const sortedCourses = [...coursesWithCounts].sort((a, b) => {
           if (a.createdAt && b.createdAt) {
             return new Date(b.createdAt) - new Date(a.createdAt);
@@ -714,8 +747,15 @@ export async function initializeCourses(dispatch) {
           return idB - idA;
         });
 
+        const storedCourse = storedActiveCourseId
+          ? coursesWithCounts.find((course) => Number(course.id) === Number(storedActiveCourseId))
+          : null;
         const mostRecentCourse = sortedCourses[0];
-        dispatch({ type: "SET_ACTIVE_COURSE", payload: mostRecentCourse.id });
+        const defaultCourse = storedCourse || mostRecentCourse;
+        dispatch({ type: "SET_ACTIVE_COURSE", payload: defaultCourse.id });
+        if (storedUser?.id && defaultCourse?.id) {
+          writeStoredActiveCourseId(storedUser.id, defaultCourse.id);
+        }
 
         // Load data for all courses in parallel
         await Promise.all(

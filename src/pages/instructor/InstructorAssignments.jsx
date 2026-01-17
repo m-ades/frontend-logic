@@ -301,9 +301,11 @@ export default function InstructorAssignments() {
       <Box
         sx={{
           display: "flex",
+          flexDirection: { xs: "column", sm: "row" },
           justifyContent: "space-between",
-          alignItems: "center",
+          alignItems: { xs: "flex-start", sm: "center" },
           mb: 3,
+          gap: 2,
         }}
       >
         <Box>
@@ -318,6 +320,7 @@ export default function InstructorAssignments() {
           variant="contained"
           startIcon={<Plus size={20} />}
           onClick={handleCreateOpen}
+          sx={{ width: { xs: "100%", sm: "auto" } }}
         >
           Create Assignment
         </Button>

@@ -63,12 +63,16 @@ export default function Login() {
 
       let role = 'student';
       try {
-        const enrollments = await fetchJson('/api/course-enrollments');
-        const courseEnrollment = (enrollments || []).find(
-          (enrollment) => Number(enrollment.course_id) === Number(API_CONFIG.courseId)
-        );
-        if (courseEnrollment && ['instructor', 'ta'].includes(courseEnrollment.role)) {
+        if (data?.user?.is_system_admin) {
           role = 'instructor';
+        } else {
+          const enrollments = await fetchJson('/api/course-enrollments');
+          const hasInstructorEnrollment = (enrollments || []).some((enrollment) =>
+            ['instructor', 'ta'].includes(enrollment.role)
+          );
+          if (hasInstructorEnrollment) {
+            role = 'instructor';
+          }
         }
       } catch (enrollmentError) {
         console.warn('Failed to load enrollments for role routing', enrollmentError);

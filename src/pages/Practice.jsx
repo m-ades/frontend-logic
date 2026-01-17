@@ -27,15 +27,32 @@ const buildCourseStructure = (assignments, sectionTitle) => {
     chapters.set(chapterLabel, chapterEntry)
   })
 
-  return Array.from(chapters.entries()).map(([chapterLabel, subMap]) => ({
-    id: chapterLabel,
-    title: chapterLabel,
-    subchapters: Array.from(subMap.entries()).map(([subLabel, items]) => ({
-      id: `${chapterLabel}-${subLabel}`,
-      title: subLabel,
-      activities: items,
-    })),
-  }))
+  const compareLabels = (a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' })
+  const chapterValue = (label) => {
+    const match = /^Chapter\s+(\d+)/i.exec(label)
+    return match ? Number(match[1]) : null
+  }
+
+  return Array.from(chapters.entries())
+    .sort(([labelA], [labelB]) => {
+      const aNum = chapterValue(labelA)
+      const bNum = chapterValue(labelB)
+      if (aNum !== null && bNum !== null) return aNum - bNum
+      if (aNum !== null) return -1
+      if (bNum !== null) return 1
+      return compareLabels(labelA, labelB)
+    })
+    .map(([chapterLabel, subMap]) => ({
+      id: chapterLabel,
+      title: chapterLabel,
+      subchapters: Array.from(subMap.entries())
+        .sort(([a], [b]) => compareLabels(a, b))
+        .map(([subLabel, items]) => ({
+          id: `${chapterLabel}-${subLabel}`,
+          title: subLabel,
+          activities: items,
+        })),
+    }))
 }
 
 export default function Practice() {
@@ -83,21 +100,27 @@ export default function Practice() {
         courseStructure={courseStructure}
         emptyText="No practice problems available"
         renderActivity={(activity, { chapter, subchapter }) => (
-          <ThemedCard            key={activity.id}
+          <ThemedCard
+            key={activity.id}
             sx={{ cursor: 'pointer', '&:hover': { boxShadow: 4 } }}
             onClick={() => handleActivityClick(activity)}
           >
             <CardContent>
-              <Stack direction="row" justifyContent="space-between" alignItems="flex-start" spacing={2}>
-                <Box sx={{ flex: 1 }}>
-                  <Typography variant="h6" sx={{ mb: 1 }}>
+              <Stack
+                direction={{ xs: 'column', sm: 'row' }}
+                justifyContent="space-between"
+                alignItems={{ xs: 'flex-start', sm: 'flex-start' }}
+                spacing={2}
+              >
+                <Box sx={{ flex: 1, minWidth: 0 }}>
+                  <Typography variant="h6" sx={{ mb: 1, wordBreak: 'break-word' }}>
                     {activity.title}
                   </Typography>
                   <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
                     {chapter.title} • {subchapter.title}
                   </Typography>
                   {activity.description && (
-                    <Typography variant="body2" color="text.secondary">
+                    <Typography variant="body2" color="text.secondary" sx={{ wordBreak: 'break-word' }}>
                       {activity.description}
                     </Typography>
                   )}
@@ -107,7 +130,13 @@ export default function Practice() {
                     </Typography>
                   )}
                 </Box>
-                <Chip label="Practice" size="small" color="primary" variant="outlined" />
+                <Chip
+                  label="Practice"
+                  size="small"
+                  color="primary"
+                  variant="outlined"
+                  sx={{ alignSelf: { xs: 'flex-start', sm: 'center' } }}
+                />
               </Stack>
             </CardContent>
           </ThemedCard>

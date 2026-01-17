@@ -29,7 +29,14 @@ export default function WorksheetTabs({
   completedProofs,
   onProofComplete,
   getSavedProofState,
-  handleProofStateChange
+  handleProofStateChange,
+  gradePercent,
+  total,
+  score,
+  dueDate,
+  completionPercent,
+  gradeLabel,
+  isOverdue
 }) {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
@@ -51,6 +58,13 @@ export default function WorksheetTabs({
             onProofComplete={onProofComplete}
             getSavedProofState={getSavedProofState}
             handleProofStateChange={handleProofStateChange}
+            gradePercent={gradePercent}
+            total={total}
+            score={score}
+            dueDate={dueDate}
+            completionPercent={completionPercent}
+            gradeLabel={gradeLabel}
+            isOverdue={isOverdue}
           />
         </WorksheetTabPanel>
       ))}

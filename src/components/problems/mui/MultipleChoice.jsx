@@ -3,6 +3,7 @@ import { Box, Stack, Radio, RadioGroup, FormControlLabel, FormControl, FormGroup
 import ProblemSetButtons from './ProblemSetButtons.jsx'
 import { useProblemChecker } from '../../../hooks/useProblemChecker.js'
 import SolutionReveal from '../SolutionReveal.jsx'
+import RichText from '../../ui/RichText.jsx'
 
 export default function MultipleChoice({ 
   problem, 
@@ -16,6 +17,7 @@ export default function MultipleChoice({
   hideActions = false,
   suppressReveal = false,
 }) {
+  const prompt = problem?.prompt || ''
   const subquestions = Array.isArray(problem?.subquestions) ? problem.subquestions : []
   const isComposite = subquestions.length > 0
   const isMultiSelect = !isComposite && (Array.isArray(answer) || Array.isArray(problem?.answerIndices) || problem?.multiSelect)
@@ -162,6 +164,53 @@ export default function MultipleChoice({
           className="lp-problem-card"
         >
           <Stack spacing={3} sx={{ p: { xs: 2, md: 2 } }}>
+            {prompt && (
+              <Box 
+                className="multiple-choice-prompt"
+                sx={{ 
+                  mb: 3,
+                  '& .MuiTypography-root': {
+                    fontSize: '1.2rem',
+                    lineHeight: 1.7,
+                    fontWeight: 400
+                  },
+                  '& .MuiTypography-root *': {
+                    fontSize: '1.2rem',
+                    lineHeight: 1.7,
+                    fontWeight: 400
+                  },
+                  '& .MuiTypography-root div': {
+                    marginBottom: '0.75rem',
+                    fontSize: '1.2rem',
+                    lineHeight: 1.7,
+                    fontWeight: 400,
+                    '&:last-child': {
+                      marginBottom: 0
+                    }
+                  },
+                  '& .MuiTypography-root .instructions': {
+                    fontSize: '1rem',
+                    lineHeight: 1.6,
+                    fontWeight: 600
+                  },
+                  '& .MuiTypography-root div.instructions': {
+                    fontSize: '1rem',
+                    lineHeight: 1.6,
+                    fontWeight: 600
+                  },
+                  '& .MuiTypography-root strong': {
+                    fontWeight: 600
+                  },
+                  '& .MuiTypography-root div:has(strong)': {
+                    fontSize: '1rem',
+                    lineHeight: 1.6,
+                    fontWeight: 400
+                  }
+                }}
+              >
+                <RichText content={prompt} variant="body1" />
+              </Box>
+            )}
             {isComposite ? (
               <Stack spacing={3}>
                 {subquestions.map((subq, subIdx) => {
@@ -170,11 +219,7 @@ export default function MultipleChoice({
                     : (subq?.choices || [])
                   return (
                     <Box key={`mc-subq-${subIdx}`}>
-                      {subq?.prompt && (
-                        <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
-                          {subq.prompt}
-                        </Typography>
-                      )}
+                      <RichText content={subq?.prompt} variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }} />
                       <FormControl component="fieldset" sx={{ width: '100%' }}>
                         {isMultiSelectSubq(subq) ? (
                           <FormGroup>
@@ -305,11 +350,7 @@ export default function MultipleChoice({
                   : (Number.isFinite(subq.answerIndex) ? subq.answerIndex : null)
                 return (
                   <Box key={`solution-${subIdx}`}>
-                    {subq?.prompt && (
-                      <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
-                        {subq.prompt}
-                      </Typography>
-                    )}
+                    <RichText content={subq?.prompt} variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }} />
                     <FormControl component="fieldset" sx={{ width: '100%' }}>
                       {isMulti ? (
                         <FormGroup>

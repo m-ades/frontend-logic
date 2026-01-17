@@ -58,9 +58,12 @@
   padding: 1rem;
   box-shadow: 0 7px 12px -3px rgba(0, 0, 0, 0.08), 0 3px 5px -2px rgba(0, 0, 0, 0.04);
   border: 1px solid rgba(0, 0, 0, 0.08);
-  width: max-content;
-  min-width: 28em;
+  width: 100%;
+  min-width: 0;
   max-width: 100%;
+  box-sizing: border-box;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
 }
 
 .logicpenguin .tt-table-wrap {
@@ -135,8 +138,26 @@
 
 
 @media (max-width: 900px) {
+  .logicpenguin {
+    font-size: 18px;
+  }
+
   .logicpenguin .lp-problem-card {
     width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    padding: 0.85rem;
+    box-sizing: border-box;
+  }
+}
+
+@media (max-width: 600px) {
+  .logicpenguin {
+    font-size: 16px;
+  }
+
+  .logicpenguin .tt-table {
+    font-size: 0.8rem;
   }
 }
 

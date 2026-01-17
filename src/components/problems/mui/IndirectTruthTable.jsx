@@ -22,6 +22,7 @@ import getSyntax from '../../../lib/logicpenguin/symbolic/libsyntax.js'
 import { multiTables } from '../../../lib/logicpenguin/symbolic/libsemantics.js'
 import ProblemSetButtons from './ProblemSetButtons.jsx'
 import { useProblemChecker } from '../../../hooks/useProblemChecker.js'
+import RichText from '../../ui/RichText.jsx'
 
 const toSymbol = (value) => {
   if (value === true || value === 'T' || value === 't' || value === 1) return 'T'
@@ -291,12 +292,11 @@ export default function IndirectTruthTable({
         >
           <Stack spacing={3} sx={{ p: { xs: 2, md: 2 } }}>
             {prompt && (
-              <Typography
+              <RichText
+                content={prompt}
                 variant="body1"
-                sx={{ fontSize: { xs: '0.95rem', md: '1rem' }, whiteSpace: 'pre-line' }}
-              >
-                {prompt}
-              </Typography>
+                sx={{ fontSize: { xs: '0.95rem', md: '1rem' } }}
+              />
             )}
 
             {argument?.premises?.length > 0 && (
@@ -330,54 +330,58 @@ export default function IndirectTruthTable({
                 <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
                   Sandbox (not graded)
                 </Typography>
-                <TableContainer component={Paper} className="tt-table-wrap" elevation={0}>
-                  <Table className="tt-table">
-                    <TableHead className="tt-head">
-                      <TableRow className="tt-token-row">
-                        {sandboxColumns.map((col, idx) => (
-                          <TableCell
-                            key={`itt-label-${idx}`}
-                            className="tt-token"
-                            align="center"
-                            sx={col.separator ? { width: 18, px: 0 } : undefined}
-                          >
-                            {col.token}
-                          </TableCell>
-                        ))}
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {sandboxRows.map((row, rowIndex) => (
-                        <TableRow key={`itt-row-${rowIndex}`} className="tt-row">
-                          {sandboxColumns.map((col, idx) => {
-                            if (col.separator) {
-                              return (
-                                <TableCell key={`itt-cell-${rowIndex}-${idx}`} className="tt-cell" align="center" />
-                              )
-                            }
-                            const dataIndex = sandboxColumns
-                              .slice(0, idx)
-                              .filter((c) => !c.separator).length
-                            return (
-                              <TableCell key={`itt-cell-${rowIndex}-${idx}`} className="tt-cell" align="center">
-                                <TruthToggle
-                                  value={row?.[dataIndex] ?? ''}
-                                  onChange={(value) => handleSandboxChange(rowIndex, dataIndex, value)}
-                                  ariaLabel={`Sandbox row ${rowIndex + 1} col ${dataIndex + 1}`}
-                                  readOnly={readOnly}
-                                />
+                <Box className="tt-table-wrap">
+                  <Box sx={{ width: 'max-content', minWidth: 'max-content', display: 'flex', flexDirection: 'column' }}>
+                    <TableContainer component={Paper} elevation={0}>
+                      <Table className="tt-table">
+                        <TableHead className="tt-head">
+                          <TableRow className="tt-token-row">
+                            {sandboxColumns.map((col, idx) => (
+                              <TableCell
+                                key={`itt-label-${idx}`}
+                                className="tt-token"
+                                align="center"
+                                sx={col.separator ? { width: 18, px: 0 } : undefined}
+                              >
+                                {col.token}
                               </TableCell>
-                            )
-                          })}
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
-                <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 1 }}>
-                  <Button size="small" variant="outlined" onClick={handleAddRow} disabled={readOnly}>
-                    + Add row
-                  </Button>
+                            ))}
+                          </TableRow>
+                        </TableHead>
+                        <TableBody>
+                          {sandboxRows.map((row, rowIndex) => (
+                            <TableRow key={`itt-row-${rowIndex}`} className="tt-row">
+                              {sandboxColumns.map((col, idx) => {
+                                if (col.separator) {
+                                  return (
+                                    <TableCell key={`itt-cell-${rowIndex}-${idx}`} className="tt-cell" align="center" />
+                                  )
+                                }
+                                const dataIndex = sandboxColumns
+                                  .slice(0, idx)
+                                  .filter((c) => !c.separator).length
+                                return (
+                                  <TableCell key={`itt-cell-${rowIndex}-${idx}`} className="tt-cell" align="center">
+                                    <TruthToggle
+                                      value={row?.[dataIndex] ?? ''}
+                                      onChange={(value) => handleSandboxChange(rowIndex, dataIndex, value)}
+                                      ariaLabel={`Sandbox row ${rowIndex + 1} col ${dataIndex + 1}`}
+                                      readOnly={readOnly}
+                                    />
+                                  </TableCell>
+                                )
+                              })}
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </TableContainer>
+                    <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 1 }}>
+                      <Button size="small" variant="outlined" onClick={handleAddRow} disabled={readOnly}>
+                        + Add row
+                      </Button>
+                    </Box>
+                  </Box>
                 </Box>
               </Box>
             )}
@@ -386,11 +390,7 @@ export default function IndirectTruthTable({
               <Stack spacing={2}>
                 {mcQuestions.map((mcq, qIdx) => (
                   <Box key={`itt-mc-${qIdx}`} sx={{ width: '100%' }}>
-                    {mcq.prompt && (
-                      <Typography variant="body1" sx={{ mb: 1, fontWeight: 500 }}>
-                        {mcq.prompt}
-                      </Typography>
-                    )}
+                    <RichText content={mcq.prompt} variant="body1" sx={{ mb: 1, fontWeight: 500 }} />
                     <RadioGroup
                       value={selectedValues[qIdx] ?? ''}
                       onChange={(event) => handleChoiceChange(qIdx, event.target.value)}

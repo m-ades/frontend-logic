@@ -1,6 +1,6 @@
 import { useState, useMemo, useCallback, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Box, Grid, Tabs, Tab, Typography, CardContent, Chip, Stack } from '@mui/material'
+import { Box, Tabs, Tab, Typography, CardContent, Chip, Stack } from '@mui/material'
 import ThemedCard from '../components/ui/ThemedCard.jsx'
 import ActivityAccordion from '../components/ui/ActivityAccordion.jsx'
 import { ACTIVITY_TYPES } from '../placeholder/courseActivities.js'
@@ -28,15 +28,32 @@ const buildCourseStructure = (assignments, sectionTitle) => {
     chapters.set(chapterLabel, chapterEntry)
   })
 
-  return Array.from(chapters.entries()).map(([chapterLabel, subMap]) => ({
-    id: chapterLabel,
-    title: chapterLabel,
-    subchapters: Array.from(subMap.entries()).map(([subLabel, items]) => ({
-      id: `${chapterLabel}-${subLabel}`,
-      title: subLabel,
-      activities: items,
-    })),
-  }))
+  const compareLabels = (a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' })
+  const chapterValue = (label) => {
+    const match = /^Chapter\s+(\d+)/i.exec(label)
+    return match ? Number(match[1]) : null
+  }
+
+  return Array.from(chapters.entries())
+    .sort(([labelA], [labelB]) => {
+      const aNum = chapterValue(labelA)
+      const bNum = chapterValue(labelB)
+      if (aNum !== null && bNum !== null) return aNum - bNum
+      if (aNum !== null) return -1
+      if (bNum !== null) return 1
+      return compareLabels(labelA, labelB)
+    })
+    .map(([chapterLabel, subMap]) => ({
+      id: chapterLabel,
+      title: chapterLabel,
+      subchapters: Array.from(subMap.entries())
+        .sort(([a], [b]) => compareLabels(a, b))
+        .map(([subLabel, items]) => ({
+          id: `${chapterLabel}-${subLabel}`,
+          title: subLabel,
+          activities: items,
+        })),
+    }))
 }
 
 function TabPanel({ children, value, index }) {
@@ -175,27 +192,33 @@ export default function Assignments() {
   }, [])
 
   const renderActivity = (activity, { chapter, subchapter }, datePrefix, showCompletionChip) => (
-    <ThemedCard      key={activity.id}
+    <ThemedCard
+      key={activity.id}
       sx={{ cursor: 'pointer', '&:hover': { boxShadow: 4 } }}
       onClick={() => handleActivityClick(activity)}
     >
       <CardContent sx={{ pl: 0, pr: 2, pt: 2, pb: 2, '&:last-child': { pb: 2 } }}>
-        <Stack direction="row" justifyContent="space-between" alignItems="flex-start" spacing={2}>
-          <Box sx={{ flex: 1 }}>
-            <Typography variant="h6" sx={{ mb: 1 }}>
+        <Stack
+          direction={{ xs: 'column', sm: 'row' }}
+          justifyContent="space-between"
+          alignItems={{ xs: 'flex-start', sm: 'flex-start' }}
+          spacing={2}
+        >
+          <Box sx={{ flex: 1, minWidth: 0 }}>
+            <Typography variant="h6" sx={{ mb: 1, wordBreak: 'break-word' }}>
               {activity.title}
             </Typography>
             <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
               {chapter.title} • {subchapter.title}
             </Typography>
             {activity.description && (
-              <Typography variant="body2" color="text.secondary">
+              <Typography variant="body2" color="text.secondary" sx={{ wordBreak: 'break-word' }}>
                 {activity.description}
               </Typography>
             )}
           </Box>
-          <Stack spacing={1} alignItems="flex-end">
-            <Stack direction="row" spacing={1} alignItems="center">
+          <Stack spacing={1} alignItems={{ xs: 'flex-start', sm: 'flex-end' }} width={{ xs: '100%', sm: 'auto' }}>
+            <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap">
               <Chip
                 label={activity.type === ACTIVITY_TYPES.HOMEWORK ? 'Homework' : activity.type === ACTIVITY_TYPES.QUIZ ? 'Quiz' : 'Exam'}
                 size="small"
@@ -231,39 +254,30 @@ export default function Assignments() {
 
   return (
     <Box>
-      <Grid container spacing={3}>
-        <Grid size={{ xs: 12, lg: 8 }}>
-          <Tabs value={tabValue} onChange={handleTabChange} sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
-            <Tab label="All Assignments" />
-            <Tab label="Upcoming" />
-            <Tab label="Submitted" />
-          </Tabs>
+      <Tabs
+        value={tabValue}
+        onChange={handleTabChange}
+        variant="scrollable"
+        scrollButtons="auto"
+        allowScrollButtonsMobile
+        sx={{ borderBottom: 1, borderColor: 'divider', mb: 3, maxWidth: '100%' }}
+      >
+        <Tab label="All Assignments" />
+        <Tab label="Upcoming" />
+        <Tab label="Submitted" />
+      </Tabs>
 
-          <TabPanel value={tabValue} index={0}>
-            {renderAssignmentsAccordion('No assignments found', '', true)}
-          </TabPanel>
+      <TabPanel value={tabValue} index={0}>
+        {renderAssignmentsAccordion('No assignments found', '', true)}
+      </TabPanel>
 
-          <TabPanel value={tabValue} index={1}>
-            {renderAssignmentsAccordion('No upcoming assignments', 'Due: ', false)}
-          </TabPanel>
+      <TabPanel value={tabValue} index={1}>
+        {renderAssignmentsAccordion('No upcoming assignments', 'Due: ', false)}
+      </TabPanel>
 
-          <TabPanel value={tabValue} index={2}>
-            {renderAssignmentsAccordion('No submitted assignments', 'Submitted: ', true)}
-          </TabPanel>
-        </Grid>
-        <Grid size={{ xs: 12, lg: 4 }}>
-          <ThemedCard>
-            <CardContent>
-              <Typography variant="subtitle2" color="text.secondary">
-                Your average
-              </Typography>
-              <Typography variant="h4" fontWeight={600} sx={{ mb: 3 }}>
-                {averagePercent !== null ? `${averagePercent.toFixed(2)}%` : '—'}
-              </Typography>
-            </CardContent>
-          </ThemedCard>
-        </Grid>
-      </Grid>
+      <TabPanel value={tabValue} index={2}>
+        {renderAssignmentsAccordion('No submitted assignments', 'Submitted: ', true)}
+      </TabPanel>
     </Box>
   )
 }
