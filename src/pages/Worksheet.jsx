@@ -1,11 +1,12 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import WorksheetLayout from '../components/layout/WorksheetLayout.jsx'
 import WorksheetTabs from '../components/problems/WorksheetTabs.jsx'
 import { useScoring } from '../hooks/usescoring.js'
 import { useProofState } from '../hooks/useproofstate.js'
-import { exportWorksheetPDF } from '../utils/exportPDF.js'
-import { API_CONFIG, fetchJson } from '../utils/api.js'
+// import { exportWorksheetPDF } from '../utils/exportPDF.js'
+import { API_CONFIG, fetchJson, getActiveUserId } from '../utils/api.js'
+import { useCoursesState } from '../context/CoursesContext.jsx'
 
 export default function Worksheet() {
   const { worksheetId, assignmentId } = useParams()
@@ -14,6 +15,14 @@ export default function Worksheet() {
   const [worksheets, setWorksheets] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const [loadError, setLoadError] = useState('')
+  const [gradePercent, setGradePercent] = useState(null)
+  const [currentDueDate, setCurrentDueDate] = useState(null)
+  const { activeCourseId } = useCoursesState()
+  const courseId = activeCourseId ?? API_CONFIG.courseId
+  const sessionId = useRef(null)
+  const questionSessionId = useRef(null)
+  const activeUserId = getActiveUserId()
+  const gradesCache = useRef(null)
   
   // support both /assignment/:id and /worksheet/:id routes
   // assignmentId will be used when backend is implemented
@@ -27,8 +36,152 @@ export default function Worksheet() {
   const currentWorksheet = worksheets[currentWorksheetIndex]
   const currentProof = currentWorksheet?.proofs[currentProofIndex]
   
-  const { completedProofs, score, scoreStyle, handleProofComplete } = useScoring(currentWorksheet)
-  const { getSavedProofState, handleProofStateChange } = useProofState()
+  const {
+    completedProofs,
+    score,
+    scoreStyle,
+    handleProofComplete,
+    setCompletedProofs,
+  } = useScoring(currentWorksheet)
+  const { getSavedProofState, handleProofStateChange, initializeSavedProofStates } = useProofState()
+
+  useEffect(() => {
+    let keepGoing = true
+
+    const startSession = async () => {
+      if (!currentWorksheet?.id) return
+      try {
+        const session = await fetchJson('/api/assignment-sessions', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            assignment_id: currentWorksheet.id,
+            user_id: activeUserId,
+            started_at: new Date().toISOString(),
+          }),
+        })
+        if (keepGoing) {
+          sessionId.current = session?.id ?? null
+        }
+      } catch (err) {
+        // ignore for now
+      }
+    }
+
+    const endSession = async () => {
+      if (!sessionId.current) return
+      try {
+        await fetchJson(`/api/assignment-sessions/${sessionId.current}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ended_at: new Date().toISOString() }),
+        })
+      } catch (err) {
+        // ignore for now
+      } finally {
+        sessionId.current = null
+      }
+    }
+
+    // start a session when this assignment loads
+    if (currentWorksheet?.id) {
+      startSession()
+    }
+
+    // end it when leaving this assignment
+    return () => {
+      keepGoing = false
+      endSession()
+    }
+  }, [currentWorksheet?.id])
+
+  useEffect(() => {
+    let keepGoing = true
+
+    const startQuestion = async () => {
+      if (!currentProof?.questionId) return
+      try {
+        const session = await fetchJson('/api/question-sessions', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            assignment_question_id: currentProof.questionId,
+            user_id: activeUserId,
+            started_at: new Date().toISOString(),
+          }),
+        })
+        if (keepGoing) {
+          questionSessionId.current = session?.id ?? null
+        }
+      } catch (err) {
+        // ignore for now
+      }
+    }
+
+    const endQuestion = async () => {
+      if (!questionSessionId.current) return
+      try {
+        await fetchJson(`/api/question-sessions/${questionSessionId.current}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ended_at: new Date().toISOString() }),
+        })
+      } catch (err) {
+        // ignore for now
+      } finally {
+        questionSessionId.current = null
+      }
+    }
+
+    // start session when a question becomes 'active'
+    if (currentProof?.questionId) {
+      startQuestion()
+    }
+
+    // end it upon any nav away from the question
+    return () => {
+      keepGoing = false
+      endQuestion()
+    }
+  }, [currentProof?.questionId])
+
+  useEffect(() => {
+    let isMounted = true
+
+    const loadGradePercent = async () => {
+      if (!currentWorksheet?.id || !activeUserId) return
+      try {
+        if (!gradesCache.current) {
+          const grades = await fetchJson(`/api/users/${activeUserId}/grades`)
+          gradesCache.current = new Map(
+            (grades || []).map((grade) => [
+              Number(grade.assignment_id ?? grade.Assignment?.id),
+              grade,
+            ])
+          )
+        }
+        const grade = gradesCache.current.get(Number(currentWorksheet.id))
+        const total = grade?.max_score || 0
+        const score = grade?.final_score ?? grade?.raw_score ?? null
+        const percent = total > 0 && score !== null ? (score / total) * 100 : null
+        if (isMounted) {
+          setGradePercent(percent)
+          setCurrentDueDate(currentWorksheet?.due_date ?? null)
+        }
+      } catch (error) {
+        if (isMounted) {
+          setGradePercent(null)
+          setCurrentDueDate(null)
+        }
+      }
+    }
+
+    loadGradePercent()
+
+    return () => {
+      isMounted = false
+    }
+  }, [activeUserId, currentWorksheet?.id])
 
   useEffect(() => {
     let isMounted = true
@@ -41,11 +194,18 @@ export default function Worksheet() {
       const snapshot = question?.question_snapshot || {}
       const type = normalizeType(snapshot)
       const description = snapshot.prompt || snapshot.description || snapshot.text || 'Solve.'
-      const proofId = `${assignment.id}-${question.id}`
+      const questionId = question?.id ?? question?.assignment_question_id ?? question?.assignmentQuestionId ?? null
+      const proofId = `${assignment.id}-${questionId ?? index}`
+      const solution = snapshot.solution
+      const attemptLimit = question?.attempt_limit ?? 3
+      const legend = snapshot.legend || snapshot.legend_text || snapshot.legendText || ''
       const proofBase = {
         id: proofId,
-        questionId: question.id,
+        questionId,
         description,
+        solution,
+        attemptLimit,
+        legend,
       }
 
       if (type === 'derivation' || type === 'derivation-hurley') {
@@ -58,12 +218,18 @@ export default function Worksheet() {
       }
 
       if (type === 'truth-table') {
+        const ttOptions = snapshot.options || snapshot.truthTable?.options || {}
+        const ttSnapshot = snapshot.truthTable || {}
+        const ttKind = ttSnapshot.kind || snapshot.truthTable?.kind || 'formula'
         return {
           ...proofBase,
           type: 'truth-table',
-          truthTable: snapshot.truthTable || {
-            kind: snapshot.truthTable?.kind || 'formula',
-            statement: snapshot.statement || snapshot.formula || '',
+          options: ttOptions,
+          truthTable: {
+            ...ttSnapshot,
+            kind: ttKind,
+            statement: ttSnapshot.statement ?? snapshot.statement ?? snapshot.formula ?? '',
+            options: ttOptions,
           },
         }
       }
@@ -72,20 +238,61 @@ export default function Worksheet() {
         return {
           ...proofBase,
           type: 'symbolic-translation',
-          translation: snapshot.prompt || snapshot.statement || snapshot.question || '',
+          translation: {
+            legend: snapshot.legend || '',
+            prompt: snapshot.prompt || snapshot.statement || snapshot.question || '',
+            options: snapshot.options || {},
+          },
           answer: snapshot.answer,
         }
       }
 
       if (type === 'multiple-choice') {
+        const subquestions = snapshot.subquestions || snapshot.questions || []
+        const hasSubquestions = Array.isArray(subquestions) && subquestions.length > 0
+        const baseMultipleChoice = snapshot.multipleChoice || {
+          prompt: snapshot.prompt || '',
+          choices: snapshot.choices || [],
+        }
+        const normalizedMultipleChoice = {
+          ...baseMultipleChoice,
+          subquestions: baseMultipleChoice.subquestions || subquestions,
+        }
         return {
           ...proofBase,
           type: 'multiple-choice',
-          multipleChoice: snapshot.multipleChoice || {
+          multipleChoice: normalizedMultipleChoice,
+          answer: hasSubquestions ? null : (snapshot.answerIndices ?? snapshot.answerIndex ?? snapshot.answer),
+        }
+      }
+
+      if (type === 'indirect-truth-table') {
+        const snapshotQuestions = snapshot.questions || snapshot.subquestions || []
+        const choiceList = Array.isArray(snapshot.choices) ? snapshot.choices : []
+        const questions = Array.isArray(snapshotQuestions) && snapshotQuestions.length > 0
+          ? snapshotQuestions
+          : (choiceList.length > 0
+            ? [{
+                prompt: snapshot.choicePrompt || snapshot.question || '',
+                choices: choiceList,
+                answerIndex: snapshot.answerIndex ?? snapshot.answer ?? (Array.isArray(snapshot.answerIndices) ? snapshot.answerIndices[0] : undefined),
+              }]
+            : [])
+        const derivedAnswer = questions.length
+          ? questions.map((q) => q.answerIndex ?? q.answer ?? q.correctIndex)
+          : (snapshot.answerIndex ?? snapshot.answer ?? snapshot.answerIndices)
+        return {
+          ...proofBase,
+          type: 'indirect-truth-table',
+          answer: derivedAnswer,
+          indirectTruthTable: {
             prompt: snapshot.prompt || '',
-            choices: snapshot.choices || [],
+            argument: snapshot.argument || {},
+            questions,
+            subquestions: questions,
+            choices: choiceList,
+            sandbox: snapshot.sandbox || {},
           },
-          answer: snapshot.answerIndex ?? snapshot.answer,
         }
       }
 
@@ -109,6 +316,7 @@ export default function Worksheet() {
         }
       }
 
+      /*
       if (type === 'valid-correct-sound') {
         return {
           ...proofBase,
@@ -118,6 +326,49 @@ export default function Worksheet() {
           answer: snapshot.answer,
         }
       }
+      */
+
+      if (type === 'single-row-truth-table') {
+        return {
+          ...proofBase,
+          type: 'single-row-truth-table',
+          singleRowTruthTable: {
+            statement: snapshot.statement || snapshot.evaluateTruth || snapshot.prompt || '',
+            interpretation: snapshot.interpretation || {},
+            prompt: snapshot.prompt || snapshot.description || '',
+          },
+        }
+      }
+
+      if (type === 'partial-truth-table') {
+        return {
+          ...proofBase,
+          type: 'partial-truth-table',
+          partialTruthTable: snapshot,
+        }
+      }
+
+      if (type === 'combo-translation-truth-table') {
+        return {
+          ...proofBase,
+          description: '',
+          type: 'combo-translation-truth-table',
+          answer: snapshot.answer,
+          options: snapshot.options,
+          comboTranslationTruthTable: snapshot,
+        }
+      }
+
+      if (type === 'combo-translation-derivation') {
+        return {
+          ...proofBase,
+          description: '',
+          type: 'combo-translation-derivation',
+          answer: snapshot.answer,
+          options: snapshot.options,
+          comboTranslationDerivation: snapshot,
+        }
+      }
 
       return {
         ...proofBase,
@@ -125,26 +376,290 @@ export default function Worksheet() {
       }
     }
 
+    const toSymbol = (value) => (value === true ? 'T' : value === false ? 'F' : '')
+    const buildTruthTableState = (lefts, right, data) => {
+      const mapRows = (rows = []) => rows.map((row) => row.map(toSymbol))
+      const state = ({
+        tables: [
+          ...lefts.map((table) => ({ rows: mapRows(table.rows) })),
+          { rows: mapRows(right.rows) }
+        ]
+      })
+      if (Array.isArray(data?.mcans)) {
+        state.mcans = data.mcans
+      }
+      if (data?.taut !== undefined) {
+        state.taut = data.taut
+      }
+      if (data?.contra !== undefined) {
+        state.contra = data.contra
+      }
+      if (data?.valid !== undefined) {
+        state.valid = data.valid
+      }
+      if (data?.equiv !== undefined) {
+        state.equiv = data.equiv
+      }
+      return state
+    }
+
+    const loadSavedStates = async (worksheetData) => {
+      const questionIds = new Set()
+      const proofMeta = {}
+
+      worksheetData.forEach((worksheet) => {
+        worksheet.proofs.forEach((proof) => {
+          if (proof.questionId) {
+            questionIds.add(proof.questionId)
+            proofMeta[proof.questionId] = proof
+          }
+        })
+      })
+
+      const draftMap = new Map()
+      try {
+        const drafts = await fetchJson('/api/assignment-drafts')
+        drafts.forEach((draft) => {
+          if (draft.user_id !== activeUserId) return
+          if (!questionIds.has(draft.assignment_question_id)) return
+          draftMap.set(draft.assignment_question_id, draft.draft_data)
+        })
+      } catch (err) {
+        // ignore draft load errors for now
+      }
+
+      const submissionMap = new Map()
+      const submittedQuestionIds = new Set()
+      const attemptCountMap = new Map()
+      const worksheetsWithProofs = worksheetData.filter((worksheet) => worksheet.proofs.length)
+      await Promise.all(
+        worksheetsWithProofs.map(async (worksheet) => {
+          try {
+            const submissions = await fetchJson(
+              `/api/assignments/${worksheet.id}/submissions?userId=${activeUserId}`
+            )
+            submissions.forEach((submission) => {
+              const questionId = Number(submission.assignment_question_id)
+              const existing = submissionMap.get(questionId)
+              if (!existing || new Date(submission.submitted_at) > new Date(existing.submitted_at)) {
+                submissionMap.set(questionId, submission)
+              }
+              submittedQuestionIds.add(questionId)
+              const currentAttempt = attemptCountMap.get(questionId) || 0
+              if (submission.attempt > currentAttempt) {
+                attemptCountMap.set(questionId, submission.attempt)
+              }
+            })
+          } catch (err) {
+            // ignore submission load errors for now
+          }
+        })
+      )
+
+      const initialStates = {}
+      questionIds.forEach((questionId) => {
+        const proof = proofMeta[questionId]
+        if (!proof) return
+        if (draftMap.has(questionId)) {
+          initialStates[proof.id] = draftMap.get(questionId)
+          return
+        }
+
+        const submission = submissionMap.get(questionId)
+        if (!submission?.submission_data) return
+        const data = submission.submission_data
+
+        if (proof.type === 'truth-table') {
+          const truthTable = proof.truthTable || {}
+          const kind = truthTable.kind || 'formula'
+          if (kind === 'formula' && data.right) {
+            initialStates[proof.id] = buildTruthTableState([], data.right, data)
+          } else if (kind === 'equivalence' && data.lefts?.length && data.right) {
+            initialStates[proof.id] = buildTruthTableState(data.lefts, data.right, data)
+          } else if (kind === 'argument' && data.lefts?.length && data.right) {
+            initialStates[proof.id] = buildTruthTableState(data.lefts, data.right, data)
+          }
+          return
+        }
+
+        if (proof.type === 'single-row-truth-table') {
+          if (Array.isArray(data.row)) {
+            initialStates[proof.id] = {
+              row: data.row.map(toSymbol),
+            }
+          }
+          return
+        }
+
+        if (proof.type === 'partial-truth-table') {
+          if (Array.isArray(data.row)) {
+            initialStates[proof.id] = {
+              row: data.row.map(toSymbol),
+            }
+          }
+          return
+        }
+
+        if (proof.type === 'combo-translation-truth-table') {
+          const translations = Array.isArray(data?.translations) ? data.translations : []
+          const chosenConclusion = data?.chosenConclusion ?? null
+          let argumentLine = data?.argumentLine ?? data?.argument ?? ''
+          if (!argumentLine && translations.length > 0 && chosenConclusion !== null) {
+            const premiseTranslations = translations.filter((_, idx) => idx !== chosenConclusion)
+            const conclusionTranslation = translations[chosenConclusion] ?? ''
+            if (premiseTranslations.length && conclusionTranslation) {
+              argumentLine = `${premiseTranslations.join(' / ')} // ${conclusionTranslation}`
+            }
+          }
+          const initial = {
+            argumentLine,
+          }
+          if (data?.tableAns?.lefts && data?.tableAns?.right) {
+            initial.tableState = buildTruthTableState(
+              data.tableAns.lefts,
+              data.tableAns.right,
+              data.tableAns
+            )
+          }
+          initialStates[proof.id] = initial
+          return
+        }
+
+        if (proof.type === 'combo-translation-derivation') {
+          const translations = Array.isArray(data?.translations) ? data.translations : []
+          const chosenConclusion = data?.chosenConclusion ?? null
+          let argumentLine = data?.argumentLine ?? data?.argument ?? ''
+          if (!argumentLine && translations.length > 0 && chosenConclusion !== null) {
+            const premiseTranslations = translations.filter((_, idx) => idx !== chosenConclusion)
+            const conclusionTranslation = translations[chosenConclusion] ?? ''
+            if (premiseTranslations.length && conclusionTranslation) {
+              argumentLine = `${premiseTranslations.join(' / ')} // ${conclusionTranslation}`
+            }
+          }
+          const initial = { argumentLine }
+          if (data?.derivationState) {
+            initial.derivationState = data.derivationState
+          } else if (data?.proof) {
+            initial.derivationState = { ans: data.proof }
+          } else if (data?.ans) {
+            initial.derivationState = data.ans
+          }
+          initialStates[proof.id] = initial
+          return
+        }
+
+        if (proof.type === 'indirect-truth-table') {
+          if (data && typeof data === 'object') {
+            initialStates[proof.id] = {
+              ans: data.ans ?? data.answer ?? (Array.isArray(data.answers) ? data.answers[0] : ''),
+              answers: Array.isArray(data.answers) ? data.answers : undefined,
+              sandboxRow: Array.isArray(data.sandboxRow) ? data.sandboxRow : [],
+              sandboxRows: Array.isArray(data.sandboxRows) ? data.sandboxRows : [],
+            }
+          } else {
+            initialStates[proof.id] = { ans: data }
+          }
+          return
+        }
+
+        if (proof.type === 'valid-correct-sound') {
+          initialStates[proof.id] = { ans: data }
+          return
+        }
+
+        if (proof.type === 'derivation' || proof.type === 'derivation-hurley') {
+          initialStates[proof.id] = data.ans || data.ind ? data : { ans: data }
+          return
+        }
+
+        initialStates[proof.id] = { ans: data }
+      })
+
+      initializeSavedProofStates(initialStates)
+      const completedProofIds = new Set()
+      questionIds.forEach((questionId) => {
+        if (!submittedQuestionIds.has(questionId)) return
+        const proof = proofMeta[questionId]
+        if (!proof) return
+        completedProofIds.add(proof.id)
+      })
+      return { attemptCountMap, completedProofIds }
+    }
+
+    const loadWorksheetDetails = async (assignmentId, assignmentMeta) => {
+      const response = await fetchJson(
+        `/api/assignments/${assignmentId}?userId=${activeUserId}`
+      )
+      const questions = response.questions || []
+      const assignmentInfo = response.assignment
+        || assignmentMeta
+        || { id: assignmentId, title: 'Assignment' }
+      const worksheet = {
+        id: assignmentInfo.id,
+        title: assignmentInfo.title,
+        due_date: assignmentInfo.due_date,
+        proofs: questions.map((question, idx) =>
+          mapQuestionToProof(question, assignmentInfo, idx)
+        ),
+      }
+      const { attemptCountMap, completedProofIds } = await loadSavedStates([worksheet])
+      setCompletedProofs(completedProofIds)
+      return {
+        ...worksheet,
+        proofs: worksheet.proofs.map((proof) => ({
+          ...proof,
+          attemptCount: attemptCountMap?.get(proof.questionId) ?? 0,
+        })),
+      }
+    }
+
     const loadWorksheets = async () => {
-      setIsLoading(true)
       setLoadError('')
       try {
-        const assignments = await fetchJson(`/api/courses/${API_CONFIG.courseId}/assignments`)
-        const worksheetData = await Promise.all(
-          assignments.map(async (assignment) => {
-            const response = await fetchJson(
-              `/api/assignments/${assignment.id}?userId=${API_CONFIG.userId}`
-            )
-            const questions = response.questions || []
-            return {
-              id: assignment.id,
-              title: assignment.title,
-              proofs: questions.map((question, idx) =>
-                mapQuestionToProof(question, assignment, idx)
-              ),
+        if (!courseId) return
+        const targetAssignmentId = Number.isFinite(worksheetIdNum) ? worksheetIdNum : null
+
+        if (worksheets.length && targetAssignmentId) {
+          const existingIndex = worksheets.findIndex((worksheet) => worksheet.id === targetAssignmentId)
+          if (existingIndex !== -1) {
+            const existing = worksheets[existingIndex]
+            if (existing.proofs.length) {
+              if (isMounted) {
+                setIsLoading(false)
+              }
+              return
             }
-          })
-        )
+            setIsLoading(true)
+            const loaded = await loadWorksheetDetails(targetAssignmentId, existing)
+            if (isMounted) {
+              setWorksheets((prev) => prev.map((worksheet, idx) => (
+                idx === existingIndex ? loaded : worksheet
+              )))
+              setIsLoading(false)
+            }
+            return
+          }
+        }
+
+        setIsLoading(true)
+        const assignments = await fetchJson(`/api/courses/${courseId}/assignments`)
+        const fallbackAssignmentId = targetAssignmentId || assignments?.[0]?.id
+        if (!fallbackAssignmentId) {
+          if (isMounted) {
+            setWorksheets([])
+            setIsLoading(false)
+          }
+          return
+        }
+        const assignmentMeta = assignments.find((assignment) => assignment.id === fallbackAssignmentId)
+        const loadedWorksheet = await loadWorksheetDetails(fallbackAssignmentId, assignmentMeta)
+        const worksheetData = assignments?.length
+          ? assignments.map((assignment) => (
+            assignment.id === fallbackAssignmentId
+              ? loadedWorksheet
+              : { id: assignment.id, title: assignment.title, proofs: [] }
+          ))
+          : [loadedWorksheet]
 
         if (isMounted) {
           setWorksheets(worksheetData)
@@ -167,55 +682,50 @@ export default function Worksheet() {
     return () => {
       isMounted = false
     }
-  }, [])
+  }, [activeUserId, courseId, worksheetIdNum, worksheets])
 
   const handleWorksheetChange = (newIndex) => {
     const newWorksheet = worksheets[newIndex]
     if (newWorksheet) {
-      // use assignment route if we came from assignment route, otherwise worksheet route
-      if (assignmentId) {
-        navigate(`/assignment/${newWorksheet.id}`)
-      } else {
-        navigate(`/worksheet/${newWorksheet.id}`)
-      }
+      navigate(`/student/assignment/${newWorksheet.id}`)
     }
   }
 
-  const handleExport = async () => {
-    if (!currentWorksheet) return
-    if (!window.confirm('Download your answers as PDF?')) return
-    
-    try {
-      let liveState = null
-      try {
-        const derivEl = document.querySelector('derivation-hurley')
-        if (derivEl?.getState && !derivEl._isRestoring) {
-          liveState = derivEl.getState()
-        }
-      } catch (err) {
-        // silently fail - use saved state instead
-      }
+  // Temporarily disabled export PDF feature
+  // const handleExport = async () => {
+  //   if (!currentWorksheet) return
+  //   if (!window.confirm('Download your answers as PDF?')) return
+  //   
+  //   try {
+  //     let liveState = null
+  //     try {
+  //       const derivEl = document.querySelector('derivation-hurley')
+  //       if (derivEl?.getState && !derivEl._isRestoring) {
+  //         liveState = derivEl.getState()
+  //       }
+  //     } catch (err) {
+  //     }
 
-      const allStates = currentWorksheet.proofs.map((proof) => ({
-        id: proof.id,
-        questionId: proof.questionId,
-        premises: proof.premises,
-        conclusion: proof.conclusion,
-        savedState: proof.id === currentProof?.id && liveState
-          ? liveState
-          : getSavedProofState(proof.id)
-      }))
-      
-      await exportWorksheetPDF({
-        worksheet: currentWorksheet.title,
-        worksheetId: currentWorksheet.id,
-        exportedAt: new Date().toISOString(),
-        proofs: allStates
-      })
-    } catch (error) {
-      alert(`Export failed: ${error?.message || 'Unknown error'}`)
-    }
-  }
+  //     const allStates = currentWorksheet.proofs.map((proof) => ({
+  //       id: proof.id,
+  //       questionId: proof.questionId,
+  //       premises: proof.premises,
+  //       conclusion: proof.conclusion,
+  //       savedState: proof.id === currentProof?.id && liveState
+  //         ? liveState
+  //         : getSavedProofState(proof.id)
+  //     }))
+  //     
+  //     await exportWorksheetPDF({
+  //       worksheet: currentWorksheet.title,
+  //       worksheetId: currentWorksheet.id,
+  //       exportedAt: new Date().toISOString(),
+  //       proofs: allStates
+  //     })
+  //   } catch (error) {
+  //     alert(`Export failed: ${error?.message || 'Unknown error'}`)
+  //   }
+  // }
 
   if (isLoading) {
     return <div>Loading assignment...</div>
@@ -231,17 +741,18 @@ export default function Worksheet() {
 
   return (
     <WorksheetLayout
-      title="PHILO 275"
       subtitle={currentWorksheet.title || "Predicate Logic: Natural Deduction"}
       score={score}
       total={currentWorksheet.proofs.length || 0}
+      gradePercent={gradePercent}
+      dueDate={currentWorksheet?.due_date || currentDueDate}
       scoreStyle={scoreStyle}
       currentProofId={currentProof?.id}
       completedProofs={completedProofs}
       worksheets={worksheets}
       currentWorksheetIndex={currentWorksheetIndex}
       onWorksheetIndexChange={handleWorksheetChange}
-      onExportClick={handleExport}
+      onExportClick={null}
       onBackToLMS={() => navigate('/')}
     >
       <WorksheetTabs
@@ -254,6 +765,13 @@ export default function Worksheet() {
         onProofComplete={handleProofComplete}
         getSavedProofState={getSavedProofState}
         handleProofStateChange={handleProofStateChange}
+        gradePercent={gradePercent}
+        total={currentWorksheet.proofs.length || 0}
+        score={score}
+        dueDate={currentWorksheet?.due_date || currentDueDate}
+        completionPercent={currentWorksheet.proofs.length > 0 ? Math.round((score / (currentWorksheet.proofs.length || 0)) * 100) : 0}
+        gradeLabel={Number.isFinite(gradePercent) ? `${gradePercent.toFixed(1)}%` : '—'}
+        isOverdue={currentWorksheet?.due_date ? new Date(currentWorksheet.due_date) < new Date() : false}
       />
     </WorksheetLayout>
   )

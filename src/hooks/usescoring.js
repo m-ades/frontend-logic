@@ -36,6 +36,7 @@ export function useScoring(currentWorksheet) {
     completedProofs,
     score,
     scoreStyle,
-    handleProofComplete
+    handleProofComplete,
+    setCompletedProofs,
   }
 }

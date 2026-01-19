@@ -8,6 +8,36 @@
 
 import { fullTableMatch } from './truth-tables.js';
 
+function normalizeSelection(givenans) {
+    if (Array.isArray(givenans?.mcans)) {
+        return new Set(givenans.mcans.map((v) => String(v)));
+    }
+    if (givenans?.mcans === 0) { return new Set(['tautology']); }
+    if (givenans?.mcans === 1) { return new Set(['contingent']); }
+    if (givenans?.mcans === 2) { return new Set(['self-contradiction']); }
+    const selections = [];
+    if (givenans?.taut) { selections.push('tautology'); }
+    if (givenans?.contra) { selections.push('self-contradiction'); }
+    if (!givenans?.taut && !givenans?.contra && givenans?.mcans === -1) {
+        return new Set();
+    }
+    return new Set(selections.length ? selections : ['contingent']);
+}
+
+function correctSelection(answer) {
+    if (answer.taut) { return new Set(['tautology']); }
+    if (answer.contra) { return new Set(['self-contradiction']); }
+    return new Set(['contingent']);
+}
+
+function sameSelection(a, b) {
+    if (a.size !== b.size) { return false; }
+    for (const v of a) {
+        if (!b.has(v)) { return false; }
+    }
+    return true;
+}
+
 // tests whether they should think the statement is a tautology,
 // self contradiction or contingent
 function shouldBe(rows, opspot) {
@@ -63,27 +93,21 @@ export default async function(
     let qright = false;
     let awarded = 0;
     if (options.question) {
-        let oftwo = 0;
-        if ((answer.contra == givenans.contra) && (answer.taut == givenans.taut) && (givenans.mcans !== -1)) {
-            oftwo = 2;
-            qright = true;
-        } else {
-            let theyshouldthink = shouldBe(givenans.right.rows, answer.opspot);
+        const selection = normalizeSelection(givenans);
+        const expected = correctSelection(answer);
+        qright = sameSelection(selection, expected);
+        if (!qright) {
+            const theyshouldthink = shouldBe(givenans.right.rows, answer.opspot);
             if (theyshouldthink.comp) {
-                if ((theyshouldthink.contra == givenans.contra) &&
-                    (theyshouldthink.taut == givenans.taut) && (givenans.mcans !== -1)) {
-                    oftwo = 2;
-                } else {
-                    oftwo = 0;
-                    correct = false;
-                }
-            } else {
-                oftwo = 0;
-                correct = false;
+                const derived = correctSelection(theyshouldthink);
+                qright = sameSelection(selection, derived);
             }
         }
+        if (!qright) { correct = false; }
         if (partialcredit) {
-            awarded = Math.floor(((oftwo + offive)/7) * points);
+            const tableScore = offive / 5;
+            const mcScore = qright ? 1 : 0;
+            awarded = Math.floor(points * (0.5 * tableScore + 0.5 * mcScore));
         } else {
             awarded = (correct) ? points : 0;
         }
@@ -109,4 +133,3 @@ export default async function(
     }
     return rv;
 }
-

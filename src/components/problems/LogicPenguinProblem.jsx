@@ -3,7 +3,12 @@ import SymbolicTranslation from './mui/SymbolicTranslation.jsx'
 import MultipleChoice from './mui/MultipleChoice.jsx'
 import TrueFalse from './mui/TrueFalse.jsx'
 import EvaluateTruth from './mui/EvaluateTruth.jsx'
-import ValidCorrectSound from './mui/ValidCorrectSound.jsx'
+// import ValidCorrectSound from './mui/ValidCorrectSound.jsx'
+import SingleRowTruthTable from './mui/SingleRowTruthTable.jsx'
+import ComboTranslationTruthTable from './mui/ComboTranslationTruthTable.jsx'
+import ComboTranslationDerivation from './mui/ComboTranslationDerivation.jsx'
+import IndirectTruthTable from './mui/IndirectTruthTable.jsx'
+import PartialTruthTable from './mui/PartialTruthTable.jsx'
 
 export default function LogicPenguinProblem({ 
   proof, 
@@ -41,10 +46,21 @@ export default function LogicPenguinProblem({
   
   if (proof.type === 'symbolic-translation') {
     problemData = proof.translation || proof.description || ''
+    if (typeof problemData === 'string') {
+      problemData = { prompt: problemData, legend: proof.legend || '' }
+    } else {
+      problemData = {
+        legend: proof.legend ?? problemData.legend ?? '',
+        prompt: problemData.prompt || proof.description || '',
+        question_snapshot: proof.snapshot || {},
+      }
+    }
     return (
       <SymbolicTranslation
         problem={problemData}
         answer={proof.answer}
+        attemptLimit={proof.attemptLimit}
+        assignmentQuestionId={proof.questionId}
         onStateChange={handleStateChange}
         onComplete={handleComplete}
         savedState={localState}
@@ -59,6 +75,8 @@ export default function LogicPenguinProblem({
       <MultipleChoice
         problem={problemData}
         answer={proof.answer}
+        attemptLimit={proof.attemptLimit}
+        assignmentQuestionId={proof.questionId}
         onStateChange={handleStateChange}
         onComplete={handleComplete}
         savedState={localState}
@@ -72,6 +90,8 @@ export default function LogicPenguinProblem({
       <TrueFalse
         problem={problemData}
         answer={proof.answer}
+        attemptLimit={proof.attemptLimit}
+        assignmentQuestionId={proof.questionId}
         onStateChange={handleStateChange}
         onComplete={handleComplete}
         savedState={localState}
@@ -83,12 +103,14 @@ export default function LogicPenguinProblem({
       <EvaluateTruth
         problem={problemData}
         answer={proof.answer}
+        attemptLimit={proof.attemptLimit}
+        assignmentQuestionId={proof.questionId}
         onStateChange={handleStateChange}
         onComplete={handleComplete}
         savedState={localState}
       />
     )
-  } else if (proof.type === 'valid-correct-sound') {
+  /* } else if (proof.type === 'valid-correct-sound') {
     const prems = Array.isArray(proof.premises) ? proof.premises : (proof.premises ? [proof.premises] : [])
     problemData = {
       prems: prems,
@@ -98,6 +120,88 @@ export default function LogicPenguinProblem({
       <ValidCorrectSound
         problem={problemData}
         answer={proof.answer}
+        attemptLimit={proof.attemptLimit}
+        assignmentQuestionId={proof.questionId}
+        onStateChange={handleStateChange}
+        onComplete={handleComplete}
+        savedState={localState}
+      />
+    )
+  } else if (proof.type === 'single-row-truth-table') { */
+  } else if (proof.type === 'single-row-truth-table') {
+    problemData = proof.singleRowTruthTable || {
+      statement: proof.description || '',
+      interpretation: {},
+      prompt: proof.description || '',
+    }
+    return (
+      <SingleRowTruthTable
+        problem={problemData}
+        attemptLimit={proof.attemptLimit}
+        assignmentQuestionId={proof.questionId}
+        onStateChange={handleStateChange}
+        onComplete={handleComplete}
+        savedState={localState}
+      />
+    )
+  } else if (proof.type === 'combo-translation-truth-table') {
+    return (
+      <ComboTranslationTruthTable
+        proof={proof}
+        attemptLimit={proof.attemptLimit}
+        assignmentQuestionId={proof.questionId}
+        onStateChange={handleStateChange}
+        onComplete={handleComplete}
+        savedState={localState}
+      />
+    )
+  } else if (proof.type === 'combo-translation-derivation') {
+    return (
+      <ComboTranslationDerivation
+        proof={proof}
+        attemptLimit={proof.attemptLimit}
+        assignmentQuestionId={proof.questionId}
+        onStateChange={handleStateChange}
+        onComplete={handleComplete}
+        savedState={localState}
+      />
+    )
+  } else if (proof.type === 'indirect-truth-table') {
+    const problemData = proof.indirectTruthTable || {
+      prompt: proof.description || '',
+      choices: proof.choices || [],
+    }
+    const questions = Array.isArray(problemData?.questions) && problemData.questions.length > 0
+      ? problemData.questions
+      : (Array.isArray(problemData?.choices) && problemData.choices.length > 0
+        ? [{
+            prompt: problemData?.choicePrompt || '',
+            choices: problemData.choices,
+            answerIndex: proof.answerIndex ?? proof.answer ?? (Array.isArray(proof.answerIndices) ? proof.answerIndices[0] : undefined),
+          }]
+        : [])
+    const derivedAnswer = questions.length
+      ? questions.map((q) => q.answerIndex ?? q.answer ?? q.correctIndex)
+      : proof.answer
+    const normalizedProblem = { ...problemData, questions, subquestions: questions }
+    return (
+      <IndirectTruthTable
+        problem={normalizedProblem}
+        answer={derivedAnswer}
+        attemptLimit={proof.attemptLimit}
+        assignmentQuestionId={proof.questionId}
+        onStateChange={handleStateChange}
+        onComplete={handleComplete}
+        savedState={localState}
+      />
+    )
+  } else if (proof.type === 'partial-truth-table') {
+    const problemData = proof.partialTruthTable || proof.description || {}
+    return (
+      <PartialTruthTable
+        problem={problemData}
+        attemptLimit={proof.attemptLimit}
+        assignmentQuestionId={proof.questionId}
         onStateChange={handleStateChange}
         onComplete={handleComplete}
         savedState={localState}

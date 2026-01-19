@@ -26,12 +26,33 @@ import {
   Area,
 } from 'recharts'
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday'
-import AssignmentIcon from '@mui/icons-material/Assignment'
 import TrendingUpIcon from '@mui/icons-material/TrendingUp'
 import BookIcon from '@mui/icons-material/Book'
-import { formatDate } from '../utils/formatting.js'
-import { API_CONFIG, fetchJson } from '../utils/api.js'
+import LeaderboardIcon from '@mui/icons-material/Leaderboard'
+import { formatDateTime } from '../utils/formatting.js'
+import { API_CONFIG, fetchJson, getActiveUserId } from '../utils/api.js'
+import { useCoursesState } from '../context/CoursesContext.jsx'
+import { useAuthState } from '../context/AuthContext.jsx'
+import { isInstructorRole } from '../utils/auth.js'
 import ThemedCard from '../components/ui/ThemedCard.jsx'
+
+const formatPercent = (value) => (value === null || value === undefined ? '—' : `${value.toFixed(1)}%`)
+
+const getLetterGrade = (percent) => {
+  if (percent === null || percent === undefined) return null
+  if (percent >= 93) return 'A'
+  if (percent >= 90) return 'A-'
+  if (percent >= 87) return 'B+'
+  if (percent >= 83) return 'B'
+  if (percent >= 80) return 'B-'
+  if (percent >= 77) return 'C+'
+  if (percent >= 73) return 'C'
+  if (percent >= 70) return 'C-'
+  if (percent >= 67) return 'D+'
+  if (percent >= 63) return 'D'
+  if (percent >= 60) return 'D-'
+  return 'F'
+}
 
 const emptyAnalytics = {
   assignments: { upcoming: 0, pending: 0, overdue: 0, upcomingList: [] },
@@ -42,14 +63,31 @@ const emptyAnalytics = {
 
 export default function Dashboard() {
   const theme = useTheme()
+  const { user } = useAuthState()
+  const { activeCourseId } = useCoursesState()
+  const courseId = activeCourseId ?? API_CONFIG.courseId
   const [analytics, setAnalytics] = useState(emptyAnalytics)
   const [gradeTimeline, setGradeTimeline] = useState([])
+  const [gradeOverview, setGradeOverview] = useState({
+    percent: null,
+    letter: null,
+    classAverage: null,
+    completed: 0,
+    total: 0,
+    lowestScore: null,
+    lowestTitle: null,
+    lowestScores: [],
+  })
   const [instructorAnalytics, setInstructorAnalytics] = useState({
     gradeSummary: null,
     assignmentStats: [],
     timeByCategory: [],
   })
-  const dashboardMode = import.meta.env.VITE_DASHBOARD_MODE || 'student'
+  const envDashboardMode = import.meta.env.VITE_DASHBOARD_MODE || 'student'
+  const isInstructor = isInstructorRole(user?.role)
+  const dashboardMode = isInstructor && envDashboardMode === 'instructor'
+    ? 'instructor'
+    : 'student'
 
   const statCardSx = { height: '100%' }
   const statCardContentSx = {
@@ -65,30 +103,121 @@ export default function Dashboard() {
     let isMounted = true
 
     const loadAnalytics = async () => {
+      if (!courseId) {
+        if (isMounted) {
+          setAnalytics(emptyAnalytics)
+          setGradeTimeline([])
+        }
+        return
+      }
       try {
-        const [analyticsData, grades] = await Promise.all([
-          fetchJson(`/api/analytics/student?userId=${API_CONFIG.userId}&courseId=${API_CONFIG.courseId}`),
-          fetchJson(`/api/users/${API_CONFIG.userId}/grades`),
-        ])
+          const [analyticsData, grades, gradebookSummary] = await Promise.all([
+            fetchJson(`/api/analytics/student?userId=${getActiveUserId()}&courseId=${courseId}`),
+            fetchJson(`/api/users/${getActiveUserId()}/grades`),
+            fetchJson(`/api/analytics/gradebook-summary?courseId=${courseId}`).catch(() => null),
+          ])
         if (isMounted) {
           setAnalytics({ ...emptyAnalytics, ...analyticsData })
-          const timeline = (grades || [])
-            .map((grade) => {
-              const assignment = grade.Assignment || {}
-              const total = grade.max_score || assignment.total_points || 0
-              const score = grade.final_score ?? grade.raw_score ?? null
-              const percent = total > 0 && score !== null ? (score / total) * 100 : null
-              const date = assignment.due_date || grade.graded_at
-              return {
-                id: grade.id,
-                title: assignment.title || 'Assignment',
-                date,
-                percent,
-              }
-            })
-            .filter((item) => item.percent !== null)
-            .sort((a, b) => new Date(a.date) - new Date(b.date))
+          const userId = getActiveUserId()
+          const gradeMap = new Map(
+            (grades || []).map((grade) => [
+              grade.assignment_id ?? grade.Assignment?.id,
+              grade,
+            ])
+          )
+          const timeline = gradebookSummary?.length
+            ? gradebookSummary
+                .slice()
+                .sort((a, b) => {
+                  const aDate = a.due_date ? new Date(a.due_date) : null
+                  const bDate = b.due_date ? new Date(b.due_date) : null
+                  if (aDate && bDate) return aDate - bDate
+                  if (aDate) return -1
+                  if (bDate) return 1
+                  return (a.id ?? 0) - (b.id ?? 0)
+                })
+                .map((assignment) => {
+                  const grade = gradeMap.get(assignment.id)
+                  const total = grade?.max_score || 0
+                  const score = grade?.final_score ?? grade?.raw_score ?? null
+                  const fallbackPercent = total > 0 && score !== null ? score / total : null
+                  return {
+                    id: assignment.id,
+                    title: assignment.title || 'Assignment',
+                    avgPercent: assignment.avg_percent !== null && assignment.avg_percent !== undefined
+                      ? assignment.avg_percent * 100
+                      : null,
+                    medianPercent: assignment.median_percent !== null && assignment.median_percent !== undefined
+                      ? assignment.median_percent * 100
+                      : null,
+                    studentPercent:
+                      fallbackPercent !== null
+                          ? fallbackPercent * 100
+                          : null,
+                  }
+                })
+            : (grades || [])
+                .map((grade) => {
+                  const assignment = grade.Assignment || {}
+                  const total = grade.max_score || 0
+                  const score = grade.final_score ?? grade.raw_score ?? null
+                  const percent = total > 0 && score !== null ? (score / total) * 100 : null
+                  const date = assignment.due_date || grade.graded_at
+                  return {
+                    id: grade.id,
+                    title: assignment.title || 'Assignment',
+                    studentPercent: percent,
+                    avgPercent: null,
+                    medianPercent: null,
+                    date,
+                  }
+                })
+                .filter((item) => item.studentPercent !== null)
+                .sort((a, b) => new Date(a.date) - new Date(b.date))
           setGradeTimeline(timeline)
+
+          const gradedPercents = (grades || []).reduce((list, grade) => {
+            const max = grade?.max_score || 0
+            const score = grade?.final_score ?? grade?.raw_score
+            if (!max || score === null || score === undefined) return list
+            list.push({
+              percent: (score / max) * 100,
+              title: grade?.Assignment?.title || grade?.title || 'Assignment',
+            })
+            return list
+          }, [])
+
+          const totalMax = (grades || []).reduce((sum, grade) => sum + (grade.max_score || 0), 0)
+          const totalFinal = (grades || []).reduce(
+            (sum, grade) => sum + (grade.final_score ?? grade.raw_score ?? 0),
+            0
+          )
+          const overallPercent = totalMax > 0 ? (totalFinal / totalMax) * 100 : null
+          const completedAssignments = gradedPercents.length
+          const totalAssignments = gradebookSummary?.length || grades?.length || 0
+          const classAverageValues = (gradebookSummary || [])
+            .map((assignment) => assignment.avg_percent)
+            .filter((value) => value !== null && value !== undefined)
+          const classAverage =
+            classAverageValues.length > 0
+              ? (classAverageValues.reduce((sum, value) => sum + value, 0) / classAverageValues.length) * 100
+              : null
+          const lowestScores = gradedPercents
+            .slice()
+            .sort((a, b) => a.percent - b.percent)
+            .slice(0, 2)
+          const lowestGrade = lowestScores[0] ?? null
+
+          setGradeOverview({
+            percent: overallPercent,
+            letter: overallPercent !== null ? getLetterGrade(overallPercent) : null,
+            classAverage,
+            completed: completedAssignments,
+            total: totalAssignments,
+            lowestScore: lowestGrade?.percent ?? null,
+            lowestTitle: lowestGrade?.title ?? null,
+            lowestScores,
+          })
         }
       } catch (error) {
         if (isMounted) {
@@ -104,7 +233,7 @@ export default function Dashboard() {
     return () => {
       isMounted = false
     }
-  }, [])
+  }, [courseId])
 
   useEffect(() => {
     if (dashboardMode !== 'instructor') {
@@ -115,7 +244,10 @@ export default function Dashboard() {
 
     const loadInstructorAnalytics = async () => {
       try {
-        const data = await fetchJson(`/api/analytics/instructor?courseId=${API_CONFIG.courseId}`)
+        if (!courseId) {
+          return
+        }
+        const data = await fetchJson(`/api/analytics/instructor?courseId=${courseId}`)
         if (isMounted) {
           setInstructorAnalytics(data)
         }
@@ -158,7 +290,9 @@ export default function Dashboard() {
     () =>
       gradeTimeline.map((item) => ({
         name: item.title,
-        percent: Number(item.percent.toFixed(1)),
+        studentPercent: item.studentPercent !== null ? Number(item.studentPercent.toFixed(1)) : null,
+        avgPercent: item.avgPercent !== null ? Number(item.avgPercent.toFixed(1)) : null,
+        medianPercent: item.medianPercent !== null ? Number(item.medianPercent.toFixed(1)) : null,
       })),
     [gradeTimeline]
   )
@@ -178,118 +312,52 @@ export default function Dashboard() {
         <ThemedCard sx={statCardSx}>
           <CardContent sx={statCardContentSx}>
             <Box display="flex" alignItems="center" mb={2}>
-              <AssignmentIcon color="primary" sx={{ mr: 1 }} />
+              <LeaderboardIcon color="primary" sx={{ mr: 1 }} />
               <Typography variant="h6" component="h3">
-                Upcoming Assignments
+                Your Grade
               </Typography>
             </Box>
-            <Grid container spacing={2} alignItems="center">
-              <Grid size={{ xs: 6 }}>
-                <Box display="flex" alignItems="baseline">
-                  <Typography variant="h3" fontWeight="medium">
-                    {assignmentStats.upcoming}
-                  </Typography>
-                  <Typography variant="caption" color="text.secondary" sx={{ ml: 1 }}>
-                    Upcoming
-                  </Typography>
-                </Box>
-              </Grid>
-              <Grid size={{ xs: 6 }} sx={{ display: 'flex', justifyContent: 'center' }}>
-                <Box sx={{ position: 'relative', display: 'inline-flex' }}>
-                  <Typography
-                    variant="caption"
-                    fontWeight="medium"
-                    sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}
-                  >
-                    {practiceAccuracy.correctFirstTry}%
-                  </Typography>
-                  <PieChart width={miniChartSize} height={miniChartSize}>
-                      <Pie
-                        data={[
-                          { name: 'Upcoming', value: assignmentStats.upcoming, color: 'primary' },
-                          { name: 'Pending', value: assignmentStats.pending, color: 'warning' },
-                          { name: 'Overdue', value: assignmentStats.overdue, color: 'error' },
-                        ]}
-                        startAngle={90}
-                        endAngle={-270}
-                        innerRadius={25}
-                        outerRadius={35}
-                        dataKey="value"
-                      >
-                        {[
-                          { name: 'Upcoming', value: assignmentStats.upcoming, color: 'primary' },
-                          { name: 'Pending', value: assignmentStats.pending, color: 'warning' },
-                          { name: 'Overdue', value: assignmentStats.overdue, color: 'error' },
-                        ].map((entry, index) => (
-                          <Cell
-                            key={`cell-${index}`}
-                            fill={theme.palette[entry.color].main}
-                          />
-                        ))}
-                      </Pie>
-                    </PieChart>
-                </Box>
-              </Grid>
-            </Grid>
-            <Grid container spacing={2} sx={{ mt: 1 }}>
-              <Grid size={{ xs: 4 }}>
-                <Typography variant="caption" color="text.secondary" display="block">
-                  Upcoming
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+              <Box>
+                <Typography variant="h3" fontWeight="medium">
+                  {formatPercent(gradeOverview.percent)}
+                  {gradeOverview.letter ? ` (${gradeOverview.letter})` : ''}
                 </Typography>
-                <Box display="flex" alignItems="center">
-                  <Typography variant="body2" fontWeight="medium">
-                    {assignmentStats.upcoming}
-                  </Typography>
-                  <Box
-                    sx={{
-                      width: 8,
-                      height: 8,
-                      borderRadius: '50%',
-                      bgcolor: 'primary.main',
-                      ml: 1,
-                    }}
-                  />
-                </Box>
-              </Grid>
-              <Grid size={{ xs: 4 }}>
-                <Typography variant="caption" color="text.secondary" display="block">
-                  Pending
+                <Typography variant="body1" color="text.secondary">
+                  Class avg: {formatPercent(gradeOverview.classAverage)}
                 </Typography>
-                <Box display="flex" alignItems="center">
-                  <Typography variant="body2" fontWeight="medium">
-                    {assignmentStats.pending}
-                  </Typography>
-                  <Box
-                    sx={{
-                      width: 8,
-                      height: 8,
-                      borderRadius: '50%',
-                      bgcolor: 'warning.main',
-                      ml: 1,
-                    }}
-                  />
-                </Box>
-              </Grid>
-              <Grid size={{ xs: 4 }}>
-                <Typography variant="caption" color="text.secondary" display="block">
-                  Overdue
+              </Box>
+              <Box
+                sx={(theme) => ({
+                  px: 2,
+                  py: 1.5,
+                  borderRadius: 1,
+                  border: `1px dashed ${theme.palette.divider}`,
+                  background:
+                    theme.palette.mode === 'light'
+                      ? 'linear-gradient(135deg, rgba(25, 118, 210, 0.06), rgba(0, 0, 0, 0.02))'
+                      : 'linear-gradient(135deg, rgba(144, 202, 249, 0.1), rgba(255, 255, 255, 0.04))',
+                })}
+              >
+                <Typography variant="body2">
+                  {gradeOverview.total
+                    ? `${gradeOverview.completed}/${gradeOverview.total} assignments complete`
+                    : 'No assignments graded yet'}
                 </Typography>
-                <Box display="flex" alignItems="center">
-                  <Typography variant="body2" fontWeight="medium">
-                    {assignmentStats.overdue}
-                  </Typography>
-                  <Box
-                    sx={{
-                      width: 8,
-                      height: 8,
-                      borderRadius: '50%',
-                      bgcolor: 'error.main',
-                      ml: 1,
-                    }}
-                  />
-                </Box>
-              </Grid>
-            </Grid>
+                <Typography variant="body2" color="text.secondary">
+                  Lowest score:{' '}
+                  {gradeOverview.lowestScore !== null
+                    ? `${gradeOverview.lowestScore.toFixed(1)}%${gradeOverview.lowestTitle ? ` (${gradeOverview.lowestTitle})` : ''}`
+                    : '—'}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Second lowest:{' '}
+                  {gradeOverview.lowestScores?.[1]
+                    ? `${gradeOverview.lowestScores[1].percent.toFixed(1)}%${gradeOverview.lowestScores[1].title ? ` (${gradeOverview.lowestScores[1].title})` : ''}`
+                    : '—'}
+                </Typography>
+              </Box>
+            </Box>
           </CardContent>
         </ThemedCard>
       </Grid>
@@ -392,14 +460,14 @@ export default function Dashboard() {
                         {assignment.title}
                       </Typography>
                       <Typography variant="caption" color="text.secondary">
-                        Due {formatDate(assignment.due_date)}
+                        Due {formatDateTime(assignment.due_date) || '—'}
                       </Typography>
                     </Box>
                     <Button
                       size="small"
                       variant="outlined"
                       component={Link}
-                      to={`/assignment/${assignment.id}`}
+                      to={`/student/assignment/${assignment.id}`}
                     >
                       Open
                     </Button>
@@ -481,7 +549,15 @@ export default function Dashboard() {
               <Box sx={{ display: 'flex', gap: 3, alignItems: 'center', flexWrap: 'wrap' }}>
                 <Box display="flex" alignItems="center" gap={1}>
                   <Box sx={{ width: 12, height: 12, borderRadius: '50%', bgcolor: 'primary.main' }} />
-                  <Typography variant="body2">Score %</Typography>
+                  <Typography variant="body2">Your score %</Typography>
+                </Box>
+                <Box display="flex" alignItems="center" gap={1}>
+                  <Box sx={{ width: 12, height: 12, borderRadius: '50%', bgcolor: 'secondary.main' }} />
+                  <Typography variant="body2">Class average %</Typography>
+                </Box>
+                <Box display="flex" alignItems="center" gap={1}>
+                  <Box sx={{ width: 12, height: 12, borderRadius: '50%', bgcolor: 'success.main' }} />
+                  <Typography variant="body2">Class median %</Typography>
                 </Box>
               </Box>
             </Box>
@@ -497,13 +573,33 @@ export default function Dashboard() {
                   stroke={theme.palette.divider}
                   domain={[0, 100]}
                 />
-                <Tooltip />
+                <Tooltip
+                  formatter={(value) =>
+                    value === null || value === undefined ? '—' : `${Number(value).toFixed(1)}%`
+                  }
+                />
                 <Line
                   type="monotone"
-                  dataKey="percent"
+                  dataKey="studentPercent"
                   stroke={theme.palette.primary.main}
                   strokeWidth={2}
                   dot={{ r: 3 }}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="avgPercent"
+                  stroke={theme.palette.secondary.main}
+                  strokeWidth={2}
+                  dot={{ r: 3 }}
+                  connectNulls
+                />
+                <Line
+                  type="monotone"
+                  dataKey="medianPercent"
+                  stroke={theme.palette.success.main}
+                  strokeWidth={2}
+                  dot={{ r: 3 }}
+                  connectNulls
                 />
               </LineChart>
             </ResponsiveContainer>
@@ -630,7 +726,7 @@ export default function Dashboard() {
                 View upcoming and submitted assigments
               </Typography>
             </Box>
-            <Button variant="contained" onClick={() => navigate('/assignments')}>
+            <Button variant="contained" onClick={() => navigate('/student/assignments')}>
               View assignments
             </Button>
           </CardContent>
@@ -644,7 +740,7 @@ export default function Dashboard() {
                 Sharpen your skills with supplementary problem sets.
               </Typography>
             </Box>
-            <Button variant="contained" onClick={() => navigate('/practice')}>
+            <Button variant="contained" onClick={() => navigate('/student/practice')}>
               Start practice
             </Button>
           </CardContent>
@@ -658,7 +754,7 @@ export default function Dashboard() {
                 Track your progress.
               </Typography>
             </Box>
-            <Button variant="contained" onClick={() => navigate('/grades')}>
+            <Button variant="contained" onClick={() => navigate('/student/grades')}>
               View grades
             </Button>
           </CardContent>

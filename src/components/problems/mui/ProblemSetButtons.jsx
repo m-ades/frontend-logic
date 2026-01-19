@@ -6,13 +6,14 @@ export default function ProblemSetButtons({
   onStartOver, 
   isChecking = false, 
   isDisabled = false,
+  align = 'center',
   sx = {} 
 }) {
   return (
     <Stack 
       direction="row" 
       spacing={2} 
-      justifyContent="center" 
+      justifyContent={align}
       sx={{ mt: 3, ...sx }}
     >
       <Button

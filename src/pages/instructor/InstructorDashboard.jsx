@@ -1,24 +1,313 @@
-import { Box, Typography, CardContent, Stack, Divider } from '@mui/material'
-import ThemedCard from '../../components/ui/ThemedCard.jsx'
+import { Box, Typography, Alert } from "@mui/material";
+import { useEffect, useMemo, useState } from "react";
+import { TrendingUp, Users, CheckCircle, Calendar } from "lucide-react";
+import {
+  useCoursesState,
+  calculateAssignmentAverage,
+  calculateGradeDistribution,
+} from "../../context/CoursesContext";
+import { fetchJson } from "../../utils/api.js";
+import { MetricCard } from "../../components/ui/MetricCard";
+import { PerformanceTrendsChart } from "../../components/ui/dashboard/PerformanceTrendsChart";
+import { GradeDistributionChart } from "../../components/ui/dashboard/GradeDistributionChart";
+import { StudentsAtRiskTable } from "../../components/ui/dashboard/StudentsAtRiskTable";
+import { UpcomingDeadlinesTable } from "../../components/ui/dashboard/UpcomingDeadlinesTable";
+import { AssignmentOverviewTable } from "../../components/ui/dashboard/AssignmentOverviewTable";
 
 export default function InstructorDashboard() {
-  return (
-    <Box>
-      <Typography variant="h4" sx={{ mb: 3, fontWeight: 600 }}>
-        Dashboard
-      </Typography>
+  const { courses, activeCourseId, assignmentsByCourse, gradebookByCourse } =
+    useCoursesState();
+  const [analytics, setAnalytics] = useState({
+    gradeSummary: null,
+    assignmentStats: [],
+    timeByCategory: [],
+  });
+  const [gradebookSummary, setGradebookSummary] = useState([]);
 
-      <ThemedCard>
-        <CardContent>
-          <Stack spacing={2}>
-            <Typography variant="h6">placeholder</Typography>
-            <Divider />
-            <Typography variant="body2" color="text.secondary">
-              placeholder
-            </Typography>
-          </Stack>
-        </CardContent>
-      </ThemedCard>
+  const course = courses.find((c) => c.id === activeCourseId);
+  const assignments = assignmentsByCourse[activeCourseId] || [];
+  const students = gradebookByCourse[activeCourseId] || [];
+  const totalStudents = course?.studentCount || students.length || 0;
+
+  useEffect(() => {
+    let isMounted = true;
+    const loadAnalytics = async () => {
+      if (!activeCourseId) return;
+      try {
+        const [instructorAnalytics, summary] = await Promise.all([
+          fetchJson(`/api/analytics/instructor?courseId=${activeCourseId}`),
+          fetchJson(`/api/analytics/gradebook-summary?courseId=${activeCourseId}`),
+        ]);
+        if (isMounted) {
+          setAnalytics(instructorAnalytics);
+          setGradebookSummary(summary || []);
+        }
+      } catch (error) {
+        if (isMounted) {
+          console.warn("Failed to load instructor analytics", error);
+          setAnalytics({ gradeSummary: null, assignmentStats: [], timeByCategory: [] });
+          setGradebookSummary([]);
+        }
+      }
+    };
+
+    loadAnalytics();
+    return () => {
+      isMounted = false;
+    };
+  }, [activeCourseId]);
+
+  const nonPracticeAssignments = useMemo(
+    () => assignments.filter((assignment) => assignment.kind !== "practice"),
+    [assignments]
+  );
+
+  const nonPracticeIds = useMemo(
+    () => new Set(nonPracticeAssignments.map((assignment) => Number(assignment.id))),
+    [nonPracticeAssignments]
+  );
+
+  const filteredGradebookSummary = useMemo(
+    () => (gradebookSummary || []).filter((item) => nonPracticeIds.has(Number(item.id))),
+    [gradebookSummary, nonPracticeIds]
+  );
+
+  const filteredAssignmentStats = useMemo(
+    () => (analytics.assignmentStats || []).filter((item) => nonPracticeIds.has(Number(item.id))),
+    [analytics.assignmentStats, nonPracticeIds]
+  );
+
+  const studentsForAssignments = useMemo(
+    () =>
+      students.map((student) => {
+        const filteredGrades = Object.entries(student.grades || {}).reduce(
+          (acc, [assignmentId, grade]) => {
+            const numericId = Number(assignmentId);
+            if (nonPracticeIds.has(numericId)) {
+              acc[assignmentId] = grade;
+            }
+            return acc;
+          },
+          {}
+        );
+        return { ...student, grades: filteredGrades };
+      }),
+    [students, nonPracticeIds]
+  );
+
+  // Enrich assignments with calculated data
+  const enrichedAssignments = useMemo(() => {
+    const summaryMap = new Map(
+      (filteredGradebookSummary || []).map((item) => [Number(item.id), item])
+    );
+    const statsMap = new Map(
+      (filteredAssignmentStats || []).map((item) => [Number(item.id), item])
+    );
+
+    return nonPracticeAssignments.map((assignment) => {
+      const summary = summaryMap.get(Number(assignment.id));
+      const stats = statsMap.get(Number(assignment.id));
+      const averagePercent = summary?.avg_percent ?? null;
+      const average =
+        averagePercent !== null && averagePercent !== undefined
+          ? Math.round(averagePercent * 100)
+          : calculateAssignmentAverage(assignment.id, studentsForAssignments);
+      const submissionsFallback = studentsForAssignments.filter(
+        (student) => student.grades[assignment.id] !== undefined
+      ).length;
+      const submissionsRaw =
+        stats?.students_submitted ?? submissionsFallback;
+      const submissions = totalStudents
+        ? Math.min(submissionsRaw, totalStudents)
+        : submissionsRaw;
+      const dueAt = assignment.dueDate
+        ? new Date(`${assignment.dueDate}T${assignment.dueTime || "23:59:59"}`)
+        : null;
+      return {
+        ...assignment,
+        average,
+        avgAttempts: stats?.avg_attempt ?? null,
+        submissions,
+        totalStudents,
+        dueDate: assignment.dueDate
+          ? new Date(assignment.dueDate).toLocaleDateString()
+          : "—",
+        dueAt,
+        lateSubmissions: null,
+      };
+    });
+  }, [
+    filteredAssignmentStats,
+    filteredGradebookSummary,
+    nonPracticeAssignments,
+    students,
+    studentsForAssignments,
+    totalStudents,
+  ]);
+
+  // Pass the course's grading scale to calculateGradeDistribution
+  const gradeDistribution = calculateGradeDistribution(
+    studentsForAssignments,
+    course?.gradingScale
+  );
+
+  const isGradedAndUnlocked = (assignment) => {
+    const hasSubmissions = assignment.submissions > 0;
+    const wasEverUnlocked = hasSubmissions || assignment.isLocked === false;
+    return hasSubmissions && wasEverUnlocked;
+  };
+
+  const gradedUnlockedAssignments = useMemo(
+    () => enrichedAssignments.filter(isGradedAndUnlocked),
+    [enrichedAssignments]
+  );
+
+  const gradedPastDueAssignments = useMemo(
+    () =>
+      gradedUnlockedAssignments.filter(
+        (assignment) => assignment.dueAt && assignment.dueAt <= new Date()
+      ),
+    [gradedUnlockedAssignments]
+  );
+
+  const totalAverage = gradedPastDueAssignments.length > 0
+    ? Math.round(
+        gradedPastDueAssignments.reduce((sum, a) => sum + a.average, 0) /
+          gradedPastDueAssignments.length
+      )
+    : 0;
+
+  const totalSubmissions = enrichedAssignments.reduce(
+    (sum, a) => sum + a.submissions,
+    0
+  );
+  const totalPossible = totalStudents * nonPracticeAssignments.length;
+  const completionRate =
+    totalPossible > 0
+      ? Math.round((Math.min(totalSubmissions, totalPossible) / totalPossible) * 100)
+      : 0;
+
+  const handleAssignmentClick = (data) => {
+    // This can be used for chart clicks or other navigation
+    console.log("Assignment clicked:", data);
+  };
+
+  // Show message if no course selected
+    if (!activeCourseId || !course) {
+    return (
+      <Box sx={{ p: 4 }}>
+        <Typography variant="h4" fontWeight={600} mb={2}>
+          Dashboard
+        </Typography>
+        <Alert severity="info">
+          Please select a course from the sidebar to view the dashboard.
+        </Alert>
+      </Box>
+    );
+  }
+
+  return (
+    <Box
+      sx={{
+        width: "100%",
+        display: "flex",
+        flexDirection: "column",
+        gap: 4,
+      }}
+    >
+      {/* Header */}
+      <Box>
+        <Typography variant="h4" fontWeight={700} mb={1}>
+          Dashboard
+        </Typography>
+        <Typography variant="body1" color="text.secondary">
+          Overview of {course.name}
+        </Typography>
+      </Box>
+
+      {/* Metric Cards */}
+      <Box
+        sx={{
+          display: "grid",
+          gridTemplateColumns: {
+            xs: "1fr",
+            sm: "1fr 1fr",
+            lg: "repeat(4, 1fr)",
+          },
+          gap: 3,
+        }}
+      >
+        <MetricCard
+          title="Class Average"
+          value={`${totalAverage}%`}
+          subtitle="Across all assignments"
+          icon={TrendingUp}
+          gradient={["#10b981", "#059669"]}
+        />
+        <MetricCard
+          title="Completion Rate"
+          value={`${completionRate}%`}
+          subtitle={`${totalSubmissions} of ${totalPossible}`}
+          icon={CheckCircle}
+          gradient={["#3b82f6", "#2563eb"]}
+        />
+        <MetricCard
+          title="Total Students"
+          value={totalStudents}
+          subtitle="Enrolled in course"
+          icon={Users}
+          gradient={["#8b5cf6", "#7c3aed"]}
+        />
+        <MetricCard
+          title="Assignments"
+          value={gradedUnlockedAssignments.length}
+          subtitle="Total posted"
+          icon={Calendar}
+          gradient={["#ec4899", "#db2777"]}
+        />
+      </Box>
+
+      {/* Charts */}
+      <Box
+        sx={{
+          display: "grid",
+          gridTemplateColumns: { xs: "1fr", lg: "1fr 1fr" },
+          gap: 3,
+        }}
+      >
+        <PerformanceTrendsChart
+          data={enrichedAssignments}
+          onAssignmentClick={handleAssignmentClick}
+        />
+        <GradeDistributionChart data={gradeDistribution} />
+      </Box>
+
+      {/* Assignment Overview Table */}
+      <AssignmentOverviewTable
+        assignments={enrichedAssignments}
+        totalAverage={totalAverage}
+        totalSubmissions={totalSubmissions}
+        totalPossible={totalPossible}
+        completionRate={completionRate}
+      />
+
+      {/* Students at Risk and Upcoming Deadlines Tables */}
+      <Box
+        sx={{
+          display: "grid",
+          gridTemplateColumns: { xs: "1fr", lg: "1fr 1fr" },
+          gap: 3,
+        }}
+      >
+        <StudentsAtRiskTable
+          students={studentsForAssignments}
+          assignments={nonPracticeAssignments}
+        />
+        <UpcomingDeadlinesTable
+          assignments={nonPracticeAssignments}
+          onAssignmentClick={handleAssignmentClick}
+        />
+      </Box>
     </Box>
-  )
+  );
 }

@@ -1,87 +1,432 @@
 import { useState, useEffect } from 'react'
-import { Box, Radio, RadioGroup, FormControlLabel, FormControl, Typography, Alert } from '@mui/material'
-import { useTheme } from '@mui/material/styles'
+import { Box, Stack, Radio, RadioGroup, FormControlLabel, FormControl, FormGroup, Checkbox, Typography, Alert } from '@mui/material'
 import ProblemSetButtons from './ProblemSetButtons.jsx'
 import { useProblemChecker } from '../../../hooks/useProblemChecker.js'
+import SolutionReveal from '../SolutionReveal.jsx'
+import RichText from '../../ui/RichText.jsx'
 
 export default function MultipleChoice({ 
   problem, 
   answer, 
   onStateChange, 
   onComplete,
-  savedState 
+  savedState,
+  assignmentQuestionId,
+  attemptLimit,
+  readOnly = false,
+  hideActions = false,
+  suppressReveal = false,
 }) {
-  const theme = useTheme()
-  const [selectedValue, setSelectedValue] = useState(savedState?.ans !== undefined ? String(savedState.ans) : '')
+  const prompt = problem?.prompt || ''
+  const subquestions = Array.isArray(problem?.subquestions) ? problem.subquestions : []
+  const isComposite = subquestions.length > 0
+  const isMultiSelect = !isComposite && (Array.isArray(answer) || Array.isArray(problem?.answerIndices) || problem?.multiSelect)
+  const defaultTrueFalseChoices = ['True', 'False']
+  const isMultiSelectSubq = (subq) =>
+    subq?.type === 'multi-select' || Array.isArray(subq?.answerIndices) || subq?.multiSelect
+  const isTrueFalseSubq = (subq) => subq?.type === 'true-false'
+  const normalizeCompositeAnswers = (subs, saved) =>
+    subs.map((subq, idx) => {
+      const savedValue = saved?.[idx]
+      if (Array.isArray(savedValue)) {
+        return savedValue.map(Number).filter((value) => Number.isFinite(value))
+      }
+      if (savedValue !== undefined && savedValue !== null) {
+        return Number.isFinite(Number(savedValue)) ? Number(savedValue) : savedValue
+      }
+      return isMultiSelectSubq(subq) ? [] : ''
+    })
+
+  const [selectedValue, setSelectedValue] = useState(
+    isComposite
+      ? normalizeCompositeAnswers(subquestions, savedState?.answers)
+      : isMultiSelect
+        ? (Array.isArray(savedState?.ans) ? savedState.ans.map(Number) : [])
+        : (savedState?.ans !== undefined ? String(savedState.ans) : '')
+  )
   
-  const { status, message, isChecking, handleCheck, handleStartOver, getStatusColor, setStatus, setMessage } = useProblemChecker({
+  const { message, isChecking, handleCheck, handleStartOver, getStatusColor, setStatus, setMessage, isLocked } = useProblemChecker({
     answer,
     problemType: 'multiple-choice',
     question: problem,
-    getAnswer: () => parseInt(selectedValue),
+    getAnswer: () => (
+      isComposite
+        ? { answers: selectedValue }
+        : isMultiSelect
+          ? selectedValue
+          : parseInt(selectedValue)
+    ),
     onComplete,
-    isDisabled: () => selectedValue === '',
-    resetInput: () => setSelectedValue(''),
-    onStateChange
+    isDisabled: () => (
+      isComposite
+        ? subquestions.some((subq, idx) => {
+            const value = selectedValue?.[idx]
+            if (isMultiSelectSubq(subq)) {
+              return !Array.isArray(value) || value.length === 0
+            }
+            return value === '' || value === null || value === undefined
+          })
+        : isMultiSelect
+          ? !Array.isArray(selectedValue) || selectedValue.length === 0
+          : selectedValue === ''
+    ),
+    resetInput: () => setSelectedValue(
+      isComposite
+        ? normalizeCompositeAnswers(subquestions, [])
+        : isMultiSelect
+          ? []
+          : ''
+    ),
+    onStateChange,
+    assignmentQuestionId,
+    attemptLimit,
+    initialAttemptCount: savedState?.attemptCount ?? 0,
   })
+  const showSolution = isLocked && (isComposite || typeof answer === 'number' || Array.isArray(answer))
 
   useEffect(() => {
-    if (selectedValue !== '') {
-      onStateChange?.({ ans: parseInt(selectedValue) })
+    if (isComposite) {
+      setSelectedValue(normalizeCompositeAnswers(subquestions, savedState?.answers))
+      return
     }
-  }, [selectedValue, onStateChange])
+    if (savedState?.ans === undefined) {
+      setSelectedValue(isMultiSelect ? [] : '')
+      return
+    }
+    if (isMultiSelect) {
+      setSelectedValue(Array.isArray(savedState.ans) ? savedState.ans.map(Number) : [])
+    } else {
+      setSelectedValue(String(savedState.ans))
+    }
+  }, [savedState?.ans, savedState?.answers, isComposite, isMultiSelect, subquestions])
 
   const handleChange = (event) => {
-    setSelectedValue(event.target.value)
+    if (readOnly) return
+    const nextValue = event.target.value
+    setSelectedValue(nextValue)
+    onStateChange?.({ ans: parseInt(nextValue) })
+    setStatus('unanswered')
+    setMessage('')
+  }
+
+  const handleMultiChange = (choiceIndex, checked) => {
+    if (readOnly) return
+    setSelectedValue((prev) => {
+      const current = Array.isArray(prev) ? prev : []
+      const next = checked
+        ? [...new Set([...current, choiceIndex])]
+        : current.filter((value) => value !== choiceIndex)
+      onStateChange?.({ ans: next })
+      return next
+    })
+    setStatus('unanswered')
+    setMessage('')
+  }
+
+  const handleCompositeSingleChange = (index, value) => {
+    if (readOnly || isLocked) return
+    setSelectedValue((prev) => {
+      const next = Array.isArray(prev) ? [...prev] : []
+      next[index] = value
+      onStateChange?.({ answers: next })
+      return next
+    })
+    setStatus('unanswered')
+    setMessage('')
+  }
+
+  const handleCompositeMultiChange = (index, choiceIndex, checked) => {
+    if (readOnly || isLocked) return
+    setSelectedValue((prev) => {
+      const next = Array.isArray(prev) ? [...prev] : []
+      const current = Array.isArray(next[index]) ? next[index] : []
+      const updated = checked
+        ? [...new Set([...current, choiceIndex])]
+        : current.filter((value) => value !== choiceIndex)
+      next[index] = updated
+      onStateChange?.({ answers: next })
+      return next
+    })
     setStatus('unanswered')
     setMessage('')
   }
 
   return (
-    <Box sx={{ width: '100%', maxWidth: '800px', mx: 'auto' }}>
-      <Typography variant="body1" sx={{ mb: 3, fontWeight: 500, textAlign: 'center' }}>
-        {problem.prompt}
-      </Typography>
-
-      <FormControl component="fieldset" sx={{ width: '100%', mb: 2 }}>
-        <RadioGroup
-          value={selectedValue}
-          onChange={handleChange}
-          name="multiple-choice"
+    <Stack spacing={3} sx={{ px: 0, width: '100%', alignItems: 'stretch', flexGrow: 1 }}>
+      <Box className="logicpenguin" sx={{ width: '100%', flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
+        <Box
+          sx={{
+            overflow: 'visible',
+            minHeight: '200px',
+            flexGrow: 1,
+            alignSelf: { xs: 'stretch', md: 'flex-start' },
+          }}
+          className="lp-problem-card"
         >
-          {problem.choices.map((choice, index) => (
-            <FormControlLabel
-              key={index}
-              value={String(index)}
-              control={<Radio />}
-              label={choice}
-              sx={{
-                mb: 1,
-                '& .MuiFormControlLabel-label': {
-                  fontSize: '1rem'
-                }
-              }}
-            />
-          ))}
-        </RadioGroup>
-      </FormControl>
+          <Stack spacing={3} sx={{ p: { xs: 2, md: 2 } }}>
+            {prompt && (
+              <Box 
+                className="multiple-choice-prompt"
+                sx={{ 
+                  mb: 3,
+                  '& .MuiTypography-root': {
+                    fontSize: '1.2rem',
+                    lineHeight: 1.7,
+                    fontWeight: 400
+                  },
+                  '& .MuiTypography-root *': {
+                    fontSize: '1.2rem',
+                    lineHeight: 1.7,
+                    fontWeight: 400
+                  },
+                  '& .MuiTypography-root div': {
+                    marginBottom: '0.75rem',
+                    fontSize: '1.2rem',
+                    lineHeight: 1.7,
+                    fontWeight: 400,
+                    '&:last-child': {
+                      marginBottom: 0
+                    }
+                  },
+                  '& .MuiTypography-root .instructions': {
+                    fontSize: '1rem',
+                    lineHeight: 1.6,
+                    fontWeight: 600
+                  },
+                  '& .MuiTypography-root div.instructions': {
+                    fontSize: '1rem',
+                    lineHeight: 1.6,
+                    fontWeight: 600
+                  },
+                  '& .MuiTypography-root strong': {
+                    fontWeight: 600
+                  },
+                  '& .MuiTypography-root div:has(strong)': {
+                    fontSize: '1rem',
+                    lineHeight: 1.6,
+                    fontWeight: 400
+                  }
+                }}
+              >
+                <RichText content={prompt} variant="body1" />
+              </Box>
+            )}
+            {isComposite ? (
+              <Stack spacing={3}>
+                {subquestions.map((subq, subIdx) => {
+                  const choices = isTrueFalseSubq(subq)
+                    ? (subq?.choices?.length ? subq.choices : defaultTrueFalseChoices)
+                    : (subq?.choices || [])
+                  return (
+                    <Box key={`mc-subq-${subIdx}`}>
+                      <RichText content={subq?.prompt} variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }} />
+                      <FormControl component="fieldset" sx={{ width: '100%' }}>
+                        {isMultiSelectSubq(subq) ? (
+                          <FormGroup>
+                            {choices.map((choice, index) => (
+                              <FormControlLabel
+                                key={`${subIdx}-${index}`}
+                                control={
+                                  <Checkbox
+                                    checked={Array.isArray(selectedValue?.[subIdx]) && selectedValue[subIdx].includes(index)}
+                                    onChange={(event) => handleCompositeMultiChange(subIdx, index, event.target.checked)}
+                                    disabled={readOnly || isLocked}
+                                  />
+                                }
+                                label={choice}
+                                sx={{
+                                  mb: 1,
+                                  '& .MuiFormControlLabel-label': { fontSize: '1rem' }
+                                }}
+                              />
+                            ))}
+                          </FormGroup>
+                        ) : (
+                          <RadioGroup
+                            value={selectedValue?.[subIdx] === '' ? '' : String(selectedValue?.[subIdx] ?? '')}
+                            onChange={(event) => handleCompositeSingleChange(subIdx, Number(event.target.value))}
+                            name={`multiple-choice-${subIdx}`}
+                          >
+                            {choices.map((choice, index) => (
+                              <FormControlLabel
+                                key={`${subIdx}-${index}`}
+                                value={String(index)}
+                                control={<Radio disabled={readOnly || isLocked} />}
+                                label={choice}
+                                sx={{
+                                  mb: 1,
+                                  '& .MuiFormControlLabel-label': { fontSize: '1rem' }
+                                }}
+                              />
+                            ))}
+                          </RadioGroup>
+                        )}
+                      </FormControl>
+                    </Box>
+                  )
+                })}
+              </Stack>
+            ) : (
+              <FormControl component="fieldset" sx={{ width: '100%' }}>
+                {isMultiSelect ? (
+                  <FormGroup>
+                    {problem.choices.map((choice, index) => (
+                      <FormControlLabel
+                        key={index}
+                        control={
+                          <Checkbox
+                            checked={Array.isArray(selectedValue) && selectedValue.includes(index)}
+                            onChange={(event) => handleMultiChange(index, event.target.checked)}
+                            disabled={readOnly}
+                          />
+                        }
+                        label={choice}
+                        sx={{
+                          mb: 1,
+                          '& .MuiFormControlLabel-label': {
+                            fontSize: '1rem'
+                          }
+                        }}
+                      />
+                    ))}
+                  </FormGroup>
+                ) : (
+                  <RadioGroup
+                    value={selectedValue}
+                    onChange={handleChange}
+                    name="multiple-choice"
+                  >
+                    {problem.choices.map((choice, index) => (
+                      <FormControlLabel
+                        key={index}
+                        value={String(index)}
+                        control={<Radio disabled={readOnly} />}
+                        label={choice}
+                        sx={{
+                          mb: 1,
+                          '& .MuiFormControlLabel-label': {
+                            fontSize: '1rem'
+                          }
+                        }}
+                      />
+                    ))}
+                  </RadioGroup>
+                )}
+              </FormControl>
+            )}
+          </Stack>
+        </Box>
+      </Box>
 
       {message && (
         <Alert 
           severity={getStatusColor()} 
-          sx={{ mb: 2 }}
           onClose={() => setMessage('')}
         >
           {message}
         </Alert>
       )}
 
-      <ProblemSetButtons
-        onCheck={handleCheck}
-        onStartOver={handleStartOver}
-        isChecking={isChecking}
-        isDisabled={selectedValue === ''}
-      />
-    </Box>
+      {!hideActions && (
+        <ProblemSetButtons
+          onCheck={handleCheck}
+          onStartOver={handleStartOver}
+          isChecking={isChecking}
+          isDisabled={selectedValue === '' || isLocked}
+          align="flex-start"
+        />
+      )}
+      {!suppressReveal && (
+        <SolutionReveal show={showSolution}>
+          {isComposite ? (
+            <Stack spacing={3}>
+              {subquestions.map((subq, subIdx) => {
+                const choices = isTrueFalseSubq(subq)
+                  ? (subq?.choices?.length ? subq.choices : defaultTrueFalseChoices)
+                  : (subq?.choices || [])
+                const isMulti = isMultiSelectSubq(subq)
+                const expected = isMulti
+                  ? (Array.isArray(subq.answerIndices) ? subq.answerIndices : [])
+                  : (Number.isFinite(subq.answerIndex) ? subq.answerIndex : null)
+                return (
+                  <Box key={`solution-${subIdx}`}>
+                    <RichText content={subq?.prompt} variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }} />
+                    <FormControl component="fieldset" sx={{ width: '100%' }}>
+                      {isMulti ? (
+                        <FormGroup>
+                          {choices.map((choice, index) => (
+                            <FormControlLabel
+                              key={`${subIdx}-${index}`}
+                              control={<Checkbox checked={expected?.includes(index)} disabled />}
+                              label={choice}
+                              sx={{
+                                mb: 1,
+                                '& .MuiFormControlLabel-label': { fontSize: '1rem' }
+                              }}
+                            />
+                          ))}
+                        </FormGroup>
+                      ) : (
+                        <RadioGroup value={expected === null ? '' : String(expected)} name={`multiple-choice-reveal-${subIdx}`}>
+                          {choices.map((choice, index) => (
+                            <FormControlLabel
+                              key={`${subIdx}-${index}`}
+                              value={String(index)}
+                              control={<Radio disabled />}
+                              label={choice}
+                              sx={{
+                                mb: 1,
+                                '& .MuiFormControlLabel-label': { fontSize: '1rem' }
+                              }}
+                            />
+                          ))}
+                        </RadioGroup>
+                      )}
+                    </FormControl>
+                  </Box>
+                )
+              })}
+            </Stack>
+          ) : (
+            <FormControl component="fieldset" sx={{ width: '100%' }}>
+              {isMultiSelect ? (
+                <FormGroup>
+                  {problem.choices.map((choice, index) => (
+                    <FormControlLabel
+                      key={`${choice}-${index}`}
+                      control={<Checkbox checked={Array.isArray(answer) && answer.includes(index)} disabled />}
+                      label={choice}
+                      sx={{
+                        mb: 1,
+                        '& .MuiFormControlLabel-label': {
+                          fontSize: '1rem'
+                        }
+                      }}
+                    />
+                  ))}
+                </FormGroup>
+              ) : (
+                <RadioGroup value={String(answer ?? '')} name="multiple-choice-reveal">
+                  {problem.choices.map((choice, index) => (
+                    <FormControlLabel
+                      key={`${choice}-${index}`}
+                      value={String(index)}
+                      control={<Radio disabled />}
+                      label={choice}
+                      sx={{
+                        mb: 1,
+                        '& .MuiFormControlLabel-label': {
+                          fontSize: '1rem'
+                        }
+                      }}
+                    />
+                  ))}
+                </RadioGroup>
+              )}
+            </FormControl>
+          )}
+        </SolutionReveal>
+      )}
+    </Stack>
   )
 }

@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react'
-import { Box, Typography, IconButton, Drawer, Fab, useTheme, useMediaQuery } from '@mui/material'
+import { useState } from 'react'
+import { Box, Typography, IconButton, Drawer, Fab } from '@mui/material'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import ExpandLessIcon from '@mui/icons-material/ExpandLess'
 import MenuBookIcon from '@mui/icons-material/MenuBook'
@@ -10,7 +10,7 @@ function RulesCard({ title, children, defaultExpanded = false }) {
   return (
       <Box
         sx={{
-          width: { xs: '100%', md: '280px' },
+          width: '100%',
           mb: 1,
         }}
       >
@@ -74,9 +74,6 @@ function RulesCard({ title, children, defaultExpanded = false }) {
 
 export default function RulesReference() {
   const [mobileOpen, setMobileOpen] = useState(false)
-  const theme = useTheme()
-  const isNarrow = useMediaQuery(theme.breakpoints.down('lg'))
-
   const blurActiveElement = () => {
     const el = document.activeElement
     if (el && typeof el.blur === 'function') {
@@ -88,13 +85,6 @@ export default function RulesReference() {
     setMobileOpen(false)
     blurActiveElement()
   }
-
-  useEffect(() => {
-    if (!isNarrow && mobileOpen) {
-      setMobileOpen(false)
-      blurActiveElement()
-    }
-  }, [isNarrow, mobileOpen])
   
   const rulesContent = (
     <Box
@@ -206,25 +196,7 @@ export default function RulesReference() {
   
   return (
     <>
-      {/* Desktop: Fixed panel */}
-      <Box
-        sx={{
-          position: 'fixed',
-          right: 0,
-          top: { xs: 8, md: 16 },
-          transform: { xs: 'none', lg: 'scale(0.85)' },
-          transformOrigin: 'top right',
-          zIndex: 101,
-          maxHeight: '90vh',
-          overflowY: 'auto',
-          pr: { xs: 1, md: 2 },
-          display: { xs: 'none', lg: 'block' },
-        }}
-      >
-        {rulesContent}
-      </Box>
-      
-      {/* Mobile: Floating action button */}
+      {/* Floating action button - shown on all resolutions */}
       <Fab
         color="primary"
         aria-label="rules"
@@ -234,7 +206,7 @@ export default function RulesReference() {
           bottom: 16,
           right: 16,
           zIndex: 1000,
-          display: { xs: 'flex', lg: 'none' },
+          display: 'flex',
           backgroundColor: '#2f6bff',
           '&:hover': {
             backgroundColor: '#2f6bff',
@@ -244,7 +216,7 @@ export default function RulesReference() {
         <MenuBookIcon />
       </Fab>
       
-      {/* Mobile: Drawer */}
+      {/* Drawer - shown on all resolutions */}
       <Drawer
         anchor="right"
         open={mobileOpen}
@@ -253,7 +225,7 @@ export default function RulesReference() {
           keepMounted: true,
         }}
         sx={{
-          display: { xs: 'block', lg: 'none' },
+          display: 'block',
           '& .MuiDrawer-paper': {
             width: { xs: '85%', sm: '400px' },
             maxWidth: '400px',

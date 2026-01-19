@@ -1,16 +1,42 @@
 import * as React from 'react'
-import { Alert, Box, Stack, Typography } from '@mui/material'
+import {
+  Alert,
+  Box,
+  Stack,
+  Typography,
+  FormControl,
+  FormGroup,
+  FormControlLabel,
+  FormLabel,
+  Checkbox,
+  RadioGroup,
+  Radio,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+} from '@mui/material'
 import getFormulaClass from '../../lib/logicpenguin/symbolic/formula.js'
 import getSyntax from '../../lib/logicpenguin/symbolic/libsyntax.js'
 import { multiTables } from '../../lib/logicpenguin/symbolic/libsemantics.js'
 import { fullTableMatch } from '../../lib/logicpenguin/checkers/truth-tables.js'
 import ProblemSetButtons from './mui/ProblemSetButtons.jsx'
+import { fetchJson, getActiveUserId } from '../../utils/api.js'
+import RichText from '../ui/RichText.jsx'
 
-function TruthToggle({ value, onChange, ariaLabel, accent }) {
+function TruthToggle({ value, onChange, ariaLabel, accent, readOnly = false }) {
   const cycleValue = (current) => {
     if (!current) return 'T'
     if (current === 'T') return 'F'
     return ''
+  }
+
+  const handleClick = () => {
+    if (readOnly) return
+    onChange(cycleValue(value))
   }
 
   return (
@@ -19,8 +45,9 @@ function TruthToggle({ value, onChange, ariaLabel, accent }) {
       role="button"
       tabIndex={0}
       aria-label={ariaLabel}
-      onClick={() => onChange(cycleValue(value))}
+      onClick={handleClick}
       onKeyDown={(event) => {
+        if (readOnly) return
         if (event.key === 'Enter' || event.key === ' ') {
           event.preventDefault()
           onChange(cycleValue(value))
@@ -58,12 +85,52 @@ function TruthToggle({ value, onChange, ariaLabel, accent }) {
   )
 }
 
-export default function TruthTableEditor({ proof, savedState, onStateChange, onProofComplete }) {
+export default function TruthTableEditor({
+  proof,
+  savedState,
+  onStateChange,
+  onProofComplete,
+  hideActions = false,
+  suppressReveal = false,
+  embedded = false,
+}) {
   const truthTable = proof.truthTable ?? {}
   const syntax = React.useMemo(() => getSyntax(), [])
   const Formula = React.useMemo(() => getFormulaClass(), [])
   const kind = truthTable.kind
     ?? (truthTable.left && truthTable.right ? 'equivalence' : 'formula')
+  const classificationEnabled = React.useMemo(() => {
+    return Boolean(
+      truthTable?.options?.question ??
+      proof?.options?.question ??
+      false
+    )
+  }, [proof?.options?.question, truthTable?.options?.question])
+  const classificationOptions = React.useMemo(() => {
+    if (!classificationEnabled) { return []; }
+    if (kind === 'formula') {
+      return [
+        { value: 'tautology', label: 'Tautology' },
+        { value: 'contingent', label: 'Contingent' },
+        { value: 'self-contradiction', label: 'Self-contradiction' },
+      ];
+    }
+    if (kind === 'equivalence') {
+      return [
+        { value: 'equivalent', label: 'Logically equivalent' },
+        { value: 'contradictory', label: 'Contradictory' },
+        { value: 'consistent', label: 'Consistent' },
+        { value: 'inconsistent', label: 'Inconsistent' },
+      ];
+    }
+    if (kind === 'argument') {
+      return [
+        { value: 'valid', label: 'Valid' },
+        { value: 'invalid', label: 'Invalid' },
+      ];
+    }
+    return [];
+  }, [classificationEnabled, kind])
   const operatorSet = React.useMemo(() => new Set(Object.keys(syntax.operators)), [syntax])
   const statements = React.useMemo(() => {
     if (Array.isArray(truthTable.statements) && truthTable.statements.length > 0) {
@@ -143,19 +210,76 @@ export default function TruthTableEditor({ proof, savedState, onStateChange, onP
       ),
     [expectedTables, isAtomicToken, savedState, tables]
   )
+  const resetTables = React.useMemo(
+    () =>
+      tables.map((table, tableIndex) =>
+        table.rows.map((row, rowIndex) =>
+          row.map((_, colIndex) =>
+            isAtomicToken(table.tokens[colIndex])
+              ? expectedTables?.[tableIndex]?.[rowIndex]?.[colIndex]
+              : ''
+          )
+        )
+      ),
+    [expectedTables, isAtomicToken, tables]
+  )
 
   const [tableInputs, setTableInputs] = React.useState(derivedInitialTables)
   const [status, setStatus] = React.useState('unanswered')
   const [message, setMessage] = React.useState('')
   const [isChecking, setIsChecking] = React.useState(false)
+  const [attemptCount, setAttemptCount] = React.useState(savedState?.attemptCount ?? 0)
+  const attemptLimit = proof?.attemptLimit ?? 3
+  const assignmentQuestionId = Number(proof?.questionId || 0)
+  const [mcSelection, setMcSelection] = React.useState([])
+  const updateClassificationSelection = React.useCallback((next) => {
+    setMcSelection(next)
+    onStateChange?.({
+      tables: tableInputs.map((rows) => ({ rows })),
+      mcans: next,
+      taut: next.includes('tautology'),
+      contra: next.includes('self-contradiction'),
+      valid: next.includes('valid'),
+      equiv: next.includes('equivalent'),
+      classification: {
+        mcans: next,
+        taut: next.includes('tautology'),
+        contra: next.includes('self-contradiction'),
+      },
+    })
+    if (status !== 'unanswered') {
+      setStatus('unanswered')
+      setMessage('')
+    }
+  }, [onStateChange, status, tableInputs])
 
   React.useEffect(() => {
+    const normalizeSavedSelection = () => {
+      if (Array.isArray(savedState?.mcans)) {
+        return savedState.mcans.map((v) => String(v));
+      }
+      if (kind === 'formula') {
+        if (savedState?.taut) { return ['tautology']; }
+        if (savedState?.contra) { return ['self-contradiction']; }
+        if (savedState?.mcans === 1) { return ['contingent']; }
+      }
+      if (kind === 'argument') {
+        if (savedState?.valid === true || savedState?.mcans === 0) { return ['valid']; }
+        if (savedState?.valid === false || savedState?.mcans === 1) { return ['invalid']; }
+      }
+      if (kind === 'equivalence') {
+        if (savedState?.equiv === true || savedState?.mcans === 0) { return ['equivalent']; }
+      }
+      return [];
+    }
     setTableInputs(derivedInitialTables)
-  }, [derivedInitialTables])
+    setMcSelection(normalizeSavedSelection())
+  }, [derivedInitialTables, kind, savedState])
 
   const handleCellChange = (tableIndex, rowIndex, colIndex, value) => {
+    let nextTables = null
     setTableInputs((prev) => {
-      const next = prev.map((tableRows, tIdx) =>
+      nextTables = prev.map((tableRows, tIdx) =>
         tIdx === tableIndex
           ? tableRows.map((row, rIdx) =>
               rIdx === rowIndex
@@ -164,11 +288,25 @@ export default function TruthTableEditor({ proof, savedState, onStateChange, onP
             )
           : tableRows
       )
-      onStateChange?.({
-        tables: next.map((rows) => ({ rows })),
-      })
-      return next
+      return nextTables
     })
+    if (nextTables) {
+      onStateChange?.({
+        tables: nextTables.map((rows) => ({ rows })),
+        ...(classificationEnabled ? {
+          mcans: mcSelection,
+          taut: mcSelection.includes('tautology'),
+          contra: mcSelection.includes('self-contradiction'),
+          valid: mcSelection.includes('valid'),
+          equiv: mcSelection.includes('equivalent'),
+          classification: {
+            mcans: mcSelection,
+            taut: mcSelection.includes('tautology'),
+            contra: mcSelection.includes('self-contradiction'),
+          },
+        } : {}),
+      })
+    }
     if (status !== 'unanswered') {
       setStatus('unanswered')
       setMessage('')
@@ -229,7 +367,8 @@ export default function TruthTableEditor({ proof, savedState, onStateChange, onP
           row.length === (tables[tIdx]?.rows?.[rIdx]?.length ?? 0) &&
           row.every((cell) => cell !== '')
       )
-    )
+    ) &&
+    (!classificationEnabled || mcSelection.length > 0)
 
   const tableCorrect =
     hasTruthTable &&
@@ -240,20 +379,18 @@ export default function TruthTableEditor({ proof, savedState, onStateChange, onP
 
   React.useEffect(() => {
     if (!hasTruthTable) return
-    if (tableCorrect && !completionRef.current) {
+    const responseComplete = tableCorrect && (!classificationEnabled || mcSelection.length > 0)
+    if (responseComplete && !completionRef.current) {
       completionRef.current = true
       onProofComplete?.(proof.id)
-    } else if (!tableCorrect && completionRef.current) {
+    } else if (!responseComplete && completionRef.current) {
       completionRef.current = false
     }
-  }, [hasTruthTable, tableCorrect, onProofComplete, proof.id])
+  }, [classificationEnabled, hasTruthTable, mcSelection.length, onProofComplete, proof.id, tableCorrect])
 
   if (!hasTruthTable) {
     return (
       <Stack spacing={2} sx={{ px: 0, width: '100%' }}>
-        <Typography variant="h5" sx={{ fontWeight: 600, color: '#2f6bff' }}>
-          Truth Table Task
-        </Typography>
         <Typography color="text.secondary">
           No truth-table metadata is available for this problem.
         </Typography>
@@ -261,226 +398,408 @@ export default function TruthTableEditor({ proof, savedState, onStateChange, onP
     )
   }
 
-  const handleCheck = () => {
-    if (isChecking) return
-    setIsChecking(true)
-    if (tableCorrect) {
-      setStatus('correct')
-      setMessage('Correct!')
-      onProofComplete?.(proof.id)
-    } else {
-      setStatus('incorrect')
-      setMessage('Incorrect. Please try again.')
+  const buildSubmissionData = () => {
+    const toBool = (cell) => cell === 'T'
+    const mapRows = (rows) => rows.map((row) => row.map(toBool))
+    const tableData = tableInputs.map((rows) => ({
+      rows: mapRows(rows),
+      colhls: rows.length > 0 ? Array(rows[0].length).fill(false) : [],
+    }))
+
+    const base = { lefts: [], right: { rows: [] }, rowhls: [] }
+
+    if (tableData.length === 0) {
+      return base
     }
-    setIsChecking(false)
+
+    if (kind === 'formula') {
+      const payload = { lefts: [], right: tableData[0], rowhls: [] }
+      if (classificationEnabled) {
+        payload.mcans = mcSelection
+        payload.taut = mcSelection.includes('tautology')
+        payload.contra = mcSelection.includes('self-contradiction')
+      }
+      return payload
+    }
+
+    if (kind === 'equivalence' && classificationEnabled) {
+      const payload = { lefts: [tableData[0]], right: tableData[1], rowhls: [] }
+      payload.mcans = mcSelection
+      payload.equiv = mcSelection.includes('equivalent')
+      return payload
+    }
+
+    if (kind === 'equivalence') {
+      return { lefts: [tableData[0]], right: tableData[1], rowhls: [] }
+    }
+
+    // argument (premises + conclusion)
+    if (tableData.length > 1) {
+      return {
+        lefts: tableData.slice(0, -1),
+        right: tableData[tableData.length - 1],
+        rowhls: [],
+        ...(classificationEnabled
+          ? {
+              mcans: mcSelection,
+              valid: mcSelection.includes('valid'),
+            }
+          : {}),
+      }
+    }
+
+    return { lefts: [], right: tableData[0], rowhls: [] }
+  }
+
+  const handleCheck = async () => {
+    if (isChecking || attemptCount >= attemptLimit) return
+    if (!tableFilled) {
+      setStatus('unanswered')
+      setMessage(classificationEnabled && mcSelection.length === 0
+        ? 'Select a classification before submitting.'
+        : 'Complete the table before submitting.'
+      )
+      return
+    }
+    setIsChecking(true)
+    try {
+      if (assignmentQuestionId) {
+        const resp = await fetchJson('/api/validate/submission', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            assignment_question_id: assignmentQuestionId,
+            user_id: getActiveUserId(),
+            submission_data: buildSubmissionData(),
+          }),
+        })
+        const validation = resp?.validation || {}
+        const success = validation.successstatus === 'correct'
+        setAttemptCount((prev) => resp?.submission?.attempt ?? Math.min(prev + 1, attemptLimit))
+        if (success) {
+          setStatus('correct')
+          setMessage('Correct!')
+          onProofComplete?.(proof.id)
+        } else {
+          setStatus('incorrect')
+          setMessage(validation.message || validation.transmessage || 'Incorrect.')
+        }
+      } else {
+        setAttemptCount((prev) => Math.min(prev + 1, attemptLimit))
+        if (tableCorrect && (!classificationEnabled || mcSelection.length > 0)) {
+          setStatus('correct')
+          setMessage('Correct!')
+          onProofComplete?.(proof.id)
+        } else {
+          setStatus('incorrect')
+          setMessage(classificationEnabled && mcSelection.length === 0
+            ? 'Select a classification before submitting.'
+            : 'Incorrect.'
+          )
+        }
+      }
+    } catch (err) {
+      setStatus('malfunction')
+      setMessage('Error submitting answer')
+    } finally {
+      setIsChecking(false)
+    }
   }
 
   const handleStartOver = () => {
-    setTableInputs(derivedInitialTables)
+    setTableInputs(resetTables)
     onStateChange?.({
-      tables: derivedInitialTables.map((rows) => ({ rows })),
+      tables: resetTables.map((rows) => ({ rows })),
+      mcans: [],
+      taut: false,
+      contra: false,
+      valid: false,
+      equiv: false,
+      classification: { mcans: [], taut: false, contra: false },
     })
+    setMcSelection([])
     setStatus('unanswered')
     setMessage('')
   }
 
+  const solutionTables = React.useMemo(() => {
+    const solution = proof?.solution
+    if (!solution) return []
+    if (solution.format === 'truth-table' && Array.isArray(solution.rows)) {
+      return [{
+        label: solution.label || proof?.description || 'Answer',
+        tokens: solution.tokens || [],
+        rows: solution.rows
+      }]
+    }
+    if (solution.format === 'truth-table-row' && Array.isArray(solution.row)) {
+      return [{
+        label: solution.label || proof?.description || 'Answer',
+        tokens: solution.tokens || [],
+        rows: [solution.row]
+      }]
+    }
+    if (Array.isArray(solution.tables)) {
+      return solution.tables.map((table) => ({
+        label: table.label || '',
+        tokens: table.tokens || [],
+        rows: table.rows || []
+      }))
+    }
+    return []
+  }, [proof])
+  const showSolution = attemptCount >= attemptLimit && solutionTables.length > 0
+
+  const renderTableSet = (tablesToRender, tableInputsToRender, combined, readOnly, onCellChange, showConclusionMarker) => {
+    if (combined) {
+      const rowCount = tablesToRender[0]?.rows?.length || 0
+      return (
+        <TableContainer component={Paper} className="tt-table-wrap" elevation={0}>
+          <Table className="tt-table">
+            <TableHead className="tt-head">
+              <TableRow className="tt-token-row">
+                {tablesToRender.map((table, tableIndex) => {
+                  const isConclusion = showConclusionMarker && tableIndex === tablesToRender.length - 1 && tablesToRender.length > 1
+                  const isSeparator = tableIndex > 0
+                  const headerTokens = table.headerTokens && table.headerTokens.length > 0 ? table.headerTokens : table.tokens
+                  return (
+                    <React.Fragment key={`solution-tokenfrag-${tableIndex}`}>
+                      {isSeparator && (
+                        <TableCell className="tt-token tt-separator" align="center">
+                          {isConclusion ? '//' : '/'}
+                        </TableCell>
+                      )}
+                      {headerTokens.map((token, tokenIndex) => (
+                        <TableCell
+                          key={`solution-header-${tableIndex}-${tokenIndex}`}
+                          className={
+                            isConclusion && tokenIndex === 0 ? 'tt-token tt-conclusion' : 'tt-token'
+                          }
+                          align="center"
+                        >
+                          {token}
+                        </TableCell>
+                      ))}
+                    </React.Fragment>
+                  )
+                })}
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {Array.from({ length: rowCount }, (_, rowIndex) => (
+                <TableRow key={`solution-row-${rowIndex}`} className="tt-row">
+                  {tablesToRender.map((table, tableIndex) => {
+                    const isConclusion = showConclusionMarker && tableIndex === tablesToRender.length - 1 && tablesToRender.length > 1
+                    return (
+                      <React.Fragment key={`solution-rowfrag-${tableIndex}`}>
+                        {tableIndex > 0 && (
+                          <TableCell className="tt-cell tt-separator-cell" align="center">
+                            {/* separator column intentionally blank */}
+                          </TableCell>
+                        )}
+                        {table.rows[rowIndex].map((_, colIndex) => (
+                          <TableCell
+                            key={`solution-cell-${tableIndex}-${rowIndex}-${colIndex}`}
+                            className={
+                              isConclusion && colIndex === 0 ? 'tt-cell tt-conclusion-cell' : 'tt-cell'
+                            }
+                            align="center"
+                          >
+                            <TruthToggle
+                              value={tableInputsToRender[tableIndex]?.[rowIndex]?.[colIndex]}
+                              onChange={(token) => onCellChange?.(tableIndex, rowIndex, colIndex, token)}
+                              ariaLabel={`Answer row ${rowIndex + 1} col ${colIndex + 1}`}
+                              accent={false}
+                              readOnly={readOnly}
+                            />
+                          </TableCell>
+                        ))}
+                      </React.Fragment>
+                    )
+                  })}
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      )
+    }
+
+    return (
+      <>
+        {tablesToRender.map((table, tableIndex) => (
+          <TableContainer component={Paper} key={`solution-tt-table-${tableIndex}`} className="tt-table-wrap" elevation={0}>
+            {table.label && (
+              <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 1 }}>
+                {table.label}
+              </Typography>
+            )}
+            <Table className="tt-table">
+              <TableHead className="tt-head">
+                <TableRow className="tt-token-row">
+                  {(table.headerTokens && table.headerTokens.length > 0 ? table.headerTokens : table.tokens).map((token, idx) => (
+                    <TableCell
+                      key={`solution-header-${tableIndex}-${idx}`}
+                      className="tt-token"
+                      align="center"
+                    >
+                      {token}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {table.rows.map((row, rowIndex) => (
+                  <TableRow
+                    key={`solution-row-${tableIndex}-${rowIndex}`}
+                    className="tt-row"
+                  >
+                    {row.map((_, colIndex) => (
+                      <TableCell
+                        key={`solution-cell-${tableIndex}-${rowIndex}-${colIndex}`}
+                        className="tt-cell"
+                        align="center"
+                      >
+                        <TruthToggle
+                          value={tableInputsToRender[tableIndex]?.[rowIndex]?.[colIndex]}
+                          onChange={(token) => onCellChange?.(tableIndex, rowIndex, colIndex, token)}
+                          ariaLabel={`Answer row ${rowIndex + 1} col ${colIndex + 1}`}
+                          accent={false}
+                          readOnly={readOnly}
+                        />
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        ))}
+      </>
+    )
+  }
+
+  const renderAnswerCard = (title, body) => (
+    <Box className="logicpenguin" sx={{ width: '100%', flexGrow: 1 }}>
+      <Box
+        sx={{
+          mt: 1,
+          overflow: 'visible',
+          minHeight: '420px',
+          flexGrow: 1,
+          alignSelf: { xs: 'stretch', md: 'flex-start' },
+        }}
+        className="lp-problem-card"
+      >
+        <Stack spacing={3} sx={{ p: { xs: 2, md: 2 } }}>
+          <Typography variant="h6" sx={{ fontWeight: 600, color: '#2f6bff' }}>
+            {title}
+          </Typography>
+          {body}
+        </Stack>
+      </Box>
+    </Box>
+  )
+
+  const promptContent = !embedded && (proof.description || truthTable.prompt)
+    ? (
+        <RichText
+          content={truthTable.prompt || proof.description}
+          variant="body1"
+          sx={{ fontSize: { xs: '0.95rem', md: '1rem' } }}
+        />
+      )
+    : null
+
+  const tableCard = (
+    <Box
+      sx={{
+        mt: embedded ? 0 : 1,
+        overflow: 'visible',
+        minHeight: embedded ? 'auto' : '420px',
+        flexGrow: 1,
+        alignSelf: { xs: 'stretch', md: 'flex-start' },
+      }}
+      className={embedded ? undefined : 'lp-problem-card'}
+    >
+      <Stack spacing={3} sx={{ p: { xs: embedded ? 0 : 2, md: embedded ? 0 : 2 } }}>
+        {promptContent}
+        {!embedded && (
+          <Typography variant="body2" sx={{ color: '#2f6bff' }}>
+            Fill in each column to match the expected truth values.
+          </Typography>
+        )}
+        {renderTableSet(tables, tableInputs, useCombinedTable, false, handleCellChange, kind === 'argument')}
+        {classificationEnabled && classificationOptions.length > 0 && (
+          <Box sx={{ width: '100%' }}>
+            <FormControl component="fieldset" variant="standard">
+              <FormLabel component="legend">
+                {kind === 'argument' ? 'Is this argument valid or invalid?' : 'Select all that apply'}
+              </FormLabel>
+              {kind === 'argument' ? (
+                <RadioGroup
+                  value={mcSelection[0] || ''}
+                  onChange={(event) => {
+                    const next = event.target.value ? [event.target.value] : []
+                    updateClassificationSelection(next)
+                  }}
+                >
+                  {classificationOptions.map((option) => (
+                    <FormControlLabel
+                      key={option.value}
+                      value={option.value}
+                      control={<Radio />}
+                      label={option.label}
+                    />
+                  ))}
+                </RadioGroup>
+              ) : (
+                <FormGroup>
+                  {classificationOptions.map((option) => (
+                    <FormControlLabel
+                      key={option.value}
+                      control={
+                        <Checkbox
+                          checked={mcSelection.includes(option.value)}
+                          onChange={(event) => {
+                            const checked = event.target.checked
+                            const next = checked
+                              ? [...mcSelection, option.value]
+                              : mcSelection.filter((v) => v !== option.value)
+                            updateClassificationSelection(next)
+                          }}
+                        />
+                      }
+                      label={option.label}
+                    />
+                  ))}
+                </FormGroup>
+              )}
+            </FormControl>
+          </Box>
+        )}
+      </Stack>
+    </Box>
+  )
+
   return (
     <Stack spacing={2} sx={{ px: 0, width: '100%', alignItems: 'stretch', flexGrow: 1 }}>
-      <Typography variant="h5" sx={{ fontWeight: 600, color: '#2f6bff' }}>
-        Truth Table Task
-      </Typography>
-      {(proof.description || truthTable.prompt) && (
-        <Typography variant="body1" sx={{ fontSize: { xs: '0.95rem', md: '1rem' } }}>
-          {truthTable.prompt || proof.description}
-        </Typography>
-      )}
-      <Typography variant="body2" sx={{ color: '#2f6bff' }}>
-        Fill in each column to match the expected truth values.
-      </Typography>
-      <Box className="logicpenguin" sx={{ width: '100%', flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
-        <Box
-          sx={{
-            mt: 1,
-            overflow: 'visible',
-            minHeight: '420px',
-            flexGrow: 1,
-            alignSelf: { xs: 'stretch', md: 'flex-start' },
-          }}
-          className="lp-problem-card"
-        >
-          <Stack spacing={3} sx={{ p: { xs: 2, md: 2 } }}>
-            {useCombinedTable ? (
-              <Box className="tt-table-wrap">
-                <Box
-                  component="table"
-                  className="tt-table"
-                >
-                  <Box component="thead" className="tt-head">
-                    <Box component="tr" className="tt-group-row">
-                      {tables.map((table, tableIndex) => {
-                        const isConclusion = useCombinedTable && tableIndex === tables.length - 1 && tables.length > 1
-                        return (
-                          <Box
-                            component="th"
-                            key={`group-${tableIndex}`}
-                            colSpan={table.tokens.length || 1}
-                            className={
-                              isConclusion
-                                ? 'tt-group tt-conclusion'
-                                : tableIndex < tables.length - 1
-                                  ? 'tt-group tt-divider'
-                                  : 'tt-group'
-                            }
-                          >
-                            {isConclusion && tables.length > 1 ? '// ' : ''}
-                            {table.label}
-                          </Box>
-                        )
-                      })}
-                    </Box>
-                    <Box component="tr" className="tt-token-row">
-                      {tables.map((table, tableIndex) => {
-                        const isConclusion = useCombinedTable && tableIndex === tables.length - 1 && tables.length > 1
-                        return (
-                          <React.Fragment key={`tokenfrag-${tableIndex}`}>
-                            {(table.headerTokens && table.headerTokens.length > 0 ? table.headerTokens : table.tokens).map((token, tokenIndex) => {
-                              const headerTokens = table.headerTokens && table.headerTokens.length > 0 ? table.headerTokens : table.tokens
-                              return (
-                                <Box
-                                  component="th"
-                                  key={`header-${tableIndex}-${tokenIndex}`}
-                                  className={
-                                    isConclusion
-                                      ? 'tt-token tt-conclusion'
-                                      : tokenIndex === headerTokens.length - 1 && tableIndex < tables.length - 1
-                                        ? 'tt-token tt-divider'
-                                        : 'tt-token'
-                                  }
-                                >
-                                  {token}
-                                </Box>
-                              )
-                            })}
-                          </React.Fragment>
-                        )
-                      })}
-                    </Box>
-                  </Box>
-                  <Box component="tbody">
-                    {(tables[0]?.rows ?? []).map((_, rowIndex) => (
-                      <Box
-                        component="tr"
-                        key={`combined-row-${rowIndex}`}
-                        className={
-                          combinedRowMatches[rowIndex]
-                            ? 'tt-row tt-row-ok'
-                            : 'tt-row'
-                        }
-                      >
-                        {tables.map((table, tableIndex) => {
-                          const isConclusion = useCombinedTable && tableIndex === tables.length - 1 && tables.length > 1
-                          return (
-                            <React.Fragment key={`rowfrag-${tableIndex}`}>
-                              {table.rows[rowIndex].map((_, colIndex) => (
-                                <Box
-                                  component="td"
-                                  key={`cell-${tableIndex}-${rowIndex}-${colIndex}`}
-                                  className={
-                                    isConclusion
-                                      ? 'tt-cell tt-conclusion-cell'
-                                      : colIndex === table.tokens.length - 1 &&
-                                        tableIndex < tables.length - 1
-                                          ? 'tt-cell tt-divider'
-                                          : 'tt-cell'
-                                  }
-                                >
-                                  <TruthToggle
-                                    value={tableInputs[tableIndex]?.[rowIndex]?.[colIndex]}
-                                    onChange={(token) =>
-                                      handleCellChange(tableIndex, rowIndex, colIndex, token)
-                                    }
-                                    ariaLabel={`Row ${rowIndex + 1} col ${colIndex + 1}`}
-                                    accent={false}
-                                  />
-                                </Box>
-                              ))}
-                            </React.Fragment>
-                          )
-                        })}
-                      </Box>
-                    ))}
-                  </Box>
-                </Box>
-              </Box>
-            ) : (
-              tables.map((table, tableIndex) => (
-                <Box key={`tt-table-${tableIndex}`} className="tt-table-wrap">
-                  <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 1 }}>
-                    {table.label}
-                  </Typography>
-                  <Box
-                    component="table"
-                    className="tt-table"
-                  >
-                    <Box component="thead" className="tt-head">
-                      <Box component="tr" className="tt-token-row">
-                        {(table.headerTokens && table.headerTokens.length > 0 ? table.headerTokens : table.tokens).map((token, idx) => (
-                          <Box
-                            component="th"
-                            key={`header-${tableIndex}-${idx}`}
-                            className="tt-token"
-                          >
-                            {token}
-                          </Box>
-                        ))}
-                      </Box>
-                    </Box>
-                    <Box component="tbody">
-                      {table.rows.map((row, rowIndex) => (
-                        <Box
-                          component="tr"
-                          key={`row-${tableIndex}-${rowIndex}`}
-                          className={
-                            tableMatches[tableIndex]?.[rowIndex]
-                              ? 'tt-row tt-row-ok'
-                              : 'tt-row'
-                          }
-                        >
-                          {row.map((_, colIndex) => (
-                            <Box
-                              component="td"
-                              key={`cell-${tableIndex}-${rowIndex}-${colIndex}`}
-                              className="tt-cell"
-                            >
-                              <TruthToggle
-                                value={tableInputs[tableIndex]?.[rowIndex]?.[colIndex]}
-                                onChange={(token) =>
-                                  handleCellChange(tableIndex, rowIndex, colIndex, token)
-                                }
-                                ariaLabel={`Row ${rowIndex + 1} col ${colIndex + 1}`}
-                                accent={false}
-                              />
-                            </Box>
-                          ))}
-                        </Box>
-                      ))}
-                    </Box>
-                  </Box>
-                </Box>
-              ))
-            )}
-          </Stack>
+      {embedded ? (
+        tableCard
+      ) : (
+        <Box className="logicpenguin" sx={{ width: '100%', flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
+          {tableCard}
         </Box>
-      </Box>
+      )}
       <Typography
         variant="body2"
         sx={{
-          color: tableCorrect ? '#76b947' : tableFilled ? '#d58b00' : '#2f6bff',
+          color: tableCorrect ? '#2f6bff' : tableFilled ? '#d58b00' : '#2f6bff',
           fontWeight: tableFilled ? 600 : 500,
         }}
       >
         {tableCorrect
-          ? 'All rows match!'
+          ? 'All rows match.'
           : tableFilled
             ? 'Table filled. Check your rows.'
             : 'Complete every cell to finish.'}
@@ -488,17 +807,32 @@ export default function TruthTableEditor({ proof, savedState, onStateChange, onP
       {message && (
         <Alert
           severity={status === 'correct' ? 'success' : status === 'incorrect' ? 'error' : 'info'}
+          variant="filled"
           onClose={() => setMessage('')}
         >
           {message}
         </Alert>
       )}
-      <ProblemSetButtons
-        onCheck={handleCheck}
-        onStartOver={handleStartOver}
-        isChecking={isChecking}
-        isDisabled={!tableFilled}
-      />
+      {!hideActions && (
+        <ProblemSetButtons
+          onCheck={handleCheck}
+          onStartOver={handleStartOver}
+          isChecking={isChecking}
+          isDisabled={!tableFilled || attemptCount >= attemptLimit}
+          align="flex-start"
+        />
+      )}
+      {!hideActions && !suppressReveal && showSolution && renderAnswerCard(
+        'Correct Answer',
+        renderTableSet(
+          solutionTables,
+          solutionTables.map((table) => table.rows),
+          solutionTables.length > 1,
+          true,
+          null,
+          kind === 'argument'
+        )
+      )}
     </Stack>
   )
 }

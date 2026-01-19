@@ -58,9 +58,12 @@
   padding: 1rem;
   box-shadow: 0 7px 12px -3px rgba(0, 0, 0, 0.08), 0 3px 5px -2px rgba(0, 0, 0, 0.04);
   border: 1px solid rgba(0, 0, 0, 0.08);
-  width: max-content;
-  min-width: 28em;
+  width: 100%;
+  min-width: 0;
   max-width: 100%;
+  box-sizing: border-box;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
 }
 
 .logicpenguin .tt-table-wrap {
@@ -105,8 +108,16 @@
   min-width: 2.2rem;
 }
 
-.logicpenguin .tt-divider {
-  border-right: 2px solid var(--lpgray4) !important;
+.logicpenguin .tt-separator {
+  background: #f0f0f0;
+  font-weight: 600;
+  color: inherit;
+}
+.logicpenguin .tt-separator-cell {
+  background: #f5f5f5;
+  font-weight: 600;
+  color: inherit;
+  user-select: none;
 }
 
 .logicpenguin .tt-row:nth-child(even) {
@@ -118,19 +129,35 @@
 }
 
 .logicpenguin .tt-conclusion {
-  border-left: 2px solid var(--lpgray4) !important;
   background: #f1f4ff;
 }
 
 .logicpenguin .tt-conclusion-cell {
-  border-left: 2px solid var(--lpgray4) !important;
   background: #f7f9ff;
 }
 
 
 @media (max-width: 900px) {
+  .logicpenguin {
+    font-size: 18px;
+  }
+
   .logicpenguin .lp-problem-card {
     width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    padding: 0.85rem;
+    box-sizing: border-box;
+  }
+}
+
+@media (max-width: 600px) {
+  .logicpenguin {
+    font-size: 16px;
+  }
+
+  .logicpenguin .tt-table {
+    font-size: 0.8rem;
   }
 }
 

@@ -7,6 +7,7 @@
 //////////////////////////////////////////////////////////////////////////
 
 import { addelem, byid, sendAnswerToServer, localCheck } from './common.js';
+import { fetchJson, getActiveUserId } from '../../utils/api.js';
 import { randomString } from './misc.js';
 
 // the problem is its HTML element, so we extend it
@@ -211,6 +212,93 @@ export default class LogicPenguinProblem extends HTMLElement {
                 successstatus: 'malfunction',
                 points: -1,
                 message: 'Could not determine answer state.'
+            });
+            return;
+        }
+
+        if (this.attemptLimit && this.attemptCount >= this.attemptLimit) {
+            this.setIndicator({
+                savestatus: 'saved',
+                successstatus: 'incorrect',
+                points: -1,
+                message: 'Attempt limit reached.'
+            });
+            if (this.checksaveButton) {
+                this.checksaveButton.disabled = true;
+            }
+            return;
+        }
+
+        // submit to our api when this problem is tied to an assignment question
+        const assignmentQuestionId = Number(this.dataset?.assignmentQuestionId || 0);
+        if (assignmentQuestionId) {
+            this.setIndicator({
+                savestatus: 'saving',
+                successstatus: 'checking',
+                points: -1,
+                message: ''
+            });
+
+            // for derivations we only want the proof structure
+            const submissionData = (this.myproblemtype === 'derivation-hurley' || this.myproblemtype === 'derivation')
+                ? state.ans
+                : state;
+
+            fetchJson('/api/validate/submission', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    assignment_question_id: assignmentQuestionId,
+                    user_id: getActiveUserId(),
+                    submission_data: submissionData
+                })
+            }).then((resp) => {
+                const validation = resp?.validation || {};
+                this.setIndicator({
+                    ...validation,
+                    savestatus: 'saved',
+                    points: validation.points ?? resp?.submission?.score ?? -1
+                });
+                if (typeof resp?.attempt_limit === 'number') {
+                    this.attemptLimit = resp.attempt_limit;
+                }
+                if (typeof resp?.submission?.attempt === 'number') {
+                    this.attemptCount = resp.submission.attempt;
+                }
+                if (this.attemptLimit && this.attemptCount >= this.attemptLimit) {
+                    if (this.checksaveButton) {
+                        this.checksaveButton.disabled = true;
+                    }
+                }
+                this.dispatchEvent(new CustomEvent('lp-submission', {
+                    detail: {
+                        assignmentQuestionId,
+                        attempt: resp?.submission?.attempt,
+                        attemptLimit: resp?.attempt_limit,
+                        isCorrect: validation.successstatus === 'correct'
+                    }
+                }));
+            }).catch((err) => {
+                if (err?.message?.includes('Attempt limit exceeded')) {
+                    this.attemptLimit = this.attemptLimit || 0;
+                    this.attemptCount = this.attemptLimit;
+                    if (this.checksaveButton) {
+                        this.checksaveButton.disabled = true;
+                    }
+                    this.setIndicator({
+                        savestatus: 'saved',
+                        successstatus: 'incorrect',
+                        points: -1,
+                        message: 'Attempt limit reached.'
+                    });
+                    return;
+                }
+                this.setIndicator({
+                    savestatus: 'saveerror',
+                    successstatus: 'malfunction',
+                    points: -1,
+                    message: 'Error saving answer: ' + err.toString()
+                });
             });
             return;
         }
@@ -434,4 +522,3 @@ export default class LogicPenguinProblem extends HTMLElement {
         unsaved: 'circle'
     }
 }
-

@@ -1,8 +1,8 @@
-import { useState } from 'react'
-import { Box, Grid, Typography, Tooltip, Select, MenuItem, FormControl, IconButton, Button, Chip } from '@mui/material'
+import React from 'react'
+import { Box, Typography, IconButton, Chip } from '@mui/material'
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
-import DownloadIcon from '@mui/icons-material/Download'
+// import DownloadIcon from '@mui/icons-material/Download'
 import RulesReference from '../ui/RulesReference.jsx'
 import Widget from '../ui/Widget.jsx'
 import PageTitle from '../ui/PageTitle.jsx'
@@ -12,6 +12,8 @@ export default function Layout({
   subtitle, 
   score, 
   total, 
+  gradePercent,
+  dueDate,
   scoreStyle, 
   currentProofId, 
   completedProofs, 
@@ -23,23 +25,31 @@ export default function Layout({
   onBackToLMS, 
   inModal = false 
 }) {
-  const [dropdownOpen, setDropdownOpen] = useState(false)
-  const [isTouchDevice] = useState(() => {
-    if (typeof window === 'undefined') return false
-    return window.matchMedia && window.matchMedia('(hover: none)').matches
-  })
-  const handleOpen = () => setDropdownOpen(true)
-  const handleClose = () => setDropdownOpen(false)
+  const completionPercent = total > 0 ? Math.round((score / total) * 100) : 0
+  const gradeLabel = Number.isFinite(gradePercent)
+    ? `${gradePercent.toFixed(1)}%`
+    : '—'
+  const isOverdue = dueDate ? new Date(dueDate) < new Date() : false
   
   return (
     <Box sx={{ width: '100%', height: '100%' }}>
       {!inModal && <RulesReference />}
       
-      <Box sx={{ mb: 4 }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2, flexWrap: 'wrap', gap: 2 }}>
+      <Box sx={{ mb: { xs: 3, md: 4 } }}>
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: { xs: 'flex-start', md: 'center' },
+            justifyContent: 'space-between',
+            mb: 2,
+            flexWrap: 'wrap',
+            gap: 2,
+          }}
+        >
           {onBackToLMS && (
             <IconButton
               onClick={onBackToLMS}
+              aria-label="Back to dashboard"
               sx={{
                 color: 'text.secondary',
                 '&:hover': { backgroundColor: 'action.hover' }
@@ -60,17 +70,18 @@ export default function Layout({
           </Box>
         </Box>
 
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap', mb: 2 }}>
-          <Chip
-            label={`${score} / ${total}`}
-            color={score === total && total > 0 ? 'success' : 'default'}
-            icon={score === total && total > 0 ? <CheckCircleIcon /> : undefined}
-            sx={{
-              fontSize: '0.875rem',
-              fontWeight: 600,
-              height: 32,
-            }}
-          />
+        {/* Commented out export PDF and assignment dropdown - temporarily removed */}
+        {/* <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap', mb: 2 }}>
+          <Stack direction="row" spacing={1} alignItems="center" sx={{ flexWrap: 'wrap' }}>
+            {isOverdue && (
+              <Chip
+                label="Past due"
+                color="error"
+                size="small"
+                sx={{ fontWeight: 600, height: 28 }}
+              />
+            )}
+          </Stack>
           
           {onExportClick && (
             <Tooltip title="Export answers to PDF">
@@ -79,7 +90,7 @@ export default function Layout({
                 size="small"
                 startIcon={<DownloadIcon />}
                 onClick={onExportClick}
-                sx={{ textTransform: 'none' }}
+                sx={{ textTransform: 'none', width: { xs: '100%', sm: 'auto' } }}
               >
                 Export PDF
               </Button>
@@ -89,7 +100,7 @@ export default function Layout({
           {worksheets && (
             <FormControl 
               size="small"
-              sx={{ minWidth: 200 }}
+              sx={{ minWidth: { xs: '100%', sm: 200 }, width: { xs: '100%', sm: 'auto' } }}
             >
               <Select
                 value={currentWorksheetIndex}
@@ -106,7 +117,9 @@ export default function Layout({
                 }}
               >
                 {worksheets.map((worksheet, idx) => {
-                  const worksheetCompleted = worksheet.proofs.every(p => completedProofs.has(p.id))
+                  const worksheetCompleted = worksheet.proofs.length > 0
+                    ? worksheet.proofs.every((p) => completedProofs.has(p.id))
+                    : false
                   return (
                     <MenuItem key={worksheet.id} value={idx}>
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, width: '100%' }}>
@@ -123,13 +136,21 @@ export default function Layout({
               </Select>
             </FormControl>
           )}
-        </Box>
+        </Box> */}
       </Box>
 
       <Box>
-        <Widget>
-          <Box sx={{ p: 3 }}>
-            {children}
+        <Widget noBodyPadding>
+          <Box sx={{ p: { xs: 2, sm: 3 } }}>
+            {React.cloneElement(children, {
+              gradePercent,
+              total,
+              score,
+              dueDate,
+              completionPercent,
+              gradeLabel,
+              isOverdue
+            })}
           </Box>
         </Widget>
       </Box>

@@ -197,6 +197,7 @@ const WORKSHEET_EVALUATE_TRUTH = [
   }),
 ]
 
+/*
 const WORKSHEET_VALID_CORRECT_SOUND = [
   createProof(25, 'A', ['All humans are mortal.', 'Socrates is human.'], 'Socrates is mortal.', 'Determine validity, correctness, and soundness.', {
     type: 'valid-correct-sound',
@@ -205,6 +206,7 @@ const WORKSHEET_VALID_CORRECT_SOUND = [
     type: 'valid-correct-sound',
   }),
 ]
+*/
 
 export const WORKSHEETS = [
   { id: 14, title: 'Worksheet 14', proofs: WORKSHEET_14 },
@@ -217,7 +219,7 @@ export const WORKSHEETS = [
   { id: 21, title: 'Test: Multiple Choice', proofs: WORKSHEET_MULTIPLE_CHOICE },
   { id: 22, title: 'Test: True/False', proofs: WORKSHEET_TRUE_FALSE },
   { id: 23, title: 'Test: Evaluate Truth', proofs: WORKSHEET_EVALUATE_TRUTH },
-  { id: 25, title: 'Test: Valid/Correct/Sound', proofs: WORKSHEET_VALID_CORRECT_SOUND },
+  /* { id: 25, title: 'Test: Valid/Correct/Sound', proofs: WORKSHEET_VALID_CORRECT_SOUND }, */
 ]
 
 export const PROOFS = WORKSHEET_14
