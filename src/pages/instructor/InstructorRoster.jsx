@@ -46,10 +46,8 @@ export default function InstructorRoster() {
     calculateClassStats(students);
 
   // Handlers
-  const handleAddStudent = async (studentData) => {
-    await addStudentToCourse(dispatch, activeCourseId, studentData);
-    setAddDialogOpen(false);
-  };
+  const handleAddStudent = (studentData) =>
+    addStudentToCourse(dispatch, activeCourseId, studentData);
 
   const handleStudentClick = (student) => {
     setSelectedStudent(student);

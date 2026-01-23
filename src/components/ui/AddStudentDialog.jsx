@@ -13,6 +13,12 @@ import {
   Typography,
 } from "@mui/material";
 import { X, UserPlus } from "lucide-react";
+// Match backend password policy and messaging in the UI.
+import {
+  generateStrongPassword,
+  isStrongPassword,
+  PASSWORD_POLICY_MESSAGE,
+} from "../../utils/passwords.js";
 
 export default function AddStudentDialog({ open, onClose, onSubmit }) {
   const [formData, setFormData] = useState({
@@ -20,12 +26,16 @@ export default function AddStudentDialog({ open, onClose, onSubmit }) {
     password: "",
   });
   const [errors, setErrors] = useState({});
+  const [submitError, setSubmitError] = useState("");
 
   const handleChange = (field, value) => {
     setFormData({ ...formData, [field]: value });
     // Clear error for this field
     if (errors[field]) {
       setErrors({ ...errors, [field]: null });
+    }
+    if (submitError) {
+      setSubmitError("");
     }
   };
 
@@ -38,36 +48,57 @@ export default function AddStudentDialog({ open, onClose, onSubmit }) {
 
     if (!formData.password) {
       newErrors.password = "Password is required";
-    } else if (formData.password.length < 6) {
-      newErrors.password = "Password must be at least 6 characters";
+
+    } else if (!isStrongPassword(formData.password)) {
+      newErrors.password = PASSWORD_POLICY_MESSAGE;
     }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = () => {
+  // backend error payloads msg
+  const getErrorMessage = (error) => {
+    if (!error) return "Failed to add student.";
+    if (typeof error === "string") return error;
+    const message = error.message || String(error);
+    if (!message) return "Failed to add student.";
+    try {
+      const parsed = JSON.parse(message);
+      if (Array.isArray(parsed?.errors) && parsed.errors.length > 0) {
+        return parsed.errors
+          .map((entry) => entry?.msg || entry?.message)
+          .filter(Boolean)
+          .join(", ");
+      }
+      if (parsed?.message) return parsed.message;
+    } catch {
+      // ignore parse errors
+    }
+    return message;
+  };
+
+  const handleSubmit = async () => {
     if (!validateForm()) return;
 
-    onSubmit(formData);
-    handleClose();
+    try {
+      setSubmitError("");
+      await onSubmit(formData);
+      handleClose();
+    } catch (error) {
+      setSubmitError(getErrorMessage(error));
+    }
   };
 
   const handleClose = () => {
     setFormData({ username: "", password: "" });
     setErrors({});
+    setSubmitError("");
     onClose();
   };
 
   const generatePassword = () => {
-    // Generate a random 8-character password
-    const chars =
-      "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789!@#$";
-    let password = "";
-    for (let i = 0; i < 8; i++) {
-      password += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    setFormData({ ...formData, password });
+    handleChange("password", generateStrongPassword());
   };
 
   return (
@@ -98,6 +129,7 @@ export default function AddStudentDialog({ open, onClose, onSubmit }) {
             A student account will be created with the information below. Make
             sure to share the password with the student securely.
           </Alert>
+          {submitError && <Alert severity="error">{submitError}</Alert>}
 
           <TextField
             label="Username"
@@ -122,7 +154,7 @@ export default function AddStudentDialog({ open, onClose, onSubmit }) {
                 error={!!errors.password}
                 helperText={
                   errors.password ||
-                  "Student will use this to log in (minimum 6 characters)"
+                  PASSWORD_POLICY_MESSAGE
                 }
               />
               <Button

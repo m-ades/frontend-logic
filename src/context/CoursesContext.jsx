@@ -862,6 +862,7 @@ export async function addStudentToCourse(dispatch, courseId, studentData) {
   } catch (error) {
     dispatch({ type: "SET_ERROR", payload: error.message });
     console.error(`Failed to add student to course ${courseId}:`, error);
+    throw error;
   }
 }
 
