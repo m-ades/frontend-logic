@@ -1,16 +1,53 @@
 // Utility functions for roster management
 
-export function getStudentStats(student) {
-  const grades = Object.values(student.grades || {}).filter(
-    (g) => g !== undefined && g !== null
-  );
+const getAssignmentDeadline = (assignment) => {
+  if (!assignment?.dueDate) return null;
+  const deadline = new Date(assignment.dueDate);
+  if (Number.isNaN(deadline.getTime())) return null;
+  if (assignment.dueTime) {
+    const [hours, minutes] = assignment.dueTime.split(":");
+    deadline.setHours(parseInt(hours, 10), parseInt(minutes, 10), 0, 0);
+  } else {
+    deadline.setHours(23, 59, 59, 999);
+  }
+  return deadline;
+};
+
+const getPastDueAssignmentIds = (assignments) => {
+  if (!Array.isArray(assignments) || assignments.length === 0) return null;
+  const now = new Date();
+  const ids = new Set();
+  assignments.forEach((assignment) => {
+    const deadline = getAssignmentDeadline(assignment);
+    if (!deadline || deadline > now) return;
+    const assignmentId = Number(assignment.id);
+    if (Number.isFinite(assignmentId)) {
+      ids.add(assignmentId);
+    }
+  });
+  return ids;
+};
+
+export function getStudentStats(student, assignments) {
+  const pastDueAssignmentIds = getPastDueAssignmentIds(assignments);
+  const grades = Object.entries(student.grades || {})
+    .filter(
+      ([assignmentId, grade]) =>
+        grade !== undefined &&
+        grade !== null &&
+        (!pastDueAssignmentIds ||
+          pastDueAssignmentIds.has(Number(assignmentId)))
+    )
+    .map(([, grade]) => grade);
   const average =
     grades.length > 0
       ? Math.round(grades.reduce((sum, g) => sum + g, 0) / grades.length)
       : 0;
   const completed = grades.length;
-  const lateCount = Object.values(student.lateSubmissions || {}).filter(
-    Boolean
+  const lateCount = Object.entries(student.lateSubmissions || {}).filter(
+    ([assignmentId, isLate]) =>
+      Boolean(isLate) &&
+      (!pastDueAssignmentIds || pastDueAssignmentIds.has(Number(assignmentId)))
   ).length;
 
   return { average, completed, lateCount };
@@ -23,28 +60,28 @@ export function filterStudents(students, searchQuery) {
   );
 }
 
-export function calculateClassStats(students) {
+export function calculateClassStats(students, assignments) {
   const totalStudents = students.length;
 
   const averageClassGrade =
     totalStudents > 0
       ? Math.round(
           students.reduce((sum, s) => {
-            const stats = getStudentStats(s);
+            const stats = getStudentStats(s, assignments);
             return sum + stats.average;
           }, 0) / totalStudents
         )
       : 0;
 
   const studentsAtRisk = students.filter((s) => {
-    const stats = getStudentStats(s);
+    const stats = getStudentStats(s, assignments);
     return stats.average < 70 && stats.average > 0;
   }).length;
 
   return { totalStudents, averageClassGrade, studentsAtRisk };
 }
 
-export function exportRosterCSV(students, courseCode) {
+export function exportRosterCSV(students, courseCode, assignments) {
   const csv = [
     [
       "Username",
@@ -53,7 +90,7 @@ export function exportRosterCSV(students, courseCode) {
       "Late Submissions",
     ].join(","),
     ...students.map((student) => {
-      const stats = getStudentStats(student);
+      const stats = getStudentStats(student, assignments);
       return [
         student.username,
         `${stats.average}%`,

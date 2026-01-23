@@ -43,7 +43,9 @@ export default function InstructorRoster() {
   // Filter and calculate stats
   const filteredStudents = filterStudents(students, searchQuery);
   const { totalStudents, averageClassGrade, studentsAtRisk } =
-    calculateClassStats(students);
+    calculateClassStats(students, assignments);
+  const getRosterStudentStats = (student) =>
+    getStudentStats(student, assignments);
 
   // Handlers
   const handleAddStudent = (studentData) =>
@@ -66,7 +68,7 @@ export default function InstructorRoster() {
   };
 
   const handleExportRoster = () => {
-    exportRosterCSV(filteredStudents, activeCourse?.code);
+    exportRosterCSV(filteredStudents, activeCourse?.code, assignments);
   };
 
   const handleImportRoster = async (studentsToImport) => {
@@ -146,7 +148,7 @@ export default function InstructorRoster() {
         onStudentClick={handleStudentClick}
         onMenuClick={handleMenuClick}
         onAddStudent={() => setAddDialogOpen(true)}
-        getStudentStats={getStudentStats}
+        getStudentStats={getRosterStudentStats}
         searchQuery={searchQuery}
       />
 
