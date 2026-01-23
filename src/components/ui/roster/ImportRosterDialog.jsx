@@ -19,6 +19,10 @@ import {
   Divider,
 } from "@mui/material";
 import { Upload, FileText, CheckCircle, XCircle, X } from "lucide-react";
+import {
+  isStrongPassword,
+  PASSWORD_POLICY_MESSAGE,
+} from "../../../utils/passwords.js";
 
 export default function ImportRosterDialog({ open, onClose, onImport }) {
   const [file, setFile] = useState(null);
@@ -90,9 +94,9 @@ export default function ImportRosterDialog({ open, onClose, onImport }) {
           }
           if (!student.password) {
             studentErrors.push(`Row ${i + 1}: Missing password`);
-          } else if (student.password.length < 6) {
+          } else if (!isStrongPassword(student.password)) {
             studentErrors.push(
-              `Row ${i + 1}: Password must be at least 6 characters`
+              `Row ${i + 1}: ${PASSWORD_POLICY_MESSAGE}`
             );
           }
 
@@ -190,7 +194,7 @@ export default function ImportRosterDialog({ open, onClose, onImport }) {
               <br />
               • Each subsequent row represents one student
               <br />
-              • Passwords must be at least 6 characters
+              • {PASSWORD_POLICY_MESSAGE}
             </Typography>
           </Alert>
 
