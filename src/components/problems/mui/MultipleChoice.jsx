@@ -33,6 +33,9 @@ export default function MultipleChoice({
       if (Array.isArray(savedValue)) {
         return savedValue.map(Number).filter((value) => Number.isFinite(value))
       }
+      if (savedValue === '') {
+        return isMultiSelectSubq(subq) ? [] : ''
+      }
       if (savedValue !== undefined && savedValue !== null) {
         return Number.isFinite(Number(savedValue)) ? Number(savedValue) : savedValue
       }
@@ -248,14 +251,24 @@ export default function MultipleChoice({
                         ) : (
                           <RadioGroup
                             value={selectedValue?.[subIdx] === '' ? '' : String(selectedValue?.[subIdx] ?? '')}
-                            onChange={(event) => handleCompositeSingleChange(subIdx, Number(event.target.value))}
                             name={`${groupBase}-subq-${subIdx}`}
+                            onChange={(event) => {
+                              const nextValue = event.target.value
+                              handleCompositeSingleChange(
+                                subIdx,
+                                nextValue === '' ? '' : Number(nextValue)
+                              )
+                            }}
                           >
                             {choices.map((choice, index) => (
                               <FormControlLabel
                                 key={`${subIdx}-${index}`}
                                 value={String(index)}
-                                control={<Radio disabled={readOnly || isLocked} />}
+                                control={
+                                  <Radio
+                                    disabled={readOnly || isLocked}
+                                  />
+                                }
                                 label={choice}
                                 sx={{
                                   mb: 1,
