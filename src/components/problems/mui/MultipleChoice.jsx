@@ -45,7 +45,7 @@ export default function MultipleChoice({
         : (savedState?.ans !== undefined ? String(savedState.ans) : '')
   )
   
-  const { message, isChecking, handleCheck, handleStartOver, getStatusColor, setStatus, setMessage, isLocked } = useProblemChecker({
+  const { message, isChecking, handleCheck, handleStartOver, getStatusColor, setStatus, setMessage, attemptCount, maxAttempts, isLocked } = useProblemChecker({
     answer,
     problemType: 'multiple-choice',
     question: problem,
@@ -331,6 +331,8 @@ export default function MultipleChoice({
           isChecking={isChecking}
           isDisabled={selectedValue === '' || isLocked}
           align="flex-start"
+          attemptCount={attemptCount}
+          attemptLimit={maxAttempts}
         />
       )}
       {!suppressReveal && (

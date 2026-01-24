@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
+import { Typography } from '@mui/material'
 import LogicPenguinProof from './LogicPenguinProof.jsx'
 import SolutionReveal from './SolutionReveal.jsx'
 
@@ -7,6 +8,8 @@ export default function ProofEditor({ proof, onProofComplete, savedState, onStat
   const proofRef = useRef(null)
   const [attemptCount, setAttemptCount] = useState(proof?.attemptCount ?? 0)
   const [attemptLimit, setAttemptLimit] = useState(proof?.attemptLimit ?? 10)
+  const hasAttempts = Number.isFinite(attemptCount) && Number.isFinite(attemptLimit)
+  const attemptsLeft = hasAttempts ? Math.max(0, attemptLimit - attemptCount) : null
 
   useEffect(() => {
     if (typeof proof?.attemptCount === 'number') {
@@ -93,6 +96,14 @@ export default function ProofEditor({ proof, onProofComplete, savedState, onStat
         attemptCount={attemptCount}
         attemptLimit={attemptLimit}
       />
+      {hasAttempts && (
+        <Typography
+          variant="caption"
+          sx={{ mt: 1, display: 'block', fontSize: '0.75rem', color: 'text.primary' }}
+        >
+          Attempts left: {attemptsLeft}/{attemptLimit}
+        </Typography>
+      )}
       <SolutionReveal
         solution={proof.solution}
         show={attemptCount >= attemptLimit}

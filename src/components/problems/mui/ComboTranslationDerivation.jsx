@@ -149,7 +149,7 @@ export default function ComboTranslationDerivation({
     updateState({ argumentLine: '', derivationState: null })
   }
 
-  const { message, isChecking, handleCheck, handleStartOver, getStatusColor, setMessage, isLocked } =
+  const { message, isChecking, handleCheck, handleStartOver, getStatusColor, setMessage, attemptCount, maxAttempts, isLocked } =
     useProblemChecker({
       answer: proof?.answer ?? snapshot?.answer,
       problemType: 'combo-translation-derivation',
@@ -259,6 +259,8 @@ export default function ComboTranslationDerivation({
         isChecking={isChecking}
         isDisabled={!parseStatus.ok || isLocked}
         align="flex-start"
+        attemptCount={attemptCount}
+        attemptLimit={maxAttempts}
       />
     </Stack>
   )

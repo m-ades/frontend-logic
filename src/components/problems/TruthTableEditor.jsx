@@ -830,6 +830,8 @@ export default function TruthTableEditor({
           isChecking={isChecking}
           isDisabled={!tableFilled || attemptCount >= attemptLimit}
           align="flex-start"
+          attemptCount={attemptCount}
+          attemptLimit={attemptLimit}
         />
       )}
       {!hideActions && !suppressReveal && showSolution && renderAnswerCard(

@@ -25,7 +25,7 @@ export default function TrueFalse({
     ? `true-false-${assignmentQuestionId}`
     : `true-false-${baseId}`
   
-  const { status, message, isChecking, handleCheck, handleStartOver, getStatusColor, setStatus, setMessage, isLocked } = useProblemChecker({
+  const { status, message, isChecking, handleCheck, handleStartOver, getStatusColor, setStatus, setMessage, attemptCount, maxAttempts, isLocked } = useProblemChecker({
     answer,
     problemType: 'true-false',
     question: problem,
@@ -122,6 +122,8 @@ export default function TrueFalse({
           isChecking={isChecking}
           isDisabled={selectedValue === '' || isLocked}
           align="flex-start"
+          attemptCount={attemptCount}
+          attemptLimit={maxAttempts}
         />
       )}
       <SolutionReveal show={showSolution}>

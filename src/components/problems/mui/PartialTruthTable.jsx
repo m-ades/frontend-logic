@@ -80,7 +80,7 @@ export default function PartialTruthTable({
     rowInputs.length === 0 ||
     rowInputs.some((cell, idx) => editableIndices[idx] && cell === '')
 
-  const { status, message, isChecking, handleCheck, handleStartOver, getStatusColor, setStatus, setMessage } = useProblemChecker({
+  const { status, message, isChecking, handleCheck, handleStartOver, getStatusColor, setStatus, setMessage, attemptCount, maxAttempts } = useProblemChecker({
     answer: null,
     problemType: 'partial-truth-table',
     question: problem,
@@ -188,6 +188,8 @@ export default function PartialTruthTable({
           isChecking={isChecking}
           isDisabled={isDisabled()}
           align="flex-start"
+          attemptCount={attemptCount}
+          attemptLimit={maxAttempts}
         />
       )}
     </Stack>

@@ -254,7 +254,7 @@ export default function IndirectTruthTable({
     })
   }
 
-  const { message, isChecking, handleCheck, handleStartOver, getStatusColor, setMessage, isLocked } =
+  const { message, isChecking, handleCheck, handleStartOver, getStatusColor, setMessage, attemptCount, maxAttempts, isLocked } =
     useProblemChecker({
       answer,
       problemType: 'indirect-truth-table',
@@ -430,6 +430,8 @@ export default function IndirectTruthTable({
           isChecking={isChecking}
           isDisabled={mcQuestions.length === 0 || selectedValues.some((val) => val === '') || isLocked}
           align="flex-start"
+          attemptCount={attemptCount}
+          attemptLimit={maxAttempts}
         />
       )}
     </Stack>

@@ -115,7 +115,7 @@ export default function ComboTranslationTruthTable({
     }
   }, [parseStatus.ok, parseStatus.parsed, proof])
 
-  const { message, isChecking, handleCheck, handleStartOver, getStatusColor, setMessage, isLocked } =
+  const { message, isChecking, handleCheck, handleStartOver, getStatusColor, setMessage, attemptCount, maxAttempts, isLocked } =
     useProblemChecker({
       answer: proof?.answer ?? snapshot?.answer,
       problemType: 'combo-translation-truth-table',
@@ -220,6 +220,8 @@ export default function ComboTranslationTruthTable({
         isChecking={isChecking}
         isDisabled={!parseStatus.ok || !isTableComplete(tableState) || isLocked}
         align="flex-start"
+        attemptCount={attemptCount}
+        attemptLimit={maxAttempts}
       />
     </Stack>
   )

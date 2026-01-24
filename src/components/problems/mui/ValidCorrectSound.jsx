@@ -157,6 +157,8 @@ export default function ValidCorrectSound({
           isChecking={isChecking}
           isDisabled={!isComplete || isLocked}
           align="flex-start"
+          attemptCount={attemptCount}
+          attemptLimit={maxAttempts}
         />
       )}
       {!suppressReveal && (

@@ -124,7 +124,7 @@ export default function SymbolicTranslation({
     }, 200)
   }, [onStateChange])
   
-  const { message, isChecking, handleCheck, handleStartOver, getStatusColor, setMessage, isLocked } = useProblemChecker({
+  const { message, isChecking, handleCheck, handleStartOver, getStatusColor, setMessage, attemptCount, maxAttempts, isLocked } = useProblemChecker({
     answer,
     problemType: 'symbolic-translation',
     question: problem,
@@ -222,6 +222,8 @@ export default function SymbolicTranslation({
           isChecking={isChecking}
           isDisabled={!inputValue.trim() || isLocked}
           align="flex-start"
+          attemptCount={attemptCount}
+          attemptLimit={maxAttempts}
         />
       )}
       {!suppressReveal && (

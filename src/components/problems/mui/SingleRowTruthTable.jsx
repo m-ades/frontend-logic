@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Alert, Box, Stack, Typography } from '@mui/material'
+import { Alert, Box, Stack, Typography, FormControl, Select, MenuItem } from '@mui/material'
 import getFormulaClass from '../../../lib/logicpenguin/symbolic/formula.js'
 import getSyntax from '../../../lib/logicpenguin/symbolic/libsyntax.js'
 import { libtf } from '../../../lib/logicpenguin/symbolic/libsemantics.js'
@@ -161,6 +161,10 @@ export default function SingleRowTruthTable({
   const [compoundInput, setCompoundInput] = useState(
     savedState?.compound !== undefined ? toSymbol(savedState.compound) : ''
   )
+  const compoundOptions = [
+    { value: 'T', label: 'True' },
+    { value: 'F', label: 'False' },
+  ]
 
   useEffect(() => {
     setRowInputs(buildInitialRow())
@@ -174,7 +178,7 @@ export default function SingleRowTruthTable({
     rowInputs.some((cell, idx) => cell === '' && !isAtomicToken(tokens[idx])) ||
     compoundInput === ''
 
-  const { status, message, isChecking, handleCheck, handleStartOver, getStatusColor, setStatus, setMessage, isLocked } = useProblemChecker({
+  const { status, message, isChecking, handleCheck, handleStartOver, getStatusColor, setStatus, setMessage, attemptCount, maxAttempts, isLocked } = useProblemChecker({
     answer: expectedRow,
     problemType: 'single-row-truth-table',
     question: problem,
@@ -314,13 +318,28 @@ export default function SingleRowTruthTable({
               <Typography variant="body2" sx={{ fontWeight: 600 }}>
                 Truth value of compound statement:
               </Typography>
-              <TruthToggle
-                value={compoundInput}
-                onChange={handleCompoundChange}
-                ariaLabel="Truth value of compound statement"
-                accent
-                readOnly={readOnly || isLocked}
-              />
+              <FormControl size="small" sx={{ minWidth: 110 }}>
+                <Select
+                  value={compoundInput}
+                  displayEmpty
+                  onChange={(event) => handleCompoundChange(event.target.value)}
+                  inputProps={{ 'aria-label': 'Truth value of compound statement' }}
+                  disabled={readOnly || isLocked}
+                  sx={{
+                    borderRadius: 0,
+                    '& .MuiOutlinedInput-notchedOutline': { borderRadius: 0 },
+                  }}
+                >
+                  <MenuItem value="">
+                    <em>Select</em>
+                  </MenuItem>
+                  {compoundOptions.map((option) => (
+                    <MenuItem key={option.value} value={option.value}>
+                      {option.label}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
             </Stack>
           </Stack>
         </Box>
@@ -354,6 +373,8 @@ export default function SingleRowTruthTable({
           isChecking={isChecking}
           isDisabled={!tableFilled || isLocked}
           align="flex-start"
+          attemptCount={attemptCount}
+          attemptLimit={maxAttempts}
         />
       )}
 
@@ -365,13 +386,27 @@ export default function SingleRowTruthTable({
             <Typography variant="body2" sx={{ fontWeight: 600 }}>
               Truth value of compound statement:
             </Typography>
-            <TruthToggle
-              value={expectedCompound}
-              onChange={() => {}}
-              ariaLabel="Truth value of compound statement (answer)"
-              accent
-              readOnly
-            />
+            <FormControl size="small" sx={{ minWidth: 110 }}>
+              <Select
+                value={expectedCompound}
+                displayEmpty
+                inputProps={{ 'aria-label': 'Truth value of compound statement (answer)' }}
+                disabled
+                sx={{
+                  borderRadius: 0,
+                  '& .MuiOutlinedInput-notchedOutline': { borderRadius: 0 },
+                }}
+              >
+                <MenuItem value="">
+                  <em>Select</em>
+                </MenuItem>
+                {compoundOptions.map((option) => (
+                  <MenuItem key={option.value} value={option.value}>
+                    {option.label}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
           </Stack>
         </Stack>
       )}
