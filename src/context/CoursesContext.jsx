@@ -1,5 +1,6 @@
 import { createContext, useContext, useReducer } from "react";
 import { fetchJson, getStoredUser } from "../utils/api.js";
+import { sortAssignmentsBySubchapter } from "../utils/assignmentSort.js";
 import { isInstructorRole } from "../utils/auth.js";
 
 // ============================================================================
@@ -146,24 +147,30 @@ function getAssignmentsListCache(courseId) {
 
 export async function fetchCourseAssignments(courseId) {
   const assignments = await fetchCourseAssignmentsList(courseId);
-  return (assignments || [])
+  const mapped = (assignments || [])
     .filter((assignment) => assignment.kind !== "practice")
     .map((assignment) => mapAssignmentRecord(assignment));
+  return sortAssignmentsBySubchapter(mapped);
 }
 
 export async function fetchCoursePractices(courseId) {
   const assignments = await fetchCourseAssignmentsList(courseId);
-  return (assignments || [])
+  const mapped = (assignments || [])
     .filter((assignment) => assignment.kind === "practice")
     .map((assignment) => mapAssignmentRecord(assignment));
+  return sortAssignmentsBySubchapter(mapped);
 }
 
 export async function fetchCourseAssignmentsAndPractices(courseId) {
   const assignments = await fetchCourseAssignmentsList(courseId);
   const mapped = (assignments || []).map((assignment) => mapAssignmentRecord(assignment));
   return {
-    assignments: mapped.filter((assignment) => assignment.kind !== "practice"),
-    practices: mapped.filter((assignment) => assignment.kind === "practice"),
+    assignments: sortAssignmentsBySubchapter(
+      mapped.filter((assignment) => assignment.kind !== "practice")
+    ),
+    practices: sortAssignmentsBySubchapter(
+      mapped.filter((assignment) => assignment.kind === "practice")
+    ),
   };
 }
 

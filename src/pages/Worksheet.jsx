@@ -7,6 +7,7 @@ import { useProofState } from '../hooks/useproofstate.js'
 import { useWorksheetMetrics } from '../hooks/useWorksheetMetrics.js'
 // import { exportWorksheetPDF } from '../utils/exportPDF.js'
 import { API_CONFIG, fetchJson, getActiveUserId } from '../utils/api.js'
+import { sortAssignmentsBySubchapter } from '../utils/assignmentSort.js'
 import { useCoursesState } from '../context/CoursesContext.jsx'
 
 export default function Worksheet() {
@@ -682,7 +683,8 @@ export default function Worksheet() {
 
         setIsLoading(true)
         const assignments = await fetchJson(`/api/courses/${courseId}/assignments`)
-        const fallbackAssignmentId = targetAssignmentId || assignments?.[0]?.id
+        const orderedAssignments = sortAssignmentsBySubchapter(assignments || [])
+        const fallbackAssignmentId = targetAssignmentId || orderedAssignments?.[0]?.id
         if (!fallbackAssignmentId) {
           if (isMounted) {
             setWorksheets([])
@@ -690,10 +692,10 @@ export default function Worksheet() {
           }
           return
         }
-        const assignmentMeta = assignments.find((assignment) => assignment.id === fallbackAssignmentId)
+        const assignmentMeta = orderedAssignments.find((assignment) => assignment.id === fallbackAssignmentId)
         const loadedWorksheet = await loadWorksheetDetails(fallbackAssignmentId, assignmentMeta)
-        const worksheetData = assignments?.length
-          ? assignments.map((assignment) => (
+        const worksheetData = orderedAssignments?.length
+          ? orderedAssignments.map((assignment) => (
             assignment.id === fallbackAssignmentId
               ? loadedWorksheet
               : { id: assignment.id, title: assignment.title, proofs: [] }

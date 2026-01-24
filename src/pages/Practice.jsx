@@ -5,6 +5,7 @@ import ThemedCard from '../components/ui/ThemedCard.jsx'
 import ActivityAccordion from '../components/ui/ActivityAccordion.jsx'
 import { ACTIVITY_TYPES } from '../placeholder/courseActivities.js'
 import { API_CONFIG, fetchJson } from '../utils/api.js'
+import { compareSubchapterLabels, sortAssignmentsBySubchapter } from '../utils/assignmentSort.js'
 import { useCoursesState } from '../context/CoursesContext.jsx'
 
 const buildCourseStructure = (assignments, sectionTitle) => {
@@ -46,7 +47,7 @@ const buildCourseStructure = (assignments, sectionTitle) => {
       id: chapterLabel,
       title: chapterLabel,
       subchapters: Array.from(subMap.entries())
-        .sort(([a], [b]) => compareLabels(a, b))
+        .sort(([a], [b]) => compareSubchapterLabels(a, b))
         .map(([subLabel, items]) => ({
           id: `${chapterLabel}-${subLabel}`,
           title: subLabel,
@@ -70,7 +71,9 @@ export default function Practice() {
         const assignments = await fetchJson(`/api/courses/${courseId}/assignments`)
         if (!isMounted) return
 
-        const practiceAssignments = assignments.filter((assignment) => assignment.kind === 'practice')
+        const practiceAssignments = sortAssignmentsBySubchapter(
+          assignments.filter((assignment) => assignment.kind === 'practice')
+        )
         setCourseStructure(buildCourseStructure(practiceAssignments, 'Practice'))
       } catch (error) {
         if (isMounted) {

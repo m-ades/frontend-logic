@@ -5,6 +5,7 @@ import ThemedCard from '../components/ui/ThemedCard.jsx'
 import ActivityAccordion from '../components/ui/ActivityAccordion.jsx'
 import { ACTIVITY_TYPES } from '../placeholder/courseActivities.js'
 import { formatDateTime } from '../utils/formatting.js'
+import { compareSubchapterLabels, sortAssignmentsBySubchapter } from '../utils/assignmentSort.js'
 import { API_CONFIG, fetchJson, getActiveUserId } from '../utils/api.js'
 import { useCoursesState } from '../context/CoursesContext.jsx'
 
@@ -47,7 +48,7 @@ const buildCourseStructure = (assignments, sectionTitle) => {
       id: chapterLabel,
       title: chapterLabel,
       subchapters: Array.from(subMap.entries())
-        .sort(([a], [b]) => compareLabels(a, b))
+        .sort(([a], [b]) => compareSubchapterLabels(a, b))
         .map(([subLabel, items]) => ({
           id: `${chapterLabel}-${subLabel}`,
           title: subLabel,
@@ -85,7 +86,9 @@ export default function Assignments() {
       try {
         if (!courseId) return
         const assignments = await fetchJson(`/api/courses/${courseId}/assignments`)
-        const gradedAssignments = assignments.filter((assignment) => assignment.kind !== 'practice')
+        const gradedAssignments = sortAssignmentsBySubchapter(
+          assignments.filter((assignment) => assignment.kind !== 'practice')
+        )
         if (!isMounted) return
 
         setCourseStructure(buildCourseStructure(gradedAssignments, 'Assignments'))
@@ -134,12 +137,20 @@ export default function Assignments() {
 
   const filteredStructure = useMemo(() => {
     const now = new Date()
+    const startOfDay = new Date(now)
+    startOfDay.setHours(0, 0, 0, 0)
+    const twoWeeksOut = new Date(startOfDay)
+    twoWeeksOut.setDate(twoWeeksOut.getDate() + 14)
     const predicate = (activity) => {
       switch (tabValue) {
-        case 1: {
+        case 0: {
           if (!activity.dueDate) return false
           const dueDate = new Date(activity.dueDate)
-          return dueDate > now && !getCompletionStatus(activity.id)
+          return (
+            dueDate >= startOfDay &&
+            dueDate <= twoWeeksOut &&
+            !getCompletionStatus(activity.id)
+          )
         }
         case 2:
           return getCompletionStatus(activity.id)
@@ -262,17 +273,17 @@ export default function Assignments() {
         allowScrollButtonsMobile
         sx={{ borderBottom: 1, borderColor: 'divider', mb: 3, maxWidth: '100%' }}
       >
-        <Tab label="All Assignments" />
         <Tab label="Upcoming" />
+        <Tab label="All Assignments" />
         <Tab label="Submitted" />
       </Tabs>
 
       <TabPanel value={tabValue} index={0}>
-        {renderAssignmentsAccordion('No assignments found', '', true)}
+        {renderAssignmentsAccordion('No upcoming assignments', 'Due: ', false)}
       </TabPanel>
 
       <TabPanel value={tabValue} index={1}>
-        {renderAssignmentsAccordion('No upcoming assignments', 'Due: ', false)}
+        {renderAssignmentsAccordion('No assignments found', '', true)}
       </TabPanel>
 
       <TabPanel value={tabValue} index={2}>

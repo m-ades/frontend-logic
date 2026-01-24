@@ -5,6 +5,7 @@ import ThemedCard from '../components/ui/ThemedCard.jsx'
 import { formatDateTime } from '../utils/formatting.js'
 import { API_CONFIG, fetchJson, getActiveUserId } from '../utils/api.js'
 import { useCoursesState } from '../context/CoursesContext.jsx'
+import { sortAssignmentsBySubchapter } from '../utils/assignmentSort.js'
 
 function NoRowsOverlay() {
   return (
@@ -32,23 +33,16 @@ export default function Grades() {
           fetchJson(`/api/courses/${courseId}/assignments`),
           fetchJson(`/api/users/${userId}/grades`),
         ])
-        const gradedAssignments = (assignments || []).filter((assignment) => assignment.kind !== 'practice')
+        const gradedAssignments = sortAssignmentsBySubchapter(
+          (assignments || []).filter((assignment) => assignment.kind !== 'practice')
+        )
         const gradeMap = new Map((grades || []).map((grade) => [grade.assignment_id, grade]))
-        const assignmentIds = new Set(gradedAssignments.map((assignment) => assignment.id))
         const entries = gradedAssignments.map((assignment) => ({
           assignment,
           grade: gradeMap.get(assignment.id) || null,
         }))
-        const sorted = entries.sort((a, b) => {
-          const aDate = a.assignment?.due_at ?? a.assignment?.due_date ?? a.grade?.graded_at
-          const bDate = b.assignment?.due_at ?? b.assignment?.due_date ?? b.grade?.graded_at
-          if (!aDate && !bDate) return 0
-          if (!aDate) return 1
-          if (!bDate) return -1
-          return new Date(aDate) - new Date(bDate)
-        })
         if (isMounted) {
-          setGradeEntries(sorted)
+          setGradeEntries(entries)
         }
       } catch (error) {
         console.warn('Failed to load grades', error)
