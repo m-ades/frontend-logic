@@ -746,7 +746,7 @@ export default function TruthTableEditor({
               <FormLabel component="legend">
                 {kind === 'argument' ? 'Is this argument valid or invalid?' : 'Select all that apply'}
               </FormLabel>
-              {kind === 'argument' ? (
+              {kind === 'argument' || kind === 'formula' ? (
                 <RadioGroup
                   value={mcSelection[0] || ''}
                   onChange={(event) => {
