@@ -16,6 +16,7 @@ export default function LogicPenguinProof({ premises, conclusion, questionId, sa
     const el = ref.current
     if (!el) return
     hasAppliedSavedStateRef.current = false
+    lastSavedStateRef.current = null
 
     const needsPred = /[∃∀]|[a-z]/.test([...premises, conclusion].join(" "))
     const problem = { prems: premises, conc: conclusion }
@@ -26,6 +27,11 @@ export default function LogicPenguinProof({ premises, conclusion, questionId, sa
       if (savedState && typeof el.setStateSnapshot === "function") {
         el.setStateSnapshot(savedState)
         hasAppliedSavedStateRef.current = true
+        try {
+          lastSavedStateRef.current = JSON.stringify(savedState)
+        } catch (err) {
+          // ignore
+        }
       }
     }
 
@@ -42,10 +48,20 @@ export default function LogicPenguinProof({ premises, conclusion, questionId, sa
   useEffect(() => {
     const el = ref.current
     if (!el || !savedState) return
+    let serialized = null
+    try {
+      serialized = JSON.stringify(savedState)
+    } catch (err) {
+      // ignore
+    }
+    if (serialized && lastSavedStateRef.current === serialized) return
     if (hasAppliedSavedStateRef.current) return
     if (typeof el.setStateSnapshot === "function") {
       el.setStateSnapshot(savedState)
       hasAppliedSavedStateRef.current = true
+      if (serialized) {
+        lastSavedStateRef.current = serialized
+      }
     }
   }, [savedState, problemKey])
 
