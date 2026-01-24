@@ -277,7 +277,7 @@ export default function Assignments() {
       >
         <Tab label="Upcoming" />
         <Tab label="All Assignments" />
-        <Tab label="Submitted" />
+        <Tab label="Completed" />
       </Tabs>
 
       <TabPanel value={tabValue} index={0}>
