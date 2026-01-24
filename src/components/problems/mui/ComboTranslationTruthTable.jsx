@@ -151,7 +151,11 @@ export default function ComboTranslationTruthTable({
         <Box className="lp-problem-card">
           <Stack spacing={3} sx={{ p: { xs: 2, md: 2 } }}>
             {promptText && (
-              <RichText content={promptText} variant="body1" sx={{ fontSize: '1rem' }} />
+              <RichText
+                content={promptText}
+                variant="body1"
+                sx={{ fontSize: '1rem', whiteSpace: 'pre-line' }}
+              />
             )}
             <Typography variant="body2" color="text.secondary">
               Enter the argument as a single line, then complete the truth table and classify it.
