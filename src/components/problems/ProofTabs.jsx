@@ -61,10 +61,7 @@ export default function ProofTabs({
   onProofComplete,
   getSavedProofState,
   handleProofStateChange,
-  gradePercent,
   total,
-  score,
-  dueDate,
   completionPercent,
   gradeLabel,
   isOverdue

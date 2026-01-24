@@ -476,6 +476,16 @@ export default function TruthTableEditor({
         const validation = resp?.validation || {}
         const success = validation.successstatus === 'correct'
         setAttemptCount((prev) => resp?.submission?.attempt ?? Math.min(prev + 1, attemptLimit))
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('assignment-submission', {
+            detail: {
+              assignmentQuestionId,
+              attempt: resp?.submission?.attempt,
+              attemptLimit: resp?.attempt_limit,
+              isCorrect: success,
+            },
+          }))
+        }
         if (success) {
           setStatus('correct')
           setMessage('Correct!')

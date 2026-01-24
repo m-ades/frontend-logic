@@ -129,8 +129,10 @@ export default function Dashboard() {
             ? gradebookSummary
                 .slice()
                 .sort((a, b) => {
-                  const aDate = a.due_date ? new Date(a.due_date) : null
-                  const bDate = b.due_date ? new Date(b.due_date) : null
+                  const aDateValue = a.due_at ?? a.due_date ?? null
+                  const bDateValue = b.due_at ?? b.due_date ?? null
+                  const aDate = aDateValue ? new Date(aDateValue) : null
+                  const bDate = bDateValue ? new Date(bDateValue) : null
                   if (aDate && bDate) return aDate - bDate
                   if (aDate) return -1
                   if (bDate) return 1
@@ -162,7 +164,7 @@ export default function Dashboard() {
                   const total = grade.max_score || 0
                   const score = grade.final_score ?? grade.raw_score ?? null
                   const percent = total > 0 && score !== null ? (score / total) * 100 : null
-                  const date = assignment.due_date || grade.graded_at
+                  const date = assignment.due_at ?? assignment.due_date ?? grade.graded_at
                   return {
                     id: grade.id,
                     title: assignment.title || 'Assignment',
@@ -460,7 +462,7 @@ export default function Dashboard() {
                         {assignment.title}
                       </Typography>
                       <Typography variant="caption" color="text.secondary">
-                        Due {formatDateTime(assignment.due_date) || '—'}
+                        Due {formatDateTime(assignment.due_at ?? assignment.due_date) || '—'}
                       </Typography>
                     </Box>
                     <Button

@@ -40,8 +40,8 @@ export default function Grades() {
           grade: gradeMap.get(assignment.id) || null,
         }))
         const sorted = entries.sort((a, b) => {
-          const aDate = a.assignment?.due_date || a.grade?.graded_at
-          const bDate = b.assignment?.due_date || b.grade?.graded_at
+          const aDate = a.assignment?.due_at ?? a.assignment?.due_date ?? a.grade?.graded_at
+          const bDate = b.assignment?.due_at ?? b.assignment?.due_date ?? b.grade?.graded_at
           if (!aDate && !bDate) return 0
           if (!aDate) return 1
           if (!bDate) return -1
@@ -105,7 +105,9 @@ export default function Grades() {
         return {
           id: assignment.id ?? entry.grade?.id ?? `grade-${index}`,
           assignment: assignment.title || 'Assignment',
-          due: assignment.due_date ? formatDateTime(assignment.due_date) : '—',
+          due: assignment.due_at || assignment.due_date
+            ? formatDateTime(assignment.due_at ?? assignment.due_date)
+            : '—',
           submitted: submittedLabel,
           percent: percentage !== null ? `${percentage.toFixed(1)}%` : '—'
         }

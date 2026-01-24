@@ -30,10 +30,7 @@ export default function WorksheetTabs({
   onProofComplete,
   getSavedProofState,
   handleProofStateChange,
-  gradePercent,
   total,
-  score,
-  dueDate,
   completionPercent,
   gradeLabel,
   isOverdue
@@ -58,10 +55,7 @@ export default function WorksheetTabs({
             onProofComplete={onProofComplete}
             getSavedProofState={getSavedProofState}
             handleProofStateChange={handleProofStateChange}
-            gradePercent={gradePercent}
             total={total}
-            score={score}
-            dueDate={dueDate}
             completionPercent={completionPercent}
             gradeLabel={gradeLabel}
             isOverdue={isOverdue}

@@ -120,9 +120,11 @@ export default function InstructorDashboard() {
       const submissions = totalStudents
         ? Math.min(submissionsRaw, totalStudents)
         : submissionsRaw;
-      const dueAt = assignment.dueDate
-        ? new Date(`${assignment.dueDate}T${assignment.dueTime || "23:59:59"}`)
-        : null;
+      const dueAtValue = assignment.dueAt
+        || (assignment.dueDate
+          ? `${assignment.dueDate}T${assignment.dueTime || "23:59:59"}`
+          : null);
+      const dueAt = dueAtValue ? new Date(dueAtValue) : null;
       return {
         ...assignment,
         average,
@@ -160,6 +162,10 @@ export default function InstructorDashboard() {
   const gradedUnlockedAssignments = useMemo(
     () => enrichedAssignments.filter(isGradedAndUnlocked),
     [enrichedAssignments]
+  );
+  const unlockedAssignments = useMemo(
+    () => nonPracticeAssignments.filter((assignment) => !assignment.isLocked),
+    [nonPracticeAssignments]
   );
 
   const gradedPastDueAssignments = useMemo(
@@ -260,7 +266,7 @@ export default function InstructorDashboard() {
         />
         <MetricCard
           title="Assignments"
-          value={gradedUnlockedAssignments.length}
+          value={unlockedAssignments.length}
           subtitle="Total posted"
           icon={Calendar}
           gradient={["#ec4899", "#db2777"]}

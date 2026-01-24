@@ -65,10 +65,10 @@ export default function LogicPenguinProof({ premises, conclusion, questionId, sa
 
   useEffect(() => {
     const el = ref.current
-    if (!el || !onAttempt) return
+    if (!el) return
 
     const handleAttempt = (event) => {
-      onAttempt(event?.detail)
+      onAttempt?.(event?.detail)
       if (onStateChange && event?.detail?.state) {
         try {
           const serialized = JSON.stringify(event.detail.state)
@@ -79,6 +79,11 @@ export default function LogicPenguinProof({ premises, conclusion, questionId, sa
         } catch (err) {
           // ignore
         }
+      }
+      if (typeof window !== 'undefined' && event?.detail?.assignmentQuestionId) {
+        window.dispatchEvent(new CustomEvent('assignment-submission', {
+          detail: event.detail,
+        }))
       }
     }
 

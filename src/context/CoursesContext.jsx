@@ -76,7 +76,8 @@ const mapCourseRecord = (course, index) => ({
 });
 
 const mapAssignmentRecord = (assignment) => {
-  const due = splitDateTime(assignment.due_date);
+  const dueAt = assignment.due_at ?? assignment.dueAt ?? assignment.due_date ?? null;
+  const due = splitDateTime(dueAt);
   const publish = splitDateTime(assignment.created_at);
 
   return {
@@ -89,6 +90,7 @@ const mapAssignmentRecord = (assignment) => {
     subchapter: assignment.subchapter,
     publishDate: publish.date,
     publishTime: publish.time,
+    dueAt,
     dueDate: due.date,
     dueTime: due.time,
     totalPoints: assignment.total_points,

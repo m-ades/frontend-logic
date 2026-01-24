@@ -47,6 +47,16 @@ export function useProblemChecker({
           setMaxAttempts(resp.attempt_limit)
         }
         setAttemptCount((prev) => resp?.submission?.attempt ?? prev + 1)
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('assignment-submission', {
+            detail: {
+              assignmentQuestionId,
+              attempt: resp?.submission?.attempt,
+              attemptLimit: resp?.attempt_limit,
+              isCorrect: successstatus === 'correct',
+            },
+          }))
+        }
         if (successstatus === 'correct') {
           setStatus('correct')
           setMessage('Correct!')

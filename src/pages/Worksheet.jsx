@@ -1,9 +1,10 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import WorksheetLayout from '../components/layout/WorksheetLayout.jsx'
 import WorksheetTabs from '../components/problems/WorksheetTabs.jsx'
 import { useScoring } from '../hooks/usescoring.js'
 import { useProofState } from '../hooks/useproofstate.js'
+import { useWorksheetMetrics } from '../hooks/useWorksheetMetrics.js'
 // import { exportWorksheetPDF } from '../utils/exportPDF.js'
 import { API_CONFIG, fetchJson, getActiveUserId } from '../utils/api.js'
 import { useCoursesState } from '../context/CoursesContext.jsx'
@@ -16,13 +17,16 @@ export default function Worksheet() {
   const [isLoading, setIsLoading] = useState(true)
   const [loadError, setLoadError] = useState('')
   const [gradePercent, setGradePercent] = useState(null)
-  const [currentDueDate, setCurrentDueDate] = useState(null)
+  const [currentDueAt, setCurrentDueAt] = useState(null)
   const { activeCourseId } = useCoursesState()
   const courseId = activeCourseId ?? API_CONFIG.courseId
   const sessionId = useRef(null)
   const questionSessionId = useRef(null)
   const activeUserId = getActiveUserId()
   const gradesCache = useRef(null)
+  const gradeRefreshTimerRef = useRef(null)
+  const isMountedRef = useRef(true)
+  const currentWorksheetIdRef = useRef(null)
   
   // support both /assignment/:id and /worksheet/:id routes
   // assignmentId will be used when backend is implemented
@@ -35,15 +39,32 @@ export default function Worksheet() {
   )
   const currentWorksheet = worksheets[currentWorksheetIndex]
   const currentProof = currentWorksheet?.proofs[currentProofIndex]
+  const total = currentWorksheet?.proofs.length || 0
+  const worksheetDueAt = currentWorksheet?.due_at
+    ?? currentWorksheet?.due_date
+    ?? currentDueAt
   
   const {
     completedProofs,
     score,
-    scoreStyle,
     handleProofComplete,
     setCompletedProofs,
   } = useScoring(currentWorksheet)
   const { getSavedProofState, handleProofStateChange, initializeSavedProofStates } = useProofState()
+  const { completionPercent, gradeLabel, isOverdue } = useWorksheetMetrics({
+    score,
+    total,
+    gradePercent,
+    dueAt: worksheetDueAt,
+  })
+
+  useEffect(() => () => {
+    isMountedRef.current = false
+  }, [])
+
+  useEffect(() => {
+    currentWorksheetIdRef.current = currentWorksheet?.id ?? null
+  }, [currentWorksheet?.id])
 
   useEffect(() => {
     let keepGoing = true
@@ -145,43 +166,61 @@ export default function Worksheet() {
     }
   }, [currentProof?.questionId])
 
-  useEffect(() => {
-    let isMounted = true
+  const refreshGradePercent = useCallback(async () => {
+    if (!currentWorksheet?.id || !activeUserId) return
+    const assignmentId = currentWorksheet.id
+    try {
+      const grades = await fetchJson(`/api/users/${activeUserId}/grades`)
+      gradesCache.current = new Map(
+        (grades || []).map((grade) => [
+          Number(grade.assignment_id ?? grade.Assignment?.id),
+          grade,
+        ])
+      )
+      if (!isMountedRef.current || assignmentId !== currentWorksheetIdRef.current) {
+        return
+      }
+      const grade = gradesCache.current.get(Number(assignmentId))
+      const total = grade?.max_score || 0
+      const score = grade?.final_score ?? grade?.raw_score ?? null
+      const percent = total > 0 && score !== null ? (score / total) * 100 : null
+      setGradePercent(percent)
+      setCurrentDueAt(currentWorksheet?.due_at ?? currentWorksheet?.due_date ?? null)
+    } catch (error) {
+      // keep the previous grade on transient refresh errors
+    }
+  }, [activeUserId, currentWorksheet?.id, currentWorksheet?.due_at, currentWorksheet?.due_date])
 
-    const loadGradePercent = async () => {
-      if (!currentWorksheet?.id || !activeUserId) return
-      try {
-        if (!gradesCache.current) {
-          const grades = await fetchJson(`/api/users/${activeUserId}/grades`)
-          gradesCache.current = new Map(
-            (grades || []).map((grade) => [
-              Number(grade.assignment_id ?? grade.Assignment?.id),
-              grade,
-            ])
-          )
-        }
-        const grade = gradesCache.current.get(Number(currentWorksheet.id))
-        const total = grade?.max_score || 0
-        const score = grade?.final_score ?? grade?.raw_score ?? null
-        const percent = total > 0 && score !== null ? (score / total) * 100 : null
-        if (isMounted) {
-          setGradePercent(percent)
-          setCurrentDueDate(currentWorksheet?.due_date ?? null)
-        }
-      } catch (error) {
-        if (isMounted) {
-          setGradePercent(null)
-          setCurrentDueDate(null)
-        }
+  const scheduleGradeRefresh = useCallback(() => {
+    if (!currentWorksheet?.id || !activeUserId) return
+    if (gradeRefreshTimerRef.current) return
+    gradeRefreshTimerRef.current = setTimeout(() => {
+      gradeRefreshTimerRef.current = null
+      refreshGradePercent()
+    }, 250)
+  }, [activeUserId, currentWorksheet?.id, refreshGradePercent])
+
+  useEffect(() => {
+    refreshGradePercent()
+  }, [refreshGradePercent])
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const handleSubmission = () => {
+      scheduleGradeRefresh()
+    }
+    window.addEventListener('assignment-submission', handleSubmission)
+    return () => window.removeEventListener('assignment-submission', handleSubmission)
+  }, [scheduleGradeRefresh])
+
+  useEffect(() => {
+    return () => {
+      if (gradeRefreshTimerRef.current) {
+        clearTimeout(gradeRefreshTimerRef.current)
+        gradeRefreshTimerRef.current = null
       }
     }
-
-    loadGradePercent()
-
-    return () => {
-      isMounted = false
-    }
-  }, [activeUserId, currentWorksheet?.id])
+  }, [currentWorksheet?.id])
 
   useEffect(() => {
     let isMounted = true
@@ -597,7 +636,7 @@ export default function Worksheet() {
       const worksheet = {
         id: assignmentInfo.id,
         title: assignmentInfo.title,
-        due_date: assignmentInfo.due_date,
+        due_at: assignmentInfo.due_at ?? assignmentInfo.due_date ?? null,
         proofs: questions.map((question, idx) =>
           mapQuestionToProof(question, assignmentInfo, idx)
         ),
@@ -742,17 +781,6 @@ export default function Worksheet() {
   return (
     <WorksheetLayout
       subtitle={currentWorksheet.title || "Predicate Logic: Natural Deduction"}
-      score={score}
-      total={currentWorksheet.proofs.length || 0}
-      gradePercent={gradePercent}
-      dueDate={currentWorksheet?.due_date || currentDueDate}
-      scoreStyle={scoreStyle}
-      currentProofId={currentProof?.id}
-      completedProofs={completedProofs}
-      worksheets={worksheets}
-      currentWorksheetIndex={currentWorksheetIndex}
-      onWorksheetIndexChange={handleWorksheetChange}
-      onExportClick={null}
       onBackToLMS={() => navigate('/')}
     >
       <WorksheetTabs
@@ -765,13 +793,10 @@ export default function Worksheet() {
         onProofComplete={handleProofComplete}
         getSavedProofState={getSavedProofState}
         handleProofStateChange={handleProofStateChange}
-        gradePercent={gradePercent}
-        total={currentWorksheet.proofs.length || 0}
-        score={score}
-        dueDate={currentWorksheet?.due_date || currentDueDate}
-        completionPercent={currentWorksheet.proofs.length > 0 ? Math.round((score / (currentWorksheet.proofs.length || 0)) * 100) : 0}
-        gradeLabel={Number.isFinite(gradePercent) ? `${gradePercent.toFixed(1)}%` : '—'}
-        isOverdue={currentWorksheet?.due_date ? new Date(currentWorksheet.due_date) < new Date() : false}
+        total={total}
+        completionPercent={completionPercent}
+        gradeLabel={gradeLabel}
+        isOverdue={isOverdue}
       />
     </WorksheetLayout>
   )

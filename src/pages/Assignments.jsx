@@ -20,7 +20,7 @@ const buildCourseStructure = (assignments, sectionTitle) => {
       id: assignment.id,
       title: assignment.title,
       description: assignment.description || '',
-      dueDate: assignment.due_date,
+      dueDate: assignment.due_at ?? assignment.due_date,
       type: ACTIVITY_TYPES.HOMEWORK,
       worksheet: { id: assignment.id, proofs: [] },
     })

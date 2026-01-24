@@ -10,27 +10,10 @@ import PageTitle from '../ui/PageTitle.jsx'
 export default function Layout({ 
   title, 
   subtitle, 
-  score, 
-  total, 
-  gradePercent,
-  dueDate,
-  scoreStyle, 
-  currentProofId, 
-  completedProofs, 
   children, 
-  worksheets, 
-  currentWorksheetIndex, 
-  onWorksheetIndexChange, 
-  onExportClick, 
   onBackToLMS, 
   inModal = false 
 }) {
-  const completionPercent = total > 0 ? Math.round((score / total) * 100) : 0
-  const gradeLabel = Number.isFinite(gradePercent)
-    ? `${gradePercent.toFixed(1)}%`
-    : '—'
-  const isOverdue = dueDate ? new Date(dueDate) < new Date() : false
-  
   return (
     <Box sx={{ width: '100%', height: '100%' }}>
       {!inModal && <RulesReference />}
@@ -142,15 +125,7 @@ export default function Layout({
       <Box>
         <Widget noBodyPadding>
           <Box sx={{ p: { xs: 2, sm: 3 } }}>
-            {React.cloneElement(children, {
-              gradePercent,
-              total,
-              score,
-              dueDate,
-              completionPercent,
-              gradeLabel,
-              isOverdue
-            })}
+            {children}
           </Box>
         </Widget>
       </Box>

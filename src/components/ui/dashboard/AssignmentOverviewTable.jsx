@@ -105,7 +105,7 @@ export const AssignmentOverviewTable = ({
     return {
       ...assignment,
       name: assignment.name || assignment.title || "Assignment",
-      dueDate: assignment.dueDate || assignment.due_date,
+      dueDate: assignment.dueDate || assignment.dueAt || assignment.due_at || assignment.due_date,
       dueTime: assignment.dueTime || assignment.due_time,
       submissions,
       average,
