@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useId } from 'react'
 import { Box, Stack, Radio, RadioGroup, FormControlLabel, FormControl, FormGroup, Checkbox, Typography, Alert } from '@mui/material'
 import ProblemSetButtons from './ProblemSetButtons.jsx'
 import { useProblemChecker } from '../../../hooks/useProblemChecker.js'
@@ -22,6 +22,8 @@ export default function MultipleChoice({
   const isComposite = subquestions.length > 0
   const isMultiSelect = !isComposite && (Array.isArray(answer) || Array.isArray(problem?.answerIndices) || problem?.multiSelect)
   const defaultTrueFalseChoices = ['True', 'False']
+  const autoGroupId = useId()
+  const groupBase = assignmentQuestionId ? `aq-${assignmentQuestionId}` : `mc-${autoGroupId}`
   const isMultiSelectSubq = (subq) =>
     subq?.type === 'multi-select' || Array.isArray(subq?.answerIndices) || subq?.multiSelect
   const isTrueFalseSubq = (subq) => subq?.type === 'true-false'
@@ -247,7 +249,7 @@ export default function MultipleChoice({
                           <RadioGroup
                             value={selectedValue?.[subIdx] === '' ? '' : String(selectedValue?.[subIdx] ?? '')}
                             onChange={(event) => handleCompositeSingleChange(subIdx, Number(event.target.value))}
-                            name={`multiple-choice-${subIdx}`}
+                            name={`${groupBase}-subq-${subIdx}`}
                           >
                             {choices.map((choice, index) => (
                               <FormControlLabel
@@ -291,7 +293,7 @@ export default function MultipleChoice({
                   <RadioGroup
                     value={selectedValue}
                     onChange={handleChange}
-                    name="multiple-choice"
+                    name={`${groupBase}-single`}
                   >
                     {problem.choices.map((choice, index) => (
                       <FormControlLabel
@@ -363,7 +365,7 @@ export default function MultipleChoice({
                           ))}
                         </FormGroup>
                       ) : (
-                        <RadioGroup value={expected === null ? '' : String(expected)} name={`multiple-choice-reveal-${subIdx}`}>
+                        <RadioGroup value={expected === null ? '' : String(expected)} name={`${groupBase}-reveal-${subIdx}`}>
                           {choices.map((choice, index) => (
                             <FormControlLabel
                               key={`${subIdx}-${index}`}
@@ -397,7 +399,7 @@ export default function MultipleChoice({
                   ))}
                 </FormGroup>
               ) : (
-                <RadioGroup value={String(answer ?? '')} name="multiple-choice-reveal">
+                <RadioGroup value={String(answer ?? '')} name={`${groupBase}-reveal`}>
                   {problem.choices.map((choice, index) => (
                     <FormControlLabel
                       key={`${choice}-${index}`}
