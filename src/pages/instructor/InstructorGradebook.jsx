@@ -4,6 +4,7 @@ import { useCoursesState } from "../../context/CoursesContext";
 import GradebookFilters from "../../components/ui/gradebook/GradebookFilters";
 import GradebookTable from "../../components/ui/gradebook/GradebookTable";
 import { filterStudents, sortStudents } from "../../utils/GradebookUtils";
+import { sortAssignmentsBySubchapter } from "../../utils/assignmentSort.js";
 
 export default function InstructorGradebook() {
   const { courses, activeCourseId, assignmentsByCourse, gradebookByCourse } =
@@ -19,7 +20,7 @@ export default function InstructorGradebook() {
   const [sortDirection, setSortDirection] = useState("asc");
 
   const course = courses.find((c) => c.id === activeCourseId);
-  const assignments = assignmentsByCourse[activeCourseId] || [];
+  const assignments = sortAssignmentsBySubchapter(assignmentsByCourse[activeCourseId] || []);
   const students = gradebookByCourse[activeCourseId] || [];
 
   if (!course) {

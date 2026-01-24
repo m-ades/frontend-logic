@@ -12,6 +12,7 @@ import { fetchJson } from "../../utils/api.js";
 import AssignmentTable from "../../components/ui/AssignmentTable";
 import AssignmentFormDialog from "../../components/ui/AssignmentFormDialog";
 import AssignmentContextMenu from "../../components/ui/AssignmentContextMenu";
+import { sortAssignmentsBySubchapter } from "../../utils/assignmentSort.js";
 import {
   getStatusColor,
   getStatusText,
@@ -79,7 +80,7 @@ export default function InstructorAssignments() {
 
   // Get current course data
   const activeCourse = courses.find((c) => c.id === activeCourseId);
-  const assignments = assignmentsByCourse[activeCourseId] || [];
+  const assignments = sortAssignmentsBySubchapter(assignmentsByCourse[activeCourseId] || []);
   const gradebook = gradebookByCourse[activeCourseId] || [];
 
   // Enhance assignments with calculated data

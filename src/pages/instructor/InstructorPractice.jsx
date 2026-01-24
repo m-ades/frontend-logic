@@ -11,6 +11,7 @@ import { fetchJson } from "../../utils/api.js";
 import AssignmentTable from "../../components/ui/AssignmentTable";
 import AssignmentFormDialog from "../../components/ui/AssignmentFormDialog";
 import AssignmentContextMenu from "../../components/ui/AssignmentContextMenu";
+import { sortAssignmentsBySubchapter } from "../../utils/assignmentSort.js";
 import {
   getStatusColor,
   getStatusText,
@@ -54,7 +55,7 @@ export default function InstructorPractice() {
 
   // Get current course data
   const activeCourse = courses.find((c) => c.id === activeCourseId);
-  const practices = practicesByCourse[activeCourseId] || [];
+  const practices = sortAssignmentsBySubchapter(practicesByCourse[activeCourseId] || []);
   const enhancedPractices = enhanceItems(practices, activeCourse, [], true);
 
   // Handlers

@@ -13,6 +13,7 @@ import { GradeDistributionChart } from "../../components/ui/dashboard/GradeDistr
 import { StudentsAtRiskTable } from "../../components/ui/dashboard/StudentsAtRiskTable";
 import { UpcomingDeadlinesTable } from "../../components/ui/dashboard/UpcomingDeadlinesTable";
 import { AssignmentOverviewTable } from "../../components/ui/dashboard/AssignmentOverviewTable";
+import { sortAssignmentsBySubchapter } from "../../utils/assignmentSort.js";
 
 export default function InstructorDashboard() {
   const { courses, activeCourseId, assignmentsByCourse, gradebookByCourse } =
@@ -25,7 +26,7 @@ export default function InstructorDashboard() {
   const [gradebookSummary, setGradebookSummary] = useState([]);
 
   const course = courses.find((c) => c.id === activeCourseId);
-  const assignments = assignmentsByCourse[activeCourseId] || [];
+  const assignments = sortAssignmentsBySubchapter(assignmentsByCourse[activeCourseId] || []);
   const students = gradebookByCourse[activeCourseId] || [];
   const totalStudents = course?.studentCount || students.length || 0;
 
