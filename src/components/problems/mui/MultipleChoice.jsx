@@ -83,6 +83,11 @@ export default function MultipleChoice({
     initialAttemptCount: savedState?.attemptCount ?? 0,
   })
   const showSolution = isLocked && (isComposite || typeof answer === 'number' || Array.isArray(answer))
+  const multiSelectLabelSx = {
+    mb: 1,
+    ml: 2,
+    '& .MuiFormControlLabel-label': { fontSize: '1rem' },
+  }
 
   useEffect(() => {
     if (isComposite) {
@@ -234,10 +239,7 @@ export default function MultipleChoice({
                                   />
                                 }
                                 label={choice}
-                                sx={{
-                                  mb: 1,
-                                  '& .MuiFormControlLabel-label': { fontSize: '1rem' }
-                                }}
+                                sx={multiSelectLabelSx}
                               />
                             ))}
                           </FormGroup>
@@ -281,12 +283,7 @@ export default function MultipleChoice({
                           />
                         }
                         label={choice}
-                        sx={{
-                          mb: 1,
-                          '& .MuiFormControlLabel-label': {
-                            fontSize: '1rem'
-                          }
-                        }}
+                        sx={multiSelectLabelSx}
                       />
                     ))}
                   </FormGroup>
@@ -359,10 +356,7 @@ export default function MultipleChoice({
                               key={`${subIdx}-${index}`}
                               control={<Checkbox checked={expected?.includes(index)} disabled />}
                               label={choice}
-                              sx={{
-                                mb: 1,
-                                '& .MuiFormControlLabel-label': { fontSize: '1rem' }
-                              }}
+                              sx={multiSelectLabelSx}
                             />
                           ))}
                         </FormGroup>
@@ -396,12 +390,7 @@ export default function MultipleChoice({
                       key={`${choice}-${index}`}
                       control={<Checkbox checked={Array.isArray(answer) && answer.includes(index)} disabled />}
                       label={choice}
-                      sx={{
-                        mb: 1,
-                        '& .MuiFormControlLabel-label': {
-                          fontSize: '1rem'
-                        }
-                      }}
+                      sx={multiSelectLabelSx}
                     />
                   ))}
                 </FormGroup>
