@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams, useNavigate, useLocation } from 'react-router-dom'
 import WorksheetLayout from '../components/layout/WorksheetLayout.jsx'
 import WorksheetTabs from '../components/problems/WorksheetTabs.jsx'
 import { useScoring } from '../hooks/usescoring.js'
@@ -13,6 +13,7 @@ import { useCoursesState } from '../context/CoursesContext.jsx'
 export default function Worksheet() {
   const { worksheetId, assignmentId } = useParams()
   const navigate = useNavigate()
+  const location = useLocation()
   const [currentProofIndex, setCurrentProofIndex] = useState(0)
   const [worksheets, setWorksheets] = useState([])
   const [isLoading, setIsLoading] = useState(true)
@@ -44,6 +45,7 @@ export default function Worksheet() {
   const worksheetDueAt = currentWorksheet?.due_at
     ?? currentWorksheet?.due_date
     ?? currentDueAt
+  const backTarget = location?.state?.returnTo || '/student/assignments'
   
   const {
     completedProofs,
@@ -728,7 +730,9 @@ export default function Worksheet() {
   const handleWorksheetChange = (newIndex) => {
     const newWorksheet = worksheets[newIndex]
     if (newWorksheet) {
-      navigate(`/student/assignment/${newWorksheet.id}`)
+      navigate(`/student/assignment/${newWorksheet.id}`, {
+        state: { returnTo: backTarget }
+      })
     }
   }
 
@@ -783,7 +787,7 @@ export default function Worksheet() {
   return (
     <WorksheetLayout
       subtitle={currentWorksheet.title || "Predicate Logic: Natural Deduction"}
-      onBackToLMS={() => navigate('/')}
+      onBackToLMS={() => navigate(backTarget)}
     >
       <WorksheetTabs
         worksheets={worksheets}
