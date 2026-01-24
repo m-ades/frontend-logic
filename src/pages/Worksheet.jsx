@@ -471,7 +471,7 @@ export default function Worksheet() {
       }
 
       const submissionMap = new Map()
-      const submittedQuestionIds = new Set()
+      const correctQuestionIds = new Set()
       const attemptCountMap = new Map()
       const worksheetsWithProofs = worksheetData.filter((worksheet) => worksheet.proofs.length)
       await Promise.all(
@@ -486,7 +486,9 @@ export default function Worksheet() {
               if (!existing || new Date(submission.submitted_at) > new Date(existing.submitted_at)) {
                 submissionMap.set(questionId, submission)
               }
-              submittedQuestionIds.add(questionId)
+              if (submission.is_correct) {
+                correctQuestionIds.add(questionId)
+              }
               const currentAttempt = attemptCountMap.get(questionId) || 0
               if (submission.attempt > currentAttempt) {
                 attemptCountMap.set(questionId, submission.attempt)
@@ -620,7 +622,7 @@ export default function Worksheet() {
       initializeSavedProofStates(initialStates)
       const completedProofIds = new Set()
       questionIds.forEach((questionId) => {
-        if (!submittedQuestionIds.has(questionId)) return
+        if (!correctQuestionIds.has(questionId)) return
         const proof = proofMeta[questionId]
         if (!proof) return
         completedProofIds.add(proof.id)

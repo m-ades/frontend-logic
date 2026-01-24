@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { Box, Stack, Tabs, Tab, useTheme, useMediaQuery, Chip } from '@mui/material'
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
+import CancelIcon from '@mui/icons-material/Cancel'
 import ProofEditor from './ProofEditor.jsx'
 import LogicPenguinProblem from './LogicPenguinProblem.jsx'
 import TruthTableEditor from './TruthTableEditor.jsx'
@@ -155,9 +156,20 @@ export default function ProofTabs({
               label={
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1, width: '100%' }}>
                   <span>Problem {idx + 1}</span>
-                  {completedProofs.has(proof.id) && (
-                    <CheckCircleIcon sx={{ color: '#2f6bff', fontSize: 16 }} />
-                  )}
+                  {(() => {
+                    const isCorrect = completedProofs.has(proof.id)
+                    const isLockedOut = !isCorrect
+                      && Number.isFinite(proof.attemptLimit)
+                      && Number.isFinite(proof.attemptCount)
+                      && proof.attemptCount >= proof.attemptLimit
+                    if (isCorrect) {
+                      return <CheckCircleIcon sx={{ color: '#2f6bff', fontSize: 16 }} />
+                    }
+                    if (isLockedOut) {
+                      return <CancelIcon sx={{ color: '#2f6bff', fontSize: 16 }} />
+                    }
+                    return null
+                  })()}
                 </Box>
               }
               {...a11yProps(idx)}
