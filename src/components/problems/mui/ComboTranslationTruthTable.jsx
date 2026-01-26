@@ -178,9 +178,6 @@ export default function ComboTranslationTruthTable({
               <Typography variant="body2" sx={{ mb: 1, fontWeight: 600 }}>
                 Argument line
               </Typography>
-              <Typography variant="body2" sx={{ mb: 1, color: 'text.secondary', fontSize: '0.875rem' }}>
-                Use "/" for separate premises and "//" for the conclusion. Example: A ⊃ B / A // B.
-              </Typography>
               <Box
                 ref={(el) => {
                   if (!el) return
@@ -232,10 +229,6 @@ export default function ComboTranslationTruthTable({
           </Stack>
         </Box>
       </Box>
-
-      {!parseStatus.ok && parseStatus.reason && (
-        <Alert severity="info">{parseStatus.reason}</Alert>
-      )}
 
       {message && <Alert severity={getStatusColor()} onClose={() => setMessage('')}>{message}</Alert>}
 
