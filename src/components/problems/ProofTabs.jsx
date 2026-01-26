@@ -5,7 +5,6 @@ import CancelIcon from '@mui/icons-material/Cancel'
 import ProofEditor from './ProofEditor.jsx'
 import LogicPenguinProblem from './LogicPenguinProblem.jsx'
 import TruthTableEditor from './TruthTableEditor.jsx'
-import RichText from '../ui/RichText.jsx'
 
 function TabPanel(props) {
   const { children, value, index, direction, isMobile, ...other } = props;
@@ -267,35 +266,15 @@ export default function ProofTabs({
                     // only worksheets 14-16 and practice set (17) use derivation
                     // default to derivation if type is not specified (backwards compatibility)
                     return (
-                      <Box
-                        className="logicpenguin"
-                        sx={{ width: '100%', flexGrow: 1, display: 'flex', flexDirection: 'column' }}
-                      >
-                        <Box
-                          sx={{
-                            overflow: 'visible',
-                            minHeight: '200px',
-                            flexGrow: 1,
-                            alignSelf: { xs: 'stretch', md: 'flex-start' },
-                          }}
-                          className="lp-problem-card"
-                        >
-                          <Stack spacing={3} sx={{ p: { xs: 2, md: 2 } }}>
-                            {proof.description && (
-                              <RichText content={proof.description} variant="body1" sx={{ fontSize: '1rem' }} />
-                            )}
-                            <ProofEditor 
-                              key={`proof-${proof.id}`} 
-                              proof={proof} 
-                              onProofComplete={onProofComplete}
-                              savedState={savedStateWithAttempts}
-                              onStateChange={(state) => handleProofStateChange(proof.id, state, {
-                                assignmentQuestionId: proof.questionId
-                              })}
-                            />
-                          </Stack>
-                        </Box>
-                      </Box>
+                      <ProofEditor 
+                        key={`proof-${proof.id}`} 
+                        proof={proof} 
+                        onProofComplete={onProofComplete}
+                        savedState={savedStateWithAttempts}
+                        onStateChange={(state) => handleProofStateChange(proof.id, state, {
+                          assignmentQuestionId: proof.questionId
+                        })}
+                      />
                     )
                   }
 

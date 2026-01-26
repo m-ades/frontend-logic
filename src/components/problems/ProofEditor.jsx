@@ -1,15 +1,18 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
-import { Typography } from '@mui/material'
+import { Box, Stack } from '@mui/material'
 import LogicPenguinProof from './LogicPenguinProof.jsx'
+import ProblemSetButtons from './mui/ProblemSetButtons.jsx'
 import SolutionReveal from './SolutionReveal.jsx'
+import RichText from '../ui/RichText.jsx'
 
 export default function ProofEditor({ proof, onProofComplete, savedState, onStateChange }) {
   const completionRef = useRef(false)
   const proofRef = useRef(null)
   const [attemptCount, setAttemptCount] = useState(proof?.attemptCount ?? 0)
   const [attemptLimit, setAttemptLimit] = useState(proof?.attemptLimit ?? 10)
+  const [isChecking, setIsChecking] = useState(false)
   const hasAttempts = Number.isFinite(attemptCount) && Number.isFinite(attemptLimit)
-  const attemptsLeft = hasAttempts ? Math.max(0, attemptLimit - attemptCount) : null
+  const isLocked = hasAttempts && attemptCount >= attemptLimit
 
   useEffect(() => {
     if (typeof proof?.attemptCount === 'number') {
@@ -21,6 +24,8 @@ export default function ProofEditor({ proof, onProofComplete, savedState, onStat
   }, [proof?.attemptCount, proof?.attemptLimit])
 
   const handleAttempt = useCallback((detail) => {
+    // end check
+    setIsChecking(false)
     setAttemptCount((prev) => {
       if (typeof detail?.attempt === 'number') {
         return detail.attempt
@@ -32,16 +37,21 @@ export default function ProofEditor({ proof, onProofComplete, savedState, onStat
     }
   }, [])
 
+  const getDerivElement = useCallback(
+    () => proofRef.current?.querySelector('derivation-hurley') || null,
+    []
+  )
+
   useEffect(() => {
     if (!proof || !onProofComplete) return
-    
-    const getDerivElement = () => proofRef.current?.querySelector('derivation-hurley') || null
     
     const checkCompletion = () => {
       const derivElement = getDerivElement()
       if (!derivElement) return
       
       const hasCorrectClass = derivElement.classList.contains('correct')
+      const isNowChecking = derivElement.classList.contains('checking')
+      setIsChecking((prev) => (prev === isNowChecking ? prev : isNowChecking))
       
       if (hasCorrectClass && !completionRef.current) {
         completionRef.current = true
@@ -80,34 +90,97 @@ export default function ProofEditor({ proof, onProofComplete, savedState, onStat
       clearTimeout(observerTimeout)
       observer?.disconnect()
     }
-  }, [proof, onProofComplete])
+  }, [getDerivElement, onProofComplete, proof])
+
+  useEffect(() => {
+    const derivElement = getDerivElement()
+    if (!derivElement) return
+    // hide old buttons
+    const hideButtons = () => {
+      const buttonDiv = derivElement.querySelector('.buttondiv')
+      if (buttonDiv) {
+        buttonDiv.style.display = 'none'
+      }
+    }
+    hideButtons()
+    derivElement.addEventListener('LP-ready', hideButtons)
+    return () => {
+      derivElement.removeEventListener('LP-ready', hideButtons)
+    }
+  }, [getDerivElement])
+
+  const handleCheck = () => {
+    if (isLocked) return
+    const derivElement = getDerivElement()
+    if (!derivElement?.processAnswer) return
+    // run check
+    setIsChecking(true)
+    derivElement.processAnswer()
+  }
+
+  const handleStartOver = () => {
+    const derivElement = getDerivElement()
+    if (!derivElement?.startOver) return
+    // clear state
+    derivElement.startOver()
+    setIsChecking(false)
+    if (derivElement?.getState && onStateChange) {
+      setTimeout(() => {
+        const nextState = derivElement.getState()
+        if (nextState) {
+          onStateChange(nextState)
+        }
+      }, 0)
+    }
+  }
 
   if (!proof) return null
 
   return (
-    <div ref={proofRef}>
-      <LogicPenguinProof 
-        premises={proof.premises} 
-        conclusion={proof.conclusion}
-        questionId={proof.questionId}
-        savedState={savedState}
-        onStateChange={onStateChange}
-        onAttempt={handleAttempt}
+    <Stack spacing={3} sx={{ px: 0, width: '100%', alignItems: 'stretch', flexGrow: 1 }}>
+      <Box className="logicpenguin" sx={{ width: '100%', flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
+        <Box
+          sx={{
+            overflow: 'visible',
+            minHeight: '200px',
+            flexGrow: 1,
+            alignSelf: { xs: 'stretch', md: 'flex-start' },
+          }}
+          className="lp-problem-card"
+        >
+          <Stack spacing={3} sx={{ p: { xs: 2, md: 2 } }}>
+            {proof.description && (
+              <RichText content={proof.description} variant="body1" sx={{ fontSize: '1rem' }} />
+            )}
+            <div ref={proofRef}>
+              <LogicPenguinProof 
+                premises={proof.premises} 
+                conclusion={proof.conclusion}
+                questionId={proof.questionId}
+                savedState={savedState}
+                onStateChange={onStateChange}
+                onAttempt={handleAttempt}
+                attemptCount={attemptCount}
+                attemptLimit={attemptLimit}
+              />
+            </div>
+          </Stack>
+        </Box>
+      </Box>
+
+      <ProblemSetButtons
+        onCheck={handleCheck}
+        onStartOver={handleStartOver}
+        isChecking={isChecking}
+        isDisabled={isLocked}
+        align="flex-start"
         attemptCount={attemptCount}
         attemptLimit={attemptLimit}
       />
-      {hasAttempts && (
-        <Typography
-          variant="caption"
-          sx={{ mt: 1, display: 'block', fontSize: '0.75rem', color: 'text.primary' }}
-        >
-          Attempts left: {attemptsLeft}/{attemptLimit} | Drafts save automatically.
-        </Typography>
-      )}
       <SolutionReveal
         solution={proof.solution}
-        show={attemptCount >= attemptLimit}
+        show={hasAttempts && attemptCount >= attemptLimit}
       />
-    </div>
+    </Stack>
   )
 }
