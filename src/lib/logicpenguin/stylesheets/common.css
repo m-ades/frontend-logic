@@ -8,7 +8,7 @@
   to {transform:rotate(360deg);}
 }
 
-.logicpenguin .spinning {
+:where(.logicpenguin) .spinning {
   animation: spin 3s infinite linear;
   animation-direction: reverse;
 }
@@ -44,7 +44,7 @@
 /* basic settings universal to LP */
 /*////////////////////////////////*/
 
-.logicpenguin {
+:where(.logicpenguin) {
   all: revert-layer;
   font-size: 20px;
   font-family: 'IBM Plex Sans', sans-serif;
@@ -52,97 +52,100 @@
   color: var(--lpblack);
 }
 
-.logicpenguin .lp-problem-card {
+:where(.logicpenguin) .lp-problem-card {
   background-color: white;
   border-radius: 0.5rem;
   padding: 1rem;
   box-shadow: 0 7px 12px -3px rgba(0, 0, 0, 0.08), 0 3px 5px -2px rgba(0, 0, 0, 0.04);
   border: 1px solid rgba(0, 0, 0, 0.08);
   width: 100%;
-  min-width: 0;
   max-width: 100%;
+  min-width: 0;
+  margin: 0;
   box-sizing: border-box;
   overflow-wrap: break-word;
   word-wrap: break-word;
 }
 
-.logicpenguin .tt-table-wrap {
-  width: 100%;
+:where(.logicpenguin) .tt-table-wrap {
+  width: auto;
+  display: inline-block;
+  max-width: 100%;
   overflow-x: auto;
 }
 
-.logicpenguin .tt-table {
+:where(.logicpenguin) .tt-table {
   border-collapse: collapse;
-  width: max-content;
-  max-width: 100%;
+  width: max-content !important;
+  table-layout: auto;
   background: #fff;
   border: 1px solid var(--lpgray6);
   font-size: 0.9rem;
 }
 
-.logicpenguin .tt-table th,
-.logicpenguin .tt-table td {
+:where(.logicpenguin) .tt-table th,
+:where(.logicpenguin) .tt-table td {
   border: 1px solid var(--lpgray6);
   padding: 0.35rem 0.55rem;
   text-align: center;
   vertical-align: middle;
 }
 
-.logicpenguin .tt-head {
+:where(.logicpenguin) .tt-head {
   background: var(--lpbgblue);
 }
 
-.logicpenguin .tt-group-row th {
+:where(.logicpenguin) .tt-group-row th {
   background: #e8f1ff;
   font-weight: 700;
   font-size: 0.85rem;
 }
 
-.logicpenguin .tt-token-row th {
+:where(.logicpenguin) .tt-token-row th {
   background: #f4f7ff;
   font-weight: 600;
   text-transform: uppercase;
 }
 
-.logicpenguin .tt-cell {
+:where(.logicpenguin) .tt-cell {
   min-width: 2.2rem;
 }
 
-.logicpenguin .tt-separator {
+:where(.logicpenguin) .tt-separator {
   background: #f0f0f0;
   font-weight: 600;
   color: inherit;
 }
-.logicpenguin .tt-separator-cell {
+:where(.logicpenguin) .tt-separator-cell {
   background: #f5f5f5;
   font-weight: 600;
   color: inherit;
   user-select: none;
 }
 
-.logicpenguin .tt-row:nth-child(even) {
+:where(.logicpenguin) .tt-row:nth-child(even) {
   background: #f9fafc;
 }
 
-.logicpenguin .tt-row-ok {
+:where(.logicpenguin) .tt-row-ok {
   background: #f3fbf1;
 }
 
-.logicpenguin .tt-conclusion {
+:where(.logicpenguin) .tt-conclusion {
   background: #f1f4ff;
 }
 
-.logicpenguin .tt-conclusion-cell {
+:where(.logicpenguin) .tt-conclusion-cell {
   background: #f7f9ff;
 }
 
 
 @media (max-width: 900px) {
-  .logicpenguin {
+  :where(.logicpenguin) {
     font-size: 18px;
   }
 
-  .logicpenguin .lp-problem-card {
+  :where(.logicpenguin) .lp-problem-card {
     width: 100%;
     min-width: 0;
     max-width: 100%;
@@ -152,68 +155,68 @@
 }
 
 @media (max-width: 600px) {
-  .logicpenguin {
+  :where(.logicpenguin) {
     font-size: 16px;
   }
 
-  .logicpenguin .tt-table {
+  :where(.logicpenguin) .tt-table {
     font-size: 0.8rem;
   }
 }
 
-.logicpenguin #savenotice {
+:where(.logicpenguin) #savenotice {
   margin-top: 4ex;
   font-size: 90%;
   color: var(--lpgray1);
 }
 
-.logicpenguin.symbolinsertwidget {
+:where(.logicpenguin).symbolinsertwidget {
   background-color: transparent;
   z-index: 10;
 }
 
 /* link color */
-.logicpenguin a,
-.logicpenguin a:link,
-.logicpenguin a:visited {
+:where(.logicpenguin) a,
+:where(.logicpenguin) a:link,
+:where(.logicpenguin) a:visited {
   color: var(--lpblue);
 }
 
-.logicpenguin a:hover,
-.logicpenguin a:link:hover,
-.logicpenguin a:visited:hover {
+:where(.logicpenguin) a:hover,
+:where(.logicpenguin) a:link:hover,
+:where(.logicpenguin) a:visited:hover {
   color: var(--lpcyan);
 }
 
-.logicpenguin a.fakebutton {
+:where(.logicpenguin) a.fakebutton {
   text-decoration: underline;
   cursor: pointer;
 }
 
-.logicpenguin a.fakebutton:hover {
+:where(.logicpenguin) a.fakebutton:hover {
   color: var(--lpcyan);
 }
 
-.logicpenguin button {
+:where(.logicpenguin) button {
   font-family: 'IBM Plex Sans', sans-serif;
 }
 
-.logicpenguin .math,
-.logicpenguin .symbolic {
+:where(.logicpenguin) .math,
+:where(.logicpenguin) .symbolic {
   font-family: 'IBM Plex Sans', sans-serif;
 }
 
 /* material icons generally */
-.logicpenguin span.material-symbols-outlined {
+:where(.logicpenguin) span.material-symbols-outlined {
   cursor: default;
   user-select: none;
 }
 
 /* hidden elements */
-.logicpenguin .hidden {
+:where(.logicpenguin) .hidden {
   display: none !important;
 }
-.logicpenguin .invisible {
+:where(.logicpenguin) .invisible {
   visibility: hidden !important;
   cursor: none !important;
 }
@@ -252,7 +255,7 @@ a#lplogo:hover span {
 }
 
 /* exercise title */
-.logicpenguin h1 {
+:where(.logicpenguin) h1 {
   font-weight: 900;
   font-size: 200%;
   color: var(--lpmagenta);
@@ -263,42 +266,42 @@ a#lplogo:hover span {
 }
 
 /* exercise set description */
-.logicpenguin h2 {
+:where(.logicpenguin) h2 {
   font-style: italic;
   font-weight: 200;
   font-size: 180%;
   color: var(--lpyellow);
 }
 
-.logicpenguin h3 {
+:where(.logicpenguin) h3 {
   color: var(--lpblue);
   margin-bottom: 1ex;
   font-weight: 500;
 }
 
 /* lecture links */
-.logicpenguin .lecturelink {
+:where(.logicpenguin) .lecturelink {
   margin-top: 2ex;
   margin-bottom: 2ex;
 }
 
 /* instructions */
-.logicpenguin .instructions::before {
+:where(.logicpenguin) .instructions::before {
   content: 'Instructions: ';
   font-style: italic;
   color: var(--lpgray2);
 }
 
-.logicpenguin .problem {
+:where(.logicpenguin) .problem {
   display: block;
 }
 
-.logicpenguin .problemlist li {
+:where(.logicpenguin) .problemlist li {
   margin-bottom: 4ex;
 }
 
-.logicpenguin.sampleproblem ol,
-.logicpenguin .sampleproblem ol {
+:where(.logicpenguin).sampleproblem ol,
+:where(.logicpenguin) .sampleproblem ol {
   list-style-type: none;
   margin-left: 0;
   padding-left: 0;
@@ -309,7 +312,7 @@ a#lplogo:hover span {
 /* status indicators   */
 /*////////////////////*/
 
-.logicpenguin .problemstatusindicator {
+:where(.logicpenguin) .problemstatusindicator {
   text-align: center;
   margin-top: 0.7ex;
   border: 2px solid var(--lpgray4);
@@ -326,51 +329,51 @@ a#lplogo:hover span {
   transition: background-color 1s;
 }
 
-.logicpenguin .problemstatusindicator span.material-symbols-outlined {
+:where(.logicpenguin) .problemstatusindicator span.material-symbols-outlined {
   font-size: 180%;
 }
 
 /** COLOR OF INDICATOR **/
 
 /* when saved only */
-.logicpenguin .saved.unknown .problemstatusindicator,
-.logicpenguin .unknown .problemstatusindicator,
-.logicpenguin .saved .problemstatusindicator {
+:where(.logicpenguin) .saved.unknown .problemstatusindicator,
+:where(.logicpenguin) .unknown .problemstatusindicator,
+:where(.logicpenguin) .saved .problemstatusindicator {
   background-color: transparent;
 }
 
 /* when correct or saved+correct */
-.logicpenguin .saved.correct .problemstatusindicator,
-.logicpenguin .correct .problemstatusindicator {
+:where(.logicpenguin) .saved.correct .problemstatusindicator,
+:where(.logicpenguin) .correct .problemstatusindicator {
   background-color: var(--lpbggreen);
 }
 
 /* when incorrect or saved+incorrect */
-.logicpenguin .saved.incorrect .problemstatusindicator,
-.logicpenguin .incorrect .problemstatusindicator {
+:where(.logicpenguin) .saved.incorrect .problemstatusindicator,
+:where(.logicpenguin) .incorrect .problemstatusindicator {
   background-color: var(--lpbgred);
 }
 
 /* when malfunctioning */
-.logicpenguin .malfunction .problemstatusindicator {
+:where(.logicpenguin) .malfunction .problemstatusindicator {
   background-color: var(--lpred);
   color: var(--lpwhite);
 }
 
 /* when saved indeterminate */
-.logicpenguin .indeterminate .problemstatusindicator,
-.logicpenguin .saved.indeterminate .problemstatusindicator {
+:where(.logicpenguin) .indeterminate .problemstatusindicator,
+:where(.logicpenguin) .saved.indeterminate .problemstatusindicator {
   background-color: var(--lpbgmagenta);
 }
 
 /* when error saving */
-.logicpenguin .saveerror .problemstatusindicator {
+:where(.logicpenguin) .saveerror .problemstatusindicator {
   background-color: var(--lpred);
   color: var(--lpwhite);
 }
 
 /* point indicator */
-.logicpenguin .problempointsindicator {
+:where(.logicpenguin) .problempointsindicator {
   padding-left: 0.5em;
   padding-right: 0.5em;
   position: relative;
@@ -378,7 +381,7 @@ a#lplogo:hover span {
 }
 
 /* message */
-.logicpenguin .problemindicatormessage {
+:where(.logicpenguin) .problemindicatormessage {
   text-transform: none;
   position: relative;
   top: 0.63ex;
@@ -386,7 +389,7 @@ a#lplogo:hover span {
 
 /* SUCCESS INDICATOR */
 
-.logicpenguin .problemsuccessindicator {
+:where(.logicpenguin) .problemsuccessindicator {
   color: var(--lpgray3);
   display: inline-block;
   float: left;
@@ -395,11 +398,11 @@ a#lplogo:hover span {
 }
 
 /* when unanswered */
-.logicpenguin .problemsuccessindicator span {
+:where(.logicpenguin) .problemsuccessindicator span {
   color: var(--lpgray6);
 }
 
-.logicpenguin .problemsuccessindicator::after {
+:where(.logicpenguin) .problemsuccessindicator::after {
   content: 'unanswered';
   position: relative;
   bottom: 1.05ex;
@@ -407,79 +410,79 @@ a#lplogo:hover span {
 }
 
 /* when processing */
-.logicpenguin .checking .problemsuccessindicator span {
+:where(.logicpenguin) .checking .problemsuccessindicator span {
   color: var(--lpblue);
   animation: flip 1s infinite linear;
   animation-direction: alternate;
 }
 
-.logicpenguin .checking .problemsuccessindicator::after {
+:where(.logicpenguin) .checking .problemsuccessindicator::after {
   content: 'checking';
 }
 
-.logicpenguin .unknown .problemsuccessindicator::after {
+:where(.logicpenguin) .unknown .problemsuccessindicator::after {
   content: 'score tbd';
 }
 
-.logicpenguin .unknown .problemsuccessindicator span {
+:where(.logicpenguin) .unknown .problemsuccessindicator span {
   color: var(--lpgray4);
 }
 
 /* when correct */
-.logicpenguin .correct .problemsuccessindicator span {
+:where(.logicpenguin) .correct .problemsuccessindicator span {
   color: #beafc2;
 }
 
-.logicpenguin .correct .problemsuccessindicator::after {
+:where(.logicpenguin) .correct .problemsuccessindicator::after {
   content: 'correct';
 }
 
 /* when edited */
-.logicpenguin .edited .problemsuccessindicator span {
+:where(.logicpenguin) .edited .problemsuccessindicator span {
   color: var(--lpwhite);
 }
 
-.logicpenguin .edited .problemsuccessindicator::after {
+:where(.logicpenguin) .edited .problemsuccessindicator::after {
   content: 'edited';
 }
 
-.logicpenguin .edited.saveerror .problemsuccessindicator::after {
+:where(.logicpenguin) .edited.saveerror .problemsuccessindicator::after {
   color: var(--lpwhite);
 }
 
 /* when incorrect */
-.logicpenguin .incorrect .problemsuccessindicator span {
+:where(.logicpenguin) .incorrect .problemsuccessindicator span {
   color: var(--lpred);
 }
 
-.logicpenguin .incorrect .problemsuccessindicator::after {
+:where(.logicpenguin) .incorrect .problemsuccessindicator::after {
   content: 'incorrect';
 }
 
 /* when indeterminate */
-.logicpenguin .indeterminate .problemsuccessindicator span {
+:where(.logicpenguin) .indeterminate .problemsuccessindicator span {
   color: var(--lpmagenta);
 }
 
-.logicpenguin .indeterminate .problemsuccessindicator::after {
+:where(.logicpenguin) .indeterminate .problemsuccessindicator::after {
   content: 'computer could not determine';
   color: var(--lpmagenta);
 }
 
 /* when malfunctioning */
-.logicpenguin .malfunction .problemsuccessindicator span {
+:where(.logicpenguin) .malfunction .problemsuccessindicator span {
   color: var(--lpbgyellow);
   background-color: var(--lpred);
 }
 
-.logicpenguin .malfunction .problemsuccessindicator::after {
+:where(.logicpenguin) .malfunction .problemsuccessindicator::after {
   content: 'malfunction';
   color: var(--lpbgyellow);
 }
 
 /* SAVED INDICATOR */
 
-.logicpenguin .problemsavedindicator {
+:where(.logicpenguin) .problemsavedindicator {
   color: var(--lpgray2);
   display: inline-block;
   float: right;
@@ -489,11 +492,11 @@ a#lplogo:hover span {
 }
 
 /* when unsaved */
-.logicpenguin .problemsavedindicator span {
+:where(.logicpenguin) .problemsavedindicator span {
   color: var(--lpgray6);
 }
 
-.logicpenguin .problemsavedindicator::before {
+:where(.logicpenguin) .problemsavedindicator::before {
   content: 'unsaved';
   position: relative;
   bottom: 1.05ex;
@@ -501,126 +504,126 @@ a#lplogo:hover span {
 }
 
 /* when malfunctioning */
-.logicpenguin .malfunction .problemsavedindicator span {
+:where(.logicpenguin) .malfunction .problemsavedindicator span {
   color: var(--lpbgyellow);
   background-color: var(--lpred);
 }
 
-.logicpenguin .malfunction .problemsavedindicator::before {
+:where(.logicpenguin) .malfunction .problemsavedindicator::before {
   color: var(--lpbgyellow);
   content: 'malfunction';
 }
 
 /* when saved */
-.logicpenguin .saved .problemsavedindicator span {
+:where(.logicpenguin) .saved .problemsavedindicator span {
   color: var(--lpgray2);
 }
 
-.logicpenguin .saved .problemsavedindicator::before {
+:where(.logicpenguin) .saved .problemsavedindicator::before {
   content: 'saved'
 }
 
 /* when error saving */
-.logicpenguin .saveerror .problemsavedindicator span {
+:where(.logicpenguin) .saveerror .problemsavedindicator span {
   color: var(--lpbgred);
 }
 
-.logicpenguin .saveerror .problemsavedindicator::before {
+:where(.logicpenguin) .saveerror .problemsavedindicator::before {
   content: 'error saving';
   color: var(--lpbgred);
 }
 
 /* when save processing */
-.logicpenguin .saving .problemsavedindicator span {
+:where(.logicpenguin) .saving .problemsavedindicator span {
   color: var(--lpblue);
   animation: spin 1s infinite linear;
 }
 
-.logicpenguin .saving .problemsavedindicator::before {
+:where(.logicpenguin) .saving .problemsavedindicator::before {
   content: 'saving';
 }
 
 /* when cannot be saved */
-.logicpenguin .unsavable .problemsavedindicator span {
+:where(.logicpenguin) .unsavable .problemsavedindicator span {
   color: var(--lpgray3);
 }
 
-.logicpenguin .unsavable .problemsavedindicator::before {
+:where(.logicpenguin) .unsavable .problemsavedindicator::before {
   content: '';
 }
 
-.logicpenguin input[type="checkbox"],
-.logicpenguin input[type="radio"] {
+:where(.logicpenguin) input[type="checkbox"],
+:where(.logicpenguin) input[type="radio"] {
   width: 1.5rem;
   height: 1.5rem;
   accent-color: var(--lpblue);
   cursor: pointer;
 }
 
-.logicpenguin input[type="radio"] {
+:where(.logicpenguin) input[type="radio"] {
   position: relative;
   top: 0.25ex;
   margin-right: 0.8rem;
 }
 
-.logicpenguin input[type="radio"] + label {
+:where(.logicpenguin) input[type="radio"] + label {
   cursor: pointer;
 }
 
-.logicpenguin .infobox table {
+:where(.logicpenguin) .infobox table {
   border-collapse: collapse;
   border-style: solid;
   border-width: 2px;
 }
 
-.logicpenguin .infobox table.info {
+:where(.logicpenguin) .infobox table.info {
   border-color: var(--lpcyan);
 }
 
-.logicpenguin .infobox table.warning {
+:where(.logicpenguin) .infobox table.warning {
   border-color: var(--lpyellow);
 }
 
-.logicpenguin .infobox table.error {
+:where(.logicpenguin) .infobox table.error {
   border-color: var(--lpred);
 }
 
-.logicpenguin .infobox table td:first-child {
+:where(.logicpenguin) .infobox table td:first-child {
   padding-left: 0.5em;
   padding-right: 0.5em;
   vertical-align: middle;
 }
 
-.logicpenguin .infobox table td:first-child span.material-symbols-outlined {
+:where(.logicpenguin) .infobox table td:first-child span.material-symbols-outlined {
   font-size: 180%;
 }
 
-.logicpenguin .infobox table.info td:first-child {
+:where(.logicpenguin) .infobox table.info td:first-child {
   color: var(--lpblue);
   background-color: var(--lpbgcyan);
 }
 
-.logicpenguin .infobox table.warning td:first-child {
+:where(.logicpenguin) .infobox table.warning td:first-child {
   color: var(--lpred);
   background-color: transparent;
 }
 
-.logicpenguin .infobox table.error td:first-child {
+:where(.logicpenguin) .infobox table.error td:first-child {
   color: #ffffff;
   background-color: var(--lpred);
 }
 
-.logicpenguin .infobox table.error td:first-child span.material-symbols-outlined {
+:where(.logicpenguin) .infobox table.error td:first-child span.material-symbols-outlined {
   animation: fade 0.8s infinite ease-out;
   animation-direction: alternate;
   animation-delay: 1s;
 }
 
-.logicpenguin .infobox table td:first-child {
+:where(.logicpenguin) .infobox table td:first-child {
   padding-top: 0.5ex;
 }
 
-.logicpenguin .infobox table td:last-child {
+:where(.logicpenguin) .infobox table td:last-child {
   padding-left: 0.5em;
   padding-right: 0.5em;
   padding-top: 1ex;
@@ -628,7 +631,7 @@ a#lplogo:hover span {
   color: var(--lpgray2);
 }
 
-.logicpenguin .buttondiv {
+:where(.logicpenguin) .buttondiv {
   display: flex;
   flex-direction: row;
   gap: 12px;
@@ -638,8 +641,8 @@ a#lplogo:hover span {
   overflow: visible;
 }
 
-.logicpenguin button,
-.logicpenguin .buttondiv button {
+:where(.logicpenguin) button,
+:where(.logicpenguin) .buttondiv button {
   font-family: 'Roboto', 'Helvetica', 'Arial', sans-serif;
   font-weight: 500;
   font-size: 0.875rem;
@@ -672,7 +675,7 @@ a#lplogo:hover span {
   opacity: 1;
 }
 
-.logicpenguin .buttondiv button {
+:where(.logicpenguin) .buttondiv button {
   padding: 6px 16px;
   font-size: 0.875rem;
   text-transform: uppercase;
@@ -680,14 +683,14 @@ a#lplogo:hover span {
   font-weight: 500;
 }
 
-.logicpenguin .buttondiv button:first-of-type {
+:where(.logicpenguin) .buttondiv button:first-of-type {
   color: #536DFE;
   background-color: transparent;
   border: 1px solid rgba(83, 109, 254, 0.5);
   box-shadow: none;
 }
 
-.logicpenguin .symbolicargumentinput td button {
+:where(.logicpenguin) .symbolicargumentinput td button {
   padding-left: 0.3em;
   padding-right: 0.3em;
   padding-top: 0.1em;
@@ -695,8 +698,8 @@ a#lplogo:hover span {
   margin-right: 0.5em;
 }
 
-.logicpenguin button:hover,
-.logicpenguin .buttondiv button:hover {
+:where(.logicpenguin) button:hover,
+:where(.logicpenguin) .buttondiv button:hover {
   background-color: #3d5afe;
   box-shadow: 0px 2px 4px -1px rgba(0, 0, 0, 0.2),
               0px 4px 5px 0px rgba(0, 0, 0, 0.14),
@@ -704,32 +707,32 @@ a#lplogo:hover span {
   opacity: 1;
 }
 
-.logicpenguin .buttondiv button:first-of-type:hover {
+:where(.logicpenguin) .buttondiv button:first-of-type:hover {
   background-color: rgba(83, 109, 254, 0.04);
   border-color: #536DFE;
   box-shadow: none;
 }
 
-.logicpenguin button:focus,
-.logicpenguin button:active,
-.logicpenguin .buttondiv button:focus,
-.logicpenguin .buttondiv button:active {
+:where(.logicpenguin) button:focus,
+:where(.logicpenguin) button:active,
+:where(.logicpenguin) .buttondiv button:focus,
+:where(.logicpenguin) .buttondiv button:active {
   box-shadow: 0px 5px 5px -3px rgba(0, 0, 0, 0.2),
               0px 8px 10px 1px rgba(0, 0, 0, 0.14),
               0px 3px 14px 2px rgba(0, 0, 0, 0.12);
   opacity: 1;
 }
 
-.logicpenguin .buttondiv button:first-of-type:active {
+:where(.logicpenguin) .buttondiv button:first-of-type:active {
   box-shadow: none;
 }
 
-.logicpenguin button:disabled,
-.logicpenguin button:disabled:hover,
-.logicpenguin button[disabled]:hover,
-.logicpenguin .buttondiv button:disabled,
-.logicpenguin .buttondiv button:disabled:hover,
-.logicpenguin .buttondiv button[disabled]:hover {
+:where(.logicpenguin) button:disabled,
+:where(.logicpenguin) button:disabled:hover,
+:where(.logicpenguin) button[disabled]:hover,
+:where(.logicpenguin) .buttondiv button:disabled,
+:where(.logicpenguin) .buttondiv button:disabled:hover,
+:where(.logicpenguin) .buttondiv button[disabled]:hover {
   color: rgba(0, 0, 0, 0.26);
   background-color: rgba(0, 0, 0, 0.12);
   box-shadow: none;
@@ -737,18 +740,18 @@ a#lplogo:hover span {
   opacity: 1;
 }
 
-.logicpenguin button svg,
-.logicpenguin .buttondiv button svg {
+:where(.logicpenguin) button svg,
+:where(.logicpenguin) .buttondiv button svg {
   width: 1.25rem;
   height: 1.25rem;
 }
 
-.logicpenguin input {
+:where(.logicpenguin) input {
   background-color: var(--lpwhite);
   color: var(--lpblack);
 }
 
-.logicpenguin input.formulainput {
+:where(.logicpenguin) input.formulainput {
   font-size: inherit;
   padding: 4px;
   min-width: 22em;
@@ -758,7 +761,7 @@ a#lplogo:hover span {
   outline: 1px solid transparent;
 }
 
-.logicpenguin input.formulainput:focus {
+:where(.logicpenguin) input.formulainput:focus {
   border: 2px solid var(--lpblue);
   outline: 1px solid var(--lpblue);
   background-color: var(--lpbgblue);
@@ -766,7 +769,7 @@ a#lplogo:hover span {
 
 
 
-.logicpenguin.symbolinsertwidget {
+:where(.logicpenguin).symbolinsertwidget {
   display: none !important;
 }
 
@@ -793,30 +796,30 @@ a#lplogo:hover span {
 
 /* progress bar */
 
-.logicpenguin .lpprogressbar table {
+:where(.logicpenguin) .lpprogressbar table {
   border-spacing: 0;
   border-collapse: collapse;
   width: 100%;
   border: 2px ridge var(--lpgray3);
 }
 
-.logicpenguin .lpprogressbar table td {
+:where(.logicpenguin) .lpprogressbar table td {
   height: 3ex;
   color: var(--lpbgwhite);
   text-align: center;
   vertical-align: middle;
 }
 
-.logicpenguin .lpprogressbar table .pbcorrectcell {
+:where(.logicpenguin) .lpprogressbar table .pbcorrectcell {
   background-color: var(--lpgreen);
 }
-.logicpenguin .lpprogressbar table .pbincorrectcell {
+:where(.logicpenguin) .lpprogressbar table .pbincorrectcell {
   background-color: var(--lpred);
 }
-.logicpenguin .lpprogressbar table .pbsavedcell {
+:where(.logicpenguin) .lpprogressbar table .pbsavedcell {
   background-color: var(--lpyellow);
 }
-.logicpenguin .lpprogressbar table .pbunansweredcell {
+:where(.logicpenguin) .lpprogressbar table .pbunansweredcell {
   background-color: var(--lpgray6);
 }
 

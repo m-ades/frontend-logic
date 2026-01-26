@@ -3,6 +3,7 @@ import { Box, Stack, Typography, Alert } from '@mui/material'
 import { useTheme } from '@mui/material/styles'
 import ProblemSetButtons from './ProblemSetButtons.jsx'
 import FormulaInput from '../../ui/logicpenguin/formula-input.js'
+import SymbolButtonRow from '../../ui/logicpenguin/SymbolButtonRow.jsx'
 import { useProblemChecker } from '../../../hooks/useProblemChecker.js'
 import SolutionReveal from '../SolutionReveal.jsx'
 import RichText from '../../ui/RichText.jsx'
@@ -230,6 +231,17 @@ export default function SymbolicTranslation({
                 fieldReadOnly={readOnly}
                 formulaInputRef={formulaInputRef}
               />
+              <Box sx={{ mt: 1 }}>
+                <SymbolButtonRow
+                  inputRef={formulaInputRef}
+                  disabled={readOnly}
+                  onValueChange={(value) => {
+                    if (readOnly) return
+                    setInputValue(value)
+                    scheduleStateSave(value)
+                  }}
+                />
+              </Box>
             </Box>
             {!suppressReveal && (
               /* show answer in card */

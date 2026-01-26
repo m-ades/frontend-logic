@@ -3,6 +3,7 @@ import { Alert, Box, Stack, Typography } from '@mui/material'
 import { useTheme } from '@mui/material/styles'
 import ProblemSetButtons from './ProblemSetButtons.jsx'
 import FormulaInput from '../../ui/logicpenguin/formula-input.js'
+import SymbolButtonRow from '../../ui/logicpenguin/SymbolButtonRow.jsx'
 import LogicPenguinProof from '../LogicPenguinProof.jsx'
 import getFormulaClass from '../../../lib/logicpenguin/symbolic/formula.js'
 import { useProblemChecker } from '../../../hooks/useProblemChecker.js'
@@ -223,6 +224,12 @@ export default function ComboTranslationDerivation({
                 }}
                 sx={{ width: '100%', minHeight: '56px' }}
               />
+              <Box sx={{ mt: 1 }}>
+                <SymbolButtonRow
+                  inputRef={inputRef}
+                  onValueChange={handleArgumentChange}
+                />
+              </Box>
             </Box>
 
             {parseStatus.ok && derivationProblem && (

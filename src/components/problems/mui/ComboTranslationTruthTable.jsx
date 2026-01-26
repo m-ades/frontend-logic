@@ -1,8 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Alert, Box, Stack, Typography } from '@mui/material'
 import { useTheme } from '@mui/material/styles'
+import getSyntax from '../../../lib/logicpenguin/symbolic/libsyntax.js'
 import ProblemSetButtons from './ProblemSetButtons.jsx'
 import FormulaInput from '../../ui/logicpenguin/formula-input.js'
+import SymbolButtonRow from '../../ui/logicpenguin/SymbolButtonRow.jsx'
 import TruthTableEditor from '../TruthTableEditor.jsx'
 import getFormulaClass from '../../../lib/logicpenguin/symbolic/formula.js'
 import { useProblemChecker } from '../../../hooks/useProblemChecker.js'
@@ -68,6 +70,7 @@ export default function ComboTranslationTruthTable({
 }) {
   const theme = useTheme()
   const Formula = useMemo(() => getFormulaClass(), [])
+  const syntax = useMemo(() => getSyntax(), [])
   const snapshot = proof?.comboTranslationTruthTable || proof?.snapshot || {}
   const promptText = snapshot?.prompt || proof?.description || ''
   const [argumentLine, setArgumentLine] = useState(savedState?.argumentLine ?? '')
@@ -88,6 +91,17 @@ export default function ComboTranslationTruthTable({
   const parseStatus = useMemo(() => {
     if (!argumentLine) {
       return { ok: false, reason: '', parsed: null }
+    }
+    const quantSymbols = [syntax?.symbols?.FORALL, syntax?.symbols?.EXISTS].filter(Boolean)
+    if (quantSymbols.length > 0) {
+      const quantRegex = new RegExp(`[${quantSymbols.join('')}]`)
+      if (quantRegex.test(argumentLine)) {
+        return {
+          ok: false,
+          reason: 'Truth tables do not support quantifiers.',
+          parsed: null,
+        }
+      }
     }
     const parsed = parseArgumentLine(argumentLine)
     if (parsed.error) {
@@ -193,6 +207,13 @@ export default function ComboTranslationTruthTable({
                 }}
                 sx={{ width: '100%', minHeight: '56px' }}
               />
+              <Box sx={{ mt: 1 }}>
+                <SymbolButtonRow
+                  inputRef={inputRef}
+                  onValueChange={handleArgumentChange}
+                  includeQuantifiers={false}
+                />
+              </Box>
             </Box>
             {parseStatus.ok && tableProof && (
               <TruthTableEditor
