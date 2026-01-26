@@ -29,6 +29,7 @@ function TabPanel(props) {
       {isActive && (
         <Box 
           sx={{ 
+            // let page scroll
             pl: { xs: 0, md: 3 }, 
             pr: { xs: 0, md: 3 }, 
             pt: { xs: 2, md: 0 }, 
@@ -36,8 +37,6 @@ function TabPanel(props) {
             overflowX: 'auto', 
             minWidth: 0, 
             width: '100%',
-            height: { xs: 'auto', md: 'calc(100vh - 200px)', lg: 'calc(100vh - 180px)' },
-            overflowY: { xs: 'visible', md: 'auto' },
           }}
         >
           {children}

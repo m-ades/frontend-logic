@@ -2,7 +2,6 @@ import { Box, Typography, IconButton, Chip, Stack, FormControl, Select, MenuItem
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import RulesReference from '../ui/RulesReference.jsx'
-import Widget from '../ui/Widget.jsx'
 
 export default function Layout({ 
   title, 
@@ -112,12 +111,9 @@ export default function Layout({
         )}
       </Box>
 
-      <Box>
-        <Widget noBodyPadding>
-          <Box sx={{ p: { xs: 2, sm: 3 } }}>
-            {children}
-          </Box>
-        </Widget>
+      <Box sx={{ p: { xs: 2, sm: 3 } }}>
+        {/* single surface */}
+        {children}
       </Box>
     </Box>
   )

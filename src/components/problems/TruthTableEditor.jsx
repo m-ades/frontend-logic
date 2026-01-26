@@ -734,7 +734,8 @@ export default function TruthTableEditor({
       sx={{
         mt: embedded ? 0 : 1,
         overflow: 'visible',
-        minHeight: embedded ? 'auto' : '420px',
+        // no tall card
+        minHeight: 'auto',
         flexGrow: 1,
         alignSelf: { xs: 'stretch', md: 'flex-start' },
       }}
