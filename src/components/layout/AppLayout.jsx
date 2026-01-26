@@ -1,4 +1,4 @@
-import { Box, Toolbar } from "@mui/material";
+import { Box } from "@mui/material";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useEffect, useRef } from "react";
 import Header from "./Header.jsx";
@@ -74,10 +74,6 @@ export default function AppLayout({ children }) {
     return () => clearTimeout(timer);
   }, [location.pathname]);
 
-  const showToolbar =
-    location.pathname.includes("/assignment/") ||
-    location.pathname.includes("/worksheet/");
-
   const sidebarStructure = isInstructorRole(user?.role)
     ? InstructorSidebarStructure
     : StudentSidebarStructure;
@@ -117,7 +113,6 @@ export default function AppLayout({ children }) {
             minWidth: 0,
           }}
         >
-          {showToolbar && <Toolbar />}
           {children}
         </Box>
       </Box>
