@@ -5,11 +5,19 @@ import {
   Box,
   Breadcrumbs,
   Link,
+  IconButton,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
+import { Menu as MenuIcon } from "@mui/icons-material";
 import { ChevronRight } from "lucide-react";
 import { useLocation } from "react-router-dom";
 import { useCoursesState } from "../../context/CoursesContext";
 import ThemeToggle from "./ThemeToggle.jsx";
+import {
+  useLayoutDispatch,
+  toggleSidebar,
+} from "../../context/LayoutContext.jsx";
 
 // Map routes to readable page names
 const getPageName = (pathname) => {
@@ -45,6 +53,9 @@ const getPageName = (pathname) => {
 export default function Header() {
   const location = useLocation();
   const { courses, activeCourseId } = useCoursesState();
+  const layoutDispatch = useLayoutDispatch();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 
   const activeCourse = courses.find((c) => c.id === activeCourseId);
   const pageName = getPageName(location.pathname);
@@ -61,6 +72,16 @@ export default function Header() {
       }}
     >
       <Toolbar>
+        {isMobile && (
+          <IconButton
+            edge="start"
+            aria-label="Open navigation"
+            onClick={() => toggleSidebar(layoutDispatch)}
+            sx={{ mr: 1 }}
+          >
+            <MenuIcon />
+          </IconButton>
+        )}
         <Box
           sx={{ flexGrow: 1, display: "flex", alignItems: "center", gap: 1 }}
         >

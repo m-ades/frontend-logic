@@ -19,6 +19,7 @@ export default function SidebarLink({
   label,
   children,
   isSidebarOpened,
+  isTemporary,
   toggleDrawer,
   type,
   nested,
@@ -45,7 +46,11 @@ export default function SidebarLink({
   const handleClick = (e) => {
     if (link) {
       navigate(link)
-      if (!isSidebarOpened) toggleDrawer()
+      if (isTemporary) {
+        toggleDrawer()
+      } else if (!isSidebarOpened) {
+        toggleDrawer()
+      }
       return
     }
     if (children && isSidebarOpened) {

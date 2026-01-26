@@ -160,6 +160,7 @@ export default function Sidebar({ structure, location, onSignOut }) {
               key={link.id}
               location={location}
               isSidebarOpened={isSidebarOpened}
+              isTemporary={!isPermanent}
               toggleDrawer={handleDrawerToggle}
               {...link}
             />
