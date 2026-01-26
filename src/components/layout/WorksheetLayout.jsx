@@ -1,4 +1,4 @@
-import { Box, Typography, IconButton, Chip } from '@mui/material'
+import { Box, Typography, IconButton } from '@mui/material'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import RulesReference from '../ui/RulesReference.jsx'
 
@@ -49,17 +49,6 @@ export default function Layout({
           </Box>
         </Box>
 
-        {isOverdue && (
-          <Box sx={{ mb: 2 }}>
-            {/* past due only */}
-            <Chip
-              label="Past due"
-              color="error"
-              size="small"
-              sx={{ fontWeight: 600, height: 28 }}
-            />
-          </Box>
-        )}
       </Box>
 
       <Box sx={{ p: { xs: 2, sm: 3 } }}>

@@ -50,6 +50,7 @@ export default function LogicPenguinProblem({
       problemData = { prompt: problemData, legend: proof.legend || '' }
     } else {
       problemData = {
+        ...problemData,
         legend: proof.legend ?? problemData.legend ?? '',
         prompt: problemData.prompt || proof.description || '',
         question_snapshot: proof.snapshot || {},

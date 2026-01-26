@@ -288,6 +288,7 @@ export default function Worksheet() {
           translation: {
             legend: snapshot.legend || '',
             prompt: snapshot.prompt || snapshot.statement || snapshot.question || '',
+            symbolizationKey: snapshot.symbolizationKey || snapshot.symbolization_key || [],
             options: snapshot.options || {},
           },
           answer: snapshot.answer,

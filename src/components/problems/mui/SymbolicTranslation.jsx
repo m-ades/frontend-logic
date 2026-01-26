@@ -111,6 +111,16 @@ export default function SymbolicTranslation({
   const lastSavedValueRef = useRef(null)
   const legend = problem?.legend || problem?.question_snapshot?.legend
   const prompt = problem?.prompt || ''
+  const symbolizationKeyRaw = problem?.symbolizationKey
+    ?? problem?.symbolization_key
+    ?? problem?.question_snapshot?.symbolizationKey
+    ?? problem?.question_snapshot?.symbolization_key
+  // key lines
+  const symbolizationKey = Array.isArray(symbolizationKeyRaw)
+    ? symbolizationKeyRaw.filter(Boolean)
+    : (typeof symbolizationKeyRaw === 'string'
+      ? symbolizationKeyRaw.split('\n').map((line) => line.trim()).filter(Boolean)
+      : [])
 
   const scheduleStateSave = useCallback((nextValue) => {
     if (!onStateChange) return
@@ -184,6 +194,25 @@ export default function SymbolicTranslation({
             <Box>
               {prompt && (
                 <RichText content={prompt} variant="body1" sx={{ mb: 1, fontSize: '1rem' }} />
+              )}
+              {symbolizationKey.length > 0 && (
+                <Box sx={{ mb: 1 }}>
+                  <Typography variant="body2" sx={{ mb: 0.5, fontWeight: 600 }}>
+                    Symbolization key
+                  </Typography>
+                  <Box component="ul" sx={{ pl: 3, m: 0, color: 'text.secondary' }}>
+                    {symbolizationKey.map((line, index) => (
+                      <Typography
+                        key={`${line}-${index}`}
+                        component="li"
+                        variant="body2"
+                        sx={{ mb: 0.5 }}
+                      >
+                        {line}
+                      </Typography>
+                    ))}
+                  </Box>
+                </Box>
               )}
               {legend && (
                 <RichText content={legend} variant="body2" sx={{ mb: 1, color: 'text.secondary' }} />
