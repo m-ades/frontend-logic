@@ -70,6 +70,11 @@ export default function Worksheet() {
   }, [currentWorksheet?.id])
 
   useEffect(() => {
+    // reset to first problem on assignment change
+    setCurrentProofIndex(0)
+  }, [worksheetIdNum])
+
+  useEffect(() => {
     let keepGoing = true
 
     const startSession = async () => {
@@ -790,6 +795,11 @@ export default function Worksheet() {
     <WorksheetLayout
       subtitle={currentWorksheet.title || "Predicate Logic: Natural Deduction"}
       onBackToLMS={() => navigate(backTarget)}
+      worksheets={worksheets}
+      currentWorksheetIndex={currentWorksheetIndex}
+      onWorksheetIndexChange={handleWorksheetChange}
+      completedProofs={completedProofs}
+      isOverdue={isOverdue}
     >
       <WorksheetTabs
         worksheets={worksheets}

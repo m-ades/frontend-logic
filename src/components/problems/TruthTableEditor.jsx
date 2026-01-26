@@ -229,9 +229,13 @@ export default function TruthTableEditor({
   const [message, setMessage] = React.useState('')
   const [isChecking, setIsChecking] = React.useState(false)
   const [attemptCount, setAttemptCount] = React.useState(savedState?.attemptCount ?? 0)
-  const attemptLimit = proof?.attemptLimit ?? 3
+  const [attemptLimit, setAttemptLimit] = React.useState(proof?.attemptLimit ?? 3)
   const assignmentQuestionId = Number(proof?.questionId || 0)
   const [mcSelection, setMcSelection] = React.useState([])
+  React.useEffect(() => {
+    // use per-proof limit
+    setAttemptLimit(proof?.attemptLimit ?? 3)
+  }, [proof?.attemptLimit])
   const updateClassificationSelection = React.useCallback((next) => {
     setMcSelection(next)
     onStateChange?.({
@@ -475,6 +479,10 @@ export default function TruthTableEditor({
         })
         const validation = resp?.validation || {}
         const success = validation.successstatus === 'correct'
+        // sync limit from server
+        if (typeof resp?.attempt_limit === 'number') {
+          setAttemptLimit(resp.attempt_limit)
+        }
         setAttemptCount((prev) => resp?.submission?.attempt ?? Math.min(prev + 1, attemptLimit))
         if (typeof window !== 'undefined') {
           window.dispatchEvent(new CustomEvent('assignment-submission', {

@@ -101,7 +101,7 @@ export default function ProofEditor({ proof, onProofComplete, savedState, onStat
           variant="caption"
           sx={{ mt: 1, display: 'block', fontSize: '0.75rem', color: 'text.primary' }}
         >
-          Attempts left: {attemptsLeft}/{attemptLimit}
+          Attempts left: {attemptsLeft}/{attemptLimit} | Drafts save automatically.
         </Typography>
       )}
       <SolutionReveal

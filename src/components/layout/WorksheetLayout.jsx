@@ -1,23 +1,32 @@
-import React from 'react'
-import { Box, Typography, IconButton, Chip } from '@mui/material'
+import { Box, Typography, IconButton, Chip, Stack, FormControl, Select, MenuItem } from '@mui/material'
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
-// import DownloadIcon from '@mui/icons-material/Download'
 import RulesReference from '../ui/RulesReference.jsx'
 import Widget from '../ui/Widget.jsx'
-import PageTitle from '../ui/PageTitle.jsx'
 
 export default function Layout({ 
   title, 
   subtitle, 
   children, 
-  onBackToLMS, 
-  inModal = false 
+  inModal = false,
+  onBackToLMS,
+  worksheets,
+  currentWorksheetIndex,
+  onWorksheetIndexChange,
+  completedProofs,
+  isOverdue,
 }) {
+  const showWorksheetSelect = Array.isArray(worksheets) && worksheets.length > 1
+  const completedSet = completedProofs ?? new Set()
+  // guard bad index
+  const activeIndex = Number.isFinite(currentWorksheetIndex) && currentWorksheetIndex >= 0
+    ? currentWorksheetIndex
+    : 0
+
   return (
     <Box sx={{ width: '100%', height: '100%' }}>
       {!inModal && <RulesReference />}
-      
+
       <Box sx={{ mb: { xs: 3, md: 4 } }}>
         <Box
           sx={{
@@ -53,9 +62,12 @@ export default function Layout({
           </Box>
         </Box>
 
-        {/* Commented out export PDF and assignment dropdown - temporarily removed */}
-        {/* <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap', mb: 2 }}>
-          <Stack direction="row" spacing={1} alignItems="center" sx={{ flexWrap: 'wrap' }}>
+        {(isOverdue || showWorksheetSelect) && (
+          <Stack
+            direction={{ xs: 'column', sm: 'row' }}
+            spacing={2}
+            sx={{ alignItems: { xs: 'stretch', sm: 'center' }, mb: 2 }}
+          >
             {isOverdue && (
               <Chip
                 label="Past due"
@@ -64,62 +76,40 @@ export default function Layout({
                 sx={{ fontWeight: 600, height: 28 }}
               />
             )}
-          </Stack>
-          
-          {onExportClick && (
-            <Tooltip title="Export answers to PDF">
-              <Button
-                variant="outlined"
+            {showWorksheetSelect && (
+              <FormControl
                 size="small"
-                startIcon={<DownloadIcon />}
-                onClick={onExportClick}
-                sx={{ textTransform: 'none', width: { xs: '100%', sm: 'auto' } }}
+                sx={{ minWidth: { xs: '100%', sm: 240 }, width: { xs: '100%', sm: 'auto' } }}
               >
-                Export PDF
-              </Button>
-            </Tooltip>
-          )}
-          
-          {worksheets && (
-            <FormControl 
-              size="small"
-              sx={{ minWidth: { xs: '100%', sm: 200 }, width: { xs: '100%', sm: 'auto' } }}
-            >
-              <Select
-                value={currentWorksheetIndex}
-                onChange={(e) => {
-                  onWorksheetIndexChange(e.target.value)
-                  handleClose()
-                }}
-                open={dropdownOpen}
-                onOpen={handleOpen}
-                onClose={handleClose}
-                displayEmpty
-                sx={{
-                  textTransform: 'none',
-                }}
-              >
-                {worksheets.map((worksheet, idx) => {
-                  const worksheetCompleted = worksheet.proofs.length > 0
-                    ? worksheet.proofs.every((p) => completedProofs.has(p.id))
-                    : false
-                  return (
-                    <MenuItem key={worksheet.id} value={idx}>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, width: '100%' }}>
-                        <Typography variant="body2" sx={{ flex: 1 }}>
-                          {worksheet.title}
-                        </Typography>
-                        {worksheetCompleted && (
-                          <CheckCircleIcon sx={{ color: 'success.main', fontSize: 16 }} />
-                        )}
-                      </Box>
-                    </MenuItem>
-                  )
-                })}
-              </Select>
-            </FormControl>
-          )}
-        </Box> */}
+                <Select
+                  value={activeIndex}
+                  onChange={(event) => onWorksheetIndexChange?.(event.target.value)}
+                  displayEmpty
+                  sx={{ textTransform: 'none' }}
+                >
+                  {worksheets.map((worksheet, idx) => {
+                    // show done mark
+                    const worksheetCompleted = worksheet.proofs?.length
+                      ? worksheet.proofs.every((p) => completedSet.has(p.id))
+                      : false
+                    return (
+                      <MenuItem key={worksheet.id} value={idx}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, width: '100%' }}>
+                          <Typography variant="body2" sx={{ flex: 1 }}>
+                            {worksheet.title || `Assignment ${idx + 1}`}
+                          </Typography>
+                          {worksheetCompleted && (
+                            <CheckCircleIcon sx={{ color: 'success.main', fontSize: 16 }} />
+                          )}
+                        </Box>
+                      </MenuItem>
+                    )
+                  })}
+                </Select>
+              </FormControl>
+            )}
+          </Stack>
+        )}
       </Box>
 
       <Box>

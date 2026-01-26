@@ -88,6 +88,20 @@ export default function MultipleChoice({
     initialAttemptCount: savedState?.attemptCount ?? 0,
   })
   const showSolution = isLocked && (isComposite || typeof answer === 'number' || Array.isArray(answer))
+  // match checker rules
+  const isSubmitDisabled = isLocked || (
+    isComposite
+      ? subquestions.some((subq, idx) => {
+          const value = selectedValue?.[idx]
+          if (isMultiSelectSubq(subq)) {
+            return !Array.isArray(value) || value.length === 0
+          }
+          return value === '' || value === null || value === undefined
+        })
+      : isMultiSelect
+        ? !Array.isArray(selectedValue) || selectedValue.length === 0
+        : selectedValue === ''
+  )
   const multiSelectLabelSx = {
     mb: 1,
     ml: 2,
@@ -344,7 +358,7 @@ export default function MultipleChoice({
           onCheck={handleCheck}
           onStartOver={handleStartOver}
           isChecking={isChecking}
-          isDisabled={selectedValue === '' || isLocked}
+          isDisabled={isSubmitDisabled}
           align="flex-start"
           attemptCount={attemptCount}
           attemptLimit={maxAttempts}
