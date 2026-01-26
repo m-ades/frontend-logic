@@ -10,6 +10,224 @@ import { API_CONFIG, fetchJson, getActiveUserId } from '../utils/api.js'
 import { sortAssignmentsBySubchapter } from '../utils/assignmentSort.js'
 import { useCoursesState } from '../context/CoursesContext.jsx'
 
+const normalizeType = (snapshot) => (
+  snapshot?.type || snapshot?.problemType || snapshot?.logic_problem_type || 'derivation'
+)
+
+const mapQuestionToProof = (question, assignment, index) => {
+  const snapshot = question?.question_snapshot || {}
+  const type = normalizeType(snapshot)
+  const description = snapshot.prompt || snapshot.description || snapshot.text || 'Solve.'
+  const questionId = question?.id ?? question?.assignment_question_id ?? question?.assignmentQuestionId ?? null
+  const proofId = `${assignment.id}-${questionId ?? index}`
+  const solution = snapshot.solution
+  const attemptLimit = question?.attempt_limit ?? 3
+  const legend = snapshot.legend || snapshot.legend_text || snapshot.legendText || ''
+  const proofBase = {
+    id: proofId,
+    questionId,
+    description,
+    solution,
+    attemptLimit,
+    legend,
+  }
+
+  if (type === 'derivation' || type === 'derivation-hurley') {
+    return {
+      ...proofBase,
+      type: 'derivation',
+      premises: snapshot.prems || snapshot.premises || [],
+      conclusion: snapshot.conc || snapshot.conclusion || '',
+    }
+  }
+
+  if (type === 'truth-table') {
+    const ttOptions = snapshot.options || snapshot.truthTable?.options || {}
+    const ttSnapshot = snapshot.truthTable || {}
+    const ttKind = ttSnapshot.kind || snapshot.truthTable?.kind || 'formula'
+    return {
+      ...proofBase,
+      type: 'truth-table',
+      options: ttOptions,
+      truthTable: {
+        ...ttSnapshot,
+        kind: ttKind,
+        statement: ttSnapshot.statement ?? snapshot.statement ?? snapshot.formula ?? '',
+        options: ttOptions,
+      },
+    }
+  }
+
+  if (type === 'symbolic-translation') {
+    return {
+      ...proofBase,
+      type: 'symbolic-translation',
+      translation: {
+        legend: snapshot.legend || '',
+        prompt: snapshot.prompt || snapshot.statement || snapshot.question || '',
+        symbolizationKey: snapshot.symbolizationKey || snapshot.symbolization_key || [],
+        options: snapshot.options || {},
+      },
+      answer: snapshot.answer,
+    }
+  }
+
+  if (type === 'multiple-choice') {
+    const subquestions = snapshot.subquestions || snapshot.questions || []
+    const hasSubquestions = Array.isArray(subquestions) && subquestions.length > 0
+    const baseMultipleChoice = snapshot.multipleChoice || {
+      prompt: snapshot.prompt || '',
+      choices: snapshot.choices || [],
+    }
+    const normalizedMultipleChoice = {
+      ...baseMultipleChoice,
+      subquestions: baseMultipleChoice.subquestions || subquestions,
+    }
+    return {
+      ...proofBase,
+      type: 'multiple-choice',
+      multipleChoice: normalizedMultipleChoice,
+      answer: hasSubquestions ? null : (snapshot.answerIndices ?? snapshot.answerIndex ?? snapshot.answer),
+    }
+  }
+
+  if (type === 'indirect-truth-table') {
+    const snapshotQuestions = snapshot.questions || snapshot.subquestions || []
+    const choiceList = Array.isArray(snapshot.choices) ? snapshot.choices : []
+    const questions = Array.isArray(snapshotQuestions) && snapshotQuestions.length > 0
+      ? snapshotQuestions
+      : (choiceList.length > 0
+        ? [{
+            prompt: snapshot.choicePrompt || snapshot.question || '',
+            choices: choiceList,
+            answerIndex: snapshot.answerIndex ?? snapshot.answer ?? (Array.isArray(snapshot.answerIndices) ? snapshot.answerIndices[0] : undefined),
+          }]
+        : [])
+    const derivedAnswer = questions.length
+      ? questions.map((q) => q.answerIndex ?? q.answer ?? q.correctIndex)
+      : (snapshot.answerIndex ?? snapshot.answer ?? snapshot.answerIndices)
+    return {
+      ...proofBase,
+      type: 'indirect-truth-table',
+      answer: derivedAnswer,
+      indirectTruthTable: {
+        prompt: snapshot.prompt || '',
+        argument: snapshot.argument || {},
+        questions,
+        subquestions: questions,
+        choices: choiceList,
+        sandbox: snapshot.sandbox || {},
+      },
+    }
+  }
+
+  if (type === 'true-false') {
+    return {
+      ...proofBase,
+      type: 'true-false',
+      trueFalse: snapshot.trueFalse || {
+        prompt: snapshot.prompt || snapshot.statement || '',
+      },
+      answer: snapshot.answer,
+    }
+  }
+
+  if (type === 'evaluate-truth') {
+    return {
+      ...proofBase,
+      type: 'evaluate-truth',
+      evaluateTruth: snapshot.statement || snapshot.evaluateTruth || snapshot.prompt || '',
+      answer: snapshot.answer,
+    }
+  }
+
+  /*
+  if (type === 'valid-correct-sound') {
+    return {
+      ...proofBase,
+      type: 'valid-correct-sound',
+      premises: snapshot.prems || snapshot.premises || [],
+      conclusion: snapshot.conc || snapshot.conclusion || '',
+      answer: snapshot.answer,
+    }
+  }
+  */
+
+  if (type === 'single-row-truth-table') {
+    return {
+      ...proofBase,
+      type: 'single-row-truth-table',
+      singleRowTruthTable: {
+        statement: snapshot.statement || snapshot.evaluateTruth || snapshot.prompt || '',
+        interpretation: snapshot.interpretation || {},
+        prompt: snapshot.prompt || snapshot.description || '',
+      },
+    }
+  }
+
+  if (type === 'partial-truth-table') {
+    return {
+      ...proofBase,
+      type: 'partial-truth-table',
+      partialTruthTable: snapshot,
+    }
+  }
+
+  if (type === 'combo-translation-truth-table') {
+    return {
+      ...proofBase,
+      description: '',
+      type: 'combo-translation-truth-table',
+      answer: snapshot.answer,
+      options: snapshot.options,
+      comboTranslationTruthTable: snapshot,
+    }
+  }
+
+  if (type === 'combo-translation-derivation') {
+    return {
+      ...proofBase,
+      description: '',
+      type: 'combo-translation-derivation',
+      answer: snapshot.answer,
+      options: snapshot.options,
+      comboTranslationDerivation: snapshot,
+    }
+  }
+
+  return {
+    ...proofBase,
+    type,
+  }
+}
+
+const toSymbol = (value) => (value === true ? 'T' : value === false ? 'F' : '')
+const buildTruthTableState = (lefts, right, data) => {
+  const mapRows = (rows = []) => rows.map((row) => row.map(toSymbol))
+  const state = ({
+    tables: [
+      ...lefts.map((table) => ({ rows: mapRows(table.rows) })),
+      { rows: mapRows(right.rows) }
+    ]
+  })
+  if (Array.isArray(data?.mcans)) {
+    state.mcans = data.mcans
+  }
+  if (data?.taut !== undefined) {
+    state.taut = data.taut
+  }
+  if (data?.contra !== undefined) {
+    state.contra = data.contra
+  }
+  if (data?.valid !== undefined) {
+    state.valid = data.valid
+  }
+  if (data?.equiv !== undefined) {
+    state.equiv = data.equiv
+  }
+  return state
+}
+
 export default function Worksheet() {
   const { worksheetId, assignmentId } = useParams()
   const navigate = useNavigate()
@@ -29,6 +247,7 @@ export default function Worksheet() {
   const gradeRefreshTimerRef = useRef(null)
   const isMountedRef = useRef(true)
   const currentWorksheetIdRef = useRef(null)
+  const solutionRefreshRef = useRef(new Set())
   
   // support both /assignment/:id and /worksheet/:id routes
   // assignmentId will be used when backend is implemented
@@ -208,18 +427,95 @@ export default function Worksheet() {
     }, 250)
   }, [activeUserId, currentWorksheet?.id, refreshGradePercent])
 
+  const refreshQuestionSolutions = useCallback(async (assignmentId, questionId) => {
+    if (!assignmentId || !questionId || !activeUserId) return
+    if (solutionRefreshRef.current.has(questionId)) return
+    solutionRefreshRef.current.add(questionId)
+    try {
+      const response = await fetchJson(
+        `/api/assignments/${assignmentId}?userId=${activeUserId}`
+      )
+      const questions = response.questions || []
+      const assignmentInfo = response.assignment || { id: assignmentId }
+      const targetQuestion = questions.find((question) => (
+        Number(question?.id ?? question?.assignment_question_id) === Number(questionId)
+      ))
+      if (!targetQuestion) {
+        solutionRefreshRef.current.delete(questionId)
+        return
+      }
+      setWorksheets((prev) => (
+        prev.map((worksheet) => {
+          if (worksheet.id !== assignmentId) return worksheet
+          const nextProofs = worksheet.proofs.map((proof, idx) => {
+            if (Number(proof.questionId) !== Number(questionId)) return proof
+            const updated = mapQuestionToProof(targetQuestion, assignmentInfo, idx)
+            return {
+              ...proof,
+              ...updated,
+              attemptCount: proof.attemptCount,
+              attemptLimit: updated.attemptLimit ?? proof.attemptLimit,
+            }
+          })
+          return { ...worksheet, proofs: nextProofs }
+        })
+      ))
+    } catch (err) {
+      solutionRefreshRef.current.delete(questionId)
+    }
+  }, [activeUserId])
+
   useEffect(() => {
     refreshGradePercent()
   }, [refreshGradePercent])
 
   useEffect(() => {
     if (typeof window === 'undefined') return
-    const handleSubmission = () => {
+    const handleSubmission = (event) => {
+      const detail = event?.detail || {}
+      const questionId = Number(detail.assignmentQuestionId)
+      const attempt = Number(detail.attempt)
+      const attemptLimit = Number(detail.attemptLimit)
+      const reachedLimit = Number.isFinite(attempt) && Number.isFinite(attemptLimit)
+        && attempt >= attemptLimit
+      if (Number.isFinite(questionId)) {
+        // sync attempts
+        setWorksheets((prev) => {
+          let didUpdate = false
+          const next = prev.map((worksheet) => {
+            let proofUpdated = false
+            const nextProofs = worksheet.proofs.map((proof) => {
+              if (proof.questionId !== questionId) return proof
+              const attemptCount = Number.isFinite(detail.attempt)
+                ? detail.attempt
+                : (proof.attemptCount ?? 0) + 1
+              const attemptLimit = Number.isFinite(detail.attemptLimit)
+                ? detail.attemptLimit
+                : proof.attemptLimit
+              if (attemptCount === proof.attemptCount && attemptLimit === proof.attemptLimit) {
+                return proof
+              }
+              proofUpdated = true
+              return { ...proof, attemptCount, attemptLimit }
+            })
+            if (!proofUpdated) return worksheet
+            didUpdate = true
+            return { ...worksheet, proofs: nextProofs }
+          })
+          return didUpdate ? next : prev
+        })
+      }
+      if (reachedLimit && Number.isFinite(questionId)) {
+        const assignmentId = currentWorksheetIdRef.current
+        if (assignmentId) {
+          refreshQuestionSolutions(assignmentId, questionId)
+        }
+      }
       scheduleGradeRefresh()
     }
     window.addEventListener('assignment-submission', handleSubmission)
     return () => window.removeEventListener('assignment-submission', handleSubmission)
-  }, [scheduleGradeRefresh])
+  }, [refreshQuestionSolutions, scheduleGradeRefresh])
 
   useEffect(() => {
     return () => {
@@ -232,224 +528,6 @@ export default function Worksheet() {
 
   useEffect(() => {
     let isMounted = true
-
-    const normalizeType = (snapshot) => (
-      snapshot?.type || snapshot?.problemType || snapshot?.logic_problem_type || 'derivation'
-    )
-
-    const mapQuestionToProof = (question, assignment, index) => {
-      const snapshot = question?.question_snapshot || {}
-      const type = normalizeType(snapshot)
-      const description = snapshot.prompt || snapshot.description || snapshot.text || 'Solve.'
-      const questionId = question?.id ?? question?.assignment_question_id ?? question?.assignmentQuestionId ?? null
-      const proofId = `${assignment.id}-${questionId ?? index}`
-      const solution = snapshot.solution
-      const attemptLimit = question?.attempt_limit ?? 3
-      const legend = snapshot.legend || snapshot.legend_text || snapshot.legendText || ''
-      const proofBase = {
-        id: proofId,
-        questionId,
-        description,
-        solution,
-        attemptLimit,
-        legend,
-      }
-
-      if (type === 'derivation' || type === 'derivation-hurley') {
-        return {
-          ...proofBase,
-          type: 'derivation',
-          premises: snapshot.prems || snapshot.premises || [],
-          conclusion: snapshot.conc || snapshot.conclusion || '',
-        }
-      }
-
-      if (type === 'truth-table') {
-        const ttOptions = snapshot.options || snapshot.truthTable?.options || {}
-        const ttSnapshot = snapshot.truthTable || {}
-        const ttKind = ttSnapshot.kind || snapshot.truthTable?.kind || 'formula'
-        return {
-          ...proofBase,
-          type: 'truth-table',
-          options: ttOptions,
-          truthTable: {
-            ...ttSnapshot,
-            kind: ttKind,
-            statement: ttSnapshot.statement ?? snapshot.statement ?? snapshot.formula ?? '',
-            options: ttOptions,
-          },
-        }
-      }
-
-      if (type === 'symbolic-translation') {
-        return {
-          ...proofBase,
-          type: 'symbolic-translation',
-          translation: {
-            legend: snapshot.legend || '',
-            prompt: snapshot.prompt || snapshot.statement || snapshot.question || '',
-            symbolizationKey: snapshot.symbolizationKey || snapshot.symbolization_key || [],
-            options: snapshot.options || {},
-          },
-          answer: snapshot.answer,
-        }
-      }
-
-      if (type === 'multiple-choice') {
-        const subquestions = snapshot.subquestions || snapshot.questions || []
-        const hasSubquestions = Array.isArray(subquestions) && subquestions.length > 0
-        const baseMultipleChoice = snapshot.multipleChoice || {
-          prompt: snapshot.prompt || '',
-          choices: snapshot.choices || [],
-        }
-        const normalizedMultipleChoice = {
-          ...baseMultipleChoice,
-          subquestions: baseMultipleChoice.subquestions || subquestions,
-        }
-        return {
-          ...proofBase,
-          type: 'multiple-choice',
-          multipleChoice: normalizedMultipleChoice,
-          answer: hasSubquestions ? null : (snapshot.answerIndices ?? snapshot.answerIndex ?? snapshot.answer),
-        }
-      }
-
-      if (type === 'indirect-truth-table') {
-        const snapshotQuestions = snapshot.questions || snapshot.subquestions || []
-        const choiceList = Array.isArray(snapshot.choices) ? snapshot.choices : []
-        const questions = Array.isArray(snapshotQuestions) && snapshotQuestions.length > 0
-          ? snapshotQuestions
-          : (choiceList.length > 0
-            ? [{
-                prompt: snapshot.choicePrompt || snapshot.question || '',
-                choices: choiceList,
-                answerIndex: snapshot.answerIndex ?? snapshot.answer ?? (Array.isArray(snapshot.answerIndices) ? snapshot.answerIndices[0] : undefined),
-              }]
-            : [])
-        const derivedAnswer = questions.length
-          ? questions.map((q) => q.answerIndex ?? q.answer ?? q.correctIndex)
-          : (snapshot.answerIndex ?? snapshot.answer ?? snapshot.answerIndices)
-        return {
-          ...proofBase,
-          type: 'indirect-truth-table',
-          answer: derivedAnswer,
-          indirectTruthTable: {
-            prompt: snapshot.prompt || '',
-            argument: snapshot.argument || {},
-            questions,
-            subquestions: questions,
-            choices: choiceList,
-            sandbox: snapshot.sandbox || {},
-          },
-        }
-      }
-
-      if (type === 'true-false') {
-        return {
-          ...proofBase,
-          type: 'true-false',
-          trueFalse: snapshot.trueFalse || {
-            prompt: snapshot.prompt || snapshot.statement || '',
-          },
-          answer: snapshot.answer,
-        }
-      }
-
-      if (type === 'evaluate-truth') {
-        return {
-          ...proofBase,
-          type: 'evaluate-truth',
-          evaluateTruth: snapshot.statement || snapshot.evaluateTruth || snapshot.prompt || '',
-          answer: snapshot.answer,
-        }
-      }
-
-      /*
-      if (type === 'valid-correct-sound') {
-        return {
-          ...proofBase,
-          type: 'valid-correct-sound',
-          premises: snapshot.prems || snapshot.premises || [],
-          conclusion: snapshot.conc || snapshot.conclusion || '',
-          answer: snapshot.answer,
-        }
-      }
-      */
-
-      if (type === 'single-row-truth-table') {
-        return {
-          ...proofBase,
-          type: 'single-row-truth-table',
-          singleRowTruthTable: {
-            statement: snapshot.statement || snapshot.evaluateTruth || snapshot.prompt || '',
-            interpretation: snapshot.interpretation || {},
-            prompt: snapshot.prompt || snapshot.description || '',
-          },
-        }
-      }
-
-      if (type === 'partial-truth-table') {
-        return {
-          ...proofBase,
-          type: 'partial-truth-table',
-          partialTruthTable: snapshot,
-        }
-      }
-
-      if (type === 'combo-translation-truth-table') {
-        return {
-          ...proofBase,
-          description: '',
-          type: 'combo-translation-truth-table',
-          answer: snapshot.answer,
-          options: snapshot.options,
-          comboTranslationTruthTable: snapshot,
-        }
-      }
-
-      if (type === 'combo-translation-derivation') {
-        return {
-          ...proofBase,
-          description: '',
-          type: 'combo-translation-derivation',
-          answer: snapshot.answer,
-          options: snapshot.options,
-          comboTranslationDerivation: snapshot,
-        }
-      }
-
-      return {
-        ...proofBase,
-        type,
-      }
-    }
-
-    const toSymbol = (value) => (value === true ? 'T' : value === false ? 'F' : '')
-    const buildTruthTableState = (lefts, right, data) => {
-      const mapRows = (rows = []) => rows.map((row) => row.map(toSymbol))
-      const state = ({
-        tables: [
-          ...lefts.map((table) => ({ rows: mapRows(table.rows) })),
-          { rows: mapRows(right.rows) }
-        ]
-      })
-      if (Array.isArray(data?.mcans)) {
-        state.mcans = data.mcans
-      }
-      if (data?.taut !== undefined) {
-        state.taut = data.taut
-      }
-      if (data?.contra !== undefined) {
-        state.contra = data.contra
-      }
-      if (data?.valid !== undefined) {
-        state.valid = data.valid
-      }
-      if (data?.equiv !== undefined) {
-        state.equiv = data.equiv
-      }
-      return state
-    }
 
     const loadSavedStates = async (worksheetData) => {
       const questionIds = new Set()
