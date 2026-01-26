@@ -1,5 +1,4 @@
-import { Box, Typography, IconButton, Chip, Stack, FormControl, Select, MenuItem } from '@mui/material'
-import CheckCircleIcon from '@mui/icons-material/CheckCircle'
+import { Box, Typography, IconButton, Chip } from '@mui/material'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import RulesReference from '../ui/RulesReference.jsx'
 
@@ -9,19 +8,8 @@ export default function Layout({
   children, 
   inModal = false,
   onBackToLMS,
-  worksheets,
-  currentWorksheetIndex,
-  onWorksheetIndexChange,
-  completedProofs,
   isOverdue,
 }) {
-  const showWorksheetSelect = Array.isArray(worksheets) && worksheets.length > 1
-  const completedSet = completedProofs ?? new Set()
-  // guard bad index
-  const activeIndex = Number.isFinite(currentWorksheetIndex) && currentWorksheetIndex >= 0
-    ? currentWorksheetIndex
-    : 0
-
   return (
     <Box sx={{ width: '100%', height: '100%' }}>
       {!inModal && <RulesReference />}
@@ -61,53 +49,16 @@ export default function Layout({
           </Box>
         </Box>
 
-        {(isOverdue || showWorksheetSelect) && (
-          <Stack
-            direction={{ xs: 'column', sm: 'row' }}
-            spacing={2}
-            sx={{ alignItems: { xs: 'stretch', sm: 'center' }, mb: 2 }}
-          >
-            {isOverdue && (
-              <Chip
-                label="Past due"
-                color="error"
-                size="small"
-                sx={{ fontWeight: 600, height: 28 }}
-              />
-            )}
-            {showWorksheetSelect && (
-              <FormControl
-                size="small"
-                sx={{ minWidth: { xs: '100%', sm: 240 }, width: { xs: '100%', sm: 'auto' } }}
-              >
-                <Select
-                  value={activeIndex}
-                  onChange={(event) => onWorksheetIndexChange?.(event.target.value)}
-                  displayEmpty
-                  sx={{ textTransform: 'none' }}
-                >
-                  {worksheets.map((worksheet, idx) => {
-                    // show done mark
-                    const worksheetCompleted = worksheet.proofs?.length
-                      ? worksheet.proofs.every((p) => completedSet.has(p.id))
-                      : false
-                    return (
-                      <MenuItem key={worksheet.id} value={idx}>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, width: '100%' }}>
-                          <Typography variant="body2" sx={{ flex: 1 }}>
-                            {worksheet.title || `Assignment ${idx + 1}`}
-                          </Typography>
-                          {worksheetCompleted && (
-                            <CheckCircleIcon sx={{ color: 'success.main', fontSize: 16 }} />
-                          )}
-                        </Box>
-                      </MenuItem>
-                    )
-                  })}
-                </Select>
-              </FormControl>
-            )}
-          </Stack>
+        {isOverdue && (
+          <Box sx={{ mb: 2 }}>
+            {/* past due only */}
+            <Chip
+              label="Past due"
+              color="error"
+              size="small"
+              sx={{ fontWeight: 600, height: 28 }}
+            />
+          </Box>
         )}
       </Box>
 
