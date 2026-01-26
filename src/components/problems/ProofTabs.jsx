@@ -21,7 +21,8 @@ function TabPanel(props) {
         width: '100%', 
         minWidth: 0,
         position: 'relative',
-        overflow: isMobile ? 'visible' : 'hidden',
+        overflowX: 'hidden',
+        overflowY: 'visible',
       }}
       {...other}
     >
@@ -33,9 +34,12 @@ function TabPanel(props) {
             pr: { xs: 0, md: 3 }, 
             pt: { xs: 2, md: 0 }, 
             pb: 0, 
-            overflowX: 'auto', 
+            overflowX: 'auto',
+            overflowY: 'visible',
             minWidth: 0, 
             width: '100%',
+            maxWidth: '100%',
+            WebkitOverflowScrolling: 'touch',
           }}
         >
           {children}
@@ -106,7 +110,7 @@ export default function ProofTabs({
   }, [currentProofIndex])
   
   return (
-    <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: { xs: 'column', md: 'row' }, mt: 0, minWidth: 0 }}>
+    <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: { xs: 'column', md: 'row' }, mt: 0, minWidth: 0, maxWidth: '100%' }}>
       <Box sx={{ 
         display: 'flex', 
         flexDirection: 'column',

@@ -96,13 +96,13 @@ export default function AppLayout({ children }) {
   };
 
   return (
-    <Box sx={{ display: "flex", minHeight: "100vh" }}>
+    <Box sx={{ display: "flex", minHeight: "100vh", minWidth: 0 }}>
       <Sidebar
         structure={sidebarStructure}
         location={location}
         onSignOut={handleSignOut}
       />
-      <Box sx={{ display: "flex", flexDirection: "column", flexGrow: 1 }}>
+      <Box sx={{ display: "flex", flexDirection: "column", flexGrow: 1, minWidth: 0 }}>
         <Header />
         <Box
           component="main"
@@ -113,6 +113,8 @@ export default function AppLayout({ children }) {
             backgroundColor: "background.default",
             minHeight: "100vh",
             overflow: "auto",
+            overflowX: "hidden",
+            minWidth: 0,
           }}
         >
           {showToolbar && <Toolbar />}

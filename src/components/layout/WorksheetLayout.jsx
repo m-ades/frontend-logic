@@ -11,7 +11,7 @@ export default function Layout({
   isOverdue,
 }) {
   return (
-    <Box sx={{ width: '100%', height: '100%' }}>
+    <Box sx={{ width: '100%', height: '100%', minWidth: 0, overflowX: 'hidden' }}>
       {!inModal && <RulesReference />}
 
       <Box sx={{ mb: { xs: 3, md: 4 } }}>
@@ -51,7 +51,7 @@ export default function Layout({
 
       </Box>
 
-      <Box sx={{ p: { xs: 2, sm: 3 } }}>
+      <Box sx={{ p: { xs: 1, sm: 2, md: 3 }, minWidth: 0, maxWidth: '100%', overflowX: 'hidden' }}>
         {/* single surface */}
         {children}
       </Box>

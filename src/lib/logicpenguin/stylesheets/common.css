@@ -52,6 +52,11 @@
   color: var(--lpblack);
 }
 
+:where(.logicpenguin),
+:where(.logicpenguin) * {
+  box-sizing: border-box;
+}
+
 :where(.logicpenguin) .lp-problem-card {
   background-color: white;
   border-radius: 0.5rem;
@@ -63,6 +68,10 @@
   min-width: 0;
   margin: 0;
   box-sizing: border-box;
+  overflow-x: auto;
+  overflow-y: visible;
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
   overflow-wrap: break-word;
   word-wrap: break-word;
 }
@@ -151,6 +160,12 @@
     max-width: 100%;
     padding: 0.85rem;
     box-sizing: border-box;
+  }
+
+  :where(.logicpenguin) input.formulainput {
+    min-width: 0;
+    width: 100%;
+    max-width: 100%;
   }
 }
 
