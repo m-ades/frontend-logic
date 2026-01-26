@@ -102,6 +102,15 @@ export default function TrueFalse({
                 />
               </RadioGroup>
             </FormControl>
+            {/* show answer in card */}
+            <SolutionReveal show={showSolution}>
+              <FormControl component="fieldset" sx={{ width: '100%' }}>
+                <RadioGroup value={answer ? 'true' : 'false'} name={`${groupName}-reveal`}>
+                  <FormControlLabel value="true" control={<Radio disabled />} label="True" />
+                  <FormControlLabel value="false" control={<Radio disabled />} label="False" />
+                </RadioGroup>
+              </FormControl>
+            </SolutionReveal>
           </Stack>
         </Box>
       </Box>
@@ -126,14 +135,6 @@ export default function TrueFalse({
           attemptLimit={maxAttempts}
         />
       )}
-      <SolutionReveal show={showSolution}>
-        <FormControl component="fieldset" sx={{ width: '100%' }}>
-          <RadioGroup value={answer ? 'true' : 'false'} name={`${groupName}-reveal`}>
-            <FormControlLabel value="true" control={<Radio disabled />} label="True" />
-            <FormControlLabel value="false" control={<Radio disabled />} label="False" />
-          </RadioGroup>
-        </FormControl>
-      </SolutionReveal>
     </Stack>
   )
 }

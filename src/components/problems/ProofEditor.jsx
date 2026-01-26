@@ -164,6 +164,11 @@ export default function ProofEditor({ proof, onProofComplete, savedState, onStat
                 attemptLimit={attemptLimit}
               />
             </div>
+            {/* show answer in card */}
+            <SolutionReveal
+              solution={proof.solution}
+              show={hasAttempts && attemptCount >= attemptLimit}
+            />
           </Stack>
         </Box>
       </Box>
@@ -176,10 +181,6 @@ export default function ProofEditor({ proof, onProofComplete, savedState, onStat
         align="flex-start"
         attemptCount={attemptCount}
         attemptLimit={attemptLimit}
-      />
-      <SolutionReveal
-        solution={proof.solution}
-        show={hasAttempts && attemptCount >= attemptLimit}
       />
     </Stack>
   )

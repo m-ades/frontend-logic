@@ -231,6 +231,17 @@ export default function SymbolicTranslation({
                 formulaInputRef={formulaInputRef}
               />
             </Box>
+            {!suppressReveal && (
+              /* show answer in card */
+              <SolutionReveal show={showSolution}>
+                <FormulaInputField
+                  value={answer ?? ''}
+                  onValueChange={null}
+                  fieldReadOnly
+                  formulaInputRef={solutionInputRef}
+                />
+              </SolutionReveal>
+            )}
           </Stack>
         </Box>
       </Box>
@@ -254,16 +265,6 @@ export default function SymbolicTranslation({
           attemptCount={attemptCount}
           attemptLimit={maxAttempts}
         />
-      )}
-      {!suppressReveal && (
-        <SolutionReveal show={showSolution}>
-          <FormulaInputField
-            value={answer ?? ''}
-            onValueChange={null}
-            fieldReadOnly
-            formulaInputRef={solutionInputRef}
-          />
-        </SolutionReveal>
       )}
     </Stack>
   )

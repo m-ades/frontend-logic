@@ -268,24 +268,13 @@ export default function SingleRowTruthTable({
     </Box>
   )
 
-  const renderAnswerCard = (title, body) => (
-    <Box className="logicpenguin" sx={{ width: '100%', flexGrow: 1 }}>
-      <Box
-        sx={{
-          mt: 1,
-          overflow: 'visible',
-          minHeight: '260px',
-          flexGrow: 1,
-          alignSelf: { xs: 'stretch', md: 'flex-start' },
-        }}
-        className="lp-problem-card"
-      >
-        <Stack spacing={3} sx={{ p: { xs: 2, md: 2 } }}>
-          <Typography variant="h6" sx={{ fontWeight: 600, color: '#2f6bff' }}>
-            {title}
-          </Typography>
-          {body}
-        </Stack>
+  const renderAnswerBlock = (title, body) => (
+    <Box sx={{ mt: 2 }}>
+      <Typography variant="h6" sx={{ fontWeight: 600, color: '#2f6bff' }}>
+        {title}
+      </Typography>
+      <Box sx={{ mt: 2 }}>
+        {body}
       </Box>
     </Box>
   )
@@ -341,6 +330,41 @@ export default function SingleRowTruthTable({
                 </Select>
               </FormControl>
             </Stack>
+            {isLocked && expectedRow.length > 0 && (
+              /* show answer in card */
+              renderAnswerBlock(
+                'Correct Answer',
+                <Stack spacing={2}>
+                  {renderTableSet([expectedRow], [expectedRow], true)}
+                  <Stack direction="row" spacing={1.5} alignItems="center">
+                    <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                      Truth value of compound statement:
+                    </Typography>
+                    <FormControl size="small" sx={{ minWidth: 110 }}>
+                      <Select
+                        value={expectedCompound}
+                        displayEmpty
+                        inputProps={{ 'aria-label': 'Truth value of compound statement (answer)' }}
+                        disabled
+                        sx={{
+                          borderRadius: 0,
+                          '& .MuiOutlinedInput-notchedOutline': { borderRadius: 0 },
+                        }}
+                      >
+                        <MenuItem value="">
+                          <em>Select</em>
+                        </MenuItem>
+                        {compoundOptions.map((option) => (
+                          <MenuItem key={option.value} value={option.value}>
+                            {option.label}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  </Stack>
+                </Stack>
+              )
+            )}
           </Stack>
         </Box>
       </Box>
@@ -376,39 +400,6 @@ export default function SingleRowTruthTable({
           attemptCount={attemptCount}
           attemptLimit={maxAttempts}
         />
-      )}
-
-      {isLocked && expectedRow.length > 0 && renderAnswerCard(
-        'Correct Answer',
-        <Stack spacing={2}>
-          {renderTableSet([expectedRow], [expectedRow], true)}
-          <Stack direction="row" spacing={1.5} alignItems="center">
-            <Typography variant="body2" sx={{ fontWeight: 600 }}>
-              Truth value of compound statement:
-            </Typography>
-            <FormControl size="small" sx={{ minWidth: 110 }}>
-              <Select
-                value={expectedCompound}
-                displayEmpty
-                inputProps={{ 'aria-label': 'Truth value of compound statement (answer)' }}
-                disabled
-                sx={{
-                  borderRadius: 0,
-                  '& .MuiOutlinedInput-notchedOutline': { borderRadius: 0 },
-                }}
-              >
-                <MenuItem value="">
-                  <em>Select</em>
-                </MenuItem>
-                {compoundOptions.map((option) => (
-                  <MenuItem key={option.value} value={option.value}>
-                    {option.label}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </Stack>
-        </Stack>
       )}
     </Stack>
   )

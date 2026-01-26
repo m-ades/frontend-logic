@@ -340,6 +340,90 @@ export default function MultipleChoice({
                 )}
               </FormControl>
             )}
+            {!suppressReveal && (
+              /* show answer in card */
+              <SolutionReveal show={showSolution}>
+                {isComposite ? (
+                  <Stack spacing={3}>
+                    {subquestions.map((subq, subIdx) => {
+                      const choices = isTrueFalseSubq(subq)
+                        ? (subq?.choices?.length ? subq.choices : defaultTrueFalseChoices)
+                        : (subq?.choices || [])
+                      const isMulti = isMultiSelectSubq(subq)
+                      const expected = isMulti
+                        ? (Array.isArray(subq.answerIndices) ? subq.answerIndices : [])
+                        : (Number.isFinite(subq.answerIndex) ? subq.answerIndex : null)
+                      return (
+                        <Box key={`solution-${subIdx}`}>
+                          <RichText content={subq?.prompt} variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }} />
+                          <FormControl component="fieldset" sx={{ width: '100%' }}>
+                            {isMulti ? (
+                              <FormGroup>
+                                {choices.map((choice, index) => (
+                                  <FormControlLabel
+                                    key={`${subIdx}-${index}`}
+                                    control={<Checkbox checked={expected?.includes(index)} disabled />}
+                                    label={choice}
+                                    sx={multiSelectLabelSx}
+                                  />
+                                ))}
+                              </FormGroup>
+                            ) : (
+                              <RadioGroup value={expected === null ? '' : String(expected)} name={`${groupBase}-reveal-${subIdx}`}>
+                                {choices.map((choice, index) => (
+                                  <FormControlLabel
+                                    key={`${subIdx}-${index}`}
+                                    value={String(index)}
+                                    control={<Radio disabled />}
+                                    label={choice}
+                                    sx={{
+                                      mb: 1,
+                                      '& .MuiFormControlLabel-label': { fontSize: '1rem' }
+                                    }}
+                                  />
+                                ))}
+                              </RadioGroup>
+                            )}
+                          </FormControl>
+                        </Box>
+                      )
+                    })}
+                  </Stack>
+                ) : (
+                  <FormControl component="fieldset" sx={{ width: '100%' }}>
+                    {isMultiSelect ? (
+                      <FormGroup>
+                        {problem.choices.map((choice, index) => (
+                          <FormControlLabel
+                            key={`${choice}-${index}`}
+                            control={<Checkbox checked={Array.isArray(answer) && answer.includes(index)} disabled />}
+                            label={choice}
+                            sx={multiSelectLabelSx}
+                          />
+                        ))}
+                      </FormGroup>
+                    ) : (
+                      <RadioGroup value={String(answer ?? '')} name={`${groupBase}-reveal`}>
+                        {problem.choices.map((choice, index) => (
+                          <FormControlLabel
+                            key={`${choice}-${index}`}
+                            value={String(index)}
+                            control={<Radio disabled />}
+                            label={choice}
+                            sx={{
+                              mb: 1,
+                              '& .MuiFormControlLabel-label': {
+                                fontSize: '1rem'
+                              }
+                            }}
+                          />
+                        ))}
+                      </RadioGroup>
+                    )}
+                  </FormControl>
+                )}
+              </SolutionReveal>
+            )}
           </Stack>
         </Box>
       </Box>
@@ -363,89 +447,6 @@ export default function MultipleChoice({
           attemptCount={attemptCount}
           attemptLimit={maxAttempts}
         />
-      )}
-      {!suppressReveal && (
-        <SolutionReveal show={showSolution}>
-          {isComposite ? (
-            <Stack spacing={3}>
-              {subquestions.map((subq, subIdx) => {
-                const choices = isTrueFalseSubq(subq)
-                  ? (subq?.choices?.length ? subq.choices : defaultTrueFalseChoices)
-                  : (subq?.choices || [])
-                const isMulti = isMultiSelectSubq(subq)
-                const expected = isMulti
-                  ? (Array.isArray(subq.answerIndices) ? subq.answerIndices : [])
-                  : (Number.isFinite(subq.answerIndex) ? subq.answerIndex : null)
-                return (
-                  <Box key={`solution-${subIdx}`}>
-                    <RichText content={subq?.prompt} variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }} />
-                    <FormControl component="fieldset" sx={{ width: '100%' }}>
-                      {isMulti ? (
-                        <FormGroup>
-                          {choices.map((choice, index) => (
-                            <FormControlLabel
-                              key={`${subIdx}-${index}`}
-                              control={<Checkbox checked={expected?.includes(index)} disabled />}
-                              label={choice}
-                              sx={multiSelectLabelSx}
-                            />
-                          ))}
-                        </FormGroup>
-                      ) : (
-                        <RadioGroup value={expected === null ? '' : String(expected)} name={`${groupBase}-reveal-${subIdx}`}>
-                          {choices.map((choice, index) => (
-                            <FormControlLabel
-                              key={`${subIdx}-${index}`}
-                              value={String(index)}
-                              control={<Radio disabled />}
-                              label={choice}
-                              sx={{
-                                mb: 1,
-                                '& .MuiFormControlLabel-label': { fontSize: '1rem' }
-                              }}
-                            />
-                          ))}
-                        </RadioGroup>
-                      )}
-                    </FormControl>
-                  </Box>
-                )
-              })}
-            </Stack>
-          ) : (
-            <FormControl component="fieldset" sx={{ width: '100%' }}>
-              {isMultiSelect ? (
-                <FormGroup>
-                  {problem.choices.map((choice, index) => (
-                    <FormControlLabel
-                      key={`${choice}-${index}`}
-                      control={<Checkbox checked={Array.isArray(answer) && answer.includes(index)} disabled />}
-                      label={choice}
-                      sx={multiSelectLabelSx}
-                    />
-                  ))}
-                </FormGroup>
-              ) : (
-                <RadioGroup value={String(answer ?? '')} name={`${groupBase}-reveal`}>
-                  {problem.choices.map((choice, index) => (
-                    <FormControlLabel
-                      key={`${choice}-${index}`}
-                      value={String(index)}
-                      control={<Radio disabled />}
-                      label={choice}
-                      sx={{
-                        mb: 1,
-                        '& .MuiFormControlLabel-label': {
-                          fontSize: '1rem'
-                        }
-                      }}
-                    />
-                  ))}
-                </RadioGroup>
-              )}
-            </FormControl>
-          )}
-        </SolutionReveal>
       )}
     </Stack>
   )

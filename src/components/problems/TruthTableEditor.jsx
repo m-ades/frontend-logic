@@ -697,24 +697,13 @@ export default function TruthTableEditor({
     )
   }
 
-  const renderAnswerCard = (title, body) => (
-    <Box className="logicpenguin" sx={{ width: '100%', flexGrow: 1 }}>
-      <Box
-        sx={{
-          mt: 1,
-          overflow: 'visible',
-          minHeight: '420px',
-          flexGrow: 1,
-          alignSelf: { xs: 'stretch', md: 'flex-start' },
-        }}
-        className="lp-problem-card"
-      >
-        <Stack spacing={3} sx={{ p: { xs: 2, md: 2 } }}>
-          <Typography variant="h6" sx={{ fontWeight: 600, color: '#2f6bff' }}>
-            {title}
-          </Typography>
-          {body}
-        </Stack>
+  const renderAnswerBlock = (title, body) => (
+    <Box sx={{ mt: 2 }}>
+      <Typography variant="h6" sx={{ fontWeight: 600, color: '#2f6bff' }}>
+        {title}
+      </Typography>
+      <Box sx={{ mt: 2 }}>
+        {body}
       </Box>
     </Box>
   )
@@ -797,6 +786,20 @@ export default function TruthTableEditor({
             </FormControl>
           </Box>
         )}
+        {!hideActions && !suppressReveal && showSolution && (
+          /* show answer in card */
+          renderAnswerBlock(
+            'Correct Answer',
+            renderTableSet(
+              solutionTables,
+              solutionTables.map((table) => table.rows),
+              solutionTables.length > 1,
+              true,
+              null,
+              kind === 'argument'
+            )
+          )
+        )}
       </Stack>
     </Box>
   )
@@ -842,17 +845,6 @@ export default function TruthTableEditor({
           attemptCount={attemptCount}
           attemptLimit={attemptLimit}
         />
-      )}
-      {!hideActions && !suppressReveal && showSolution && renderAnswerCard(
-        'Correct Answer',
-        renderTableSet(
-          solutionTables,
-          solutionTables.map((table) => table.rows),
-          solutionTables.length > 1,
-          true,
-          null,
-          kind === 'argument'
-        )
       )}
     </Stack>
   )
