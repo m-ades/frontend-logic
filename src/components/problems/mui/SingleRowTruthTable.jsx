@@ -285,6 +285,10 @@ export default function SingleRowTruthTable({
 
   const tableRows = [rowInputs]
   const tableFilled = rowInputs.length > 0 && !isDisabled()
+  const isCurrentlyCorrect = tableFilled &&
+    rowInputs.length === expectedRow.length &&
+    rowInputs.every((cell, idx) => cell === expectedRow[idx]) &&
+    compoundInput === expectedCompound
 
   return (
     <Stack spacing={3} sx={{ px: 0, width: '100%', alignItems: 'stretch', flexGrow: 1 }}>
@@ -344,7 +348,7 @@ export default function SingleRowTruthTable({
                       <Select
                         value={expectedCompound}
                         displayEmpty
-                        inputProps={{ 'aria-label': 'Truth value of compound statement (answer)' }}
+                        inputProps={{ 'aria-label': 'Truth value (answer)' }}
                         disabled
                         sx={{
                           borderRadius: 0,
@@ -365,22 +369,23 @@ export default function SingleRowTruthTable({
                 </Stack>
               )
             )}
+            <Typography
+              variant="body2"
+              sx={{
+                color: '#2f6bff',
+                fontFamily: 'inherit',
+                fontWeight: 400,
+              }}
+            >
+              {status === 'correct' || isCurrentlyCorrect
+                ? 'Answer looks good.'
+                : tableFilled
+                  ? 'Recheck your truth values.'
+                  : 'Click cells to toggle truth values - fill in every cell to finish.'}
+            </Typography>
           </Stack>
         </Box>
       </Box>
-      <Typography
-        variant="body2"
-        sx={{
-          color: status === 'correct' ? '#76b947' : tableFilled ? '#d58b00' : '#2f6bff',
-          fontWeight: tableFilled ? 600 : 500,
-        }}
-      >
-        {status === 'correct'
-          ? 'Answer matches!'
-          : tableFilled
-            ? 'Row and compound filled. Check your values.'
-            : 'Complete every cell and the compound value to finish.'}
-      </Typography>
       {message && (
         <Alert
           severity={getStatusColor()}

@@ -5,6 +5,7 @@ import CancelIcon from '@mui/icons-material/Cancel'
 import ProofEditor from './ProofEditor.jsx'
 import LogicPenguinProblem from './LogicPenguinProblem.jsx'
 import TruthTableEditor from './TruthTableEditor.jsx'
+import { ProblemNavigationContext } from './ProblemNavigationContext.jsx'
 
 function TabPanel(props) {
   const { children, value, index, direction, isMobile, ...other } = props;
@@ -234,71 +235,76 @@ export default function ProofTabs({
           </Box>
         )}
       </Box>
-        {proofs.map((proof, idx) => (
-        <TabPanel
-          key={proof.id}
-          value={currentProofIndex}
-          index={idx}
-          direction={direction}
-          isMobile={isMobile}
-        >
-          <Stack spacing={3} sx={{ minWidth: 0 }}>
-            <Box sx={{ minWidth: 0 }}>
-              <div ref={el => { if (el) proofRefs.current[proof.id] = el }}>
-                {(() => {
-                  const savedState = getSavedProofState(proof.id)
-                  const shouldAttachAttempts = proof.type !== 'derivation' && proof.type !== 'derivation-hurley' && proof.type
-                  const savedStateWithAttempts = shouldAttachAttempts
-                    ? { ...(savedState || {}), attemptCount: proof.attemptCount ?? 0 }
-                    : savedState
-                  const isDerivation = proof.type === 'derivation' || proof.type === 'derivation-hurley' || !proof.type
+        {proofs.map((proof, idx) => {
+          const isLast = idx >= proofs.length - 1
+          const handleNext = isLast ? null : () => handleTabChange(null, idx + 1)
+          return (
+            <ProblemNavigationContext.Provider key={proof.id} value={{ onNext: handleNext }}>
+              <TabPanel
+                value={currentProofIndex}
+                index={idx}
+                direction={direction}
+                isMobile={isMobile}
+              >
+                <Stack spacing={3} sx={{ minWidth: 0 }}>
+                  <Box sx={{ minWidth: 0 }}>
+                    <div ref={el => { if (el) proofRefs.current[proof.id] = el }}>
+                      {(() => {
+                        const savedState = getSavedProofState(proof.id)
+                        const shouldAttachAttempts = proof.type !== 'derivation' && proof.type !== 'derivation-hurley' && proof.type
+                        const savedStateWithAttempts = shouldAttachAttempts
+                          ? { ...(savedState || {}), attemptCount: proof.attemptCount ?? 0 }
+                          : savedState
+                        const isDerivation = proof.type === 'derivation' || proof.type === 'derivation-hurley' || !proof.type
 
-                  if (proof.type === 'truth-table') {
-                    return (
-                      <TruthTableEditor
-                        proof={proof}
-                        savedState={savedStateWithAttempts}
-                        onStateChange={(state) => handleProofStateChange(proof.id, state, {
-                          assignmentQuestionId: proof.questionId
-                        })}
-                        onProofComplete={onProofComplete}
-                      />
-                    )
-                  }
+                        if (proof.type === 'truth-table') {
+                          return (
+                            <TruthTableEditor
+                              proof={proof}
+                              savedState={savedStateWithAttempts}
+                              onStateChange={(state) => handleProofStateChange(proof.id, state, {
+                                assignmentQuestionId: proof.questionId
+                              })}
+                              onProofComplete={onProofComplete}
+                            />
+                          )
+                        }
 
-                  if (isDerivation) {
-                    // only worksheets 14-16 and practice set (17) use derivation
-                    // default to derivation if type is not specified (backwards compatibility)
-                    return (
-                      <ProofEditor 
-                        key={`proof-${proof.id}`} 
-                        proof={proof} 
-                        onProofComplete={onProofComplete}
-                        savedState={savedStateWithAttempts}
-                        onStateChange={(state) => handleProofStateChange(proof.id, state, {
-                          assignmentQuestionId: proof.questionId
-                        })}
-                      />
-                    )
-                  }
+                        if (isDerivation) {
+                          // only worksheets 14-16 and practice set (17) use derivation
+                          // default to derivation if type is not specified (backwards compatibility)
+                          return (
+                            <ProofEditor 
+                              key={`proof-${proof.id}`} 
+                              proof={proof} 
+                              onProofComplete={onProofComplete}
+                              savedState={savedStateWithAttempts}
+                              onStateChange={(state) => handleProofStateChange(proof.id, state, {
+                                assignmentQuestionId: proof.questionId
+                              })}
+                            />
+                          )
+                        }
 
-                  return (
-                    <LogicPenguinProblem
-                      key={`proof-${proof.id}`}
-                      proof={proof}
-                      onProofComplete={onProofComplete}
-                      savedState={savedStateWithAttempts}
-                      onStateChange={(state) => handleProofStateChange(proof.id, state, {
-                        assignmentQuestionId: proof.questionId
-                      })}
-                    />
-                  )
-                })()}
-              </div>
-            </Box>
-          </Stack>
-        </TabPanel>
-      ))}
+                        return (
+                          <LogicPenguinProblem
+                            key={`proof-${proof.id}`}
+                            proof={proof}
+                            onProofComplete={onProofComplete}
+                            savedState={savedStateWithAttempts}
+                            onStateChange={(state) => handleProofStateChange(proof.id, state, {
+                              assignmentQuestionId: proof.questionId
+                            })}
+                          />
+                        )
+                      })()}
+                    </div>
+                  </Box>
+                </Stack>
+              </TabPanel>
+            </ProblemNavigationContext.Provider>
+          )
+        })}
     </Box>
   )
 }
