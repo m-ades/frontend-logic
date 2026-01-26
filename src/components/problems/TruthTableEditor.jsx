@@ -816,15 +816,16 @@ export default function TruthTableEditor({
       <Typography
         variant="body2"
         sx={{
-          color: tableCorrect ? '#2f6bff' : tableFilled ? '#d58b00' : '#2f6bff',
-          fontWeight: tableFilled ? 600 : 500,
+          color: '#2f6bff',
+          fontFamily: 'inherit',
+          fontWeight: 400,
         }}
       >
         {tableCorrect
-          ? 'All rows match.'
+          ? 'Answer looks good.'
           : tableFilled
-            ? 'Table filled. Check your rows.'
-            : 'Complete every cell to finish.'}
+            ? 'Recheck your rows.'
+            : 'Click cells to toggle truth values - fill in every cell to finish.'}
       </Typography>
       {message && (
         <Alert
