@@ -147,7 +147,7 @@ export default function Sidebar({ structure, location, onSignOut }) {
             letterSpacing: 1,
           }}
         >
-          {isSidebarOpened ? "LOGO" : "L"}
+          {isSidebarOpened ? "HuLA" : "H"}
         </Typography>
       </Box>
 
