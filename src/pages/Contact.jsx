@@ -315,7 +315,6 @@ export default function Contact({ isInstructorView = false }) {
         </>
       )}
 
-      {/* Add/Edit contact dialog */}
     </Box>
   )
 }

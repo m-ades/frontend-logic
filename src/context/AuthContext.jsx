@@ -1,5 +1,10 @@
 import { createContext, useContext, useReducer, useEffect } from "react";
-import { clearStoredUser, getStoredUser, setStoredUser } from "../utils/api.js";
+import {
+  clearStoredUser,
+  getStoredUser,
+  setStoredUser,
+  setUnauthorizedHandler,
+} from "../utils/api.js";
 import { normalizeRole } from "../utils/auth.js";
 
 const AuthStateContext = createContext();
@@ -46,6 +51,10 @@ export function AuthProvider({ children }) {
   const [state, dispatch] = useReducer(authReducer, initialState);
 
   useEffect(() => {
+    setUnauthorizedHandler(() => {
+      clearStoredUser();
+      dispatch({ type: "LOGOUT" });
+    });
     const storedUser = getStoredUser();
     if (storedUser) {
       const normalizedRole = normalizeRole(storedUser.role);
@@ -62,6 +71,7 @@ export function AuthProvider({ children }) {
     } else {
       dispatch({ type: "SET_LOADING", payload: false });
     }
+    return () => setUnauthorizedHandler(null);
   }, []);
 
   return (

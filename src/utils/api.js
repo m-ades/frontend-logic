@@ -1,5 +1,6 @@
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://backend-logic-production.up.railway.app';
 const USER_STORAGE_KEY = 'logicapp_current_user';
+let unauthorizedHandler = null;
 
 export const API_CONFIG = {
   baseUrl: API_BASE_URL.replace(/\/$/, ''),
@@ -46,6 +47,10 @@ export function clearStoredUser() {
   }
 }
 
+export function setUnauthorizedHandler(handler) {
+  unauthorizedHandler = handler;
+}
+
 export function getActiveUserId() {
   const storedUser = getStoredUser();
   return storedUser?.id ?? API_CONFIG.userId;
@@ -64,6 +69,18 @@ export async function fetchJson(path, options = {}) {
     credentials: options.credentials || 'include',
   });
   if (!res.ok) {
+    if (res.status === 401) {
+      try {
+        clearStoredUser();
+        if (typeof unauthorizedHandler === 'function') {
+          unauthorizedHandler();
+        } else if (typeof window !== 'undefined') {
+          window.location.href = '/login';
+        }
+      } catch (error) {
+        console.warn('Failed to handle unauthorized response', error);
+      }
+    }
     const text = await res.text();
     throw new Error(text || `Request failed: ${res.status}`);
   }

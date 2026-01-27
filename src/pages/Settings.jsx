@@ -320,7 +320,17 @@ export default function Settings() {
             <Divider />
             
             {submitSuccess && (
-              <Alert severity="success" sx={{ mb: 2 }}>
+              <Alert
+                severity="info"
+                sx={{
+                  mb: 2,
+                  bgcolor: "background.paper",
+                  color: "text.primary",
+                  border: "1px solid",
+                  borderColor: "primary.main",
+                  "& .MuiAlert-icon": { color: "primary.main" },
+                }}
+              >
                 Password changed successfully! (This is a demo — no actual change occurred)
               </Alert>
             )}

@@ -200,19 +200,6 @@ export default function Profile() {
           </Stack>
         </CardContent>
       </ThemedCard>
-
-      {/* Account Settings Card */}
-      <ThemedCard sx={{ mt: 3 }}>
-        <CardContent>
-          <Stack spacing={3}>
-            <Typography variant="h6">Account Settings</Typography>
-            <Divider />
-            <Button variant="outlined" color="primary">
-              Change Password
-            </Button>
-          </Stack>
-        </CardContent>
-      </ThemedCard>
     </Box>
   );
 }

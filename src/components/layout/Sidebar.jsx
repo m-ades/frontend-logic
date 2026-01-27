@@ -27,13 +27,12 @@ import {
   setSidebar,
 } from "../../context/LayoutContext.jsx";
 import { useAuthState } from "../../context/AuthContext.jsx";
-import { isInstructorRole } from "../../utils/auth.js";
 import SidebarLink from "./SidebarLink.jsx";
 import CourseSelector from "../ui/CourseSelector.jsx";
 
 const DRAWER_WIDTH = 240;
 
-export default function Sidebar({ structure, location, onSignOut }) {
+export default function Sidebar({ structure, location, onSignOut, onOpenSettings }) {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const { isSidebarOpened, sidebarHoverEnabled } = useLayoutState();
@@ -235,25 +234,22 @@ export default function Sidebar({ structure, location, onSignOut }) {
             anchorOrigin={{ vertical: "top", horizontal: "right" }}
             transformOrigin={{ vertical: "bottom", horizontal: "left" }}
           >
-            <MenuItem
-              onClick={() => {
-                // Navigate to profile page
-                window.location.href = isInstructorRole(user?.role)
-                  ? "/instructor/profile"
-                  : "/student/profile";
-                setProfileMenu(null);
-              }}
-            >
-              Profile & Preferences
-            </MenuItem>
-            <MenuItem
-              onClick={() => {
-                onSignOut?.();
-                setProfileMenu(null);
-              }}
-            >
-              Sign Out
-            </MenuItem>
+          <MenuItem
+            onClick={() => {
+              onOpenSettings?.();
+              setProfileMenu(null);
+            }}
+          >
+            Settings
+          </MenuItem>
+          <MenuItem
+            onClick={() => {
+              onSignOut?.();
+              setProfileMenu(null);
+            }}
+          >
+            Sign Out
+          </MenuItem>
           </Menu>
         </Box>
       </Box>
