@@ -368,8 +368,8 @@ a#lplogo:hover span {
   font-size: 1.15em;
 }
 
-:where(.logicpenguin) div + div,
-:where(.logicpenguin) div + p,
+:where(.logicpenguin) div:not(.instructions):not(.instruction) + div,
+:where(.logicpenguin) div:not(.instructions):not(.instruction) + p,
 :where(.logicpenguin) p + div,
 :where(.logicpenguin) p + p {
   margin-top: 1.5rem;

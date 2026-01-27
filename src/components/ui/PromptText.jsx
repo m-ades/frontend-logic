@@ -4,13 +4,13 @@ const promptSx = {
   fontSize: { xs: '0.95rem', md: '1rem' },
   lineHeight: 2,
   fontWeight: 400,
-  color: 'text.primary',
+  color: 'rgba(0, 0, 0, 0.87)',
   '& *': {
     fontSize: 'inherit !important',
     lineHeight: 'inherit',
     fontWeight: 'inherit !important',
     fontStyle: 'inherit !important',
-    color: 'inherit',
+    color: 'inherit !important',
   },
   '& p, & div': {
     margin: 0,
@@ -36,11 +36,11 @@ const promptSx = {
   },
   '& .instructions, & .instruction, & div.instructions, & div.instruction, & p.instructions, & p.instruction': {
     marginBottom: 0,
-    paddingBottom: '1.5rem !important',
+    paddingBottom: '0.5rem !important',
     display: 'block',
   },
   '& .instructions + *, & .instruction + *': {
-    marginTop: 0,
+    marginTop: '0 !important',
   },
   '& em, & i': {
     fontStyle: 'normal !important',
