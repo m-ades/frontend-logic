@@ -16,8 +16,10 @@ import {
   LocationOn as LocationIcon
 } from '@mui/icons-material'
 import { useState } from 'react'
+import { useTheme } from '@mui/material/styles'
 
 export default function Contact({ isInstructorView = false }) {
+  const theme = useTheme()
   // Mock contact data
   const [contacts, setContacts] = useState([
     {
@@ -105,7 +107,7 @@ export default function Contact({ isInstructorView = false }) {
                     sx={{
                       width: 90,
                       height: 90,
-                      bgcolor: '#1976d2',
+                      bgcolor: theme.palette.primary.main,
                       fontSize: '2rem',
                       fontWeight: 'bold'
                     }}
@@ -129,7 +131,7 @@ export default function Contact({ isInstructorView = false }) {
                       <Button
                         href={`mailto:${contact.email}`}
                         size="medium"
-                        startIcon={<EmailIcon />}
+                        startIcon={<EmailIcon sx={{ color: 'primary.main' }} />}
                         sx={{ 
                           textTransform: 'none', 
                           fontSize: '1rem',
@@ -181,7 +183,7 @@ export default function Contact({ isInstructorView = false }) {
                     variant="contained"
                     color="primary"
                     href={`mailto:${contact.email}`}
-                    startIcon={<EmailIcon />}
+                    startIcon={<EmailIcon sx={{ color: 'inherit' }} />}
                     size="large"
                     sx={{ 
                       minWidth: 180,
@@ -221,7 +223,7 @@ export default function Contact({ isInstructorView = false }) {
                       sx={{
                         width: 90,
                         height: 90,
-                        bgcolor: '#d32f2f',
+                        bgcolor: theme.palette.error.main,
                         fontSize: '2rem',
                         fontWeight: 'bold'
                       }}
@@ -245,7 +247,7 @@ export default function Contact({ isInstructorView = false }) {
                         <Button
                           href={`mailto:${contact.email}`}
                           size="medium"
-                          startIcon={<EmailIcon />}
+                          startIcon={<EmailIcon sx={{ color: 'error.main' }} />}
                           sx={{ 
                             textTransform: 'none', 
                             fontSize: '1rem',
@@ -297,7 +299,7 @@ export default function Contact({ isInstructorView = false }) {
                       variant="contained"
                       color="error"
                       href={`mailto:${contact.email}`}
-                      startIcon={<EmailIcon />}
+                      startIcon={<EmailIcon sx={{ color: 'inherit' }} />}
                       size="large"
                       sx={{ 
                         minWidth: 180,
