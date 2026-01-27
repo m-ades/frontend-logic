@@ -477,7 +477,7 @@ export default function AccountSettingsDialog({ open, onClose }) {
 
             <Box>
               <Typography variant="h6" sx={{ mb: 1 }}>
-                Log out of all devices
+                Log out of all devices to end active sessions
               </Typography>
               {logoutSuccess && (
                 <Alert severity="success" sx={{ mb: 2 }}>
@@ -489,10 +489,6 @@ export default function AccountSettingsDialog({ open, onClose }) {
                   {logoutError}
                 </Alert>
               )}
-              <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                Log out of all devices to end active sessions on other browsers or
-                devices.
-              </Typography>
               <Button
                 variant="outlined"
                 color="error"

@@ -3,6 +3,10 @@
   100% { transform: scale(1); }
 }
 
+html {
+  font-size: 80%;
+}
+
 html, body {
   overflow: auto;
   height: 100%;

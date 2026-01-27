@@ -517,7 +517,7 @@ export default function Settings() {
                 onClick={openAllLogoutDialog}
                 size="small"
               >
-                Log out all devices
+                Log out of all devices to end active sessions
               </Button>
             </Box>
             <Divider />
