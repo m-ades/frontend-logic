@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Alert, Box, Stack, Typography, FormControl, Select, MenuItem } from '@mui/material'
+import { useTheme } from '@mui/material/styles'
 import getFormulaClass from '../../../lib/logicpenguin/symbolic/formula.js'
 import getSyntax from '../../../lib/logicpenguin/symbolic/libsyntax.js'
 import { libtf } from '../../../lib/logicpenguin/symbolic/libsemantics.js'
@@ -8,6 +9,9 @@ import { useProblemChecker } from '../../../hooks/useProblemChecker.js'
 import PromptText from '../../ui/PromptText.jsx'
 
 function TruthToggle({ value, onChange, ariaLabel, accent, readOnly = false }) {
+  const theme = useTheme()
+  const isDark = theme.palette.mode === 'dark'
+  
   const cycleValue = (current) => {
     if (!current) return 'T'
     if (current === 'T') return 'F'
@@ -17,6 +21,13 @@ function TruthToggle({ value, onChange, ariaLabel, accent, readOnly = false }) {
   const handleClick = () => {
     if (readOnly) return
     onChange(cycleValue(value))
+  }
+
+  const getColor = () => {
+    if (value === 'T') return accent ? '#1e55ff' : '#2f6bff'
+    if (value === 'F') return '#b22'
+    if (accent) return '#2f6bff'
+    return isDark ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.25)'
   }
 
   return (
@@ -36,10 +47,7 @@ function TruthToggle({ value, onChange, ariaLabel, accent, readOnly = false }) {
       sx={{
         fontSize: '0.85rem',
         fontWeight: 700,
-        color: value === 'T' ? (accent ? '#1e55ff' : '#2f6bff')
-          : value === 'F'
-            ? '#b22'
-            : accent ? '#2f6bff' : 'rgba(0, 0, 0, 0.25)',
+        color: getColor(),
         cursor: 'pointer',
         textTransform: 'uppercase',
         letterSpacing: '0.12em',
@@ -52,7 +60,7 @@ function TruthToggle({ value, onChange, ariaLabel, accent, readOnly = false }) {
         backgroundColor: 'transparent',
         transition: 'color 0.15s ease',
         '&:hover': {
-          color: '#2f6bff',
+          color: isDark ? '#7b93ff' : '#2f6bff',
         },
         '&:focus-visible': {
           outline: '2px solid rgba(47, 107, 255, 0.6)',

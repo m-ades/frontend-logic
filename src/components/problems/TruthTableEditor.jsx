@@ -19,6 +19,7 @@ import {
   TableRow,
   Paper,
 } from '@mui/material'
+import { useTheme } from '@mui/material/styles'
 import getFormulaClass from '../../lib/logicpenguin/symbolic/formula.js'
 import getSyntax from '../../lib/logicpenguin/symbolic/libsyntax.js'
 import { multiTables } from '../../lib/logicpenguin/symbolic/libsemantics.js'
@@ -28,6 +29,9 @@ import { fetchJson, getActiveUserId } from '../../utils/api.js'
 import PromptText from '../ui/PromptText.jsx'
 
 function TruthToggle({ value, onChange, ariaLabel, accent, readOnly = false }) {
+  const theme = useTheme()
+  const isDark = theme.palette.mode === 'dark'
+  
   const cycleValue = (current) => {
     if (!current) return 'T'
     if (current === 'T') return 'F'
@@ -37,6 +41,14 @@ function TruthToggle({ value, onChange, ariaLabel, accent, readOnly = false }) {
   const handleClick = () => {
     if (readOnly) return
     onChange(cycleValue(value))
+  }
+
+  const getColor = () => {
+    if (value === 'T') return accent ? '#1e55ff' : '#2f6bff'
+    if (value === 'F') return '#b22'
+    // Empty/placeholder color - needs to be visible in both modes
+    if (accent) return '#2f6bff'
+    return isDark ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.25)'
   }
 
   return (
@@ -56,10 +68,7 @@ function TruthToggle({ value, onChange, ariaLabel, accent, readOnly = false }) {
       sx={{
         fontSize: '0.85rem',
         fontWeight: 700,
-        color: value === 'T' ? (accent ? '#1e55ff' : '#2f6bff')
-          : value === 'F'
-            ? '#b22'
-            : accent ? '#2f6bff' : 'rgba(0, 0, 0, 0.25)',
+        color: getColor(),
         cursor: 'pointer',
         textTransform: 'uppercase',
         letterSpacing: '0.12em',
@@ -72,7 +81,7 @@ function TruthToggle({ value, onChange, ariaLabel, accent, readOnly = false }) {
         backgroundColor: 'transparent',
         transition: 'color 0.15s ease',
         '&:hover': {
-          color: '#2f6bff',
+          color: isDark ? '#7b93ff' : '#2f6bff',
         },
         '&:focus-visible': {
           outline: '2px solid rgba(47, 107, 255, 0.6)',
@@ -568,11 +577,38 @@ export default function TruthTableEditor({
   }, [proof])
   const showSolution = attemptCount >= attemptLimit && solutionTables.length > 0
 
+  const theme = useTheme()
   const renderTableSet = (tablesToRender, tableInputsToRender, combined, readOnly, onCellChange, showConclusionMarker) => {
     if (combined) {
       const rowCount = tablesToRender[0]?.rows?.length || 0
       return (
-        <TableContainer component={Paper} className="tt-table-wrap" elevation={0}>
+        <TableContainer 
+          component={Paper} 
+          className="tt-table-wrap" 
+          elevation={0} 
+          sx={{ 
+            background: 'transparent', 
+            boxShadow: 'none !important',
+            '&.MuiPaper-root': {
+              boxShadow: 'none !important',
+            },
+            '& .MuiTable-root': {
+              background: 'transparent',
+              border: 'none',
+              boxShadow: 'none',
+            },
+            '& .MuiTableCell-root': {
+              color: 'text.primary',
+              borderColor: 'divider',
+            },
+            '& .MuiTableHead-root .MuiTableCell-root': {
+              backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.04)' : undefined,
+            },
+            '& .MuiTableRow-root:nth-of-type(even)': {
+              backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.02)' : undefined,
+            },
+          }}
+        >
           <Table className="tt-table">
             <TableHead className="tt-head">
               <TableRow className="tt-token-row">
@@ -583,7 +619,11 @@ export default function TruthTableEditor({
                   return (
                     <React.Fragment key={`solution-tokenfrag-${tableIndex}`}>
                       {isSeparator && (
-                        <TableCell className="tt-token tt-separator" align="center">
+                        <TableCell 
+                          className="tt-token tt-separator" 
+                          align="center"
+                          sx={{ background: 'transparent', color: 'text.secondary' }}
+                        >
                           {isConclusion ? '//' : '/'}
                         </TableCell>
                       )}
@@ -611,7 +651,11 @@ export default function TruthTableEditor({
                     return (
                       <React.Fragment key={`solution-rowfrag-${tableIndex}`}>
                         {tableIndex > 0 && (
-                          <TableCell className="tt-cell tt-separator-cell" align="center">
+                          <TableCell 
+                            className="tt-cell tt-separator-cell" 
+                            align="center"
+                            sx={{ background: 'transparent' }}
+                          >
                             {/* separator column intentionally blank */}
                           </TableCell>
                         )}
@@ -646,7 +690,34 @@ export default function TruthTableEditor({
     return (
       <>
         {tablesToRender.map((table, tableIndex) => (
-          <TableContainer component={Paper} key={`solution-tt-table-${tableIndex}`} className="tt-table-wrap" elevation={0}>
+          <TableContainer 
+            component={Paper} 
+            key={`solution-tt-table-${tableIndex}`} 
+            className="tt-table-wrap" 
+            elevation={0} 
+            sx={{ 
+              background: 'transparent', 
+              boxShadow: 'none !important',
+              '&.MuiPaper-root': {
+                boxShadow: 'none !important',
+              },
+              '& .MuiTable-root': {
+                background: 'transparent',
+                border: 'none',
+                boxShadow: 'none',
+              },
+              '& .MuiTableCell-root': {
+                color: 'text.primary',
+                borderColor: 'divider',
+              },
+              '& .MuiTableHead-root .MuiTableCell-root': {
+                backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.04)' : undefined,
+              },
+              '& .MuiTableRow-root:nth-of-type(even)': {
+                backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.02)' : undefined,
+              },
+            }}
+          >
             {table.label && (
               <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 1 }}>
                 {table.label}

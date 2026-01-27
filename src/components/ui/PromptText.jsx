@@ -4,7 +4,7 @@ const promptSx = {
   fontSize: { xs: '0.95rem', md: '1rem' },
   lineHeight: 2,
   fontWeight: 400,
-  color: 'rgba(0, 0, 0, 0.87)',
+  color: 'text.primary',
   '& *': {
     fontSize: 'inherit !important',
     lineHeight: 'inherit',

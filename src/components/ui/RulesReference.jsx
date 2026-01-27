@@ -60,7 +60,7 @@ function RulesCard({ title, children, defaultExpanded = false }) {
           sx={{ 
             fontSize: '0.9rem', 
             lineHeight: 1.5, 
-            color: 'rgba(0, 0, 0, 0.9)',
+            color: 'text.primary',
             padding: '8px 12px',
             paddingTop: '6px',
           }}

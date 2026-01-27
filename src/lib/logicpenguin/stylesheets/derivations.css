@@ -574,3 +574,24 @@
         overflow-x: hidden !important;
     }
 }
+
+[data-theme="dark"] .logicpenguin .derivationline input.justification,
+[data-theme="dark"] .logicpenguin .derivationline input.formulainput {
+    color: #fff;
+    --border-before-color: rgba(255, 255, 255, 0.15);
+    --input-hovered-color: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme="dark"] .logicpenguin .derivationlinenumber,
+[data-theme="dark"] .logicpenguin sub-derivation .subderivbuttons > div {
+    color: #fff;
+}
+
+[data-theme="dark"] .logicpenguin.rulepanel {
+    background-color: #1a1d24;
+    color: #fff;
+}
+
+[data-theme="dark"] .logicpenguin.rulepanel .ruledisplayform {
+    background-color: #2a2d36;
+}

@@ -14,6 +14,7 @@ import {
   Select,
   MenuItem,
 } from '@mui/material'
+import { useTheme } from '@mui/material/styles'
 import getFormulaClass from '../../../lib/logicpenguin/symbolic/formula.js'
 import { multiTables } from '../../../lib/logicpenguin/symbolic/libsemantics.js'
 import ProblemSetButtons from './ProblemSetButtons.jsx'
@@ -44,6 +45,7 @@ export default function PartialTruthTable({
   readOnly = false,
   hideActions = false,
 }) {
+  const theme = useTheme()
   const Formula = useMemo(() => getFormulaClass(), [])
   const statement = problem?.statement || problem?.formula || ''
   const prompt = problem?.prompt || ''
@@ -130,7 +132,30 @@ export default function PartialTruthTable({
             {statement && (
               <RichText content={statement} variant="body2" color="text.secondary" />
             )}
-            <TableContainer component={Paper} className="tt-table-wrap" elevation={0}>
+            <TableContainer 
+              component={Paper} 
+              className="tt-table-wrap" 
+              elevation={0} 
+              sx={{ 
+                background: 'transparent', 
+                boxShadow: 'none !important',
+                '&.MuiPaper-root': {
+                  boxShadow: 'none !important',
+                },
+                '& .MuiTable-root': {
+                  background: 'transparent',
+                  border: 'none',
+                  boxShadow: 'none',
+                },
+                '& .MuiTableCell-root': {
+                  color: 'text.primary',
+                  borderColor: 'divider',
+                },
+                '& .MuiTableHead-root .MuiTableCell-root': {
+                  backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.04)' : undefined,
+                },
+              }}
+            >
               <Table className="tt-table">
                 <TableHead className="tt-head">
                   <TableRow className="tt-token-row">

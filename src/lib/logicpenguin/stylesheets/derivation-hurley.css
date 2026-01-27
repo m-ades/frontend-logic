@@ -202,6 +202,10 @@ body[data-theme='dark'] .logicpenguin derivation-hurley .derivationcore {
     text-align: right;
 }
 
+body[data-theme='dark'] .logicpenguin derivation-hurley .derivationlinenumber {
+    color: #fff;
+}
+
 .logicpenguin derivation-hurley .derivationlinenumber::before {
     content: '';
 }

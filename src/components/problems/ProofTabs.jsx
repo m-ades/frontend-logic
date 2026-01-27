@@ -178,7 +178,7 @@ export default function ProofTabs({
               {...a11yProps(idx)}
               sx={{ 
                 textAlign: 'center',
-                color: 'rgba(0, 0, 0, 0.9)',
+                color: 'text.primary',
                 '&:hover': {
                   color: '#2f6bff',
                   '& span': {
@@ -203,7 +203,7 @@ export default function ProofTabs({
           }}>
             <Box sx={{
               fontSize: { xs: '0.875rem', md: '1rem' },
-              color: 'rgba(0, 0, 0, 0.9)',
+              color: 'text.primary',
               py: 1.5,
               px: 3,
               display: 'flex',

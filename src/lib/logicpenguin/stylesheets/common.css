@@ -1,8 +1,5 @@
 @charset 'utf-8';
 
-
-/* simple animations */
-
 @keyframes spin {
   from {transform:rotate(0deg);}
   to {transform:rotate(360deg);}
@@ -23,10 +20,6 @@
   to {transform:rotateX(180deg);}
 }
 
-/*//////////////////*/
-/* color variables */
-/*////////////////*/
-
 :root {
   --lpblack:       rgba(0, 0, 0, 0.9);   --lpbgblack:   #282c34;
   --lpred:         #e45649;   --lpbgred:     #f6d3d6;
@@ -40,9 +33,6 @@
   --lpgray2:       #64676d;   --lpgray5:     #bebfc1;
   --lpgray3:       #828489;   --lpgray6:     #dcdddd;
 }
-/*////////////////////////////////*/
-/* basic settings universal to LP */
-/*////////////////////////////////*/
 
 :where(.logicpenguin) {
   all: revert-layer;
@@ -121,12 +111,12 @@
 }
 
 :where(.logicpenguin) .tt-separator {
-  background: #f0f0f0;
+  background: transparent;
   font-weight: 600;
   color: inherit;
 }
 :where(.logicpenguin) .tt-separator-cell {
-  background: #f5f5f5;
+  background: transparent;
   font-weight: 600;
   color: inherit;
   user-select: none;
@@ -271,7 +261,6 @@
   user-select: none;
 }
 
-/* hidden elements */
 :where(.logicpenguin) .hidden {
   display: none !important;
 }
@@ -1014,4 +1003,36 @@ a#lplogo:hover span {
   99.999% {
     transform: rotate(0deg) translate(0px, 0px) scale(var(--zoom-to));
   }
+}
+
+[data-theme="dark"] :where(.logicpenguin) {
+  color: #fff;
+}
+
+[data-theme="dark"] :where(.logicpenguin) .lp-problem-card {
+  background-color: #23232D;
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+[data-theme="dark"] .MuiPaper-root.tt-table-wrap,
+[data-theme="dark"] .MuiPaper-root:has(.tt-table) {
+  box-shadow: none !important;
+}
+
+/* Vanilla HTML table elements (not MUI) */
+[data-theme="dark"] :where(.logicpenguin) table.tt-table {
+  background: transparent;
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+[data-theme="dark"] :where(.logicpenguin) table.tt-table th,
+[data-theme="dark"] :where(.logicpenguin) table.tt-table td {
+  border-color: rgba(255, 255, 255, 0.12);
+  color: #fff;
+}
+
+[data-theme="dark"] :where(.logicpenguin) input:not([class*="Mui"]) {
+  background-color: rgba(255, 255, 255, 0.05);
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.12);
 }

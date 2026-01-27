@@ -17,6 +17,7 @@ import {
   FormControl,
   Button,
 } from '@mui/material'
+import { useTheme } from '@mui/material/styles'
 import getFormulaClass from '../../../lib/logicpenguin/symbolic/formula.js'
 import getSyntax from '../../../lib/logicpenguin/symbolic/libsyntax.js'
 import { multiTables } from '../../../lib/logicpenguin/symbolic/libsemantics.js'
@@ -31,6 +32,9 @@ const toSymbol = (value) => {
 }
 
 function TruthToggle({ value, onChange, ariaLabel, readOnly = false }) {
+  const theme = useTheme()
+  const isDark = theme.palette.mode === 'dark'
+  
   const cycleValue = (current) => {
     if (!current) return 'T'
     if (current === 'T') return 'F'
@@ -40,6 +44,12 @@ function TruthToggle({ value, onChange, ariaLabel, readOnly = false }) {
   const handleClick = () => {
     if (readOnly) return
     onChange(cycleValue(value))
+  }
+
+  const getColor = () => {
+    if (value === 'T') return '#2f6bff'
+    if (value === 'F') return '#b22'
+    return isDark ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.25)'
   }
 
   return (
@@ -59,10 +69,7 @@ function TruthToggle({ value, onChange, ariaLabel, readOnly = false }) {
       sx={{
         fontSize: '0.85rem',
         fontWeight: 700,
-        color: value === 'T' ? '#2f6bff'
-          : value === 'F'
-            ? '#b22'
-            : 'rgba(0, 0, 0, 0.25)',
+        color: getColor(),
         cursor: readOnly ? 'default' : 'pointer',
         textTransform: 'uppercase',
         letterSpacing: '0.12em',
@@ -75,7 +82,7 @@ function TruthToggle({ value, onChange, ariaLabel, readOnly = false }) {
         backgroundColor: 'transparent',
         transition: 'color 0.15s ease',
         '&:hover': {
-          color: readOnly ? undefined : '#2f6bff',
+          color: readOnly ? undefined : (isDark ? '#7b93ff' : '#2f6bff'),
         },
         '&:focus-visible': {
           outline: '2px solid rgba(47, 107, 255, 0.6)',
@@ -306,7 +313,7 @@ export default function IndirectTruthTable({
                     ))}
                     {argument.conclusion && (
                       <>
-                        <Box sx={{ borderTop: '1px solid rgba(0,0,0,0.65)', width: '140px', my: 0.5 }} />
+                        <Box sx={{ borderTop: (theme) => `1px solid ${theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.65)' : 'rgba(0,0,0,0.65)'}`, width: '140px', my: 0.5 }} />
                         <Typography sx={{ fontSize: '1.1rem' }}>
                           {argument.conclusion}
                         </Typography>
@@ -328,7 +335,32 @@ export default function IndirectTruthTable({
                 </Typography>
                 <Box className="tt-table-wrap">
                   <Box sx={{ width: 'max-content', minWidth: 'max-content', display: 'flex', flexDirection: 'column' }}>
-                    <TableContainer component={Paper} elevation={0}>
+                    <TableContainer 
+                      component={Paper} 
+                      elevation={0} 
+                      sx={{ 
+                        background: 'transparent', 
+                        boxShadow: 'none !important',
+                        '&.MuiPaper-root': {
+                          boxShadow: 'none !important',
+                        },
+                        '& .MuiTable-root': {
+                          background: 'transparent',
+                          border: 'none',
+                          boxShadow: 'none',
+                        },
+                        '& .MuiTableCell-root': {
+                          color: 'text.primary',
+                          borderColor: 'divider',
+                        },
+                        '& .MuiTableHead-root .MuiTableCell-root': {
+                          backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.04)' : undefined,
+                        },
+                        '& .MuiTableRow-root:nth-of-type(even)': {
+                          backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.02)' : undefined,
+                        },
+                      }}
+                    >
                       <Table className="tt-table">
                         <TableHead className="tt-head">
                           <TableRow className="tt-token-row">
@@ -337,7 +369,7 @@ export default function IndirectTruthTable({
                                 key={`itt-label-${idx}`}
                                 className="tt-token"
                                 align="center"
-                                sx={col.separator ? { width: 18, px: 0 } : undefined}
+                                sx={col.separator ? { width: 18, px: 0, background: 'transparent', color: 'text.secondary' } : undefined}
                               >
                                 {col.token}
                               </TableCell>
@@ -350,7 +382,12 @@ export default function IndirectTruthTable({
                               {sandboxColumns.map((col, idx) => {
                                 if (col.separator) {
                                   return (
-                                    <TableCell key={`itt-cell-${rowIndex}-${idx}`} className="tt-cell" align="center" />
+                                    <TableCell 
+                                      key={`itt-cell-${rowIndex}-${idx}`} 
+                                      className="tt-cell" 
+                                      align="center"
+                                      sx={{ background: 'transparent' }}
+                                    />
                                   )
                                 }
                                 const dataIndex = sandboxColumns
