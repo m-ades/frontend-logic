@@ -130,10 +130,15 @@ export default function Header() {
         </Box>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <Button
-            color="inherit"
             onClick={() => openRulesReference(layoutDispatch)}
             startIcon={<MenuBookIcon />}
-            sx={{ textTransform: 'none' }}
+            sx={{ 
+              textTransform: 'none',
+              color: '#2f6bff',
+              '&:hover': {
+                backgroundColor: 'rgba(47, 107, 255, 0.08)',
+              }
+            }}
           >
             Rulebook
           </Button>
