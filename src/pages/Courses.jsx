@@ -5,7 +5,7 @@ import {
   School as SchoolIcon,
   CheckCircle as CheckCircleIcon,
 } from "@mui/icons-material";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useAuthState } from "../context/AuthContext";
 import { isInstructorRole } from "../utils/auth.js";
@@ -27,9 +27,14 @@ export default function Courses() {
   const { courses, loading, error, initialized } = useCoursesState();
   const dispatch = useCoursesDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
 
-  const isInstructor = isInstructorRole(user?.role);
+  const isInstructor = location.pathname.startsWith("/instructor")
+    ? true
+    : location.pathname.startsWith("/student")
+    ? false
+    : isInstructorRole(user?.role);
   const dashboardPath = isInstructor
     ? "/instructor/dashboard"
     : "/student/dashboard";

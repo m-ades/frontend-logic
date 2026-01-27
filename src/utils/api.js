@@ -82,6 +82,16 @@ export async function fetchJson(path, options = {}) {
       }
     }
     const text = await res.text();
+    try {
+      const parsed = JSON.parse(text);
+      if (parsed?.message) {
+        throw new Error(parsed.message);
+      }
+    } catch (error) {
+      if (error instanceof Error && error.message !== text) {
+        throw error;
+      }
+    }
     throw new Error(text || `Request failed: ${res.status}`);
   }
   return res.json();

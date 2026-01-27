@@ -34,7 +34,11 @@ export default function CourseSelector({ isSidebarOpened }) {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const isInstructor = isInstructorRole(user?.role);
+  const isInstructor = location.pathname.startsWith("/instructor")
+    ? true
+    : location.pathname.startsWith("/student")
+    ? false
+    : isInstructorRole(user?.role);
   const coursesPath = isInstructor ? "/instructor/courses" : "/student/courses";
   const dashboardPath = isInstructor
     ? "/instructor/dashboard"
