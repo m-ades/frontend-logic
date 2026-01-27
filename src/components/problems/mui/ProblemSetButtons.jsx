@@ -1,4 +1,5 @@
-import { Button, Stack, Typography } from '@mui/material'
+import { Button, IconButton, Stack, Typography } from '@mui/material'
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward'
 import { useProblemNavigation } from '../ProblemNavigationContext.jsx'
 
 // shared button component is 'submit answer' and 'start over' for now
@@ -25,38 +26,33 @@ export default function ProblemSetButtons({
         <Stack
           direction="row"
           spacing={2}
-          justifyContent="space-between"
+          justifyContent={align}
           alignItems="center"
         >
-          <Stack
-            direction="row"
-            spacing={2}
-            justifyContent={align}
-            sx={{ flex: 1 }}
+          <Button
+            variant="contained"
+            onClick={onCheck}
+            disabled={isChecking || isDisabled}
+            sx={{ minWidth: 120 }}
           >
-            <Button
-              variant="contained"
-              onClick={onCheck}
-              disabled={isChecking || isDisabled}
-              sx={{ minWidth: 120 }}
-            >
-              {isChecking ? 'Submitting...' : 'Submit Answer'}
-            </Button>
-            <Button
-              variant="outlined"
-              onClick={onStartOver}
-              disabled={isChecking}
-            >
-              Start Over
-            </Button>
-          </Stack>
+            {isChecking ? 'Submitting...' : 'Submit Answer'}
+          </Button>
           <Button
             variant="outlined"
+            onClick={onStartOver}
+            disabled={isChecking}
+          >
+            Start Over
+          </Button>
+          <IconButton
             onClick={navigation?.onNext}
             disabled={isChecking || isNextDisabled}
+            size="small"
+            sx={{ color: 'primary.main' }}
+            aria-label="Next problem"
           >
-            Next
-          </Button>
+            <ArrowForwardIcon />
+          </IconButton>
         </Stack>
       ) : (
         <Stack 
