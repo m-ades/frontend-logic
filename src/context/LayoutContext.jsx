@@ -11,6 +11,10 @@ function layoutReducer(state, action) {
       return { ...state, isSidebarOpened: action.payload };
     case "TOGGLE_SIDEBAR_HOVER":
       return { ...state, sidebarHoverEnabled: !state.sidebarHoverEnabled };
+    case "OPEN_RULES_REFERENCE":
+      return { ...state, isRulesReferenceOpen: true };
+    case "CLOSE_RULES_REFERENCE":
+      return { ...state, isRulesReferenceOpen: false };
     default:
       throw new Error(`Unhandled action type: ${action.type}`);
   }
@@ -20,6 +24,7 @@ export function LayoutProvider({ children }) {
   const [state, dispatch] = useReducer(layoutReducer, {
     isSidebarOpened: false, // Changed to false - start collapsed
     sidebarHoverEnabled: true, // Default to hover enabled
+    isRulesReferenceOpen: false,
   });
   return (
     <LayoutStateContext.Provider value={state}>
@@ -62,5 +67,17 @@ export function setSidebar(dispatch, isOpen) {
 export function toggleSidebarHover(dispatch) {
   dispatch({
     type: "TOGGLE_SIDEBAR_HOVER",
+  });
+}
+
+export function openRulesReference(dispatch) {
+  dispatch({
+    type: "OPEN_RULES_REFERENCE",
+  });
+}
+
+export function closeRulesReference(dispatch) {
+  dispatch({
+    type: "CLOSE_RULES_REFERENCE",
   });
 }

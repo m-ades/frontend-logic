@@ -1,6 +1,5 @@
 import { Box, Typography, IconButton } from '@mui/material'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
-import RulesReference from '../ui/RulesReference.jsx'
 
 export default function Layout({ 
   title, 
@@ -12,7 +11,6 @@ export default function Layout({
 }) {
   return (
     <Box sx={{ width: '100%', height: '100%', minWidth: 0, overflowX: 'hidden' }}>
-      {!inModal && <RulesReference />}
 
       <Box sx={{ mb: { xs: 3, md: 4 } }}>
         <Box

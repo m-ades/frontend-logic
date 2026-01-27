@@ -6,6 +6,7 @@ import Sidebar from "./Sidebar.jsx";
 import StudentSidebarStructure from "./StudentSidebarStructure.jsx";
 import InstructorSidebarStructure from "./InstructorSidebarStructure.jsx";
 import AccountSettingsDialog from "../ui/AccountSettingsDialog.jsx";
+import RulesReference from "../ui/RulesReference.jsx";
 import { useAuthState, useAuthDispatch, logout } from "../../context/AuthContext";
 import { useCoursesDispatch, useCoursesState, initializeCourses, resetCourses } from "../../context/CoursesContext";
 import { clearStoredUser, fetchJson } from "../../utils/api.js";
@@ -100,6 +101,7 @@ export default function AppLayout({ children }) {
         open={isAccountSettingsOpen}
         onClose={() => setIsAccountSettingsOpen(false)}
       />
+      <RulesReference />
     </Box>
   );
 }

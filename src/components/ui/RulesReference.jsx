@@ -1,8 +1,8 @@
 import { useState } from 'react'
-import { Box, Typography, IconButton, Drawer, Fab } from '@mui/material'
+import { Box, Typography, IconButton, Drawer } from '@mui/material'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import ExpandLessIcon from '@mui/icons-material/ExpandLess'
-import MenuBookIcon from '@mui/icons-material/MenuBook'
+import { useLayoutState, useLayoutDispatch, closeRulesReference } from '../../context/LayoutContext.jsx'
 
 function RulesCard({ title, children, defaultExpanded = false }) {
   const [expanded, setExpanded] = useState(defaultExpanded)
@@ -73,7 +73,9 @@ function RulesCard({ title, children, defaultExpanded = false }) {
 }
 
 export default function RulesReference() {
-  const [mobileOpen, setMobileOpen] = useState(false)
+  const { isRulesReferenceOpen } = useLayoutState()
+  const dispatch = useLayoutDispatch()
+  
   const blurActiveElement = () => {
     const el = document.activeElement
     if (el && typeof el.blur === 'function') {
@@ -82,7 +84,7 @@ export default function RulesReference() {
   }
 
   const handleClose = () => {
-    setMobileOpen(false)
+    closeRulesReference(dispatch)
     blurActiveElement()
   }
   
@@ -195,51 +197,33 @@ export default function RulesReference() {
   )
   
   return (
-    <>
-      {/* Floating action button - shown on all resolutions */}
-      <Fab
-        color="primary"
-        aria-label="rules"
-        onClick={() => setMobileOpen(true)}
-        sx={{
-          position: 'fixed',
-          bottom: 16,
-          right: 16,
-          zIndex: 1000,
-          display: 'flex',
-          backgroundColor: '#2f6bff',
-          '&:hover': {
-            backgroundColor: '#2f6bff',
-          },
-        }}
-      >
-        <MenuBookIcon />
-      </Fab>
-      
-      {/* Drawer - shown on all resolutions */}
-      <Drawer
-        anchor="right"
-        open={mobileOpen}
-        onClose={handleClose}
-        ModalProps={{
-          keepMounted: true,
-        }}
-        sx={{
-          display: 'block',
-          '& .MuiDrawer-paper': {
-            width: { xs: '85%', sm: '400px' },
-            maxWidth: '400px',
-          },
-        }}
-      >
-        <Box sx={{ p: 2, borderBottom: 1, borderColor: 'divider', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Typography variant="h6">Information</Typography>
-          <IconButton onClick={() => setMobileOpen(false)}>
-            <ExpandLessIcon />
-          </IconButton>
+    <Drawer
+      anchor="right"
+      open={isRulesReferenceOpen}
+      onClose={handleClose}
+      ModalProps={{
+        keepMounted: true,
+      }}
+      sx={{
+        display: 'block',
+        '& .MuiDrawer-paper': {
+          width: { xs: '85%', sm: '400px' },
+          maxWidth: '400px',
+        },
+      }}
+    >
+      <Box sx={{ p: 2, borderBottom: 1, borderColor: 'divider', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <Box>
+          <Typography variant="h6">Rulebook</Typography>
+          <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.75rem' }}>
+            Logic Rules & Shortcuts
+          </Typography>
         </Box>
-        {rulesContent}
-      </Drawer>
-    </>
+        <IconButton onClick={handleClose}>
+          <ExpandLessIcon />
+        </IconButton>
+      </Box>
+      {rulesContent}
+    </Drawer>
   )
 }

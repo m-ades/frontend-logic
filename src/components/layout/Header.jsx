@@ -6,10 +6,12 @@ import {
   Breadcrumbs,
   Link,
   IconButton,
+  Button,
   useMediaQuery,
   useTheme,
+  Tooltip,
 } from "@mui/material";
-import { Menu as MenuIcon } from "@mui/icons-material";
+import { Menu as MenuIcon, MenuBook as MenuBookIcon } from "@mui/icons-material";
 import { ChevronRight } from "lucide-react";
 import { useLocation } from "react-router-dom";
 import { useCoursesState } from "../../context/CoursesContext";
@@ -17,6 +19,7 @@ import ThemeToggle from "./ThemeToggle.jsx";
 import {
   useLayoutDispatch,
   toggleSidebar,
+  openRulesReference,
 } from "../../context/LayoutContext.jsx";
 
 // Map routes to readable page names
@@ -125,7 +128,17 @@ export default function Header() {
             </Typography>
           )}
         </Box>
-        <ThemeToggle />
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <Button
+            color="inherit"
+            onClick={() => openRulesReference(layoutDispatch)}
+            startIcon={<MenuBookIcon />}
+            sx={{ textTransform: 'none' }}
+          >
+            Rulebook
+          </Button>
+          <ThemeToggle />
+        </Box>
       </Toolbar>
     </AppBar>
   );
