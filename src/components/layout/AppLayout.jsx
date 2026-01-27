@@ -43,40 +43,17 @@ export default function AppLayout({ children }) {
         });
       }
 
-      const scrollableElements = document.querySelectorAll("*");
-      scrollableElements.forEach((element) => {
-        const style = window.getComputedStyle(element);
-        const isScrollable =
-          style.overflow === "auto" ||
-          style.overflow === "scroll" ||
-          style.overflowY === "auto" ||
-          style.overflowY === "scroll";
-
-        if (isScrollable && element.scrollTop > 0) {
-          element.scrollTo({
-            top: 0,
-            left: 0,
-            behavior: "smooth",
-          });
-        }
-      });
-
-      const muiBoxes = document.querySelectorAll(".MuiBox-root");
-      muiBoxes.forEach((box) => {
-        if (box.scrollTop > 0) {
-          box.scrollTo({
-            top: 0,
-            left: 0,
-            behavior: "smooth",
-          });
-        }
-      });
     }, 0);
 
     return () => clearTimeout(timer);
   }, [location.pathname]);
 
-  const sidebarStructure = isInstructorRole(user?.role)
+  const isInstructorRoute = location.pathname.startsWith("/instructor")
+    ? true
+    : location.pathname.startsWith("/student")
+    ? false
+    : isInstructorRole(user?.role);
+  const sidebarStructure = isInstructorRoute
     ? InstructorSidebarStructure
     : StudentSidebarStructure;
 
