@@ -82,7 +82,7 @@ export default function ProblemSetButtons({
           variant="caption"
           sx={{ fontSize: '0.75rem', color: 'text.primary', textAlign }}
         >
-          Attempts left: {attemptsLeft}/{attemptLimit} | Drafts save automatically.
+          Attempts left: {attemptsLeft}/{attemptLimit} | Assignment grade updates with each submitted answer.
         </Typography>
       )}
     </Stack>
