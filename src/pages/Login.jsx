@@ -97,9 +97,7 @@ export default function Login() {
     <Box 
       sx={{ 
         minHeight: '100vh',
-        background: isDark 
-          ? 'linear-gradient(180deg, #0a0a0f 0%, #13131A 30%, #1d1d28 50%, #23232D 70%, #2a2a35 85%, #313140 100%)'
-          : 'linear-gradient(180deg, #ffffff 0%, #ffffff 30%, #f0f8ff 50%, #d6eaff 70%, #99ccff 85%, #1e90ff 100%)',
+        backgroundColor: isDark ? theme.palette.background.default : '#ffffff',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
@@ -144,10 +142,11 @@ export default function Login() {
             textAlign: 'center',
             color: '#1d4ed8',
             textShadow: isDark ? '0 4px 8px rgba(55, 66, 166, 1)' : '0 4px 8px rgba(0,0,0,0.1)',
-            fontSize: { xs: '3rem', sm: '4rem', md: '5rem' }
+            fontSize: { xs: '2.5rem', sm: '3.5rem', md: '5rem' },
+            whiteSpace: 'nowrap'
           }}
         >
-          Open Logic
+          Hunter Logic
         </Typography>
         
         <Typography 
