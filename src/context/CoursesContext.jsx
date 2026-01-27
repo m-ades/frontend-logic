@@ -65,7 +65,7 @@ const splitDateTime = (isoString) => {
   };
 };
 
-const mapCourseRecord = (course, index) => ({
+const mapCourseRecord = (course, index, role = null) => ({
   id: course.id,
   name: course.title,
   code: course.course_code,
@@ -76,6 +76,7 @@ const mapCourseRecord = (course, index) => ({
   color: COURSE_COLORS[index % COURSE_COLORS.length],
   latePolicy: DEFAULT_LATE_POLICY,
   gradingScale: DEFAULT_GRADING_SCALE,
+  role: role,
 });
 
 const mapAssignmentRecord = (assignment) => {
@@ -119,10 +120,21 @@ export async function fetchInstructorCourses() {
   const enrollments = await fetchJson("/api/course-enrollments");
   const courseIds = new Set((enrollments || []).map((item) => Number(item.course_id)));
   const courses = await fetchJson("/api/courses");
+  
+  // Create a map of course_id -> role for the current user
+  const storedUser = getStoredUser();
+  const roleMap = new Map();
+  if (storedUser?.id && enrollments) {
+    enrollments.forEach((enrollment) => {
+      if (Number(enrollment.user_id) === Number(storedUser.id)) {
+        roleMap.set(Number(enrollment.course_id), enrollment.role);
+      }
+    });
+  }
 
   return (courses || [])
     .filter((course) => courseIds.size === 0 || courseIds.has(Number(course.id)))
-    .map((course, index) => mapCourseRecord(course, index));
+    .map((course, index) => mapCourseRecord(course, index, roleMap.get(Number(course.id)) || null));
 }
 
 const assignmentsListCache = new Map();

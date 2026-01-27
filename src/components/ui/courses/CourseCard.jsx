@@ -195,7 +195,7 @@ export default function CourseCard({ course, isInstructor, onSelect }) {
                       whiteSpace: "nowrap",
                     }}
                   >
-                    {course.instructor || "Instructor"}
+                    {course.role ? course.role.charAt(0).toUpperCase() + course.role.slice(1) : "Student"}
                   </Typography>
                 </>
               )}
