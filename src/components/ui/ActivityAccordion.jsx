@@ -59,7 +59,7 @@ export default function ActivityAccordion({
   }
 
   return (
-    <Box sx={{ width: '100%', maxWidth: 1200, mx: 'auto' }}>
+    <Box sx={{ width: '100%', maxWidth: 1200, ml: 0, mr: 'auto' }}>
       <Box
         sx={{
           display: 'flex',

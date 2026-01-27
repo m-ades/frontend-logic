@@ -38,7 +38,7 @@ export default function Contact({ isInstructorView = false }) {
     },
     {
       id: 3,
-      name: "Miah Kurton",
+      name: "Miah Kirton",
       role: "Tutor",
       email: " miah.kirton74@myhunter.cuny.edu",
       officeHours: "Tuesdays: 11:50am-2:20pm / Thursdays: 11:50am-2:20pm (will change to 4:45-7:15pm)",
