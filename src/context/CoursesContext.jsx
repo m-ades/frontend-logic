@@ -54,13 +54,15 @@ const writeStoredActiveCourseId = (userId, courseId) => {
   }
 };
 
+// Convert UTC ISO string to Eastern Time date/time components
 const splitDateTime = (isoString) => {
   if (!isoString) return { date: null, time: null };
-  const date = new Date(isoString);
-  if (Number.isNaN(date.getTime())) return { date: null, time: null };
-  const datePart = date.toISOString().slice(0, 10);
-  const timePart = date.toISOString().slice(11, 16);
-  return { date: datePart, time: timePart };
+  const d = new Date(isoString);
+  if (isNaN(d)) return { date: null, time: null };
+  return {
+    date: d.toLocaleDateString('en-CA', { timeZone: 'America/New_York' }),
+    time: d.toLocaleTimeString('en-GB', { timeZone: 'America/New_York', hour: '2-digit', minute: '2-digit' }),
+  };
 };
 
 const mapCourseRecord = (course, index) => ({

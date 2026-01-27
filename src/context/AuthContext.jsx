@@ -116,3 +116,4 @@ export function updateUser(dispatch, userData) {
     setStoredUser({ ...storedUser, ...userData });
   }
 }
+

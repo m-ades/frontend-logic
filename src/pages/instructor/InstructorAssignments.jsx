@@ -19,23 +19,21 @@ import {
   enhanceItems,
 } from "../../utils/assignmentStatus";
 
-// Helper to get current date
-const getCurrentDate = () => {
-  const today = new Date();
-  const year = today.getFullYear();
-  const month = String(today.getMonth() + 1).padStart(2, "0");
-  const day = String(today.getDate()).padStart(2, "0");
-  return `${year}-${month}-${day}`;
+// Convert Eastern date/time to UTC ISO string for database
+const easternToUtc = (dateStr, timeStr = '00:00') => {
+  if (!dateStr) return null;
+  const [y, m, d] = dateStr.split('-').map(Number);
+  const [h, min] = timeStr.split(':').map(Number);
+  const local = new Date(y, m - 1, d, h, min);
+  const eastern = new Date(local.toLocaleString('en-US', { timeZone: 'America/New_York' }));
+  return new Date(local.getTime() + (local - eastern)).toISOString();
 };
 
-const toIsoDateTime = (date, time) => {
-  if (!date) return null;
-  const safeTime = time || "00:00";
-  return new Date(`${date}T${safeTime}:00`).toISOString();
-};
+// Current date in Eastern timezone
+const getCurrentEasternDate = () => new Date().toLocaleDateString('en-CA', { timeZone: 'America/New_York' });
 
 const buildAssignmentPayload = (formData, courseId, overrides = {}) => {
-  const dueDate = toIsoDateTime(formData.dueDate, formData.dueTime || "23:59");
+  const dueDate = easternToUtc(formData.dueDate, formData.dueTime || "23:59");
   return {
     course_id: courseId,
     kind: "assignment",
@@ -54,9 +52,9 @@ const buildAssignmentPayload = (formData, courseId, overrides = {}) => {
 
 const INITIAL_FORM_DATA = {
   name: "",
-  publishDate: getCurrentDate(),
+  publishDate: getCurrentEasternDate(),
   publishTime: "00:00",
-  dueDate: getCurrentDate(),
+  dueDate: getCurrentEasternDate(),
   dueTime: "23:59",
   totalPoints: 100,
   chapter: 1,
@@ -106,8 +104,8 @@ export default function InstructorAssignments() {
   const handleCreateOpen = () => {
     setFormData({
       ...INITIAL_FORM_DATA,
-      publishDate: getCurrentDate(),
-      dueDate: getCurrentDate(),
+      publishDate: getCurrentEasternDate(),
+      dueDate: getCurrentEasternDate(),
     });
     setCreateDialogOpen(true);
   };
@@ -140,9 +138,9 @@ export default function InstructorAssignments() {
 
     setFormData({
       name: assignment.name,
-      publishDate: assignment.publishDate || getCurrentDate(),
+      publishDate: assignment.publishDate || getCurrentEasternDate(),
       publishTime: assignment.publishTime || "00:00",
-      dueDate: assignment.dueDate || getCurrentDate(),
+      dueDate: assignment.dueDate || getCurrentEasternDate(),
       dueTime: assignment.dueTime || "23:59",
       totalPoints: assignment.totalPoints || 100,
       chapter: assignment.chapter || 1,
@@ -228,7 +226,7 @@ export default function InstructorAssignments() {
         chapter: assignment.chapter || 1,
         subchapter: assignment.subchapter || "A",
         due_date: assignment.dueDate
-          ? toIsoDateTime(assignment.dueDate, assignment.dueTime || "23:59")
+          ? easternToUtc(assignment.dueDate, assignment.dueTime || "23:59")
           : null,
         total_points: Number.isFinite(assignment.totalPoints)
           ? assignment.totalPoints

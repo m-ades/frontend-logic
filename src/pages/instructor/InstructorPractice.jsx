@@ -18,13 +18,7 @@ import {
   enhanceItems,
 } from "../../utils/assignmentStatus";
 
-const getCurrentDate = () => {
-  const today = new Date();
-  const year = today.getFullYear();
-  const month = String(today.getMonth() + 1).padStart(2, "0");
-  const day = String(today.getDate()).padStart(2, "0");
-  return `${year}-${month}-${day}`;
-};
+const getCurrentEasternDate = () => new Date().toLocaleDateString('en-CA', { timeZone: 'America/New_York' });
 
 const INITIAL_FORM_DATA = {
   name: "",
@@ -62,7 +56,7 @@ export default function InstructorPractice() {
   const handleCreateOpen = () => {
     setFormData({
       ...INITIAL_FORM_DATA,
-      publishDate: getCurrentDate(),
+      publishDate: getCurrentEasternDate(),
     });
     setCreateDialogOpen(true);
   };
@@ -110,7 +104,7 @@ export default function InstructorPractice() {
       name: practice.name,
       dueDate: practice.dueDate || "",
       dueTime: practice.dueTime || "23:59",
-      publishDate: practice.publishDate || getCurrentDate(),
+      publishDate: practice.publishDate || getCurrentEasternDate(),
       publishTime: practice.publishTime || "00:00",
       totalPoints: practice.totalPoints ?? 0,
       chapter: practice.chapter || 1,
