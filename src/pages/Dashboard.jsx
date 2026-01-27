@@ -125,8 +125,11 @@ export default function Dashboard() {
               grade,
             ])
           )
-          const timeline = gradebookSummary?.length
-            ? gradebookSummary
+          const unlockedSummary = gradebookSummary?.length
+            ? gradebookSummary.filter((assignment) => !assignment.is_locked)
+            : []
+          const timeline = unlockedSummary.length
+            ? unlockedSummary
                 .slice()
                 .sort((a, b) => {
                   const aDateValue = a.due_at ?? a.due_date ?? null
@@ -545,7 +548,7 @@ export default function Dashboard() {
             >
               <Box>
                 <Typography variant="h6" fontWeight="medium">
-                  Assignment Progress Over Time
+                  Assignment Scores Over Time
                 </Typography>
               </Box>
               <Box sx={{ display: 'flex', gap: 3, alignItems: 'center', flexWrap: 'wrap' }}>
