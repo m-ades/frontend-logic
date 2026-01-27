@@ -59,6 +59,7 @@ const emptyAnalytics = {
   performance: { avg_score: null, avg_attempt: null, correct_rate: null, first_try_correct_rate: null },
   time: { avg_minutes_per_question: null },
   submissionCount: 0,
+  submittedAssignmentIds: [],
 }
 
 export default function Dashboard() {
@@ -77,6 +78,10 @@ export default function Dashboard() {
     lowestScore: null,
     lowestTitle: null,
     lowestScores: [],
+  })
+  const [releaseOverview, setReleaseOverview] = useState({
+    pastDuePercent: 0,
+    remainingPercent: 0,
   })
   const [instructorAnalytics, setInstructorAnalytics] = useState({
     gradeSummary: null,
@@ -97,7 +102,6 @@ export default function Dashboard() {
     justifyContent: 'space-between',
     gap: 2,
   }
-  const miniChartSize = 84
 
   useEffect(() => {
     let isMounted = true
@@ -107,6 +111,10 @@ export default function Dashboard() {
         if (isMounted) {
           setAnalytics(emptyAnalytics)
           setGradeTimeline([])
+          setReleaseOverview({
+            pastDuePercent: 0,
+            remainingPercent: 0,
+          })
         }
         return
       }
@@ -223,12 +231,26 @@ export default function Dashboard() {
             lowestTitle: lowestGrade?.title ?? null,
             lowestScores,
           })
+
+          const overdueCount = analyticsData?.assignments?.overdue ?? 0
+          const remainingCount = Math.max(0, totalAssignments - overdueCount)
+          const pastDuePercent = totalAssignments > 0 ? (overdueCount / totalAssignments) * 100 : 0
+          const remainingPercent = totalAssignments > 0 ? (remainingCount / totalAssignments) * 100 : 0
+
+          setReleaseOverview({
+            pastDuePercent: Number(pastDuePercent.toFixed(1)),
+            remainingPercent: Number(remainingPercent.toFixed(1)),
+          })
         }
       } catch (error) {
         if (isMounted) {
           console.warn('Failed to load analytics', error)
           setAnalytics(emptyAnalytics)
           setGradeTimeline([])
+          setReleaseOverview({
+            pastDuePercent: 0,
+            remainingPercent: 0,
+          })
         }
       }
     }
@@ -281,16 +303,6 @@ export default function Dashboard() {
 
   const assignmentStats = analytics.assignments || emptyAnalytics.assignments
 
-  const practiceAccuracy = useMemo(() => {
-    const firstTryRate = analytics.performance.first_try_correct_rate || 0
-    const correctFirstTry = Math.round(firstTryRate * 100)
-    const incorrectFirstTry = Math.max(0, 100 - correctFirstTry)
-    const averageAttempts = analytics.performance.avg_attempt
-      ? Number(analytics.performance.avg_attempt.toFixed(1))
-      : 0
-    return { correctFirstTry, incorrectFirstTry, averageAttempts }
-  }, [analytics.performance])
-
   const mainChartData = useMemo(
     () =>
       gradeTimeline.map((item) => ({
@@ -316,7 +328,7 @@ export default function Dashboard() {
       <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
         <ThemedCard sx={statCardSx}>
           <CardContent sx={statCardContentSx}>
-            <Box display="flex" alignItems="center" mb={2}>
+            <Box display="flex" alignItems="center" mb={1}>
               <LeaderboardIcon color="primary" sx={{ mr: 1 }} />
               <Typography variant="h6" component="h3">
                 Your Grade
@@ -373,64 +385,80 @@ export default function Dashboard() {
             <Box display="flex" alignItems="center" mb={2}>
               <TrendingUpIcon color="secondary" sx={{ mr: 1 }} />
               <Typography variant="h6" component="h3">
-                Practice Accuracy
+                What's Left
               </Typography>
             </Box>
-            <Grid container spacing={2}>
-              <Grid size={{ xs: 6 }} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                <Box sx={{ position: 'relative', display: 'inline-flex' }}>
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+              <Box sx={{ display: 'flex', justifyContent: 'flex-start', width: '100%' }}>
+                <Box
+                  sx={{
+                    position: 'relative',
+                    display: 'inline-flex',
+                    p: 0.5,
+                    width: '100%',
+                  }}
+                >
                   <Typography
                     variant="caption"
                     fontWeight="medium"
                     sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}
                   >
-                    {practiceAccuracy.correctFirstTry}%
+                    {releaseOverview.pastDuePercent}%
                   </Typography>
-                  <PieChart width={miniChartSize} height={miniChartSize}>
+                  <ResponsiveContainer width="100%" height={200}>
+                    <PieChart>
                       <Pie
                         data={[
-                          { value: practiceAccuracy.correctFirstTry, color: 'primary' },
-                          { value: practiceAccuracy.incorrectFirstTry, color: 'grey' },
+                          { value: releaseOverview.pastDuePercent },
+                          { value: releaseOverview.remainingPercent },
                         ]}
-                        innerRadius={35}
-                        outerRadius={45}
+                        innerRadius="62%"
+                        outerRadius="78%"
                         dataKey="value"
+                        cx="50%"
+                        cy="50%"
                       >
+                        <Cell fill={theme.palette.warning.main} />
                         <Cell fill={theme.palette.primary.main} />
-                        <Cell fill={theme.palette.grey[200]} />
                       </Pie>
                     </PieChart>
+                  </ResponsiveContainer>
                 </Box>
-              </Grid>
-              <Grid size={{ xs: 6 }}>
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                  {[
-                    { label: 'Correct on first try', value: practiceAccuracy.correctFirstTry, color: 'success' },
-                    { label: 'Incorrect on first try', value: practiceAccuracy.incorrectFirstTry, color: 'error' },
-                    { label: 'Avg attempts', value: practiceAccuracy.averageAttempts, color: 'warning' },
-                  ].map((item) => (
-                    <Box key={item.label}>
-                      <Box display="flex" alignItems="center" gap={1}>
-                        <Box
-                          sx={{
-                            width: 8,
-                            height: 8,
-                            borderRadius: '50%',
-                            bgcolor: `${item.color}.main`,
-                          }}
-                        />
-                        <Typography variant="caption" color="text.secondary">
-                          {item.label}
-                        </Typography>
-                        <Typography variant="caption" fontWeight="medium">
-                          {item.label === 'Avg attempts' ? item.value : `${item.value}%`}
-                        </Typography>
-                      </Box>
+              </Box>
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, alignItems: 'flex-start' }}>
+                {[
+                  {
+                    label: 'Assignments that were due',
+                    value: releaseOverview.pastDuePercent,
+                    color: 'warning',
+                  },
+                  {
+                    label: 'Remaining assignments in the course',
+                    value: releaseOverview.remainingPercent,
+                    color: 'primary',
+                  },
+                ].map((item) => (
+                  <Box key={item.label}>
+                    <Box display="flex" alignItems="center" gap={1} justifyContent="flex-start">
+                      <Box
+                        sx={{
+                          width: 8,
+                          height: 8,
+                          borderRadius: '50%',
+                          bgcolor: `${item.color}.main`,
+                        }}
+                      />
+                      <Typography variant="caption" color="text.secondary">
+                        {item.label}
+                      </Typography>
+                      <Typography variant="caption" fontWeight="medium" sx={{ ml: 1 }}>
+                        {item.value}%
+                      </Typography>
                     </Box>
-                  ))}
-                </Box>
-              </Grid>
-            </Grid>
+                  </Box>
+                ))}
+              </Box>
+            </Box>
           </CardContent>
         </ThemedCard>
       </Grid>
