@@ -162,6 +162,11 @@
     box-sizing: border-box;
   }
 
+  :where(.logicpenguin) .tt-table-wrap {
+    width: 100%;
+    display: block;
+  }
+
   :where(.logicpenguin) input.formulainput {
     min-width: 0;
     width: 100%;
@@ -176,6 +181,45 @@
 
   :where(.logicpenguin) .tt-table {
     font-size: 0.8rem;
+    width: 100% !important;
+    table-layout: fixed;
+  }
+
+  :where(.logicpenguin) .tt-table th,
+  :where(.logicpenguin) .tt-table td {
+    padding: 0.25rem 0.35rem;
+  }
+
+  :where(.logicpenguin) .tt-cell {
+    min-width: 1.6rem;
+  }
+
+  :where(.logicpenguin) .tt-toggle {
+    width: 22px !important;
+    height: 22px !important;
+    font-size: 0.75rem !important;
+    letter-spacing: 0.08em;
+  }
+
+  :where(.logicpenguin) .tt-table:has(th:nth-child(9)) {
+    width: max-content !important;
+    table-layout: auto;
+  }
+
+  :where(.logicpenguin) .tt-table:has(th:nth-child(9)) th,
+  :where(.logicpenguin) .tt-table:has(th:nth-child(9)) td {
+    padding: 0.35rem 0.55rem;
+  }
+
+  :where(.logicpenguin) .tt-table:has(th:nth-child(9)) .tt-cell {
+    min-width: 2.2rem;
+  }
+
+  :where(.logicpenguin) .tt-table:has(th:nth-child(9)) .tt-toggle {
+    width: 28px !important;
+    height: 28px !important;
+    font-size: 0.85rem !important;
+    letter-spacing: 0.12em;
   }
 }
 
