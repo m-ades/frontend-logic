@@ -15,7 +15,7 @@ import Worksheet from "./pages/Worksheet.jsx";
 import Assignments from "./pages/Assignments.jsx";
 import Practice from "./pages/Practice.jsx";
 import Grades from "./pages/Grades.jsx";
-import Contact from "./pages/Contact.jsx";
+import ContactStudent from "./pages/ContactStudent.jsx";
 import InstructorDashboard from "./pages/instructor/InstructorDashboard.jsx";
 import InstructorGradebook from "./pages/instructor/InstructorGradebook.jsx";
 import InstructorControls from "./pages/instructor/InstructorControls.jsx";
@@ -26,6 +26,7 @@ import Courses from "./pages/Courses.jsx";
 import Profile from "./pages/Profile.jsx";
 import InstructorPractice from "./pages/instructor/InstructorPractice.jsx";
 import InstructorRoster from "./pages/instructor/InstructorRoster.jsx";
+import InstructorContact from "./pages/instructor/Contact.jsx";
 
 function AppRoutes() {
   return (
@@ -107,7 +108,7 @@ function AppRoutes() {
         element={
           <ProtectedRoute allowedRoles={["student"]}>
             <AppLayout>
-              <Contact />
+              <ContactStudent />
             </AppLayout>
           </ProtectedRoute>
         }
@@ -217,7 +218,7 @@ function AppRoutes() {
         element={
           <ProtectedRoute allowedRoles={["instructor"]}>
             <AppLayout>
-              <Contact />
+              <InstructorContact />
             </AppLayout>
           </ProtectedRoute>
         }
