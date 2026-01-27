@@ -10,7 +10,7 @@ export default function CoursesHeader({
 }) {
   const summaryText = isInstructor
     ? `${currentCount} active • ${pastCount} archived`
-    : `${currentCount} enrolled • ${pastCount} completed`;
+    : `${currentCount} enrolled`;
 
   return (
     <Box
