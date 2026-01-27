@@ -369,6 +369,11 @@ a#lplogo:hover span {
   margin-top: 1.5rem;
 }
 
+:where(.logicpenguin) .lp-problem-card p,
+:where(.logicpenguin) .lp-problem-card div {
+  line-height: 2;
+}
+
 :where(.logicpenguin) .problem {
   display: block;
 }
