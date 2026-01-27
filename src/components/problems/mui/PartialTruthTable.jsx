@@ -18,6 +18,7 @@ import getFormulaClass from '../../../lib/logicpenguin/symbolic/formula.js'
 import { multiTables } from '../../../lib/logicpenguin/symbolic/libsemantics.js'
 import ProblemSetButtons from './ProblemSetButtons.jsx'
 import { useProblemChecker } from '../../../hooks/useProblemChecker.js'
+import PromptText from '../../ui/PromptText.jsx'
 import RichText from '../../ui/RichText.jsx'
 
 const toTruth = (value) => {
@@ -124,7 +125,7 @@ export default function PartialTruthTable({
         >
           <Stack spacing={3} sx={{ p: { xs: 2, md: 2 } }}>
             {prompt && (
-              <RichText content={prompt} variant="body1" sx={{ fontSize: { xs: '0.95rem', md: '1rem' } }} />
+              <PromptText content={prompt} />
             )}
             {statement && (
               <RichText content={statement} variant="body2" color="text.secondary" />

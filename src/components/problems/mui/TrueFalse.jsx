@@ -3,7 +3,7 @@ import { Box, Stack, Radio, RadioGroup, FormControlLabel, FormControl, Alert } f
 import ProblemSetButtons from './ProblemSetButtons.jsx'
 import { useProblemChecker } from '../../../hooks/useProblemChecker.js'
 import SolutionReveal from '../SolutionReveal.jsx'
-import RichText from '../../ui/RichText.jsx'
+import PromptText from '../../ui/PromptText.jsx'
 
 export default function TrueFalse({ 
   problem, 
@@ -71,7 +71,7 @@ export default function TrueFalse({
         >
           <Stack spacing={3} sx={{ p: { xs: 2, md: 2 } }}>
             {prompt && (
-              <RichText content={prompt} variant="body1" sx={{ fontSize: '1rem' }} />
+              <PromptText content={prompt} />
             )}
             <FormControl component="fieldset" sx={{ width: '100%' }}>
               <RadioGroup

@@ -347,8 +347,26 @@ a#lplogo:hover span {
 /* instructions */
 :where(.logicpenguin) .instructions::before {
   content: 'Instructions: ';
-  font-style: italic;
+  font-style: normal;
   color: var(--lpgray2);
+}
+:where(.logicpenguin) .instructions,
+:where(.logicpenguin) .instruction {
+  display: block;
+  font-weight: 400;
+  margin-bottom: .5rem;
+  padding-bottom: .5rem;
+}
+:where(.logicpenguin) .instructions + *,
+:where(.logicpenguin) .instruction + * {
+  margin-top: .5rem;
+}
+
+:where(.logicpenguin) div + div,
+:where(.logicpenguin) div + p,
+:where(.logicpenguin) p + div,
+:where(.logicpenguin) p + p {
+  margin-top: 1.5rem;
 }
 
 :where(.logicpenguin) .problem {

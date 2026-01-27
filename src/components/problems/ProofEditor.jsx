@@ -3,7 +3,7 @@ import { Box, Stack } from '@mui/material'
 import LogicPenguinProof from './LogicPenguinProof.jsx'
 import ProblemSetButtons from './mui/ProblemSetButtons.jsx'
 import SolutionReveal from './SolutionReveal.jsx'
-import RichText from '../ui/RichText.jsx'
+import PromptText from '../ui/PromptText.jsx'
 
 export default function ProofEditor({ proof, onProofComplete, savedState, onStateChange }) {
   const completionRef = useRef(false)
@@ -150,7 +150,7 @@ export default function ProofEditor({ proof, onProofComplete, savedState, onStat
         >
           <Stack spacing={3} sx={{ p: { xs: 2, md: 2 } }}>
             {proof.description && (
-              <RichText content={proof.description} variant="body1" sx={{ fontSize: '1rem' }} />
+              <PromptText content={proof.description} />
             )}
             <div ref={proofRef}>
               <LogicPenguinProof 

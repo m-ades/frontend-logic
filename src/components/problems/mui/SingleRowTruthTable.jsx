@@ -5,7 +5,7 @@ import getSyntax from '../../../lib/logicpenguin/symbolic/libsyntax.js'
 import { libtf } from '../../../lib/logicpenguin/symbolic/libsemantics.js'
 import ProblemSetButtons from './ProblemSetButtons.jsx'
 import { useProblemChecker } from '../../../hooks/useProblemChecker.js'
-import RichText from '../../ui/RichText.jsx'
+import PromptText from '../../ui/PromptText.jsx'
 
 function TruthToggle({ value, onChange, ariaLabel, accent, readOnly = false }) {
   const cycleValue = (current) => {
@@ -304,7 +304,7 @@ export default function SingleRowTruthTable({
         >
           <Stack spacing={3} sx={{ p: { xs: 2, md: 2 } }}>
             {prompt && (
-              <RichText content={prompt} variant="body1" sx={{ fontSize: '1rem' }} />
+              <PromptText content={prompt} />
             )}
             {renderTableSet(tableRows, tableRows, false)}
             <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mt: 2 }}>

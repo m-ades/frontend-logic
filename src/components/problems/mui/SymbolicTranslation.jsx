@@ -6,6 +6,7 @@ import FormulaInput from '../../ui/logicpenguin/formula-input.js'
 import SymbolButtonRow from '../../ui/logicpenguin/SymbolButtonRow.jsx'
 import { useProblemChecker } from '../../../hooks/useProblemChecker.js'
 import SolutionReveal from '../SolutionReveal.jsx'
+import PromptText from '../../ui/PromptText.jsx'
 import RichText from '../../ui/RichText.jsx'
 
 function FormulaInputField({ value, onValueChange, fieldReadOnly, formulaInputRef }) {
@@ -194,10 +195,10 @@ export default function SymbolicTranslation({
           <Stack spacing={3} sx={{ p: { xs: 2, md: 2 } }}>
             <Box>
               {prompt && (
-                <RichText content={prompt} variant="body1" sx={{ mb: 1, fontSize: '1rem' }} />
+                <PromptText content={prompt} sx={{ mb: 1 }} />
               )}
               {symbolizationKey.length > 0 && (
-                <Box sx={{ mb: 1 }}>
+                <Box sx={{ mb: 1, mt: 2.5 }}>
                   <Typography variant="body2" sx={{ mb: 0.5, fontWeight: 600 }}>
                     Symbolization key
                   </Typography>
@@ -218,7 +219,7 @@ export default function SymbolicTranslation({
               {legend && (
                 <RichText content={legend} variant="body2" sx={{ mb: 1, color: 'text.secondary' }} />
               )}
-              <Typography variant="body2" sx={{ mb: 1, color: 'text.secondary' }}>
+              <Typography variant="body2" sx={{ mb: 1, mt: 2.5, color: 'text.secondary' }}>
                 Your translation:
               </Typography>
               <FormulaInputField

@@ -25,7 +25,7 @@ import { multiTables } from '../../lib/logicpenguin/symbolic/libsemantics.js'
 import { fullTableMatch } from '../../lib/logicpenguin/checkers/truth-tables.js'
 import ProblemSetButtons from './mui/ProblemSetButtons.jsx'
 import { fetchJson, getActiveUserId } from '../../utils/api.js'
-import RichText from '../ui/RichText.jsx'
+import PromptText from '../ui/PromptText.jsx'
 
 function TruthToggle({ value, onChange, ariaLabel, accent, readOnly = false }) {
   const cycleValue = (current) => {
@@ -710,11 +710,7 @@ export default function TruthTableEditor({
 
   const promptContent = !embedded && (proof.description || truthTable.prompt)
     ? (
-        <RichText
-          content={truthTable.prompt || proof.description}
-          variant="body1"
-          sx={{ fontSize: { xs: '0.95rem', md: '1rem' } }}
-        />
+        <PromptText content={truthTable.prompt || proof.description} />
       )
     : null
 

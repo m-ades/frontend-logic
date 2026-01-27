@@ -22,7 +22,7 @@ import getSyntax from '../../../lib/logicpenguin/symbolic/libsyntax.js'
 import { multiTables } from '../../../lib/logicpenguin/symbolic/libsemantics.js'
 import ProblemSetButtons from './ProblemSetButtons.jsx'
 import { useProblemChecker } from '../../../hooks/useProblemChecker.js'
-import RichText from '../../ui/RichText.jsx'
+import PromptText from '../../ui/PromptText.jsx'
 
 const toSymbol = (value) => {
   if (value === true || value === 'T' || value === 't' || value === 1) return 'T'
@@ -292,11 +292,7 @@ export default function IndirectTruthTable({
         >
           <Stack spacing={3} sx={{ p: { xs: 2, md: 2 } }}>
             {prompt && (
-              <RichText
-                content={prompt}
-                variant="body1"
-                sx={{ fontSize: { xs: '0.95rem', md: '1rem' } }}
-              />
+              <PromptText content={prompt} />
             )}
 
             {argument?.premises?.length > 0 && (
@@ -390,7 +386,7 @@ export default function IndirectTruthTable({
               <Stack spacing={2}>
                 {mcQuestions.map((mcq, qIdx) => (
                   <Box key={`itt-mc-${qIdx}`} sx={{ width: '100%' }}>
-                    <RichText content={mcq.prompt} variant="body1" sx={{ mb: 1, fontWeight: 500 }} />
+                    <PromptText content={mcq.prompt} sx={{ mb: 1, fontWeight: 500 }} />
                     <RadioGroup
                       value={selectedValues[qIdx] ?? ''}
                       onChange={(event) => handleChoiceChange(qIdx, event.target.value)}
