@@ -362,6 +362,12 @@ a#lplogo:hover span {
   margin-top: .5rem;
 }
 
+:where(.logicpenguin) .argument,
+:where(.logicpenguin) .lp-problem-card > div > div:not([class]):last-of-type,
+:where(.logicpenguin) .lp-problem-card .MuiTypography-root > div:not([class]):last-of-type {
+  font-size: 1.15em;
+}
+
 :where(.logicpenguin) div + div,
 :where(.logicpenguin) div + p,
 :where(.logicpenguin) p + div,
