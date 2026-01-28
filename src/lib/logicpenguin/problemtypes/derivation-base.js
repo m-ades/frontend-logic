@@ -321,7 +321,7 @@ export default class DerivationExercise extends LogicPenguinProblem {
         const ruleAliases = {
             'mp': 'MP', 'mt': 'MT', 'hs': 'HS', 'ds': 'DS', 'cd': 'CD',
             'simp': 'Simp', 'conj': 'Conj', 'add': 'Add',
-            'dn': 'DN', 'dm': 'DM', 'com': 'Com', 'assoc': 'Assoc',
+            'dn': 'DN', 'dm': 'DM', 'com': 'Com', 'comm': 'Com', 'assoc': 'Assoc',
             'dist': 'Dist', 'trans': 'Trans', 'impl': 'Impl', 'equiv': 'Equiv',
             'exp': 'Exp', 'taut': 'Taut', 'ui': 'UI', 'ug': 'UG',
             'ei': 'EI', 'eg': 'EG', 'cq': 'CQ', 'qn': 'QN',

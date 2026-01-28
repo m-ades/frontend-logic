@@ -25,6 +25,7 @@ export default class DerivationCheck {
         'dn': 'DN', 'Dn': 'DN', 'dN': 'DN',
         'dm': 'DM', 'Dm': 'DM', 'dM': 'DM',
         'com': 'Com', 'COM': 'Com', 'CoM': 'Com', 'cOm': 'Com',
+        'comm': 'Com', 'COMM': 'Com', 'Comm': 'Com', 'CoMm': 'Com', 'cOmm': 'Com', 'coMm': 'Com', 'cOmM': 'Com',
         'assoc': 'Assoc', 'ASSOC': 'Assoc', 'AsSoC': 'Assoc',
         'dist': 'Dist', 'DIST': 'Dist', 'DiSt': 'Dist', 'dIsT': 'Dist',
         'trans': 'Trans', 'TRANS': 'Trans', 'TrAnS': 'Trans',
