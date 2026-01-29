@@ -241,6 +241,7 @@ export default function TruthTableEditor({
   const [attemptLimit, setAttemptLimit] = React.useState(proof?.attemptLimit ?? 3)
   const assignmentQuestionId = Number(proof?.questionId || 0)
   const [mcSelection, setMcSelection] = React.useState([])
+  const lastRestoredProofIdRef = React.useRef(undefined)
   React.useEffect(() => {
     // use per-proof limit
     setAttemptLimit(proof?.attemptLimit ?? 3)
@@ -267,6 +268,8 @@ export default function TruthTableEditor({
   }, [onStateChange, status, tableInputs])
 
   React.useEffect(() => {
+    if (proof?.id === lastRestoredProofIdRef.current) return
+    lastRestoredProofIdRef.current = proof?.id
     const normalizeSavedSelection = () => {
       if (Array.isArray(savedState?.mcans)) {
         return savedState.mcans.map((v) => String(v));
@@ -287,39 +290,34 @@ export default function TruthTableEditor({
     }
     setTableInputs(derivedInitialTables)
     setMcSelection(normalizeSavedSelection())
-  }, [derivedInitialTables, kind, savedState])
+  }, [derivedInitialTables, kind, proof?.id, savedState])
 
   const handleCellChange = (tableIndex, rowIndex, colIndex, value) => {
-    let nextTables = null
-    setTableInputs((prev) => {
-      nextTables = prev.map((tableRows, tIdx) =>
-        tIdx === tableIndex
-          ? tableRows.map((row, rIdx) =>
-              rIdx === rowIndex
-                ? row.map((cell, cIdx) => (cIdx === colIndex ? value : cell))
-                : row
-            )
-          : tableRows
-      )
-      return nextTables
-    })
-    if (nextTables) {
-      onStateChange?.({
-        tables: nextTables.map((rows) => ({ rows })),
-        ...(classificationEnabled ? {
+    const nextTables = tableInputs.map((tableRows, tIdx) =>
+      tIdx === tableIndex
+        ? tableRows.map((row, rIdx) =>
+            rIdx === rowIndex
+              ? row.map((cell, cIdx) => (cIdx === colIndex ? value : cell))
+              : row
+          )
+        : tableRows
+    )
+    setTableInputs(nextTables)
+    onStateChange?.({
+      tables: nextTables.map((rows) => ({ rows })),
+      ...(classificationEnabled ? {
+        mcans: mcSelection,
+        taut: mcSelection.includes('tautology'),
+        contra: mcSelection.includes('self-contradiction'),
+        valid: mcSelection.includes('valid'),
+        equiv: mcSelection.includes('equivalent'),
+        classification: {
           mcans: mcSelection,
           taut: mcSelection.includes('tautology'),
           contra: mcSelection.includes('self-contradiction'),
-          valid: mcSelection.includes('valid'),
-          equiv: mcSelection.includes('equivalent'),
-          classification: {
-            mcans: mcSelection,
-            taut: mcSelection.includes('tautology'),
-            contra: mcSelection.includes('self-contradiction'),
-          },
-        } : {}),
-      })
-    }
+        },
+      } : {}),
+    })
     if (status !== 'unanswered') {
       setStatus('unanswered')
       setMessage('')
@@ -889,7 +887,7 @@ export default function TruthTableEditor({
         }}
       >
         {tableCorrect
-          ? ((kind === 'equivalence' || kind === 'argument') ? 'Truth table looks good.' : 'Answer looks good.')
+          ? 'Answer looks good.'
           : tableFilled
             ? 'Recheck your rows.'
             : 'Click cells to toggle truth values - fill in every cell to finish.'}
