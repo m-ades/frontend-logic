@@ -22,7 +22,12 @@ import {
 import { useTheme } from '@mui/material/styles'
 import getFormulaClass from '../../lib/logicpenguin/symbolic/formula.js'
 import getSyntax from '../../lib/logicpenguin/symbolic/libsyntax.js'
-import { multiTables } from '../../lib/logicpenguin/symbolic/libsemantics.js'
+import {
+  multiTables,
+  formulaTable,
+  equivTables,
+  argumentTables,
+} from '../../lib/logicpenguin/symbolic/libsemantics.js'
 import { fullTableMatch } from '../../lib/logicpenguin/checkers/truth-tables.js'
 import ProblemSetButtons from './mui/ProblemSetButtons.jsx'
 import { fetchJson, getActiveUserId } from '../../utils/api.js'
@@ -594,6 +599,96 @@ export default function TruthTableEditor({
   const showSolution =
     attemptCount >= attemptLimit && displaySolutionTables.length > 0
 
+  // Correct multiple-choice answer for solution reveal (from proof.solution or derived from problem)
+  const solutionMcValues = React.useMemo(() => {
+    const solution = proof?.solution
+    if (kind === 'formula') {
+      if (solution?.taut) return ['tautology']
+      if (solution?.contra) return ['self-contradiction']
+      if (solution?.mcans === 1) return ['contingent']
+      if (statements.length === 0) return []
+      try {
+        const wff = Formula.from(statements[0])
+        const { taut, contra } = formulaTable(wff)
+        if (taut) return ['tautology']
+        if (contra) return ['self-contradiction']
+        return ['contingent']
+      } catch {
+        return []
+      }
+    }
+    if (kind === 'argument') {
+      if (solution?.valid === true) return ['valid']
+      if (solution?.valid === false) return ['invalid']
+      if (statements.length < 2) return []
+      try {
+        const leftWffs = statements.slice(0, -1).map((s) => Formula.from(s))
+        const rightWff = Formula.from(statements[statements.length - 1])
+        const { valid } = argumentTables(leftWffs, rightWff)
+        return valid ? ['valid'] : ['invalid']
+      } catch {
+        return []
+      }
+    }
+    if (kind === 'equivalence') {
+      if (solution?.equiv === true) return ['equivalent']
+      if (solution?.equiv === false) {
+        // need relationSet to know which of contradictory/consistent/inconsistent
+        if (statements.length < 2) return []
+        try {
+          const fa = Formula.from(statements[0])
+          const fb = Formula.from(statements[1])
+          const { A, B } = equivTables(fa, fb)
+          const toBool = (v) => v === true || v === 'T'
+          let equiv = true
+          let contra = true
+          let consistent = false
+          let comp = true
+          for (let i = 0; i < A.rows.length; i++) {
+            const tvA = toBool(A.rows[i][A.opspot])
+            const tvB = toBool(B.rows[i][B.opspot])
+            if (tvA !== tvB) equiv = false
+            else contra = false
+            if (tvA && tvB) consistent = true
+          }
+          const inconsistent = comp && !consistent
+          const labels = []
+          if (equiv) labels.push('equivalent')
+          if (contra) labels.push('contradictory')
+          if (consistent) labels.push('consistent')
+          if (inconsistent) labels.push('inconsistent')
+          return labels
+        } catch {
+          return []
+        }
+      }
+      if (statements.length < 2) return []
+      try {
+        const fa = Formula.from(statements[0])
+        const fb = Formula.from(statements[1])
+        const { equiv, A, B } = equivTables(fa, fb)
+        if (equiv) return ['equivalent']
+        const toBool = (v) => v === true || v === 'T'
+        let contra = true
+        let consistent = false
+        for (let i = 0; i < A.rows.length; i++) {
+          const tvA = toBool(A.rows[i][A.opspot])
+          const tvB = toBool(B.rows[i][B.opspot])
+          if (tvA !== tvB) contra = false
+          if (tvA && tvB) consistent = true
+        }
+        const labels = []
+        if (contra) labels.push('contradictory')
+        if (consistent) labels.push('consistent')
+        if (!consistent) labels.push('inconsistent')
+        return labels
+      } catch {
+        return []
+      }
+    }
+    return []
+  }, [kind, proof?.solution, statements, Formula])
+
   const theme = useTheme()
   const renderTableSet = (tablesToRender, tableInputsToRender, combined, readOnly, onCellChange, showConclusionMarker) => {
     if (combined) {
@@ -871,18 +966,31 @@ export default function TruthTableEditor({
           </Box>
         )}
         {!hideActions && !suppressReveal && showSolution && (
-          /* show answer in card */
-          renderAnswerBlock(
-            'Correct Answer',
-            renderTableSet(
-              displaySolutionTables,
-              displaySolutionTables.map((table) => table.rows),
-              displaySolutionTables.length > 1,
-              true,
-              null,
-              kind === 'argument'
-            )
-          )
+          <>
+            {renderAnswerBlock(
+              'Correct Answer',
+              renderTableSet(
+                displaySolutionTables,
+                displaySolutionTables.map((table) => table.rows),
+                displaySolutionTables.length > 1,
+                true,
+                null,
+                kind === 'argument'
+              )
+            )}
+            {classificationEnabled && solutionMcValues.length > 0 && (
+              <Box sx={{ mt: 2 }}>
+                <Typography variant="h6" sx={{ fontWeight: 600, color: '#2f6bff' }}>
+                  Correct classification
+                </Typography>
+                <Typography variant="body1" sx={{ mt: 1 }}>
+                  {solutionMcValues
+                    .map((v) => classificationOptions.find((o) => o.value === v)?.label ?? v)
+                    .join(', ')}
+                </Typography>
+              </Box>
+            )}
+          </>
         )}
       </Stack>
     </Box>
