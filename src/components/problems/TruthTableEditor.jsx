@@ -532,6 +532,7 @@ export default function TruthTableEditor({
   }
 
   const handleStartOver = () => {
+    if (attemptCount >= attemptLimit) return
     setTableInputs(resetTables)
     onStateChange?.({
       tables: resetTables.map((rows) => ({ rows })),
@@ -573,7 +574,24 @@ export default function TruthTableEditor({
     }
     return []
   }, [proof])
-  const showSolution = attemptCount >= attemptLimit && solutionTables.length > 0
+  const solutionTablesFromProblem = React.useMemo(
+    () =>
+      tables.map((table) => ({
+        label: table.label || '',
+        tokens: table.tokens || [],
+        rows: (table.rows || []).map((row) =>
+          row.map((cell) => (cell === true || cell === 'T' ? 'T' : 'F'))
+        ),
+        headerTokens: table.headerTokens,
+      })),
+    [tables]
+  )
+  const displaySolutionTables =
+    solutionTables.length > 0
+      ? solutionTables
+      : solutionTablesFromProblem
+  const showSolution =
+    attemptCount >= attemptLimit && displaySolutionTables.length > 0
 
   const theme = useTheme()
   const renderTableSet = (tablesToRender, tableInputsToRender, combined, readOnly, onCellChange, showConclusionMarker) => {
@@ -856,9 +874,9 @@ export default function TruthTableEditor({
           renderAnswerBlock(
             'Correct Answer',
             renderTableSet(
-              solutionTables,
-              solutionTables.map((table) => table.rows),
-              solutionTables.length > 1,
+              displaySolutionTables,
+              displaySolutionTables.map((table) => table.rows),
+              displaySolutionTables.length > 1,
               true,
               null,
               kind === 'argument'

@@ -40,7 +40,7 @@ export default function ProblemSetButtons({
           <Button
             variant="outlined"
             onClick={onStartOver}
-            disabled={isChecking}
+            disabled={isChecking || (hasAttempts && attemptsLeft === 0)}
           >
             Start Over
           </Button>
@@ -71,7 +71,7 @@ export default function ProblemSetButtons({
           <Button
             variant="outlined"
             onClick={onStartOver}
-            disabled={isChecking}
+            disabled={isChecking || (hasAttempts && attemptsLeft === 0)}
           >
             Start Over
           </Button>

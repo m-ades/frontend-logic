@@ -119,6 +119,7 @@ export default function ProofEditor({ proof, onProofComplete, savedState, onStat
   }
 
   const handleStartOver = () => {
+    if (isLocked) return
     const derivElement = getDerivElement()
     if (!derivElement?.startOver) return
     // clear state

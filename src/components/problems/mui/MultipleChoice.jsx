@@ -87,7 +87,8 @@ export default function MultipleChoice({
     attemptLimit,
     initialAttemptCount: savedState?.attemptCount ?? 0,
   })
-  const showSolution = isLocked && (isComposite || typeof answer === 'number' || Array.isArray(answer))
+  const correctAnswer = answer ?? problem?.answer ?? problem?.answerIndex ?? problem?.answerIndices
+  const showSolution = isLocked && (isComposite || correctAnswer !== undefined && correctAnswer !== null)
   // match checker rules
   const isSubmitDisabled = isLocked || (
     isComposite
@@ -352,14 +353,14 @@ export default function MultipleChoice({
                         {problem.choices.map((choice, index) => (
                           <FormControlLabel
                             key={`${choice}-${index}`}
-                            control={<Checkbox checked={Array.isArray(answer) && answer.includes(index)} disabled />}
+                            control={<Checkbox checked={Array.isArray(correctAnswer) && correctAnswer.includes(index)} disabled />}
                             label={choice}
                             sx={multiSelectLabelSx}
                           />
                         ))}
                       </FormGroup>
                     ) : (
-                      <RadioGroup value={String(answer ?? '')} name={`${groupBase}-reveal`}>
+                      <RadioGroup value={String(correctAnswer ?? '')} name={`${groupBase}-reveal`}>
                         {problem.choices.map((choice, index) => (
                           <FormControlLabel
                             key={`${choice}-${index}`}

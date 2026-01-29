@@ -106,6 +106,7 @@ export function useProblemChecker({
   }
 
   const handleStartOver = () => {
+    if (isLocked) return
     resetInput()
     setStatus('unanswered')
     setMessage('')
