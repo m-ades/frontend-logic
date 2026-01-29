@@ -889,7 +889,7 @@ export default function TruthTableEditor({
         }}
       >
         {tableCorrect
-          ? 'Answer looks good.'
+          ? ((kind === 'equivalence' || kind === 'argument') ? 'Truth table looks good.' : 'Answer looks good.')
           : tableFilled
             ? 'Recheck your rows.'
             : 'Click cells to toggle truth values - fill in every cell to finish.'}
