@@ -40,35 +40,7 @@ import { MetricCard } from "../MetricCard";
 import { GradeDistributionChart } from "./GradeDistributionChart";
 import StudentSubmissionsTable from "./StudentSubmissionsTable";
 import GradeBreakdown from "./GradeBreakdown";
-
-// Helper to format date and time
-function formatDateTime(dateString, timeString) {
-  if (!dateString) return "—";
-
-  const date = new Date(dateString);
-  const dateFormatted = date.toLocaleDateString("en-US", {
-    month: "long",
-    day: "numeric",
-    year: "numeric",
-  });
-
-  if (!timeString) return dateFormatted;
-
-  const [hours, minutes] = timeString.split(":");
-  const timeFormatted = new Date(
-    2000,
-    0,
-    1,
-    parseInt(hours),
-    parseInt(minutes)
-  ).toLocaleTimeString("en-US", {
-    hour: "numeric",
-    minute: "2-digit",
-    hour12: true,
-  });
-
-  return `${dateFormatted} at ${timeFormatted}`;
-}
+import { formatEasternDateTime } from "../../../utils/easternTime.js";
 
 // Helper functions
 function getLetterGrade(grade) {
@@ -265,7 +237,7 @@ export default function AssignmentDetailModal({ open, onClose, assignmentId }) {
               )}
             </Box>
             <Typography variant="body2" color="text.secondary">
-              Due: {formatDateTime(assignment.dueDate, assignment.dueTime)} •{" "}
+              Due: {formatEasternDateTime(assignment.dueDate, assignment.dueTime) ?? "—"} •{" "}
               {assignment.totalPoints || 100} points • Avg time: {avgTime}
             </Typography>
           </Box>

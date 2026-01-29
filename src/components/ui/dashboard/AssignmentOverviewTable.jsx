@@ -21,34 +21,7 @@ import {
   getGradeColorVariant,
   getDefaultGradingScale,
 } from "../../../utils/gradingUtils";
-
-// Helper to format date and time
-function formatDateTime(dateString, timeString) {
-  if (!dateString) return "—";
-
-  const date = new Date(dateString);
-  const dateFormatted = date.toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
-  });
-
-  if (!timeString) return dateFormatted;
-
-  const [hours, minutes] = timeString.split(":");
-  const timeFormatted = new Date(
-    2000,
-    0,
-    1,
-    parseInt(hours),
-    parseInt(minutes)
-  ).toLocaleTimeString("en-US", {
-    hour: "numeric",
-    minute: "2-digit",
-    hour12: true,
-  });
-
-  return `${dateFormatted} at ${timeFormatted}`;
-}
+import { formatEasternDateTime } from "../../../utils/easternTime.js";
 
 export const AssignmentOverviewTable = ({
   assignments: assignmentsProp,
@@ -310,7 +283,10 @@ export const AssignmentOverviewTable = ({
                     </TableCell>
                     <TableCell>
                       <Typography variant="body2" color="text.secondary">
-                        {formatDateTime(assignment.dueDate, assignment.dueTime)}
+                        {formatEasternDateTime(
+                          assignment.dueDate,
+                          assignment.dueTime
+                        ) ?? "—"}
                       </Typography>
                     </TableCell>
                     <TableCell align="center">

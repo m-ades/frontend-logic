@@ -26,37 +26,9 @@ import {
   Plus,
   Brain,
 } from "lucide-react";
+import { formatEasternDateTime } from "../../utils/easternTime.js";
 
 // Helper function to format date and time
-function formatDateTime(dateString, timeString) {
-  if (!dateString) return "—";
-
-  const date = new Date(dateString);
-  const dateFormatted = date.toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  });
-
-  if (!timeString) return dateFormatted;
-
-  // Parse time string (HH:mm format)
-  const [hours, minutes] = timeString.split(":");
-  const timeFormatted = new Date(
-    2000,
-    0,
-    1,
-    parseInt(hours),
-    parseInt(minutes)
-  ).toLocaleTimeString("en-US", {
-    hour: "numeric",
-    minute: "2-digit",
-    hour12: true,
-  });
-
-  return `${dateFormatted} at ${timeFormatted}`;
-}
-
 export default function AssignmentTable({
   items,
   type = "assignment",
@@ -181,7 +153,7 @@ export default function AssignmentTable({
                       Publish date
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
-                      {formatDateTime(item.publishDate, item.publishTime)}
+                      {formatEasternDateTime(item.publishDate, item.publishTime) ?? "—"}
                     </Typography>
                   </Stack>
 
@@ -190,7 +162,7 @@ export default function AssignmentTable({
                       Due date
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
-                      {formatDateTime(item.dueDate, item.dueTime)}
+                      {formatEasternDateTime(item.dueDate, item.dueTime) ?? "—"}
                     </Typography>
                   </Stack>
 
@@ -398,12 +370,12 @@ export default function AssignmentTable({
                   </TableCell>
                   <TableCell>
                     <Typography variant="body2" color="text.secondary">
-                      {formatDateTime(item.publishDate, item.publishTime)}
+                      {formatEasternDateTime(item.publishDate, item.publishTime) ?? "—"}
                     </Typography>
                   </TableCell>
                   <TableCell>
                     <Typography variant="body2" color="text.secondary">
-                      {formatDateTime(item.dueDate, item.dueTime)}
+                      {formatEasternDateTime(item.dueDate, item.dueTime) ?? "—"}
                     </Typography>
                   </TableCell>
                   {isPractice ? (
