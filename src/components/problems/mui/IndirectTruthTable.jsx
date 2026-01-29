@@ -117,6 +117,7 @@ export default function IndirectTruthTable({
   readOnly = false,
   hideActions = false,
 }) {
+  const theme = useTheme()
   const syntax = useMemo(() => getSyntax(), [])
   const Formula = useMemo(() => getFormulaClass(), [])
   const prompt = problem?.prompt || ''
