@@ -368,7 +368,7 @@ export default function TruthTableEditor({
   }, [tableMatches, tables, useCombinedTable])
 
   const hasTruthTable = tables.length > 0 && expectedTables.length === tables.length
-  const tableFilled =
+  const tableFilledOnly =
     hasTruthTable &&
     tableInputs.length > 0 &&
     tableInputs.every((t, tIdx) =>
@@ -378,8 +378,9 @@ export default function TruthTableEditor({
           row.length === (tables[tIdx]?.rows?.[rIdx]?.length ?? 0) &&
           row.every((cell) => cell !== '')
       )
-    ) &&
-    (!classificationEnabled || mcSelection.length > 0)
+    )
+  const tableFilled =
+    tableFilledOnly && (!classificationEnabled || mcSelection.length > 0)
 
   const tableCorrect =
     hasTruthTable &&
@@ -905,8 +906,8 @@ export default function TruthTableEditor({
         }}
       >
         {tableCorrect
-          ? ((kind === 'equivalence' || kind === 'argument') ? 'Truth table looks good.' : 'Answer looks good.')
-          : tableFilled
+          ? 'Truth table looks good.'
+          : tableFilledOnly
             ? 'Recheck your rows.'
             : 'Click cells to toggle truth values - fill in every cell to finish.'}
       </Typography>

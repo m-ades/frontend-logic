@@ -386,7 +386,7 @@ export default function SingleRowTruthTable({
               }}
             >
               {status === 'correct' || isCurrentlyCorrect
-                ? 'Answer looks good.'
+                ? 'Truth table looks good.'
                 : tableFilled
                   ? 'Recheck your truth values.'
                   : 'Click cells to toggle truth values - fill in every cell to finish.'}
