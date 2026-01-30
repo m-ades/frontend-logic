@@ -42,7 +42,7 @@ export default function ProblemSetButtons({
             onClick={onStartOver}
             disabled={isChecking || (hasAttempts && attemptsLeft === 0)}
           >
-            Start Over
+            Clear Answer
           </Button>
           <IconButton
             onClick={navigation?.onNext}
@@ -73,7 +73,7 @@ export default function ProblemSetButtons({
             onClick={onStartOver}
             disabled={isChecking || (hasAttempts && attemptsLeft === 0)}
           >
-            Start Over
+            Clear Answer
           </Button>
         </Stack>
       )}

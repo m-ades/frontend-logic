@@ -269,9 +269,9 @@ export default class DerivationExercise extends LogicPenguinProblem {
         });
 
         this.startOverButton = addelem('button', this.buttonDiv, {
-            type: 'button',
-            myprob: this,
-            innerHTML: 'Start Over',
+          type: 'button',
+          myprob: this,
+          innerHTML: 'Clear Answer',
             onmousedown: function(e) {
                 e.preventDefault();
             },
