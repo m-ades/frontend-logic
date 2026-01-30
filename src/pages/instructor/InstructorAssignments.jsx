@@ -276,6 +276,12 @@ export default function InstructorAssignments() {
     });
   };
 
+  const handlePreviewAsStudent = (assignment) => {
+    navigate(`/student/assignment/${assignment.id}?preview=student`, {
+      state: { returnTo: "/instructor/assignments" },
+    });
+  };
+
   const handleOpenBuilder = (assignment) => {
     navigate("/instructor/assignment-builder", {
       state: { assignmentId: assignment.id },
@@ -353,6 +359,7 @@ export default function InstructorAssignments() {
         onClose={() => setMenuAnchor(null)}
         item={menuAssignment}
         onOpenBuilder={handleOpenBuilder}
+        onPreview={handlePreviewAsStudent}
         onEdit={handleEditOpen}
         onDuplicate={handleDuplicate}
         onDelete={handleDelete}
