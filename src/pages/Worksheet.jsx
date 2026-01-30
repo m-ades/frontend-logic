@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useParams, useNavigate, useLocation } from 'react-router-dom'
+import { Box } from '@mui/material'
 import WorksheetLayout from '../components/layout/WorksheetLayout.jsx'
 import WorksheetTabs from '../components/problems/WorksheetTabs.jsx'
 import { useScoring } from '../hooks/usescoring.js'
@@ -871,30 +872,32 @@ export default function Worksheet() {
   }
 
   return (
-    <WorksheetLayout
-      subtitle={currentWorksheet.title || "Predicate Logic: Natural Deduction"}
-      onBackToLMS={() => navigate(backTarget)}
-      worksheets={worksheets}
-      currentWorksheetIndex={currentWorksheetIndex}
-      onWorksheetIndexChange={handleWorksheetChange}
-      completedProofs={completedProofs}
-      isOverdue={isOverdue}
-    >
-      <WorksheetTabs
+    <Box sx={{ '& .logicpenguin': { fontSize: '16px' } }}>
+      <WorksheetLayout
+        subtitle={currentWorksheet.title || "Predicate Logic: Natural Deduction"}
+        onBackToLMS={() => navigate(backTarget)}
         worksheets={worksheets}
         currentWorksheetIndex={currentWorksheetIndex}
         onWorksheetIndexChange={handleWorksheetChange}
-        currentProofIndex={currentProofIndex}
-        onProofIndexChange={setCurrentProofIndex}
         completedProofs={completedProofs}
-        onProofComplete={handleProofComplete}
-        getSavedProofState={getSavedProofState}
-        handleProofStateChange={handleProofStateChange}
-        total={total}
-        completionPercent={completionPercent}
-        gradeLabel={gradeLabel}
         isOverdue={isOverdue}
-      />
-    </WorksheetLayout>
+      >
+        <WorksheetTabs
+          worksheets={worksheets}
+          currentWorksheetIndex={currentWorksheetIndex}
+          onWorksheetIndexChange={handleWorksheetChange}
+          currentProofIndex={currentProofIndex}
+          onProofIndexChange={setCurrentProofIndex}
+          completedProofs={completedProofs}
+          onProofComplete={handleProofComplete}
+          getSavedProofState={getSavedProofState}
+          handleProofStateChange={handleProofStateChange}
+          total={total}
+          completionPercent={completionPercent}
+          gradeLabel={gradeLabel}
+          isOverdue={isOverdue}
+        />
+      </WorksheetLayout>
+    </Box>
   )
 }
