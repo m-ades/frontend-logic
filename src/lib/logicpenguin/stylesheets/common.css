@@ -42,6 +42,15 @@
   color: var(--lpblack);
 }
 
+:where(.logicpenguin) .problemstatusindicator,
+:where(.logicpenguin) .problemsuccessindicator,
+:where(.logicpenguin) .problemsavedindicator,
+:where(.logicpenguin) .problempointsindicator,
+:where(.logicpenguin) .problemindicatormessage {
+  /* Hide legacy status UI while React/MUI owns feedback */
+  display: none;
+}
+
 :where(.logicpenguin),
 :where(.logicpenguin) * {
   box-sizing: border-box;
