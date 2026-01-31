@@ -113,7 +113,6 @@ export default function RulesReference() {
         </Typography>
         <Box component="div" sx={{ fontSize: '0.85rem' }}>
           <div><strong>•</strong> Press <strong>Enter</strong> to go to the justification line</div>
-          <div><strong>•</strong> Press <strong>Enter</strong> from the justification line to start a new line</div>
         </Box>
       </RulesCard>
       
