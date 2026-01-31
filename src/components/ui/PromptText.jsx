@@ -34,6 +34,11 @@ const promptSx = {
   '& .instructions, & .instruction': {
     fontWeight: '400 !important',
   },
+  '& .instructions::before, & .instruction::before': {
+    content: '"Instructions: "',
+    fontStyle: 'normal',
+    color: 'text.secondary',
+  },
   '& .instructions, & .instruction, & div.instructions, & div.instruction, & p.instructions, & p.instruction': {
     marginBottom: 0,
     paddingBottom: '0.5rem !important',
