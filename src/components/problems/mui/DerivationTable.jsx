@@ -30,7 +30,17 @@ import checkDerivation from '../../../lib/logicpenguin/checkers/derivation-hurle
 import getSyntax from '../../../lib/logicpenguin/symbolic/libsyntax.js'
 import { justParse } from '../../ui/logicpenguin/justification-parse.js'
 
-const SYMBOLS = ['~', '•', '∨', '⊃', '≡', '(∀x)', '(∃x)']
+const SYMBOL_BUTTONS = [
+  { label: '~', insert: '~' },
+  { label: '•', insert: '•' },
+  { label: '∨', insert: '∨' },
+  { label: '⊃', insert: '⊃' },
+  { label: '≡', insert: '≡' },
+  { label: '(∀x)', insert: '(∀x)' },
+  { label: '(∃x)', insert: '(∃x)' },
+  { label: '(  )', pair: '()' },
+  { label: '[  ]', pair: '[]' },
+]
 const FORCE_UPPER_RULES = new Set(['UI','UG','EI','EG','MP','MT','HS','DS','CD','DN','DM','CQ','QN','CP','IP','ACP','AIP'])
 const RULES_ALLOW_NO_LINES = new Set(['ACP', 'AIP'])
 const ASSUMPTION_RULES = new Set(['ACP', 'AIP'])
@@ -1078,10 +1088,10 @@ export default function DerivationTable({
                       <AutoAwesomeIcon />
                     </IconButton>
                   </Tooltip>
-                  {SYMBOLS.map((sym) => (
+                  {SYMBOL_BUTTONS.map(({ label, insert, pair }) => (
                     <Chip
-                      key={sym}
-                      label={sym}
+                      key={label}
+                      label={label}
                       size="small"
                       variant="filled"
                       onMouseDown={(event) => {
@@ -1114,16 +1124,25 @@ export default function DerivationTable({
                         const isFocused = typeof document !== 'undefined' && document.activeElement === inputEl
                         const start = isFocused && typeof inputEl?.selectionStart === 'number' ? inputEl.selectionStart : stored.start
                         const end = isFocused && typeof inputEl?.selectionEnd === 'number' ? inputEl.selectionEnd : stored.end
+                        const hasSelection = end > start
+                        const [open, close] = pair ? pair.split('') : []
+                        const insertText = pair
+                          ? (hasSelection ? `${open}${current.slice(start, end)}${close}` : `${open}  ${close}`)
+                          : insert
+                        const nextCursor = pair
+                          ? (hasSelection ? start + insertText.length : start + open.length + 1)
+                          : start + (insertText?.length ?? 0)
                         if (inputEl && typeof inputEl.setRangeText === 'function') {
-                          inputEl.setRangeText(sym, start, end, 'end')
+                          inputEl.setRangeText(insertText, start, end, 'end')
                           handleLineChange(targetIdx, 'formula', inputEl.value ?? '')
                           inputEl.focus()
-                          const nextCursor = start + sym.length
                           setStoredSelection(targetIdx, nextCursor)
                           setTimeout(() => inputEl.setSelectionRange(nextCursor, nextCursor), 0)
                           return
                         }
-                        const { nextValue, nextCursor } = applyInsertion(current, start, end, sym)
+                        const before = current.slice(0, start)
+                        const after = current.slice(end)
+                        const nextValue = `${before}${insertText}${after}`
                         handleLineChange(targetIdx, 'formula', nextValue)
                         setStoredSelection(targetIdx, nextCursor)
                         if (inputEl) {
