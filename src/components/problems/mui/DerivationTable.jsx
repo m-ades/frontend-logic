@@ -472,6 +472,7 @@ export default function DerivationTable({
             ? cursorPositionsRef.current[index]
             : value.length)
     const end = typeof el.selectionEnd === 'number' ? el.selectionEnd : start
+    const hasModifier = event.ctrlKey || event.metaKey || event.altKey
 
     const insertSymbol = (symbol, replaceBefore = 0) => {
       event.preventDefault()
@@ -493,30 +494,30 @@ export default function DerivationTable({
       setTimeout(() => el.setSelectionRange(nextCursor, nextCursor), 0)
     }
 
-    if (key === '&' || key === '^' || key === '.' || key === '*' || key === '•' || key === '·' || key === '∧') {
+    if (!hasModifier && (key === '&' || key === '^' || key === '.' || key === '*' || key === '•' || key === '·' || key === '∧')) {
       insertSymbol('•')
       return
     }
-    if (key === 'v' || key === '∨') {
+    if (!hasModifier && (key === 'v' || key === '∨')) {
       insertSymbol('∨')
       return
     }
-    if (key === '>' || key === '→' || key === '⇒' || key === '⊃') {
+    if (!hasModifier && (key === '>' || key === '→' || key === '⇒' || key === '⊃')) {
       insertSymbol('⊃')
       return
     }
-    if (key === '=' && start > 0 && value[start - 1] === '=') {
+    if (!hasModifier && key === '=' && start > 0 && value[start - 1] === '=') {
       insertSymbol('≡', 1)
       return
     }
-    if ((key === 'l' || key === 'L')) {
+    if (!hasModifier && (key === 'l' || key === 'L')) {
       const textWithKey = value.slice(0, start) + key.toLowerCase()
       if (/all$/i.test(textWithKey)) {
         insertSymbol('∀', 3)
       }
       return
     }
-    if ((key === 'e' || key === 'E')) {
+    if (!hasModifier && (key === 'e' || key === 'E')) {
       const textWithKey = value.slice(0, start) + key.toLowerCase()
       if (/some$/i.test(textWithKey)) {
         insertSymbol('∃', 4)
