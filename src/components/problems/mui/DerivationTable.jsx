@@ -22,8 +22,10 @@ import ThemedCard from '../../ui/ThemedCard.jsx'
 import ProblemSetButtons from './ProblemSetButtons.jsx'
 import checkDerivation from '../../../lib/logicpenguin/checkers/derivation-hurley.js'
 import getSyntax from '../../../lib/logicpenguin/symbolic/libsyntax.js'
+import { justParse } from '../../ui/logicpenguin/justification-parse.js'
 
 const SYMBOLS = ['~', '•', '∨', '⊃', '≡', '(∀x)', '(∃x)']
+const FORCE_UPPER_RULES = new Set(['UI','UG','EI','EG','MP','MT','HS','DS','CD','DN','DM','CQ','QN','CP','IP','ACP','AIP'])
 
 const applyInsertion = (value, selectionStart, selectionEnd, insertText, replaceBefore = 0) => {
   const start = selectionStart ?? value.length
@@ -33,6 +35,32 @@ const applyInsertion = (value, selectionStart, selectionEnd, insertText, replace
   const nextValue = before + insertText + after
   const nextCursor = before.length + insertText.length
   return { nextValue, nextCursor }
+}
+
+const formatJustificationDisplay = (value) => {
+  if (!value) return ''
+  let { nums, ranges, citedrules } = justParse(String(value))
+  nums = nums.sort((a, b) => (a - b))
+  ranges = ranges.sort(([a, b], [c, d]) => ((a - c === 0) ? b - d : a - c))
+  citedrules = citedrules.map((rule) => {
+    if (!rule) return rule
+    if (FORCE_UPPER_RULES.has(rule.toUpperCase())) {
+      return rule.toUpperCase()
+    }
+    return rule.charAt(0).toUpperCase() + rule.slice(1).toLowerCase()
+  })
+  citedrules = citedrules.sort()
+
+  let pretty = nums.map((n) => n.toString()).join(', ')
+  if (ranges.length > 0) {
+    if (pretty !== '') pretty += ', '
+    pretty += ranges.map(([s, e]) => `${s}–${e}`).join(', ')
+  }
+  if (citedrules.length > 0) {
+    if (pretty !== '') pretty += ' '
+    pretty += citedrules.join(', ')
+  }
+  return pretty
 }
 
 const buildErrorRows = (errors, { skipCompletion = false } = {}) => {
@@ -356,8 +384,8 @@ export default function DerivationTable({
     if (readOnly) return
     if (event.key === 'Enter') {
       event.preventDefault()
-      const normalized = normalizeJustificationForCheck(event.target.value)
-      handleLineChange(index, 'justification', normalized)
+      const formatted = formatJustificationDisplay(event.target.value)
+      handleLineChange(index, 'justification', formatted)
       const nextIndex = index + 1
       if (nextIndex >= lines.length) {
         addLine()
@@ -503,7 +531,7 @@ export default function DerivationTable({
                         value={line.justification}
                         onChange={(e) => handleLineChange(idx, 'justification', e.target.value)}
                         onKeyDown={(e) => handleJustKeyDown(e, idx, line.readOnly)}
-                        onBlur={(e) => handleLineChange(idx, 'justification', normalizeJustificationForCheck(e.target.value))}
+                        onBlur={(e) => handleLineChange(idx, 'justification', formatJustificationDisplay(e.target.value))}
                         InputProps={{ readOnly: line.readOnly }}
                         inputRef={(el) => { if (el) justRefs.current[idx] = el }}
                         sx={{
