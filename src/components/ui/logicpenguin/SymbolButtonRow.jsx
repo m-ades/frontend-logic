@@ -20,6 +20,8 @@ const BUTTONS = [
   { op: 'IFF' },
   { op: 'FORALL', quantifier: true },
   { op: 'EXISTS', quantifier: true },
+  { pair: '()' },
+  { pair: '[]' },
 ]
 
 export default function SymbolButtonRow({
@@ -32,7 +34,13 @@ export default function SymbolButtonRow({
   const inputSymbols = inputRef?.current?.symbols
   const symbols = inputSymbols || syntax?.symbols || {}
 
-  const resolveLabel = (op, quantifier = false) => {
+  const resolveLabel = (op, quantifier = false, insert = null, pair = null) => {
+    if (insert) return insert
+    if (pair) {
+      const open = pair[0]
+      const close = pair[1]
+      return `${open}  ${close}`
+    }
     const sym = symbols?.[op] || FALLBACK_SYMBOLS[op] || op
     return quantifier ? `(${sym}x)` : sym
   }
@@ -40,6 +48,12 @@ export default function SymbolButtonRow({
   const finalizeChange = (input) => {
     if (onValueChange) {
       onValueChange(input.value ?? '')
+    }
+  }
+
+  const markChanged = (input) => {
+    if (input?.myline?.mysubderiv?.myprob.makeChanged) {
+      input.myline.mysubderiv.myprob.makeChanged(false, true)
     }
   }
 
@@ -51,12 +65,51 @@ export default function SymbolButtonRow({
     input.setRangeText(text, start, end, 'end')
     input.focus()
     input.setSelectionRange(start + text.length, start + text.length)
+    markChanged(input)
   }
 
-  const handleInsert = (op, quantifier = false) => {
+  const insertLiteral = (input, text) => {
+    const start = input.selectionStart ?? input.value.length
+    const end = input.selectionEnd ?? start
+    input.setRangeText(text, start, end, 'end')
+    input.focus()
+    input.setSelectionRange(start + text.length, start + text.length)
+    markChanged(input)
+  }
+
+  const insertPair = (input, pairText) => {
+    const start = input.selectionStart ?? input.value.length
+    const end = input.selectionEnd ?? start
+    const [open, close] = pairText.split('')
+    const hasSelection = end > start
+    const selected = hasSelection ? input.value.slice(start, end) : ''
+    const text = hasSelection ? `${open}${selected}${close}` : `${open}  ${close}`
+    input.setRangeText(text, start, end, 'end')
+    input.focus()
+    if (hasSelection) {
+      const newPos = start + text.length
+      input.setSelectionRange(newPos, newPos)
+    } else {
+      const newPos = start + open.length + 1
+      input.setSelectionRange(newPos, newPos)
+    }
+    markChanged(input)
+  }
+
+  const handleInsert = ({ op, quantifier = false, insert = null, pair = null }) => {
     if (disabled) return
     const input = inputRef?.current
     if (!input) return
+    if (insert) {
+      insertLiteral(input, insert)
+      finalizeChange(input)
+      return
+    }
+    if (pair) {
+      insertPair(input, pair)
+      finalizeChange(input)
+      return
+    }
     if (quantifier) {
       insertQuantifier(input, op)
       finalizeChange(input)
@@ -74,23 +127,24 @@ export default function SymbolButtonRow({
   return (
     <Box aria-label="Symbol shortcuts">
       <Stack direction="row" spacing={0.5} flexWrap="wrap" useFlexGap>
-        {visibleButtons.map(({ op, quantifier }) => (
+        {visibleButtons.map(({ op, quantifier, insert, pair }) => (
           <Button
-            key={op}
+            key={op || insert || pair}
             type="button"
-            size="small"
+            size="medium"
             variant="outlined"
-            onClick={() => handleInsert(op, quantifier)}
+            onClick={() => handleInsert({ op, quantifier, insert, pair })}
             disabled={disabled}
             aria-disabled={disabled}
-            title={`Insert ${resolveLabel(op, quantifier)}`}
+            title={`Insert ${resolveLabel(op, quantifier, insert, pair)}`}
             sx={{
-              minWidth: 0,
-              px: 0.7,
-              py: 0.2,
-              fontSize: '0.875rem',
-              lineHeight: 1,
-              minHeight: 28,
+              minWidth: 34,
+              px: 1,
+              py: 0.45,
+              fontSize: '1rem',
+              lineHeight: 1.1,
+              minHeight: 34,
+              fontWeight: 600,
               textTransform: 'none',
               boxShadow: 'none',
               border: 'none',
@@ -104,7 +158,7 @@ export default function SymbolButtonRow({
               }),
             }}
           >
-            {resolveLabel(op, quantifier)}
+            {resolveLabel(op, quantifier, insert, pair)}
           </Button>
         ))}
       </Stack>
