@@ -405,7 +405,7 @@ export default function DerivationTable({
       const nextCats = {}
       Object.keys(categories).forEach((category) => {
         if (line === '??' && category === 'rule' && !readyForRuleGate) return
-        if (category === 'completion' && !readyForRuleGate && !isAssumptionLine) return
+        if (category === 'completion' && !readyForRuleGate) return
         nextCats[category] = categories[category]
       })
       if (Object.keys(nextCats).length > 0) {
@@ -820,6 +820,29 @@ export default function DerivationTable({
         <TableContainer component={Box} sx={{ width: '100%' }}>
           <Table size="medium" sx={{ width: 'auto' }}>
             <TableBody>
+            {premises.length === 0 && proof?.conclusion && (
+              <TableRow
+                key="conclusion-row"
+                sx={{
+                  '& td': {
+                    py: 0.5,
+                    position: 'relative',
+                  },
+                }}
+              >
+                <TableCell sx={{ width: 48, borderBottom: 'none' }}>
+                  <Typography sx={{ color: 'transparent' }}>—</Typography>
+                </TableCell>
+                <TableCell sx={{ borderBottom: 'none', width: 'auto', pr: 0.5, whiteSpace: 'nowrap' }}>
+                  <Typography sx={{ color: 'transparent' }}>—</Typography>
+                </TableCell>
+                <TableCell sx={{ borderBottom: 'none', width: 'auto', pl: 0.5, whiteSpace: 'nowrap' }}>
+                  <Typography component="span" sx={{ fontSize: 16, color: 'text.primary' }}>
+                    {`// ${proof.conclusion}`}
+                  </Typography>
+                </TableCell>
+              </TableRow>
+            )}
             {lines.map((line, idx) => {
               const indentPx = (indentLevels[idx] || 0) * INDENT_PX
                 + (indentLevels[idx] ? ASSUMPTION_INDENT_PX : 0)
