@@ -24,6 +24,9 @@ import {
 
 // Map routes to readable page names
 const getPageName = (pathname) => {
+  if (pathname.startsWith("/instructor/assignment/")) {
+    return "Assignment";
+  }
   if (pathname.startsWith("/student/assignment/")) {
     return "Assignment";
   }
@@ -37,7 +40,7 @@ const getPageName = (pathname) => {
     "/instructor/gradebook": "Gradebook",
     "/instructor/controls": "Course Controls",
     "/instructor/contact": "Contact",
-    "/instructor/assignment-builder": "Assignment Builder",
+    "/instructor/assignment-builder": "Assignments",
     "/instructor/roster": "Roster",
     "/instructor/profile": "Profile & Preferences",
     "/instructor/practice": "Practice",

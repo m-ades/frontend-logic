@@ -52,6 +52,13 @@ export default function InstructorPractice() {
   const practices = sortAssignmentsBySubchapter(practicesByCourse[activeCourseId] || []);
   const enhancedPractices = enhanceItems(practices, activeCourse, [], true);
 
+  const navigateToPractice = (practiceId) => {
+    if (!practiceId) return;
+    navigate(`/instructor/assignment/${practiceId}`, {
+      state: { returnTo: "/instructor/practice" },
+    });
+  };
+
   // Handlers
   const handleCreateOpen = () => {
     setFormData({
@@ -90,9 +97,7 @@ export default function InstructorPractice() {
         payload: refreshed,
       });
       setCreateDialogOpen(false);
-      navigate("/instructor/assignment-builder", {
-        state: { practiceId: created?.id ?? payload.id },
-      });
+      navigateToPractice(created?.id ?? payload.id);
     } catch (error) {
       console.error("Failed to create practice", error);
     }
@@ -252,16 +257,7 @@ export default function InstructorPractice() {
   };
 
   const handleViewPractice = (practice) => {
-    navigate("/instructor/assignment-builder", {
-      state: { practiceId: practice.id },
-    });
-  };
-
-  const handleOpenBuilder = (practice) => {
-    navigate("/instructor/assignment-builder", {
-      state: { practiceId: practice.id },
-    });
-    setMenuAnchor(null);
+    navigateToPractice(practice?.id);
   };
 
   // Show message if no active course
@@ -340,7 +336,6 @@ export default function InstructorPractice() {
         open={Boolean(menuAnchor)}
         onClose={() => setMenuAnchor(null)}
         item={menuPractice}
-        onOpenBuilder={handleOpenBuilder}
         onEdit={handleEditOpen}
         onDuplicate={handleDuplicate}
         onDelete={handleDelete}

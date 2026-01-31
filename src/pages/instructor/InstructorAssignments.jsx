@@ -81,6 +81,13 @@ export default function InstructorAssignments() {
   const assignments = sortAssignmentsBySubchapter(assignmentsByCourse[activeCourseId] || []);
   const gradebook = gradebookByCourse[activeCourseId] || [];
 
+  const navigateToAssignment = (assignmentId) => {
+    if (!assignmentId) return;
+    navigate(`/instructor/assignment/${assignmentId}`, {
+      state: { returnTo: "/instructor/assignments" },
+    });
+  };
+
   // Enhance assignments with calculated data
   const enhancedAssignments = enhanceItems(
     assignments,
@@ -125,9 +132,7 @@ export default function InstructorAssignments() {
         payload: refreshed,
       });
       setCreateDialogOpen(false);
-      navigate("/instructor/assignment-builder", {
-        state: { assignmentId: created?.id ?? payload.id },
-      });
+      navigateToAssignment(created?.id ?? payload.id);
     } catch (error) {
       console.error("Failed to create assignment", error);
     }
@@ -271,22 +276,7 @@ export default function InstructorAssignments() {
   };
 
   const handleViewAssignment = (assignment) => {
-    navigate("/instructor/assignment-builder", {
-      state: { assignmentId: assignment.id },
-    });
-  };
-
-  const handlePreviewAsStudent = (assignment) => {
-    navigate(`/student/assignment/${assignment.id}?preview=student`, {
-      state: { returnTo: "/instructor/assignments" },
-    });
-  };
-
-  const handleOpenBuilder = (assignment) => {
-    navigate("/instructor/assignment-builder", {
-      state: { assignmentId: assignment.id },
-    });
-    setMenuAnchor(null);
+    navigateToAssignment(assignment?.id);
   };
 
   // Show message if no active course
@@ -358,8 +348,6 @@ export default function InstructorAssignments() {
         open={Boolean(menuAnchor)}
         onClose={() => setMenuAnchor(null)}
         item={menuAssignment}
-        onOpenBuilder={handleOpenBuilder}
-        onPreview={handlePreviewAsStudent}
         onEdit={handleEditOpen}
         onDuplicate={handleDuplicate}
         onDelete={handleDelete}

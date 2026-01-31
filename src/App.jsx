@@ -144,6 +144,16 @@ function AppRoutes() {
         }
       />
       <Route
+        path="/instructor/assignment/:assignmentId"
+        element={
+          <ProtectedRoute allowedRoles={["instructor"]}>
+            <AppLayout>
+              <Worksheet />
+            </AppLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
         path="/instructor/dashboard"
         element={
           <ProtectedRoute allowedRoles={["instructor"]}>

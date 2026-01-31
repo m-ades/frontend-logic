@@ -267,7 +267,10 @@ export default function Worksheet() {
   const worksheetDueAt = currentWorksheet?.due_at
     ?? currentWorksheet?.due_date
     ?? currentDueAt
-  const backTarget = location?.state?.returnTo || '/student/assignments'
+  const isInstructorView = location.pathname.startsWith('/instructor')
+  const assignmentPathBase = isInstructorView ? '/instructor/assignment' : '/student/assignment'
+  const defaultBackTarget = isInstructorView ? '/instructor/assignments' : '/student/assignments'
+  const backTarget = location?.state?.returnTo || defaultBackTarget
   
   const {
     completedProofs,
@@ -819,7 +822,7 @@ export default function Worksheet() {
   const handleWorksheetChange = (newIndex) => {
     const newWorksheet = worksheets[newIndex]
     if (newWorksheet) {
-      navigate(`/student/assignment/${newWorksheet.id}`, {
+      navigate(`${assignmentPathBase}/${newWorksheet.id}`, {
         state: { returnTo: backTarget }
       })
     }

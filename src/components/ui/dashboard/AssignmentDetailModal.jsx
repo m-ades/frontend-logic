@@ -29,7 +29,7 @@ import {
   Download,
 } from "lucide-react";
 
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import {
   useCoursesState,
   useCoursesDispatch,
@@ -62,6 +62,7 @@ function getGradeColor(grade) {
 export default function AssignmentDetailModal({ open, onClose, assignmentId }) {
   const [activeTab, setActiveTab] = useState(0);
   const navigate = useNavigate();
+  const location = useLocation();
   const dispatch = useCoursesDispatch();
 
   // Pull data from context
@@ -165,9 +166,9 @@ export default function AssignmentDetailModal({ open, onClose, assignmentId }) {
     });
   };
 
-  const handleOpenBuilder = () => {
-    navigate("/instructor/assignment-builder", {
-      state: { assignmentId: assignment.id },
+  const handleOpenAssignment = () => {
+    navigate(`/instructor/assignment/${assignment.id}`, {
+      state: { returnTo: location.pathname },
     });
     onClose();
   };
@@ -291,9 +292,9 @@ export default function AssignmentDetailModal({ open, onClose, assignmentId }) {
             <Button
               size="small"
               startIcon={<FileEdit size={16} />}
-              onClick={handleOpenBuilder}
+              onClick={handleOpenAssignment}
             >
-              Open Builder
+              Open Assignment
             </Button>
             <Button
               size="small"
@@ -399,9 +400,9 @@ export default function AssignmentDetailModal({ open, onClose, assignmentId }) {
         <Button
           variant="contained"
           startIcon={<FileEdit size={16} />}
-          onClick={handleOpenBuilder}
+          onClick={handleOpenAssignment}
         >
-          Edit in Builder
+          Open Assignment
         </Button>
       </DialogActions>
     </Dialog>

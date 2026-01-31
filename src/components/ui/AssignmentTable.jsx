@@ -229,7 +229,7 @@ export default function AssignmentTable({
                   )}
 
                   <Stack direction="row" spacing={0.5} justifyContent="flex-end">
-                    <Tooltip title="Open Builder">
+                    <Tooltip title="Open Assignment">
                       <IconButton size="small" onClick={() => onView(item)}>
                         <FileEdit size={18} />
                       </IconButton>
@@ -454,7 +454,7 @@ export default function AssignmentTable({
                       spacing={0.5}
                       justifyContent="center"
                     >
-                      <Tooltip title="Open Builder">
+                      <Tooltip title="Open Assignment">
                         <IconButton size="small" onClick={() => onView(item)}>
                           <FileEdit size={18} />
                         </IconButton>
