@@ -203,6 +203,7 @@ export default function DerivationTable({
   const formulaRefs = useRef({})
   const justRefs = useRef({})
   const [activeFormulaIndex, setActiveFormulaIndex] = useState(null)
+  const lastEditableIndexRef = useRef(null)
   const cursorPositionsRef = useRef({})
   const syntax = useMemo(() => getSyntax(), [])
   const premises = useMemo(
@@ -425,6 +426,17 @@ export default function DerivationTable({
     }
   }
 
+  const resolveEditableIndex = () => {
+    if (activeFormulaIndex !== null && !lines[activeFormulaIndex]?.readOnly) {
+      return activeFormulaIndex
+    }
+    if (lastEditableIndexRef.current !== null && !lines[lastEditableIndexRef.current]?.readOnly) {
+      return lastEditableIndexRef.current
+    }
+    const fallback = lines.findIndex((line) => !line.readOnly)
+    return fallback >= 0 ? fallback : null
+  }
+
   const handleFormulaKeyDown = (event, index, readOnly) => {
     if (readOnly) return
     const el = event.target
@@ -479,7 +491,7 @@ export default function DerivationTable({
       return
     }
     if (key === '=' && start > 0 && value[start - 1] === '=') {
-      insertSymbol('≡')
+      insertSymbol('≡', 1)
       return
     }
     if ((key === 'l' || key === 'L')) {
@@ -634,15 +646,29 @@ export default function DerivationTable({
                     value={line.formula}
                     onChange={(e) => handleLineChange(idx, 'formula', e.target.value)}
                     onKeyDown={(e) => handleFormulaKeyDown(e, idx, line.readOnly)}
-                    onClick={(e) => updateCursorPosition(idx, e)}
-                    onKeyUp={(e) => updateCursorPosition(idx, e)}
-                    onSelect={(e) => updateCursorPosition(idx, e)}
+                    onClick={(e) => {
+                      if (line.readOnly) return
+                      lastEditableIndexRef.current = idx
+                      updateCursorPosition(idx, e)
+                    }}
+                    onKeyUp={(e) => {
+                      if (line.readOnly) return
+                      lastEditableIndexRef.current = idx
+                      updateCursorPosition(idx, e)
+                    }}
+                    onSelect={(e) => {
+                      if (line.readOnly) return
+                      lastEditableIndexRef.current = idx
+                      updateCursorPosition(idx, e)
+                    }}
                     onBlur={(e) => handleLineChange(idx, 'formula', normalizeFormulaForCheck(e.target.value))}
                     InputProps={{ readOnly: line.readOnly }}
                     inputProps={{ autoComplete: 'off' }}
                     inputRef={(el) => { if (el) formulaRefs.current[idx] = el }}
                     onFocus={(e) => {
+                      if (line.readOnly) return
                       setActiveFormulaIndex(idx)
+                      lastEditableIndexRef.current = idx
                       updateCursorPosition(idx, e)
                     }}
                     sx={{
@@ -781,7 +807,7 @@ export default function DerivationTable({
                         fontWeight: 600,
                       }}
                       onClick={() => {
-                        const targetIdx = activeFormulaIndex ?? lines.findIndex((l) => !l.readOnly)
+                        const targetIdx = resolveEditableIndex()
                         if (targetIdx === -1 || targetIdx === null) return
                         const inputEl = formulaRefs.current[targetIdx]
                         const current = lines[targetIdx]?.formula || ''
