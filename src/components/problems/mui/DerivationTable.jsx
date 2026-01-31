@@ -623,14 +623,14 @@ export default function DerivationTable({
           <Table size="medium" sx={{ width: 'auto' }}>
             <TableBody>
             {lines.map((line, idx) => (
-              <TableRow key={`line-${idx}`}>
+              <TableRow key={`line-${idx}`} sx={{ '& td': { py: 0.5 } }}>
                 <TableCell sx={{ width: 48, borderBottom: 'none', color: '#4f5b7a', fontWeight: 600 }}>
                   {idx + 1}
                 </TableCell>
                 <TableCell sx={{ borderBottom: 'none', width: 'auto', pr: 0.5, whiteSpace: 'nowrap' }}>
                   <TextField
                     variant="standard"
-                    placeholder={line.readOnly || idx !== firstEditableIndex ? '' : 'Premise'}
+                    placeholder=""
                     value={line.formula}
                     onChange={(e) => handleLineChange(idx, 'formula', e.target.value)}
                     onKeyDown={(e) => handleFormulaKeyDown(e, idx, line.readOnly)}
@@ -639,6 +639,7 @@ export default function DerivationTable({
                     onSelect={(e) => updateCursorPosition(idx, e)}
                     onBlur={(e) => handleLineChange(idx, 'formula', normalizeFormulaForCheck(e.target.value))}
                     InputProps={{ readOnly: line.readOnly }}
+                    inputProps={{ autoComplete: 'off' }}
                     inputRef={(el) => { if (el) formulaRefs.current[idx] = el }}
                     onFocus={(e) => {
                       setActiveFormulaIndex(idx)
@@ -647,8 +648,8 @@ export default function DerivationTable({
                     sx={{
                       width: { xs: '100%', md: 280 },
                       '& .MuiInput-underline:before': { borderBottomColor: '#e3e6ee' },
-                      '& .MuiInput-underline:hover:before': { borderBottomColor: '#d7dbe6' },
-                      '& .MuiInput-underline:after': { borderBottomColor: '#b8c2e6' },
+                      '& .MuiInput-underline:hover:before': { borderBottomColor: '#edf1f7' },
+                      '& .MuiInput-underline:after': { borderBottomColor: '#dfe5f0' },
                       '& .MuiInputBase-input': { fontSize: 16, py: 1 },
                     }}
                   />
@@ -693,17 +694,18 @@ export default function DerivationTable({
                           })
                         }}
                         InputProps={{ readOnly: line.readOnly }}
+                        inputProps={{ autoComplete: 'off' }}
                         inputRef={(el) => { if (el) justRefs.current[idx] = el }}
                         sx={{
                           width: { xs: '100%', md: 58 },
                           '& .MuiInput-underline:before': { borderBottomColor: '#e3e6ee' },
-                          '& .MuiInput-underline:hover:before': { borderBottomColor: '#d7dbe6' },
-                          '& .MuiInput-underline:after': { borderBottomColor: '#b8c2e6' },
+                          '& .MuiInput-underline:hover:before': { borderBottomColor: '#edf1f7' },
+                          '& .MuiInput-underline:after': { borderBottomColor: '#dfe5f0' },
                           '& .MuiInputBase-input': { fontSize: 16, py: 1 },
                         }}
                       />
                       {allowedRules.length > 0 && (
-                        <FormControl variant="standard" sx={{ minWidth: 80 }}>
+                        <FormControl variant="standard" sx={{ minWidth: 70 }}>
                           <Select
                             value={getRuleFromJustification(line.justification)}
                             displayEmpty
@@ -717,8 +719,8 @@ export default function DerivationTable({
                               '& .MuiInputBase-input': { fontSize: 16, py: 1 },
                               '& .MuiSelect-select.MuiInputBase-input': { display: 'flex', alignItems: 'center' },
                               '& .MuiInput-underline:before': { borderBottomColor: '#e3e6ee' },
-                              '& .MuiInput-underline:hover:before': { borderBottomColor: '#d7dbe6' },
-                              '& .MuiInput-underline:after': { borderBottomColor: '#b8c2e6' },
+                              '& .MuiInput-underline:hover:before': { borderBottomColor: '#edf1f7' },
+                              '& .MuiInput-underline:after': { borderBottomColor: '#dfe5f0' },
                             }}
                             MenuProps={{
                               PaperProps: { sx: { '& .MuiMenuItem-root': { fontSize: 16 } } }
@@ -840,24 +842,24 @@ export default function DerivationTable({
                 </Box>
               ))
             ) : (
-              <Typography variant="body2">Autochecker: no issues detected yet.</Typography>
+              <Typography variant="body2">Autochecker on: no issues detected yet.</Typography>
             )}
           </Box>
         )}
 
-        <Box sx={{ mt: 1 }}>
-          <ProblemSetButtons
-            onCheck={handleSubmit}
-            onStartOver={handleStartOver}
-            isChecking={isChecking}
-            isDisabled={isLocked}
-            align="flex-start"
-            attemptCount={attemptCount}
-            attemptLimit={attemptLimit}
-            sx={{ mt: 1 }}
-          />
-        </Box>
       </ThemedCard>
+      <Box sx={{ mt: 1 }}>
+        <ProblemSetButtons
+          onCheck={handleSubmit}
+          onStartOver={handleStartOver}
+          isChecking={isChecking}
+          isDisabled={isLocked}
+          align="flex-start"
+          attemptCount={attemptCount}
+          attemptLimit={attemptLimit}
+          sx={{ mt: 1 }}
+        />
+      </Box>
     </Stack>
   )
 }
