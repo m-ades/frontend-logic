@@ -48,7 +48,7 @@ export default class DerivationCheck {
         'aip': 'AIP', 'Aip': 'AIP', 'AiP': 'AIP', 'aIp': 'AIP', 'aiP': 'AIP',
     };
 
-    constructor(rules, deriv, prems, conc) {
+    constructor(rules, deriv, prems, conc, options = {}) {
         const Formula = getFormulaClass();
         this.Formula = Formula;
         this.syntax = Formula.syntax;
@@ -57,6 +57,7 @@ export default class DerivationCheck {
         this.prems = prems.map((p) => (Formula.from(p).normal));
         this.conc = Formula.from(conc).normal;
         this.errors = {};
+        this.allowOpenScopeCitations = Boolean(options.allowOpenScopeCitations);
     }
 
     adderror(target, category, severity, desc) {
@@ -490,7 +491,6 @@ export default class DerivationCheck {
         let indentLevel = 0;
         const assumptionStack = [];
         for (const line of this.deriv.lines) {
-            line.openAssumptions = [...assumptionStack];
             if (typeof line.indent !== 'number') {
                 line.indent = 0;
             }
@@ -505,6 +505,7 @@ export default class DerivationCheck {
                 indentLevel++;
                 line.indent = indentLevel;
                 assumptionStack.push(line);
+                line.openAssumptions = [...assumptionStack];
                 continue;
             }
 
@@ -518,10 +519,12 @@ export default class DerivationCheck {
                     indentLevel = Math.max(indentLevel - 1, 0);
                 }
                 line.indent = indentLevel;
+                line.openAssumptions = [...assumptionStack];
                 continue;
             }
 
             line.indent = indentLevel;
+            line.openAssumptions = [...assumptionStack];
         }
     }
 
@@ -552,6 +555,68 @@ export default class DerivationCheck {
         return null;
     }
 
+    hasContradictionInSubderivation(assumptionLine, closingLine) {
+        if (!assumptionLine || !closingLine || !this?.deriv?.lines) { return false; }
+        if (typeof assumptionLine.pos !== 'number' || typeof closingLine.pos !== 'number') { return false; }
+        const start = assumptionLine.pos + 1;
+        const end = closingLine.pos - 1;
+        if (end < start) { return false; }
+        const notSym = this.syntax?.symbols?.NOT ?? '~';
+        const andSym = this.syntax?.symbols?.AND ?? '•';
+        const positive = new Set();
+        const negated = new Set();
+        for (let i = start; i <= end; i++) {
+            const line = this.deriv.lines[i];
+            if (!line) { continue; }
+            if (!Array.isArray(line.openAssumptions) || !line.openAssumptions.includes(assumptionLine)) {
+                continue;
+            }
+            const f = line.formula ?? (line.s ? this.Formula.from(line.s) : null);
+            if (!f || !f.wellformed) { continue; }
+            const normal = f.normal ?? line.formulaNormal ?? '';
+            if (!normal) { continue; }
+            if (f.op === andSym && f.left && f.right) {
+                const left = f.left;
+                const right = f.right;
+                const leftIsNeg = left.op === notSym && left.right?.normal === right.normal;
+                const rightIsNeg = right.op === notSym && right.right?.normal === left.normal;
+                if (leftIsNeg || rightIsNeg) {
+                    return true;
+                }
+            }
+            if (f.op === notSym) {
+                const inner = f.right?.normal ?? '';
+                if (inner && positive.has(inner)) {
+                    return true;
+                }
+                if (inner) {
+                    negated.add(inner);
+                }
+                continue;
+            }
+            if (negated.has(normal)) {
+                return true;
+            }
+            positive.add(normal);
+        }
+        return false;
+    }
+
+    lastLineInSubderivation(assumptionLine, closingLine) {
+        if (!assumptionLine || !closingLine || !this?.deriv?.lines) { return null; }
+        if (typeof assumptionLine.pos !== 'number' || typeof closingLine.pos !== 'number') { return null; }
+        for (let i = closingLine.pos - 1; i > assumptionLine.pos; i--) {
+            const line = this.deriv.lines[i];
+            if (!line) { continue; }
+            if (!Array.isArray(line.openAssumptions) || !line.openAssumptions.includes(assumptionLine)) {
+                continue;
+            }
+            if (!line.s && !line.j) { continue; }
+            return line;
+        }
+        return null;
+    }
+
     checkACP(line) {
         if (!line?.formulaNormal) {
             this.adderror(line.n, "rule", "high",
@@ -578,13 +643,15 @@ export default class DerivationCheck {
                 "CP requires a conditional conclusion (A ⊃ B).");
             return line;
         }
-        const parts = line.formulaNormal.split("⊃");
-        if (parts.length < 2) {
+        const formula = line.formula ?? (line.s ? this.Formula.from(line.s) : null);
+        const ifSym = this.syntax?.symbols?.IFTHEN ?? "⊃";
+        if (!formula || formula.op !== ifSym || !formula.right || !formula.left) {
             this.adderror(line.n, "rule", "high",
                 "CP requires a conditional conclusion (A ⊃ B).");
             return line;
         }
-        const antecedent = parts[0].trim();
+        const antecedent = formula.left.normal ?? '';
+        const consequent = formula.right.normal ?? '';
         const assumptionLine = line.closedAssumption;
         if (!assumptionLine || this.resolveRuleName(assumptionLine) !== 'ACP') {
             this.adderror(line.n, "rule", "high",
@@ -594,10 +661,38 @@ export default class DerivationCheck {
         const Formula = this.Formula;
         const assumptionFormula = assumptionLine?.formulaNormal ??
             (assumptionLine?.s ? Formula.from(assumptionLine.s).normal : '');
-        const antecedentNorm = Formula.from(antecedent).normal;
-        if (assumptionFormula !== antecedentNorm) {
+        if (assumptionFormula !== antecedent) {
             this.adderror(line.n, "rule", "high",
                 "CP requires an ACP with the same antecedent.");
+            return line;
+        }
+        const ranges = Array.isArray(line.citedrangenums) ? line.citedrangenums : [];
+        if (ranges.length !== 1) {
+            this.adderror(line.n, "justification", "high",
+                "CP requires exactly one line range (e.g. 3–9).");
+            return line;
+        }
+        const [start, end] = ranges[0];
+        const lastLine = this.lastLineInSubderivation(assumptionLine, line);
+        const lastNormal = lastLine?.formulaNormal ??
+            (lastLine?.s ? Formula.from(lastLine.s).normal : '');
+        if (!lastLine || lastNormal !== consequent) {
+            this.adderror(line.n, "rule", "high",
+                "CP requires the consequent to be the last line before the CP.");
+            return line;
+        }
+        const expectedStart = parseInt(assumptionLine.n, 10);
+        const expectedEnd = parseInt(lastLine.n, 10);
+        if (!Number.isFinite(start) || !Number.isFinite(end) ||
+            !Number.isFinite(expectedStart) || !Number.isFinite(expectedEnd)) {
+            this.adderror(line.n, "justification", "high",
+                "CP requires a concrete line range (e.g. 3–9).");
+            return line;
+        }
+        if (start !== expectedStart || end !== expectedEnd) {
+            this.adderror(line.n, "justification", "high",
+                "CP must cite the ACP subderivation range " +
+                expectedStart + "–" + expectedEnd + ".");
             return line;
         }
         line.checkedOK = true;
@@ -622,6 +717,38 @@ export default class DerivationCheck {
                 "IP conclusion must be the negation of the AIP assumption.");
             return line;
         }
+        const ranges = Array.isArray(line.citedrangenums) ? line.citedrangenums : [];
+        if (ranges.length !== 1) {
+            this.adderror(line.n, "justification", "high",
+                "IP requires exactly one line range (e.g. 3–9).");
+            return line;
+        }
+        const [start, end] = ranges[0];
+        const lastLine = this.lastLineInSubderivation(assumptionLine, line);
+        if (!lastLine) {
+            this.adderror(line.n, "justification", "high",
+                "IP requires a subderivation line range (e.g. 3–9).");
+            return line;
+        }
+        const expectedStart = parseInt(assumptionLine.n, 10);
+        const expectedEnd = parseInt(lastLine.n, 10);
+        if (!Number.isFinite(start) || !Number.isFinite(end) ||
+            !Number.isFinite(expectedStart) || !Number.isFinite(expectedEnd)) {
+            this.adderror(line.n, "justification", "high",
+                "IP requires a concrete line range (e.g. 3–9).");
+            return line;
+        }
+        if (start !== expectedStart || end !== expectedEnd) {
+            this.adderror(line.n, "justification", "high",
+                "IP must cite the AIP subderivation range " +
+                expectedStart + "–" + expectedEnd + ".");
+            return line;
+        }
+        if (!this.hasContradictionInSubderivation(assumptionLine, line)) {
+            this.adderror(line.n, "rule", "high",
+                "IP requires a contradiction within the AIP subderivation.");
+            return line;
+        }
         line.checkedOK = true;
         return line;
     }
@@ -629,6 +756,8 @@ export default class DerivationCheck {
     checkDeriv(deriv) {
         const Formula = this.Formula;
         if (!deriv.lines) { return; }
+        // compute indents early so justification scope checks can rely on them
+        this.computeIndents();
         // check regular lines
         for (const line of deriv.lines) {
             // check the syntax
@@ -650,7 +779,6 @@ export default class DerivationCheck {
             this.checkJustification(line);
             // check rule if there is one
         }
-        this.computeIndents();
         // loop through again to check actual rules
         for (const line of deriv.lines) {
             if (line?.rulechecked) {
@@ -681,6 +809,20 @@ export default class DerivationCheck {
             return false;
         }
         const citedline = this.deriv.lines[zbnum];
+        if (this.allowOpenScopeCitations) {
+            const currentScope = Array.isArray(line?.openAssumptions) ? line.openAssumptions : [];
+            const citedScope = Array.isArray(citedline?.openAssumptions) ? citedline.openAssumptions : [];
+            const isPrefix = citedScope.length <= currentScope.length &&
+                citedScope.every((assumption, idx) => assumption === currentScope[idx]);
+            if (isPrefix) {
+                return true;
+            }
+            if (adderrors) {
+                this.adderror(line.n, "justification", "high",
+                    "cites a line within a subderivation that is no longer available");
+            }
+            return false;
+        }
         let checkpart = line;
         while (checkpart) {
             // MOVE TO PREVIOUS PART

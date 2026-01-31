@@ -20,6 +20,7 @@ import SubdirectoryArrowRightIcon from '@mui/icons-material/SubdirectoryArrowRig
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome'
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
 import CancelIcon from '@mui/icons-material/Cancel'
+import { alpha } from '@mui/material/styles'
 import { fetchJson, getActiveUserId } from '../../../utils/api.js'
 import PromptText from '../../ui/PromptText.jsx'
 import ThemedCard from '../../ui/ThemedCard.jsx'
@@ -30,6 +31,12 @@ import { justParse } from '../../ui/logicpenguin/justification-parse.js'
 
 const SYMBOLS = ['~', '•', '∨', '⊃', '≡', '(∀x)', '(∃x)']
 const FORCE_UPPER_RULES = new Set(['UI','UG','EI','EG','MP','MT','HS','DS','CD','DN','DM','CQ','QN','CP','IP','ACP','AIP'])
+const RULES_ALLOW_NO_LINES = new Set(['ACP', 'AIP'])
+const ASSUMPTION_RULES = new Set(['ACP', 'AIP'])
+const INDENT_START_RULES = new Set(['ACP', 'AIP'])
+const INDENT_END_RULES = new Set(['CP', 'IP'])
+const INDENT_PX = 18
+const MAX_INDENT_LEVEL = 3
 const AUTO_CHECK_STORAGE_KEY = 'logic-app:autocheck-enabled'
 
 const applyInsertion = (value, selectionStart, selectionEnd, insertText, replaceBefore = 0) => {
@@ -106,7 +113,7 @@ const getRuleFromJustification = (value) => {
   return formatRuleName(citedrules[0])
 }
 
-const buildErrorRows = (errors, { skipCompletion = false } = {}) => {
+const buildErrorRows = (errors, linesSnapshot = [], { skipCompletion = false } = {}) => {
   if (!errors) return []
   const lines = Object.keys(errors).sort((a, b) => {
     if (a === '??') return -1
@@ -117,6 +124,8 @@ const buildErrorRows = (errors, { skipCompletion = false } = {}) => {
   for (const line of lines) {
     const categories = errors[line] || {}
     const entries = []
+    const idx = line !== '??' ? Number(line) - 1 : -1
+    const lineRule = idx >= 0 ? getRuleFromJustification(linesSnapshot[idx]?.justification || '').toUpperCase() : ''
     for (const category of Object.keys(categories)) {
       if (skipCompletion && category === 'completion') continue
       const severities = categories[category] || {}
@@ -124,7 +133,15 @@ const buildErrorRows = (errors, { skipCompletion = false } = {}) => {
       for (const severity of Object.keys(severities)) {
         const items = severities[severity] || {}
         for (const desc of Object.keys(items)) {
-          descs.push(desc)
+          if (
+            lineRule &&
+            (lineRule === 'CP' || lineRule === 'IP') &&
+            desc === 'cites the wrong number of subderivation line ranges for the rule specified'
+          ) {
+            descs.push(`${desc} (e.g. 3-9)`)
+          } else {
+            descs.push(desc)
+          }
         }
       }
       if (descs.length === 0) continue
@@ -232,7 +249,15 @@ export default function DerivationTable({
     const formulaFilled = (line.formula || '').trim().length > 0
     if (!formulaFilled) return false
     const { hasLines, hasRule } = getJustificationMeta(line.justification)
-    return hasLines && hasRule
+    if (!hasRule) return false
+    const rule = getRuleFromJustification(line.justification).toUpperCase()
+    if (rule === 'CP' || rule === 'IP') {
+      const { ranges } = justParse(String(line.justification || ''))
+      return ranges.length > 0
+    }
+    if (hasLines) return true
+    if (!rule) return false
+    return RULES_ALLOW_NO_LINES.has(rule)
   }, [])
   const [autoCheckEnabled, setAutoCheckEnabled] = useState(() => {
     if (typeof window === 'undefined') return true
@@ -244,6 +269,19 @@ export default function DerivationTable({
   const autoCheckTimerRef = useRef(null)
   const [lineGateNotice, setLineGateNotice] = useState({ index: null, message: '' })
   const [lineDrafts, setLineDrafts] = useState({})
+  const indentLevels = useMemo(() => {
+    let level = 0
+    return lines.map((line) => {
+      const rule = getRuleFromJustification(line.justification).toUpperCase()
+      if (INDENT_END_RULES.has(rule)) {
+        level = Math.max(0, level - 1)
+      }
+      if (INDENT_START_RULES.has(rule)) {
+        level = Math.min(level + 1, MAX_INDENT_LEVEL)
+      }
+      return level
+    })
+  }, [lines])
 
   const normalizeFormulaForCheck = useMemo(
     () => (value) => {
@@ -289,24 +327,45 @@ export default function DerivationTable({
       -1,
       proof?.options
     )
+    const normalizedConclusion = normalizeFormulaForCheck(proof?.conclusion || '')
     const errors = result?.errors || {}
-    const filteredErrors = {}
     const isLineComplete = (idx) => {
       if (idx < premises.length) return true
-      const line = linesSnapshot[idx] || {}
-      return isLineCompleteForCheck(line)
+      return isLineCompleteForCheck(linesSnapshot[idx] || {})
     }
+    const filledLineIndices = linesSnapshot
+      .map((line, idx) => ({
+        idx,
+        hasContent: Boolean((line?.formula || '').trim() || (line?.justification || '').trim()),
+      }))
+      .filter((entry) => entry.idx >= premises.length && entry.hasContent)
+      .map((entry) => entry.idx)
+    const lastFilledIndex = filledLineIndices.length ? filledLineIndices[filledLineIndices.length - 1] : -1
+    const lastFilled = lastFilledIndex >= 0 ? linesSnapshot[lastFilledIndex] : null
+    const allFilledComplete = filledLineIndices.every((idx) => isLineComplete(idx))
+    const readyForRuleGate = Boolean(
+      normalizedConclusion &&
+      lastFilled &&
+      isLineCompleteForCheck(lastFilled) &&
+      normalizeFormulaForCheck(lastFilled.formula || '') === normalizedConclusion &&
+      allFilledComplete
+    )
+    const filteredErrors = {}
     Object.keys(errors).forEach((line) => {
+      const categories = errors[line] || {}
       if (line !== '??') {
         const idx = Number(line) - 1
         if (Number.isFinite(idx) && !isLineComplete(idx)) {
-          return
+          const rule = getRuleFromJustification(linesSnapshot[idx]?.justification || '').toUpperCase()
+          if (rule !== 'CP' && rule !== 'IP') {
+            return
+          }
         }
       }
-      const categories = errors[line] || {}
       const nextCats = {}
       Object.keys(categories).forEach((category) => {
-        if (category === 'completion') return
+        if (line === '??' && category === 'rule' && !readyForRuleGate) return
+        if (category === 'completion' && !readyForRuleGate) return
         nextCats[category] = categories[category]
       })
       if (Object.keys(nextCats).length > 0) {
@@ -320,16 +379,22 @@ export default function DerivationTable({
         return
       }
       const lineNum = String(idx + 1)
-      const complete = isLineComplete(idx)
-      if (!complete) {
+      const formulaFilled = Boolean((line?.formula || '').trim())
+      if (!formulaFilled) {
         perLine[idx] = null
         return
       }
-      const hasError = Boolean(filteredErrors[lineNum] && Object.keys(filteredErrors[lineNum]).length > 0)
+      const { hasLines, hasRule } = getJustificationMeta(line.justification)
+      if (!hasRule) {
+        perLine[idx] = null
+        return
+      }
+      const lineErrors = filteredErrors[lineNum] || {}
+      const blockingCategories = Object.keys(lineErrors).filter((category) => category !== 'dependency')
+      const hasError = blockingCategories.length > 0
       perLine[idx] = hasError ? 'error' : 'ok'
     })
-    const rows = buildErrorRows(filteredErrors, { skipCompletion: true })
-    const normalizedConclusion = normalizeFormulaForCheck(proof?.conclusion || '')
+    const rows = buildErrorRows(filteredErrors, linesSnapshot, { skipCompletion: false })
     const lastIndex = linesSnapshot.length - 1
     const last = linesSnapshot[lastIndex]
     const shouldAutoAdd = Boolean(
@@ -395,13 +460,22 @@ export default function DerivationTable({
     }
   }
 
-  const handleLineCommit = (index, field, value) => {
-    const nextLines = applyLineChange(lines, index, field, value)
-    setLines(nextLines)
-    emitState(nextLines)
-    if (lineGateNotice.index === index) {
+  const commitLines = useCallback((updater, clearNoticeIndex = null) => {
+    setLines((prev) => {
+      const nextLines = updater(prev)
+      emitState(nextLines)
+      return nextLines
+    })
+    if (clearNoticeIndex !== null && lineGateNotice.index === clearNoticeIndex) {
       setLineGateNotice({ index: null, message: '' })
     }
+  }, [emitState, lineGateNotice.index])
+
+  const handleLineCommit = (index, field, value) => {
+    commitLines(
+      (prev) => applyLineChange(prev, index, field, value),
+      index
+    )
   }
 
   const canAddLine = useMemo(() => {
@@ -644,8 +718,19 @@ export default function DerivationTable({
         <TableContainer component={Box} sx={{ width: '100%' }}>
           <Table size="medium" sx={{ width: 'auto' }}>
             <TableBody>
-            {lines.map((line, idx) => (
-              <TableRow key={`line-${idx}`} sx={{ '& td': { py: 0.5 } }}>
+            {lines.map((line, idx) => {
+              const indentPx = (indentLevels[idx] || 0) * INDENT_PX
+              return (
+              <TableRow
+                key={`line-${idx}`}
+                sx={{
+                  '& td': {
+                    py: 0.5,
+                    position: 'relative',
+                    left: indentPx ? `${indentPx}px` : 0,
+                  },
+                }}
+              >
                 <TableCell sx={{ width: 48, borderBottom: 'none', color: '#4f5b7a', fontWeight: 600 }}>
                   {idx + 1}
                 </TableCell>
@@ -746,8 +831,32 @@ export default function DerivationTable({
                             value={getRuleFromJustification(line.justification)}
                             displayEmpty
                             onChange={(e) => {
-                              const nextValue = applyRuleToJustification(line.justification, e.target.value)
-                              handleLineCommit(idx, 'justification', nextValue)
+                              const selectedRule = String(e.target.value || '')
+                              const nextValue = applyRuleToJustification(line.justification, selectedRule)
+                              commitLines((prev) => {
+                                let nextLines = applyLineChange(prev, idx, 'justification', nextValue)
+                                const upperRule = selectedRule.toUpperCase()
+                                if (ASSUMPTION_RULES.has(upperRule)) {
+                                  const nextIdx = idx + 1
+                                  const nextLine = nextLines[nextIdx]
+                                  const isBlankLine = nextLine &&
+                                    !nextLine.readOnly &&
+                                    !(nextLine.formula || '').trim() &&
+                                    !(nextLine.justification || '').trim()
+                                  if (nextLine && isBlankLine) {
+                                    return nextLines
+                                  }
+                                  if (!nextLine || !nextLine.readOnly) {
+                                    const newLine = { formula: '', justification: '', readOnly: false }
+                                    nextLines = [
+                                      ...nextLines.slice(0, nextIdx),
+                                      newLine,
+                                      ...nextLines.slice(nextIdx),
+                                    ]
+                                  }
+                                }
+                                return nextLines
+                              }, idx)
                             }}
                             renderValue={(value) => value || 'Rule'}
                             sx={{
@@ -783,7 +892,8 @@ export default function DerivationTable({
                   )}
                 </TableCell>
               </TableRow>
-            ))}
+              )
+            })}
             <TableRow>
               <TableCell sx={{ width: 48, borderBottom: 'none' }}>
                 <Tooltip title="New line">
@@ -814,7 +924,16 @@ export default function DerivationTable({
                       size="small"
                       variant="filled"
                       sx={{
-                        bgcolor: '#eef1f6',
+                        bgcolor: (theme) =>
+                          theme.palette.mode === 'dark'
+                            ? alpha(theme.palette.common.white, 0.08)
+                            : theme.palette.grey[100],
+                        color: 'text.primary',
+                        border: '1px solid',
+                        borderColor: (theme) =>
+                          theme.palette.mode === 'dark'
+                            ? theme.palette.grey[700]
+                            : theme.palette.grey[200],
                         borderRadius: 2,
                         fontWeight: 600,
                       }}

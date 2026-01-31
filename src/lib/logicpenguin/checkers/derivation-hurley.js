@@ -46,7 +46,11 @@ export default async function(question, givenans, points, options) {
     const ansclone = JSON.parse(JSON.stringify(givenans));
     const rules = getRules();
     const checkResult = new DerivationCheck(
-        rules, ansclone, question.prems, question.conc
+        rules,
+        ansclone,
+        question.prems,
+        question.conc,
+        { allowOpenScopeCitations: true }
     ).report();
     const require = options?.ruleset?.require || question?.ruleset?.require;
     const requireAny = options?.ruleset?.requireAny || question?.ruleset?.requireAny;
