@@ -386,19 +386,24 @@ export default function DerivationTable({
     const filteredErrors = {}
     Object.keys(errors).forEach((line) => {
       const categories = errors[line] || {}
+      let lineRule = ''
+      let isAssumptionLine = false
       if (line !== '??') {
         const idx = Number(line) - 1
-        if (Number.isFinite(idx) && !isLineComplete(idx)) {
-          const rule = getRuleFromJustification(linesSnapshot[idx]?.justification || '').toUpperCase()
-          if (rule !== 'CP' && rule !== 'IP') {
-            return
+        if (Number.isFinite(idx)) {
+          lineRule = getRuleFromJustification(linesSnapshot[idx]?.justification || '').toUpperCase()
+          isAssumptionLine = ASSUMPTION_RULES.has(lineRule)
+          if (!isLineComplete(idx) && !isAssumptionLine) {
+            if (lineRule !== 'CP' && lineRule !== 'IP') {
+              return
+            }
           }
         }
       }
       const nextCats = {}
       Object.keys(categories).forEach((category) => {
         if (line === '??' && category === 'rule' && !readyForRuleGate) return
-        if (category === 'completion' && !readyForRuleGate) return
+        if (category === 'completion' && !readyForRuleGate && !isAssumptionLine) return
         nextCats[category] = categories[category]
       })
       if (Object.keys(nextCats).length > 0) {
@@ -413,8 +418,14 @@ export default function DerivationTable({
       }
       const lineNum = String(idx + 1)
       const formulaFilled = Boolean((line?.formula || '').trim())
+      const lineRule = getRuleFromJustification(line?.justification || '').toUpperCase()
+      const lineErrors = filteredErrors[lineNum] || {}
       if (!formulaFilled) {
-        perLine[idx] = null
+        if (ASSUMPTION_RULES.has(lineRule) && Object.keys(lineErrors).length > 0) {
+          perLine[idx] = 'error'
+        } else {
+          perLine[idx] = null
+        }
         return
       }
       const { hasLines, hasRule } = getJustificationMeta(line.justification)
@@ -422,7 +433,6 @@ export default function DerivationTable({
         perLine[idx] = null
         return
       }
-      const lineErrors = filteredErrors[lineNum] || {}
       const blockingCategories = Object.keys(lineErrors).filter((category) => category !== 'dependency')
       const hasError = blockingCategories.length > 0
       perLine[idx] = hasError ? 'error' : 'ok'
@@ -829,7 +839,7 @@ export default function DerivationTable({
                       {!ASSUMPTION_RULES.has(getRuleFromJustification(line.justification).toUpperCase()) && (
                         <TextField
                           variant="standard"
-                          placeholder={idx === firstEditableIndex ? 'Line(s)' : ''}
+                          placeholder="Line(s)"
                           value={lineDrafts[idx] ?? formatJustificationLines(line.justification)}
                           onChange={(e) => {
                             const raw = e.target.value

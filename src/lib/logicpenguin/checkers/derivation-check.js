@@ -711,7 +711,16 @@ export default class DerivationCheck {
                 "IP requires a matching AIP to discharge.");
             return line;
         }
-        const expected = "~" + (assumptionLine.formulaNormal ?? '').trim();
+        const notSym = this.syntax?.symbols?.NOT ?? "~";
+        const assumptionFormula = assumptionLine?.formula ??
+            (assumptionLine?.s ? this.Formula.from(assumptionLine.s) : null);
+        const assumptionNormal = assumptionFormula
+            ? assumptionFormula.wrapifneeded()
+            : (assumptionLine.formulaNormal ?? '').trim();
+        const expectedFormula = assumptionNormal
+            ? this.Formula.from(notSym + assumptionNormal)
+            : null;
+        const expected = expectedFormula?.normal ?? (notSym + assumptionNormal);
         if (line.formulaNormal.trim() !== expected) {
             this.adderror(line.n, "rule", "high",
                 "IP conclusion must be the negation of the AIP assumption.");
