@@ -1,17 +1,20 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   Box,
+  FormControl,
   Stack,
   Table,
   TableBody,
   TableCell,
   TableContainer,
   TableRow,
+  Select,
   TextField,
   Typography,
   IconButton,
   Chip,
   Tooltip,
+  MenuItem,
 } from '@mui/material'
 import SubdirectoryArrowRightIcon from '@mui/icons-material/SubdirectoryArrowRight'
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome'
@@ -39,18 +42,18 @@ const applyInsertion = (value, selectionStart, selectionEnd, insertText, replace
   return { nextValue, nextCursor }
 }
 
-const formatJustificationDisplay = (value) => {
-  if (!value) return ''
-  let { nums, ranges, citedrules } = justParse(String(value))
+const formatRuleName = (rule) => {
+  if (!rule) return ''
+  if (FORCE_UPPER_RULES.has(rule.toUpperCase())) {
+    return rule.toUpperCase()
+  }
+  return rule.charAt(0).toUpperCase() + rule.slice(1).toLowerCase()
+}
+
+const formatJustificationParts = (nums, ranges, citedrules) => {
   nums = nums.sort((a, b) => (a - b))
   ranges = ranges.sort(([a, b], [c, d]) => ((a - c === 0) ? b - d : a - c))
-  citedrules = citedrules.map((rule) => {
-    if (!rule) return rule
-    if (FORCE_UPPER_RULES.has(rule.toUpperCase())) {
-      return rule.toUpperCase()
-    }
-    return rule.charAt(0).toUpperCase() + rule.slice(1).toLowerCase()
-  })
+  citedrules = citedrules.map((rule) => formatRuleName(rule))
   citedrules = citedrules.sort()
 
   let pretty = nums.map((n) => n.toString()).join(', ')
@@ -63,6 +66,44 @@ const formatJustificationDisplay = (value) => {
     pretty += citedrules.join(', ')
   }
   return pretty
+}
+
+const formatJustificationDisplay = (value) => {
+  if (!value) return ''
+  let { nums, ranges, citedrules } = justParse(String(value))
+  return formatJustificationParts(nums, ranges, citedrules)
+}
+
+const getJustificationMeta = (value) => {
+  const { nums, ranges, citedrules } = justParse(String(value || ''))
+  return {
+    hasLines: nums.length > 0 || ranges.length > 0,
+    hasRule: Array.isArray(citedrules) && citedrules.length > 0,
+  }
+}
+
+const formatJustificationLines = (value) => {
+  if (!value) return ''
+  let { nums, ranges } = justParse(String(value))
+  return formatJustificationParts(nums, ranges, [])
+}
+
+const applyRuleToJustification = (value, rule) => {
+  const { nums, ranges } = justParse(String(value || ''))
+  const nextRules = rule ? [rule] : []
+  return formatJustificationParts(nums, ranges, nextRules)
+}
+
+const applyLinesToJustification = (value, linesInput) => {
+  const existingRule = getRuleFromJustification(value)
+  const { nums, ranges } = justParse(String(linesInput || ''))
+  return formatJustificationParts(nums, ranges, existingRule ? [existingRule] : [])
+}
+
+const getRuleFromJustification = (value) => {
+  const { citedrules } = justParse(String(value || ''))
+  if (!Array.isArray(citedrules) || citedrules.length === 0) return ''
+  return formatRuleName(citedrules[0])
 }
 
 const buildErrorRows = (errors, { skipCompletion = false } = {}) => {
@@ -178,6 +219,19 @@ export default function DerivationTable({
 
   const [lines, setLines] = useState(initialLines)
   const firstEditableIndex = premises.length
+  const allowedRules = useMemo(() => {
+    const allow = proof?.ruleset?.allow ?? proof?.options?.ruleset?.allow ?? []
+    if (!Array.isArray(allow)) return []
+    const unique = Array.from(new Set(allow.map((rule) => formatRuleName(String(rule)))))
+    return unique.filter((rule) => rule && rule.toLowerCase() !== 'pr')
+  }, [proof?.ruleset, proof?.options?.ruleset])
+  const isLineCompleteForCheck = useCallback((line) => {
+    if (!line) return false
+    const formulaFilled = (line.formula || '').trim().length > 0
+    if (!formulaFilled) return false
+    const { hasLines, hasRule } = getJustificationMeta(line.justification)
+    return hasLines && hasRule
+  }, [])
   const [autoCheckEnabled, setAutoCheckEnabled] = useState(() => {
     if (typeof window === 'undefined') return true
     const saved = window.sessionStorage.getItem(AUTO_CHECK_STORAGE_KEY)
@@ -187,6 +241,7 @@ export default function DerivationTable({
   const [autoCheckState, setAutoCheckState] = useState({ perLine: {}, rows: [] })
   const autoCheckTimerRef = useRef(null)
   const [lineGateNotice, setLineGateNotice] = useState({ index: null, message: '' })
+  const [lineDrafts, setLineDrafts] = useState({})
 
   const normalizeFormulaForCheck = useMemo(
     () => (value) => {
@@ -233,9 +288,7 @@ export default function DerivationTable({
     const isLineComplete = (idx) => {
       if (idx < premises.length) return true
       const line = linesSnapshot[idx] || {}
-      const formulaFilled = (line.formula || '').trim().length > 0
-      const justFilled = (line.justification || '').trim().length > 0
-      return formulaFilled && justFilled
+      return isLineCompleteForCheck(line)
     }
     Object.keys(errors).forEach((line) => {
       if (line !== '??') {
@@ -271,7 +324,7 @@ export default function DerivationTable({
     })
     const rows = buildErrorRows(filteredErrors, { skipCompletion: true })
     return { perLine, rows }
-  }, [normalizeFormulaForCheck, normalizeJustificationForCheck, premises, proof?.conclusion, proof?.options, proof?.ruleset])
+  }, [normalizeFormulaForCheck, normalizeJustificationForCheck, premises, proof?.conclusion, proof?.options, proof?.ruleset, isLineCompleteForCheck])
 
   useEffect(() => {
     if (!autoCheckEnabled) {
@@ -316,9 +369,9 @@ export default function DerivationTable({
     if (!autoCheckEnabled) return true
     const last = lines[lines.length - 1]
     if (!last || last.readOnly) return true
-    if (!last.formula?.trim() || !last.justification?.trim()) return false
+    if (!isLineCompleteForCheck(last)) return false
     return autoCheckState.perLine[lines.length - 1] === 'ok'
-  }, [autoCheckEnabled, lines, autoCheckState.perLine])
+  }, [autoCheckEnabled, lines, autoCheckState.perLine, isLineCompleteForCheck])
 
   const addLine = () => {
     if (autoCheckEnabled && !canAddLine) {
@@ -425,11 +478,17 @@ export default function DerivationTable({
     if (readOnly) return
     if (event.key === 'Enter') {
       event.preventDefault()
-      const formatted = formatJustificationDisplay(event.target.value)
+      const formatted = applyLinesToJustification(lines[index]?.justification, event.target.value)
       const nextLines = lines.map((line, idx) =>
         idx === index ? { ...line, justification: formatted } : line
       )
       handleLineChange(index, 'justification', formatted)
+      setLineDrafts((prev) => {
+        if (!(index in prev)) return prev
+        const next = { ...prev }
+        delete next[index]
+        return next
+      })
       if (autoCheckEnabled) {
         try {
           const result = await runAutoCheck(nextLines)
@@ -581,26 +640,80 @@ export default function DerivationTable({
                       <Typography sx={{ color: 'transparent' }}>—</Typography>
                     )
                   ) : (
-                    <Stack direction="row" spacing={0.5} alignItems="center">
+                    <Stack direction="row" spacing={0.5} alignItems="center" sx={{ flexWrap: 'nowrap' }}>
                       <TextField
                         variant="standard"
-                        placeholder={idx === firstEditableIndex ? 'Justification' : ''}
-                        value={line.justification}
-                        onChange={(e) => handleLineChange(idx, 'justification', e.target.value)}
+                        placeholder={idx === firstEditableIndex ? 'Line(s)' : ''}
+                        value={lineDrafts[idx] ?? formatJustificationLines(line.justification)}
+                        onChange={(e) => {
+                          const raw = e.target.value
+                          setLineDrafts((prev) => ({ ...prev, [idx]: raw }))
+                          handleLineChange(
+                            idx,
+                            'justification',
+                            applyLinesToJustification(line.justification, raw)
+                          )
+                        }}
                         onKeyDown={(e) => handleJustKeyDown(e, idx, line.readOnly)}
-                        onBlur={(e) => handleLineChange(idx, 'justification', formatJustificationDisplay(e.target.value))}
+                        onBlur={(e) => {
+                          const raw = e.target.value
+                          handleLineChange(
+                            idx,
+                            'justification',
+                            applyLinesToJustification(line.justification, raw)
+                          )
+                          setLineDrafts((prev) => {
+                            if (!(idx in prev)) return prev
+                            const next = { ...prev }
+                            delete next[idx]
+                            return next
+                          })
+                        }}
                         InputProps={{ readOnly: line.readOnly }}
                         inputRef={(el) => { if (el) justRefs.current[idx] = el }}
                         sx={{
-                          width: { xs: '100%', md: 90 },
+                          width: { xs: '100%', md: 58 },
                           '& .MuiInput-underline:before': { borderBottomColor: '#e3e6ee' },
                           '& .MuiInput-underline:hover:before': { borderBottomColor: '#d7dbe6' },
                           '& .MuiInput-underline:after': { borderBottomColor: '#b8c2e6' },
                           '& .MuiInputBase-input': { fontSize: 16, py: 1 },
                         }}
                       />
+                      {allowedRules.length > 0 && (
+                        <FormControl variant="standard" sx={{ minWidth: 80 }}>
+                          <Select
+                            value={getRuleFromJustification(line.justification)}
+                            displayEmpty
+                            onChange={(e) => {
+                              const nextValue = applyRuleToJustification(line.justification, e.target.value)
+                              handleLineChange(idx, 'justification', nextValue)
+                            }}
+                            renderValue={(value) => value || 'Rule'}
+                            sx={{
+                              '& .MuiSelect-select': { fontSize: 16, py: 1 },
+                              '& .MuiInputBase-input': { fontSize: 16, py: 1 },
+                              '& .MuiSelect-select.MuiInputBase-input': { display: 'flex', alignItems: 'center' },
+                              '& .MuiInput-underline:before': { borderBottomColor: '#e3e6ee' },
+                              '& .MuiInput-underline:hover:before': { borderBottomColor: '#d7dbe6' },
+                              '& .MuiInput-underline:after': { borderBottomColor: '#b8c2e6' },
+                            }}
+                            MenuProps={{
+                              PaperProps: { sx: { '& .MuiMenuItem-root': { fontSize: 16 } } }
+                            }}
+                          >
+                            <MenuItem value="">
+                              <em>Rule</em>
+                            </MenuItem>
+                            {allowedRules.map((rule) => (
+                              <MenuItem key={rule} value={rule}>
+                                {rule}
+                              </MenuItem>
+                            ))}
+                          </Select>
+                        </FormControl>
+                      )}
                       {autoCheckEnabled && autoCheckState.perLine[idx] === 'ok' && (
-                        <CheckCircleIcon fontSize="small" color="success" />
+                        <CheckCircleIcon fontSize="small" sx={{ color: 'primary.main' }} />
                       )}
                       {autoCheckEnabled && autoCheckState.perLine[idx] === 'error' && (
                         <CancelIcon fontSize="small" color="error" />

@@ -39,6 +39,8 @@ const mapQuestionToProof = (question, assignment, index) => {
       type: 'derivation',
       premises: snapshot.prems || snapshot.premises || [],
       conclusion: snapshot.conc || snapshot.conclusion || '',
+      ruleset: snapshot.ruleset || snapshot.ruleSet || {},
+      options: snapshot.options || {},
     }
   }
 
