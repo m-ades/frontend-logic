@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   Box,
   Stack,
@@ -186,6 +186,7 @@ export default function DerivationTable({
   })
   const [autoCheckState, setAutoCheckState] = useState({ perLine: {}, rows: [] })
   const autoCheckTimerRef = useRef(null)
+  const [lineGateNotice, setLineGateNotice] = useState({ index: null, message: '' })
 
   const normalizeFormulaForCheck = useMemo(
     () => (value) => {
@@ -213,6 +214,65 @@ export default function DerivationTable({
     onStateChange?.(submission)
   }, [lines, onStateChange, premises, proof?.conclusion, normalizeFormulaForCheck, normalizeJustificationForCheck])
 
+  const runAutoCheck = useCallback(async (linesSnapshot) => {
+    const submission = buildSubmission(
+      linesSnapshot,
+      proof?.conclusion,
+      premises,
+      normalizeFormulaForCheck,
+      normalizeJustificationForCheck
+    )
+    const result = await checkDerivation(
+      { prems: premises, conc: proof?.conclusion, ruleset: proof?.ruleset },
+      submission.ans,
+      -1,
+      proof?.options
+    )
+    const errors = result?.errors || {}
+    const filteredErrors = {}
+    const isLineComplete = (idx) => {
+      if (idx < premises.length) return true
+      const line = linesSnapshot[idx] || {}
+      const formulaFilled = (line.formula || '').trim().length > 0
+      const justFilled = (line.justification || '').trim().length > 0
+      return formulaFilled && justFilled
+    }
+    Object.keys(errors).forEach((line) => {
+      if (line !== '??') {
+        const idx = Number(line) - 1
+        if (Number.isFinite(idx) && !isLineComplete(idx)) {
+          return
+        }
+      }
+      const categories = errors[line] || {}
+      const nextCats = {}
+      Object.keys(categories).forEach((category) => {
+        if (category === 'completion') return
+        nextCats[category] = categories[category]
+      })
+      if (Object.keys(nextCats).length > 0) {
+        filteredErrors[line] = nextCats
+      }
+    })
+    const perLine = {}
+    linesSnapshot.forEach((line, idx) => {
+      if (idx < premises.length) {
+        perLine[idx] = null
+        return
+      }
+      const lineNum = String(idx + 1)
+      const complete = isLineComplete(idx)
+      if (!complete) {
+        perLine[idx] = null
+        return
+      }
+      const hasError = Boolean(filteredErrors[lineNum] && Object.keys(filteredErrors[lineNum]).length > 0)
+      perLine[idx] = hasError ? 'error' : 'ok'
+    })
+    const rows = buildErrorRows(filteredErrors, { skipCompletion: true })
+    return { perLine, rows }
+  }, [normalizeFormulaForCheck, normalizeJustificationForCheck, premises, proof?.conclusion, proof?.options, proof?.ruleset])
+
   useEffect(() => {
     if (!autoCheckEnabled) {
       setAutoCheckState({ perLine: {}, rows: [] })
@@ -223,54 +283,8 @@ export default function DerivationTable({
     }
     autoCheckTimerRef.current = setTimeout(async () => {
       try {
-        const submission = buildSubmission(
-          lines,
-          proof?.conclusion,
-          premises,
-          normalizeFormulaForCheck,
-          normalizeJustificationForCheck
-        )
-        const result = await checkDerivation(
-          { prems: premises, conc: proof?.conclusion, ruleset: proof?.ruleset },
-          submission.ans,
-          -1,
-          proof?.options
-        )
-        const errors = result?.errors || {}
-        const filteredErrors = {}
-        Object.keys(errors).forEach((line) => {
-          const categories = errors[line] || {}
-          const nextCats = {}
-          Object.keys(categories).forEach((category) => {
-            if (category === 'completion') return
-            nextCats[category] = categories[category]
-          })
-          if (Object.keys(nextCats).length > 0) {
-            filteredErrors[line] = nextCats
-          }
-        })
-        const perLine = {}
-        lines.forEach((line, idx) => {
-          if (idx < premises.length) {
-            perLine[idx] = null
-            return
-          }
-          const lineNum = String(idx + 1)
-          const hasError = Boolean(filteredErrors[lineNum] && Object.keys(filteredErrors[lineNum]).length > 0)
-          const formulaFilled = (line.formula || '').trim().length > 0
-          const justFilled = (line.justification || '').trim().length > 0
-          if (!formulaFilled && !justFilled) {
-            perLine[idx] = null
-          } else if (hasError) {
-            perLine[idx] = 'error'
-          } else if (formulaFilled && justFilled) {
-            perLine[idx] = 'ok'
-          } else {
-            perLine[idx] = null
-          }
-        })
-        const rows = buildErrorRows(filteredErrors, { skipCompletion: true })
-        setAutoCheckState({ perLine, rows })
+        const result = await runAutoCheck(lines)
+        setAutoCheckState(result)
       } catch (err) {
         setAutoCheckState({ perLine: {}, rows: [{ line: '', entries: [{ label: 'Autocheck', messages: ['Autocheck failed.'], isWarning: true }] }] })
       }
@@ -280,7 +294,7 @@ export default function DerivationTable({
         clearTimeout(autoCheckTimerRef.current)
       }
     }
-  }, [autoCheckEnabled, lines, premises, proof?.conclusion, proof?.options, proof?.ruleset])
+  }, [autoCheckEnabled, lines, runAutoCheck])
 
   useEffect(() => {
     if (typeof window === 'undefined') return
@@ -293,9 +307,24 @@ export default function DerivationTable({
         idx === index ? { ...line, [field]: value } : line
       )
     )
+    if (lineGateNotice.index === index) {
+      setLineGateNotice({ index: null, message: '' })
+    }
   }
 
+  const canAddLine = useMemo(() => {
+    if (!autoCheckEnabled) return true
+    const last = lines[lines.length - 1]
+    if (!last || last.readOnly) return true
+    if (!last.formula?.trim() || !last.justification?.trim()) return false
+    return autoCheckState.perLine[lines.length - 1] === 'ok'
+  }, [autoCheckEnabled, lines, autoCheckState.perLine])
+
   const addLine = () => {
+    if (autoCheckEnabled && !canAddLine) {
+      setLineGateNotice({ index: lines.length - 1, message: 'Re-check current line to move onto the next line.' })
+      return
+    }
     setLines((prev) => [...prev, { formula: '', justification: '', readOnly: false }])
   }
 
@@ -392,12 +421,28 @@ export default function DerivationTable({
     }
   }
 
-  const handleJustKeyDown = (event, index, readOnly) => {
+  const handleJustKeyDown = async (event, index, readOnly) => {
     if (readOnly) return
     if (event.key === 'Enter') {
       event.preventDefault()
       const formatted = formatJustificationDisplay(event.target.value)
+      const nextLines = lines.map((line, idx) =>
+        idx === index ? { ...line, justification: formatted } : line
+      )
       handleLineChange(index, 'justification', formatted)
+      if (autoCheckEnabled) {
+        try {
+          const result = await runAutoCheck(nextLines)
+          setAutoCheckState(result)
+          if (result.perLine[index] !== 'ok') {
+            setLineGateNotice({ index, message: 'Re-check current line to move onto the next line.' })
+            return
+          }
+        } catch (err) {
+          setLineGateNotice({ index, message: 'Re-check current line to move onto the next line.' })
+          return
+        }
+      }
       const nextIndex = index + 1
       if (nextIndex >= lines.length) {
         addLine()
@@ -567,7 +612,7 @@ export default function DerivationTable({
             ))}
             <TableRow>
               <TableCell sx={{ width: 48, borderBottom: 'none' }}>
-                <IconButton onClick={addLine} size="small" aria-label="Add line">
+                <IconButton onClick={addLine} size="small" aria-label="Add line" disabled={!canAddLine}>
                   <SubdirectoryArrowRightIcon />
                 </IconButton>
               </TableCell>
@@ -634,6 +679,12 @@ export default function DerivationTable({
             </TableBody>
           </Table>
         </TableContainer>
+
+        {lineGateNotice.message && (
+          <Typography variant="body2" sx={{ mt: 1, color: 'error.main' }}>
+            {lineGateNotice.message}
+          </Typography>
+        )}
 
         {autoCheckEnabled && (
           <Box sx={{ mt: 2, color: 'text.secondary' }}>
