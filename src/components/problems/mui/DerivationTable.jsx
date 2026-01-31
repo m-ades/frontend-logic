@@ -20,6 +20,7 @@ import SubdirectoryArrowRightIcon from '@mui/icons-material/SubdirectoryArrowRig
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome'
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
 import CancelIcon from '@mui/icons-material/Cancel'
+import RemoveIcon from '@mui/icons-material/Remove'
 import { alpha } from '@mui/material/styles'
 import { fetchJson, getActiveUserId } from '../../../utils/api.js'
 import PromptText from '../../ui/PromptText.jsx'
@@ -546,6 +547,38 @@ export default function DerivationTable({
     pendingFocusRef.current = nextIndex
   }
 
+  const deleteLine = (index) => {
+    if (index < premises.length) return
+    commitLines((prev) => {
+      if (index < premises.length || prev.length === 0) return prev
+      const next = prev.filter((_, idx) => idx !== index)
+      const hasEditable = next.some((line, idx) => idx >= premises.length && !line.readOnly)
+      if (!hasEditable) {
+        next.push({ formula: '', justification: '', readOnly: false })
+      }
+      pendingFocusRef.current = Math.min(index, next.length - 1)
+      return next
+    }, index)
+    setLineDrafts((prev) => {
+      const next = {}
+      Object.keys(prev).forEach((key) => {
+        const idx = Number(key)
+        if (!Number.isFinite(idx)) return
+        if (idx < index) {
+          next[idx] = prev[key]
+          return
+        }
+        if (idx > index) {
+          next[idx - 1] = prev[key]
+        }
+      })
+      return next
+    })
+    formulaRefs.current = {}
+    justRefs.current = {}
+    cursorPositionsRef.current = {}
+  }
+
   const focusFormula = (index) => {
     const el = formulaRefs.current[index]
     if (el && typeof el.focus === 'function') {
@@ -825,7 +858,16 @@ export default function DerivationTable({
                     })}
                   />
                 </TableCell>
-                <TableCell sx={{ borderBottom: 'none', width: 'auto', pl: 0.5, whiteSpace: 'nowrap' }}>
+                <TableCell
+                  sx={{
+                    borderBottom: 'none',
+                    width: 'auto',
+                    pl: 0.5,
+                    whiteSpace: 'nowrap',
+                    '& .line-delete': { opacity: 0, transition: 'opacity 120ms ease' },
+                    '&:hover .line-delete': { opacity: 1 },
+                  }}
+                >
                   {idx < premises.length ? (
                     idx === premises.length - 1 ? (
                       <Typography component="span" sx={{ fontSize: 16, color: 'text.primary' }}>
@@ -945,6 +987,18 @@ export default function DerivationTable({
                       )}
                       {autoCheckEnabled && autoCheckState.perLine[idx] === 'error' && (
                         <CancelIcon fontSize="small" color="error" />
+                      )}
+                      {idx >= premises.length && !line.readOnly && (
+                        <Tooltip title="Delete line">
+                          <IconButton
+                            onClick={() => deleteLine(idx)}
+                            size="small"
+                            aria-label={`Delete line ${idx + 1}`}
+                            className="line-delete"
+                          >
+                            <RemoveIcon />
+                          </IconButton>
+                        </Tooltip>
                       )}
                     </Stack>
                   )}
