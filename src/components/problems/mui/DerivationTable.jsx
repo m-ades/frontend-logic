@@ -38,8 +38,6 @@ const SYMBOL_BUTTONS = [
   { label: '≡', insert: '≡' },
   { label: '(∀x)', insert: '(∀x)' },
   { label: '(∃x)', insert: '(∃x)' },
-  { label: '(  )', pair: '()' },
-  { label: '[  ]', pair: '[]' },
 ]
 const FORCE_UPPER_RULES = new Set(['UI','UG','EI','EG','MP','MT','HS','DS','CD','DN','DM','CQ','QN','CP','IP','ACP','AIP'])
 const RULES_ALLOW_NO_LINES = new Set(['ACP', 'AIP'])
