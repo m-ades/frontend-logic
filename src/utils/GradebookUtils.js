@@ -80,3 +80,58 @@ export function sortStudents(students, sortColumn, sortDirection) {
     }
   });
 }
+
+export function exportGradebookCSV(students, assignments, courseLabel) {
+  const escapeCSVValue = (value) => {
+    if (value === null || value === undefined) return "";
+    const stringValue = String(value);
+    if (/[",\n]/.test(stringValue)) {
+      return `"${stringValue.replace(/"/g, '""')}"`;
+    }
+    return stringValue;
+  };
+
+  const assignmentList = Array.isArray(assignments) ? assignments : [];
+  const assignmentHeaders = assignmentList.map(
+    (assignment, index) => assignment?.name || `Assignment ${index + 1}`
+  );
+
+  const rows = [
+    ["Username", "Average", "Letter Grade", ...assignmentHeaders],
+    ...students.map((student) => {
+      const average = calculateAverage(student?.grades || {});
+      const letterGrade = getLetterGrade(average);
+      const grades = student?.grades || {};
+      const assignmentGrades = assignmentList.map((assignment) => {
+        const grade = grades[assignment?.id];
+        if (grade === undefined || grade === null || Number.isNaN(grade)) {
+          return "";
+        }
+        return `${grade}%`;
+      });
+
+      return [
+        student?.username ?? "",
+        `${average}%`,
+        letterGrade,
+        ...assignmentGrades,
+      ];
+    }),
+  ];
+
+  const csv = rows
+    .map((row) => row.map(escapeCSVValue).join(","))
+    .join("\n");
+
+  const baseName = String(courseLabel || "course")
+    .replace(/[^a-z0-9_-]+/gi, "_")
+    .replace(/^_+|_+$/g, "");
+
+  const blob = new Blob([csv], { type: "text/csv" });
+  const url = window.URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `${baseName || "course"}_gradebook.csv`;
+  a.click();
+  window.URL.revokeObjectURL(url);
+}

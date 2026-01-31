@@ -1,9 +1,14 @@
 import { useState } from "react";
-import { Box, Typography } from "@mui/material";
+import { Box, Typography, Button } from "@mui/material";
+import { Download } from "lucide-react";
 import { useCoursesState } from "../../context/CoursesContext";
 import GradebookFilters from "../../components/ui/gradebook/GradebookFilters";
 import GradebookTable from "../../components/ui/gradebook/GradebookTable";
-import { filterStudents, sortStudents } from "../../utils/GradebookUtils";
+import {
+  filterStudents,
+  sortStudents,
+  exportGradebookCSV,
+} from "../../utils/GradebookUtils";
 import { sortAssignmentsBySubchapter } from "../../utils/assignmentSort.js";
 
 export default function InstructorGradebook() {
@@ -58,6 +63,14 @@ export default function InstructorGradebook() {
     }
   };
 
+  const handleExportGradebook = () => {
+    exportGradebookCSV(
+      sortedStudents,
+      assignments,
+      course?.code || course?.name
+    );
+  };
+
   return (
     <Box
       sx={{
@@ -66,12 +79,33 @@ export default function InstructorGradebook() {
         overflow: "hidden",
       }}
     >
-      <Typography variant="h4" fontWeight={600} mb={1}>
-        Gradebook
-      </Typography>
-      <Typography variant="body1" color="text.secondary" mb={3}>
-        {course.name}
-      </Typography>
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: { xs: "flex-start", sm: "center" },
+          justifyContent: "space-between",
+          gap: 2,
+          flexWrap: "wrap",
+          mb: 3,
+        }}
+      >
+        <Box>
+          <Typography variant="h4" fontWeight={600} mb={1}>
+            Gradebook
+          </Typography>
+          <Typography variant="body1" color="text.secondary">
+            {course.name}
+          </Typography>
+        </Box>
+        <Button
+          variant="outlined"
+          startIcon={<Download size={18} />}
+          onClick={handleExportGradebook}
+          disabled={sortedStudents.length === 0}
+        >
+          Export CSV
+        </Button>
+      </Box>
 
       <GradebookFilters
         searchTerm={searchTerm}
