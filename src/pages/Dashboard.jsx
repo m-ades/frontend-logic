@@ -35,6 +35,7 @@ import { useCoursesState } from '../context/CoursesContext.jsx'
 import { useAuthState } from '../context/AuthContext.jsx'
 import { isInstructorRole } from '../utils/auth.js'
 import ThemedCard from '../components/ui/ThemedCard.jsx'
+import LoadingSpinner from '../components/ui/LoadingSpinner.jsx'
 
 const formatPercent = (value) => (value === null || value === undefined ? '—' : `${value.toFixed(1)}%`)
 
@@ -68,6 +69,7 @@ export default function Dashboard() {
   const { activeCourseId } = useCoursesState()
   const courseId = activeCourseId ?? API_CONFIG.courseId
   const [analytics, setAnalytics] = useState(emptyAnalytics)
+  const [isLoadingAnalytics, setIsLoadingAnalytics] = useState(true)
   const [gradeTimeline, setGradeTimeline] = useState([])
   const [gradeOverview, setGradeOverview] = useState({
     percent: null,
@@ -115,10 +117,14 @@ export default function Dashboard() {
             pastDuePercent: 0,
             remainingPercent: 0,
           })
+          setIsLoadingAnalytics(false)
         }
         return
       }
       try {
+          if (isMounted) {
+            setIsLoadingAnalytics(true)
+          }
           const [analyticsData, grades, gradebookSummary] = await Promise.all([
             fetchJson(`/api/analytics/student?userId=${getActiveUserId()}&courseId=${courseId}`),
             fetchJson(`/api/users/${getActiveUserId()}/grades`),
@@ -251,6 +257,10 @@ export default function Dashboard() {
             pastDuePercent: 0,
             remainingPercent: 0,
           })
+        }
+      } finally {
+        if (isMounted) {
+          setIsLoadingAnalytics(false)
         }
       }
     }
@@ -472,8 +482,10 @@ export default function Dashboard() {
                 Upcoming Assignments
               </Typography>
             </Box>
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
-              {assignmentStats.upcomingList.length === 0 ? (
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+              {isLoadingAnalytics ? (
+                <LoadingSpinner label="Loading assignments..." size="sm" />
+              ) : assignmentStats.upcomingList.length === 0 ? (
                 <Typography variant="body2" color="text.secondary">
                   No upcoming assignments
                 </Typography>

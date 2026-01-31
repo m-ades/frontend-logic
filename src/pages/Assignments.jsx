@@ -70,6 +70,7 @@ export default function Assignments() {
   const [averagePercent, setAveragePercent] = useState(null)
   const [courseStructure, setCourseStructure] = useState([])
   const [completedAssignments, setCompletedAssignments] = useState(new Set())
+  const [isLoadingAssignments, setIsLoadingAssignments] = useState(true)
   const { activeCourseId } = useCoursesState()
   const courseId = activeCourseId ?? API_CONFIG.courseId
   const navigate = useNavigate()
@@ -84,7 +85,17 @@ export default function Assignments() {
 
     const loadAssignments = async () => {
       try {
-        if (!courseId) return
+        if (!courseId) {
+          if (isMounted) {
+            setCourseStructure([])
+            setCompletedAssignments(new Set())
+            setIsLoadingAssignments(false)
+          }
+          return
+        }
+        if (isMounted) {
+          setIsLoadingAssignments(true)
+        }
         const assignments = await fetchJson(`/api/courses/${courseId}/assignments`)
         const gradedAssignments = sortAssignmentsBySubchapter(
           assignments.filter((assignment) => assignment.kind !== 'practice')
@@ -112,6 +123,10 @@ export default function Assignments() {
           console.warn('Failed to load assignments', error)
           setCourseStructure([])
           setCompletedAssignments(new Set())
+        }
+      } finally {
+        if (isMounted) {
+          setIsLoadingAssignments(false)
         }
       }
     }
@@ -258,6 +273,7 @@ export default function Assignments() {
     <ActivityAccordion
       title="Assignments"
       courseStructure={filteredStructure}
+      isLoading={isLoadingAssignments}
       emptyText={emptyText}
       renderActivity={(activity, context) =>
         renderActivity(activity, context, datePrefix, showCompletionChip)

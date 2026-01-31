@@ -11,6 +11,7 @@ import {
 } from '@mui/material'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import FolderIcon from '@mui/icons-material/Folder'
+import LoadingSpinner from './LoadingSpinner.jsx'
 
 export default function ActivityAccordion({
   title,
@@ -18,6 +19,7 @@ export default function ActivityAccordion({
   renderActivity,
   emptyText = 'No activities available',
   showCollapseAll = true,
+  isLoading = false,
 }) {
   const [expandedChapters, setExpandedChapters] = useState({})
   const [expandedSubchapters, setExpandedSubchapters] = useState({})
@@ -46,6 +48,14 @@ export default function ActivityAccordion({
     })
     setExpandedChapters(allCollapsed)
     setExpandedSubchapters(allCollapsed)
+  }
+
+  if (isLoading) {
+    return (
+      <Box sx={{ p: 3 }}>
+        <LoadingSpinner label="Loading activities..." size="sm" />
+      </Box>
+    )
   }
 
   if (!courseStructure?.length) {

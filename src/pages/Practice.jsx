@@ -59,6 +59,7 @@ const buildCourseStructure = (assignments, sectionTitle) => {
 export default function Practice() {
   const navigate = useNavigate()
   const [courseStructure, setCourseStructure] = useState([])
+  const [isLoadingPractice, setIsLoadingPractice] = useState(true)
   const { activeCourseId } = useCoursesState()
   const courseId = activeCourseId ?? API_CONFIG.courseId
 
@@ -67,7 +68,16 @@ export default function Practice() {
 
     const loadPractice = async () => {
       try {
-        if (!courseId) return
+        if (!courseId) {
+          if (isMounted) {
+            setCourseStructure([])
+            setIsLoadingPractice(false)
+          }
+          return
+        }
+        if (isMounted) {
+          setIsLoadingPractice(true)
+        }
         const assignments = await fetchJson(`/api/courses/${courseId}/assignments`)
         if (!isMounted) return
 
@@ -79,6 +89,10 @@ export default function Practice() {
         if (isMounted) {
           console.warn('Failed to load practice assignments', error)
           setCourseStructure([])
+        }
+      } finally {
+        if (isMounted) {
+          setIsLoadingPractice(false)
         }
       }
     }
@@ -103,6 +117,7 @@ export default function Practice() {
       <ActivityAccordion
         title="Practice Problems"
         courseStructure={courseStructure}
+        isLoading={isLoadingPractice}
         emptyText="No practice problems available"
         renderActivity={(activity, { chapter, subchapter }) => (
           <ThemedCard

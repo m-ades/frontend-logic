@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Box, Typography, CardContent, Stack } from '@mui/material'
 import { DataGrid } from '@mui/x-data-grid'
 import ThemedCard from '../components/ui/ThemedCard.jsx'
+import LoadingSpinner from '../components/ui/LoadingSpinner.jsx'
 import { formatDateTime } from '../utils/formatting.js'
 import { API_CONFIG, fetchJson, getActiveUserId } from '../utils/api.js'
 import { useCoursesState } from '../context/CoursesContext.jsx'
@@ -19,6 +20,7 @@ function NoRowsOverlay() {
 
 export default function Grades() {
   const [gradeEntries, setGradeEntries] = useState([])
+  const [isLoadingGrades, setIsLoadingGrades] = useState(true)
   const { activeCourseId } = useCoursesState()
   const courseId = activeCourseId ?? API_CONFIG.courseId
 
@@ -27,7 +29,16 @@ export default function Grades() {
 
     const loadGrades = async () => {
       try {
-        if (!courseId) return
+        if (!courseId) {
+          if (isMounted) {
+            setGradeEntries([])
+            setIsLoadingGrades(false)
+          }
+          return
+        }
+        if (isMounted) {
+          setIsLoadingGrades(true)
+        }
         const userId = getActiveUserId()
         const [assignments, grades] = await Promise.all([
           fetchJson(`/api/courses/${courseId}/assignments`),
@@ -48,6 +59,10 @@ export default function Grades() {
         console.warn('Failed to load grades', error)
         if (isMounted) {
           setGradeEntries([])
+        }
+      } finally {
+        if (isMounted) {
+          setIsLoadingGrades(false)
         }
       }
     }
@@ -133,16 +148,22 @@ export default function Grades() {
               {overallPercentage.toFixed(1)}%
             </Typography>
           </Stack>
-          <DataGrid
-            rows={rows}
-            columns={columns}
-            autoHeight
-            disableColumnMenu
-            disableRowSelectionOnClick
-            hideFooter
-            slots={{ noRowsOverlay: NoRowsOverlay }}
-            sx={{ border: 0 }}
-          />
+          {isLoadingGrades ? (
+            <Box sx={{ minHeight: 220, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <LoadingSpinner label="Loading grades..." size="sm" />
+            </Box>
+          ) : (
+            <DataGrid
+              rows={rows}
+              columns={columns}
+              autoHeight
+              disableColumnMenu
+              disableRowSelectionOnClick
+              hideFooter
+              slots={{ noRowsOverlay: NoRowsOverlay }}
+              sx={{ border: 0 }}
+            />
+          )}
         </CardContent>
       </ThemedCard>
     </Box>
