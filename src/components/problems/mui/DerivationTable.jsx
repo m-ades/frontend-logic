@@ -786,9 +786,11 @@ export default function DerivationTable({
             ))}
             <TableRow>
               <TableCell sx={{ width: 48, borderBottom: 'none' }}>
-                <IconButton onClick={addLine} size="small" aria-label="Add line" disabled={!canAddLine}>
-                  <SubdirectoryArrowRightIcon />
-                </IconButton>
+                <Tooltip title="New line">
+                  <IconButton onClick={addLine} size="small" aria-label="Add line" disabled={!canAddLine}>
+                    <SubdirectoryArrowRightIcon />
+                  </IconButton>
+                </Tooltip>
               </TableCell>
               <TableCell sx={{ borderBottom: 'none' }}>
                 <Stack direction="row" spacing={1} alignItems="center">
