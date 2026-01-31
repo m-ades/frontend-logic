@@ -38,6 +38,41 @@ const INDENT_END_RULES = new Set(['CP', 'IP'])
 const INDENT_PX = 18
 const MAX_INDENT_LEVEL = 3
 const AUTO_CHECK_STORAGE_KEY = 'logic-app:autocheck-enabled'
+const getUnderlineColors = (theme) => {
+  if (theme.palette.mode === 'dark') {
+    return {
+      base: theme.palette.divider,
+      hover: alpha(theme.palette.common.white, 0.24),
+      focus: theme.palette.primary.main,
+    }
+  }
+  return {
+    base: '#e3e6ee',
+    hover: '#edf1f7',
+    focus: '#dfe5f0',
+  }
+}
+
+const getInputUnderlineSx = (theme) => {
+  const colors = getUnderlineColors(theme)
+  return {
+    '& .MuiInput-underline:before': { borderBottomColor: colors.base },
+    '& .MuiInput-underline:hover:before': { borderBottomColor: colors.hover },
+    '& .MuiInput-underline:after': { borderBottomColor: colors.focus },
+  }
+}
+
+const getSelectUnderlineSx = (theme) => {
+  const colors = getUnderlineColors(theme)
+  return {
+    '&:before': { borderBottomColor: colors.base },
+    '&:hover:not(.Mui-disabled):before': { borderBottomColor: colors.hover },
+    '&:after': { borderBottomColor: colors.focus },
+    '& .MuiInput-underline:before': { borderBottomColor: colors.base },
+    '& .MuiInput-underline:hover:before': { borderBottomColor: colors.hover },
+    '& .MuiInput-underline:after': { borderBottomColor: colors.focus },
+  }
+}
 
 const applyInsertion = (value, selectionStart, selectionEnd, insertText, replaceBefore = 0) => {
   const start = selectionStart ?? value.length
@@ -773,13 +808,11 @@ export default function DerivationTable({
                       lastEditableIndexRef.current = idx
                       updateCursorPosition(idx, e)
                     }}
-                    sx={{
+                    sx={(theme) => ({
                       width: { xs: '100%', md: 280 },
-                      '& .MuiInput-underline:before': { borderBottomColor: '#e3e6ee' },
-                      '& .MuiInput-underline:hover:before': { borderBottomColor: '#edf1f7' },
-                      '& .MuiInput-underline:after': { borderBottomColor: '#dfe5f0' },
+                      ...getInputUnderlineSx(theme),
                       '& .MuiInputBase-input': { fontSize: 16, py: 1 },
-                    }}
+                    })}
                   />
                 </TableCell>
                 <TableCell sx={{ borderBottom: 'none', width: 'auto', pl: 0.5, whiteSpace: 'nowrap' }}>
@@ -825,13 +858,11 @@ export default function DerivationTable({
                           InputProps={{ readOnly: line.readOnly }}
                           inputProps={{ autoComplete: 'off' }}
                           inputRef={(el) => { if (el) justRefs.current[idx] = el }}
-                          sx={{
+                          sx={(theme) => ({
                             width: { xs: '100%', md: 58 },
-                            '& .MuiInput-underline:before': { borderBottomColor: '#e3e6ee' },
-                            '& .MuiInput-underline:hover:before': { borderBottomColor: '#edf1f7' },
-                            '& .MuiInput-underline:after': { borderBottomColor: '#dfe5f0' },
+                            ...getInputUnderlineSx(theme),
                             '& .MuiInputBase-input': { fontSize: 16, py: 1 },
-                          }}
+                          })}
                         />
                       )}
                       {allowedRules.length > 0 && (
@@ -878,14 +909,12 @@ export default function DerivationTable({
                               }
                             }}
                             renderValue={(value) => value || 'Rule'}
-                            sx={{
+                            sx={(theme) => ({
                               '& .MuiSelect-select': { fontSize: 16, py: 1 },
                               '& .MuiInputBase-input': { fontSize: 16, py: 1 },
                               '& .MuiSelect-select.MuiInputBase-input': { display: 'flex', alignItems: 'center' },
-                              '& .MuiInput-underline:before': { borderBottomColor: '#e3e6ee' },
-                              '& .MuiInput-underline:hover:before': { borderBottomColor: '#edf1f7' },
-                              '& .MuiInput-underline:after': { borderBottomColor: '#dfe5f0' },
-                            }}
+                              ...getSelectUnderlineSx(theme),
+                            })}
                             MenuProps={{
                               PaperProps: { sx: { '& .MuiMenuItem-root': { fontSize: 16 } } }
                             }}
@@ -951,7 +980,7 @@ export default function DerivationTable({
                         border: '1px solid',
                         borderColor: (theme) =>
                           theme.palette.mode === 'dark'
-                            ? theme.palette.grey[700]
+                            ? theme.palette.grey[800]
                             : theme.palette.grey[200],
                         borderRadius: 2,
                         fontWeight: 600,
