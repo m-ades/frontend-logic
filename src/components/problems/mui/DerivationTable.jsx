@@ -12,7 +12,7 @@ import {
   TextField,
   Typography,
   IconButton,
-  Chip,
+  Button,
   Tooltip,
   MenuItem,
 } from '@mui/material'
@@ -38,6 +38,8 @@ const SYMBOL_BUTTONS = [
   { label: '≡', insert: '≡' },
   { label: '(∀x)', insert: '(∀x)' },
   { label: '(∃x)', insert: '(∃x)' },
+  { label: '(  )', pair: '()' },
+  { label: '[  ]', pair: '[]' },
 ]
 const FORCE_UPPER_RULES = new Set(['UI','UG','EI','EG','MP','MT','HS','DS','CD','DN','DM','CQ','QN','CP','IP','ACP','AIP'])
 const RULES_ALLOW_NO_LINES = new Set(['ACP', 'AIP'])
@@ -811,6 +813,43 @@ export default function DerivationTable({
 
   const isLocked = Number.isFinite(attemptLimit) && attemptCount >= attemptLimit
 
+  const handleSymbolInsert = ({ insert, pair }) => {
+    const targetIdx = resolveEditableIndex()
+    if (targetIdx === -1 || targetIdx === null) return
+    const inputEl = formulaRefs.current[targetIdx]
+    const current = lines[targetIdx]?.formula || ''
+    const stored = getStoredSelection(targetIdx, current.length)
+    const isFocused = typeof document !== 'undefined' && document.activeElement === inputEl
+    const start = isFocused && typeof inputEl?.selectionStart === 'number' ? inputEl.selectionStart : stored.start
+    const end = isFocused && typeof inputEl?.selectionEnd === 'number' ? inputEl.selectionEnd : stored.end
+    const hasSelection = end > start
+    const [open, close] = pair ? pair.split('') : []
+    const insertText = pair
+      ? (hasSelection ? `${open}${current.slice(start, end)}${close}` : `${open}  ${close}`)
+      : insert
+    if (!insertText) return
+    const nextCursor = pair
+      ? (hasSelection ? start + insertText.length : start + open.length + 1)
+      : start + insertText.length
+    if (inputEl && typeof inputEl.setRangeText === 'function') {
+      inputEl.setRangeText(insertText, start, end, 'end')
+      handleLineChange(targetIdx, 'formula', inputEl.value ?? '')
+      inputEl.focus()
+      setStoredSelection(targetIdx, nextCursor)
+      setTimeout(() => inputEl.setSelectionRange(nextCursor, nextCursor), 0)
+      return
+    }
+    const before = current.slice(0, start)
+    const after = current.slice(end)
+    const nextValue = `${before}${insertText}${after}`
+    handleLineChange(targetIdx, 'formula', nextValue)
+    setStoredSelection(targetIdx, nextCursor)
+    if (inputEl) {
+      inputEl.focus()
+      setTimeout(() => inputEl.setSelectionRange(nextCursor, nextCursor), 0)
+    }
+  }
+
   return (
     <Stack spacing={2}>
       <ThemedCard
@@ -1071,88 +1110,73 @@ export default function DerivationTable({
                   </IconButton>
                 </Tooltip>
               </TableCell>
-              <TableCell sx={{ borderBottom: 'none' }}>
-                <Stack direction="row" spacing={1} alignItems="center">
-                  <Tooltip title={autoCheckEnabled ? 'Turn off autochecker' : 'Turn on autochecker'}>
-                    <IconButton
-                      onClick={() => setAutoCheckEnabled((prev) => !prev)}
-                      size="small"
-                      aria-label="Toggle autochecker"
-                      sx={{
-                        color: autoCheckEnabled ? 'primary.main' : 'text.disabled',
-                        position: 'relative',
-                      }}
-                    >
-                      <AutoAwesomeIcon />
-                    </IconButton>
-                  </Tooltip>
-                  {SYMBOL_BUTTONS.map(({ label, insert, pair }) => (
-                    <Chip
-                      key={label}
-                      label={label}
-                      size="small"
-                      variant="filled"
-                      onMouseDown={(event) => {
-                        event.preventDefault()
-                      }}
-                      sx={{
-                        height: 32,
-                        '& .MuiChip-label': {
-                          fontSize: '1rem',
-                        },
-                        bgcolor: (theme) =>
-                          theme.palette.mode === 'dark'
-                            ? alpha(theme.palette.common.white, 0.08)
-                            : theme.palette.grey[100],
-                        color: 'text.primary',
-                        border: '1px solid',
-                        borderColor: (theme) =>
-                          theme.palette.mode === 'dark'
-                            ? theme.palette.grey[800]
-                            : theme.palette.grey[200],
-                        borderRadius: 2,
-                        fontWeight: 600,
-                      }}
-                      onClick={() => {
-                        const targetIdx = resolveEditableIndex()
-                        if (targetIdx === -1 || targetIdx === null) return
-                        const inputEl = formulaRefs.current[targetIdx]
-                        const current = lines[targetIdx]?.formula || ''
-                        const stored = getStoredSelection(targetIdx, current.length)
-                        const isFocused = typeof document !== 'undefined' && document.activeElement === inputEl
-                        const start = isFocused && typeof inputEl?.selectionStart === 'number' ? inputEl.selectionStart : stored.start
-                        const end = isFocused && typeof inputEl?.selectionEnd === 'number' ? inputEl.selectionEnd : stored.end
-                        const hasSelection = end > start
-                        const [open, close] = pair ? pair.split('') : []
-                        const insertText = pair
-                          ? (hasSelection ? `${open}${current.slice(start, end)}${close}` : `${open}  ${close}`)
-                          : insert
-                        const nextCursor = pair
-                          ? (hasSelection ? start + insertText.length : start + open.length + 1)
-                          : start + (insertText?.length ?? 0)
-                        if (inputEl && typeof inputEl.setRangeText === 'function') {
-                          inputEl.setRangeText(insertText, start, end, 'end')
-                          handleLineChange(targetIdx, 'formula', inputEl.value ?? '')
-                          inputEl.focus()
-                          setStoredSelection(targetIdx, nextCursor)
-                          setTimeout(() => inputEl.setSelectionRange(nextCursor, nextCursor), 0)
-                          return
-                        }
-                        const before = current.slice(0, start)
-                        const after = current.slice(end)
-                        const nextValue = `${before}${insertText}${after}`
-                        handleLineChange(targetIdx, 'formula', nextValue)
-                        setStoredSelection(targetIdx, nextCursor)
-                        if (inputEl) {
-                          inputEl.focus()
-                          setTimeout(() => inputEl.setSelectionRange(nextCursor, nextCursor), 0)
-                        }
-                      }}
-                    />
-                  ))}
+              <TableCell sx={{ borderBottom: 'none', pl: 0.5 }} colSpan={2}>
+                <Stack direction="row" alignItems="center" sx={{ overflowX: 'auto', py: 0.5 }}>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 0.75,
+                      flexWrap: 'nowrap',
+                      minWidth: 'max-content',
+                      pr: 1,
+                    }}
+                  >
+                    <Tooltip title={autoCheckEnabled ? 'Turn off autochecker' : 'Turn on autochecker'}>
+                      <IconButton
+                        onClick={() => setAutoCheckEnabled((prev) => !prev)}
+                        size="small"
+                        aria-label="Toggle autochecker"
+                        sx={{
+                          color: autoCheckEnabled ? 'primary.main' : 'text.disabled',
+                          position: 'relative',
+                        }}
+                      >
+                        <AutoAwesomeIcon />
+                      </IconButton>
+                    </Tooltip>
+                    {SYMBOL_BUTTONS.map(({ label, insert, pair }) => (
+                      <Button
+                        key={label}
+                        type="button"
+                        size="small"
+                        variant="outlined"
+                        onMouseDown={(event) => {
+                          event.preventDefault()
+                        }}
+                        onClick={() => handleSymbolInsert({ insert, pair })}
+                        sx={{
+                          minWidth: 34,
+                          px: 1,
+                          py: 0.35,
+                          fontSize: '0.95rem',
+                          lineHeight: 1.1,
+                          minHeight: 32,
+                          fontWeight: 600,
+                          textTransform: 'none',
+                          boxShadow: 'none',
+                          border: 'none',
+                          bgcolor: (theme) =>
+                            theme.palette.mode === 'dark'
+                              ? alpha(theme.palette.common.white, 0.08)
+                              : theme.palette.grey[100],
+                          color: 'text.primary',
+                          '&:hover': (theme) => ({
+                            boxShadow: 'none',
+                            border: 'none',
+                            backgroundColor: alpha(
+                              theme.palette.primary.main,
+                              theme.palette.action.hoverOpacity,
+                            ),
+                          }),
+                        }}
+                      >
+                        {label}
+                      </Button>
+                    ))}
+                  </Box>
                 </Stack>
               </TableCell>
-              <TableCell sx={{ borderBottom: 'none', pl: 0.5, whiteSpace: 'nowrap' }} />
             </TableRow>
             </TableBody>
           </Table>

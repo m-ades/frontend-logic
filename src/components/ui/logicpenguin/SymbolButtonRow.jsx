@@ -20,6 +20,8 @@ const BUTTONS = [
   { op: 'IFF' },
   { op: 'FORALL', quantifier: true },
   { op: 'EXISTS', quantifier: true },
+  { pair: '()' },
+  { pair: '[]' },
 ]
 
 export default function SymbolButtonRow({
