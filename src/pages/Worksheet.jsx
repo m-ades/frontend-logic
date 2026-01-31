@@ -885,6 +885,7 @@ export default function Worksheet() {
         isOverdue={isOverdue}
       >
         <WorksheetTabs
+          key={`worksheet-${currentWorksheet?.id ?? worksheetIdNum}`}
           worksheets={worksheets}
           currentWorksheetIndex={currentWorksheetIndex}
           onWorksheetIndexChange={handleWorksheetChange}

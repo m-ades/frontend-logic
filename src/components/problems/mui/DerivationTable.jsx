@@ -219,6 +219,7 @@ export default function DerivationTable({
   }, [savedState, premises])
 
   const [lines, setLines] = useState(initialLines)
+  const onStateChangeRef = useRef(onStateChange)
   const firstEditableIndex = premises.length
   const allowedRules = useMemo(() => {
     const allow = proof?.ruleset?.allow ?? proof?.options?.ruleset?.allow ?? []
@@ -260,15 +261,19 @@ export default function DerivationTable({
   )
 
   useEffect(() => {
+    onStateChangeRef.current = onStateChange
+  }, [onStateChange])
+
+  const emitState = useCallback((linesSnapshot) => {
     const submission = buildSubmission(
-      lines,
+      linesSnapshot,
       proof?.conclusion,
       premises,
       normalizeFormulaForCheck,
       normalizeJustificationForCheck
     )
-    onStateChange?.(submission)
-  }, [lines, onStateChange, premises, proof?.conclusion, normalizeFormulaForCheck, normalizeJustificationForCheck])
+    onStateChangeRef.current?.(submission)
+  }, [premises, proof?.conclusion, normalizeFormulaForCheck, normalizeJustificationForCheck])
 
   const runAutoCheck = useCallback(async (linesSnapshot) => {
     const submission = buildSubmission(
@@ -378,12 +383,22 @@ export default function DerivationTable({
     window.sessionStorage.setItem(AUTO_CHECK_STORAGE_KEY, String(autoCheckEnabled))
   }, [autoCheckEnabled])
 
-  const handleLineChange = (index, field, value) => {
-    setLines((prev) =>
-      prev.map((line, idx) =>
-        idx === index ? { ...line, [field]: value } : line
-      )
+  const applyLineChange = (currentLines, index, field, value) =>
+    currentLines.map((line, idx) =>
+      idx === index ? { ...line, [field]: value } : line
     )
+
+  const handleLineChange = (index, field, value) => {
+    setLines((prev) => applyLineChange(prev, index, field, value))
+    if (lineGateNotice.index === index) {
+      setLineGateNotice({ index: null, message: '' })
+    }
+  }
+
+  const handleLineCommit = (index, field, value) => {
+    const nextLines = applyLineChange(lines, index, field, value)
+    setLines(nextLines)
+    emitState(nextLines)
     if (lineGateNotice.index === index) {
       setLineGateNotice({ index: null, message: '' })
     }
@@ -444,7 +459,7 @@ export default function DerivationTable({
     if (event.key === 'Enter') {
       event.preventDefault()
       const normalized = normalizeFormulaForCheck(el.value)
-      handleLineChange(index, 'formula', normalized)
+      handleLineCommit(index, 'formula', normalized)
       focusJustification(index)
       return
     }
@@ -514,10 +529,9 @@ export default function DerivationTable({
     if (event.key === 'Enter') {
       event.preventDefault()
       const formatted = applyLinesToJustification(lines[index]?.justification, event.target.value)
-      const nextLines = lines.map((line, idx) =>
-        idx === index ? { ...line, justification: formatted } : line
-      )
-      handleLineChange(index, 'justification', formatted)
+      const nextLines = applyLineChange(lines, index, 'justification', formatted)
+      setLines(nextLines)
+      emitState(nextLines)
       setLineDrafts((prev) => {
         if (!(index in prev)) return prev
         const next = { ...prev }
@@ -551,15 +565,10 @@ export default function DerivationTable({
     if (isLocked) return
     const premLines = premises.map((p) => ({ formula: p, justification: '', readOnly: true }))
     const blanks = Array.from({ length: 1 }, () => ({ formula: '', justification: '', readOnly: false }))
-    setLines([...premLines, ...blanks])
+    const nextLines = [...premLines, ...blanks]
+    setLines(nextLines)
     setStatusBanner({ status: 'unanswered', message: '' })
-    onStateChange?.(buildSubmission(
-      [...premLines, ...blanks],
-      proof?.conclusion,
-      premises,
-      normalizeFormulaForCheck,
-      normalizeJustificationForCheck
-    ))
+    emitState(nextLines)
   }
 
   const handleSubmit = async () => {
@@ -661,7 +670,7 @@ export default function DerivationTable({
                       lastEditableIndexRef.current = idx
                       updateCursorPosition(idx, e)
                     }}
-                    onBlur={(e) => handleLineChange(idx, 'formula', normalizeFormulaForCheck(e.target.value))}
+                    onBlur={(e) => handleLineCommit(idx, 'formula', normalizeFormulaForCheck(e.target.value))}
                     InputProps={{ readOnly: line.readOnly }}
                     inputProps={{ autoComplete: 'off' }}
                     inputRef={(el) => { if (el) formulaRefs.current[idx] = el }}
@@ -707,7 +716,7 @@ export default function DerivationTable({
                         onKeyDown={(e) => handleJustKeyDown(e, idx, line.readOnly)}
                         onBlur={(e) => {
                           const raw = e.target.value
-                          handleLineChange(
+                          handleLineCommit(
                             idx,
                             'justification',
                             applyLinesToJustification(line.justification, raw)
@@ -737,7 +746,7 @@ export default function DerivationTable({
                             displayEmpty
                             onChange={(e) => {
                               const nextValue = applyRuleToJustification(line.justification, e.target.value)
-                              handleLineChange(idx, 'justification', nextValue)
+                              handleLineCommit(idx, 'justification', nextValue)
                             }}
                             renderValue={(value) => value || 'Rule'}
                             sx={{
