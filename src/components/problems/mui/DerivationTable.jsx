@@ -323,7 +323,18 @@ export default function DerivationTable({
       perLine[idx] = hasError ? 'error' : 'ok'
     })
     const rows = buildErrorRows(filteredErrors, { skipCompletion: true })
-    return { perLine, rows }
+    const normalizedConclusion = normalizeFormulaForCheck(proof?.conclusion || '')
+    const lastIndex = linesSnapshot.length - 1
+    const last = linesSnapshot[lastIndex]
+    const shouldAutoAdd = Boolean(
+      normalizedConclusion &&
+      last &&
+      !last.readOnly &&
+      isLineCompleteForCheck(last) &&
+      perLine[lastIndex] === 'ok' &&
+      normalizeFormulaForCheck(last.formula || '') !== normalizedConclusion
+    )
+    return { perLine, rows, shouldAutoAdd }
   }, [normalizeFormulaForCheck, normalizeJustificationForCheck, premises, proof?.conclusion, proof?.options, proof?.ruleset, isLineCompleteForCheck])
 
   useEffect(() => {
@@ -337,7 +348,19 @@ export default function DerivationTable({
     autoCheckTimerRef.current = setTimeout(async () => {
       try {
         const result = await runAutoCheck(lines)
-        setAutoCheckState(result)
+        setAutoCheckState({ perLine: result.perLine, rows: result.rows })
+        if (result.shouldAutoAdd) {
+          setLines((prev) => {
+            if (prev.length !== lines.length) return prev
+            const last = prev[prev.length - 1]
+            if (!last || last.readOnly || !isLineCompleteForCheck(last)) return prev
+            const normalizedConclusion = normalizeFormulaForCheck(proof?.conclusion || '')
+            if (!normalizedConclusion) return prev
+            const normalizedLast = normalizeFormulaForCheck(last.formula || '')
+            if (normalizedLast === normalizedConclusion) return prev
+            return [...prev, { formula: '', justification: '', readOnly: false }]
+          })
+        }
       } catch (err) {
         setAutoCheckState({ perLine: {}, rows: [{ line: '', entries: [{ label: 'Autocheck', messages: ['Autocheck failed.'], isWarning: true }] }] })
       }
