@@ -1,7 +1,7 @@
 import RichText from './RichText.jsx'
 
 const promptSx = {
-  fontSize: { xs: '0.95rem', md: '1rem' },
+  fontSize: '15px',
   lineHeight: 2,
   fontWeight: 400,
   color: 'text.primary',
