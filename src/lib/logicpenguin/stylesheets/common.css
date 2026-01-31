@@ -36,7 +36,7 @@
 
 :where(.logicpenguin) {
   all: revert-layer;
-  font-size: 20px;
+  font-size: 1rem;
   font-family: 'IBM Plex Sans', sans-serif;
   background-color: transparent;
   color: var(--lpblack);
@@ -62,7 +62,7 @@
   padding: 1rem;
   box-shadow: 0 7px 12px -3px rgba(0, 0, 0, 0.08), 0 3px 5px -2px rgba(0, 0, 0, 0.04);
   border: 1px solid rgba(0, 0, 0, 0.08);
-  font-size: 20px;
+  font-size: inherit;
   width: 100%;
   max-width: 100%;
   min-width: 0;
@@ -79,7 +79,7 @@
 :where(.logicpenguin) .lp-problem-card *,
 :where(.logicpenguin) .lp-problem-card *::before,
 :where(.logicpenguin) .lp-problem-card *::after {
-  font-size: 15px !important;
+  font-size: inherit;
 }
 
 :where(.logicpenguin) .tt-table-wrap {
@@ -157,7 +157,7 @@
 
 @media (max-width: 900px) {
   :where(.logicpenguin) {
-    font-size: 18px;
+    font-size: 1rem;
   }
 
   :where(.logicpenguin) .lp-problem-card {
@@ -182,7 +182,7 @@
 
 @media (max-width: 600px) {
   :where(.logicpenguin) {
-    font-size: 16px;
+    font-size: 1rem;
   }
 
   :where(.logicpenguin) .tt-table {

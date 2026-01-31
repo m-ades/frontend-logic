@@ -49,7 +49,12 @@ const promptSx = {
 
 export default function PromptText({ content, variant = 'body1', sx, ...props }) {
   if (!content) return null
-  const mergedSx = sx ? [promptSx, sx] : promptSx
+  const sxList = Array.isArray(sx) ? sx : (sx ? [sx] : [])
+  const hasFontSizeOverride = sxList.some(
+    (item) => item && typeof item === 'object' && Object.prototype.hasOwnProperty.call(item, 'fontSize')
+  )
+  const baseSx = hasFontSizeOverride ? { ...promptSx, fontSize: 'inherit' } : promptSx
+  const mergedSx = sxList.length ? [baseSx, ...sxList] : baseSx
   return (
     <RichText
       content={content}

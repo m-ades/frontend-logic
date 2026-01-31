@@ -35,7 +35,9 @@ const defaultSx = {
 export default function RichText({ content, variant = 'body1', sx, ...props }) {
   if (!content) return null
   const hasHtml = typeof content === 'string' && /<[^>]+>/.test(content)
-  const mergedSx = sx ? { ...defaultSx, ...sx } : defaultSx
+  const mergedSx = Array.isArray(sx)
+    ? [defaultSx, ...sx]
+    : (sx ? { ...defaultSx, ...sx } : defaultSx)
 
   if (hasHtml) {
     return (

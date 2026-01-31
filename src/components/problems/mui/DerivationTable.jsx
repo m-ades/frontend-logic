@@ -13,7 +13,8 @@ import {
   Chip,
   Tooltip,
 } from '@mui/material'
-import AddIcon from '@mui/icons-material/Add'
+import SubdirectoryArrowRightIcon from '@mui/icons-material/SubdirectoryArrowRight'
+import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome'
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
 import CancelIcon from '@mui/icons-material/Cancel'
 import { fetchJson, getActiveUserId } from '../../../utils/api.js'
@@ -26,6 +27,7 @@ import { justParse } from '../../ui/logicpenguin/justification-parse.js'
 
 const SYMBOLS = ['~', '•', '∨', '⊃', '≡', '(∀x)', '(∃x)']
 const FORCE_UPPER_RULES = new Set(['UI','UG','EI','EG','MP','MT','HS','DS','CD','DN','DM','CQ','QN','CP','IP','ACP','AIP'])
+const AUTO_CHECK_STORAGE_KEY = 'logic-app:autocheck-enabled'
 
 const applyInsertion = (value, selectionStart, selectionEnd, insertText, replaceBefore = 0) => {
   const start = selectionStart ?? value.length
@@ -176,7 +178,12 @@ export default function DerivationTable({
 
   const [lines, setLines] = useState(initialLines)
   const firstEditableIndex = premises.length
-  const [autoCheckEnabled, setAutoCheckEnabled] = useState(false)
+  const [autoCheckEnabled, setAutoCheckEnabled] = useState(() => {
+    if (typeof window === 'undefined') return true
+    const saved = window.sessionStorage.getItem(AUTO_CHECK_STORAGE_KEY)
+    if (saved === null) return true
+    return saved === 'true'
+  })
   const [autoCheckState, setAutoCheckState] = useState({ perLine: {}, rows: [] })
   const autoCheckTimerRef = useRef(null)
 
@@ -274,6 +281,11 @@ export default function DerivationTable({
       }
     }
   }, [autoCheckEnabled, lines, premises, proof?.conclusion, proof?.options, proof?.ruleset])
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    window.sessionStorage.setItem(AUTO_CHECK_STORAGE_KEY, String(autoCheckEnabled))
+  }, [autoCheckEnabled])
 
   const handleLineChange = (index, field, value) => {
     setLines((prev) =>
@@ -477,7 +489,7 @@ export default function DerivationTable({
       >
         {proof.description && (
           <Box sx={{ mb: 2 }}>
-            <PromptText content={proof.description} />
+            <PromptText content={proof.description} sx={{ fontSize: 15 }} />
           </Box>
         )}
         <TableContainer component={Box} sx={{ width: '100%' }}>
@@ -554,12 +566,12 @@ export default function DerivationTable({
               </TableRow>
             ))}
             <TableRow>
-              <TableCell sx={{ borderBottom: 'none' }}>
+              <TableCell sx={{ width: 48, borderBottom: 'none' }}>
                 <IconButton onClick={addLine} size="small" aria-label="Add line">
-                  <AddIcon />
+                  <SubdirectoryArrowRightIcon />
                 </IconButton>
               </TableCell>
-              <TableCell colSpan={2} sx={{ borderBottom: 'none' }}>
+              <TableCell sx={{ borderBottom: 'none' }}>
                 <Stack direction="row" spacing={1} alignItems="center">
                   <Tooltip title={autoCheckEnabled ? 'Turn off autochecker' : 'Turn on autochecker'}>
                     <IconButton
@@ -571,18 +583,7 @@ export default function DerivationTable({
                         position: 'relative',
                       }}
                     >
-                      <CheckCircleIcon />
-                      {!autoCheckEnabled && (
-                        <Box
-                          sx={{
-                            position: 'absolute',
-                            width: 18,
-                            height: 2,
-                            bgcolor: 'text.disabled',
-                            transform: 'rotate(-45deg)',
-                          }}
-                        />
-                      )}
+                      <AutoAwesomeIcon />
                     </IconButton>
                   </Tooltip>
                   {SYMBOLS.map((sym) => (
@@ -628,6 +629,7 @@ export default function DerivationTable({
                   ))}
                 </Stack>
               </TableCell>
+              <TableCell sx={{ borderBottom: 'none', pl: 0.5, whiteSpace: 'nowrap' }} />
             </TableRow>
             </TableBody>
           </Table>
