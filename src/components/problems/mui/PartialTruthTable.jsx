@@ -180,7 +180,7 @@ export default function PartialTruthTable({
                               size="small"
                               displayEmpty
                               disabled={readOnly}
-                              sx={{ minWidth: 64 }}
+                              sx={{ minWidth: 'var(--tt-select-min-width)' }}
                             >
                               <MenuItem value="">
                                 <em>?</em>

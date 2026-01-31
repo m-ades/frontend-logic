@@ -71,14 +71,10 @@ function TruthToggle({ value, onChange, ariaLabel, accent, readOnly = false }) {
         }
       }}
       sx={{
-        fontSize: '0.85rem',
         fontWeight: 700,
         color: getColor(),
         cursor: 'pointer',
         textTransform: 'uppercase',
-        letterSpacing: '0.12em',
-        width: 28,
-        height: 28,
         display: 'inline-flex',
         justifyContent: 'center',
         alignItems: 'center',

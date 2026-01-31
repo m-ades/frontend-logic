@@ -40,6 +40,15 @@
   font-family: 'IBM Plex Sans', sans-serif;
   background-color: transparent;
   color: var(--lpblack);
+  --tt-font-size: clamp(1rem, 0.9rem + 0.45vw, 1.25rem);
+  --tt-token-font-size: clamp(0.95rem, 0.85rem + 0.35vw, 1.15rem);
+  --tt-cell-pad-y: clamp(0.4rem, 0.3rem + 0.4vw, 0.65rem);
+  --tt-cell-pad-x: clamp(0.6rem, 0.45rem + 0.6vw, 0.95rem);
+  --tt-cell-min-width: clamp(2.4rem, 2rem + 0.9vw, 3.2rem);
+  --tt-toggle-size: clamp(2rem, 1.6rem + 1vw, 2.8rem);
+  --tt-toggle-font-size: clamp(0.9rem, 0.8rem + 0.4vw, 1.15rem);
+  --tt-toggle-letter-spacing: clamp(0.09em, 0.07em + 0.08vw, 0.14em);
+  --tt-select-min-width: clamp(5.5rem, 4.8rem + 1vw, 7.5rem);
 }
 
 :where(.logicpenguin) .problemstatusindicator,
@@ -95,13 +104,13 @@
   table-layout: auto;
   background: #fff;
   border: 1px solid var(--lpgray6);
-  font-size: 0.9rem;
+  font-size: var(--tt-font-size);
 }
 
 :where(.logicpenguin) .tt-table th,
 :where(.logicpenguin) .tt-table td {
   border: 1px solid var(--lpgray6);
-  padding: 0.35rem 0.55rem;
+  padding: var(--tt-cell-pad-y) var(--tt-cell-pad-x);
   text-align: center;
   vertical-align: middle;
 }
@@ -113,17 +122,25 @@
 :where(.logicpenguin) .tt-group-row th {
   background: #e8f1ff;
   font-weight: 700;
-  font-size: 0.85rem;
+  font-size: var(--tt-token-font-size);
 }
 
 :where(.logicpenguin) .tt-token-row th {
   background: #f4f7ff;
   font-weight: 600;
   text-transform: uppercase;
+  font-size: var(--tt-token-font-size);
 }
 
 :where(.logicpenguin) .tt-cell {
-  min-width: 2.2rem;
+  min-width: var(--tt-cell-min-width);
+}
+
+:where(.logicpenguin) .tt-toggle {
+  font-size: var(--tt-toggle-font-size);
+  letter-spacing: var(--tt-toggle-letter-spacing);
+  width: var(--tt-toggle-size);
+  height: var(--tt-toggle-size);
 }
 
 :where(.logicpenguin) .tt-separator {
@@ -183,49 +200,26 @@
 @media (max-width: 600px) {
   :where(.logicpenguin) {
     font-size: 1rem;
-  }
-
-  :where(.logicpenguin) .tt-table {
-    font-size: 0.8rem;
-    width: 100% !important;
-    table-layout: fixed;
-  }
-
-  :where(.logicpenguin) .tt-table th,
-  :where(.logicpenguin) .tt-table td {
-    padding: 0.25rem 0.35rem;
-  }
-
-  :where(.logicpenguin) .tt-cell {
-    min-width: 1.6rem;
-  }
-
-  :where(.logicpenguin) .tt-toggle {
-    width: 22px !important;
-    height: 22px !important;
-    font-size: 0.75rem !important;
-    letter-spacing: 0.08em;
+    --tt-font-size: clamp(0.95rem, 0.85rem + 0.3vw, 1.1rem);
+    --tt-token-font-size: clamp(0.9rem, 0.8rem + 0.25vw, 1.05rem);
+    --tt-cell-pad-y: clamp(0.32rem, 0.24rem + 0.25vw, 0.5rem);
+    --tt-cell-pad-x: clamp(0.5rem, 0.4rem + 0.35vw, 0.75rem);
+    --tt-cell-min-width: clamp(2.1rem, 1.8rem + 0.7vw, 2.8rem);
+    --tt-toggle-size: clamp(1.8rem, 1.5rem + 0.8vw, 2.4rem);
+    --tt-toggle-font-size: clamp(0.85rem, 0.75rem + 0.35vw, 1rem);
+    --tt-toggle-letter-spacing: clamp(0.08em, 0.06em + 0.06vw, 0.12em);
+    --tt-select-min-width: clamp(4.5rem, 4rem + 0.8vw, 6.5rem);
   }
 
   :where(.logicpenguin) .tt-table:has(th:nth-child(9)) {
-    width: max-content !important;
-    table-layout: auto;
-  }
-
-  :where(.logicpenguin) .tt-table:has(th:nth-child(9)) th,
-  :where(.logicpenguin) .tt-table:has(th:nth-child(9)) td {
-    padding: 0.35rem 0.55rem;
-  }
-
-  :where(.logicpenguin) .tt-table:has(th:nth-child(9)) .tt-cell {
-    min-width: 2.2rem;
-  }
-
-  :where(.logicpenguin) .tt-table:has(th:nth-child(9)) .tt-toggle {
-    width: 28px !important;
-    height: 28px !important;
-    font-size: 0.85rem !important;
-    letter-spacing: 0.12em;
+    --tt-font-size: clamp(0.9rem, 0.82rem + 0.28vw, 1.05rem);
+    --tt-token-font-size: clamp(0.85rem, 0.78rem + 0.22vw, 1rem);
+    --tt-cell-pad-y: clamp(0.28rem, 0.22rem + 0.2vw, 0.45rem);
+    --tt-cell-pad-x: clamp(0.45rem, 0.36rem + 0.28vw, 0.65rem);
+    --tt-cell-min-width: clamp(1.9rem, 1.6rem + 0.55vw, 2.5rem);
+    --tt-toggle-size: clamp(1.6rem, 1.35rem + 0.6vw, 2.1rem);
+    --tt-toggle-font-size: clamp(0.78rem, 0.7rem + 0.25vw, 0.95rem);
+    --tt-toggle-letter-spacing: clamp(0.07em, 0.055em + 0.05vw, 0.11em);
   }
 }
 

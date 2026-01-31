@@ -45,14 +45,10 @@ function TruthToggle({ value, onChange, ariaLabel, accent, readOnly = false }) {
         }
       }}
       sx={{
-        fontSize: '0.85rem',
         fontWeight: 700,
         color: getColor(),
         cursor: 'pointer',
         textTransform: 'uppercase',
-        letterSpacing: '0.12em',
-        width: 28,
-        height: 28,
         display: 'inline-flex',
         justifyContent: 'center',
         alignItems: 'center',
@@ -319,7 +315,7 @@ export default function SingleRowTruthTable({
               <Typography variant="body2" sx={{ fontWeight: 600 }}>
                 Truth value of compound statement:
               </Typography>
-              <FormControl size="small" sx={{ minWidth: 110 }}>
+              <FormControl size="small" sx={{ minWidth: 'var(--tt-select-min-width)' }}>
                 <Select
                   value={compoundInput}
                   displayEmpty
@@ -352,7 +348,7 @@ export default function SingleRowTruthTable({
                     <Typography variant="body2" sx={{ fontWeight: 600 }}>
                       Truth value of compound statement:
                     </Typography>
-                    <FormControl size="small" sx={{ minWidth: 110 }}>
+                    <FormControl size="small" sx={{ minWidth: 'var(--tt-select-min-width)' }}>
                       <Select
                         value={expectedCompound}
                         displayEmpty
