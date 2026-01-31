@@ -37,6 +37,7 @@ const ASSUMPTION_RULES = new Set(['ACP', 'AIP'])
 const INDENT_START_RULES = new Set(['ACP', 'AIP'])
 const INDENT_END_RULES = new Set(['CP', 'IP'])
 const INDENT_PX = 18
+const ASSUMPTION_INDENT_PX = 12
 const MAX_INDENT_LEVEL = 3
 const AUTO_CHECK_STORAGE_KEY = 'logic-app:autocheck-enabled'
 const getUnderlineColors = (theme) => {
@@ -593,10 +594,30 @@ export default function DerivationTable({
     }
   }
 
+  const setStoredSelection = (index, start, end = start) => {
+    cursorPositionsRef.current[index] = { start, end }
+  }
+
+  const getStoredSelection = (index, fallbackLength) => {
+    const stored = cursorPositionsRef.current[index]
+    if (stored && typeof stored === 'object' && typeof stored.start === 'number') {
+      return {
+        start: stored.start,
+        end: typeof stored.end === 'number' ? stored.end : stored.start,
+      }
+    }
+    if (typeof stored === 'number') {
+      return { start: stored, end: stored }
+    }
+    return { start: fallbackLength, end: fallbackLength }
+  }
+
   const updateCursorPosition = (index, event) => {
     const target = event?.target
     if (target && typeof target.selectionStart === 'number') {
-      cursorPositionsRef.current[index] = target.selectionStart
+      const start = target.selectionStart
+      const end = typeof target.selectionEnd === 'number' ? target.selectionEnd : start
+      setStoredSelection(index, start, end)
     }
   }
 
@@ -624,13 +645,9 @@ export default function DerivationTable({
     }
     const key = event.key
     const value = el.value ?? ''
-    const start =
-      typeof el.selectionStart === 'number'
-        ? el.selectionStart
-        : (typeof cursorPositionsRef.current[index] === 'number'
-            ? cursorPositionsRef.current[index]
-            : value.length)
-    const end = typeof el.selectionEnd === 'number' ? el.selectionEnd : start
+    const stored = getStoredSelection(index, value.length)
+    const start = typeof el.selectionStart === 'number' ? el.selectionStart : stored.start
+    const end = typeof el.selectionEnd === 'number' ? el.selectionEnd : stored.end
     const hasModifier = event.ctrlKey || event.metaKey || event.altKey
 
     const insertSymbol = (symbol, replaceBefore = 0) => {
@@ -643,13 +660,13 @@ export default function DerivationTable({
         const nextValue = el.value ?? ''
         handleLineChange(index, 'formula', nextValue)
         const nextCursor = Math.max(0, caret - replaceBefore) + symbol.length
-        cursorPositionsRef.current[index] = nextCursor
+        setStoredSelection(index, nextCursor)
         setTimeout(() => el.setSelectionRange(nextCursor, nextCursor), 0)
         return
       }
       const { nextValue, nextCursor } = applyInsertion(value, start, end, symbol, replaceBefore)
       handleLineChange(index, 'formula', nextValue)
-      cursorPositionsRef.current[index] = nextCursor
+      setStoredSelection(index, nextCursor)
       setTimeout(() => el.setSelectionRange(nextCursor, nextCursor), 0)
     }
 
@@ -805,6 +822,7 @@ export default function DerivationTable({
             <TableBody>
             {lines.map((line, idx) => {
               const indentPx = (indentLevels[idx] || 0) * INDENT_PX
+                + (indentLevels[idx] ? ASSUMPTION_INDENT_PX : 0)
               return (
               <TableRow
                 key={`line-${idx}`}
@@ -831,6 +849,11 @@ export default function DerivationTable({
                       lastEditableIndexRef.current = idx
                       updateCursorPosition(idx, e)
                     }}
+                    onMouseUp={(e) => {
+                      if (line.readOnly) return
+                      lastEditableIndexRef.current = idx
+                      updateCursorPosition(idx, e)
+                    }}
                     onKeyUp={(e) => {
                       if (line.readOnly) return
                       lastEditableIndexRef.current = idx
@@ -841,7 +864,10 @@ export default function DerivationTable({
                       lastEditableIndexRef.current = idx
                       updateCursorPosition(idx, e)
                     }}
-                    onBlur={(e) => handleLineCommit(idx, 'formula', normalizeFormulaForCheck(e.target.value))}
+                    onBlur={(e) => {
+                      updateCursorPosition(idx, e)
+                      handleLineCommit(idx, 'formula', normalizeFormulaForCheck(e.target.value))
+                    }}
                     InputProps={{ readOnly: line.readOnly }}
                     inputProps={{ autoComplete: 'off' }}
                     inputRef={(el) => { if (el) formulaRefs.current[idx] = el }}
@@ -1035,7 +1061,14 @@ export default function DerivationTable({
                       label={sym}
                       size="small"
                       variant="filled"
+                      onMouseDown={(event) => {
+                        event.preventDefault()
+                      }}
                       sx={{
+                        height: 32,
+                        '& .MuiChip-label': {
+                          fontSize: '1rem',
+                        },
                         bgcolor: (theme) =>
                           theme.palette.mode === 'dark'
                             ? alpha(theme.palette.common.white, 0.08)
@@ -1054,24 +1087,22 @@ export default function DerivationTable({
                         if (targetIdx === -1 || targetIdx === null) return
                         const inputEl = formulaRefs.current[targetIdx]
                         const current = lines[targetIdx]?.formula || ''
-                        const stored =
-                          typeof cursorPositionsRef.current[targetIdx] === 'number'
-                            ? cursorPositionsRef.current[targetIdx]
-                            : current.length
-                        const start = typeof inputEl?.selectionStart === 'number' ? inputEl.selectionStart : stored
-                        const end = typeof inputEl?.selectionEnd === 'number' ? inputEl.selectionEnd : start
+                        const stored = getStoredSelection(targetIdx, current.length)
+                        const isFocused = typeof document !== 'undefined' && document.activeElement === inputEl
+                        const start = isFocused && typeof inputEl?.selectionStart === 'number' ? inputEl.selectionStart : stored.start
+                        const end = isFocused && typeof inputEl?.selectionEnd === 'number' ? inputEl.selectionEnd : stored.end
                         if (inputEl && typeof inputEl.setRangeText === 'function') {
                           inputEl.setRangeText(sym, start, end, 'end')
                           handleLineChange(targetIdx, 'formula', inputEl.value ?? '')
                           inputEl.focus()
                           const nextCursor = start + sym.length
-                          cursorPositionsRef.current[targetIdx] = nextCursor
+                          setStoredSelection(targetIdx, nextCursor)
                           setTimeout(() => inputEl.setSelectionRange(nextCursor, nextCursor), 0)
                           return
                         }
                         const { nextValue, nextCursor } = applyInsertion(current, start, end, sym)
                         handleLineChange(targetIdx, 'formula', nextValue)
-                        cursorPositionsRef.current[targetIdx] = nextCursor
+                        setStoredSelection(targetIdx, nextCursor)
                         if (inputEl) {
                           inputEl.focus()
                           setTimeout(() => inputEl.setSelectionRange(nextCursor, nextCursor), 0)
