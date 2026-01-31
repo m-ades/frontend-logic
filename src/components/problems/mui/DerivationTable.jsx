@@ -58,10 +58,7 @@ const formatRuleName = (rule) => {
 }
 
 const formatJustificationParts = (nums, ranges, citedrules) => {
-  nums = nums.sort((a, b) => (a - b))
-  ranges = ranges.sort(([a, b], [c, d]) => ((a - c === 0) ? b - d : a - c))
   citedrules = citedrules.map((rule) => formatRuleName(rule))
-  citedrules = citedrules.sort()
 
   let pretty = nums.map((n) => n.toString()).join(', ')
   if (ranges.length > 0) {
@@ -269,6 +266,7 @@ export default function DerivationTable({
   const autoCheckTimerRef = useRef(null)
   const [lineGateNotice, setLineGateNotice] = useState({ index: null, message: '' })
   const [lineDrafts, setLineDrafts] = useState({})
+  const pendingFocusRef = useRef(null)
   const indentLevels = useMemo(() => {
     let level = 0
     return lines.map((line) => {
@@ -471,6 +469,13 @@ export default function DerivationTable({
     }
   }, [emitState, lineGateNotice.index])
 
+  useEffect(() => {
+    if (pendingFocusRef.current === null) return
+    const targetIdx = pendingFocusRef.current
+    pendingFocusRef.current = null
+    setTimeout(() => focusFormula(targetIdx), 0)
+  }, [lines.length])
+
   const handleLineCommit = (index, field, value) => {
     commitLines(
       (prev) => applyLineChange(prev, index, field, value),
@@ -491,7 +496,9 @@ export default function DerivationTable({
       setLineGateNotice({ index: lines.length - 1, message: 'Re-check current line to move onto the next line.' })
       return
     }
+    const nextIndex = lines.length
     setLines((prev) => [...prev, { formula: '', justification: '', readOnly: false }])
+    pendingFocusRef.current = nextIndex
   }
 
   const focusFormula = (index) => {
@@ -707,7 +714,7 @@ export default function DerivationTable({
         sx={{
           p: { xs: 2, md: 2.5 },
           borderRadius: 3,
-          border: '1px solid #eef1f6',
+          border: (theme) => `1px solid ${theme.palette.divider}`,
         }}
       >
         {proof.description && (
@@ -786,45 +793,47 @@ export default function DerivationTable({
                     )
                   ) : (
                     <Stack direction="row" spacing={0.5} alignItems="center" sx={{ flexWrap: 'nowrap' }}>
-                      <TextField
-                        variant="standard"
-                        placeholder={idx === firstEditableIndex ? 'Line(s)' : ''}
-                        value={lineDrafts[idx] ?? formatJustificationLines(line.justification)}
-                        onChange={(e) => {
-                          const raw = e.target.value
-                          setLineDrafts((prev) => ({ ...prev, [idx]: raw }))
-                          handleLineChange(
-                            idx,
-                            'justification',
-                            applyLinesToJustification(line.justification, raw)
-                          )
-                        }}
-                        onKeyDown={(e) => handleJustKeyDown(e, idx, line.readOnly)}
-                        onBlur={(e) => {
-                          const raw = e.target.value
-                          handleLineCommit(
-                            idx,
-                            'justification',
-                            applyLinesToJustification(line.justification, raw)
-                          )
-                          setLineDrafts((prev) => {
-                            if (!(idx in prev)) return prev
-                            const next = { ...prev }
-                            delete next[idx]
-                            return next
-                          })
-                        }}
-                        InputProps={{ readOnly: line.readOnly }}
-                        inputProps={{ autoComplete: 'off' }}
-                        inputRef={(el) => { if (el) justRefs.current[idx] = el }}
-                        sx={{
-                          width: { xs: '100%', md: 58 },
-                          '& .MuiInput-underline:before': { borderBottomColor: '#e3e6ee' },
-                          '& .MuiInput-underline:hover:before': { borderBottomColor: '#edf1f7' },
-                          '& .MuiInput-underline:after': { borderBottomColor: '#dfe5f0' },
-                          '& .MuiInputBase-input': { fontSize: 16, py: 1 },
-                        }}
-                      />
+                      {!ASSUMPTION_RULES.has(getRuleFromJustification(line.justification).toUpperCase()) && (
+                        <TextField
+                          variant="standard"
+                          placeholder={idx === firstEditableIndex ? 'Line(s)' : ''}
+                          value={lineDrafts[idx] ?? formatJustificationLines(line.justification)}
+                          onChange={(e) => {
+                            const raw = e.target.value
+                            setLineDrafts((prev) => ({ ...prev, [idx]: raw }))
+                            handleLineChange(
+                              idx,
+                              'justification',
+                              applyLinesToJustification(line.justification, raw)
+                            )
+                          }}
+                          onKeyDown={(e) => handleJustKeyDown(e, idx, line.readOnly)}
+                          onBlur={(e) => {
+                            const raw = e.target.value
+                            handleLineCommit(
+                              idx,
+                              'justification',
+                              applyLinesToJustification(line.justification, raw)
+                            )
+                            setLineDrafts((prev) => {
+                              if (!(idx in prev)) return prev
+                              const next = { ...prev }
+                              delete next[idx]
+                              return next
+                            })
+                          }}
+                          InputProps={{ readOnly: line.readOnly }}
+                          inputProps={{ autoComplete: 'off' }}
+                          inputRef={(el) => { if (el) justRefs.current[idx] = el }}
+                          sx={{
+                            width: { xs: '100%', md: 58 },
+                            '& .MuiInput-underline:before': { borderBottomColor: '#e3e6ee' },
+                            '& .MuiInput-underline:hover:before': { borderBottomColor: '#edf1f7' },
+                            '& .MuiInput-underline:after': { borderBottomColor: '#dfe5f0' },
+                            '& .MuiInputBase-input': { fontSize: 16, py: 1 },
+                          }}
+                        />
+                      )}
                       {allowedRules.length > 0 && (
                         <FormControl variant="standard" sx={{ minWidth: 70 }}>
                           <Select
@@ -832,10 +841,12 @@ export default function DerivationTable({
                             displayEmpty
                             onChange={(e) => {
                               const selectedRule = String(e.target.value || '')
-                              const nextValue = applyRuleToJustification(line.justification, selectedRule)
+                              const upperRule = selectedRule.toUpperCase()
+                              const nextValue = ASSUMPTION_RULES.has(upperRule)
+                                ? applyRuleToJustification('', selectedRule)
+                                : applyRuleToJustification(line.justification, selectedRule)
                               commitLines((prev) => {
                                 let nextLines = applyLineChange(prev, idx, 'justification', nextValue)
-                                const upperRule = selectedRule.toUpperCase()
                                 if (ASSUMPTION_RULES.has(upperRule)) {
                                   const nextIdx = idx + 1
                                   const nextLine = nextLines[nextIdx]
@@ -857,6 +868,14 @@ export default function DerivationTable({
                                 }
                                 return nextLines
                               }, idx)
+                              if (ASSUMPTION_RULES.has(upperRule)) {
+                                setLineDrafts((prev) => {
+                                  if (!(idx in prev)) return prev
+                                  const next = { ...prev }
+                                  delete next[idx]
+                                  return next
+                                })
+                              }
                             }}
                             renderValue={(value) => value || 'Rule'}
                             sx={{
