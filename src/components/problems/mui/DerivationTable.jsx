@@ -697,6 +697,15 @@ export default function DerivationTable({
       focusJustification(index)
       return
     }
+    if (event.key === 'ArrowRight' && !event.ctrlKey && !event.metaKey && !event.altKey) {
+      const len = (el.value ?? '').length
+      const selEnd = typeof el.selectionEnd === 'number' ? el.selectionEnd : getStoredSelection(index, len).end
+      if (selEnd >= len) {
+        event.preventDefault()
+        focusJustification(index)
+      }
+      return
+    }
     const key = event.key
     const value = el.value ?? ''
     const stored = getStoredSelection(index, value.length)
@@ -757,6 +766,15 @@ export default function DerivationTable({
 
   const handleJustKeyDown = async (event, index, readOnly) => {
     if (readOnly) return
+    if (event.key === 'ArrowLeft' && !event.ctrlKey && !event.metaKey && !event.altKey) {
+      const el = event.target
+      const start = typeof el.selectionStart === 'number' ? el.selectionStart : 0
+      if (start <= 0) {
+        event.preventDefault()
+        focusFormula(index)
+      }
+      return
+    }
     if (event.key === 'Enter') {
       event.preventDefault()
       const formatted = applyLinesToJustification(lines[index]?.justification, event.target.value)
