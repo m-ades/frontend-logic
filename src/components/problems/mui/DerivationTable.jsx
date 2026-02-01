@@ -73,6 +73,9 @@ const MAX_INDENT_LEVEL = 3
 const AUTO_CHECK_STORAGE_KEY = 'logic-app:autocheck-enabled'
 const RULE_INPUT_MODE_KEY = 'logic-app:derivation-rule-input-mode'
 
+// Message shown on mobile when derivation is not fullscreen (table not rendered)
+const MOBILE_DERIVATION_PLACEHOLDER_MSG = 'Tap to open proof'
+
 const symbolBtnSx = (isFullScreen, isMobile) => {
   const mobileFullscreen = isMobile && isFullScreen
   return {
@@ -1034,6 +1037,32 @@ export default function DerivationTable({
             <PromptText content={proof.description} sx={{ fontSize: 15 }} />
           </Box>
         )}
+        {isMobile && !isFullScreen && canOpenFullScreen ? (
+          <Box
+            component="button"
+            type="button"
+            onClick={() => onOpenFullScreen(null)}
+            sx={{
+              display: 'block',
+              width: '100%',
+              py: 3,
+              px: 2,
+              border: (t) => `1px dashed ${t.palette.divider}`,
+              borderRadius: 2,
+              bgcolor: (t) => alpha(t.palette.primary.main, 0.04),
+              color: 'primary.main',
+              fontSize: '15px',
+              lineHeight: 2,
+              fontWeight: 400,
+              cursor: 'pointer',
+              textAlign: 'center',
+              '&:hover': { bgcolor: (t) => alpha(t.palette.primary.main, 0.08) },
+            }}
+          >
+            {MOBILE_DERIVATION_PLACEHOLDER_MSG}
+          </Box>
+        ) : (
+        <>
         {allowedRules.length > 0 && (
           <Box sx={{ mb: 1.5, display: 'flex', alignItems: 'center', gap: 0.5, flexWrap: 'wrap', ...(isFullScreen && { pl: 2 }) }}>
             <Typography variant="body2" sx={{ color: 'text.secondary' }}>
@@ -1623,6 +1652,9 @@ export default function DerivationTable({
               <Typography variant="body2">Autochecker on: no issues detected yet.</Typography>
             )}
           </Box>
+        )}
+
+        </>
         )}
 
           </Wrapper>
