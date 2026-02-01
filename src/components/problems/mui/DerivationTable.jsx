@@ -29,8 +29,13 @@ import PromptText from '../../ui/PromptText.jsx'
 import ThemedCard from '../../ui/ThemedCard.jsx'
 import ProblemSetButtons from './ProblemSetButtons.jsx'
 import checkDerivation from '../../../lib/logicpenguin/checkers/derivation-hurley.js'
+import getHurleyRuleset from '../../../lib/logicpenguin/checkers/rules/hurley-rules.js'
 import getSyntax from '../../../lib/logicpenguin/symbolic/libsyntax.js'
 import { justParse } from '../../ui/logicpenguin/justification-parse.js'
+
+const HURLEY_RULE_NAMES = Object.keys(getHurleyRuleset()).filter(
+  (r) => r !== 'Pr' && r !== 'Ass'
+)
 
 const SYMBOL_BUTTONS = [
   { label: '~', insert: '~' },
@@ -308,10 +313,13 @@ export default function DerivationTable({
   }, [])
 
   const allowedRules = useMemo(() => {
-    const allow = proof?.ruleset?.allow ?? proof?.options?.ruleset?.allow ?? []
-    if (!Array.isArray(allow)) return []
-    const unique = Array.from(new Set(allow.map((rule) => formatRuleName(String(rule)))))
-    return unique.filter((rule) => rule && rule.toLowerCase() !== 'pr')
+    const allow = proof?.ruleset?.allow ?? proof?.options?.ruleset?.allow
+    if (Array.isArray(allow) && allow.length > 0) {
+      const unique = Array.from(new Set(allow.map((rule) => formatRuleName(String(rule)))))
+      return unique.filter((rule) => rule && rule.toLowerCase() !== 'pr')
+    }
+    // Fallback: show rule toggle for all derivations (e.g. predicate logic) when snapshot has no ruleset.allow
+    return HURLEY_RULE_NAMES.map((rule) => formatRuleName(rule))
   }, [proof?.ruleset, proof?.options?.ruleset])
   const isLineCompleteForCheck = useCallback((line) => {
     if (!line) return false
