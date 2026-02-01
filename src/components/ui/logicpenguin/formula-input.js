@@ -271,13 +271,13 @@ export default class FormulaInput {
             }
         }
 
-        // v's and wedges become disjunctions
-        if (e.key == 'v' || e.key == 'V' || e.key == '∨') {
-            if (e.ctrlKey || e.metaKey) {
+        // lowercase v and wedge become disjunction; uppercase V and ctrl+alt+v pass through (like derivations)
+        if (e.key == 'v' || e.key == '∨') {
+            if (e.ctrlKey || e.metaKey || e.altKey) {
                 return;
             }
             if (this.classList.contains('justification')) {
-                return; 
+                return;
             }
             e.preventDefault();
             this.insOp('OR');
