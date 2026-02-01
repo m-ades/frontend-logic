@@ -1218,8 +1218,13 @@ export default function DerivationTable({
                     pl: 0.5,
                     verticalAlign: 'middle',
                     ...(isFullScreen ? { width: '50%', minWidth: 0 } : { width: 'auto', whiteSpace: 'nowrap' }),
-                    '& .line-delete': { opacity: 0, transition: 'opacity 120ms ease' },
-                    '&:hover .line-delete': { opacity: 1 },
+                    '& .line-delete': {
+                      opacity: isMobile && isFullScreen
+                        ? (activeFormulaIndex === idx ? 1 : 0)
+                        : 0,
+                      transition: 'opacity 120ms ease',
+                    },
+                    ...(!(isMobile && isFullScreen) && { '&:hover .line-delete': { opacity: 1 } }),
                   }}
                 >
                   {idx < premises.length ? (
@@ -1239,6 +1244,12 @@ export default function DerivationTable({
                               variant="standard"
                               placeholder="Line(s)"
                               value={lineDrafts[idx] ?? formatJustificationLines(line.justification)}
+                              onFocus={() => {
+                                if (!line.readOnly && isMobile && isFullScreen) {
+                                  setActiveFormulaIndex(idx)
+                                  lastEditableIndexRef.current = idx
+                                }
+                              }}
                               onPointerDown={(e) => {
                                 if (line.readOnly) return
                                 if (canOpenFullScreen) {
@@ -1289,6 +1300,12 @@ export default function DerivationTable({
                               <Select
                                 value={getRuleFromJustification(line.justification)}
                                 displayEmpty
+                                onFocus={() => {
+                                  if (!line.readOnly && isMobile && isFullScreen) {
+                                    setActiveFormulaIndex(idx)
+                                    lastEditableIndexRef.current = idx
+                                  }
+                                }}
                                 onChange={(e) => {
                                   const selectedRule = String(e.target.value || '')
                                   const upperRule = selectedRule.toUpperCase()
