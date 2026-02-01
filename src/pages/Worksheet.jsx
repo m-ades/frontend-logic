@@ -257,6 +257,29 @@ export default function Worksheet() {
   const id = assignmentId || worksheetId
   const worksheetIdNum = parseInt(id)
 
+  const LAST_QUESTION_KEY = 'logic-app:last-question'
+  const getLastQuestionIndex = useCallback((assignmentId) => {
+    try {
+      const raw = localStorage.getItem(LAST_QUESTION_KEY)
+      if (!raw) return null
+      const map = JSON.parse(raw)
+      const n = map?.[String(assignmentId)]
+      return Number.isFinite(n) ? Math.max(0, Math.floor(n)) : null
+    } catch {
+      return null
+    }
+  }, [])
+  const setLastQuestionIndex = useCallback((assignmentId, index) => {
+    try {
+      const raw = localStorage.getItem(LAST_QUESTION_KEY) || '{}'
+      const map = JSON.parse(raw)
+      map[String(assignmentId)] = index
+      localStorage.setItem(LAST_QUESTION_KEY, JSON.stringify(map))
+    } catch {
+      // ignore
+    }
+  }, [])
+
   const currentWorksheetIndex = useMemo(
     () => worksheets.findIndex((w) => w.id === worksheetIdNum),
     [worksheets, worksheetIdNum]
@@ -295,9 +318,28 @@ export default function Worksheet() {
   }, [currentWorksheet?.id])
 
   useEffect(() => {
-    // reset to first problem on assignment change
+    // reset to first problem on assignment change (restored from localStorage when worksheet loads)
     setCurrentProofIndex(0)
   }, [worksheetIdNum])
+
+  useEffect(() => {
+    // when worksheet has loaded, restore last-question index from localStorage
+    const assignmentId = currentWorksheet?.id
+    const proofCount = currentWorksheet?.proofs?.length
+    if (assignmentId == null || !Number.isFinite(proofCount) || proofCount === 0) return
+    const saved = getLastQuestionIndex(assignmentId)
+    if (saved != null) {
+      const clamped = Math.min(Math.max(0, saved), proofCount - 1)
+      setCurrentProofIndex(clamped)
+    }
+  }, [currentWorksheet?.id, currentWorksheet?.proofs?.length, getLastQuestionIndex])
+
+  useEffect(() => {
+    // persist current question index so we can land on it next time
+    const assignmentId = currentWorksheet?.id
+    if (assignmentId == null || !Number.isFinite(currentProofIndex)) return
+    setLastQuestionIndex(assignmentId, currentProofIndex)
+  }, [currentWorksheet?.id, currentProofIndex, setLastQuestionIndex])
 
   useEffect(() => {
     let keepGoing = true
