@@ -78,3 +78,21 @@ export function formatEasternDateTime(dateString, timeString, options = {}) {
   const includeTime = options.includeTime ?? Boolean(timeString);
   return formatEasternFromIso(iso, { ...options, includeTime });
 }
+
+/**
+ * Parse due date (and optional time) as Eastern, return a Date for comparison.
+ * Use this for "is past due" / deadline checks so Feb 1 means end of Feb 1 Eastern.
+ * - If dueDate is full ISO with offset (e.g. from API), parses as-is.
+ * - If date-only (YYYY-MM-DD), treats as that day at 23:59 Eastern (or dueTime if provided).
+ */
+export function parseDueDateAsEastern(dueDate, dueTime = '23:59') {
+  if (!dueDate) return null;
+  const dateOnly = String(dueDate).slice(0, 10);
+  if (String(dueDate).includes('T') && /[+-]\d{2}:?\d{2}$|Z$/i.test(String(dueDate))) {
+    return new Date(dueDate);
+  }
+  const iso = toEasternIso(dateOnly, dueTime || '23:59');
+  if (!iso) return null;
+  const d = new Date(iso);
+  return Number.isNaN(d.getTime()) ? null : d;
+}
