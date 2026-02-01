@@ -15,6 +15,8 @@ import {
   Button,
   Tooltip,
   MenuItem,
+  ToggleButton,
+  ToggleButtonGroup,
 } from '@mui/material'
 import SubdirectoryArrowRightIcon from '@mui/icons-material/SubdirectoryArrowRight'
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome'
@@ -50,6 +52,7 @@ const INDENT_PX = 18
 const ASSUMPTION_INDENT_PX = 12
 const MAX_INDENT_LEVEL = 3
 const AUTO_CHECK_STORAGE_KEY = 'logic-app:autocheck-enabled'
+const RULE_INPUT_MODE_KEY = 'logic-app:derivation-rule-input-mode'
 const getUnderlineColors = (theme) => {
   if (theme.palette.mode === 'dark') {
     return {
@@ -283,6 +286,27 @@ export default function DerivationTable({
   const [lines, setLines] = useState(initialLines)
   const onStateChangeRef = useRef(onStateChange)
   const firstEditableIndex = premises.length
+
+  const [ruleInputMode, setRuleInputMode] = useState(() => {
+    if (typeof window === 'undefined') return 'dropdown'
+    try {
+      const stored = window.localStorage.getItem(RULE_INPUT_MODE_KEY)
+      return stored === 'type' ? 'type' : 'dropdown'
+    } catch {
+      return 'dropdown'
+    }
+  })
+  const useRuleDropdown = ruleInputMode === 'dropdown'
+  const handleRuleInputModeChange = useCallback((_, value) => {
+    if (value == null) return
+    setRuleInputMode(value)
+    try {
+      window.localStorage.setItem(RULE_INPUT_MODE_KEY, value)
+    } catch {
+      // ignore
+    }
+  }, [])
+
   const allowedRules = useMemo(() => {
     const allow = proof?.ruleset?.allow ?? proof?.options?.ruleset?.allow ?? []
     if (!Array.isArray(allow)) return []
@@ -343,6 +367,7 @@ export default function DerivationTable({
     () => (value) => String(value ?? '').replace(/\s+/g, ''),
     []
   )
+  const normalizeJustificationForSave = useCallback((value) => String(value ?? '').trim(), [])
 
   useEffect(() => {
     onStateChangeRef.current = onStateChange
@@ -354,10 +379,10 @@ export default function DerivationTable({
       proof?.conclusion,
       premises,
       normalizeFormulaForCheck,
-      normalizeJustificationForCheck
+      normalizeJustificationForSave
     )
     onStateChangeRef.current?.(submission)
-  }, [premises, proof?.conclusion, normalizeFormulaForCheck, normalizeJustificationForCheck])
+  }, [premises, proof?.conclusion, normalizeFormulaForCheck, normalizeJustificationForSave])
 
   const runAutoCheck = useCallback(async (linesSnapshot) => {
     const submission = buildSubmission(
@@ -867,6 +892,40 @@ export default function DerivationTable({
             <PromptText content={proof.description} sx={{ fontSize: 15 }} />
           </Box>
         )}
+        {allowedRules.length > 0 && (
+          <Box sx={{ mb: 1.5, display: 'flex', alignItems: 'center', gap: 0.5, flexWrap: 'wrap' }}>
+            <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+              Rule input:
+            </Typography>
+            <ToggleButtonGroup
+              value={ruleInputMode}
+              exclusive
+              onChange={handleRuleInputModeChange}
+              size="small"
+              sx={{
+                border: 'none',
+                '& .MuiToggleButtonGroup-grouped': { border: 'none' },
+                '& .MuiToggleButton-root': {
+                  py: 0.25,
+                  px: 1.25,
+                  fontSize: '0.8125rem',
+                  border: 'none',
+                  '&.Mui-selected': { fontWeight: 600 },
+                },
+              }}
+            >
+              <ToggleButton value="type" aria-label="Type rule">
+                TYPE
+              </ToggleButton>
+              <Typography component="span" variant="body2" sx={{ color: 'text.secondary', alignSelf: 'center', px: 0.5 }}>
+                or
+              </Typography>
+              <ToggleButton value="dropdown" aria-label="Select rule from dropdown">
+                SELECT FROM LIST
+              </ToggleButton>
+            </ToggleButtonGroup>
+          </Box>
+        )}
         <TableContainer component={Box} sx={{ width: '100%' }}>
           <Table size="medium" sx={{ width: 'auto' }}>
             <TableBody>
@@ -977,109 +1036,138 @@ export default function DerivationTable({
                     )
                   ) : (
                     <Stack direction="row" spacing={0.5} alignItems="center" sx={{ flexWrap: 'nowrap' }}>
-                      {!ASSUMPTION_RULES.has(getRuleFromJustification(line.justification).toUpperCase()) && (
-                        <TextField
-                          variant="standard"
-                          placeholder="Line(s)"
-                          value={lineDrafts[idx] ?? formatJustificationLines(line.justification)}
-                          onChange={(e) => {
-                            const raw = e.target.value
-                            setLineDrafts((prev) => ({ ...prev, [idx]: raw }))
-                            handleLineChange(
-                              idx,
-                              'justification',
-                              applyLinesToJustification(line.justification, raw)
-                            )
-                          }}
-                          onKeyDown={(e) => handleJustKeyDown(e, idx, line.readOnly)}
-                          onBlur={(e) => {
-                            const raw = e.target.value
-                            handleLineCommit(
-                              idx,
-                              'justification',
-                              applyLinesToJustification(line.justification, raw)
-                            )
-                            setLineDrafts((prev) => {
-                              if (!(idx in prev)) return prev
-                              const next = { ...prev }
-                              delete next[idx]
-                              return next
-                            })
-                          }}
-                          InputProps={{ readOnly: line.readOnly }}
-                          inputProps={{ autoComplete: 'off' }}
-                          inputRef={(el) => { if (el) justRefs.current[idx] = el }}
-                          sx={(theme) => ({
-                            width: { xs: '100%', md: 58 },
-                            ...getInputUnderlineSx(theme),
-                            '& .MuiInputBase-input': { fontSize: 16, py: 1 },
-                          })}
-                        />
-                      )}
-                      {allowedRules.length > 0 && (
-                        <FormControl variant="standard" sx={{ minWidth: 70 }}>
-                          <Select
-                            value={getRuleFromJustification(line.justification)}
-                            displayEmpty
-                            onChange={(e) => {
-                              const selectedRule = String(e.target.value || '')
-                              const upperRule = selectedRule.toUpperCase()
-                              const nextValue = ASSUMPTION_RULES.has(upperRule)
-                                ? applyRuleToJustification('', selectedRule)
-                                : applyRuleToJustification(line.justification, selectedRule)
-                              commitLines((prev) => {
-                                let nextLines = applyLineChange(prev, idx, 'justification', nextValue)
-                                if (ASSUMPTION_RULES.has(upperRule)) {
-                                  const nextIdx = idx + 1
-                                  const nextLine = nextLines[nextIdx]
-                                  const isBlankLine = nextLine &&
-                                    !nextLine.readOnly &&
-                                    !(nextLine.formula || '').trim() &&
-                                    !(nextLine.justification || '').trim()
-                                  if (nextLine && isBlankLine) {
-                                    return nextLines
-                                  }
-                                  if (!nextLine || !nextLine.readOnly) {
-                                    const newLine = { formula: '', justification: '', readOnly: false }
-                                    nextLines = [
-                                      ...nextLines.slice(0, nextIdx),
-                                      newLine,
-                                      ...nextLines.slice(nextIdx),
-                                    ]
-                                  }
-                                }
-                                return nextLines
-                              }, idx)
-                              if (ASSUMPTION_RULES.has(upperRule)) {
+                      {useRuleDropdown ? (
+                        <>
+                          {!ASSUMPTION_RULES.has(getRuleFromJustification(line.justification).toUpperCase()) && (
+                            <TextField
+                              variant="standard"
+                              placeholder="Line(s)"
+                              value={lineDrafts[idx] ?? formatJustificationLines(line.justification)}
+                              onChange={(e) => {
+                                const raw = e.target.value
+                                setLineDrafts((prev) => ({ ...prev, [idx]: raw }))
+                                handleLineChange(
+                                  idx,
+                                  'justification',
+                                  applyLinesToJustification(line.justification, raw)
+                                )
+                              }}
+                              onKeyDown={(e) => handleJustKeyDown(e, idx, line.readOnly)}
+                              onBlur={(e) => {
+                                const raw = e.target.value
+                                handleLineCommit(
+                                  idx,
+                                  'justification',
+                                  applyLinesToJustification(line.justification, raw)
+                                )
                                 setLineDrafts((prev) => {
                                   if (!(idx in prev)) return prev
                                   const next = { ...prev }
                                   delete next[idx]
                                   return next
                                 })
-                              }
-                            }}
-                            renderValue={(value) => value || 'Rule'}
-                            sx={(theme) => ({
-                              '& .MuiSelect-select': { fontSize: 16, py: 1 },
-                              '& .MuiInputBase-input': { fontSize: 16, py: 1 },
-                              '& .MuiSelect-select.MuiInputBase-input': { display: 'flex', alignItems: 'center' },
-                              ...getSelectUnderlineSx(theme),
-                            })}
-                            MenuProps={{
-                              PaperProps: { sx: { '& .MuiMenuItem-root': { fontSize: 16 } } }
-                            }}
-                          >
-                            <MenuItem value="">
-                              <em>Rule</em>
-                            </MenuItem>
-                            {allowedRules.map((rule) => (
-                              <MenuItem key={rule} value={rule}>
-                                {rule}
-                              </MenuItem>
-                            ))}
-                          </Select>
-                        </FormControl>
+                              }}
+                              InputProps={{ readOnly: line.readOnly }}
+                              inputProps={{ autoComplete: 'off' }}
+                              inputRef={(el) => { if (el) justRefs.current[idx] = el }}
+                              sx={(theme) => ({
+                                width: { xs: '100%', md: 58 },
+                                ...getInputUnderlineSx(theme),
+                                '& .MuiInputBase-input': { fontSize: 16, py: 1 },
+                              })}
+                            />
+                          )}
+                          {allowedRules.length > 0 && (
+                            <FormControl variant="standard" sx={{ minWidth: 70 }}>
+                              <Select
+                                value={getRuleFromJustification(line.justification)}
+                                displayEmpty
+                                onChange={(e) => {
+                                  const selectedRule = String(e.target.value || '')
+                                  const upperRule = selectedRule.toUpperCase()
+                                  const nextValue = ASSUMPTION_RULES.has(upperRule)
+                                    ? applyRuleToJustification('', selectedRule)
+                                    : applyRuleToJustification(line.justification, selectedRule)
+                                  commitLines((prev) => {
+                                    let nextLines = applyLineChange(prev, idx, 'justification', nextValue)
+                                    if (ASSUMPTION_RULES.has(upperRule)) {
+                                      const nextIdx = idx + 1
+                                      const nextLine = nextLines[nextIdx]
+                                      const isBlankLine = nextLine &&
+                                        !nextLine.readOnly &&
+                                        !(nextLine.formula || '').trim() &&
+                                        !(nextLine.justification || '').trim()
+                                      if (nextLine && isBlankLine) {
+                                        return nextLines
+                                      }
+                                      if (!nextLine || !nextLine.readOnly) {
+                                        const newLine = { formula: '', justification: '', readOnly: false }
+                                        nextLines = [
+                                          ...nextLines.slice(0, nextIdx),
+                                          newLine,
+                                          ...nextLines.slice(nextIdx),
+                                        ]
+                                      }
+                                    }
+                                    return nextLines
+                                  }, idx)
+                                  if (ASSUMPTION_RULES.has(upperRule)) {
+                                    setLineDrafts((prev) => {
+                                      if (!(idx in prev)) return prev
+                                      const next = { ...prev }
+                                      delete next[idx]
+                                      return next
+                                    })
+                                  }
+                                }}
+                                renderValue={(value) => value || 'Rule'}
+                                sx={(theme) => ({
+                                  '& .MuiSelect-select': { fontSize: 16, py: 1 },
+                                  '& .MuiInputBase-input': { fontSize: 16, py: 1 },
+                                  '& .MuiSelect-select.MuiInputBase-input': { display: 'flex', alignItems: 'center' },
+                                  ...getSelectUnderlineSx(theme),
+                                })}
+                                MenuProps={{
+                                  PaperProps: { sx: { '& .MuiMenuItem-root': { fontSize: 16 } } }
+                                }}
+                              >
+                                <MenuItem value="">
+                                  <em>Rule</em>
+                                </MenuItem>
+                                {allowedRules.map((rule) => (
+                                  <MenuItem key={rule} value={rule}>
+                                    {rule}
+                                  </MenuItem>
+                                ))}
+                              </Select>
+                            </FormControl>
+                          )}
+                        </>
+                      ) : (
+                        <TextField
+                          variant="standard"
+                          placeholder="Line(s) and rule"
+                          value={line.justification}
+                          onChange={(e) => handleLineChange(idx, 'justification', e.target.value)}
+                          onKeyDown={(e) => handleJustKeyDown(e, idx, line.readOnly)}
+                          onBlur={(e) => {
+                            const raw = (e.target.value || '').trim()
+                            const formatted = raw ? formatJustificationDisplay(raw) : ''
+                            if (formatted !== raw) {
+                              handleLineChange(idx, 'justification', formatted)
+                            }
+                            handleLineCommit(idx, 'justification', formatted || raw)
+                          }}
+                          InputProps={{ readOnly: line.readOnly }}
+                          inputProps={{ autoComplete: 'off' }}
+                          inputRef={(el) => { if (el) justRefs.current[idx] = el }}
+                          sx={(theme) => ({
+                            width: 110,
+                            maxWidth: 110,
+                            ...getInputUnderlineSx(theme),
+                            '& .MuiInputBase-input': { fontSize: 16, py: 1 },
+                          })}
+                        />
                       )}
                       {autoCheckEnabled && autoCheckState.perLine[idx] === 'ok' && (
                         <CheckCircleIcon fontSize="small" sx={{ color: 'primary.main' }} />
