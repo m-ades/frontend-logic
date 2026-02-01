@@ -8,7 +8,6 @@ import {
   TableBody,
   Typography,
   Chip,
-  Switch,
   IconButton,
   Tooltip,
   Stack,
@@ -17,6 +16,7 @@ import {
   useMediaQuery,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
+import { Edit as EditIcon } from "@mui/icons-material";
 import {
   Lock,
   Unlock,
@@ -36,6 +36,7 @@ export default function AssignmentTable({
   onToggleLock,
   onTogglePublish,
   onMenuOpen,
+  onEditDueDate,
   onCreate,
   emptyMessage,
   getStatusColor,
@@ -136,34 +137,41 @@ export default function AssignmentTable({
                     />
                   </Stack>
 
-                  <Stack direction="row" justifyContent="space-between" alignItems="center">
-                    <Typography variant="caption" color="text.secondary">
-                      Published
-                    </Typography>
-                    <Switch
-                      checked={item.isPublished}
-                      onChange={() => onTogglePublish(item.id)}
-                      size="small"
-                      disabled={item.isLocked}
-                    />
-                  </Stack>
-
-                  <Stack direction="row" justifyContent="space-between" alignItems="center">
-                    <Typography variant="caption" color="text.secondary">
-                      Publish date
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      {formatEasternDateTime(item.publishDate, item.publishTime) ?? "—"}
-                    </Typography>
-                  </Stack>
-
-                  <Stack direction="row" justifyContent="space-between" alignItems="center">
+                  <Stack
+                    direction="row"
+                    justifyContent="space-between"
+                    alignItems="center"
+                    sx={{
+                      "& .due-date-pencil": {
+                        opacity: 0,
+                        transition: "opacity 0.15s ease",
+                      },
+                      "&:hover .due-date-pencil": { opacity: 1 },
+                    }}
+                  >
                     <Typography variant="caption" color="text.secondary">
                       Due date
                     </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      {formatEasternDateTime(item.dueDate, item.dueTime) ?? "—"}
-                    </Typography>
+                    <Stack direction="row" alignItems="center" spacing={0.5}>
+                      <Typography variant="body2" color="text.secondary">
+                        {formatEasternDateTime(item.dueDate, item.dueTime) ?? "—"}
+                      </Typography>
+                      {onEditDueDate && (
+                        <Tooltip title="Edit due date">
+                          <IconButton
+                            className="due-date-pencil"
+                            size="small"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onEditDueDate(item);
+                            }}
+                            sx={{ p: 0.25 }}
+                          >
+                            <EditIcon fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
+                      )}
+                    </Stack>
                   </Stack>
 
                   {isPractice ? (
@@ -219,12 +227,6 @@ export default function AssignmentTable({
                           {item.submissions > 0 ? `${item.averageGrade}%` : "—"}
                         </Typography>
                       </Stack>
-                      <Stack direction="row" justifyContent="space-between" alignItems="center">
-                        <Typography variant="caption" color="text.secondary">
-                          Points
-                        </Typography>
-                        <Typography variant="body2">{item.totalPoints}</Typography>
-                      </Stack>
                     </Stack>
                   )}
 
@@ -238,12 +240,12 @@ export default function AssignmentTable({
                       <IconButton
                         size="small"
                         onClick={() => onToggleLock(item.id)}
-                        color={item.isLocked ? "warning" : "default"}
+                        color={item.isLocked ? "default" : "warning"}
                       >
                         {item.isLocked ? (
-                          <Unlock size={18} />
-                        ) : (
                           <Lock size={18} />
+                        ) : (
+                          <Unlock size={18} />
                         )}
                       </IconButton>
                     </Tooltip>
@@ -268,19 +270,13 @@ export default function AssignmentTable({
   return (
     <Paper elevation={2} sx={{ width: "100%", overflow: "hidden" }}>
       <Box sx={{ width: "100%", overflowX: "auto" }}>
-        <Table>
+        <Table sx={{ tableLayout: "fixed" }}>
           <TableHead>
             <TableRow>
-              <TableCell sx={{ fontWeight: 600 }}>
+              <TableCell sx={{ fontWeight: 600, width: "25%" }}>
                 {isPractice ? "Name" : "Name"}
               </TableCell>
               <TableCell sx={{ fontWeight: 600 }}>Status</TableCell>
-              <TableCell align="center" sx={{ fontWeight: 600 }}>
-                Published
-              </TableCell>
-              <TableCell sx={{ fontWeight: 600, minWidth: 180 }}>
-                Publish Date & Time
-              </TableCell>
               <TableCell sx={{ fontWeight: 600, minWidth: 180 }}>
                 Due Date & Time
               </TableCell>
@@ -307,9 +303,6 @@ export default function AssignmentTable({
                   <TableCell align="center" sx={{ fontWeight: 600 }}>
                     Average
                   </TableCell>
-                  <TableCell align="center" sx={{ fontWeight: 600 }}>
-                    Points
-                  </TableCell>
                 </>
               )}
               <TableCell align="center" sx={{ fontWeight: 600 }}>
@@ -332,14 +325,18 @@ export default function AssignmentTable({
 
               return (
                 <TableRow key={item.id} hover>
-                  <TableCell>
-                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                  <TableCell sx={{ width: "25%", overflow: "hidden" }}>
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 1, minWidth: 0, overflow: "hidden" }}>
                       {isPractice && <Brain size={16} color="#666" />}
                       <Typography
                         variant="body2"
                         fontWeight={500}
+                        noWrap
                         sx={{
                           cursor: "pointer",
+                          minWidth: 0,
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
                           "&:hover": {
                             color: "primary.main",
                             textDecoration: "underline",
@@ -360,23 +357,37 @@ export default function AssignmentTable({
                       sx={{ fontWeight: 600 }}
                     />
                   </TableCell>
-                  <TableCell align="center">
-                    <Switch
-                      checked={item.isPublished}
-                      onChange={() => onTogglePublish(item.id)}
-                      size="small"
-                      disabled={item.isLocked}
-                    />
-                  </TableCell>
                   <TableCell>
-                    <Typography variant="body2" color="text.secondary">
-                      {formatEasternDateTime(item.publishDate, item.publishTime) ?? "—"}
-                    </Typography>
-                  </TableCell>
-                  <TableCell>
-                    <Typography variant="body2" color="text.secondary">
-                      {formatEasternDateTime(item.dueDate, item.dueTime) ?? "—"}
-                    </Typography>
+                    <Box
+                      sx={{
+                        "& .due-date-pencil": {
+                          opacity: 0,
+                          transition: "opacity 0.15s ease",
+                        },
+                        "&:hover .due-date-pencil": { opacity: 1 },
+                      }}
+                    >
+                      <Stack direction="row" alignItems="center" spacing={0.5}>
+                        <Typography variant="body2" color="text.secondary">
+                          {formatEasternDateTime(item.dueDate, item.dueTime) ?? "—"}
+                        </Typography>
+                        {onEditDueDate && (
+                          <Tooltip title="Edit due date">
+                            <IconButton
+                              className="due-date-pencil"
+                              size="small"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                onEditDueDate(item);
+                              }}
+                              sx={{ p: 0.25 }}
+                            >
+                              <EditIcon fontSize="small" />
+                            </IconButton>
+                          </Tooltip>
+                        )}
+                      </Stack>
+                    </Box>
                   </TableCell>
                   {isPractice ? (
                     <>
@@ -441,11 +452,6 @@ export default function AssignmentTable({
                           {item.submissions > 0 ? `${item.averageGrade}%` : "—"}
                         </Typography>
                       </TableCell>
-                      <TableCell align="center">
-                        <Typography variant="body2">
-                          {item.totalPoints}
-                        </Typography>
-                      </TableCell>
                     </>
                   )}
                   <TableCell align="center">
@@ -463,12 +469,12 @@ export default function AssignmentTable({
                         <IconButton
                           size="small"
                           onClick={() => onToggleLock(item.id)}
-                          color={item.isLocked ? "warning" : "default"}
+                          color={item.isLocked ? "default" : "warning"}
                         >
                           {item.isLocked ? (
-                            <Unlock size={18} />
-                          ) : (
                             <Lock size={18} />
+                          ) : (
+                            <Unlock size={18} />
                           )}
                         </IconButton>
                       </Tooltip>

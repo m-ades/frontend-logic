@@ -68,10 +68,15 @@ export default function Login() {
         } else {
           const enrollments = await fetchJson('/api/course-enrollments');
           const hasInstructorEnrollment = (enrollments || []).some((enrollment) =>
-            ['instructor', 'ta'].includes(enrollment.role)
+            enrollment.role === 'instructor'
+          );
+          const hasTaEnrollment = (enrollments || []).some((enrollment) =>
+            enrollment.role === 'ta'
           );
           if (hasInstructorEnrollment) {
             role = 'instructor';
+          } else if (hasTaEnrollment) {
+            role = 'ta';
           }
         }
       } catch (enrollmentError) {

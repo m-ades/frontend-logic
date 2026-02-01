@@ -1,6 +1,6 @@
 export const normalizeRole = (role) => {
   if (!role) return null;
-  if (role === "ta") return "instructor";
+  if (role === "ta") return "student";
   return role;
 };
 

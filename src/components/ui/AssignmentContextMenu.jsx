@@ -1,11 +1,12 @@
 import { Menu, MenuItem } from "@mui/material";
-import { Edit, Copy, Trash2 } from "lucide-react";
+import { FileEdit, Edit, Copy, Trash2 } from "lucide-react";
 
 export default function AssignmentContextMenu({
   anchorEl,
   open,
   onClose,
   item,
+  onOpenBuilder,
   onEdit,
   onDuplicate,
   onDelete,
@@ -18,6 +19,10 @@ export default function AssignmentContextMenu({
       anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
       transformOrigin={{ vertical: "top", horizontal: "right" }}
     >
+      <MenuItem onClick={() => onOpenBuilder(item)}>
+        <FileEdit size={16} style={{ marginRight: 8 }} />
+        Open Builder
+      </MenuItem>
       <MenuItem onClick={() => onEdit(item)}>
         <Edit size={16} style={{ marginRight: 8 }} />
         Edit Settings

@@ -1,5 +1,15 @@
 import { useState } from "react";
-import { Box, Typography, Button, Alert } from "@mui/material";
+import {
+  Box,
+  Typography,
+  Button,
+  Alert,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
+} from "@mui/material";
 import { Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -19,21 +29,23 @@ import {
   enhanceItems,
 } from "../../utils/assignmentStatus";
 
-// Convert Eastern date/time to UTC ISO string for database
-const easternToUtc = (dateStr, timeStr = '00:00') => {
-  if (!dateStr) return null;
-  const [y, m, d] = dateStr.split('-').map(Number);
-  const [h, min] = timeStr.split(':').map(Number);
-  const local = new Date(y, m - 1, d, h, min);
-  const eastern = new Date(local.toLocaleString('en-US', { timeZone: 'America/New_York' }));
-  return new Date(local.getTime() + (local - eastern)).toISOString();
+// Helper to get current date
+const getCurrentDate = () => {
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, "0");
+  const day = String(today.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
 };
 
-// Current date in Eastern timezone
-const getCurrentEasternDate = () => new Date().toLocaleDateString('en-CA', { timeZone: 'America/New_York' });
+const toIsoDateTime = (date, time) => {
+  if (!date) return null;
+  const safeTime = time || "00:00";
+  return new Date(`${date}T${safeTime}:00`).toISOString();
+};
 
 const buildAssignmentPayload = (formData, courseId, overrides = {}) => {
-  const dueDate = easternToUtc(formData.dueDate, formData.dueTime || "23:59");
+  const dueDate = toIsoDateTime(formData.dueDate, formData.dueTime || "23:59");
   return {
     course_id: courseId,
     kind: "assignment",
@@ -52,9 +64,9 @@ const buildAssignmentPayload = (formData, courseId, overrides = {}) => {
 
 const INITIAL_FORM_DATA = {
   name: "",
-  publishDate: getCurrentEasternDate(),
+  publishDate: getCurrentDate(),
   publishTime: "00:00",
-  dueDate: getCurrentEasternDate(),
+  dueDate: getCurrentDate(),
   dueTime: "23:59",
   totalPoints: 100,
   chapter: 1,
@@ -75,18 +87,14 @@ export default function InstructorAssignments() {
   const [menuAnchor, setMenuAnchor] = useState(null);
   const [menuAssignment, setMenuAssignment] = useState(null);
   const [formData, setFormData] = useState(INITIAL_FORM_DATA);
+  const [dueDateDialogOpen, setDueDateDialogOpen] = useState(false);
+  const [dueDateEditAssignment, setDueDateEditAssignment] = useState(null);
+  const [dueDateForm, setDueDateForm] = useState({ dueDate: "", dueTime: "23:59" });
 
   // Get current course data
   const activeCourse = courses.find((c) => c.id === activeCourseId);
   const assignments = sortAssignmentsBySubchapter(assignmentsByCourse[activeCourseId] || []);
   const gradebook = gradebookByCourse[activeCourseId] || [];
-
-  const navigateToAssignment = (assignmentId) => {
-    if (!assignmentId) return;
-    navigate(`/instructor/assignment/${assignmentId}`, {
-      state: { returnTo: "/instructor/assignments" },
-    });
-  };
 
   // Enhance assignments with calculated data
   const enhancedAssignments = enhanceItems(
@@ -111,8 +119,8 @@ export default function InstructorAssignments() {
   const handleCreateOpen = () => {
     setFormData({
       ...INITIAL_FORM_DATA,
-      publishDate: getCurrentEasternDate(),
-      dueDate: getCurrentEasternDate(),
+      publishDate: getCurrentDate(),
+      dueDate: getCurrentDate(),
     });
     setCreateDialogOpen(true);
   };
@@ -132,7 +140,9 @@ export default function InstructorAssignments() {
         payload: refreshed,
       });
       setCreateDialogOpen(false);
-      navigateToAssignment(created?.id ?? payload.id);
+      navigate("/instructor/assignment-builder", {
+        state: { assignmentId: created?.id ?? payload.id },
+      });
     } catch (error) {
       console.error("Failed to create assignment", error);
     }
@@ -143,9 +153,9 @@ export default function InstructorAssignments() {
 
     setFormData({
       name: assignment.name,
-      publishDate: assignment.publishDate || getCurrentEasternDate(),
+      publishDate: assignment.publishDate || getCurrentDate(),
       publishTime: assignment.publishTime || "00:00",
-      dueDate: assignment.dueDate || getCurrentEasternDate(),
+      dueDate: assignment.dueDate || getCurrentDate(),
       dueTime: assignment.dueTime || "23:59",
       totalPoints: assignment.totalPoints || 100,
       chapter: assignment.chapter || 1,
@@ -231,7 +241,7 @@ export default function InstructorAssignments() {
         chapter: assignment.chapter || 1,
         subchapter: assignment.subchapter || "A",
         due_date: assignment.dueDate
-          ? easternToUtc(assignment.dueDate, assignment.dueTime || "23:59")
+          ? toIsoDateTime(assignment.dueDate, assignment.dueTime || "23:59")
           : null,
         total_points: Number.isFinite(assignment.totalPoints)
           ? assignment.totalPoints
@@ -276,7 +286,48 @@ export default function InstructorAssignments() {
   };
 
   const handleViewAssignment = (assignment) => {
-    navigateToAssignment(assignment?.id);
+    navigate("/instructor/assignment-builder", {
+      state: { assignmentId: assignment.id },
+    });
+  };
+
+  const handleOpenBuilder = (assignment) => {
+    navigate("/instructor/assignment-builder", {
+      state: { assignmentId: assignment.id },
+    });
+    setMenuAnchor(null);
+  };
+
+  const handleEditDueDateOpen = (assignment) => {
+    setDueDateEditAssignment(assignment);
+    setDueDateForm({
+      dueDate: assignment.dueDate || getCurrentDate(),
+      dueTime: assignment.dueTime || "23:59",
+    });
+    setDueDateDialogOpen(true);
+    setMenuAnchor(null);
+  };
+
+  const handleEditDueDateSubmit = async () => {
+    if (!dueDateEditAssignment?.id || !dueDateForm.dueDate) return;
+    try {
+      const dueDate = toIsoDateTime(dueDateForm.dueDate, dueDateForm.dueTime || "23:59");
+      await fetchJson(`/api/assignments/${dueDateEditAssignment.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ due_date: dueDate }),
+      });
+      const refreshed = await fetchCourseAssignments(activeCourseId);
+      dispatch({
+        type: "SET_ASSIGNMENTS",
+        courseId: activeCourseId,
+        payload: refreshed,
+      });
+      setDueDateDialogOpen(false);
+      setDueDateEditAssignment(null);
+    } catch (error) {
+      console.error("Failed to update due date", error);
+    }
   };
 
   // Show message if no active course
@@ -328,6 +379,7 @@ export default function InstructorAssignments() {
         onView={handleViewAssignment}
         onToggleLock={handleToggleLock}
         onTogglePublish={handleTogglePublish}
+        onEditDueDate={handleEditDueDateOpen}
         onMenuOpen={(e, assignment) => {
           setMenuAnchor(e.currentTarget);
           setMenuAssignment(assignment);
@@ -348,6 +400,7 @@ export default function InstructorAssignments() {
         open={Boolean(menuAnchor)}
         onClose={() => setMenuAnchor(null)}
         item={menuAssignment}
+        onOpenBuilder={handleOpenBuilder}
         onEdit={handleEditOpen}
         onDuplicate={handleDuplicate}
         onDelete={handleDelete}
@@ -377,6 +430,64 @@ export default function InstructorAssignments() {
         mode="edit"
         type="assignment"
       />
+
+      {/* Edit due date dialog */}
+      <Dialog
+        open={dueDateDialogOpen}
+        onClose={() => {
+          setDueDateDialogOpen(false);
+          setDueDateEditAssignment(null);
+        }}
+        maxWidth="xs"
+        fullWidth
+      >
+        <DialogTitle>Edit due date</DialogTitle>
+        <DialogContent>
+          {dueDateEditAssignment && (
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+              {dueDateEditAssignment.name}
+            </Typography>
+          )}
+          <TextField
+            label="Due date"
+            type="date"
+            value={dueDateForm.dueDate}
+            onChange={(e) =>
+              setDueDateForm((prev) => ({ ...prev, dueDate: e.target.value }))
+            }
+            fullWidth
+            InputLabelProps={{ shrink: true }}
+            sx={{ mb: 2 }}
+          />
+          <TextField
+            label="Due time"
+            type="time"
+            value={dueDateForm.dueTime}
+            onChange={(e) =>
+              setDueDateForm((prev) => ({ ...prev, dueTime: e.target.value }))
+            }
+            fullWidth
+            InputLabelProps={{ shrink: true }}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => {
+              setDueDateDialogOpen(false);
+              setDueDateEditAssignment(null);
+            }}
+          >
+            Cancel
+          </Button>
+          <Button
+            variant="contained"
+            onClick={handleEditDueDateSubmit}
+            disabled={!dueDateForm.dueDate}
+          >
+            Save
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 }
