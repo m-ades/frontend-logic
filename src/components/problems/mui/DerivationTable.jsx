@@ -57,6 +57,8 @@ const SYMBOL_BUTTONS = [
   { label: '(  )', pair: '()' },
   { label: '[  ]', pair: '[]' },
 ]
+// mobile fullscreen only. second row: (∀x) (∃x) ( ) [ ] under ~ • ∨ ⊃
+const SYMBOL_ROW2 = [SYMBOL_BUTTONS[5], SYMBOL_BUTTONS[6], SYMBOL_BUTTONS[7], SYMBOL_BUTTONS[8]]
 const FORCE_UPPER_RULES = new Set(['UI','UG','EI','EG','MP','MT','HS','DS','CD','DN','DM','CQ','QN','CP','IP','ACP','AIP'])
 const ALL_DERIVATION_RULES = Object.keys(getHurleyRuleset())
   .filter((r) => r !== 'Pr' && r !== 'Ass')
@@ -70,6 +72,28 @@ const ASSUMPTION_INDENT_PX = 12
 const MAX_INDENT_LEVEL = 3
 const AUTO_CHECK_STORAGE_KEY = 'logic-app:autocheck-enabled'
 const RULE_INPUT_MODE_KEY = 'logic-app:derivation-rule-input-mode'
+
+const symbolBtnSx = (isFullScreen) => ({
+  minWidth: isFullScreen ? 28 : 34,
+  px: isFullScreen ? 0.75 : 1,
+  py: 0.35,
+  fontSize: isFullScreen ? '0.8125rem' : '0.95rem',
+  lineHeight: 1.1,
+  minHeight: 32,
+  fontWeight: 600,
+  textTransform: 'none',
+  boxShadow: 'none',
+  border: 'none',
+  bgcolor: (theme) =>
+    theme.palette.mode === 'dark' ? alpha(theme.palette.common.white, 0.08) : theme.palette.grey[100],
+  color: 'text.primary',
+  '&:hover': (theme) => ({
+    boxShadow: 'none',
+    border: 'none',
+    backgroundColor: alpha(theme.palette.primary.main, theme.palette.action.hoverOpacity),
+  }),
+})
+
 const getUnderlineColors = (theme) => {
   if (theme.palette.mode === 'dark') {
     return {
@@ -404,7 +428,9 @@ export default function DerivationTable({
       normalizeFormulaForCheck,
       normalizeJustificationForSave
     )
-    onStateChangeRef.current?.(submission)
+    queueMicrotask(() => {
+      onStateChangeRef.current?.(submission)
+    })
   }, [premises, proof?.conclusion, normalizeFormulaForCheck, normalizeJustificationForSave])
 
   const runAutoCheck = useCallback(async (linesSnapshot) => {
@@ -918,6 +944,7 @@ export default function DerivationTable({
     }
   }
 
+  // tap table to go fullscreen. mobile only.
   const canOpenFullScreen = isMobile && !isFullScreen && typeof onOpenFullScreen === 'function'
 
   const handleTableAreaClick = useCallback(
@@ -935,13 +962,14 @@ export default function DerivationTable({
   )
 
   return (
-    <Stack spacing={2} sx={isFullScreen ? { flex: 1, minHeight: 0, minWidth: 0, overflow: 'auto' } : undefined}>
+    <Stack spacing={2} sx={isFullScreen ? { flex: 1, minHeight: 0, minWidth: 0, width: '100%', maxWidth: '100%', overflow: 'auto' } : undefined}>
       {(() => {
         const Wrapper = isFullScreen ? Box : ThemedCard
+        // fullscreen: no right padding. fill width.
         const wrapperSx = isFullScreen
-          ? { p: 2, position: 'relative', flex: 1, minHeight: 0, minWidth: 0, display: 'flex', flexDirection: 'column' }
+          ? { py: 2, pl: 2, pr: 0, position: 'relative', flex: 1, minHeight: 0, minWidth: 0, width: '100%', maxWidth: '100%', display: 'flex', flexDirection: 'column', boxSizing: 'border-box' }
           : {
-              p: { xs: 2, md: 2.5 },
+              p: { xs: 1.25, md: 2.5 },
               borderRadius: 3,
               border: (theme) => `1px solid ${theme.palette.divider}`,
               position: 'relative',
@@ -992,32 +1020,45 @@ export default function DerivationTable({
           component={Box}
           sx={{
             width: '100%',
-            ...(isFullScreen ? { overflowX: 'hidden', overflow: 'visible' } : { overflowX: 'auto', WebkitOverflowScrolling: 'touch' }),
+            ...(isFullScreen ? { overflowX: 'hidden', overflow: 'visible', padding: 0, margin: 0 } : { overflowX: 'auto', WebkitOverflowScrolling: 'touch' }), // fullscreen: no extra padding
           }}
           onClick={canOpenFullScreen ? handleTableAreaClick : undefined}
           onPointerDown={canOpenFullScreen ? handleTableAreaClick : undefined}
         >
-          <Table size="medium" sx={isFullScreen ? { tableLayout: 'fixed', width: '100%' } : { width: 'auto', minWidth: 280 }}>
+          {/* mobile: small table. fullscreen: last column no right padding (mui default). */}
+          <Table
+            size={isMobile ? 'small' : 'medium'}
+            sx={
+              isFullScreen
+                ? {
+                    tableLayout: 'fixed',
+                    width: '100%',
+                    '& td:last-child': { paddingRight: '0 !important' },
+                    '& .MuiTableCell-root:last-child': { paddingRight: '0 !important' },
+                  }
+                : { width: 'auto', minWidth: isMobile ? 200 : 280 }
+            }
+          >
             <TableBody>
             {premises.length === 0 && proof?.conclusion && (
               <TableRow
                 key="conclusion-row"
                 sx={{
                   '& td': {
-                    py: 0.5,
+                    py: isMobile ? 0.25 : 0.5,
                     position: 'relative',
                     verticalAlign: 'middle',
                   },
                 }}
               >
-                <TableCell sx={{ width: isFullScreen ? 36 : 48, minWidth: isFullScreen ? 36 : undefined, borderBottom: 'none', verticalAlign: 'middle' }}>
+                <TableCell sx={{ width: isFullScreen || isMobile ? 36 : 48, minWidth: isFullScreen || isMobile ? 36 : undefined, borderBottom: 'none', verticalAlign: 'middle' }}>
                   <Typography sx={{ color: 'transparent' }}>—</Typography>
                 </TableCell>
                 <TableCell sx={{ borderBottom: 'none', pr: 0.5, verticalAlign: 'middle', ...(isFullScreen ? { width: '55%', minWidth: 0 } : { width: 'auto', whiteSpace: 'nowrap' }) }}>
                   <Typography sx={{ color: 'transparent' }}>—</Typography>
                 </TableCell>
                 <TableCell sx={{ borderBottom: 'none', pl: 0.5, verticalAlign: 'middle', ...(isFullScreen ? { width: '45%', minWidth: 0 } : { width: 'auto', whiteSpace: 'nowrap' }) }}>
-                  <Typography component="span" sx={{ fontSize: isFullScreen ? 14 : 16, color: 'text.primary' }}>
+                  <Typography component="span" sx={{ fontSize: isFullScreen || isMobile ? 14 : 16, color: 'text.primary' }}>
                     {`// ${proof.conclusion}`}
                   </Typography>
                 </TableCell>
@@ -1031,14 +1072,14 @@ export default function DerivationTable({
                 key={`line-${idx}`}
                 sx={{
                   '& td': {
-                    py: 0.5,
+                    py: isMobile ? 0.25 : 0.5,
                     position: 'relative',
                     left: indentPx ? `${indentPx}px` : 0,
                     verticalAlign: 'middle',
                   },
                 }}
               >
-                <TableCell sx={{ width: isFullScreen ? 36 : 48, minWidth: isFullScreen ? 36 : undefined, borderBottom: 'none', color: '#4f5b7a', fontWeight: 600, verticalAlign: 'middle' }}>
+                <TableCell sx={{ width: isFullScreen || isMobile ? 36 : 48, minWidth: isFullScreen || isMobile ? 36 : undefined, borderBottom: 'none', color: '#4f5b7a', fontWeight: 600, verticalAlign: 'middle' }}>
                   {idx + 1}
                 </TableCell>
                 <TableCell sx={{ borderBottom: 'none', pr: 0.5, verticalAlign: 'middle', ...(isFullScreen ? { width: '55%', minWidth: 0 } : { width: 'auto', whiteSpace: 'nowrap' }) }}>
@@ -1085,7 +1126,10 @@ export default function DerivationTable({
                       width: isFullScreen ? '100%' : { xs: '100%', md: 280 },
                       minWidth: isFullScreen ? 0 : undefined,
                       ...getInputUnderlineSx(theme),
-                      '& .MuiInputBase-input': { fontSize: isFullScreen ? 14 : 16, py: 1 },
+                      '& .MuiInputBase-input': {
+                        fontSize: isFullScreen || isMobile ? 14 : 16,
+                        py: isMobile ? 0.5 : 1,
+                      },
                     })}
                   />
                 </TableCell>
@@ -1101,7 +1145,7 @@ export default function DerivationTable({
                 >
                   {idx < premises.length ? (
                     idx === premises.length - 1 ? (
-                      <Typography component="span" sx={{ fontSize: isFullScreen ? 14 : 16, color: 'text.primary' }}>
+                      <Typography component="span" sx={{ fontSize: isFullScreen || isMobile ? 14 : 16, color: 'text.primary' }}>
                         {proof?.conclusion ? `// ${proof.conclusion}` : ''}
                       </Typography>
                     ) : (
@@ -1146,12 +1190,15 @@ export default function DerivationTable({
                               sx={(theme) => ({
                                 width: { xs: '100%', md: 58 },
                                 ...getInputUnderlineSx(theme),
-                                '& .MuiInputBase-input': { fontSize: 16, py: 1 },
+                                '& .MuiInputBase-input': {
+                                  fontSize: isMobile ? 14 : 16,
+                                  py: isMobile ? 0.5 : 1,
+                                },
                               })}
                             />
                           )}
                           {allowedRules.length > 0 && (
-                            <FormControl variant="standard" sx={{ minWidth: isFullScreen ? 56 : 70 }}>
+                            <FormControl variant="standard" sx={{ minWidth: isFullScreen || isMobile ? 56 : 70 }}>
                               <Select
                                 value={getRuleFromJustification(line.justification)}
                                 displayEmpty
@@ -1195,8 +1242,8 @@ export default function DerivationTable({
                                 }}
                                 renderValue={(value) => value || 'Rule'}
                                 sx={(theme) => ({
-                                  '& .MuiSelect-select': { fontSize: 16, py: 1 },
-                                  '& .MuiInputBase-input': { fontSize: 16, py: 1 },
+                                  '& .MuiSelect-select': { fontSize: isMobile ? 14 : 16, py: isMobile ? 0.5 : 1 },
+                                  '& .MuiInputBase-input': { fontSize: isMobile ? 14 : 16, py: isMobile ? 0.5 : 1 },
                                   '& .MuiSelect-select.MuiInputBase-input': { display: 'flex', alignItems: 'center' },
                                   ...getSelectUnderlineSx(theme),
                                 })}
@@ -1235,11 +1282,14 @@ export default function DerivationTable({
                           inputProps={{ autoComplete: 'off' }}
                           inputRef={(el) => { if (el) justRefs.current[idx] = el }}
                           sx={(theme) => ({
-                            width: isFullScreen ? '100%' : 110,
-                            maxWidth: isFullScreen ? '100%' : 110,
+                            width: isFullScreen ? '100%' : isMobile ? 90 : 110,
+                            maxWidth: isFullScreen ? '100%' : isMobile ? 90 : 110,
                             minWidth: isFullScreen ? 0 : undefined,
                             ...getInputUnderlineSx(theme),
-                            '& .MuiInputBase-input': { fontSize: isFullScreen ? 14 : 16, py: 1 },
+                            '& .MuiInputBase-input': {
+                              fontSize: isFullScreen || isMobile ? 14 : 16,
+                              py: isMobile ? 0.5 : 1,
+                            },
                           })}
                         />
                       )}
@@ -1267,12 +1317,14 @@ export default function DerivationTable({
               </TableRow>
               )
             })}
-            <TableRow sx={{ '& td': { verticalAlign: 'middle' } }}>
-              <TableCell sx={{ width: isFullScreen ? 36 : 48, minWidth: isFullScreen ? 36 : undefined, borderBottom: 'none', verticalAlign: 'middle' }}>
+            <TableRow sx={{ '& td': { verticalAlign: 'middle', py: isMobile ? 0.25 : 0.5 } }}>
+              <TableCell sx={{ width: isFullScreen || isMobile ? 36 : 48, minWidth: isFullScreen || isMobile ? 36 : undefined, borderBottom: 'none', verticalAlign: 'middle' }}>
                 <Tooltip title="New line">
-                  <IconButton onClick={addLine} size="small" aria-label="Add line" disabled={!canAddLine}>
-                    <SubdirectoryArrowRightIcon />
-                  </IconButton>
+                  <span style={{ display: 'inline-flex' }}>
+                    <IconButton onClick={addLine} size="small" aria-label="Add line" disabled={!canAddLine}>
+                      <SubdirectoryArrowRightIcon />
+                    </IconButton>
+                  </span>
                 </Tooltip>
               </TableCell>
               <TableCell sx={{ borderBottom: 'none', pl: 0.5, verticalAlign: 'middle' }} colSpan={2}>
@@ -1284,61 +1336,87 @@ export default function DerivationTable({
                       gap: isFullScreen ? 0.5 : 0.75,
                       flexWrap: isFullScreen ? 'wrap' : 'nowrap',
                       minWidth: isFullScreen ? 0 : 'max-content',
-                      pr: 1,
+                      pr: isFullScreen ? 0 : 1,
+                      ...(isMobile && isFullScreen && { flexDirection: 'column', alignItems: 'flex-start' }), // two rows only in mobile fullscreen
                     }}
                   >
-                    <Tooltip title={autoCheckEnabled ? 'Turn off autochecker' : 'Turn on autochecker'}>
-                      <IconButton
-                        onClick={() => setAutoCheckEnabled((prev) => !prev)}
-                        size="small"
-                        aria-label="Toggle autochecker"
-                        sx={{
-                          color: autoCheckEnabled ? 'primary.main' : 'text.disabled',
-                          position: 'relative',
-                        }}
-                      >
-                        <AutoAwesomeIcon />
-                      </IconButton>
-                    </Tooltip>
-                    {SYMBOL_BUTTONS.map(({ label, insert, pair }) => (
-                      <Button
-                        key={label}
-                        type="button"
-                        size="small"
-                        variant="outlined"
-                        onMouseDown={(event) => {
-                          event.preventDefault()
-                        }}
-                        onClick={() => handleSymbolInsert({ insert, pair })}
-                        sx={{
-                          minWidth: isFullScreen ? 28 : 34,
-                          px: isFullScreen ? 0.75 : 1,
-                          py: 0.35,
-                          fontSize: isFullScreen ? '0.8125rem' : '0.95rem',
-                          lineHeight: 1.1,
-                          minHeight: 32,
-                          fontWeight: 600,
-                          textTransform: 'none',
-                          boxShadow: 'none',
-                          border: 'none',
-                          bgcolor: (theme) =>
-                            theme.palette.mode === 'dark'
-                              ? alpha(theme.palette.common.white, 0.08)
-                              : theme.palette.grey[100],
-                          color: 'text.primary',
-                          '&:hover': (theme) => ({
-                            boxShadow: 'none',
-                            border: 'none',
-                            backgroundColor: alpha(
-                              theme.palette.primary.main,
-                              theme.palette.action.hoverOpacity,
-                            ),
-                          }),
-                        }}
-                      >
-                        {label}
-                      </Button>
-                    ))}
+                    {isMobile && isFullScreen ? (
+                      <>
+                        {/* row 1: autochecker + first five */}
+                        <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: isFullScreen ? 0.5 : 0.75, flexShrink: 0 }}>
+                          <Tooltip title={autoCheckEnabled ? 'Turn off autochecker' : 'Turn on autochecker'}>
+                            <IconButton
+                              onClick={() => setAutoCheckEnabled((prev) => !prev)}
+                              size="small"
+                              aria-label="Toggle autochecker"
+                              sx={{ color: autoCheckEnabled ? 'primary.main' : 'text.disabled', position: 'relative' }}
+                            >
+                              <AutoAwesomeIcon />
+                            </IconButton>
+                          </Tooltip>
+                          {SYMBOL_BUTTONS.slice(0, 5).map((btn) => (
+                            <Button
+                              key={btn.label}
+                              type="button"
+                              size="small"
+                              variant="outlined"
+                              onMouseDown={(e) => e.preventDefault()}
+                              onClick={() => handleSymbolInsert({ insert: btn.insert, pair: btn.pair })}
+                              sx={symbolBtnSx(isFullScreen)}
+                            >
+                              {btn.label}
+                            </Button>
+                          ))}
+                        </Box>
+                        {/* row 2: spacer (under autochecker) then (∀x) (∃x) ( ) [ ] then spacer under ≡ */}
+                        <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: isFullScreen ? 0.5 : 0.75, flexShrink: 0 }}>
+                          <Box sx={{ width: 40, minWidth: 40, flexShrink: 0 }} aria-hidden />
+                          {SYMBOL_ROW2.map((btn) => (
+                            <Button
+                              key={btn.label}
+                              type="button"
+                              size="small"
+                              variant="outlined"
+                              onMouseDown={(e) => e.preventDefault()}
+                              onClick={() => handleSymbolInsert({ insert: btn.insert, pair: btn.pair })}
+                              sx={symbolBtnSx(isFullScreen)}
+                            >
+                              {btn.label}
+                            </Button>
+                          ))}
+                          <Box sx={{ minWidth: isFullScreen ? 28 : 34, px: isFullScreen ? 0.75 : 1, flexShrink: 0 }} aria-hidden />
+                        </Box>
+                      </>
+                    ) : (
+                      <>
+                        <Tooltip title={autoCheckEnabled ? 'Turn off autochecker' : 'Turn on autochecker'}>
+                          <IconButton
+                            onClick={() => setAutoCheckEnabled((prev) => !prev)}
+                            size="small"
+                            aria-label="Toggle autochecker"
+                            sx={{
+                              color: autoCheckEnabled ? 'primary.main' : 'text.disabled',
+                              position: 'relative',
+                            }}
+                          >
+                            <AutoAwesomeIcon />
+                          </IconButton>
+                        </Tooltip>
+                        {SYMBOL_BUTTONS.map(({ label, insert, pair }) => (
+                          <Button
+                            key={label}
+                            type="button"
+                            size="small"
+                            variant="outlined"
+                            onMouseDown={(e) => e.preventDefault()}
+                            onClick={() => handleSymbolInsert({ insert, pair })}
+                            sx={symbolBtnSx(isFullScreen)}
+                          >
+                            {label}
+                          </Button>
+                        ))}
+                      </>
+                    )}
                   </Box>
                 </Stack>
               </TableCell>
@@ -1379,7 +1457,8 @@ export default function DerivationTable({
           </Wrapper>
         )
       })()}
-      <Box sx={{ mt: 1 }}>
+      {/* fullscreen: inset button row so it doesn't touch screen edge */}
+      <Box sx={{ mt: 1, ...(isFullScreen && { pl: 2, pr: 2 }) }}>
         <ProblemSetButtons
           onCheck={handleSubmit}
           onStartOver={handleStartOver}
