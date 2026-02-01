@@ -15,6 +15,8 @@ export default function ProofEditor({
   fullScreenFocusTarget: fullScreenFocusTargetProp,
   onOpenFullScreen: onOpenFullScreenProp,
   onCloseFullScreen: onCloseFullScreenProp,
+  totalQuestions,
+  isCurrentCorrect,
 }) {
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('md')) // mobile breakpoint
@@ -136,6 +138,8 @@ export default function ProofEditor({
         initialFocusField={fullScreenFocusTarget?.field}
         onOpenFullScreen={openFullScreen}
         onCloseFullScreen={closeFullScreen}
+        totalQuestions={totalQuestions}
+        isCurrentCorrect={isCurrentCorrect}
       />
     </Box>,
     document.body
@@ -165,6 +169,8 @@ export default function ProofEditor({
             isFullScreen={false}
             onOpenFullScreen={openFullScreen}
             onCloseFullScreen={closeFullScreen}
+            totalQuestions={totalQuestions}
+            isCurrentCorrect={isCurrentCorrect}
           />
         )}
 

@@ -12,7 +12,8 @@ export default function ProblemSetButtons({
   attemptCount,
   attemptLimit,
   showAttempts = true,
-  sx = {} 
+  sx = {},
+  scoreLabel,
 }) {
   const navigation = useProblemNavigation()
   const showNext = Boolean(navigation?.onNext)
@@ -44,6 +45,18 @@ export default function ProblemSetButtons({
           >
             Clear Answer
           </Button>
+          {scoreLabel?.text != null && (
+            <Typography
+              component="span"
+              sx={{
+                fontSize: '0.875rem',
+                fontWeight: 600,
+                color: scoreLabel.color ?? 'success.main',
+              }}
+            >
+              {scoreLabel.text}
+            </Typography>
+          )}
           <IconButton
             onClick={navigation?.onNext}
             disabled={isChecking || isNextDisabled}

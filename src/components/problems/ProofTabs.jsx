@@ -312,6 +312,8 @@ export default function ProofTabs({
                                 setFullScreenOpen(false)
                                 setFullScreenFocusTarget(null)
                               }}
+                              totalQuestions={proofs.length}
+                              isCurrentCorrect={completedProofs.has(proof.id)}
                             />
                           )
                         }

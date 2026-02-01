@@ -73,26 +73,29 @@ const MAX_INDENT_LEVEL = 3
 const AUTO_CHECK_STORAGE_KEY = 'logic-app:autocheck-enabled'
 const RULE_INPUT_MODE_KEY = 'logic-app:derivation-rule-input-mode'
 
-const symbolBtnSx = (isFullScreen) => ({
-  minWidth: isFullScreen ? 28 : 34,
-  px: isFullScreen ? 0.75 : 1,
-  py: 0.35,
-  fontSize: isFullScreen ? '0.8125rem' : '0.95rem',
-  lineHeight: 1.1,
-  minHeight: 32,
-  fontWeight: 600,
-  textTransform: 'none',
-  boxShadow: 'none',
-  border: 'none',
-  bgcolor: (theme) =>
-    theme.palette.mode === 'dark' ? alpha(theme.palette.common.white, 0.08) : theme.palette.grey[100],
-  color: 'text.primary',
-  '&:hover': (theme) => ({
+const symbolBtnSx = (isFullScreen, isMobile) => {
+  const mobileFullscreen = isMobile && isFullScreen
+  return {
+    minWidth: mobileFullscreen ? 42 : (isFullScreen ? 28 : 34),
+    px: mobileFullscreen ? 1.25 : (isFullScreen ? 0.75 : 1),
+    py: mobileFullscreen ? 0.5 : 0.35,
+    fontSize: mobileFullscreen ? '1.0625rem' : (isFullScreen ? '0.8125rem' : '0.95rem'),
+    lineHeight: 1.1,
+    minHeight: mobileFullscreen ? 44 : 32,
+    fontWeight: 600,
+    textTransform: 'none',
     boxShadow: 'none',
     border: 'none',
-    backgroundColor: alpha(theme.palette.primary.main, theme.palette.action.hoverOpacity),
-  }),
-})
+    bgcolor: (theme) =>
+      theme.palette.mode === 'dark' ? alpha(theme.palette.common.white, 0.08) : theme.palette.grey[100],
+    color: 'text.primary',
+    '&:hover': (theme) => ({
+      boxShadow: 'none',
+      border: 'none',
+      backgroundColor: alpha(theme.palette.primary.main, theme.palette.action.hoverOpacity),
+    }),
+  }
+}
 
 const getUnderlineColors = (theme) => {
   if (theme.palette.mode === 'dark') {
@@ -311,6 +314,8 @@ export default function DerivationTable({
   initialFocusField = null,
   onOpenFullScreen,
   onCloseFullScreen,
+  totalQuestions,
+  isCurrentCorrect,
 }) {
   const formulaRefs = useRef({})
   const justRefs = useRef({})
@@ -1436,7 +1441,7 @@ export default function DerivationTable({
                               variant="outlined"
                               onMouseDown={(e) => e.preventDefault()}
                               onClick={() => handleSymbolInsert({ insert: btn.insert, pair: btn.pair })}
-                              sx={symbolBtnSx(isFullScreen)}
+                              sx={symbolBtnSx(isFullScreen, isMobile)}
                             >
                               {btn.label}
                             </Button>
@@ -1453,12 +1458,12 @@ export default function DerivationTable({
                               variant="outlined"
                               onMouseDown={(e) => e.preventDefault()}
                               onClick={() => handleSymbolInsert({ insert: btn.insert, pair: btn.pair })}
-                              sx={symbolBtnSx(isFullScreen)}
+                              sx={symbolBtnSx(isFullScreen, isMobile)}
                             >
                               {btn.label}
                             </Button>
                           ))}
-                          <Box sx={{ minWidth: isFullScreen ? 28 : 34, px: isFullScreen ? 0.75 : 1, flexShrink: 0 }} aria-hidden />
+                          <Box sx={{ minWidth: (isMobile && isFullScreen) ? 42 : (isFullScreen ? 28 : 34), px: (isMobile && isFullScreen) ? 1.25 : (isFullScreen ? 0.75 : 1), flexShrink: 0 }} aria-hidden />
                         </Box>
                       </>
                     ) : (
@@ -1484,7 +1489,7 @@ export default function DerivationTable({
                             variant="outlined"
                             onMouseDown={(e) => e.preventDefault()}
                             onClick={() => handleSymbolInsert({ insert, pair })}
-                            sx={symbolBtnSx(isFullScreen)}
+                            sx={symbolBtnSx(isFullScreen, isMobile)}
                           >
                             {label}
                           </Button>
@@ -1542,6 +1547,14 @@ export default function DerivationTable({
           attemptCount={attemptCount}
           attemptLimit={attemptLimit}
           sx={{ mt: 1 }}
+          scoreLabel={isMobile && isFullScreen && Number.isFinite(totalQuestions) && totalQuestions > 0 ? (() => {
+            const pointsPerQuestion = 100 / totalQuestions
+            const maxLabel = pointsPerQuestion % 1 === 0 ? String(Math.round(pointsPerQuestion)) : pointsPerQuestion.toFixed(1)
+            const isLockedOut = Number.isFinite(attemptLimit) && attemptCount >= attemptLimit
+            if (isCurrentCorrect) return { text: `${maxLabel}/${maxLabel}`, color: 'success.main' }
+            if (isLockedOut) return { text: `0/${maxLabel}`, color: 'error.main' }
+            return null
+          })() : null}
         />
       </Box>
     </Stack>
