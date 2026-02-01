@@ -167,7 +167,16 @@ export default function ProofTabs({
             <Tab
               key={proof.id}
               label={
-                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1, width: '100%' }}>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    flexDirection: isMobile && fullScreenOpen ? 'row' : 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: isMobile && fullScreenOpen ? 1 : 0.25,
+                    width: '100%',
+                  }}
+                >
                   <span>Problem {idx + 1}</span>
                   {(() => {
                     const isCorrect = completedProofs.has(proof.id)
