@@ -1108,9 +1108,21 @@ export default function DerivationTable({
                   <Typography sx={{ color: 'transparent' }}>—</Typography>
                 </TableCell>
                 <TableCell sx={{ borderBottom: 'none', pl: 0.5, verticalAlign: 'middle', ...(isFullScreen ? { width: '50%', minWidth: 0 } : { width: 'auto', whiteSpace: 'nowrap' }) }}>
-                  <Typography component="span" sx={{ fontSize: 16, color: 'text.primary' }}>
-                    {`// ${proof.conclusion}`}
-                  </Typography>
+                  <Box
+                    component="span"
+                    sx={{ fontSize: 16, color: 'text.primary', '& .clickable-char': { cursor: 'pointer', borderRadius: 1, '&:hover': { backgroundColor: (t) => alpha(t.palette.primary.main, t.palette.action.hoverOpacity) } } }}
+                  >
+                    {(`// ${proof.conclusion || ''}`).split('').map((char, i) => {
+                      const isLetter = /^[a-zA-Z]$/.test(char)
+                      return isLetter ? (
+                        <Box component="span" key={`conc-${i}`} className="clickable-char" onClick={() => handleSymbolInsert({ insert: char })} aria-label={`Insert ${char}`}>
+                          {char}
+                        </Box>
+                      ) : (
+                        <Box component="span" key={`conc-${i}`}>{char}</Box>
+                      )
+                    })}
+                  </Box>
                 </TableCell>
               </TableRow>
             )}
@@ -1154,6 +1166,39 @@ export default function DerivationTable({
                   </Box>
                 </TableCell>
                 <TableCell sx={{ borderBottom: 'none', pl: isFullScreen ? 1 : undefined, pr: 0.5, verticalAlign: 'middle', ...(isFullScreen ? { width: '50%', minWidth: 0 } : { width: 'auto', whiteSpace: 'nowrap' }) }}>
+                  {line.readOnly ? (
+                    <Box
+                      component="span"
+                      sx={(theme) => ({
+                        display: 'inline',
+                        fontSize: 16,
+                        py: isMobile ? 0.5 : 1,
+                        ...getInputUnderlineSx(theme),
+                        '& .clickable-char': {
+                          cursor: 'pointer',
+                          borderRadius: 1,
+                          '&:hover': { backgroundColor: (t) => alpha(t.palette.primary.main, t.palette.action.hoverOpacity) },
+                        },
+                      })}
+                    >
+                      {(line.formula || '').split('').map((char, i) => {
+                        const isLetter = /^[a-zA-Z]$/.test(char)
+                        return isLetter ? (
+                          <Box
+                            component="span"
+                            key={`${idx}-${i}`}
+                            className="clickable-char"
+                            onClick={() => handleSymbolInsert({ insert: char })}
+                            aria-label={`Insert ${char}`}
+                          >
+                            {char}
+                          </Box>
+                        ) : (
+                          <Box component="span" key={`${idx}-${i}`}>{char}</Box>
+                        )
+                      })}
+                    </Box>
+                  ) : (
                   <TextField
                     variant="standard"
                     placeholder=""
@@ -1211,6 +1256,7 @@ export default function DerivationTable({
                       },
                     })}
                   />
+                  )}
                 </TableCell>
                 <TableCell
                   sx={{
@@ -1229,9 +1275,21 @@ export default function DerivationTable({
                 >
                   {idx < premises.length ? (
                     idx === premises.length - 1 ? (
-                      <Typography component="span" sx={{ fontSize: 16, color: 'text.primary' }}>
-                        {proof?.conclusion ? `// ${proof.conclusion}` : ''}
-                      </Typography>
+                      <Box
+                        component="span"
+                        sx={{ fontSize: 16, color: 'text.primary', '& .clickable-char': { cursor: 'pointer', borderRadius: 1, '&:hover': { backgroundColor: (t) => alpha(t.palette.primary.main, t.palette.action.hoverOpacity) } } }}
+                      >
+                        {(proof?.conclusion ? `// ${proof.conclusion}` : '').split('').map((char, i) => {
+                          const isLetter = /^[a-zA-Z]$/.test(char)
+                          return isLetter ? (
+                            <Box component="span" key={`conc-row-${idx}-${i}`} className="clickable-char" onClick={() => handleSymbolInsert({ insert: char })} aria-label={`Insert ${char}`}>
+                              {char}
+                            </Box>
+                          ) : (
+                            <Box component="span" key={`conc-row-${idx}-${i}`}>{char}</Box>
+                          )
+                        })}
+                      </Box>
                     ) : (
                       <Typography sx={{ color: 'transparent' }}>—</Typography>
                     )
