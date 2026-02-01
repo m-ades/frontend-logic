@@ -35,7 +35,6 @@ import { useCoursesState } from '../context/CoursesContext.jsx'
 import { useAuthState } from '../context/AuthContext.jsx'
 import { isInstructorRole } from '../utils/auth.js'
 import ThemedCard from '../components/ui/ThemedCard.jsx'
-import LoadingSpinner from '../components/ui/LoadingSpinner.jsx'
 
 const formatPercent = (value) => (value === null || value === undefined ? '—' : `${value.toFixed(1)}%`)
 
@@ -485,13 +484,11 @@ export default function Dashboard() {
               </Typography>
             </Box>
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
-              {isLoadingAnalytics ? (
-                <LoadingSpinner label="Loading assignments..." size="sm" />
-              ) : assignmentStats.upcomingList.length === 0 ? (
+              {!isLoadingAnalytics && assignmentStats.upcomingList.length === 0 ? (
                 <Typography variant="body2" color="text.secondary">
                   No upcoming assignments
                 </Typography>
-              ) : (
+              ) : isLoadingAnalytics ? null : (
                 assignmentStats.upcomingList.map((assignment) => (
                   <Box
                     key={assignment.id}
