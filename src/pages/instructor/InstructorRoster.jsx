@@ -21,6 +21,7 @@ import {
   calculateClassStats,
   exportRosterCSV,
 } from "../../utils/rosterUtils";
+import { updateEnrollmentRole } from "../../context/CoursesContext";
 
 export default function InstructorRoster() {
   const { activeCourseId, gradebookByCourse, assignmentsByCourse, courses } =
@@ -110,6 +111,23 @@ export default function InstructorRoster() {
     setMenuStudent(student);
   };
 
+  const handleToggleRole = async (student, newRole) => {
+    try {
+      await updateEnrollmentRole(activeCourseId, student.id, newRole);
+      const updated = (gradebookByCourse[activeCourseId] || []).map((s) =>
+        s.id === student.id ? { ...s, role: newRole } : s
+      );
+      dispatch({ type: "SET_GRADEBOOK", courseId: activeCourseId, payload: updated });
+      setSelectedStudent((prev) =>
+        prev?.id === student.id ? { ...prev, role: newRole } : prev
+      );
+    } catch (err) {
+      console.error("Failed to update role:", err);
+    }
+  };
+
+  const isInstructor = activeCourse?.role === "instructor";
+
   // Show message if no active course
   if (!activeCourseId) {
     return (
@@ -184,6 +202,8 @@ export default function InstructorRoster() {
         }}
         student={selectedStudent}
         assignments={assignments}
+        canToggleRole={isInstructor}
+        onToggleRole={handleToggleRole}
       />
 
     </Box>

@@ -2,6 +2,7 @@ import { createContext, useContext, useReducer } from "react";
 import { fetchJson, getStoredUser } from "../utils/api.js";
 import { sortAssignmentsBySubchapter } from "../utils/assignmentSort.js";
 import { isInstructorRole } from "../utils/auth.js";
+import { parseDueDateAsEastern } from "../utils/easternTime.js";
 
 // ============================================================================
 // CONSTANTS
@@ -54,18 +55,35 @@ const writeStoredActiveCourseId = (userId, courseId) => {
   }
 };
 
-// Convert UTC ISO string to Eastern Time date/time components
+const EASTERN = "America/New_York";
+
 const splitDateTime = (isoString) => {
   if (!isoString) return { date: null, time: null };
-  const d = new Date(isoString);
-  if (isNaN(d)) return { date: null, time: null };
-  return {
-    date: d.toLocaleDateString('en-CA', { timeZone: 'America/New_York' }),
-    time: d.toLocaleTimeString('en-GB', { timeZone: 'America/New_York', hour: '2-digit', minute: '2-digit' }),
-  };
+  const date = new Date(isoString);
+  if (Number.isNaN(date.getTime())) return { date: null, time: null };
+  const dateParts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: EASTERN,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(date);
+  const y = dateParts.find((p) => p.type === "year").value;
+  const m = dateParts.find((p) => p.type === "month").value;
+  const d = dateParts.find((p) => p.type === "day").value;
+  const datePart = `${y}-${m}-${d}`;
+  const timeParts = new Intl.DateTimeFormat("en-GB", {
+    timeZone: EASTERN,
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  }).formatToParts(date);
+  const hour = timeParts.find((p) => p.type === "hour").value;
+  const minute = timeParts.find((p) => p.type === "minute").value;
+  const timePart = `${hour}:${minute}`;
+  return { date: datePart, time: timePart };
 };
 
-const mapCourseRecord = (course, index, role = null) => ({
+const mapCourseRecord = (course, index) => ({
   id: course.id,
   name: course.title,
   code: course.course_code,
@@ -76,7 +94,6 @@ const mapCourseRecord = (course, index, role = null) => ({
   color: COURSE_COLORS[index % COURSE_COLORS.length],
   latePolicy: DEFAULT_LATE_POLICY,
   gradingScale: DEFAULT_GRADING_SCALE,
-  role: role,
 });
 
 const mapAssignmentRecord = (assignment) => {
@@ -120,21 +137,10 @@ export async function fetchInstructorCourses() {
   const enrollments = await fetchJson("/api/course-enrollments");
   const courseIds = new Set((enrollments || []).map((item) => Number(item.course_id)));
   const courses = await fetchJson("/api/courses");
-  
-  // Create a map of course_id -> role for the current user
-  const storedUser = getStoredUser();
-  const roleMap = new Map();
-  if (storedUser?.id && enrollments) {
-    enrollments.forEach((enrollment) => {
-      if (Number(enrollment.user_id) === Number(storedUser.id)) {
-        roleMap.set(Number(enrollment.course_id), enrollment.role);
-      }
-    });
-  }
 
   return (courses || [])
     .filter((course) => courseIds.size === 0 || courseIds.has(Number(course.id)))
-    .map((course, index) => mapCourseRecord(course, index, roleMap.get(Number(course.id)) || null));
+    .map((course, index) => mapCourseRecord(course, index));
 }
 
 const assignmentsListCache = new Map();
@@ -200,9 +206,12 @@ export async function fetchCourseGradebook(courseId) {
       }
     });
 
+    const rawRole = student.role ?? "student";
+    const role = String(rawRole).toLowerCase() === "ta" ? "ta" : "student";
     return {
       id: student.user_id,
       username: student.username,
+      role,
       grades,
       lateSubmissions: {},
       submissionDates: {},
@@ -211,6 +220,17 @@ export async function fetchCourseGradebook(courseId) {
   });
 
   return students;
+}
+
+export async function updateEnrollmentRole(courseId, userId, role) {
+  return fetchJson(
+    `/api/instructor/courses/${courseId}/roster/${userId}/role`,
+    {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ role }),
+    }
+  );
 }
 
 export async function updateCourse(courseId, updates) {
@@ -325,24 +345,14 @@ export function getStudentsAtRisk(students, assignments) {
     .sort((a, b) => a.avg - b.avg);
 }
 
-// Get upcoming deadlines (within 7 days)
+// Get upcoming deadlines (within 7 days); due dates compared in Eastern
 export function getUpcomingDeadlines(assignments) {
   const today = new Date();
 
   return assignments
     .map((a) => {
-      const dueDate = new Date(a.dueDate);
-
-      // If time is specified, set it
-      if (a.dueTime) {
-        const [hours, minutes] = a.dueTime.split(":");
-        dueDate.setHours(parseInt(hours), parseInt(minutes), 0, 0);
-      } else {
-        // Default to end of day if no time
-        dueDate.setHours(23, 59, 59, 999);
-      }
-
-      const diffTime = dueDate - today;
+      const deadline = parseDueDateAsEastern(a.dueDate, a.dueTime || "23:59");
+      const diffTime = deadline ? deadline - today : 0;
       const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
       return { ...a, daysLeft: diffDays };
     })
@@ -364,17 +374,12 @@ export function calculateGradeWithLatePenalty(earnedGrade, isLate, latePolicy) {
   return Math.max(0, penalizedGrade);
 }
 
-// Helper function to check if submission is late
+// Helper function to check if submission is late (due date interpreted in Eastern)
 export function isSubmissionLate(submissionDate, dueDate, dueTime, latePolicy) {
   if (!latePolicy?.enabled) return false;
 
-  const deadline = new Date(dueDate);
-  if (dueTime) {
-    const [hours, minutes] = dueTime.split(":");
-    deadline.setHours(parseInt(hours), parseInt(minutes), 0, 0);
-  } else {
-    deadline.setHours(23, 59, 59, 999);
-  }
+  const deadline = parseDueDateAsEastern(dueDate, dueTime || "23:59");
+  if (!deadline) return false;
 
   const submission = new Date(submissionDate);
 
@@ -658,8 +663,8 @@ export async function addNewCourse(dispatch, courseData) {
 
     const newCourse = await createCourse(courseData);
 
-    // Add course to state
-    dispatch({ type: "ADD_COURSE", payload: newCourse });
+    // Add course to state (creator is always instructor)
+    dispatch({ type: "ADD_COURSE", payload: { ...newCourse, role: "instructor" } });
 
     // Initialize empty data for the new course
     dispatch({ type: "SET_ASSIGNMENTS", courseId: newCourse.id, payload: [] });
@@ -738,19 +743,26 @@ export async function initializeCourses(dispatch) {
       const courses = await fetchInstructorCourses();
       const storedUser = getStoredUser();
       const isInstructor = isInstructorRole(storedUser?.role);
+
+      const myEnrollments = await fetchJson("/api/course-enrollments");
+      const roleByCourseId = new Map(
+        (myEnrollments || []).map((e) => [Number(e.course_id), e.role])
+      );
+
       const coursesWithCounts = await Promise.all(
         courses.map(async (course) => {
+          const role = roleByCourseId.get(course.id) ?? null;
           if (!isInstructor) {
-            return course;
+            return { ...course, role };
           }
           try {
             const enrollments = await fetchJson(`/api/courses/${course.id}/enrollments`);
             const studentCount = (enrollments || []).filter(
               (enrollment) => enrollment.role === "student"
             ).length;
-            return { ...course, studentCount };
+            return { ...course, studentCount, role };
           } catch (error) {
-            return course;
+            return { ...course, role };
           }
         })
       );

@@ -34,6 +34,7 @@ import {
   isPassingGrade,
   getDefaultGradingScale,
 } from "../../utils/gradingUtils";
+import { formatDate } from "../../utils/formatting.js";
 import { MetricCard } from "./MetricCard";
 
 // Helper function to calculate average
@@ -73,12 +74,24 @@ export default function StudentProfileModal({
   onClose,
   student,
   assignments,
+  canToggleRole = false,
+  onToggleRole,
 }) {
   const { courses, activeCourseId } = useCoursesState();
   const activeCourse = courses.find((c) => c.id === activeCourseId);
   const gradingScale = activeCourse?.gradingScale || getDefaultGradingScale();
 
   if (!student) return null;
+
+  const roleLabel = student.role === "ta" ? "TA" : "Student";
+  const handleRoleClick = () => {
+    if (!canToggleRole || !onToggleRole) return;
+    const newRole = student.role === "ta" ? "Student" : "TA";
+    const message = `Are you sure you want to change ${student.username}'s role to ${newRole}?`;
+    if (window.confirm(message)) {
+      onToggleRole(student, newRole);
+    }
+  };
 
   const average = calculateAverage(student.grades);
   const letterGrade = getLetterGrade(average, gradingScale);
@@ -134,11 +147,43 @@ export default function StudentProfileModal({
               {student.username}
             </Typography>
             <Box
-              sx={{ display: "flex", alignItems: "center", gap: 1, mt: 0.5 }}
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                gap: 1,
+                mt: 0.5,
+                ...(canToggleRole && onToggleRole
+                  ? {
+                      cursor: "pointer",
+                      "&:hover": { opacity: 0.85 },
+                    }
+                  : {}),
+              }}
+              onClick={canToggleRole && onToggleRole ? handleRoleClick : undefined}
+              role={canToggleRole && onToggleRole ? "button" : undefined}
+              aria-label={
+                canToggleRole && onToggleRole
+                  ? `Change role to ${student.role === "ta" ? "Student" : "TA"}`
+                  : undefined
+              }
             >
-              <User size={16} color="#64748b" />
-              <Typography variant="body2" color="text.secondary">
-                {student.username}
+              <Box
+                component="span"
+                sx={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  color: "text.secondary",
+                }}
+                aria-hidden
+              >
+                <User size={18} strokeWidth={2} />
+              </Box>
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                sx={{ textTransform: "capitalize", fontWeight: 500 }}
+              >
+                {roleLabel}
               </Typography>
             </Box>
           </Box>
@@ -464,7 +509,7 @@ export default function StudentProfileModal({
                       </TableCell>
                       <TableCell>
                         <Typography variant="body2" color="text.secondary">
-                          {new Date(assignment.dueDate).toLocaleDateString()}
+                          {formatDate(assignment.dueDate) ?? "—"}
                         </Typography>
                       </TableCell>
                       <TableCell align="center">
