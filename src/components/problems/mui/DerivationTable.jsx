@@ -999,12 +999,28 @@ export default function DerivationTable({
   )
 
   return (
-    <Stack spacing={2} sx={isFullScreen ? { flex: 1, minHeight: 0, minWidth: 0, width: '100%', maxWidth: '100%', overflow: 'auto' } : undefined}>
+    <Stack
+      spacing={2}
+      sx={
+        isFullScreen
+          ? {
+              flex: 1,
+              minHeight: 0,
+              minWidth: 0,
+              width: '100%',
+              maxWidth: '100%',
+              display: 'flex',
+              flexDirection: 'column',
+              overflow: 'hidden',
+            }
+          : undefined
+      }
+    >
       {(() => {
         const Wrapper = isFullScreen ? Box : ThemedCard
-        // fullscreen: no right padding. fill width.
+        // fullscreen: no right padding. fill width. scrollable area so button row can stay sticky
         const wrapperSx = isFullScreen
-          ? { py: 2, pl: 0, pr: 0, position: 'relative', flex: 1, minHeight: 0, minWidth: 0, width: '100%', maxWidth: '100%', display: 'flex', flexDirection: 'column', boxSizing: 'border-box' }
+          ? { py: 2, pl: 0, pr: 0, position: 'relative', flex: 1, minHeight: 0, minWidth: 0, width: '100%', maxWidth: '100%', display: 'flex', flexDirection: 'column', boxSizing: 'border-box', overflow: 'auto' }
           : {
               p: { xs: 1.25, md: 2.5 },
               borderRadius: 3,
@@ -1536,8 +1552,22 @@ export default function DerivationTable({
           </Wrapper>
         )
       })()}
-      {/* fullscreen: inset button row and attempts text from left edge */}
-      <Box sx={{ mt: 1, ...(isFullScreen && { pl: 2, pr: 0 }) }}>
+      {/* fullscreen: sticky button row at bottom; non-fullscreen: normal flow */}
+      <Box
+        sx={{
+          mt: 1,
+          ...(isFullScreen && {
+            flexShrink: 0,
+            pl: 2,
+            pr: 0,
+            pt: 1.5,
+            pb: 2,
+            bgcolor: 'background.paper',
+            borderTop: 1,
+            borderColor: 'divider',
+          }),
+        }}
+      >
         <ProblemSetButtons
           onCheck={handleSubmit}
           onStartOver={handleStartOver}
