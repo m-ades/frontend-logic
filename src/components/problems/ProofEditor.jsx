@@ -83,8 +83,8 @@ export default function ProofEditor({
     }
   }
 
-  // portal to body so overlay escapes main padding. no right margin.
-  const fullScreenOverlay = fullScreenOpen && typeof document !== 'undefined' && createPortal(
+  // fullscreen overlay: mobile only (non-mobile has no fullscreen option)
+  const fullScreenOverlay = isMobile && fullScreenOpen && typeof document !== 'undefined' && createPortal(
     <Box
       sx={{
         position: 'fixed',
@@ -105,8 +105,8 @@ export default function ProofEditor({
         flexDirection: 'column',
       }}
     >
-      {/* close bar flush right */}
-      <Box sx={{ display: 'flex', justifyContent: 'flex-end', pt: 1, pb: 1, pl: 1, pr: 0, flexShrink: 0 }}>
+      {/* close bar: left padding only (table below stays edge-to-edge) */}
+      <Box sx={{ display: 'flex', justifyContent: 'flex-end', pt: 1, pb: 1, pl: 2, pr: 0, flexShrink: 0 }}>
         <IconButton
           onClick={closeFullScreen}
           aria-label="Close full screen"
@@ -145,8 +145,8 @@ export default function ProofEditor({
     <>
       {fullScreenOverlay}
       <Stack spacing={3} sx={{ px: 0, width: '100%', alignItems: 'stretch', flexGrow: 1 }}>
-        {/* table only here when not fullscreen. one instance. */}
-        {!fullScreenOpen && (
+        {/* table: show when not fullscreen, or when desktop (fullscreen is mobile-only) */}
+        {(!fullScreenOpen || !isMobile) && (
           <DerivationTable
             proof={proof}
             savedState={savedState}
