@@ -1146,7 +1146,7 @@ export default function DerivationTable({
                       ) : (
                         <TextField
                           variant="standard"
-                          placeholder="Line(s) and rule"
+                          placeholder={idx === premises.length ? 'Line(s) and rule' : ''}
                           value={line.justification}
                           onChange={(e) => handleLineChange(idx, 'justification', e.target.value)}
                           onKeyDown={(e) => handleJustKeyDown(e, idx, line.readOnly)}
