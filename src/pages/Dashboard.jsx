@@ -67,6 +67,7 @@ export default function Dashboard() {
   const { user } = useAuthState()
   const { activeCourseId } = useCoursesState()
   const courseId = activeCourseId ?? API_CONFIG.courseId
+  const courseIdForApi = activeCourseId ?? null
   const [analytics, setAnalytics] = useState(emptyAnalytics)
   const [isLoadingAnalytics, setIsLoadingAnalytics] = useState(true)
   const [gradeTimeline, setGradeTimeline] = useState([])
@@ -108,7 +109,7 @@ export default function Dashboard() {
     let isMounted = true
 
     const loadAnalytics = async () => {
-      if (!courseId) {
+      if (!courseIdForApi) {
         if (isMounted) {
           setAnalytics(emptyAnalytics)
           setGradeTimeline([])
@@ -125,9 +126,9 @@ export default function Dashboard() {
             setIsLoadingAnalytics(true)
           }
           const [analyticsData, grades, gradebookSummary] = await Promise.all([
-            fetchJson(`/api/analytics/student?userId=${getActiveUserId()}&courseId=${courseId}`),
+            fetchJson(`/api/analytics/student?userId=${getActiveUserId()}&courseId=${courseIdForApi}`),
             fetchJson(`/api/users/${getActiveUserId()}/grades`),
-            fetchJson(`/api/analytics/gradebook-summary?courseId=${courseId}`).catch(() => null),
+            fetchJson(`/api/analytics/gradebook-summary?courseId=${courseIdForApi}`).catch(() => null),
           ])
         if (isMounted) {
           setAnalytics({ ...emptyAnalytics, ...analyticsData })
@@ -272,7 +273,7 @@ export default function Dashboard() {
     return () => {
       isMounted = false
     }
-  }, [courseId])
+  }, [courseIdForApi])
 
   useEffect(() => {
     if (dashboardMode !== 'instructor') {

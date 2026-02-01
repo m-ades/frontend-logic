@@ -23,13 +23,14 @@ export default function Grades() {
   const [isLoadingGrades, setIsLoadingGrades] = useState(true)
   const { activeCourseId } = useCoursesState()
   const courseId = activeCourseId ?? API_CONFIG.courseId
+  const courseIdForApi = activeCourseId ?? null
 
   useEffect(() => {
     let isMounted = true
 
     const loadGrades = async () => {
       try {
-        if (!courseId) {
+        if (!courseIdForApi) {
           if (isMounted) {
             setGradeEntries([])
             setIsLoadingGrades(false)
@@ -41,7 +42,7 @@ export default function Grades() {
         }
         const userId = getActiveUserId()
         const [assignments, grades] = await Promise.all([
-          fetchJson(`/api/courses/${courseId}/assignments`),
+          fetchJson(`/api/courses/${courseIdForApi}/assignments`),
           fetchJson(`/api/users/${userId}/grades`),
         ])
         const gradedAssignments = sortAssignmentsBySubchapter(
@@ -72,7 +73,7 @@ export default function Grades() {
     return () => {
       isMounted = false
     }
-  }, [courseId])
+  }, [courseIdForApi])
 
   const gradedEntries = useMemo(
     () => gradeEntries.filter((entry) => entry.grade),

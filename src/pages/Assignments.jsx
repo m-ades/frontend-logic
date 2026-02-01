@@ -75,6 +75,8 @@ export default function Assignments() {
   const { activeCourseId } = useCoursesState()
   const courseId = activeCourseId ?? API_CONFIG.courseId
   const navigate = useNavigate()
+  // Only request assignments for the active course (never fallback to course 1) to avoid 403 when user isn't enrolled
+  const courseIdForApi = activeCourseId ?? null
 
   const getCompletionStatus = useCallback(
     (activityId) => completedAssignments.has(activityId),
@@ -86,7 +88,7 @@ export default function Assignments() {
 
     const loadAssignments = async () => {
       try {
-        if (!courseId) {
+        if (!courseIdForApi) {
           if (isMounted) {
             setCourseStructure([])
             setCompletedAssignments(new Set())
@@ -97,7 +99,7 @@ export default function Assignments() {
         if (isMounted) {
           setIsLoadingAssignments(true)
         }
-        const assignments = await fetchJson(`/api/courses/${courseId}/assignments`)
+        const assignments = await fetchJson(`/api/courses/${courseIdForApi}/assignments`)
         const gradedAssignments = sortAssignmentsBySubchapter(
           assignments.filter((assignment) => assignment.kind !== 'practice')
         )
@@ -137,7 +139,7 @@ export default function Assignments() {
     return () => {
       isMounted = false
     }
-  }, [courseId])
+  }, [courseIdForApi])
 
   const filterStructure = useCallback((structure, predicate) => {
     return structure.map((chapter) => {

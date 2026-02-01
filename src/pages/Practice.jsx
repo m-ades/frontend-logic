@@ -62,13 +62,14 @@ export default function Practice() {
   const [isLoadingPractice, setIsLoadingPractice] = useState(true)
   const { activeCourseId } = useCoursesState()
   const courseId = activeCourseId ?? API_CONFIG.courseId
+  const courseIdForApi = activeCourseId ?? null
 
   useEffect(() => {
     let isMounted = true
 
     const loadPractice = async () => {
       try {
-        if (!courseId) {
+        if (!courseIdForApi) {
           if (isMounted) {
             setCourseStructure([])
             setIsLoadingPractice(false)
@@ -78,7 +79,7 @@ export default function Practice() {
         if (isMounted) {
           setIsLoadingPractice(true)
         }
-        const assignments = await fetchJson(`/api/courses/${courseId}/assignments`)
+        const assignments = await fetchJson(`/api/courses/${courseIdForApi}/assignments`)
         if (!isMounted) return
 
         const practiceAssignments = sortAssignmentsBySubchapter(
@@ -102,7 +103,7 @@ export default function Practice() {
     return () => {
       isMounted = false
     }
-  }, [courseId])
+  }, [courseIdForApi])
 
   const handleActivityClick = (activity) => {
     if (activity.worksheet) {

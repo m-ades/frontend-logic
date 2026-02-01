@@ -243,6 +243,7 @@ export default function Worksheet() {
   const [currentDueAt, setCurrentDueAt] = useState(null)
   const { activeCourseId } = useCoursesState()
   const courseId = activeCourseId ?? API_CONFIG.courseId
+  const courseIdForApi = activeCourseId ?? null
   const sessionId = useRef(null)
   const questionSessionId = useRef(null)
   const activeUserId = getActiveUserId()
@@ -793,7 +794,7 @@ export default function Worksheet() {
     const loadWorksheets = async () => {
       setLoadError('')
       try {
-        if (!courseId) return
+        if (!courseIdForApi) return
         const targetAssignmentId = Number.isFinite(worksheetIdNum) ? worksheetIdNum : null
 
         if (worksheets.length && targetAssignmentId) {
@@ -819,7 +820,7 @@ export default function Worksheet() {
         }
 
         setIsLoading(true)
-        const assignments = await fetchJson(`/api/courses/${courseId}/assignments`)
+        const assignments = await fetchJson(`/api/courses/${courseIdForApi}/assignments`)
         const orderedAssignments = sortAssignmentsBySubchapter(assignments || [])
         const fallbackAssignmentId = targetAssignmentId || orderedAssignments?.[0]?.id
         if (!fallbackAssignmentId) {
