@@ -157,7 +157,13 @@ export default function ProofTabs({
             },
           }}
         >
-          {proofs.map((proof, idx) => (
+          {proofs.map((proof, idx) => {
+            const totalQuestions = proofs.length
+            const pointsPerQuestion = totalQuestions > 0 ? 100 / totalQuestions : 0
+            const maxLabel = pointsPerQuestion % 1 === 0
+              ? String(Math.round(pointsPerQuestion))
+              : pointsPerQuestion.toFixed(1)
+            return (
             <Tab
               key={proof.id}
               label={
@@ -170,10 +176,18 @@ export default function ProofTabs({
                       && Number.isFinite(proof.attemptCount)
                       && proof.attemptCount >= proof.attemptLimit
                     if (isCorrect) {
-                      return <CheckCircleIcon sx={{ color: '#2f6bff', fontSize: 16 }} />
+                      return (
+                        <span style={{ fontSize: '0.875rem', fontWeight: 500, color: theme.palette.success.main }}>
+                          {maxLabel}/{maxLabel}
+                        </span>
+                      )
                     }
                     if (isLockedOut) {
-                      return <CancelIcon sx={{ color: '#2f6bff', fontSize: 16 }} />
+                      return (
+                        <span style={{ fontSize: '0.875rem', fontWeight: 500, color: theme.palette.error.main }}>
+                          0/{maxLabel}
+                        </span>
+                      )
                     }
                     return null
                   })()}
@@ -197,7 +211,8 @@ export default function ProofTabs({
                 },
               }}
             />
-          ))}
+            )
+          })}
         </Tabs>
         {!isMobile && (
           <Box sx={{ 
