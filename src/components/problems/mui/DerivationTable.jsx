@@ -30,12 +30,21 @@ import ThemedCard from '../../ui/ThemedCard.jsx'
 import ProblemSetButtons from './ProblemSetButtons.jsx'
 import checkDerivation from '../../../lib/logicpenguin/checkers/derivation-hurley.js'
 import getHurleyRuleset from '../../../lib/logicpenguin/checkers/rules/hurley-rules.js'
+import getFormulaClass from '../../../lib/logicpenguin/symbolic/formula.js'
 import getSyntax from '../../../lib/logicpenguin/symbolic/libsyntax.js'
 import { justParse } from '../../ui/logicpenguin/justification-parse.js'
 
-const HURLEY_RULE_NAMES = Object.keys(getHurleyRuleset()).filter(
-  (r) => r !== 'Pr' && r !== 'Ass'
-)
+/** Compare formula strings by canonical form so ∃x(~Hx) and ∃x~Hx count equal */
+function formulasEqualNormally(a, b, normalizeForFallback) {
+  if (!a && !b) return true
+  if (!a || !b) return false
+  try {
+    const Formula = getFormulaClass()
+    return Formula.from(String(a)).normal === Formula.from(String(b)).normal
+  } catch {
+    return normalizeForFallback ? normalizeForFallback(a) === normalizeForFallback(b) : false
+  }
+}
 
 const SYMBOL_BUTTONS = [
   { label: '~', insert: '~' },
@@ -49,6 +58,9 @@ const SYMBOL_BUTTONS = [
   { label: '[  ]', pair: '[]' },
 ]
 const FORCE_UPPER_RULES = new Set(['UI','UG','EI','EG','MP','MT','HS','DS','CD','DN','DM','CQ','QN','CP','IP','ACP','AIP'])
+const ALL_DERIVATION_RULES = Object.keys(getHurleyRuleset())
+  .filter((r) => r !== 'Pr' && r !== 'Ass')
+  .map((r) => (FORCE_UPPER_RULES.has(r.toUpperCase()) ? r.toUpperCase() : r.charAt(0).toUpperCase() + r.slice(1).toLowerCase()))
 const RULES_ALLOW_NO_LINES = new Set(['ACP', 'AIP'])
 const ASSUMPTION_RULES = new Set(['ACP', 'AIP'])
 const INDENT_START_RULES = new Set(['ACP', 'AIP'])
@@ -318,8 +330,7 @@ export default function DerivationTable({
       const unique = Array.from(new Set(allow.map((rule) => formatRuleName(String(rule)))))
       return unique.filter((rule) => rule && rule.toLowerCase() !== 'pr')
     }
-    // Fallback: show rule toggle for all derivations (e.g. predicate logic) when snapshot has no ruleset.allow
-    return HURLEY_RULE_NAMES.map((rule) => formatRuleName(rule))
+    return ALL_DERIVATION_RULES
   }, [proof?.ruleset, proof?.options?.ruleset])
   const isLineCompleteForCheck = useCallback((line) => {
     if (!line) return false
@@ -426,7 +437,7 @@ export default function DerivationTable({
       normalizedConclusion &&
       lastFilled &&
       isLineCompleteForCheck(lastFilled) &&
-      normalizeFormulaForCheck(lastFilled.formula || '') === normalizedConclusion &&
+      formulasEqualNormally(lastFilled.formula || '', proof?.conclusion || '', normalizeFormulaForCheck) &&
       allFilledComplete
     )
     const filteredErrors = {}
@@ -492,7 +503,7 @@ export default function DerivationTable({
       !last.readOnly &&
       isLineCompleteForCheck(last) &&
       perLine[lastIndex] === 'ok' &&
-      normalizeFormulaForCheck(last.formula || '') !== normalizedConclusion
+      !formulasEqualNormally(last.formula || '', proof?.conclusion || '', normalizeFormulaForCheck)
     )
     return { perLine, rows, shouldAutoAdd }
   }, [normalizeFormulaForCheck, normalizeJustificationForCheck, premises, proof?.conclusion, proof?.options, proof?.ruleset, isLineCompleteForCheck])
@@ -514,10 +525,9 @@ export default function DerivationTable({
             if (prev.length !== lines.length) return prev
             const last = prev[prev.length - 1]
             if (!last || last.readOnly || !isLineCompleteForCheck(last)) return prev
-            const normalizedConclusion = normalizeFormulaForCheck(proof?.conclusion || '')
-            if (!normalizedConclusion) return prev
-            const normalizedLast = normalizeFormulaForCheck(last.formula || '')
-            if (normalizedLast === normalizedConclusion) return prev
+            const conclusionStr = proof?.conclusion || ''
+            if (!conclusionStr) return prev
+            if (formulasEqualNormally(last.formula || '', conclusionStr, normalizeFormulaForCheck)) return prev
             return [...prev, { formula: '', justification: '', readOnly: false }]
           })
         }
@@ -733,14 +743,14 @@ export default function DerivationTable({
     if (!hasModifier && (key === 'l' || key === 'L')) {
       const textWithKey = value.slice(0, start) + key.toLowerCase()
       if (/all$/i.test(textWithKey)) {
-        insertSymbol('∀', 3)
+        insertSymbol('∀', 2) // replace only 'al' so ~all → ~∀
       }
       return
     }
     if (!hasModifier && (key === 'e' || key === 'E')) {
       const textWithKey = value.slice(0, start) + key.toLowerCase()
       if (/some$/i.test(textWithKey)) {
-        insertSymbol('∃', 4)
+        insertSymbol('∃', 3) // replace only 'som' so ~some → ~∃
       }
     }
   }
