@@ -1115,7 +1115,7 @@ export default function DerivationTable({
                     {(`// ${proof.conclusion || ''}`).split('').map((char, i) => {
                       const isLetter = /^[a-zA-Z]$/.test(char)
                       return isLetter ? (
-                        <Box component="span" key={`conc-${i}`} className="clickable-char" onClick={() => handleSymbolInsert({ insert: char })} aria-label={`Insert ${char}`}>
+                        <Box component="span" key={`conc-${i}`} className="clickable-char" onPointerDown={(e) => e.preventDefault()} onClick={() => handleSymbolInsert({ insert: char })} aria-label={`Insert ${char}`}>
                           {char}
                         </Box>
                       ) : (
@@ -1188,6 +1188,7 @@ export default function DerivationTable({
                             component="span"
                             key={`${idx}-${i}`}
                             className="clickable-char"
+                            onPointerDown={(e) => e.preventDefault()}
                             onClick={() => handleSymbolInsert({ insert: char })}
                             aria-label={`Insert ${char}`}
                           >
@@ -1282,7 +1283,7 @@ export default function DerivationTable({
                         {(proof?.conclusion ? `// ${proof.conclusion}` : '').split('').map((char, i) => {
                           const isLetter = /^[a-zA-Z]$/.test(char)
                           return isLetter ? (
-                            <Box component="span" key={`conc-row-${idx}-${i}`} className="clickable-char" onClick={() => handleSymbolInsert({ insert: char })} aria-label={`Insert ${char}`}>
+                            <Box component="span" key={`conc-row-${idx}-${i}`} className="clickable-char" onPointerDown={(e) => e.preventDefault()} onClick={() => handleSymbolInsert({ insert: char })} aria-label={`Insert ${char}`}>
                               {char}
                             </Box>
                           ) : (
