@@ -11,6 +11,7 @@ import {
   alpha,
 } from "@mui/material";
 import { Clock } from "lucide-react";
+import { formatEasternDateTime } from "../../../utils/easternTime.js";
 
 export const UpcomingDeadlinesTable = ({ assignments, onAssignmentClick }) => {
   const upcomingAssignments = assignments
@@ -76,7 +77,7 @@ export const UpcomingDeadlinesTable = ({ assignments, onAssignmentClick }) => {
                 </TableCell>
                 <TableCell align="center">
                   <Typography variant="body2" color="text.secondary">
-                    {assignment.dueDate}
+                    {formatEasternDateTime(assignment.dueDate, assignment.dueTime) ?? assignment.dueDate}
                   </Typography>
                 </TableCell>
                 <TableCell align="center">

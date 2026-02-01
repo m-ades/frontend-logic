@@ -1,12 +1,12 @@
+import { parseDueDateAsEastern } from "./easternTime.js";
+
 /**
  * Get status color for an assignment or practice
- * @param {Object} item - Assignment or practice object
- * @param {boolean} isPractice - Whether this is a practice assignment
- * @returns {string} - MUI color name
+ * Due dates are compared in Eastern time so Feb 1 means end of Feb 1 Eastern.
  */
 export function getStatusColor(item, isPractice = false) {
   const now = new Date();
-  const dueDate = item.dueDate ? new Date(item.dueDate) : null;
+  const dueDate = item.dueDate ? parseDueDateAsEastern(item.dueDate, item.dueTime) : null;
   const publishDate = item.publishDate ? new Date(item.publishDate) : null;
 
   if (item.isLocked) return "default";
@@ -17,13 +17,11 @@ export function getStatusColor(item, isPractice = false) {
 
 /**
  * Get status text for an assignment or practice
- * @param {Object} item - Assignment or practice object
- * @param {boolean} isPractice - Whether this is a practice assignment
- * @returns {string} - Status text
+ * Due dates are compared in Eastern time.
  */
 export function getStatusText(item, isPractice = false) {
   const now = new Date();
-  const dueDate = item.dueDate ? new Date(item.dueDate) : null;
+  const dueDate = item.dueDate ? parseDueDateAsEastern(item.dueDate, item.dueTime) : null;
   const publishDate = item.publishDate ? new Date(item.publishDate) : null;
 
   if (item.isLocked) return "Locked";

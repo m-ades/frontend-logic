@@ -73,23 +73,23 @@ export default function AssignmentDetailModal({ open, onClose, assignmentId }) {
   const activeCourse = courses.find((c) => c.id === activeCourseId);
   const assignments = assignmentsByCourse[activeCourseId] || [];
   const gradebook = gradebookByCourse[activeCourseId] || [];
+  const gradebookStudentsOnly = gradebook.filter((s) => s.role !== "ta");
   const assignment = assignments.find((a) => a.id === assignmentId);
 
   if (!assignment) return null;
 
-  // Calculate metrics from context data
-  const totalStudents = activeCourse?.studentCount || gradebook.length || 0;
-  const submissions = gradebook.filter(
+  // Metrics use students only (TAs are roster-only, excluded from calculations)
+  const totalStudents = activeCourse?.studentCount ?? gradebookStudentsOnly.length;
+  const submissions = gradebookStudentsOnly.filter(
     (student) => student.grades[assignment.id] !== undefined
   ).length;
 
   const completionRate =
     totalStudents > 0 ? Math.round((submissions / totalStudents) * 100) : 0;
 
-  const averageGrade = calculateAssignmentAverage(assignment.id, gradebook);
+  const averageGrade = calculateAssignmentAverage(assignment.id, gradebookStudentsOnly);
 
-  // Count late submissions from gradebook
-  const lateSubmissions = gradebook.filter(
+  const lateSubmissions = gradebookStudentsOnly.filter(
     (student) => student.lateSubmissions?.[assignment.id]
   ).length;
 
@@ -105,7 +105,7 @@ export default function AssignmentDetailModal({ open, onClose, assignmentId }) {
     { grade: "F", range: "0-59", count: 0, color: "#ef4444" },
   ];
 
-  gradebook.forEach((student) => {
+  gradebookStudentsOnly.forEach((student) => {
     const grade = student.grades[assignment.id];
     if (grade !== undefined && grade !== null) {
       if (grade >= 90) gradeDistribution[0].count++;
@@ -116,8 +116,7 @@ export default function AssignmentDetailModal({ open, onClose, assignmentId }) {
     }
   });
 
-  // Student submissions with grades
-  const studentSubmissions = gradebook
+  const studentSubmissions = gradebookStudentsOnly
     .map((student) => {
       const grade = student.grades[assignment.id];
       const isLate = student.lateSubmissions?.[assignment.id] || false;

@@ -5,6 +5,7 @@ import ThemedCard from '../components/ui/ThemedCard.jsx'
 import ActivityAccordion from '../components/ui/ActivityAccordion.jsx'
 import { ACTIVITY_TYPES } from '../placeholder/courseActivities.js'
 import { formatDateTime } from '../utils/formatting.js'
+import { parseDueDateAsEastern } from '../utils/easternTime.js'
 import { compareSubchapterLabels, sortAssignmentsBySubchapter } from '../utils/assignmentSort.js'
 import { API_CONFIG, fetchJson, getActiveUserId } from '../utils/api.js'
 import { useCoursesState } from '../context/CoursesContext.jsx'
@@ -160,10 +161,11 @@ export default function Assignments() {
       switch (tabValue) {
         case 0: {
           if (!activity.dueDate) return false
-          const dueDate = new Date(activity.dueDate)
+          const deadline = parseDueDateAsEastern(activity.dueDate, activity.dueTime)
+          if (!deadline) return false
           return (
-            dueDate >= startOfDay &&
-            dueDate <= twoWeeksOut &&
+            deadline >= startOfDay &&
+            deadline <= twoWeeksOut &&
             !getCompletionStatus(activity.id)
           )
         }
@@ -253,7 +255,7 @@ export default function Assignments() {
                 color="primary"
                 variant="outlined"
               />
-              {activity.dueDate && new Date(activity.dueDate) < new Date() && (
+              {activity.dueDate && parseDueDateAsEastern(activity.dueDate, activity.dueTime) < new Date() && (
                 <Chip label="Past due" size="small" color="error" />
               )}
             </Stack>

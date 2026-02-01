@@ -1,16 +1,10 @@
 // Utility functions for roster management
+import { parseDueDateAsEastern } from "./easternTime.js";
 
 const getAssignmentDeadline = (assignment) => {
   if (!assignment?.dueDate) return null;
-  const deadline = new Date(assignment.dueDate);
-  if (Number.isNaN(deadline.getTime())) return null;
-  if (assignment.dueTime) {
-    const [hours, minutes] = assignment.dueTime.split(":");
-    deadline.setHours(parseInt(hours, 10), parseInt(minutes, 10), 0, 0);
-  } else {
-    deadline.setHours(23, 59, 59, 999);
-  }
-  return deadline;
+  const deadline = parseDueDateAsEastern(assignment.dueDate, assignment.dueTime);
+  return deadline && !Number.isNaN(deadline.getTime()) ? deadline : null;
 };
 
 const getPastDueAssignmentIds = (assignments) => {
@@ -60,20 +54,28 @@ export function filterStudents(students, searchQuery) {
   );
 }
 
+/** Students onlyfor analytics */
+function studentsOnlyForStats(students) {
+  return Array.isArray(students)
+    ? students.filter((s) => s.role !== "ta")
+    : [];
+}
+
 export function calculateClassStats(students, assignments) {
-  const totalStudents = students.length;
+  const forStats = studentsOnlyForStats(students);
+  const totalStudents = forStats.length;
 
   const averageClassGrade =
     totalStudents > 0
       ? Math.round(
-          students.reduce((sum, s) => {
+          forStats.reduce((sum, s) => {
             const stats = getStudentStats(s, assignments);
             return sum + stats.average;
           }, 0) / totalStudents
         )
       : 0;
 
-  const studentsAtRisk = students.filter((s) => {
+  const studentsAtRisk = forStats.filter((s) => {
     const stats = getStudentStats(s, assignments);
     return stats.average < 70 && stats.average > 0;
   }).length;

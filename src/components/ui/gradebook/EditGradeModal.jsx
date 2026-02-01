@@ -18,6 +18,8 @@ import {
   Tabs,
 } from "@mui/material";
 import { X, Save, Trash2, Clock, Calendar, AlertCircle } from "lucide-react";
+import { formatDate } from "../../../utils/formatting.js";
+import { formatEasternFromIso } from "../../../utils/easternTime.js";
 
 function TabPanel({ children, value, index }) {
   return (
@@ -213,7 +215,7 @@ export default function EditGradeModal({
                     display="block"
                     mt={0.5}
                   >
-                    Due: {new Date(assignment.dueDate).toLocaleDateString()}
+                    Due: {formatDate(assignment.dueDate) ?? "—"}
                   </Typography>
                   <Typography
                     variant="caption"
@@ -260,7 +262,7 @@ export default function EditGradeModal({
                   style={{ verticalAlign: "middle", marginRight: 4 }}
                 />
                 Original Due Date:{" "}
-                {new Date(assignment.dueDate).toLocaleDateString()}
+                {formatDate(assignment.dueDate) ?? "—"}
               </Typography>
               {extensionDays > 0 && (
                 <Typography
@@ -269,10 +271,13 @@ export default function EditGradeModal({
                   fontWeight={600}
                 >
                   New Due Date:{" "}
-                  {new Date(
-                    new Date(assignment.dueDate).getTime() +
-                      extensionDays * 24 * 60 * 60 * 1000
-                  ).toLocaleDateString()}
+                  {formatEasternFromIso(
+                    new Date(
+                      new Date(assignment.dueDate).getTime() +
+                        extensionDays * 24 * 60 * 60 * 1000
+                    ).toISOString(),
+                    { includeTime: false }
+                  ) ?? "—"}
                 </Typography>
               )}
             </Box>

@@ -14,6 +14,7 @@ import { StudentsAtRiskTable } from "../../components/ui/dashboard/StudentsAtRis
 import { UpcomingDeadlinesTable } from "../../components/ui/dashboard/UpcomingDeadlinesTable";
 import { AssignmentOverviewTable } from "../../components/ui/dashboard/AssignmentOverviewTable";
 import { sortAssignmentsBySubchapter } from "../../utils/assignmentSort.js";
+import { formatEasternDateTime } from "../../utils/easternTime.js";
 
 export default function InstructorDashboard() {
   const { courses, activeCourseId, assignmentsByCourse, gradebookByCourse } =
@@ -28,7 +29,11 @@ export default function InstructorDashboard() {
   const course = courses.find((c) => c.id === activeCourseId);
   const assignments = sortAssignmentsBySubchapter(assignmentsByCourse[activeCourseId] || []);
   const students = gradebookByCourse[activeCourseId] || [];
-  const totalStudents = course?.studentCount || students.length || 0;
+  const studentsForStats = useMemo(
+    () => students.filter((s) => s.role !== "ta"),
+    [students]
+  );
+  const totalStudents = course?.studentCount ?? studentsForStats.length;
 
   useEffect(() => {
     let isMounted = true;
@@ -80,7 +85,7 @@ export default function InstructorDashboard() {
 
   const studentsForAssignments = useMemo(
     () =>
-      students.map((student) => {
+      studentsForStats.map((student) => {
         const filteredGrades = Object.entries(student.grades || {}).reduce(
           (acc, [assignmentId, grade]) => {
             const numericId = Number(assignmentId);
@@ -93,7 +98,7 @@ export default function InstructorDashboard() {
         );
         return { ...student, grades: filteredGrades };
       }),
-    [students, nonPracticeIds]
+    [studentsForStats, nonPracticeIds]
   );
 
   // Enrich assignments with calculated data
@@ -132,9 +137,7 @@ export default function InstructorDashboard() {
         avgAttempts: stats?.avg_attempt ?? null,
         submissions,
         totalStudents,
-        dueDate: assignment.dueDate
-          ? new Date(assignment.dueDate).toLocaleDateString()
-          : "—",
+        dueDate: formatEasternDateTime(assignment.dueDate, assignment.dueTime) ?? "—",
         dueAt,
         lateSubmissions: null,
       };
@@ -143,7 +146,6 @@ export default function InstructorDashboard() {
     filteredAssignmentStats,
     filteredGradebookSummary,
     nonPracticeAssignments,
-    students,
     studentsForAssignments,
     totalStudents,
   ]);

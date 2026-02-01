@@ -34,10 +34,10 @@ export const AssignmentOverviewTable = ({
     useCoursesState();
   const activeCourse = courses.find((c) => c.id === activeCourseId);
 
-  // Get assignments and gradebook from context
   const assignments = assignmentsProp ?? (assignmentsByCourse[activeCourseId] || []);
   const gradebook = gradebookByCourse[activeCourseId] || [];
-  const totalStudents = activeCourse?.studentCount || gradebook.length || 0;
+  const gradebookStudentsOnly = gradebook.filter((s) => s.role !== "ta");
+  const totalStudents = activeCourse?.studentCount ?? gradebookStudentsOnly.length;
 
   // Use course's grading scale or default
   const gradingScale = activeCourse?.gradingScale || getDefaultGradingScale();
@@ -45,15 +45,15 @@ export const AssignmentOverviewTable = ({
   const [selectedAssignmentId, setSelectedAssignmentId] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
 
-  // Calculate metrics from context
+  // Metrics use students only
   const assignmentsWithMetrics = assignments.map((assignment) => {
     const assignmentId = assignment?.id;
     const submissions =
       assignment.submissions ??
-      gradebook.filter((student) => student.grades[assignmentId] !== undefined)
+      gradebookStudentsOnly.filter((student) => student.grades[assignmentId] !== undefined)
         .length;
 
-    const grades = gradebook
+    const grades = gradebookStudentsOnly
       .map((student) => student.grades[assignmentId])
       .filter((grade) => grade !== undefined && grade !== null);
 
@@ -67,7 +67,7 @@ export const AssignmentOverviewTable = ({
 
     const lateSubmissions =
       assignment.lateSubmissions ??
-      gradebook.filter(
+      gradebookStudentsOnly.filter(
         (student) =>
           student.grades[assignmentId] !== undefined &&
           student.lateSubmissions?.[assignmentId]

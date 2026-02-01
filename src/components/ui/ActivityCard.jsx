@@ -9,6 +9,7 @@ import { HelpOutline as QuizIcon } from '@mui/icons-material'
 import SchoolIcon from '@mui/icons-material/School'
 import { ACTIVITY_TYPES } from '../../placeholder/courseActivities.js'
 import { formatDateTime } from '../../utils/formatting.js'
+import { parseDueDateAsEastern } from '../../utils/easternTime.js'
 
 export default function ActivityCard({ activity, onClick, completedProofs }) {
   const getActivityIcon = () => {
@@ -193,7 +194,7 @@ export default function ActivityCard({ activity, onClick, completedProofs }) {
                     <Typography
                       variant="caption"
                       sx={{
-                        color: activity.dueDate < new Date() ? 'error.main' : 'text.secondary',
+                        color: (parseDueDateAsEastern(activity.dueDate, activity.dueTime)?.getTime() ?? Infinity) < Date.now() ? 'error.main' : 'text.secondary',
                         fontWeight: 500
                       }}
                     >
