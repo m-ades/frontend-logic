@@ -59,6 +59,7 @@ export default function WorksheetTabs({
             completionPercent={completionPercent}
             gradeLabel={gradeLabel}
             isOverdue={isOverdue}
+            isAssignmentLocked={worksheet.isLocked ?? false}
           />
         </WorksheetTabPanel>
       ))}

@@ -68,7 +68,8 @@ export default function ProofTabs({
   total,
   completionPercent,
   gradeLabel,
-  isOverdue
+  isOverdue,
+  isAssignmentLocked = true,
 }) {
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
@@ -282,6 +283,7 @@ export default function ProofTabs({
                               onStateChange={(state) => handleProofStateChange(proof.id, state, {
                                 assignmentQuestionId: proof.questionId
                               })}
+                              isAssignmentLocked={isAssignmentLocked}
                             />
                           )
                         }

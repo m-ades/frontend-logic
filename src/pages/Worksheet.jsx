@@ -732,6 +732,7 @@ export default function Worksheet() {
         id: assignmentInfo.id,
         title: assignmentInfo.title,
         due_at: assignmentInfo.due_at ?? assignmentInfo.due_date ?? null,
+        isLocked: assignmentInfo.is_locked ?? false,
         proofs: questions.map((question, idx) =>
           mapQuestionToProof(question, assignmentInfo, idx)
         ),

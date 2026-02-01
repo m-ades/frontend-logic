@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback } from 'react'
 import { Alert, Box, Stack } from '@mui/material'
 import DerivationTable from './mui/DerivationTable.jsx'
 
-export default function ProofEditor({ proof, onProofComplete, savedState, onStateChange }) {
+export default function ProofEditor({ proof, onProofComplete, savedState, onStateChange, isAssignmentLocked = true }) {
   const [attemptCount, setAttemptCount] = useState(proof?.attemptCount ?? 0)
   const [attemptLimit, setAttemptLimit] = useState(proof?.attemptLimit ?? 10)
   const [isChecking, setIsChecking] = useState(false)
@@ -58,6 +58,7 @@ export default function ProofEditor({ proof, onProofComplete, savedState, onStat
         setAttemptLimit={setAttemptLimit}
         setStatusBanner={setStatusBanner}
         setIsChecking={setIsChecking}
+        isAssignmentLocked={isAssignmentLocked}
       />
 
       {(statusBanner.status === 'correct' || statusBanner.status === 'incorrect' || statusBanner.status === 'malfunction') && (

@@ -260,6 +260,7 @@ export default function DerivationTable({
   setAttemptLimit,
   setStatusBanner,
   setIsChecking,
+  isAssignmentLocked = true,
 }) {
   const formulaRefs = useRef({})
   const justRefs = useRef({})
@@ -749,7 +750,7 @@ export default function DerivationTable({
   }
 
   const handleStartOver = () => {
-    if (isLocked) return
+    if (isLocked || isAssignmentLocked) return
     const premLines = premises.map((p) => ({ formula: p, justification: '', readOnly: true }))
     const blanks = Array.from({ length: 1 }, () => ({ formula: '', justification: '', readOnly: false }))
     const nextLines = [...premLines, ...blanks]
@@ -759,6 +760,7 @@ export default function DerivationTable({
   }
 
   const handleSubmit = async () => {
+    if (isAssignmentLocked) return
     setIsChecking(true)
     try {
       const submission_data = buildSubmission(
@@ -812,6 +814,7 @@ export default function DerivationTable({
   }
 
   const isLocked = Number.isFinite(attemptLimit) && attemptCount >= attemptLimit
+  const submitDisabled = isLocked || isAssignmentLocked
 
   const handleSymbolInsert = ({ insert, pair }) => {
     const targetIdx = resolveEditableIndex()
@@ -1217,7 +1220,7 @@ export default function DerivationTable({
           onCheck={handleSubmit}
           onStartOver={handleStartOver}
           isChecking={isChecking}
-          isDisabled={isLocked}
+          isDisabled={submitDisabled}
           align="flex-start"
           attemptCount={attemptCount}
           attemptLimit={attemptLimit}
