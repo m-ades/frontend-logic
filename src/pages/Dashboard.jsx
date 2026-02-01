@@ -1,5 +1,5 @@
-import { Link } from 'react-router-dom'
-import { useEffect, useMemo, useState } from 'react'
+import { Link, useLocation } from 'react-router-dom'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import Grid from '@mui/material/Grid'
 import CardContent from '@mui/material/CardContent'
 import Typography from '@mui/material/Typography'
@@ -22,8 +22,6 @@ import {
   YAxis,
   XAxis,
   Tooltip,
-  AreaChart,
-  Area,
 } from 'recharts'
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday'
 import TrendingUpIcon from '@mui/icons-material/TrendingUp'
@@ -63,8 +61,137 @@ const emptyAnalytics = {
   submittedAssignmentIds: [],
 }
 
+const CACHE_MS = 30 * 1000
+
+function buildTimeline(grades, gradebookSummary) {
+  const gradeMap = new Map(
+    (grades || []).map((grade) => [
+      grade.assignment_id ?? grade.Assignment?.id,
+      grade,
+    ])
+  )
+  const unlockedSummary =
+    gradebookSummary?.length ?
+      gradebookSummary.filter((a) => !a.is_locked)
+    : []
+  if (unlockedSummary.length === 0) {
+    return (grades || [])
+      .map((grade) => {
+        const assignment = grade.Assignment || {}
+        const total = grade.max_score || 0
+        const score = grade.final_score ?? grade.raw_score ?? null
+        const percent = total > 0 && score !== null ? (score / total) * 100 : null
+        const date = assignment.due_at ?? assignment.due_date ?? grade.graded_at
+        return {
+          id: grade.id,
+          title: assignment.title || 'Assignment',
+          studentPercent: percent,
+          avgPercent: null,
+          medianPercent: null,
+          date,
+        }
+      })
+      .filter((item) => item.studentPercent != null)
+      .sort((a, b) => new Date(a.date) - new Date(b.date))
+  }
+  return unlockedSummary
+    .slice()
+    .sort((a, b) => {
+      const aDate = a.due_at ?? a.due_date ?? null
+      const bDate = b.due_at ?? b.due_date ?? null
+      const aD = aDate ? new Date(aDate) : null
+      const bD = bDate ? new Date(bDate) : null
+      if (aD && bD) return aD - bD
+      if (aD) return -1
+      if (bD) return 1
+      return (a.id ?? 0) - (b.id ?? 0)
+    })
+    .map((assignment) => {
+      const grade = gradeMap.get(assignment.id)
+      const total = grade?.max_score || 0
+      const score = grade?.final_score ?? grade?.raw_score ?? null
+      const fallbackPercent = total > 0 && score !== null ? score / total : null
+      return {
+        id: assignment.id,
+        title: assignment.title || 'Assignment',
+        avgPercent:
+          assignment.avg_percent != null ? assignment.avg_percent * 100 : null,
+        medianPercent:
+          assignment.median_percent != null ? assignment.median_percent * 100 : null,
+        studentPercent: fallbackPercent != null ? fallbackPercent * 100 : null,
+      }
+    })
+}
+
+function computeGradeOverview(grades, gradebookSummary) {
+  const gradedPercents = (grades || []).reduce((list, grade) => {
+    const max = grade?.max_score || 0
+    const score = grade?.final_score ?? grade?.raw_score
+    if (!max || score == null) return list
+    list.push({
+      percent: (score / max) * 100,
+      title: grade?.Assignment?.title || grade?.title || 'Assignment',
+    })
+    return list
+  }, [])
+  const totalMax = (grades || []).reduce((sum, g) => sum + (g.max_score || 0), 0)
+  const totalFinal = (grades || []).reduce(
+    (sum, g) => sum + (g.final_score ?? g.raw_score ?? 0),
+    0
+  )
+  const overallPercent = totalMax > 0 ? (totalFinal / totalMax) * 100 : null
+  const totalAssignments = gradebookSummary?.length || grades?.length || 0
+  const classAverageValues = (gradebookSummary || [])
+    .map((a) => a.avg_percent)
+    .filter((v) => v != null)
+  const classAverage =
+    classAverageValues.length > 0
+      ? (classAverageValues.reduce((s, v) => s + v, 0) / classAverageValues.length) * 100
+      : null
+  const lowestScores = gradedPercents
+    .slice()
+    .sort((a, b) => a.percent - b.percent)
+    .slice(0, 2)
+  const lowestGrade = lowestScores[0] ?? null
+  return {
+    percent: overallPercent,
+    letter: overallPercent != null ? getLetterGrade(overallPercent) : null,
+    classAverage,
+    completed: gradedPercents.length,
+    total: totalAssignments,
+    lowestScore: lowestGrade?.percent ?? null,
+    lowestTitle: lowestGrade?.title ?? null,
+    lowestScores,
+  }
+}
+
+function computeReleaseOverview(
+  analyticsAssignments,
+  allCoursesAssignments,
+  activeCourseId,
+  gradebookSummary
+) {
+  const totalAssignments = gradebookSummary?.length ?? 0
+  const forWhatsLeft = activeCourseId
+    ? (analyticsAssignments ?? allCoursesAssignments)
+    : (allCoursesAssignments ?? analyticsAssignments)
+  const upcoming = forWhatsLeft?.upcoming ?? 0
+  const pending = forWhatsLeft?.pending ?? 0
+  const overdueCount = forWhatsLeft?.overdue ?? 0
+  const pastDueDateCount = forWhatsLeft?.pastDueDateCount ?? overdueCount
+  const totalForWhatsLeft = forWhatsLeft?.total ?? totalAssignments
+  const pastDuePercent =
+    totalForWhatsLeft > 0 ? (pastDueDateCount / totalForWhatsLeft) * 100 : 0
+  const remainingPercent = totalForWhatsLeft > 0 ? 100 - pastDuePercent : 0
+  return {
+    pastDuePercent: Number(pastDuePercent.toFixed(1)),
+    remainingPercent: Number(remainingPercent.toFixed(1)),
+  }
+}
+
 export default function Dashboard() {
   const theme = useTheme()
+  const location = useLocation()
   const { user } = useAuthState()
   const { activeCourseId } = useCoursesState()
   const courseId = activeCourseId ?? API_CONFIG.courseId
@@ -96,6 +223,8 @@ export default function Dashboard() {
     ? 'instructor'
     : 'student'
 
+  const analyticsCacheRef = useRef({ courseId: null, time: 0 })
+
   const statCardSx = { height: '100%' }
   const statCardContentSx = {
     height: '100%',
@@ -108,167 +237,90 @@ export default function Dashboard() {
   useEffect(() => {
     let isMounted = true
 
-    const loadAnalytics = async () => {
+    const loadAnalytics = async (forceRefresh = false) => {
       if (!courseId) {
         if (isMounted) {
           setAnalytics(emptyAnalytics)
           setGradeTimeline([])
-          setReleaseOverview({
-            pastDuePercent: 0,
-            remainingPercent: 0,
-          })
+          setReleaseOverview({ pastDuePercent: 0, remainingPercent: 0 })
           setIsLoadingAnalytics(false)
         }
         return
       }
+
+      const cache = analyticsCacheRef.current
+      const now = Date.now()
+      if (
+        !forceRefresh &&
+        cache.courseId === courseId &&
+        cache.time > 0 &&
+        now - cache.time < CACHE_MS
+      ) {
+        return
+      }
+
       try {
-          if (isMounted) {
-            setIsLoadingAnalytics(true)
-          }
-          const [analyticsData, grades, gradebookSummary] = await Promise.all([
-            fetchJson(`/api/analytics/student?userId=${getActiveUserId()}&courseId=${courseId}`),
-            fetchJson(`/api/users/${getActiveUserId()}/grades`),
-            fetchJson(`/api/analytics/gradebook-summary?courseId=${courseId}`).catch(() => null),
+        if (isMounted) setIsLoadingAnalytics(true)
+        const cacheBust = `_=${now}`
+        const gradebookPromise = activeCourseId
+          ? fetchJson(`/api/analytics/gradebook-summary?courseId=${activeCourseId}&${cacheBust}`).catch(() => null)
+          : Promise.resolve(null)
+        const [analyticsData, grades, gradebookSummary, allCoursesAnalytics] =
+          await Promise.all([
+            fetchJson(`/api/analytics/student?userId=${getActiveUserId()}&courseId=${courseId}&${cacheBust}`),
+            fetchJson(`/api/users/${getActiveUserId()}/grades?${cacheBust}`),
+            gradebookPromise,
+            fetchJson(`/api/analytics/student?userId=${getActiveUserId()}&${cacheBust}`).catch(() => null),
           ])
-        if (isMounted) {
-          setAnalytics({ ...emptyAnalytics, ...analyticsData })
-          const userId = getActiveUserId()
-          const gradeMap = new Map(
-            (grades || []).map((grade) => [
-              grade.assignment_id ?? grade.Assignment?.id,
-              grade,
-            ])
+
+        if (!isMounted) return
+
+        setAnalytics({ ...emptyAnalytics, ...analyticsData })
+        setGradeTimeline(buildTimeline(grades, gradebookSummary))
+        setGradeOverview(computeGradeOverview(grades, gradebookSummary))
+        setReleaseOverview(
+          computeReleaseOverview(
+            analyticsData?.assignments,
+            allCoursesAnalytics?.assignments,
+            activeCourseId,
+            gradebookSummary
           )
-          const unlockedSummary = gradebookSummary?.length
-            ? gradebookSummary.filter((assignment) => !assignment.is_locked)
-            : []
-          const timeline = unlockedSummary.length
-            ? unlockedSummary
-                .slice()
-                .sort((a, b) => {
-                  const aDateValue = a.due_at ?? a.due_date ?? null
-                  const bDateValue = b.due_at ?? b.due_date ?? null
-                  const aDate = aDateValue ? new Date(aDateValue) : null
-                  const bDate = bDateValue ? new Date(bDateValue) : null
-                  if (aDate && bDate) return aDate - bDate
-                  if (aDate) return -1
-                  if (bDate) return 1
-                  return (a.id ?? 0) - (b.id ?? 0)
-                })
-                .map((assignment) => {
-                  const grade = gradeMap.get(assignment.id)
-                  const total = grade?.max_score || 0
-                  const score = grade?.final_score ?? grade?.raw_score ?? null
-                  const fallbackPercent = total > 0 && score !== null ? score / total : null
-                  return {
-                    id: assignment.id,
-                    title: assignment.title || 'Assignment',
-                    avgPercent: assignment.avg_percent !== null && assignment.avg_percent !== undefined
-                      ? assignment.avg_percent * 100
-                      : null,
-                    medianPercent: assignment.median_percent !== null && assignment.median_percent !== undefined
-                      ? assignment.median_percent * 100
-                      : null,
-                    studentPercent:
-                      fallbackPercent !== null
-                          ? fallbackPercent * 100
-                          : null,
-                  }
-                })
-            : (grades || [])
-                .map((grade) => {
-                  const assignment = grade.Assignment || {}
-                  const total = grade.max_score || 0
-                  const score = grade.final_score ?? grade.raw_score ?? null
-                  const percent = total > 0 && score !== null ? (score / total) * 100 : null
-                  const date = assignment.due_at ?? assignment.due_date ?? grade.graded_at
-                  return {
-                    id: grade.id,
-                    title: assignment.title || 'Assignment',
-                    studentPercent: percent,
-                    avgPercent: null,
-                    medianPercent: null,
-                    date,
-                  }
-                })
-                .filter((item) => item.studentPercent !== null)
-                .sort((a, b) => new Date(a.date) - new Date(b.date))
-          setGradeTimeline(timeline)
-
-          const gradedPercents = (grades || []).reduce((list, grade) => {
-            const max = grade?.max_score || 0
-            const score = grade?.final_score ?? grade?.raw_score
-            if (!max || score === null || score === undefined) return list
-            list.push({
-              percent: (score / max) * 100,
-              title: grade?.Assignment?.title || grade?.title || 'Assignment',
-            })
-            return list
-          }, [])
-
-          const totalMax = (grades || []).reduce((sum, grade) => sum + (grade.max_score || 0), 0)
-          const totalFinal = (grades || []).reduce(
-            (sum, grade) => sum + (grade.final_score ?? grade.raw_score ?? 0),
-            0
-          )
-          const overallPercent = totalMax > 0 ? (totalFinal / totalMax) * 100 : null
-          const completedAssignments = gradedPercents.length
-          const totalAssignments = gradebookSummary?.length || grades?.length || 0
-          const classAverageValues = (gradebookSummary || [])
-            .map((assignment) => assignment.avg_percent)
-            .filter((value) => value !== null && value !== undefined)
-          const classAverage =
-            classAverageValues.length > 0
-              ? (classAverageValues.reduce((sum, value) => sum + value, 0) / classAverageValues.length) * 100
-              : null
-          const lowestScores = gradedPercents
-            .slice()
-            .sort((a, b) => a.percent - b.percent)
-            .slice(0, 2)
-          const lowestGrade = lowestScores[0] ?? null
-
-          setGradeOverview({
-            percent: overallPercent,
-            letter: overallPercent !== null ? getLetterGrade(overallPercent) : null,
-            classAverage,
-            completed: completedAssignments,
-            total: totalAssignments,
-            lowestScore: lowestGrade?.percent ?? null,
-            lowestTitle: lowestGrade?.title ?? null,
-            lowestScores,
-          })
-
-          const overdueCount = analyticsData?.assignments?.overdue ?? 0
-          const remainingCount = Math.max(0, totalAssignments - overdueCount)
-          const pastDuePercent = totalAssignments > 0 ? (overdueCount / totalAssignments) * 100 : 0
-          const remainingPercent = totalAssignments > 0 ? (remainingCount / totalAssignments) * 100 : 0
-
-          setReleaseOverview({
-            pastDuePercent: Number(pastDuePercent.toFixed(1)),
-            remainingPercent: Number(remainingPercent.toFixed(1)),
-          })
-        }
+        )
+        analyticsCacheRef.current = { courseId, time: Date.now() }
       } catch (error) {
         if (isMounted) {
           console.warn('Failed to load analytics', error)
           setAnalytics(emptyAnalytics)
           setGradeTimeline([])
-          setReleaseOverview({
-            pastDuePercent: 0,
-            remainingPercent: 0,
-          })
+          setReleaseOverview({ pastDuePercent: 0, remainingPercent: 0 })
         }
       } finally {
-        if (isMounted) {
-          setIsLoadingAnalytics(false)
-        }
+        if (isMounted) setIsLoadingAnalytics(false)
       }
     }
 
-    loadAnalytics()
+    loadAnalytics(true)
+
+    const onAssignmentSubmission = () => {
+      if (courseId) loadAnalytics(true)
+    }
+    const handleVisibility = () => {
+      if (typeof document !== 'undefined' && document.visibilityState === 'visible') {
+        loadAnalytics(false)
+      }
+    }
+    const handleFocus = () => {
+      if (courseId && location.pathname === '/student/dashboard') loadAnalytics(false)
+    }
+    window.addEventListener('assignment-submission', onAssignmentSubmission)
+    document.addEventListener('visibilitychange', handleVisibility)
+    window.addEventListener('focus', handleFocus)
 
     return () => {
       isMounted = false
+      window.removeEventListener('assignment-submission', onAssignmentSubmission)
+      document.removeEventListener('visibilitychange', handleVisibility)
+      window.removeEventListener('focus', handleFocus)
     }
   }, [courseId])
 
@@ -302,14 +354,6 @@ export default function Dashboard() {
       isMounted = false
     }
   }, [dashboardMode])
-
-  const randomData = useMemo(() => {
-    const base = analytics.performance.avg_attempt || 1
-    const count = analytics.submissionCount || 1
-    return Array.from({ length: 10 }, (_, index) => ({
-      value: Math.round(base * 100 + count * 2 + index * 5),
-    }))
-  }, [analytics.performance.avg_attempt, analytics.submissionCount])
 
   const assignmentStats = analytics.assignments || emptyAnalytics.assignments
 
@@ -419,8 +463,8 @@ export default function Dashboard() {
                     <PieChart>
                       <Pie
                         data={[
-                          { value: releaseOverview.pastDuePercent },
-                          { value: releaseOverview.remainingPercent },
+                          { value: releaseOverview.pastDuePercent, name: 'Past due' },
+                          { value: releaseOverview.remainingPercent, name: 'Remaining' },
                         ]}
                         innerRadius="62%"
                         outerRadius="78%"
@@ -547,18 +591,6 @@ export default function Dashboard() {
                       {item.subtext}
                     </Typography>
                   </Box>
-                  <ResponsiveContainer width="100%" height={30}>
-                    <AreaChart data={randomData}>
-                      <Area
-                        type="monotone"
-                        dataKey="value"
-                        stroke={theme.palette.secondary.main}
-                        fill={theme.palette.secondary.light}
-                        strokeWidth={2}
-                        fillOpacity={0.3}
-                      />
-                    </AreaChart>
-                  </ResponsiveContainer>
                 </Box>
               ))}
             </Box>
