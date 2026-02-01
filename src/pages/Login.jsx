@@ -63,19 +63,17 @@ export default function Login() {
 
       let role = 'student';
       try {
-        const enrollments = await fetchJson('/api/course-enrollments');
-        const hasInstructorEnrollment = (enrollments || []).some((enrollment) =>
-          enrollment.role === 'instructor'
-        );
-        const hasTaEnrollment = (enrollments || []).some((enrollment) =>
-          enrollment.role === 'ta'
-        );
-        if (hasInstructorEnrollment) {
+        if (data?.user?.is_system_admin) {
           role = 'instructor';
-        } else if (hasTaEnrollment) {
-          role = 'ta';
-        } else if (data?.user?.is_system_admin) {
-          role = 'instructor';
+        } else {
+          const enrollments = await fetchJson('/api/course-enrollments');
+          const hasInstructor = (enrollments || []).some((e) => e.role === 'instructor');
+          const hasTa = (enrollments || []).some((e) => e.role === 'ta');
+          if (hasInstructor) {
+            role = 'instructor';
+          } else if (hasTa) {
+            role = 'ta';
+          }
         }
       } catch (enrollmentError) {
         console.warn('Failed to load enrollments for role routing', enrollmentError);
