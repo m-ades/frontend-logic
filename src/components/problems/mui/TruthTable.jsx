@@ -632,7 +632,7 @@ export default function TruthTable({
       ? solutionTables
       : solutionTablesFromProblem
   const showSolution =
-    attemptCount >= attemptLimit && displaySolutionTables.length > 0
+    attemptCount >= attemptLimit && status !== 'correct' && displaySolutionTables.length > 0
 
   // Correct multiple-choice answer for solution reveal (from proof.solution or derived from problem)
   const solutionMcValues = React.useMemo(() => {

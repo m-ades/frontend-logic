@@ -38,7 +38,7 @@ export default function TrueFalse({
     attemptLimit,
     initialAttemptCount: savedState?.attemptCount ?? 0,
   })
-  const showSolution = isLocked && typeof answer === 'boolean'
+  const showSolution = isLocked && status !== 'correct' && typeof answer === 'boolean'
 
   useEffect(() => {
     if (savedState?.ans === undefined) {

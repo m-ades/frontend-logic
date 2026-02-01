@@ -50,7 +50,7 @@ export default function MultipleChoice({
         : (savedState?.ans !== undefined ? String(savedState.ans) : '')
   )
   
-  const { message, isChecking, handleCheck, handleStartOver, getStatusColor, setStatus, setMessage, attemptCount, maxAttempts, isLocked } = useProblemChecker({
+  const { status, message, isChecking, handleCheck, handleStartOver, getStatusColor, setStatus, setMessage, attemptCount, maxAttempts, isLocked } = useProblemChecker({
     answer,
     problemType: 'multiple-choice',
     question: problem,
@@ -88,7 +88,7 @@ export default function MultipleChoice({
     initialAttemptCount: savedState?.attemptCount ?? 0,
   })
   const correctAnswer = answer ?? problem?.answer ?? problem?.answerIndex ?? problem?.answerIndices
-  const showSolution = isLocked && (isComposite || correctAnswer !== undefined && correctAnswer !== null)
+  const showSolution = isLocked && status !== 'correct' && (isComposite || correctAnswer !== undefined && correctAnswer !== null)
   // match checker rules
   const isSubmitDisabled = isLocked || (
     isComposite

@@ -136,7 +136,7 @@ export default function SymbolicTranslation({
     }, 200)
   }, [onStateChange])
   
-  const { message, isChecking, handleCheck, handleStartOver, getStatusColor, setMessage, attemptCount, maxAttempts, isLocked } = useProblemChecker({
+  const { status, message, isChecking, handleCheck, handleStartOver, getStatusColor, setMessage, attemptCount, maxAttempts, isLocked } = useProblemChecker({
     answer,
     problemType: 'symbolic-translation',
     question: problem,
@@ -161,7 +161,7 @@ export default function SymbolicTranslation({
     attemptLimit,
     initialAttemptCount: savedState?.attemptCount ?? 0,
   })
-  const showSolution = isLocked
+  const showSolution = isLocked && status !== 'correct'
 
   useEffect(() => {
     if (hasHydratedRef.current) return

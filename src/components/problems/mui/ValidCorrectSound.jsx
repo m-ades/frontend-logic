@@ -47,7 +47,7 @@ export default function ValidCorrectSound({
     attemptLimit,
     initialAttemptCount: savedState?.attemptCount ?? 0,
   })
-  const showSolution = isLocked
+  const showSolution = isLocked && status !== 'correct'
   
   const handleCheck = async () => {
     const ans = buildAnswerPayload(answers)

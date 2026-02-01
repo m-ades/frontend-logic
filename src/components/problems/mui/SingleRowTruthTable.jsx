@@ -338,7 +338,7 @@ export default function SingleRowTruthTable({
                 </Select>
               </FormControl>
             </Stack>
-            {isLocked && expectedRow.length > 0 && (
+            {isLocked && status !== 'correct' && expectedRow.length > 0 && (
               /* show answer in card */
               renderAnswerBlock(
                 'Correct Answer',
