@@ -950,7 +950,7 @@ export default function DerivationTable({
   const isLocked = Number.isFinite(attemptLimit) && attemptCount >= attemptLimit
   const submitDisabled = isLocked || isAssignmentLocked
 
-  const handleSymbolInsert = ({ insert, pair }) => {
+  const handleSymbolInsert = ({ insert, pair, focusAfter = true }) => {
     const targetIdx = resolveEditableIndex()
     if (targetIdx === -1 || targetIdx === null) return
     const inputEl = formulaRefs.current[targetIdx]
@@ -971,9 +971,11 @@ export default function DerivationTable({
     if (inputEl && typeof inputEl.setRangeText === 'function') {
       inputEl.setRangeText(insertText, start, end, 'end')
       handleLineChange(targetIdx, 'formula', inputEl.value ?? '')
-      inputEl.focus()
       setStoredSelection(targetIdx, nextCursor)
-      setTimeout(() => inputEl.setSelectionRange(nextCursor, nextCursor), 0)
+      if (focusAfter) {
+        inputEl.focus()
+        setTimeout(() => inputEl.setSelectionRange(nextCursor, nextCursor), 0)
+      }
       return
     }
     const before = current.slice(0, start)
@@ -981,7 +983,7 @@ export default function DerivationTable({
     const nextValue = `${before}${insertText}${after}`
     handleLineChange(targetIdx, 'formula', nextValue)
     setStoredSelection(targetIdx, nextCursor)
-    if (inputEl) {
+    if (inputEl && focusAfter) {
       inputEl.focus()
       setTimeout(() => inputEl.setSelectionRange(nextCursor, nextCursor), 0)
     }
@@ -1115,7 +1117,7 @@ export default function DerivationTable({
                     {(`// ${proof.conclusion || ''}`).split('').map((char, i) => {
                       const isLetter = /^[a-zA-Z]$/.test(char)
                       return isLetter ? (
-                        <Box component="span" key={`conc-${i}`} className="clickable-char" onPointerDown={(e) => e.preventDefault()} onClick={() => handleSymbolInsert({ insert: char })} aria-label={`Insert ${char}`}>
+                        <Box component="span" key={`conc-${i}`} className="clickable-char" onPointerDown={(e) => e.preventDefault()} onClick={() => handleSymbolInsert({ insert: char, focusAfter: !(isMobile && isFullScreen) })} aria-label={`Insert ${char}`}>
                           {char}
                         </Box>
                       ) : (
@@ -1189,7 +1191,7 @@ export default function DerivationTable({
                             key={`${idx}-${i}`}
                             className="clickable-char"
                             onPointerDown={(e) => e.preventDefault()}
-                            onClick={() => handleSymbolInsert({ insert: char })}
+                            onClick={() => handleSymbolInsert({ insert: char, focusAfter: !(isMobile && isFullScreen) })}
                             aria-label={`Insert ${char}`}
                           >
                             {char}
@@ -1283,7 +1285,7 @@ export default function DerivationTable({
                         {(proof?.conclusion ? `// ${proof.conclusion}` : '').split('').map((char, i) => {
                           const isLetter = /^[a-zA-Z]$/.test(char)
                           return isLetter ? (
-                            <Box component="span" key={`conc-row-${idx}-${i}`} className="clickable-char" onPointerDown={(e) => e.preventDefault()} onClick={() => handleSymbolInsert({ insert: char })} aria-label={`Insert ${char}`}>
+                            <Box component="span" key={`conc-row-${idx}-${i}`} className="clickable-char" onPointerDown={(e) => e.preventDefault()} onClick={() => handleSymbolInsert({ insert: char, focusAfter: !(isMobile && isFullScreen) })} aria-label={`Insert ${char}`}>
                               {char}
                             </Box>
                           ) : (
