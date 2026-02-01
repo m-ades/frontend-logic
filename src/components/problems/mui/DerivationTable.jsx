@@ -281,6 +281,10 @@ export default function DerivationTable({
   setStatusBanner,
   setIsChecking,
   isAssignmentLocked = true,
+  isMobile = false,
+  isFullScreen = false,
+  onOpenFullScreen,
+  onCloseFullScreen,
 }) {
   const formulaRefs = useRef({})
   const justRefs = useRef({})
@@ -914,16 +918,38 @@ export default function DerivationTable({
     }
   }
 
+  const canOpenFullScreen = isMobile && !isFullScreen && typeof onOpenFullScreen === 'function'
+
+  const handleTableAreaClick = useCallback(
+    (e) => {
+      if (!canOpenFullScreen) return
+      const interactive = e.target.closest(
+        'input, textarea, button, [role="button"], select, .MuiInputBase-root, .MuiSelect-select, .MuiAutocomplete-root'
+      )
+      if (interactive) return
+      e.preventDefault?.()
+      e.stopPropagation?.()
+      onOpenFullScreen()
+    },
+    [canOpenFullScreen, onOpenFullScreen]
+  )
+
   return (
-    <Stack spacing={2}>
-      <ThemedCard
-        sx={{
-          p: { xs: 2, md: 2.5 },
-          borderRadius: 3,
-          border: (theme) => `1px solid ${theme.palette.divider}`,
-        }}
-      >
-        {proof.description && (
+    <Stack spacing={2} sx={isFullScreen ? { flex: 1, minHeight: 0, minWidth: 0, overflow: 'auto' } : undefined}>
+      {(() => {
+        const Wrapper = isFullScreen ? Box : ThemedCard
+        const wrapperSx = isFullScreen
+          ? { p: 2, position: 'relative', flex: 1, minHeight: 0, minWidth: 0, display: 'flex', flexDirection: 'column' }
+          : {
+              p: { xs: 2, md: 2.5 },
+              borderRadius: 3,
+              border: (theme) => `1px solid ${theme.palette.divider}`,
+              position: 'relative',
+              ...(canOpenFullScreen ? { cursor: 'pointer' } : {}),
+            }
+        return (
+          <Wrapper sx={wrapperSx}>
+        {proof.description && !isFullScreen && (
           <Box sx={{ mb: 2 }}>
             <PromptText content={proof.description} sx={{ fontSize: 15 }} />
           </Box>
@@ -962,8 +988,16 @@ export default function DerivationTable({
             </ToggleButtonGroup>
           </Box>
         )}
-        <TableContainer component={Box} sx={{ width: '100%' }}>
-          <Table size="medium" sx={{ width: 'auto' }}>
+        <TableContainer
+          component={Box}
+          sx={{
+            width: '100%',
+            ...(isFullScreen ? { overflowX: 'hidden', overflow: 'visible' } : { overflowX: 'auto', WebkitOverflowScrolling: 'touch' }),
+          }}
+          onClick={canOpenFullScreen ? handleTableAreaClick : undefined}
+          onPointerDown={canOpenFullScreen ? handleTableAreaClick : undefined}
+        >
+          <Table size="medium" sx={isFullScreen ? { tableLayout: 'fixed', width: '100%' } : { width: 'auto', minWidth: 280 }}>
             <TableBody>
             {premises.length === 0 && proof?.conclusion && (
               <TableRow
@@ -972,17 +1006,18 @@ export default function DerivationTable({
                   '& td': {
                     py: 0.5,
                     position: 'relative',
+                    verticalAlign: 'middle',
                   },
                 }}
               >
-                <TableCell sx={{ width: 48, borderBottom: 'none' }}>
+                <TableCell sx={{ width: isFullScreen ? 36 : 48, minWidth: isFullScreen ? 36 : undefined, borderBottom: 'none', verticalAlign: 'middle' }}>
                   <Typography sx={{ color: 'transparent' }}>—</Typography>
                 </TableCell>
-                <TableCell sx={{ borderBottom: 'none', width: 'auto', pr: 0.5, whiteSpace: 'nowrap' }}>
+                <TableCell sx={{ borderBottom: 'none', pr: 0.5, verticalAlign: 'middle', ...(isFullScreen ? { width: '55%', minWidth: 0 } : { width: 'auto', whiteSpace: 'nowrap' }) }}>
                   <Typography sx={{ color: 'transparent' }}>—</Typography>
                 </TableCell>
-                <TableCell sx={{ borderBottom: 'none', width: 'auto', pl: 0.5, whiteSpace: 'nowrap' }}>
-                  <Typography component="span" sx={{ fontSize: 16, color: 'text.primary' }}>
+                <TableCell sx={{ borderBottom: 'none', pl: 0.5, verticalAlign: 'middle', ...(isFullScreen ? { width: '45%', minWidth: 0 } : { width: 'auto', whiteSpace: 'nowrap' }) }}>
+                  <Typography component="span" sx={{ fontSize: isFullScreen ? 14 : 16, color: 'text.primary' }}>
                     {`// ${proof.conclusion}`}
                   </Typography>
                 </TableCell>
@@ -999,13 +1034,14 @@ export default function DerivationTable({
                     py: 0.5,
                     position: 'relative',
                     left: indentPx ? `${indentPx}px` : 0,
+                    verticalAlign: 'middle',
                   },
                 }}
               >
-                <TableCell sx={{ width: 48, borderBottom: 'none', color: '#4f5b7a', fontWeight: 600 }}>
+                <TableCell sx={{ width: isFullScreen ? 36 : 48, minWidth: isFullScreen ? 36 : undefined, borderBottom: 'none', color: '#4f5b7a', fontWeight: 600, verticalAlign: 'middle' }}>
                   {idx + 1}
                 </TableCell>
-                <TableCell sx={{ borderBottom: 'none', width: 'auto', pr: 0.5, whiteSpace: 'nowrap' }}>
+                <TableCell sx={{ borderBottom: 'none', pr: 0.5, verticalAlign: 'middle', ...(isFullScreen ? { width: '55%', minWidth: 0 } : { width: 'auto', whiteSpace: 'nowrap' }) }}>
                   <TextField
                     variant="standard"
                     placeholder=""
@@ -1046,32 +1082,33 @@ export default function DerivationTable({
                       updateCursorPosition(idx, e)
                     }}
                     sx={(theme) => ({
-                      width: { xs: '100%', md: 280 },
+                      width: isFullScreen ? '100%' : { xs: '100%', md: 280 },
+                      minWidth: isFullScreen ? 0 : undefined,
                       ...getInputUnderlineSx(theme),
-                      '& .MuiInputBase-input': { fontSize: 16, py: 1 },
+                      '& .MuiInputBase-input': { fontSize: isFullScreen ? 14 : 16, py: 1 },
                     })}
                   />
                 </TableCell>
                 <TableCell
                   sx={{
                     borderBottom: 'none',
-                    width: 'auto',
                     pl: 0.5,
-                    whiteSpace: 'nowrap',
+                    verticalAlign: 'middle',
+                    ...(isFullScreen ? { width: '45%', minWidth: 0 } : { width: 'auto', whiteSpace: 'nowrap' }),
                     '& .line-delete': { opacity: 0, transition: 'opacity 120ms ease' },
                     '&:hover .line-delete': { opacity: 1 },
                   }}
                 >
                   {idx < premises.length ? (
                     idx === premises.length - 1 ? (
-                      <Typography component="span" sx={{ fontSize: 16, color: 'text.primary' }}>
+                      <Typography component="span" sx={{ fontSize: isFullScreen ? 14 : 16, color: 'text.primary' }}>
                         {proof?.conclusion ? `// ${proof.conclusion}` : ''}
                       </Typography>
                     ) : (
                       <Typography sx={{ color: 'transparent' }}>—</Typography>
                     )
                   ) : (
-                    <Stack direction="row" spacing={0.5} alignItems="center" sx={{ flexWrap: 'nowrap' }}>
+                    <Stack direction="row" spacing={0.5} alignItems="center" sx={{ flexWrap: 'nowrap', gap: 0, minWidth: 0 }}>
                       {useRuleDropdown ? (
                         <>
                           {!ASSUMPTION_RULES.has(getRuleFromJustification(line.justification).toUpperCase()) && (
@@ -1114,7 +1151,7 @@ export default function DerivationTable({
                             />
                           )}
                           {allowedRules.length > 0 && (
-                            <FormControl variant="standard" sx={{ minWidth: 70 }}>
+                            <FormControl variant="standard" sx={{ minWidth: isFullScreen ? 56 : 70 }}>
                               <Select
                                 value={getRuleFromJustification(line.justification)}
                                 displayEmpty
@@ -1198,10 +1235,11 @@ export default function DerivationTable({
                           inputProps={{ autoComplete: 'off' }}
                           inputRef={(el) => { if (el) justRefs.current[idx] = el }}
                           sx={(theme) => ({
-                            width: 110,
-                            maxWidth: 110,
+                            width: isFullScreen ? '100%' : 110,
+                            maxWidth: isFullScreen ? '100%' : 110,
+                            minWidth: isFullScreen ? 0 : undefined,
                             ...getInputUnderlineSx(theme),
-                            '& .MuiInputBase-input': { fontSize: 16, py: 1 },
+                            '& .MuiInputBase-input': { fontSize: isFullScreen ? 14 : 16, py: 1 },
                           })}
                         />
                       )}
@@ -1229,23 +1267,23 @@ export default function DerivationTable({
               </TableRow>
               )
             })}
-            <TableRow>
-              <TableCell sx={{ width: 48, borderBottom: 'none' }}>
+            <TableRow sx={{ '& td': { verticalAlign: 'middle' } }}>
+              <TableCell sx={{ width: isFullScreen ? 36 : 48, minWidth: isFullScreen ? 36 : undefined, borderBottom: 'none', verticalAlign: 'middle' }}>
                 <Tooltip title="New line">
                   <IconButton onClick={addLine} size="small" aria-label="Add line" disabled={!canAddLine}>
                     <SubdirectoryArrowRightIcon />
                   </IconButton>
                 </Tooltip>
               </TableCell>
-              <TableCell sx={{ borderBottom: 'none', pl: 0.5 }} colSpan={2}>
-                <Stack direction="row" alignItems="center" sx={{ overflowX: 'auto', py: 0.5 }}>
+              <TableCell sx={{ borderBottom: 'none', pl: 0.5, verticalAlign: 'middle' }} colSpan={2}>
+                <Stack direction="row" alignItems="center" sx={{ overflowX: isFullScreen ? 'hidden' : 'auto', overflowY: 'hidden', py: 0.5, WebkitOverflowScrolling: 'touch' }}>
                   <Box
                     sx={{
                       display: 'flex',
                       alignItems: 'center',
-                      gap: 0.75,
-                      flexWrap: 'nowrap',
-                      minWidth: 'max-content',
+                      gap: isFullScreen ? 0.5 : 0.75,
+                      flexWrap: isFullScreen ? 'wrap' : 'nowrap',
+                      minWidth: isFullScreen ? 0 : 'max-content',
                       pr: 1,
                     }}
                   >
@@ -1273,10 +1311,10 @@ export default function DerivationTable({
                         }}
                         onClick={() => handleSymbolInsert({ insert, pair })}
                         sx={{
-                          minWidth: 34,
-                          px: 1,
+                          minWidth: isFullScreen ? 28 : 34,
+                          px: isFullScreen ? 0.75 : 1,
                           py: 0.35,
-                          fontSize: '0.95rem',
+                          fontSize: isFullScreen ? '0.8125rem' : '0.95rem',
                           lineHeight: 1.1,
                           minHeight: 32,
                           fontWeight: 600,
@@ -1338,7 +1376,9 @@ export default function DerivationTable({
           </Box>
         )}
 
-      </ThemedCard>
+          </Wrapper>
+        )
+      })()}
       <Box sx={{ mt: 1 }}>
         <ProblemSetButtons
           onCheck={handleSubmit}
