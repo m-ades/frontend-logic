@@ -4,10 +4,45 @@ import { Alert, Box, IconButton, Stack, useMediaQuery, useTheme } from '@mui/mat
 import CloseIcon from '@mui/icons-material/Close'
 import DerivationTable from './mui/DerivationTable.jsx'
 
-export default function ProofEditor({ proof, onProofComplete, savedState, onStateChange, isAssignmentLocked = true }) {
+export default function ProofEditor({
+  proof,
+  onProofComplete,
+  savedState,
+  onStateChange,
+  isAssignmentLocked = true,
+  // optional: when provided (e.g. from ProofTabs), fullscreen state is controlled so Next keeps fullscreen
+  fullScreenOpen: fullScreenOpenProp,
+  fullScreenFocusTarget: fullScreenFocusTargetProp,
+  onOpenFullScreen: onOpenFullScreenProp,
+  onCloseFullScreen: onCloseFullScreenProp,
+}) {
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('md')) // mobile breakpoint
-  const [fullScreenOpen, setFullScreenOpen] = useState(false)
+  const [internalOpen, setInternalOpen] = useState(false)
+  const [internalFocus, setInternalFocus] = useState(null)
+  const isControlled = typeof onOpenFullScreenProp === 'function'
+  const fullScreenOpen = isControlled ? (fullScreenOpenProp ?? false) : internalOpen
+  const fullScreenFocusTarget = isControlled ? (fullScreenFocusTargetProp ?? null) : internalFocus
+  const openFullScreen = useCallback(
+    (focusTarget) => {
+      if (isControlled) onOpenFullScreenProp(focusTarget ?? null)
+      else {
+        setInternalFocus(focusTarget ?? null)
+        setInternalOpen(true)
+      }
+    },
+    [isControlled, onOpenFullScreenProp]
+  )
+  const closeFullScreen = useCallback(
+    () => {
+      if (isControlled) onCloseFullScreenProp?.()
+      else {
+        setInternalOpen(false)
+        setInternalFocus(null)
+      }
+    },
+    [isControlled, onCloseFullScreenProp]
+  )
   const [attemptCount, setAttemptCount] = useState(proof?.attemptCount ?? 0)
   const [attemptLimit, setAttemptLimit] = useState(proof?.attemptLimit ?? 10)
   const [isChecking, setIsChecking] = useState(false)
@@ -73,7 +108,7 @@ export default function ProofEditor({ proof, onProofComplete, savedState, onStat
       {/* close bar flush right */}
       <Box sx={{ display: 'flex', justifyContent: 'flex-end', pt: 1, pb: 1, pl: 1, pr: 0, flexShrink: 0 }}>
         <IconButton
-          onClick={() => setFullScreenOpen(false)}
+          onClick={closeFullScreen}
           aria-label="Close full screen"
           size="large"
           sx={{ color: 'text.primary' }}
@@ -97,8 +132,10 @@ export default function ProofEditor({ proof, onProofComplete, savedState, onStat
         isAssignmentLocked={isAssignmentLocked}
         isMobile={isMobile}
         isFullScreen={true}
-        onOpenFullScreen={() => setFullScreenOpen(true)}
-        onCloseFullScreen={() => setFullScreenOpen(false)}
+        initialFocusLineIndex={fullScreenFocusTarget?.lineIndex}
+        initialFocusField={fullScreenFocusTarget?.field}
+        onOpenFullScreen={openFullScreen}
+        onCloseFullScreen={closeFullScreen}
       />
     </Box>,
     document.body
@@ -126,8 +163,8 @@ export default function ProofEditor({ proof, onProofComplete, savedState, onStat
             isAssignmentLocked={isAssignmentLocked}
             isMobile={isMobile}
             isFullScreen={false}
-            onOpenFullScreen={() => setFullScreenOpen(true)}
-            onCloseFullScreen={() => setFullScreenOpen(false)}
+            onOpenFullScreen={openFullScreen}
+            onCloseFullScreen={closeFullScreen}
           />
         )}
 

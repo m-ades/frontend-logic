@@ -76,6 +76,9 @@ export default function ProofTabs({
   const proofRefs = React.useRef({})
   const [direction, setDirection] = React.useState('forward')
   const prevIndexRef = React.useRef(currentProofIndex)
+  // lift fullscreen so Next keeps fullscreen and shows next question in fullscreen
+  const [fullScreenOpen, setFullScreenOpen] = React.useState(false)
+  const [fullScreenFocusTarget, setFullScreenFocusTarget] = React.useState(null)
   
   const handleTabChange = (e, newValue) => {
     const currentProof = proofs[currentProofIndex]
@@ -275,15 +278,25 @@ export default function ProofTabs({
                           // only worksheets 14-16 and practice set (17) use derivation
                           // default to derivation if type is not specified (backwards compatibility)
                           return (
-                            <ProofEditor 
-                              key={`proof-${proof.id}`} 
-                              proof={proof} 
+                            <ProofEditor
+                              key={`proof-${proof.id}`}
+                              proof={proof}
                               onProofComplete={onProofComplete}
                               savedState={savedStateWithAttempts}
                               onStateChange={(state) => handleProofStateChange(proof.id, state, {
                                 assignmentQuestionId: proof.questionId
                               })}
                               isAssignmentLocked={isAssignmentLocked}
+                              fullScreenOpen={fullScreenOpen}
+                              fullScreenFocusTarget={fullScreenFocusTarget}
+                              onOpenFullScreen={(focusTarget) => {
+                                setFullScreenFocusTarget(focusTarget ?? null)
+                                setFullScreenOpen(true)
+                              }}
+                              onCloseFullScreen={() => {
+                                setFullScreenOpen(false)
+                                setFullScreenFocusTarget(null)
+                              }}
                             />
                           )
                         }

@@ -307,6 +307,8 @@ export default function DerivationTable({
   isAssignmentLocked = true,
   isMobile = false,
   isFullScreen = false,
+  initialFocusLineIndex = null,
+  initialFocusField = null,
   onOpenFullScreen,
   onCloseFullScreen,
 }) {
@@ -419,6 +421,19 @@ export default function DerivationTable({
   useEffect(() => {
     onStateChangeRef.current = onStateChange
   }, [onStateChange])
+
+  // focus input in full-screen overlay when opened from tapping an input on mobile
+  useEffect(() => {
+    if (!isFullScreen || initialFocusLineIndex == null || !initialFocusField) return
+    const el =
+      initialFocusField === 'formula'
+        ? formulaRefs.current[initialFocusLineIndex]
+        : justRefs.current[initialFocusLineIndex]
+    if (el && typeof el.focus === 'function') {
+      const t = setTimeout(() => el.focus(), 0)
+      return () => clearTimeout(t)
+    }
+  }, [isFullScreen, initialFocusLineIndex, initialFocusField])
 
   const emitState = useCallback((linesSnapshot) => {
     const submission = buildSubmission(
@@ -967,19 +982,13 @@ export default function DerivationTable({
     }
   }
 
-  // tap table to go fullscreen. mobile only.
+  // open fullscreen when user taps an input on the table. mobile only.
   const canOpenFullScreen = isMobile && !isFullScreen && typeof onOpenFullScreen === 'function'
 
-  const handleTableAreaClick = useCallback(
-    (e) => {
+  const handleInputRequestFullScreen = useCallback(
+    (lineIndex, field) => {
       if (!canOpenFullScreen) return
-      const interactive = e.target.closest(
-        'input, textarea, button, [role="button"], select, .MuiInputBase-root, .MuiSelect-select, .MuiAutocomplete-root'
-      )
-      if (interactive) return
-      e.preventDefault?.()
-      e.stopPropagation?.()
-      onOpenFullScreen()
+      onOpenFullScreen({ lineIndex, field })
     },
     [canOpenFullScreen, onOpenFullScreen]
   )
@@ -996,7 +1005,6 @@ export default function DerivationTable({
               borderRadius: 3,
               border: (theme) => `1px solid ${theme.palette.divider}`,
               position: 'relative',
-              ...(canOpenFullScreen ? { cursor: 'pointer' } : {}),
             }
         return (
           <Wrapper sx={wrapperSx}>
@@ -1045,8 +1053,6 @@ export default function DerivationTable({
             width: '100%',
             ...(isFullScreen ? { overflowX: 'hidden', overflow: 'visible', padding: 0, margin: 0 } : { overflowX: 'auto', WebkitOverflowScrolling: 'touch' }), // fullscreen: no extra padding
           }}
-          onClick={canOpenFullScreen ? handleTableAreaClick : undefined}
-          onPointerDown={canOpenFullScreen ? handleTableAreaClick : undefined}
         >
           {/* mobile: small table. fullscreen: last column no right padding (mui default). */}
           <Table
@@ -1133,6 +1139,14 @@ export default function DerivationTable({
                     value={line.formula}
                     onChange={(e) => handleLineChange(idx, 'formula', e.target.value)}
                     onKeyDown={(e) => handleFormulaKeyDown(e, idx, line.readOnly)}
+                    onPointerDown={(e) => {
+                      if (line.readOnly) return
+                      if (canOpenFullScreen) {
+                        e.preventDefault()
+                        e.stopPropagation()
+                        handleInputRequestFullScreen(idx, 'formula')
+                      }
+                    }}
                     onClick={(e) => {
                       if (line.readOnly) return
                       lastEditableIndexRef.current = idx
@@ -1204,6 +1218,14 @@ export default function DerivationTable({
                               variant="standard"
                               placeholder="Line(s)"
                               value={lineDrafts[idx] ?? formatJustificationLines(line.justification)}
+                              onPointerDown={(e) => {
+                                if (line.readOnly) return
+                                if (canOpenFullScreen) {
+                                  e.preventDefault()
+                                  e.stopPropagation()
+                                  handleInputRequestFullScreen(idx, 'justification')
+                                }
+                              }}
                               onChange={(e) => {
                                 const raw = e.target.value
                                 setLineDrafts((prev) => ({ ...prev, [idx]: raw }))
@@ -1312,6 +1334,14 @@ export default function DerivationTable({
                           variant="standard"
                           placeholder={idx === premises.length ? 'Line(s) and rule' : ''}
                           value={line.justification}
+                          onPointerDown={(e) => {
+                            if (line.readOnly) return
+                            if (canOpenFullScreen) {
+                              e.preventDefault()
+                              e.stopPropagation()
+                              handleInputRequestFullScreen(idx, 'justification')
+                            }
+                          }}
                           onChange={(e) => handleLineChange(idx, 'justification', e.target.value)}
                           onKeyDown={(e) => handleJustKeyDown(e, idx, line.readOnly)}
                           onBlur={(e) => {
