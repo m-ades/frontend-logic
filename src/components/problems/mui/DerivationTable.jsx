@@ -1047,7 +1047,7 @@ export default function DerivationTable({
               width: '100%',
               py: 3,
               px: 2,
-              border: (t) => `1px dashed ${t.palette.divider}`,
+              border: (t) => `1px solid ${t.palette.divider}`,
               borderRadius: 2,
               bgcolor: (t) => alpha(t.palette.primary.main, 0.04),
               color: 'primary.main',
