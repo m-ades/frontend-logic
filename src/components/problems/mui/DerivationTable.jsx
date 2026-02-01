@@ -614,6 +614,29 @@ export default function DerivationTable({
     )
   }
 
+  // click row number to append it to current line's line(s) field (with space after)
+  const handleRowNumberClick = useCallback(
+    (clickedLineNum) => {
+      const targetIdx = lastEditableIndexRef.current ?? premises.length
+      if (targetIdx < premises.length) return
+      commitLines((prev) => {
+        const line = prev[targetIdx]
+        if (!line) return prev
+        const { nums, ranges, citedrules } = justParse(String(line.justification || ''))
+        const newNums = [...nums, clickedLineNum]
+        const newJust = formatJustificationParts(newNums, ranges, citedrules)
+        return applyLineChange(prev, targetIdx, 'justification', newJust)
+      })
+      setLineDrafts((prev) => {
+        if (!(targetIdx in prev)) return prev
+        const next = { ...prev }
+        delete next[targetIdx]
+        return next
+      })
+    },
+    [premises.length, commitLines]
+  )
+
   const canAddLine = useMemo(() => {
     if (!autoCheckEnabled) return true
     const last = lines[lines.length - 1]
@@ -1080,7 +1103,28 @@ export default function DerivationTable({
                 }}
               >
                 <TableCell sx={{ width: isFullScreen || isMobile ? 36 : 48, minWidth: isFullScreen || isMobile ? 36 : undefined, borderBottom: 'none', color: '#4f5b7a', fontWeight: 600, verticalAlign: 'middle' }}>
-                  {idx + 1}
+                  <Box
+                    component="button"
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault()
+                      handleRowNumberClick(idx + 1)
+                    }}
+                    sx={{
+                      cursor: 'pointer',
+                      background: 'none',
+                      border: 'none',
+                      padding: 0,
+                      font: 'inherit',
+                      color: 'inherit',
+                      fontWeight: 600,
+                      '&:hover': { textDecoration: 'underline' },
+                    }}
+                    title="Add to line(s)"
+                    aria-label={`Add ${idx + 1} to line(s)`}
+                  >
+                    {idx + 1}
+                  </Box>
                 </TableCell>
                 <TableCell sx={{ borderBottom: 'none', pr: 0.5, verticalAlign: 'middle', ...(isFullScreen ? { width: '55%', minWidth: 0 } : { width: 'auto', whiteSpace: 'nowrap' }) }}>
                   <TextField
