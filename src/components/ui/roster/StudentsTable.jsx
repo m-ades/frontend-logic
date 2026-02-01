@@ -138,12 +138,12 @@ export default function StudentsTable({
                       variant="body2"
                       fontWeight={600}
                       color={
-                        stats.average < 70 && stats.average > 0
+                        stats.completed > 0 && stats.average < 70
                           ? "error.main"
                           : "text.primary"
                       }
                     >
-                      {stats.average > 0 ? `${stats.average}%` : "—"}
+                      {stats.completed > 0 ? `${stats.average}%` : "—"}
                     </Typography>
                   </TableCell>
 
@@ -151,7 +151,7 @@ export default function StudentsTable({
                     align="center"
                     onClick={() => onStudentClick(student)}
                   >
-                    {stats.average > 0 ? (
+                    {stats.completed > 0 ? (
                       <Chip
                         label={letterGrade}
                         color={gradeColor}
