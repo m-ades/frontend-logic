@@ -212,7 +212,8 @@ export default function Dashboard() {
           )
           const overallPercent = totalMax > 0 ? (totalFinal / totalMax) * 100 : null
           const completedAssignments = gradedPercents.length
-          const totalAssignments = gradebookSummary?.length || grades?.length || 0
+          const totalAssignments =
+            analyticsData?.assignments?.total ?? gradebookSummary?.length ?? grades?.length ?? 0
           const classAverageValues = (gradebookSummary || [])
             .map((assignment) => assignment.avg_percent)
             .filter((value) => value !== null && value !== undefined)
@@ -369,7 +370,7 @@ export default function Dashboard() {
               >
                 <Typography variant="body2">
                   {gradeOverview.total
-                    ? `${gradeOverview.completed}/${gradeOverview.total} assignments complete`
+                    ? `${gradeOverview.completed}/${gradeOverview.total} assignments attempted`
                     : 'No assignments graded yet'}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
