@@ -27,6 +27,7 @@ export default function WorksheetTabs({
   currentProofIndex,
   onProofIndexChange,
   completedProofs,
+  questionScores = {},
   onProofComplete,
   getSavedProofState,
   handleProofStateChange,
@@ -52,6 +53,7 @@ export default function WorksheetTabs({
             currentProofIndex={currentProofIndex}
             onProofIndexChange={onProofIndexChange}
             completedProofs={completedProofs}
+            questionScores={questionScores}
             onProofComplete={onProofComplete}
             getSavedProofState={getSavedProofState}
             handleProofStateChange={handleProofStateChange}

@@ -241,6 +241,7 @@ export default function Worksheet() {
   const [loadError, setLoadError] = useState('')
   const [gradePercent, setGradePercent] = useState(null)
   const [currentDueAt, setCurrentDueAt] = useState(null)
+  const [questionScores, setQuestionScores] = useState({})
   const { activeCourseId } = useCoursesState()
   const courseId = activeCourseId ?? API_CONFIG.courseId
   const courseIdForApi = activeCourseId ?? null
@@ -527,6 +528,13 @@ export default function Worksheet() {
       const attemptLimit = Number(detail.attemptLimit)
       const reachedLimit = Number.isFinite(attempt) && Number.isFinite(attemptLimit)
         && attempt >= attemptLimit
+      const score = detail.score != null && Number.isFinite(Number(detail.score)) ? Number(detail.score) : null
+      if (score != null && Number.isFinite(questionId)) {
+        setQuestionScores((prev) => ({
+          ...prev,
+          [questionId]: Math.max(score, prev[questionId] ?? 0),
+        }))
+      }
       if (Number.isFinite(questionId)) {
         // sync attempts
         setWorksheets((prev) => {
@@ -606,6 +614,7 @@ export default function Worksheet() {
       const submissionMap = new Map()
       const correctQuestionIds = new Set()
       const attemptCountMap = new Map()
+      const scoreByQuestion = new Map()
       const worksheetsWithProofs = worksheetData.filter((worksheet) => worksheet.proofs.length)
       await Promise.all(
         worksheetsWithProofs.map(async (worksheet) => {
@@ -625,6 +634,10 @@ export default function Worksheet() {
               const currentAttempt = attemptCountMap.get(questionId) || 0
               if (submission.attempt > currentAttempt) {
                 attemptCountMap.set(questionId, submission.attempt)
+              }
+              const s = Number(submission.score)
+              if (Number.isFinite(s)) {
+                scoreByQuestion.set(questionId, Math.max(s, scoreByQuestion.get(questionId) ?? 0))
               }
             })
           } catch (err) {
@@ -760,7 +773,7 @@ export default function Worksheet() {
         if (!proof) return
         completedProofIds.add(proof.id)
       })
-      return { attemptCountMap, completedProofIds }
+      return { attemptCountMap, completedProofIds, scoreByQuestion }
     }
 
     const loadWorksheetDetails = async (assignmentId, assignmentMeta) => {
@@ -780,8 +793,14 @@ export default function Worksheet() {
           mapQuestionToProof(question, assignmentInfo, idx)
         ),
       }
-      const { attemptCountMap, completedProofIds } = await loadSavedStates([worksheet])
+      const { attemptCountMap, completedProofIds, scoreByQuestion } = await loadSavedStates([worksheet])
       setCompletedProofs(completedProofIds)
+      if (scoreByQuestion?.size) {
+        setQuestionScores((prev) => ({
+          ...prev,
+          ...Object.fromEntries(scoreByQuestion),
+        }))
+      }
       return {
         ...worksheet,
         proofs: worksheet.proofs.map((proof) => ({
@@ -939,6 +958,7 @@ export default function Worksheet() {
           currentProofIndex={currentProofIndex}
           onProofIndexChange={setCurrentProofIndex}
           completedProofs={completedProofs}
+          questionScores={questionScores}
           onProofComplete={handleProofComplete}
           getSavedProofState={getSavedProofState}
           handleProofStateChange={handleProofStateChange}

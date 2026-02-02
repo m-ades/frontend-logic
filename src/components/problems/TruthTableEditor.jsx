@@ -494,12 +494,14 @@ export default function TruthTableEditor({
         }
         setAttemptCount((prev) => resp?.submission?.attempt ?? Math.min(prev + 1, attemptLimit))
         if (typeof window !== 'undefined') {
+          const score = resp?.submission?.score
           window.dispatchEvent(new CustomEvent('assignment-submission', {
             detail: {
               assignmentQuestionId,
               attempt: resp?.submission?.attempt,
               attemptLimit: resp?.attempt_limit,
               isCorrect: success,
+              score: Number.isFinite(score) ? score : null,
             },
           }))
         }

@@ -2,6 +2,7 @@ import * as React from 'react'
 import { Box, Stack, Tabs, Tab, useTheme, useMediaQuery, Chip } from '@mui/material'
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
 import CancelIcon from '@mui/icons-material/Cancel'
+import WarningAmberIcon from '@mui/icons-material/WarningAmber'
 import ProofEditor from './ProofEditor.jsx'
 import LogicPenguinProblem from './LogicPenguinProblem.jsx'
 import TruthTableEditor from './TruthTableEditor.jsx'
@@ -61,7 +62,8 @@ export default function ProofTabs({
   proofs,
   currentProofIndex, 
   onProofIndexChange, 
-  completedProofs, 
+  completedProofs,
+  questionScores = {},
   onProofComplete,
   getSavedProofState,
   handleProofStateChange,
@@ -178,13 +180,49 @@ export default function ProofTabs({
                     width: '100%',
                   }}
                 >
-                  <span>Problem {idx + 1}</span>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                    <span>Problem {idx + 1}</span>
+                    {(() => {
+                      const isCorrect = completedProofs.has(proof.id)
+                      const isLockedOut = !isCorrect
+                        && Number.isFinite(proof.attemptLimit)
+                        && Number.isFinite(proof.attemptCount)
+                        && proof.attemptCount >= proof.attemptLimit
+                      const score = questionScores[proof.questionId]
+                      const hasScore = score != null && Number.isFinite(Number(score))
+                      const isCorrectStatus = isCorrect || (hasScore && score >= 100)
+                      const isIncorrectStatus = (hasScore && score === 0) || (isLockedOut && !hasScore)
+                      const isPartialStatus = hasScore && score > 0 && score < 100
+                      if (isCorrectStatus) {
+                        return <CheckCircleIcon sx={{ fontSize: 18, color: 'success.main' }} aria-label="Correct" />
+                      }
+                      if (isIncorrectStatus) {
+                        return <CancelIcon sx={{ fontSize: 18, color: 'error.main' }} aria-label="Incorrect" />
+                      }
+                      if (isPartialStatus) {
+                        return <WarningAmberIcon sx={{ fontSize: 18, color: 'warning.main' }} aria-label="Partial credit" />
+                      }
+                      return null
+                    })()}
+                  </Box>
                   {(() => {
                     const isCorrect = completedProofs.has(proof.id)
                     const isLockedOut = !isCorrect
                       && Number.isFinite(proof.attemptLimit)
                       && Number.isFinite(proof.attemptCount)
                       && proof.attemptCount >= proof.attemptLimit
+                    const score = questionScores[proof.questionId]
+                    const hasScore = score != null && Number.isFinite(Number(score))
+                    if (hasScore) {
+                      const earned = (Number(score) / 100) * pointsPerQuestion
+                      const earnedLabel = earned % 1 === 0 ? String(Math.round(earned)) : earned.toFixed(1)
+                      const color = score >= 100 ? theme.palette.success.main : score > 0 ? theme.palette.text.secondary : theme.palette.error.main
+                      return (
+                        <span style={{ fontSize: '0.875rem', fontWeight: 500, color }}>
+                          {earnedLabel}/{maxLabel}
+                        </span>
+                      )
+                    }
                     if (isCorrect) {
                       return (
                         <span style={{ fontSize: '0.875rem', fontWeight: 500, color: theme.palette.success.main }}>
@@ -324,6 +362,7 @@ export default function ProofTabs({
                               }}
                               totalQuestions={proofs.length}
                               isCurrentCorrect={completedProofs.has(proof.id)}
+                              currentQuestionScore={questionScores[proof.questionId]}
                             />
                           )
                         }

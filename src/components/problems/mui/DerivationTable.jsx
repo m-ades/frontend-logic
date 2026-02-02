@@ -320,6 +320,7 @@ export default function DerivationTable({
   onCloseFullScreen,
   totalQuestions,
   isCurrentCorrect,
+  currentQuestionScore,
 }) {
   const formulaRefs = useRef({})
   const justRefs = useRef({})
@@ -924,12 +925,14 @@ export default function DerivationTable({
       }
       setAttemptCount((prev) => resp?.submission?.attempt ?? prev + 1)
       if (typeof window !== 'undefined') {
+        const score = resp?.submission?.score
         window.dispatchEvent(new CustomEvent('assignment-submission', {
           detail: {
             assignmentQuestionId: proof?.questionId,
             attempt: resp?.submission?.attempt,
             attemptLimit: resp?.attempt_limit,
             isCorrect: successstatus === 'correct',
+            score: Number.isFinite(score) ? score : null,
           },
         }))
       }
@@ -1690,6 +1693,13 @@ export default function DerivationTable({
             const pointsPerQuestion = 100 / totalQuestions
             const maxLabel = pointsPerQuestion % 1 === 0 ? String(Math.round(pointsPerQuestion)) : pointsPerQuestion.toFixed(1)
             const isLockedOut = Number.isFinite(attemptLimit) && attemptCount >= attemptLimit
+            const score = currentQuestionScore != null && Number.isFinite(Number(currentQuestionScore)) ? Number(currentQuestionScore) : null
+            if (score != null) {
+              const earned = (score / 100) * pointsPerQuestion
+              const earnedLabel = earned % 1 === 0 ? String(Math.round(earned)) : earned.toFixed(1)
+              const color = score >= 100 ? 'success.main' : score > 0 ? 'text.secondary' : 'error.main'
+              return { text: `${earnedLabel}/${maxLabel}`, color }
+            }
             if (isCurrentCorrect) return { text: `${maxLabel}/${maxLabel}`, color: 'success.main' }
             if (isLockedOut) return { text: `0/${maxLabel}`, color: 'error.main' }
             return null

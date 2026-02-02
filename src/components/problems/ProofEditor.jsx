@@ -18,6 +18,7 @@ export default function ProofEditor({
   onCloseFullScreen: onCloseFullScreenProp,
   totalQuestions,
   isCurrentCorrect,
+  currentQuestionScore,
 }) {
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('md')) // compact layout: phone + tablet
@@ -165,6 +166,7 @@ export default function ProofEditor({
             onCloseFullScreen={closeFullScreen}
             totalQuestions={totalQuestions}
             isCurrentCorrect={isCurrentCorrect}
+            currentQuestionScore={currentQuestionScore}
           />
         )}
 
