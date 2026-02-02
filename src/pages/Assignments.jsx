@@ -25,6 +25,7 @@ const buildCourseStructure = (assignments, sectionTitle) => {
       dueDate: assignment.due_at ?? assignment.due_date,
       type: ACTIVITY_TYPES.HOMEWORK,
       worksheet: { id: assignment.id, proofs: [] },
+      isLocked: assignment.is_locked ?? assignment.isLocked ?? false,
     })
     chapterEntry.set(subLabel, items)
     chapters.set(chapterLabel, chapterEntry)
@@ -162,6 +163,7 @@ export default function Assignments() {
     const predicate = (activity) => {
       switch (tabValue) {
         case 0: {
+          if (activity.isLocked) return false
           if (!activity.dueDate) return false
           const deadline = parseDueDateAsEastern(activity.dueDate, activity.dueTime)
           if (!deadline) return false
