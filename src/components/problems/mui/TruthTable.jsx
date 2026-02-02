@@ -19,7 +19,8 @@ import {
   Paper,
 } from '@mui/material'
 import { useTheme } from '@mui/material/styles'
-import StatusBanner from '../../ui/StatusBanner.jsx'
+import StatusBanner, { isTerminalStatus } from '../../ui/StatusBanner.jsx'
+import { getSubmissionScore } from '../../../utils/problemHelpers.js'
 import getFormulaClass from '../../../lib/logicpenguin/symbolic/formula.js'
 import getSyntax from '../../../lib/logicpenguin/symbolic/libsyntax.js'
 import {
@@ -427,19 +428,6 @@ export default function TruthTable({
     tableChecks.length > 0 &&
     tableChecks.every((res) => res.rowdiff === 0 && res.offcells.length === 0)
 
-  const completionRef = React.useRef(false)
-
-  React.useEffect(() => {
-    if (!hasTruthTable) return
-    const responseComplete = tableCorrect && (!classificationEnabled || mcSelection.length > 0)
-    if (responseComplete && !completionRef.current) {
-      completionRef.current = true
-      onProofComplete?.(proof.id)
-    } else if (!responseComplete && completionRef.current) {
-      completionRef.current = false
-    }
-  }, [classificationEnabled, hasTruthTable, mcSelection.length, onProofComplete, proof.id, tableCorrect])
-
   if (!hasTruthTable) {
     return (
       <Stack spacing={2} sx={{ px: 0, width: '100%' }}>
@@ -527,20 +515,21 @@ export default function TruthTable({
         })
         const validation = resp?.validation || {}
         const success = validation.successstatus === 'correct'
+        const rawScore = resp?.score ?? resp?.submission?.score
+        const score = rawScore != null && Number.isFinite(Number(rawScore)) ? Number(rawScore) : null
         // sync limit from server
         if (typeof resp?.attempt_limit === 'number') {
           setAttemptLimit(resp.attempt_limit)
         }
         setAttemptCount((prev) => resp?.submission?.attempt ?? Math.min(prev + 1, attemptLimit))
         if (typeof window !== 'undefined') {
-          const score = resp?.submission?.score
           window.dispatchEvent(new CustomEvent('assignment-submission', {
             detail: {
               assignmentQuestionId,
               attempt: resp?.submission?.attempt,
               attemptLimit: resp?.attempt_limit,
               isCorrect: success,
-              score: Number.isFinite(score) ? score : null,
+              score,
             },
           }))
         }
@@ -548,6 +537,9 @@ export default function TruthTable({
           setStatus('correct')
           setMessage('Correct!')
           onProofComplete?.(proof.id)
+        } else if (score != null && score > 0 && score < 100) {
+          setStatus('partial')
+          setMessage(validation.message || validation.transmessage || 'Partially correct.')
         } else {
           setStatus('incorrect')
           setMessage(validation.message || validation.transmessage || 'Incorrect.')
@@ -1056,7 +1048,7 @@ export default function TruthTable({
             ? 'Recheck your rows.'
             : 'Click cells to toggle truth values - fill in every cell to finish.'}
       </Typography>
-      {message && (
+      {isTerminalStatus(status) && (
         <StatusBanner
           status={status}
           message={message}

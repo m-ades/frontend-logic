@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Box, Stack, Typography, FormControl, Select, MenuItem } from '@mui/material'
-import StatusBanner from '../../ui/StatusBanner.jsx'
+import StatusBanner, { isTerminalStatus } from '../../ui/StatusBanner.jsx'
 import { useTheme } from '@mui/material/styles'
 import getFormulaClass from '../../../lib/logicpenguin/symbolic/formula.js'
 import getSyntax from '../../../lib/logicpenguin/symbolic/libsyntax.js'
@@ -208,14 +208,12 @@ export default function SingleRowTruthTable({
   const handleCellChange = (index, value) => {
     if (readOnly || isLocked) return
     if (isAtomicToken(tokens[index])) return
-    setRowInputs((prev) => {
-      const next = [...prev]
-      next[index] = value
-      onStateChange?.({ row: next, compound: toBoolean(compoundInput) })
-      return next
-    })
+    const next = [...rowInputs]
+    next[index] = value
+    setRowInputs(next)
     setStatus('unanswered')
     setMessage('')
+    onStateChange?.({ row: next, compound: toBoolean(compoundInput) })
   }
 
   const handleCompoundChange = (value) => {
@@ -391,7 +389,7 @@ export default function SingleRowTruthTable({
           </Stack>
         </Box>
       </Box>
-      {message && (
+      {isTerminalStatus(status) && (
         <StatusBanner
           status={status}
           message={message}

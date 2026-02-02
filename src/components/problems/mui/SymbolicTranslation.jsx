@@ -6,6 +6,7 @@ import FormulaInput from '../../ui/logicpenguin/formula-input.js'
 import SymbolButtonRow from '../../ui/logicpenguin/SymbolButtonRow.jsx'
 import { useProblemChecker } from '../../../hooks/useProblemChecker.js'
 import SolutionReveal from '../SolutionReveal.jsx'
+import StatusBanner, { isTerminalStatus } from '../../ui/StatusBanner.jsx'
 import PromptText from '../../ui/PromptText.jsx'
 import RichText from '../../ui/RichText.jsx'
 
@@ -273,7 +274,7 @@ export default function SymbolicTranslation({
         </Box>
       </Box>
 
-      {message && (
+      {isTerminalStatus(status) && (
         <StatusBanner
           status={status}
           message={message}

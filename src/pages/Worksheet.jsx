@@ -9,6 +9,7 @@ import { useWorksheetMetrics } from '../hooks/useWorksheetMetrics.js'
 // import { exportWorksheetPDF } from '../utils/exportPDF.js'
 import { API_CONFIG, fetchJson, getActiveUserId } from '../utils/api.js'
 import { sortAssignmentsBySubchapter } from '../utils/assignmentSort.js'
+import { displayScoreForProof } from '../utils/problemHelpers.js'
 import { useCoursesState } from '../context/CoursesContext.jsx'
 
 const normalizeType = (snapshot) => (
@@ -24,6 +25,20 @@ const mapQuestionToProof = (question, assignment, index) => {
   const solution = snapshot.solution
   const attemptLimit = question?.attempt_limit ?? 3
   const legend = snapshot.legend || snapshot.legend_text || snapshot.legendText || ''
+  const snapshotPartial =
+    snapshot.partialCredit ??
+    snapshot.partialcredit ??
+    snapshot.partial_credit ??
+    snapshot.truthTable?.options?.partialCredit ??
+    snapshot.truthTable?.options?.partialcredit ??
+    snapshot.truthTable?.options?.partial_credit ??
+    snapshot.truth_table?.options?.partialCredit ??
+    snapshot.truth_table?.options?.partialcredit ??
+    snapshot.truth_table?.options?.partial_credit ??
+    snapshot.options?.partialCredit ??
+    snapshot.options?.partialcredit ??
+    snapshot.options?.partial_credit ??
+    false
   const proofBase = {
     id: proofId,
     questionId,
@@ -31,6 +46,7 @@ const mapQuestionToProof = (question, assignment, index) => {
     solution,
     attemptLimit,
     legend,
+    partialCredit: Boolean(snapshotPartial),
   }
 
   if (type === 'derivation' || type === 'derivation-hurley') {
@@ -45,11 +61,14 @@ const mapQuestionToProof = (question, assignment, index) => {
   }
 
   if (type === 'truth-table') {
-    const ttOptions = snapshot.options || snapshot.truthTable?.options || {}
-    const ttSnapshot = snapshot.truthTable || {}
-    const ttKind = ttSnapshot.kind || snapshot.truthTable?.kind || 'formula'
+    const ttOptions = snapshot.options || snapshot.truthTable?.options || snapshot.truth_table?.options || {}
+    const ttSnapshot = snapshot.truthTable || snapshot.truth_table || {}
+    const ttKind = ttSnapshot.kind || snapshot.truthTable?.kind || snapshot.truth_table?.kind || 'formula'
+    const hasClassification = ttOptions.question === true || ttOptions.question === 'true'
+    const ttPartialCredit = ttOptions.partialCredit ?? ttOptions.partialcredit ?? ttOptions.partial_credit ?? hasClassification ?? snapshotPartial
     return {
       ...proofBase,
+      partialCredit: Boolean(ttPartialCredit || hasClassification),
       type: 'truth-table',
       options: ttOptions,
       truthTable: {
@@ -177,8 +196,11 @@ const mapQuestionToProof = (question, assignment, index) => {
   }
 
   if (type === 'combo-translation-truth-table') {
+    const comboOptions = snapshot.options || {}
+    const comboPartial = comboOptions.partialCredit ?? comboOptions.partialcredit ?? comboOptions.partial_credit ?? snapshotPartial
     return {
       ...proofBase,
+      partialCredit: Boolean(comboPartial),
       description: '',
       type: 'combo-translation-truth-table',
       answer: snapshot.answer,
@@ -188,8 +210,11 @@ const mapQuestionToProof = (question, assignment, index) => {
   }
 
   if (type === 'combo-translation-derivation') {
+    const comboOptions = snapshot.options || {}
+    const comboPartial = comboOptions.partialCredit ?? comboOptions.partialcredit ?? comboOptions.partial_credit ?? snapshotPartial
     return {
       ...proofBase,
+      partialCredit: Boolean(comboPartial),
       description: '',
       type: 'combo-translation-derivation',
       answer: snapshot.answer,
@@ -239,7 +264,6 @@ export default function Worksheet() {
   const [worksheets, setWorksheets] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const [loadError, setLoadError] = useState('')
-  const [gradePercent, setGradePercent] = useState(null)
   const [currentDueAt, setCurrentDueAt] = useState(null)
   const [questionScores, setQuestionScores] = useState({})
   const { activeCourseId } = useCoursesState()
@@ -248,8 +272,6 @@ export default function Worksheet() {
   const sessionId = useRef(null)
   const questionSessionId = useRef(null)
   const activeUserId = getActiveUserId()
-  const gradesCache = useRef(null)
-  const gradeRefreshTimerRef = useRef(null)
   const isMountedRef = useRef(true)
   const currentWorksheetIdRef = useRef(null)
   const solutionRefreshRef = useRef(new Set())
@@ -296,7 +318,21 @@ export default function Worksheet() {
   const assignmentPathBase = isInstructorView ? '/instructor/assignment' : '/student/assignment'
   const defaultBackTarget = isInstructorView ? '/instructor/assignments' : '/student/assignments'
   const backTarget = location?.state?.returnTo || defaultBackTarget
-  
+
+  // total score: sum per-question best (0–100), same as backend
+  const calculatedGradePercent = useMemo(() => {
+    const proofs = currentWorksheet?.proofs ?? []
+    if (proofs.length === 0) return null
+    let rawSum = 0
+    for (const proof of proofs) {
+      const raw = questionScores[proof.questionId]
+      const display = displayScoreForProof(proof, raw)
+      rawSum += display != null && Number.isFinite(Number(display)) ? Number(display) : 0
+    }
+    const maxScore = proofs.length * 100
+    return maxScore > 0 ? (rawSum / maxScore) * 100 : null
+  }, [currentWorksheet?.proofs, questionScores])
+
   const {
     completedProofs,
     score,
@@ -307,7 +343,7 @@ export default function Worksheet() {
   const { completionPercent, gradeLabel, isOverdue } = useWorksheetMetrics({
     score,
     total,
-    gradePercent,
+    calculatedGradePercent,
     dueAt: worksheetDueAt,
   })
 
@@ -443,40 +479,6 @@ export default function Worksheet() {
     }
   }, [currentProof?.questionId])
 
-  const refreshGradePercent = useCallback(async () => {
-    if (!currentWorksheet?.id || !activeUserId) return
-    const assignmentId = currentWorksheet.id
-    try {
-      const grades = await fetchJson(`/api/users/${activeUserId}/grades`)
-      gradesCache.current = new Map(
-        (grades || []).map((grade) => [
-          Number(grade.assignment_id ?? grade.Assignment?.id),
-          grade,
-        ])
-      )
-      if (!isMountedRef.current || assignmentId !== currentWorksheetIdRef.current) {
-        return
-      }
-      const grade = gradesCache.current.get(Number(assignmentId))
-      const total = grade?.max_score || 0
-      const score = grade?.final_score ?? grade?.raw_score ?? null
-      const percent = total > 0 && score !== null ? (score / total) * 100 : null
-      setGradePercent(percent)
-      setCurrentDueAt(currentWorksheet?.due_at ?? currentWorksheet?.due_date ?? null)
-    } catch (error) {
-      // keep the previous grade on transient refresh errors
-    }
-  }, [activeUserId, currentWorksheet?.id, currentWorksheet?.due_at, currentWorksheet?.due_date])
-
-  const scheduleGradeRefresh = useCallback(() => {
-    if (!currentWorksheet?.id || !activeUserId) return
-    if (gradeRefreshTimerRef.current) return
-    gradeRefreshTimerRef.current = setTimeout(() => {
-      gradeRefreshTimerRef.current = null
-      refreshGradePercent()
-    }, 250)
-  }, [activeUserId, currentWorksheet?.id, refreshGradePercent])
-
   const refreshQuestionSolutions = useCallback(async (assignmentId, questionId) => {
     if (!assignmentId || !questionId || !activeUserId) return
     if (solutionRefreshRef.current.has(questionId)) return
@@ -516,14 +518,14 @@ export default function Worksheet() {
   }, [activeUserId])
 
   useEffect(() => {
-    refreshGradePercent()
-  }, [refreshGradePercent])
+    setCurrentDueAt(currentWorksheet?.due_at ?? currentWorksheet?.due_date ?? null)
+  }, [currentWorksheet?.id, currentWorksheet?.due_at, currentWorksheet?.due_date])
 
   useEffect(() => {
     if (typeof window === 'undefined') return
     const handleSubmission = (event) => {
       const detail = event?.detail || {}
-      const questionId = Number(detail.assignmentQuestionId)
+      const questionId = Number(detail.assignmentQuestionId ?? detail.assignment_question_id)
       const attempt = Number(detail.attempt)
       const attemptLimit = Number(detail.attemptLimit)
       const reachedLimit = Number.isFinite(attempt) && Number.isFinite(attemptLimit)
@@ -568,20 +570,11 @@ export default function Worksheet() {
           refreshQuestionSolutions(assignmentId, questionId)
         }
       }
-      scheduleGradeRefresh()
+      // sidebar total is local only.
     }
     window.addEventListener('assignment-submission', handleSubmission)
     return () => window.removeEventListener('assignment-submission', handleSubmission)
-  }, [refreshQuestionSolutions, scheduleGradeRefresh])
-
-  useEffect(() => {
-    return () => {
-      if (gradeRefreshTimerRef.current) {
-        clearTimeout(gradeRefreshTimerRef.current)
-        gradeRefreshTimerRef.current = null
-      }
-    }
-  }, [currentWorksheet?.id])
+  }, [refreshQuestionSolutions])
 
   useEffect(() => {
     let isMounted = true

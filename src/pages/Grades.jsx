@@ -12,7 +12,7 @@ function NoRowsOverlay() {
   return (
     <Box sx={{ p: 2, textAlign: 'center', width: '100%' }}>
       <Typography variant="body2" color="text.secondary">
-        No grades yet.
+        No unlocked assignments yet.
       </Typography>
     </Box>
   )
@@ -46,7 +46,9 @@ export default function Grades() {
           fetchJson(`/api/users/${userId}/grades`),
         ])
         const gradedAssignments = sortAssignmentsBySubchapter(
-          (assignments || []).filter((assignment) => assignment.kind !== 'practice')
+          (assignments || []).filter(
+            (a) => a.kind !== 'practice' && a.is_locked === false
+          )
         )
         const gradeMap = new Map((grades || []).map((grade) => [grade.assignment_id, grade]))
         const entries = gradedAssignments.map((assignment) => ({
@@ -75,37 +77,43 @@ export default function Grades() {
     }
   }, [courseIdForApi])
 
-  const gradedEntries = useMemo(
-    () => gradeEntries.filter((entry) => entry.grade),
-    [gradeEntries]
-  )
-  const totalMax = useMemo(
-    () =>
-      gradedEntries.reduce(
-        (sum, entry) => sum + (entry.grade?.max_score || 0),
-        0
-      ),
-    [gradedEntries]
-  )
-  const totalFinal = useMemo(
-    () => gradedEntries.reduce((sum, entry) => sum + (entry.grade?.final_score || 0), 0),
-    [gradedEntries]
-  )
-  const overallPercentage = totalMax > 0 ? (totalFinal / totalMax) * 100 : 0
+  const assignmentPercents = useMemo(() => {
+    return gradeEntries.map((entry) => {
+      const grade = entry.grade
+      const max = grade?.max_score ?? entry.assignment?.total_points ?? 0
+      const score = grade?.final_score ?? grade?.raw_score ?? null
+      const percent =
+        max > 0 && score !== null && score !== undefined ? (score / max) * 100 : 0
+      return percent
+    })
+  }, [gradeEntries])
+
+  const overallPercentage = useMemo(() => {
+    if (assignmentPercents.length === 0) return 0
+    let forAverage =
+      assignmentPercents.length >= 3
+        ? [...assignmentPercents].sort((a, b) => a - b).slice(2)
+        : assignmentPercents
+    return forAverage.reduce((s, p) => s + p, 0) / forAverage.length
+  }, [assignmentPercents])
 
   const rows = useMemo(
     () =>
       gradeEntries.map((entry, index) => {
         const assignment = entry.assignment || entry.grade?.Assignment || {}
         const grade = entry.grade
-        const total = grade?.max_score || 0
+        const total = grade?.max_score ?? assignment.total_points ?? 0
         const score = grade?.final_score ?? grade?.raw_score ?? null
-        const percentage = total > 0 && score !== null ? (score / total) * 100 : null
+        const percentage =
+          total > 0 && score !== null && score !== undefined
+            ? (score / total) * 100
+            : 0
 
-        const noSubmission = grade
-          && (grade.final_score ?? 0) === 0
-          && (grade.raw_score ?? 0) === 0
-          && grade.graded_by == null
+        const noSubmission =
+          !grade ||
+          ((grade.final_score ?? 0) === 0 &&
+            (grade.raw_score ?? 0) === 0 &&
+            grade.graded_by == null)
         const submittedLabel = noSubmission
           ? 'No submission'
           : grade?.graded_at
@@ -119,7 +127,7 @@ export default function Grades() {
             ? formatDateTime(assignment.due_at ?? assignment.due_date)
             : '—',
           submitted: submittedLabel,
-          percent: percentage !== null ? `${percentage.toFixed(1)}%` : '—'
+          percent: `${percentage.toFixed(1)}%`
         }
       }),
     [gradeEntries]

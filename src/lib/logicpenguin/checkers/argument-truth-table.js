@@ -80,26 +80,7 @@ export default async function(
         offive = 5;
     } else {
         correct = false;
-        // compare number of cells checked to correct number
-        let shouldachecked = answer.conc.rows[0].length *
-            answer.conc.rows.length;
-        for (const pr of answer.prems) {
-            shouldachecked += (pr.rows.length * pr.rows[0].length);
-        }
-        let numch = tmConcResult.numchecked;
-        for (const tmResult of tmPremResults) {
-            numch += tmResult.numchecked;
-        }
-        if (numch > 0) {
-            offive = (( numch - numOffCells ) / shouldachecked) * 4;
-        }
-        // account for missing or extra rows on score
-        if (tmConcResult.rowdiff < 0) { offive--; }
-        if (tmConcResult.rowdiff > 0) { offive = offive * (
-            ( answer.conc.rows.length - tmConcResult.rowdiff ) /
-                answer.conc.rows.length);
-        }
-        if (offive < 0) { offive = 0; }
+        offive = 0; // table is all-or-nothing; no row-by-row credit
     }
 
     // if there is a multiple choice answer it is worth 2 compared to

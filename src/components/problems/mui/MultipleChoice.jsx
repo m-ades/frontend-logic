@@ -386,7 +386,7 @@ export default function MultipleChoice({
         </Box>
       </Box>
 
-      {message && (
+      {isTerminalStatus(status) && (
         <StatusBanner
           status={status}
           message={message}

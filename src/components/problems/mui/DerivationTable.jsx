@@ -25,6 +25,7 @@ import CancelIcon from '@mui/icons-material/Cancel'
 import RemoveIcon from '@mui/icons-material/Remove'
 import { alpha } from '@mui/material/styles'
 import { fetchJson, getActiveUserId } from '../../../utils/api.js'
+import { getSubmissionScore } from '../../../utils/problemHelpers.js'
 import PromptText from '../../ui/PromptText.jsx'
 import ThemedCard from '../../ui/ThemedCard.jsx'
 import ProblemSetButtons from './ProblemSetButtons.jsx'
@@ -925,14 +926,14 @@ export default function DerivationTable({
       }
       setAttemptCount((prev) => resp?.submission?.attempt ?? prev + 1)
       if (typeof window !== 'undefined') {
-        const score = resp?.submission?.score
+        const score = getSubmissionScore(resp)
         window.dispatchEvent(new CustomEvent('assignment-submission', {
           detail: {
             assignmentQuestionId: proof?.questionId,
             attempt: resp?.submission?.attempt,
             attemptLimit: resp?.attempt_limit,
             isCorrect: successstatus === 'correct',
-            score: Number.isFinite(score) ? score : null,
+            score,
           },
         }))
       }

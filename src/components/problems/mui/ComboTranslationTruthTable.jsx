@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Box, Stack, Typography } from '@mui/material'
-import StatusBanner from '../../ui/StatusBanner.jsx'
+import StatusBanner, { isTerminalStatus } from '../../ui/StatusBanner.jsx'
 import { useTheme } from '@mui/material/styles'
 import getSyntax from '../../../lib/logicpenguin/symbolic/libsyntax.js'
 import ProblemSetButtons from './ProblemSetButtons.jsx'
@@ -60,6 +60,10 @@ const isTableComplete = (tableState) =>
   tableState?.tables?.every((t) =>
     t.rows?.every((row) => row?.every((cell) => cell !== ''))
   ) ?? false
+
+// combo argument table: require valid/invalid selection
+const hasClassification = (tableState) =>
+  Array.isArray(tableState?.mcans) && tableState.mcans.length > 0
 
 export default function ComboTranslationTruthTable({
   proof,
@@ -136,12 +140,19 @@ export default function ComboTranslationTruthTable({
       problemType: 'combo-translation-truth-table',
       question: snapshot,
       options: proof?.options ?? snapshot?.options,
-      getAnswer: () => ({
-        argumentLine,
-        tableAns: buildTableAnswer(tableState),
-      }),
+      getAnswer: () => {
+        const payload = { argumentLine }
+        const built = buildTableAnswer(tableState)
+        if (built) payload.tableAns = built
+        if (tableState && typeof tableState === 'object') payload.tableState = tableState
+        return payload
+      },
       onComplete,
-      isDisabled: () => !parseStatus.ok || !isTableComplete(tableState) || !tableState,
+      isDisabled: () =>
+        !parseStatus.ok ||
+        !tableState ||
+        !isTableComplete(tableState) ||
+        !hasClassification(tableState),
       resetInput: () => {
         setArgumentLine('')
         setTableState(null)
@@ -219,15 +230,18 @@ export default function ComboTranslationTruthTable({
                   updateState({ tableState: next })
                 }}
                 hideActions
-                suppressReveal
+                suppressReveal={status === 'correct' || attemptCount < maxAttempts}
                 embedded
+                parentStatus={status}
+                parentAttemptCount={attemptCount}
+                parentAttemptLimit={maxAttempts}
               />
             )}
           </Stack>
         </Box>
       </Box>
 
-      {message && (
+      {isTerminalStatus(status) && (
         <StatusBanner
           status={status}
           message={message}
@@ -239,7 +253,13 @@ export default function ComboTranslationTruthTable({
         onCheck={handleCheck}
         onStartOver={handleStartOver}
         isChecking={isChecking}
-        isDisabled={!parseStatus.ok || !isTableComplete(tableState) || isLocked}
+        isDisabled={
+          !parseStatus.ok ||
+          !tableState ||
+          !isTableComplete(tableState) ||
+          !hasClassification(tableState) ||
+          isLocked
+        }
         align="flex-start"
         attemptCount={attemptCount}
         attemptLimit={maxAttempts}

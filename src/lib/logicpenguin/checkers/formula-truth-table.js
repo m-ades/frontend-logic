@@ -77,17 +77,7 @@ export default async function(
         offive = 5;
     } else {
         correct = false;
-        // todo? tweak this?
-        const shouldachecked = (answer.rows.length * answer.rows[0].length);
-        if (tmResult.numchecked > 0) {
-            offive = (( tmResult.numchecked -
-                tmResult.offcells.length ) / shouldachecked) * 4;
-        }
-        if (tmResult.rowdiff < 0) { offive--; }
-        if (tmResult.rowdiff > 0) { offive = offive * (
-            (answer.rows.length - tmResult.rowdiff )/ answer.rows.length);
-        }
-        if (offive < 0) { offive = 0 };
+        offive = 0; // table is all-or-nothing; no row-by-row credit
     }
     // check answer
     let qright = false;

@@ -19,7 +19,8 @@ import {
   Paper,
 } from '@mui/material'
 import { useTheme } from '@mui/material/styles'
-import StatusBanner from '../ui/StatusBanner.jsx'
+import StatusBanner, { isTerminalStatus } from '../ui/StatusBanner.jsx'
+import { getSubmissionScore } from '../../utils/problemHelpers.js'
 import getFormulaClass from '../../lib/logicpenguin/symbolic/formula.js'
 import getSyntax from '../../lib/logicpenguin/symbolic/libsyntax.js'
 import {
@@ -103,6 +104,9 @@ export default function TruthTableEditor({
   hideActions = false,
   suppressReveal = false,
   embedded = false,
+  parentStatus,
+  parentAttemptCount,
+  parentAttemptLimit,
 }) {
   const truthTable = proof.truthTable ?? {}
   const syntax = React.useMemo(() => getSyntax(), [])
@@ -388,19 +392,6 @@ export default function TruthTableEditor({
     tableChecks.length > 0 &&
     tableChecks.every((res) => res.rowdiff === 0 && res.offcells.length === 0)
 
-  const completionRef = React.useRef(false)
-
-  React.useEffect(() => {
-    if (!hasTruthTable) return
-    const responseComplete = tableCorrect && (!classificationEnabled || mcSelection.length > 0)
-    if (responseComplete && !completionRef.current) {
-      completionRef.current = true
-      onProofComplete?.(proof.id)
-    } else if (!responseComplete && completionRef.current) {
-      completionRef.current = false
-    }
-  }, [classificationEnabled, hasTruthTable, mcSelection.length, onProofComplete, proof.id, tableCorrect])
-
   if (!hasTruthTable) {
     return (
       <Stack spacing={2} sx={{ px: 0, width: '100%' }}>
@@ -493,15 +484,15 @@ export default function TruthTableEditor({
           setAttemptLimit(resp.attempt_limit)
         }
         setAttemptCount((prev) => resp?.submission?.attempt ?? Math.min(prev + 1, attemptLimit))
+        const score = getSubmissionScore(resp)
         if (typeof window !== 'undefined') {
-          const score = resp?.submission?.score
           window.dispatchEvent(new CustomEvent('assignment-submission', {
             detail: {
               assignmentQuestionId,
               attempt: resp?.submission?.attempt,
               attemptLimit: resp?.attempt_limit,
               isCorrect: success,
-              score: Number.isFinite(score) ? score : null,
+              score,
             },
           }))
         }
@@ -509,6 +500,9 @@ export default function TruthTableEditor({
           setStatus('correct')
           setMessage('Correct!')
           onProofComplete?.(proof.id)
+        } else if (score != null && score > 0 && score < 100) {
+          setStatus('partial')
+          setMessage(validation.message || validation.transmessage || 'Partially correct.')
         } else {
           setStatus('incorrect')
           setMessage(validation.message || validation.transmessage || 'Incorrect.')
@@ -594,8 +588,11 @@ export default function TruthTableEditor({
     solutionTables.length > 0
       ? solutionTables
       : solutionTablesFromProblem
+  const effectiveStatus = embedded && parentStatus != null ? parentStatus : status
+  const effectiveAttemptCount = embedded && parentAttemptCount != null ? parentAttemptCount : attemptCount
+  const effectiveAttemptLimit = embedded && parentAttemptLimit != null ? parentAttemptLimit : attemptLimit
   const showSolution =
-    attemptCount >= attemptLimit && status !== 'correct' && displaySolutionTables.length > 0
+    effectiveAttemptCount >= effectiveAttemptLimit && effectiveStatus !== 'correct' && displaySolutionTables.length > 0
 
   // Correct multiple-choice answer for solution reveal (from proof.solution or derived from problem)
   const solutionMcValues = React.useMemo(() => {
@@ -963,7 +960,7 @@ export default function TruthTableEditor({
             </FormControl>
           </Box>
         )}
-        {!hideActions && !suppressReveal && showSolution && (
+        {!suppressReveal && showSolution && (!hideActions || embedded) && (
           <>
             {renderAnswerBlock(
               'Correct Answer',
@@ -1017,7 +1014,7 @@ export default function TruthTableEditor({
             ? 'Recheck your rows.'
             : 'Click cells to toggle truth values - fill in every cell to finish.'}
       </Typography>
-      {message && (
+      {isTerminalStatus(status) && (
         <StatusBanner
           status={status}
           message={message}

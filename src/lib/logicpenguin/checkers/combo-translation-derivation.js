@@ -167,14 +167,8 @@ export default async function(
         messages.push(tr('No derivation was submitted.'));
     }
 
-    let earned = 0;
-    if (partialcredit) {
-        const allpts = derivEarned + transEarned;
-        const avail = derivTtl + transTtl;
-        earned = Math.floor(points * (avail ? (allpts / avail) : 0));
-    } else {
-        earned = correct ? points : 0;
-    }
+    // Derivations are all-or-nothing; no partial credit for combo translation-derivation
+    const earned = correct ? points : 0;
 
     const translationScore = transTtl > 0 ? (transEarned / transTtl) : 0;
     const derivationScore = derivTtl > 0 ? (derivEarned / derivTtl) : 0;

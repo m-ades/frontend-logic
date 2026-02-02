@@ -259,7 +259,7 @@ export default function ComboTranslationDerivation({
         <Alert severity="info">{parseStatus.reason}</Alert>
       )}
 
-      {message && (
+      {isTerminalStatus(status) && (
         <StatusBanner
           status={status}
           message={message}

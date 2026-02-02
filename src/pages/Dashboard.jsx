@@ -195,26 +195,50 @@ export default function Dashboard() {
                 .sort((a, b) => new Date(a.date) - new Date(b.date))
           setGradeTimeline(timeline)
 
-          const gradedPercents = (grades || []).reduce((list, grade) => {
-            const max = grade?.max_score || 0
-            const score = grade?.final_score ?? grade?.raw_score
-            if (!max || score === null || score === undefined) return list
-            list.push({
-              percent: (score / max) * 100,
-              title: grade?.Assignment?.title || grade?.title || 'Assignment',
-            })
-            return list
-          }, [])
+          // Grade = average of unlocked (published) assignment percents. Unattempted = 0%.
+          // When 3+ assignments are unlocked, lowest 2 scores are dropped.
+          const assignmentPercents =
+            unlockedSummary.length > 0
+              ? unlockedSummary.map((assignment) => {
+                  const grade = gradeMap.get(assignment.id)
+                  const max = grade?.max_score ?? 0
+                  const score = grade?.final_score ?? grade?.raw_score ?? null
+                  const percent =
+                    max > 0 && score !== null && score !== undefined ? (score / max) * 100 : 0
+                  return {
+                    percent,
+                    title: assignment.title || 'Assignment',
+                  }
+                })
+              : (grades || []).reduce((list, grade) => {
+                  const max = grade?.max_score || 0
+                  const score = grade?.final_score ?? grade?.raw_score
+                  if (!max || score === null || score === undefined) return list
+                  list.push({
+                    percent: (score / max) * 100,
+                    title: grade?.Assignment?.title || grade?.title || 'Assignment',
+                  })
+                  return list
+                }, [])
 
-          const totalMax = (grades || []).reduce((sum, grade) => sum + (grade.max_score || 0), 0)
-          const totalFinal = (grades || []).reduce(
-            (sum, grade) => sum + (grade.final_score ?? grade.raw_score ?? 0),
-            0
-          )
-          const overallPercent = totalMax > 0 ? (totalFinal / totalMax) * 100 : null
-          const completedAssignments = gradedPercents.length
           const totalAssignments =
-            analyticsData?.assignments?.total ?? gradebookSummary?.length ?? grades?.length ?? 0
+            unlockedSummary.length > 0
+              ? unlockedSummary.length
+              : analyticsData?.assignments?.total ?? gradebookSummary?.length ?? grades?.length ?? 0
+          const completedAssignments = assignmentPercents.filter((a) => a.percent > 0).length
+
+          let overallPercent = null
+          let scoresForAverage = assignmentPercents.map((a) => a.percent)
+          if (scoresForAverage.length > 0) {
+            if (scoresForAverage.length >= 3) {
+              scoresForAverage = scoresForAverage
+                .slice()
+                .sort((a, b) => a - b)
+                .slice(2)
+            }
+            overallPercent = scoresForAverage.reduce((s, p) => s + p, 0) / scoresForAverage.length
+          }
+
           const classAverageValues = (gradebookSummary || [])
             .map((assignment) => assignment.avg_percent)
             .filter((value) => value !== null && value !== undefined)
@@ -222,7 +246,7 @@ export default function Dashboard() {
             classAverageValues.length > 0
               ? (classAverageValues.reduce((sum, value) => sum + value, 0) / classAverageValues.length) * 100
               : null
-          const lowestScores = gradedPercents
+          const lowestScores = assignmentPercents
             .slice()
             .sort((a, b) => a.percent - b.percent)
             .slice(0, 2)
@@ -369,7 +393,14 @@ export default function Dashboard() {
                       : 'linear-gradient(135deg, rgba(144, 202, 249, 0.1), rgba(255, 255, 255, 0.04))',
                 })}
               >
-                <Typography variant="body2">
+                <Typography component="div" variant="body2" sx={{ mb: 1 }}>
+                  Grade = average of published assignments.
+                  <br />
+                  Unattempted work counts as 0%.
+                  <br />
+                  Lowest 2 scores dropped after 3+ assignments.
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
                   {gradeOverview.total
                     ? `${gradeOverview.completed}/${gradeOverview.total} assignments attempted`
                     : 'No assignments graded yet'}

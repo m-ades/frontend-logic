@@ -7,6 +7,7 @@ import ProofEditor from './ProofEditor.jsx'
 import LogicPenguinProblem from './LogicPenguinProblem.jsx'
 import TruthTableEditor from './TruthTableEditor.jsx'
 import { ProblemNavigationContext } from './ProblemNavigationContext.jsx'
+import { allowPartialForProof, displayScoreForProof } from '../../utils/problemHelpers.js'
 
 function TabPanel(props) {
   const { children, value, index, direction, isMobile, ...other } = props;
@@ -188,11 +189,13 @@ export default function ProofTabs({
                         && Number.isFinite(proof.attemptLimit)
                         && Number.isFinite(proof.attemptCount)
                         && proof.attemptCount >= proof.attemptLimit
-                      const score = questionScores[proof.questionId]
-                      const hasScore = score != null && Number.isFinite(Number(score))
+                      const rawScore = questionScores[proof.questionId]
+                      const hasScore = rawScore != null && Number.isFinite(Number(rawScore))
+                      const allowPartial = allowPartialForProof(proof, rawScore)
+                      const score = displayScoreForProof(proof, rawScore)
                       const isCorrectStatus = isCorrect || (hasScore && score >= 100)
                       const isIncorrectStatus = (hasScore && score === 0) || (isLockedOut && !hasScore)
-                      const isPartialStatus = hasScore && score > 0 && score < 100
+                      const isPartialStatus = allowPartial && hasScore && score > 0 && score < 100
                       if (isCorrectStatus) {
                         return <CheckCircleIcon sx={{ fontSize: 18, color: 'success.main' }} aria-label="Correct" />
                       }
@@ -211,8 +214,10 @@ export default function ProofTabs({
                       && Number.isFinite(proof.attemptLimit)
                       && Number.isFinite(proof.attemptCount)
                       && proof.attemptCount >= proof.attemptLimit
-                    const score = questionScores[proof.questionId]
-                    const hasScore = score != null && Number.isFinite(Number(score))
+                    const rawScore = questionScores[proof.questionId]
+                    const hasScore = rawScore != null && Number.isFinite(Number(rawScore))
+                    const allowPartial = allowPartialForProof(proof, rawScore)
+                    const score = displayScoreForProof(proof, rawScore)
                     if (hasScore) {
                       const earned = (Number(score) / 100) * pointsPerQuestion
                       const earnedLabel = earned % 1 === 0 ? String(Math.round(earned)) : earned.toFixed(1)
@@ -362,7 +367,7 @@ export default function ProofTabs({
                               }}
                               totalQuestions={proofs.length}
                               isCurrentCorrect={completedProofs.has(proof.id)}
-                              currentQuestionScore={questionScores[proof.questionId]}
+                              currentQuestionScore={displayScoreForProof(proof, questionScores[proof.questionId])}
                             />
                           )
                         }

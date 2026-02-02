@@ -142,7 +142,7 @@ export default function ValidCorrectSound({
         </Box>
       </Box>
 
-      {message && (
+      {isTerminalStatus(status) && (
         <StatusBanner
           status={status}
           message={message}

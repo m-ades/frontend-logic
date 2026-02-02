@@ -91,7 +91,7 @@ export default async function(
 
     const total = unknownIndices.length;
     const correct = (total === 0) ? true : (correctCount === total);
-    const score = total > 0 ? (correctCount / total) : 1;
+    const score = total > 0 ? (correct ? 1 : 0) : 1; // all-or-nothing; no cell-by-cell credit
     const awarded = partialcredit ? Math.floor(points * score) : (correct ? points : 0);
 
     const rv = {

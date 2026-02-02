@@ -104,23 +104,7 @@ export default async function(
         offive = 5;
     } else {
         correct = false;
-        // compare number checked to how many they should have checked
-        // and how many are wrong
-        const shouldachecked = ((answer.A.rows.length
-                * answer.A.rows[0].length) + (answer.B.rows.length *
-                    answer.B.rows[0].length));
-        const totchecked = tmResultA.numchecked + tmResultB.numchecked;
-        const totwrong = tmResultA.offcells.length + tmResultB.offcells.length;
-        if (totchecked > 0) {
-            offive = (( totchecked - totwrong ) / shouldachecked) * 4;
-        }
-        // accommodate score based on wrong number of rows
-        if (tmResultA.rowdiff < 0) { offive--; }
-        if (tmResultA.rowdiff > 0) { offive = offive * (
-            ( answer.A.rows.length - tmResultA.rowdiff ) /
-                answer.A.rows.length);
-        }
-        if (offive < 0) { offive = 0 };
+        offive = 0; // table is all-or-nothing; no row-by-row credit
     }
     // check multiple choice answer answer
     let qright = false;

@@ -5,6 +5,7 @@
 import { useState } from 'react'
 import { localCheck } from '../lib/logicpenguin/common.js'
 import { fetchJson, getActiveUserId } from '../utils/api.js'
+import { getSubmissionScore } from '../utils/problemHelpers.js'
 
 export function useProblemChecker({
   answer,
@@ -48,14 +49,14 @@ export function useProblemChecker({
         }
         setAttemptCount((prev) => resp?.submission?.attempt ?? prev + 1)
         if (typeof window !== 'undefined') {
-          const score = resp?.submission?.score
+          const score = getSubmissionScore(resp)
           window.dispatchEvent(new CustomEvent('assignment-submission', {
             detail: {
               assignmentQuestionId,
               attempt: resp?.submission?.attempt,
               attemptLimit: resp?.attempt_limit,
               isCorrect: successstatus === 'correct',
-              score: Number.isFinite(score) ? score : null,
+              score,
             },
           }))
         }
@@ -63,6 +64,9 @@ export function useProblemChecker({
           setStatus('correct')
           setMessage('Correct!')
           onComplete?.()
+        } else if (successstatus === 'partial') {
+          setStatus('partial')
+          setMessage(validation.message || validation.transmessage || 'Partially correct.')
         } else {
           setStatus('incorrect')
           setMessage(validation.message || validation.transmessage || 'Incorrect.')
@@ -87,6 +91,9 @@ export function useProblemChecker({
           setStatus('correct')
           setMessage('Correct!')
           onComplete?.()
+        } else if (result.successstatus === 'partial') {
+          setStatus('partial')
+          setMessage(result.message || result.transmessage || 'Partially correct.')
         } else {
           setStatus('incorrect')
           setMessage(result.message || result.transmessage || 'Incorrect.')

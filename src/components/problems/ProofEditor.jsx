@@ -170,7 +170,7 @@ export default function ProofEditor({
           />
         )}
 
-      {(statusBanner.status === 'correct' || statusBanner.status === 'incorrect' || statusBanner.status === 'malfunction') && (
+      {(statusBanner.status === 'correct' || statusBanner.status === 'incorrect' || statusBanner.status === 'partial' || statusBanner.status === 'malfunction') && (
         <StatusBanner
           status={statusBanner.status}
           message={statusBanner.message}

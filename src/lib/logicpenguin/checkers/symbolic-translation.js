@@ -102,11 +102,8 @@ export default async function(
     // call function above
     const result = checkTranslation(answer, givenans,
         (options?.pred ?? true), (options?.notation ?? defaultnotation));
-    // determine partial credit
-    let awarded = (result.correct) ? points : 0;
-    if (partialcredit) {
-        awarded = Math.floor( points * parseFloat(result.ptfrac.toFixed(5)) );
-    }
+    // all-or-nothing; no partial credit for symbolic translation
+    const awarded = (result.correct) ? points : 0;
     // set up return value
     const rv = {
         successstatus: ((result.determinate) ?

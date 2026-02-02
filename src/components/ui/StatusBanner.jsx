@@ -1,15 +1,14 @@
 import { Alert } from '@mui/material'
 
-/**
- * Shared status banner for all question types. Uses MUI Alert with a consistent
- * look: variant="filled", same severity mapping, and default messages for correct/incorrect.
- */
+// status banner for all question types. filled variant, severity from status.
 function getSeverity(status) {
   switch (status) {
     case 'correct':
       return 'success'
     case 'incorrect':
       return 'error'
+    case 'partial':
+      return 'warning'
     case 'malfunction':
       return 'warning'
     case 'checking':
@@ -22,7 +21,18 @@ function getSeverity(status) {
 function getDefaultMessage(status) {
   if (status === 'correct') return 'Correct!'
   if (status === 'incorrect') return 'Incorrect.'
+  if (status === 'partial') return 'Partially correct.'
   return ''
+}
+
+// statuses that show the banner
+export function isTerminalStatus(status) {
+  return (
+    status === 'correct' ||
+    status === 'incorrect' ||
+    status === 'partial' ||
+    status === 'malfunction'
+  )
 }
 
 export default function StatusBanner({ status, message, onClose, sx }) {

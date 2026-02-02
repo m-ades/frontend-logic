@@ -1,7 +1,7 @@
 export function useWorksheetMetrics({
   score,
   total,
-  gradePercent,
+  calculatedGradePercent,
   dueAt,
 }) {
   const safeTotal = Number.isFinite(total) ? total : 0
@@ -9,13 +9,9 @@ export function useWorksheetMetrics({
   const completionPercent = safeTotal > 0
     ? Math.round((safeScore / safeTotal) * 100)
     : 0
-  const fallbackPercent = safeTotal > 0
-    ? (safeScore / safeTotal) * 100
-    : null
-  const gradeLabel = Number.isFinite(gradePercent)
-    ? `${gradePercent.toFixed(1)}%`
-    : Number.isFinite(fallbackPercent)
-    ? `${fallbackPercent.toFixed(1)}%`
+  // total from local calc only. no api fetch.
+  const gradeLabel = Number.isFinite(calculatedGradePercent)
+    ? `${calculatedGradePercent.toFixed(1)}%`
     : '—'
   const dueAtDate = dueAt ? new Date(dueAt) : null
   const isOverdue = dueAtDate && !Number.isNaN(dueAtDate.getTime())
