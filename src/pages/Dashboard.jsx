@@ -125,11 +125,18 @@ export default function Dashboard() {
           if (isMounted) {
             setIsLoadingAnalytics(true)
           }
-          const [analyticsData, grades, gradebookSummary] = await Promise.all([
+          const [analyticsData, grades, gradebookResponse] = await Promise.all([
             fetchJson(`/api/analytics/student?userId=${getActiveUserId()}&courseId=${courseIdForApi}`),
             fetchJson(`/api/users/${getActiveUserId()}/grades`),
             fetchJson(`/api/analytics/gradebook-summary?courseId=${courseIdForApi}`).catch(() => null),
           ])
+          const gradebookSummary = Array.isArray(gradebookResponse)
+            ? gradebookResponse
+            : (gradebookResponse?.assignments ?? [])
+          const classAvgWithDrop =
+            !Array.isArray(gradebookResponse) && gradebookResponse != null
+              ? gradebookResponse.class_avg_with_drop
+              : null
         if (isMounted) {
           setAnalytics({ ...emptyAnalytics, ...analyticsData })
           const userId = getActiveUserId()
@@ -140,7 +147,7 @@ export default function Dashboard() {
             ])
           )
           const unlockedSummary = gradebookSummary?.length
-            ? gradebookSummary.filter((assignment) => !assignment.is_locked)
+            ? gradebookSummary.filter((assignment) => assignment.is_locked === false)
             : []
           const timeline = unlockedSummary.length
             ? unlockedSummary
@@ -195,8 +202,7 @@ export default function Dashboard() {
                 .sort((a, b) => new Date(a.date) - new Date(b.date))
           setGradeTimeline(timeline)
 
-          // Grade = average of unlocked (published) assignment percents. Unattempted = 0%.
-          // When 3+ assignments are unlocked, lowest 2 scores are dropped.
+          // your grade: unlocked only, unattempted = 0%, drop two lowest when three or more
           const assignmentPercents =
             unlockedSummary.length > 0
               ? unlockedSummary.map((assignment) => {
@@ -210,16 +216,18 @@ export default function Dashboard() {
                     title: assignment.title || 'Assignment',
                   }
                 })
-              : (grades || []).reduce((list, grade) => {
-                  const max = grade?.max_score || 0
-                  const score = grade?.final_score ?? grade?.raw_score
-                  if (!max || score === null || score === undefined) return list
-                  list.push({
-                    percent: (score / max) * 100,
-                    title: grade?.Assignment?.title || grade?.title || 'Assignment',
-                  })
-                  return list
-                }, [])
+              : (grades || [])
+                  .filter((grade) => grade?.Assignment?.is_locked === false)
+                  .reduce((list, grade) => {
+                    const max = grade?.max_score || 0
+                    const score = grade?.final_score ?? grade?.raw_score
+                    if (!max || score === null || score === undefined) return list
+                    list.push({
+                      percent: (score / max) * 100,
+                      title: grade?.Assignment?.title || grade?.title || 'Assignment',
+                    })
+                    return list
+                  }, [])
 
           const totalAssignments =
             unlockedSummary.length > 0
@@ -239,13 +247,22 @@ export default function Dashboard() {
             overallPercent = scoresForAverage.reduce((s, p) => s + p, 0) / scoresForAverage.length
           }
 
-          const classAverageValues = (unlockedSummary.length > 0 ? unlockedSummary : gradebookSummary || [])
-            .map((assignment) => assignment.avg_percent)
-            .filter((value) => value !== null && value !== undefined)
+          // class avg: same policy (unlocked only, drop two lowest), from api or fallback
           const classAverage =
-            classAverageValues.length > 0
-              ? (classAverageValues.reduce((sum, value) => sum + value, 0) / classAverageValues.length) * 100
-              : null
+            classAvgWithDrop != null
+              ? classAvgWithDrop
+              : (() => {
+                  const forAvg =
+                    unlockedSummary.length > 0
+                      ? unlockedSummary
+                      : (gradebookSummary || []).filter((a) => a.is_locked === false)
+                  const classAverageValues = forAvg
+                    .map((assignment) => assignment.avg_percent)
+                    .filter((value) => value !== null && value !== undefined)
+                  return classAverageValues.length > 0
+                    ? (classAverageValues.reduce((sum, value) => sum + value, 0) / classAverageValues.length) * 100
+                    : null
+                })()
           const lowestScores = assignmentPercents
             .slice()
             .sort((a, b) => a.percent - b.percent)
@@ -263,7 +280,7 @@ export default function Dashboard() {
             lowestScores,
           })
 
-          // What's Left: use student analytics (pastDueDateCount, total) so denominator matches; remaining = 100 - pastDue
+          // what's left: remaining = 100 - pastDue percent
           const assignmentsData = analyticsData?.assignments ?? {}
           const pastDueDateCount = assignmentsData.pastDueDateCount ?? assignmentsData.overdue ?? 0
           const totalForWhatsLeft = assignmentsData.total ?? totalAssignments ?? 0

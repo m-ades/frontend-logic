@@ -46,7 +46,7 @@ export default function InstructorDashboard() {
         ]);
         if (isMounted) {
           setAnalytics(instructorAnalytics);
-          setGradebookSummary(summary || []);
+          setGradebookSummary(Array.isArray(summary) ? summary : (summary?.assignments ?? []));
         }
       } catch (error) {
         if (isMounted) {
