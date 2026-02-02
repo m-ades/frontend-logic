@@ -1375,7 +1375,7 @@ export default function DerivationTable({
                               inputProps={{ autoComplete: 'off' }}
                               inputRef={(el) => { if (el) justRefs.current[idx] = el }}
                               sx={(theme) => ({
-                                width: { xs: '100%', md: 76 },
+                                width: { xs: '100%', sm: 76 },
                                 ...getInputUnderlineSx(theme),
                                 '& .MuiInputBase-input': {
                                   fontSize: 16,
