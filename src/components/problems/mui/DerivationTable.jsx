@@ -76,8 +76,8 @@ const RULE_INPUT_MODE_KEY = 'logic-app:derivation-rule-input-mode'
 // Message shown on mobile when derivation is not fullscreen (table not rendered)
 const MOBILE_DERIVATION_PLACEHOLDER_MSG = 'Tap to open proof'
 
-const symbolBtnSx = (isFullScreen, isMobile) => {
-  const mobileFullscreen = isMobile && isFullScreen
+const symbolBtnSx = (isFullScreen, isMobile, isPhone) => {
+  const mobileFullscreen = isPhone && isFullScreen
   return {
     minWidth: mobileFullscreen ? 42 : (isFullScreen ? 28 : 34),
     px: mobileFullscreen ? 1.25 : (isFullScreen ? 0.75 : 1),
@@ -312,6 +312,7 @@ export default function DerivationTable({
   setIsChecking,
   isAssignmentLocked = true,
   isMobile = false,
+  isPhone = false,
   isFullScreen = false,
   initialFocusLineIndex = null,
   initialFocusField = null,
@@ -990,8 +991,8 @@ export default function DerivationTable({
     }
   }
 
-  // open fullscreen when user taps an input on the table. mobile only.
-  const canOpenFullScreen = isMobile && !isFullScreen && typeof onOpenFullScreen === 'function'
+  // open fullscreen when user taps an input on the table. phones only (not tablets).
+  const canOpenFullScreen = isPhone && !isFullScreen && typeof onOpenFullScreen === 'function'
 
   const handleInputRequestFullScreen = useCallback(
     (lineIndex, field) => {
@@ -1037,7 +1038,7 @@ export default function DerivationTable({
             <PromptText content={proof.description} sx={{ fontSize: 15 }} />
           </Box>
         )}
-        {isMobile && !isFullScreen && canOpenFullScreen ? (
+        {isPhone && !isFullScreen && canOpenFullScreen ? (
           <Box
             component="button"
             type="button"
@@ -1295,12 +1296,12 @@ export default function DerivationTable({
                     verticalAlign: 'middle',
                     ...(isFullScreen ? { width: '50%', minWidth: 0 } : { width: 'auto', whiteSpace: 'nowrap' }),
                     '& .line-delete': {
-                      opacity: isMobile && isFullScreen
+                      opacity: isPhone && isFullScreen
                         ? (activeFormulaIndex === idx ? 1 : 0)
                         : 0,
                       transition: 'opacity 120ms ease',
                     },
-                    ...(!(isMobile && isFullScreen) && { '&:hover .line-delete': { opacity: 1 } }),
+                    ...(!(isPhone && isFullScreen) && { '&:hover .line-delete': { opacity: 1 } }),
                   }}
                 >
                   {idx < premises.length ? (
@@ -1333,7 +1334,7 @@ export default function DerivationTable({
                               placeholder="Line(s)"
                               value={lineDrafts[idx] ?? formatJustificationLines(line.justification)}
                               onFocus={() => {
-                                if (!line.readOnly && isMobile && isFullScreen) {
+                                if (!line.readOnly && isPhone && isFullScreen) {
                                   setActiveFormulaIndex(idx)
                                   lastEditableIndexRef.current = idx
                                 }
@@ -1389,7 +1390,7 @@ export default function DerivationTable({
                                 value={getRuleFromJustification(line.justification)}
                                 displayEmpty
                                 onFocus={() => {
-                                  if (!line.readOnly && isMobile && isFullScreen) {
+                                  if (!line.readOnly && isPhone && isFullScreen) {
                                     setActiveFormulaIndex(idx)
                                     lastEditableIndexRef.current = idx
                                   }
@@ -1537,10 +1538,10 @@ export default function DerivationTable({
                       flexWrap: isFullScreen ? 'wrap' : 'nowrap',
                       minWidth: isFullScreen ? 0 : 'max-content',
                       pr: isFullScreen ? 0 : 1,
-                      ...(isMobile && isFullScreen && { flexDirection: 'column', alignItems: 'flex-start' }), // two rows only in mobile fullscreen
+                      ...(isPhone && isFullScreen && { flexDirection: 'column', alignItems: 'flex-start' }), // two rows only in mobile fullscreen
                     }}
                   >
-                    {isMobile && isFullScreen ? (
+                    {isPhone && isFullScreen ? (
                       <>
                         {/* row 1: autochecker + first five */}
                         <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: isFullScreen ? 0.5 : 0.75, flexShrink: 0 }}>
@@ -1562,7 +1563,7 @@ export default function DerivationTable({
                               variant="outlined"
                               onMouseDown={(e) => e.preventDefault()}
                               onClick={() => handleSymbolInsert({ insert: btn.insert, pair: btn.pair })}
-                              sx={symbolBtnSx(isFullScreen, isMobile)}
+                              sx={symbolBtnSx(isFullScreen, isMobile, isPhone)}
                             >
                               {btn.label}
                             </Button>
@@ -1579,12 +1580,12 @@ export default function DerivationTable({
                               variant="outlined"
                               onMouseDown={(e) => e.preventDefault()}
                               onClick={() => handleSymbolInsert({ insert: btn.insert, pair: btn.pair })}
-                              sx={symbolBtnSx(isFullScreen, isMobile)}
+                              sx={symbolBtnSx(isFullScreen, isMobile, isPhone)}
                             >
                               {btn.label}
                             </Button>
                           ))}
-                          <Box sx={{ minWidth: (isMobile && isFullScreen) ? 42 : (isFullScreen ? 28 : 34), px: (isMobile && isFullScreen) ? 1.25 : (isFullScreen ? 0.75 : 1), flexShrink: 0 }} aria-hidden />
+                          <Box sx={{ minWidth: (isPhone && isFullScreen) ? 42 : (isFullScreen ? 28 : 34), px: (isPhone && isFullScreen) ? 1.25 : (isFullScreen ? 0.75 : 1), flexShrink: 0 }} aria-hidden />
                         </Box>
                       </>
                     ) : (
@@ -1610,7 +1611,7 @@ export default function DerivationTable({
                             variant="outlined"
                             onMouseDown={(e) => e.preventDefault()}
                             onClick={() => handleSymbolInsert({ insert, pair })}
-                            sx={symbolBtnSx(isFullScreen, isMobile)}
+                            sx={symbolBtnSx(isFullScreen, isMobile, isPhone)}
                           >
                             {label}
                           </Button>
@@ -1685,7 +1686,7 @@ export default function DerivationTable({
           attemptCount={attemptCount}
           attemptLimit={attemptLimit}
           sx={{ mt: 1 }}
-          scoreLabel={isMobile && isFullScreen && Number.isFinite(totalQuestions) && totalQuestions > 0 ? (() => {
+          scoreLabel={isPhone && isFullScreen && Number.isFinite(totalQuestions) && totalQuestions > 0 ? (() => {
             const pointsPerQuestion = 100 / totalQuestions
             const maxLabel = pointsPerQuestion % 1 === 0 ? String(Math.round(pointsPerQuestion)) : pointsPerQuestion.toFixed(1)
             const isLockedOut = Number.isFinite(attemptLimit) && attemptCount >= attemptLimit

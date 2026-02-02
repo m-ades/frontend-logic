@@ -73,6 +73,7 @@ export default function ProofTabs({
 }) {
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
+  const isPhone = useMediaQuery(theme.breakpoints.down('sm')) // fullscreen layout only on phones
   const proofRefs = React.useRef({})
   const [direction, setDirection] = React.useState('forward')
   const prevIndexRef = React.useRef(currentProofIndex)
@@ -170,10 +171,10 @@ export default function ProofTabs({
                 <Box
                   sx={{
                     display: 'flex',
-                    flexDirection: isMobile && fullScreenOpen ? 'row' : 'column',
+                    flexDirection: isPhone && fullScreenOpen ? 'row' : 'column',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    gap: isMobile && fullScreenOpen ? 1 : 0.25,
+                    gap: isPhone && fullScreenOpen ? 1 : 0.25,
                     width: '100%',
                   }}
                 >

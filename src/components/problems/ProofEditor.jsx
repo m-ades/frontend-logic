@@ -19,7 +19,8 @@ export default function ProofEditor({
   isCurrentCorrect,
 }) {
   const theme = useTheme()
-  const isMobile = useMediaQuery(theme.breakpoints.down('md')) // mobile breakpoint
+  const isMobile = useMediaQuery(theme.breakpoints.down('md')) // compact layout: phone + tablet
+  const isPhone = useMediaQuery(theme.breakpoints.down('sm')) // fullscreen only on phones
   const [internalOpen, setInternalOpen] = useState(false)
   const [internalFocus, setInternalFocus] = useState(null)
   const isControlled = typeof onOpenFullScreenProp === 'function'
@@ -133,6 +134,7 @@ export default function ProofEditor({
         setIsChecking={setIsChecking}
         isAssignmentLocked={isAssignmentLocked}
         isMobile={isMobile}
+        isPhone={isPhone}
         isFullScreen={true}
         initialFocusLineIndex={fullScreenFocusTarget?.lineIndex}
         initialFocusField={fullScreenFocusTarget?.field}
@@ -150,7 +152,7 @@ export default function ProofEditor({
       {fullScreenOverlay}
       <Stack spacing={3} sx={{ px: 0, width: '100%', alignItems: 'stretch', flexGrow: 1 }}>
         {/* table: show when not fullscreen, or when desktop (fullscreen is mobile-only) */}
-        {(!fullScreenOpen || !isMobile) && (
+        {(!fullScreenOpen || !isPhone) && (
           <DerivationTable
             proof={proof}
             savedState={savedState}
@@ -166,6 +168,7 @@ export default function ProofEditor({
             setIsChecking={setIsChecking}
             isAssignmentLocked={isAssignmentLocked}
             isMobile={isMobile}
+        isPhone={isPhone}
             isFullScreen={false}
             onOpenFullScreen={openFullScreen}
             onCloseFullScreen={closeFullScreen}
