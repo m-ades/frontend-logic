@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { Alert, Box, Stack, Typography } from '@mui/material'
+import { Box, Stack, Typography } from '@mui/material'
+import StatusBanner from '../../ui/StatusBanner.jsx'
 import { useTheme } from '@mui/material/styles'
 import getSyntax from '../../../lib/logicpenguin/symbolic/libsyntax.js'
 import ProblemSetButtons from './ProblemSetButtons.jsx'
@@ -129,7 +130,7 @@ export default function ComboTranslationTruthTable({
     }
   }, [parseStatus.ok, parseStatus.parsed, proof])
 
-  const { message, isChecking, handleCheck, handleStartOver, getStatusColor, setMessage, attemptCount, maxAttempts, isLocked } =
+  const { status, message, isChecking, handleCheck, handleStartOver, setMessage, attemptCount, maxAttempts, isLocked } =
     useProblemChecker({
       answer: proof?.answer ?? snapshot?.answer,
       problemType: 'combo-translation-truth-table',
@@ -226,7 +227,13 @@ export default function ComboTranslationTruthTable({
         </Box>
       </Box>
 
-      {message && <Alert severity={getStatusColor()} onClose={() => setMessage('')}>{message}</Alert>}
+      {message && (
+        <StatusBanner
+          status={status}
+          message={message}
+          onClose={() => setMessage('')}
+        />
+      )}
 
       <ProblemSetButtons
         onCheck={handleCheck}

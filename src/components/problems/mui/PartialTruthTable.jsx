@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
 import {
-  Alert,
   Box,
   Stack,
   Typography,
@@ -18,6 +17,7 @@ import { useTheme } from '@mui/material/styles'
 import getFormulaClass from '../../../lib/logicpenguin/symbolic/formula.js'
 import { multiTables } from '../../../lib/logicpenguin/symbolic/libsemantics.js'
 import ProblemSetButtons from './ProblemSetButtons.jsx'
+import StatusBanner from '../../ui/StatusBanner.jsx'
 import { useProblemChecker } from '../../../hooks/useProblemChecker.js'
 import PromptText from '../../ui/PromptText.jsx'
 import RichText from '../../ui/RichText.jsx'
@@ -83,7 +83,7 @@ export default function PartialTruthTable({
     rowInputs.length === 0 ||
     rowInputs.some((cell, idx) => editableIndices[idx] && cell === '')
 
-  const { status, message, isChecking, handleCheck, handleStartOver, getStatusColor, setStatus, setMessage, attemptCount, maxAttempts } = useProblemChecker({
+  const { status, message, isChecking, handleCheck, handleStartOver, setStatus, setMessage, attemptCount, maxAttempts } = useProblemChecker({
     answer: null,
     problemType: 'partial-truth-table',
     question: problem,
@@ -203,9 +203,11 @@ export default function PartialTruthTable({
         </Box>
       </Box>
       {message && (
-        <Alert severity={getStatusColor()} onClose={() => setMessage('')}>
-          {message}
-        </Alert>
+        <StatusBanner
+          status={status}
+          message={message}
+          onClose={() => setMessage('')}
+        />
       )}
       {!hideActions && (
         <ProblemSetButtons

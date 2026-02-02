@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Alert, Box, Stack, Typography } from '@mui/material'
+import StatusBanner from '../../ui/StatusBanner.jsx'
 import { useTheme } from '@mui/material/styles'
 import ProblemSetButtons from './ProblemSetButtons.jsx'
 import FormulaInput from '../../ui/logicpenguin/formula-input.js'
@@ -150,7 +151,7 @@ export default function ComboTranslationDerivation({
     updateState({ argumentLine: '', derivationState: null })
   }
 
-  const { message, isChecking, handleCheck, handleStartOver, getStatusColor, setMessage, attemptCount, maxAttempts, isLocked } =
+  const { status, message, isChecking, handleCheck, handleStartOver, setMessage, attemptCount, maxAttempts, isLocked } =
     useProblemChecker({
       answer: proof?.answer ?? snapshot?.answer,
       problemType: 'combo-translation-derivation',
@@ -258,7 +259,13 @@ export default function ComboTranslationDerivation({
         <Alert severity="info">{parseStatus.reason}</Alert>
       )}
 
-      {message && <Alert severity={getStatusColor()} onClose={() => setMessage('')}>{message}</Alert>}
+      {message && (
+        <StatusBanner
+          status={status}
+          message={message}
+          onClose={() => setMessage('')}
+        />
+      )}
 
       <ProblemSetButtons
         onCheck={handleCheck}

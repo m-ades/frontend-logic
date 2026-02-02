@@ -1,6 +1,5 @@
 import * as React from 'react'
 import {
-  Alert,
   Box,
   Stack,
   Typography,
@@ -20,6 +19,7 @@ import {
   Paper,
 } from '@mui/material'
 import { useTheme } from '@mui/material/styles'
+import StatusBanner from '../../ui/StatusBanner.jsx'
 import getFormulaClass from '../../../lib/logicpenguin/symbolic/formula.js'
 import getSyntax from '../../../lib/logicpenguin/symbolic/libsyntax.js'
 import {
@@ -1055,13 +1055,11 @@ export default function TruthTable({
             : 'Click cells to toggle truth values - fill in every cell to finish.'}
       </Typography>
       {message && (
-        <Alert
-          severity={status === 'correct' ? 'success' : status === 'incorrect' ? 'error' : 'info'}
-          variant="filled"
+        <StatusBanner
+          status={status}
+          message={message}
           onClose={() => setMessage('')}
-        >
-          {message}
-        </Alert>
+        />
       )}
       {!hideActions && (
         <ProblemSetButtons

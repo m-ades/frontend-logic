@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Alert, Box, Stack, Typography, FormControl, Select, MenuItem } from '@mui/material'
+import { Box, Stack, Typography, FormControl, Select, MenuItem } from '@mui/material'
+import StatusBanner from '../../ui/StatusBanner.jsx'
 import { useTheme } from '@mui/material/styles'
 import getFormulaClass from '../../../lib/logicpenguin/symbolic/formula.js'
 import getSyntax from '../../../lib/logicpenguin/symbolic/libsyntax.js'
@@ -182,7 +183,7 @@ export default function SingleRowTruthTable({
     rowInputs.some((cell, idx) => cell === '' && !isAtomicToken(tokens[idx])) ||
     compoundInput === ''
 
-  const { status, message, isChecking, handleCheck, handleStartOver, getStatusColor, setStatus, setMessage, attemptCount, maxAttempts, isLocked } = useProblemChecker({
+  const { status, message, isChecking, handleCheck, handleStartOver, setStatus, setMessage, attemptCount, maxAttempts, isLocked } = useProblemChecker({
     answer: expectedRow,
     problemType: 'single-row-truth-table',
     question: problem,
@@ -391,12 +392,11 @@ export default function SingleRowTruthTable({
         </Box>
       </Box>
       {message && (
-        <Alert
-          severity={getStatusColor()}
+        <StatusBanner
+          status={status}
+          message={message}
           onClose={() => setMessage('')}
-        >
-          {message}
-        </Alert>
+        />
       )}
 
       {!hideActions && (

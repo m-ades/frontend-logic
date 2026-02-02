@@ -1,5 +1,6 @@
 import { useState, useEffect, useId } from 'react'
-import { Box, Stack, Radio, RadioGroup, FormControlLabel, FormControl, Alert } from '@mui/material'
+import { Box, Stack, Radio, RadioGroup, FormControlLabel, FormControl } from '@mui/material'
+import StatusBanner from '../../ui/StatusBanner.jsx'
 import ProblemSetButtons from './ProblemSetButtons.jsx'
 import { useProblemChecker } from '../../../hooks/useProblemChecker.js'
 import SolutionReveal from '../SolutionReveal.jsx'
@@ -25,7 +26,7 @@ export default function EvaluateTruth({
     ? `evaluate-truth-${assignmentQuestionId}`
     : `evaluate-truth-${baseId}`
   
-  const { status, message, isChecking, handleCheck, handleStartOver, getStatusColor, setStatus, setMessage, attemptCount, maxAttempts, isLocked } = useProblemChecker({
+  const { status, message, isChecking, handleCheck, handleStartOver, setStatus, setMessage, attemptCount, maxAttempts, isLocked } = useProblemChecker({
     answer,
     problemType: 'evaluate-truth',
     question: problem,
@@ -116,12 +117,11 @@ export default function EvaluateTruth({
       </Box>
 
       {message && (
-        <Alert 
-          severity={getStatusColor()} 
+        <StatusBanner
+          status={status}
+          message={message}
           onClose={() => setMessage('')}
-        >
-          {message}
-        </Alert>
+        />
       )}
 
       {!hideActions && (

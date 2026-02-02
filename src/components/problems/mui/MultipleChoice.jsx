@@ -1,5 +1,6 @@
 import { useState, useEffect, useId } from 'react'
-import { Box, Stack, Radio, RadioGroup, FormControlLabel, FormControl, FormGroup, Checkbox, Typography, Alert } from '@mui/material'
+import { Box, Stack, Radio, RadioGroup, FormControlLabel, FormControl, FormGroup, Checkbox, Typography } from '@mui/material'
+import StatusBanner from '../../ui/StatusBanner.jsx'
 import ProblemSetButtons from './ProblemSetButtons.jsx'
 import { useProblemChecker } from '../../../hooks/useProblemChecker.js'
 import SolutionReveal from '../SolutionReveal.jsx'
@@ -50,7 +51,7 @@ export default function MultipleChoice({
         : (savedState?.ans !== undefined ? String(savedState.ans) : '')
   )
   
-  const { status, message, isChecking, handleCheck, handleStartOver, getStatusColor, setStatus, setMessage, attemptCount, maxAttempts, isLocked } = useProblemChecker({
+  const { status, message, isChecking, handleCheck, handleStartOver, setStatus, setMessage, attemptCount, maxAttempts, isLocked } = useProblemChecker({
     answer,
     problemType: 'multiple-choice',
     question: problem,
@@ -386,12 +387,11 @@ export default function MultipleChoice({
       </Box>
 
       {message && (
-        <Alert 
-          severity={getStatusColor()} 
+        <StatusBanner
+          status={status}
+          message={message}
           onClose={() => setMessage('')}
-        >
-          {message}
-        </Alert>
+        />
       )}
 
       {!hideActions && (

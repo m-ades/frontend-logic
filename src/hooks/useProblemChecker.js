@@ -117,8 +117,9 @@ export function useProblemChecker({
     switch (status) {
       case 'correct': return 'success'
       case 'incorrect': return 'error'
+      case 'malfunction': return 'warning'
       case 'checking': return 'info'
-      default: return 'default'
+      default: return 'info'
     }
   }
 

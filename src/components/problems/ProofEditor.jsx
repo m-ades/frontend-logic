@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from 'react'
 import { createPortal } from 'react-dom'
-import { Alert, Box, IconButton, Stack, useMediaQuery, useTheme } from '@mui/material'
+import { Box, IconButton, Stack, useMediaQuery, useTheme } from '@mui/material'
+import StatusBanner from '../ui/StatusBanner.jsx'
 import CloseIcon from '@mui/icons-material/Close'
 import DerivationTable from './mui/DerivationTable.jsx'
 
@@ -75,16 +76,6 @@ export default function ProofEditor({
   }, [])
 
   if (!proof) return null
-
-  const bannerSeverity = (status) => {
-    switch (status) {
-      case 'correct': return 'success'
-      case 'incorrect': return 'error'
-      case 'malfunction': return 'warning'
-      case 'checking': return 'info'
-      default: return 'info'
-    }
-  }
 
   // fullscreen overlay: mobile only (non-mobile has no fullscreen option)
   const fullScreenOverlay = isMobile && fullScreenOpen && typeof document !== 'undefined' && createPortal(
@@ -178,14 +169,12 @@ export default function ProofEditor({
         )}
 
       {(statusBanner.status === 'correct' || statusBanner.status === 'incorrect' || statusBanner.status === 'malfunction') && (
-        <Alert
-          severity={bannerSeverity(statusBanner.status)}
-          variant="filled"
+        <StatusBanner
+          status={statusBanner.status}
+          message={statusBanner.message}
           onClose={() => setStatusBanner({ status: 'unanswered', message: '' })}
           sx={{ mt: -1 }}
-        >
-          {statusBanner.message || (statusBanner.status === 'correct' ? 'Correct!' : 'Incorrect.')}
-        </Alert>
+        />
       )}
       </Stack>
     </>

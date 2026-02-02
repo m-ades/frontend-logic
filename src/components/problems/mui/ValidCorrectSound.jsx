@@ -1,6 +1,7 @@
 /*
 import { useState, useEffect } from 'react'
-import { Box, Stack, Radio, RadioGroup, FormControlLabel, FormControl, Typography, Alert, Table, TableBody, TableRow, TableCell } from '@mui/material'
+import { Box, Stack, Radio, RadioGroup, FormControlLabel, FormControl, Typography, Table, TableBody, TableRow, TableCell } from '@mui/material'
+import StatusBanner from '../../ui/StatusBanner.jsx'
 import ProblemSetButtons from './ProblemSetButtons.jsx'
 import { useProblemChecker } from '../../../hooks/useProblemChecker.js'
 import SolutionReveal from '../SolutionReveal.jsx'
@@ -30,7 +31,7 @@ export default function ValidCorrectSound({
   })
   const hasAnyAnswer = (values) => Object.values(values).some((value) => value !== '')
   
-  const { status, message, isChecking, handleCheck: baseHandleCheck, handleStartOver, getStatusColor, setStatus, setMessage, attemptCount, maxAttempts, isLocked } = useProblemChecker({
+  const { status, message, isChecking, handleCheck: baseHandleCheck, handleStartOver, setStatus, setMessage, attemptCount, maxAttempts, isLocked } = useProblemChecker({
     answer,
     problemType: 'valid-correct-sound',
     question: problem,
@@ -142,12 +143,11 @@ export default function ValidCorrectSound({
       </Box>
 
       {message && (
-        <Alert 
-          severity={getStatusColor()} 
+        <StatusBanner
+          status={status}
+          message={message}
           onClose={() => setMessage('')}
-        >
-          {message}
-        </Alert>
+        />
       )}
 
       {!hideActions && (

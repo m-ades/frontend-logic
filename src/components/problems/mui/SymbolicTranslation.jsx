@@ -149,7 +149,7 @@ export default function SymbolicTranslation({
     }, 200)
   }, [onStateChange])
   
-  const { status, message, isChecking, handleCheck, handleStartOver, getStatusColor, setMessage, attemptCount, maxAttempts, isLocked } = useProblemChecker({
+  const { status, message, isChecking, handleCheck, handleStartOver, setMessage, attemptCount, maxAttempts, isLocked } = useProblemChecker({
     answer,
     problemType: 'symbolic-translation',
     question: problem,
@@ -274,12 +274,11 @@ export default function SymbolicTranslation({
       </Box>
 
       {message && (
-        <Alert 
-          severity={getStatusColor()} 
+        <StatusBanner
+          status={status}
+          message={message}
           onClose={() => setMessage('')}
-        >
-          {message}
-        </Alert>
+        />
       )}
 
       {!hideActions && (

@@ -1,6 +1,5 @@
 import { useMemo, useState, useEffect } from 'react'
 import {
-  Alert,
   Box,
   Stack,
   Typography,
@@ -258,7 +257,7 @@ export default function IndirectTruthTable({
     })
   }
 
-  const { message, isChecking, handleCheck, handleStartOver, getStatusColor, setMessage, attemptCount, maxAttempts, isLocked } =
+  const { status, message, isChecking, handleCheck, handleStartOver, setMessage, attemptCount, maxAttempts, isLocked } =
     useProblemChecker({
       answer,
       problemType: 'indirect-truth-table',
@@ -448,9 +447,11 @@ export default function IndirectTruthTable({
       </Box>
 
       {message && (
-        <Alert severity={getStatusColor()} onClose={() => setMessage('')}>
-          {message}
-        </Alert>
+        <StatusBanner
+          status={status}
+          message={message}
+          onClose={() => setMessage('')}
+        />
       )}
 
       {!hideActions && (
