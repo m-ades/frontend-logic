@@ -108,6 +108,7 @@ export default function Assignments() {
 
         setCourseStructure(buildCourseStructure(gradedAssignments, 'Assignments'))
 
+        // completed tab: only when there is a submission for every question in the assignment
         const completionResults = gradedAssignments.map((assignment) => {
           const completedFlag = assignment.completed === true
             || assignment.completed === 'true'
@@ -117,7 +118,7 @@ export default function Assignments() {
           const questionCount = Number(assignment.question_count) || 0
           const answeredCount = Number(assignment.answered_count) || 0
           if (questionCount === 0) return null
-          return answeredCount >= questionCount ? assignment.id : null
+          return answeredCount === questionCount ? assignment.id : null
         })
         if (isMounted) {
           setCompletedAssignments(new Set(completionResults.filter(Boolean)))
