@@ -9,7 +9,7 @@ import SolutionReveal from '../SolutionReveal.jsx'
 import PromptText from '../../ui/PromptText.jsx'
 import RichText from '../../ui/RichText.jsx'
 
-function FormulaInputField({ value, onValueChange, fieldReadOnly, formulaInputRef }) {
+function FormulaInputField({ value, onValueChange, fieldReadOnly, formulaInputRef, onEnterKey }) {
   const theme = useTheme()
   const containerRef = useRef(null)
   const changeHandlerRef = useRef(null)
@@ -79,6 +79,19 @@ function FormulaInputField({ value, onValueChange, fieldReadOnly, formulaInputRe
       formulaInputRef.current.value = value
     }
   }, [value, formulaInputRef])
+
+  useEffect(() => {
+    const formulaInput = formulaInputRef.current
+    if (!formulaInput || !onEnterKey) return
+    const handleKeyDown = (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault()
+        onEnterKey()
+      }
+    }
+    formulaInput.addEventListener('keydown', handleKeyDown)
+    return () => formulaInput.removeEventListener('keydown', handleKeyDown)
+  }, [formulaInputRef, onEnterKey])
 
   return (
     <Box
@@ -231,6 +244,7 @@ export default function SymbolicTranslation({
                 }}
                 fieldReadOnly={readOnly}
                 formulaInputRef={formulaInputRef}
+                onEnterKey={!readOnly && !hideActions ? handleCheck : undefined}
               />
               <Box sx={{ mt: 1 }}>
                 <SymbolButtonRow
