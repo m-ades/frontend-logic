@@ -35,7 +35,7 @@ export function isTerminalStatus(status) {
   )
 }
 
-export default function StatusBanner({ status, message, onClose, sx }) {
+function StatusBanner({ status, message, onClose, sx }) {
   const displayMessage = message || getDefaultMessage(status)
   const severity = getSeverity(status)
 
@@ -50,5 +50,8 @@ export default function StatusBanner({ status, message, onClose, sx }) {
     </Alert>
   )
 }
+
+StatusBanner.isTerminalStatus = isTerminalStatus
+export default StatusBanner
 
 export { getSeverity }

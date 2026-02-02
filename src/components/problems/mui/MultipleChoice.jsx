@@ -1,6 +1,6 @@
 import { useState, useEffect, useId } from 'react'
 import { Box, Stack, Radio, RadioGroup, FormControlLabel, FormControl, FormGroup, Checkbox, Typography } from '@mui/material'
-import StatusBanner from '../../ui/StatusBanner.jsx'
+import StatusBanner, { isTerminalStatus } from '../../ui/StatusBanner.jsx'
 import ProblemSetButtons from './ProblemSetButtons.jsx'
 import { useProblemChecker } from '../../../hooks/useProblemChecker.js'
 import SolutionReveal from '../SolutionReveal.jsx'

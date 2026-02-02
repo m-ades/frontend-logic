@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Alert, Box, Stack, Typography } from '@mui/material'
-import StatusBanner from '../../ui/StatusBanner.jsx'
+import StatusBanner, { isTerminalStatus } from '../../ui/StatusBanner.jsx'
 import { useTheme } from '@mui/material/styles'
 import ProblemSetButtons from './ProblemSetButtons.jsx'
 import FormulaInput from '../../ui/logicpenguin/formula-input.js'
