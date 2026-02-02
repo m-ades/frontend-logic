@@ -239,7 +239,7 @@ export default function Dashboard() {
             overallPercent = scoresForAverage.reduce((s, p) => s + p, 0) / scoresForAverage.length
           }
 
-          const classAverageValues = (gradebookSummary || [])
+          const classAverageValues = (unlockedSummary.length > 0 ? unlockedSummary : gradebookSummary || [])
             .map((assignment) => assignment.avg_percent)
             .filter((value) => value !== null && value !== undefined)
           const classAverage =
