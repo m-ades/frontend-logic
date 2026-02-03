@@ -13,91 +13,6 @@ import getFormulaClass from '../../../lib/logicpenguin/symbolic/formula.js'
 import { useProblemChecker } from '../../../hooks/useProblemChecker.js'
 import PromptText from '../../ui/PromptText.jsx'
 
-function FormulaInputField({ value, onValueChange, fieldReadOnly, formulaInputRef }) {
-  const theme = useTheme()
-  const containerRef = useRef(null)
-  const changeHandlerRef = useRef(null)
-
-  useEffect(() => {
-    if (!containerRef.current) return
-    if (!formulaInputRef.current) {
-      const formulaInput = FormulaInput.getnew({})
-      formulaInputRef.current = formulaInput
-      formulaInput.style.width = '100%'
-      formulaInput.style.padding = theme.spacing(1.5)
-      formulaInput.style.border = `1px solid ${theme.palette.divider}`
-      formulaInput.style.borderRadius = theme.shape.borderRadius
-      formulaInput.style.fontSize = '1rem'
-      formulaInput.style.fontFamily = 'monospace'
-      formulaInput.style.backgroundColor = theme.palette.background.paper
-      formulaInput.style.color = theme.palette.text.primary
-      containerRef.current.appendChild(formulaInput)
-    } else if (!containerRef.current.contains(formulaInputRef.current)) {
-      containerRef.current.appendChild(formulaInputRef.current)
-    }
-    return () => {
-      if (formulaInputRef.current) {
-        if (changeHandlerRef.current) {
-          formulaInputRef.current.removeEventListener('input', changeHandlerRef.current)
-          formulaInputRef.current.removeEventListener('change', changeHandlerRef.current)
-          changeHandlerRef.current = null
-        }
-        if (formulaInputRef.current.parentNode) {
-          formulaInputRef.current.parentNode.removeChild(formulaInputRef.current)
-        }
-        formulaInputRef.current = null
-      }
-    }
-  }, [formulaInputRef, theme])
-
-  useEffect(() => {
-    const formulaInput = formulaInputRef.current
-    if (!formulaInput) return
-    formulaInput.readOnly = fieldReadOnly
-    if (changeHandlerRef.current) {
-      formulaInput.removeEventListener('input', changeHandlerRef.current)
-      formulaInput.removeEventListener('change', changeHandlerRef.current)
-      changeHandlerRef.current = null
-    }
-    if (!fieldReadOnly && onValueChange) {
-      const handleChange = () => {
-        if (fieldReadOnly) return
-        const nextValue = formulaInput.value
-        onValueChange(nextValue)
-      }
-      changeHandlerRef.current = handleChange
-      formulaInput.addEventListener('input', handleChange)
-      formulaInput.addEventListener('change', handleChange)
-    }
-    return () => {
-      if (changeHandlerRef.current) {
-        formulaInput.removeEventListener('input', changeHandlerRef.current)
-        formulaInput.removeEventListener('change', changeHandlerRef.current)
-        changeHandlerRef.current = null
-      }
-    }
-  }, [fieldReadOnly, onValueChange, formulaInputRef])
-
-  useEffect(() => {
-    const input = formulaInputRef.current
-    if (!input || value === undefined || input.value === value) return
-    if (document.activeElement === input) return
-    input.value = value
-  }, [value, formulaInputRef])
-
-  return (
-    <Box
-      ref={containerRef}
-      sx={{
-        width: '100%',
-        minHeight: '56px',
-        display: 'flex',
-        alignItems: 'center'
-      }}
-    />
-  )
-}
-
 const parseArgumentLine = (line) => {
   if (!line || typeof line !== 'string') {
     return { error: 'Enter the argument as a single line.' }
@@ -173,6 +88,46 @@ export default function ComboTranslationTruthTable({
   const [argumentLine, setArgumentLine] = useState(savedState?.argumentLine ?? '')
   const [tableState, setTableState] = useState(savedState?.tableState ?? null)
   const inputRef = useRef(null)
+  const inputContainerRef = useRef(null)
+
+  useEffect(() => {
+    const container = inputContainerRef.current
+    if (!container) return
+    const inp = FormulaInput.getnew({})
+    inputRef.current = inp
+    Object.assign(inp.style, {
+      width: '100%',
+      padding: theme.spacing(1.5),
+      border: `1px solid ${theme.palette.divider}`,
+      borderRadius: theme.shape.borderRadius,
+      fontSize: '1rem',
+      fontFamily: 'monospace',
+      backgroundColor: theme.palette.background.paper,
+      color: theme.palette.text.primary,
+    })
+    container.appendChild(inp)
+    inp.value = argumentLine ?? ''
+    const onInput = () => {
+      setArgumentLine(inp.value)
+      setTableState(null)
+      updateState({ argumentLine: inp.value, tableState: null })
+    }
+    inp.addEventListener('input', onInput)
+    inp.addEventListener('change', onInput)
+    return () => {
+      inp.removeEventListener('input', onInput)
+      inp.removeEventListener('change', onInput)
+      if (inp.parentNode) inp.parentNode.removeChild(inp)
+      inputRef.current = null
+    }
+  }, [theme])
+
+  useEffect(() => {
+    const inp = inputRef.current
+    if (!inp || argumentLine === undefined || inp.value === argumentLine) return
+    if (document.activeElement === inp) return
+    inp.value = argumentLine
+  }, [argumentLine])
 
   useEffect(() => {
     if (savedState?.argumentLine !== undefined) {
@@ -287,11 +242,9 @@ export default function ComboTranslationTruthTable({
               <Typography variant="body2" sx={{ mb: 1, fontWeight: 600 }}>
                 Argument line
               </Typography>
-              <FormulaInputField
-                value={argumentLine}
-                onValueChange={handleArgumentChange}
-                fieldReadOnly={false}
-                formulaInputRef={inputRef}
+              <Box
+                ref={inputContainerRef}
+                sx={{ width: '100%', minHeight: 56, display: 'flex', alignItems: 'center' }}
               />
               <Box sx={{ mt: 1 }}>
                 <SymbolButtonRow
