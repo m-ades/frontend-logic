@@ -53,7 +53,7 @@ export default function ActivityAccordion({
   if (isLoading) {
     return (
       <Box sx={{ p: 3 }}>
-        <LoadingSpinner label="Loading activities..." size="sm" />
+        <LoadingSpinner label="Loading activities..." />
       </Box>
     )
   }

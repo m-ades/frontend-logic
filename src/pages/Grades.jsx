@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { Box, Typography, CardContent, Stack } from '@mui/material'
 import { DataGrid } from '@mui/x-data-grid'
 import ThemedCard from '../components/ui/ThemedCard.jsx'
@@ -19,63 +20,40 @@ function NoRowsOverlay() {
 }
 
 export default function Grades() {
-  const [gradeEntries, setGradeEntries] = useState([])
-  const [isLoadingGrades, setIsLoadingGrades] = useState(true)
   const { activeCourseId } = useCoursesState()
   const courseId = activeCourseId ?? API_CONFIG.courseId
   const courseIdForApi = activeCourseId ?? null
+  const userId = getActiveUserId()
 
-  useEffect(() => {
-    let isMounted = true
+  const assignmentsQuery = useQuery({
+    queryKey: ['course-assignments', courseIdForApi],
+    queryFn: () => fetchJson(`/api/courses/${courseIdForApi}/assignments`),
+    enabled: !!courseIdForApi,
+  })
 
-    const loadGrades = async () => {
-      try {
-        if (!courseIdForApi) {
-          if (isMounted) {
-            setGradeEntries([])
-            setIsLoadingGrades(false)
-          }
-          return
-        }
-        if (isMounted) {
-          setIsLoadingGrades(true)
-        }
-        const userId = getActiveUserId()
-        const [assignments, grades] = await Promise.all([
-          fetchJson(`/api/courses/${courseIdForApi}/assignments`),
-          fetchJson(`/api/users/${userId}/grades`),
-        ])
-        const gradedAssignments = sortAssignmentsBySubchapter(
-          (assignments || []).filter(
-            (a) => a.kind !== 'practice' && a.is_locked === false
-          )
-        )
-        const gradeMap = new Map((grades || []).map((grade) => [grade.assignment_id, grade]))
-        const entries = gradedAssignments.map((assignment) => ({
-          assignment,
-          grade: gradeMap.get(assignment.id) || null,
-        }))
-        if (isMounted) {
-          setGradeEntries(entries)
-        }
-      } catch (error) {
-        console.warn('Failed to load grades', error)
-        if (isMounted) {
-          setGradeEntries([])
-        }
-      } finally {
-        if (isMounted) {
-          setIsLoadingGrades(false)
-        }
-      }
-    }
+  const gradesQuery = useQuery({
+    queryKey: ['user-grades', userId],
+    queryFn: () => fetchJson(`/api/users/${userId}/grades`),
+    enabled: !!userId,
+  })
 
-    loadGrades()
+  const assignments = assignmentsQuery.data ?? []
+  const grades = gradesQuery.data ?? []
+  const isLoadingGrades = assignmentsQuery.isPending || gradesQuery.isPending
 
-    return () => {
-      isMounted = false
-    }
-  }, [courseIdForApi])
+  const gradeEntries = useMemo(() => {
+    if (!courseIdForApi) return []
+    const gradedAssignments = sortAssignmentsBySubchapter(
+      (assignments || []).filter(
+        (a) => a.kind !== 'practice' && a.is_locked === false
+      )
+    )
+    const gradeMap = new Map((grades || []).map((g) => [g.assignment_id, g]))
+    return gradedAssignments.map((assignment) => ({
+      assignment,
+      grade: gradeMap.get(assignment.id) || null,
+    }))
+  }, [courseIdForApi, assignments, grades])
 
   const assignmentPercents = useMemo(() => {
     return gradeEntries.map((entry) => {
@@ -159,7 +137,7 @@ export default function Grades() {
           </Stack>
           {isLoadingGrades ? (
             <Box sx={{ minHeight: 220, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <LoadingSpinner label="Loading grades..." size="sm" />
+              <LoadingSpinner label="Loading grades..." />
             </Box>
           ) : (
             <DataGrid

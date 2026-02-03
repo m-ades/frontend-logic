@@ -1,4 +1,4 @@
-import { Box, Typography, Alert } from "@mui/material";
+import { Box, Typography, Alert, LinearProgress } from "@mui/material";
 import { useEffect, useMemo, useState } from "react";
 import { TrendingUp, Users, CheckCircle, Calendar } from "lucide-react";
 import {
@@ -19,6 +19,7 @@ import { formatEasternDateTime } from "../../utils/easternTime.js";
 export default function InstructorDashboard() {
   const { courses, activeCourseId, assignmentsByCourse, gradebookByCourse } =
     useCoursesState();
+  const [isLoadingAnalytics, setIsLoadingAnalytics] = useState(true);
   const [analytics, setAnalytics] = useState({
     gradeSummary: null,
     assignmentStats: [],
@@ -38,7 +39,10 @@ export default function InstructorDashboard() {
   useEffect(() => {
     let isMounted = true;
     const loadAnalytics = async () => {
-      if (!activeCourseId) return;
+      if (!activeCourseId) {
+        if (isMounted) setIsLoadingAnalytics(false);
+        return;
+      }
       try {
         const [instructorAnalytics, summary] = await Promise.all([
           fetchJson(`/api/analytics/instructor?courseId=${activeCourseId}`),
@@ -54,6 +58,8 @@ export default function InstructorDashboard() {
           setAnalytics({ gradeSummary: null, assignmentStats: [], timeByCategory: [] });
           setGradebookSummary([]);
         }
+      } finally {
+        if (isMounted) setIsLoadingAnalytics(false);
       }
     };
 
@@ -216,14 +222,18 @@ export default function InstructorDashboard() {
   }
 
   return (
-    <Box
-      sx={{
-        width: "100%",
-        display: "flex",
-        flexDirection: "column",
-        gap: 4,
-      }}
-    >
+    <>
+      {isLoadingAnalytics && (
+        <LinearProgress sx={{ position: "sticky", top: 0, zIndex: 10, mb: 0 }} />
+      )}
+      <Box
+        sx={{
+          width: "100%",
+          display: "flex",
+          flexDirection: "column",
+          gap: 4,
+        }}
+      >
       {/* Header */}
       <Box>
         <Typography variant="h4" fontWeight={700} mb={1}>
@@ -318,5 +328,6 @@ export default function InstructorDashboard() {
         />
       </Box>
     </Box>
+    </>
   );
 }

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useParams, useNavigate, useLocation } from 'react-router-dom'
 import { Box } from '@mui/material'
+import LoadingSpinner from '../components/ui/LoadingSpinner.jsx'
 import WorksheetLayout from '../components/layout/WorksheetLayout.jsx'
 import WorksheetTabs from '../components/problems/WorksheetTabs.jsx'
 import { useScoring } from '../hooks/usescoring.js'
@@ -921,7 +922,7 @@ export default function Worksheet() {
   // }
 
   if (isLoading) {
-    return <div>Loading assignment...</div>
+    return <LoadingSpinner label="Loading assignment..." />
   }
 
   if (loadError) {

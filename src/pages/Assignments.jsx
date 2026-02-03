@@ -1,5 +1,6 @@
-import { useState, useMemo, useCallback, useEffect } from 'react'
+import { useState, useMemo, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useQuery } from '@tanstack/react-query'
 import { Box, Tabs, Tab, Typography, CardContent, Chip, Stack } from '@mui/material'
 import LockIcon from '@mui/icons-material/Lock'
 import ThemedCard from '../components/ui/ThemedCard.jsx'
@@ -70,79 +71,69 @@ function TabPanel({ children, value, index }) {
 
 export default function Assignments() {
   const [tabValue, setTabValue] = useState(0)
-  const [averagePercent, setAveragePercent] = useState(null)
-  const [courseStructure, setCourseStructure] = useState([])
-  const [completedAssignments, setCompletedAssignments] = useState(new Set())
-  const [isLoadingAssignments, setIsLoadingAssignments] = useState(true)
   const { activeCourseId } = useCoursesState()
   const courseId = activeCourseId ?? API_CONFIG.courseId
   const navigate = useNavigate()
-  // Only request assignments for the active course (never fallback to course 1) to avoid 403 when user isn't enrolled
   const courseIdForApi = activeCourseId ?? null
+  const userId = getActiveUserId()
+
+  const assignmentsQuery = useQuery({
+    queryKey: ['course-assignments', courseIdForApi],
+    queryFn: () => fetchJson(`/api/courses/${courseIdForApi}/assignments`),
+    enabled: !!courseIdForApi,
+  })
+
+  const gradesQuery = useQuery({
+    queryKey: ['user-grades', userId],
+    queryFn: () => fetchJson(`/api/users/${userId}/grades`),
+    enabled: !!userId,
+  })
+
+  const assignments = assignmentsQuery.data ?? []
+  const grades = gradesQuery.data ?? []
+  const isLoadingAssignments = assignmentsQuery.isPending || gradesQuery.isPending
+
+  const gradedAssignments = useMemo(
+    () =>
+      sortAssignmentsBySubchapter(
+        (assignments || []).filter((a) => a.kind !== 'practice')
+      ),
+    [assignments]
+  )
+
+  const courseStructure = useMemo(
+    () => (courseIdForApi ? buildCourseStructure(gradedAssignments, 'Assignments') : []),
+    [courseIdForApi, gradedAssignments]
+  )
+
+  const completedAssignments = useMemo(() => {
+    const ids = gradedAssignments
+      .map((assignment) => {
+        const completedFlag =
+          assignment.completed === true ||
+          assignment.completed === 'true' ||
+          assignment.completed === 1 ||
+          assignment.completed === 't'
+        if (completedFlag) return assignment.id
+        const questionCount = Number(assignment.question_count) || 0
+        const answeredCount = Number(assignment.answered_count) || 0
+        if (questionCount === 0) return null
+        return answeredCount === questionCount ? assignment.id : null
+      })
+      .filter(Boolean)
+    return new Set(ids)
+  }, [gradedAssignments])
+
+  const averagePercent = useMemo(() => {
+    const totalPoints = (grades || []).reduce((sum, g) => sum + (g.max_score || 0), 0)
+    const earnedPoints = (grades || []).reduce((sum, g) => sum + (g.final_score || 0), 0)
+    return totalPoints > 0 ? (earnedPoints / totalPoints) * 100 : null
+  }, [grades])
 
   const getCompletionStatus = useCallback(
     (activityId) => completedAssignments.has(activityId),
     [completedAssignments]
   )
-
-  useEffect(() => {
-    let isMounted = true
-
-    const loadAssignments = async () => {
-      try {
-        if (!courseIdForApi) {
-          if (isMounted) {
-            setCourseStructure([])
-            setCompletedAssignments(new Set())
-            setIsLoadingAssignments(false)
-          }
-          return
-        }
-        if (isMounted) {
-          setIsLoadingAssignments(true)
-        }
-        const assignments = await fetchJson(`/api/courses/${courseIdForApi}/assignments`)
-        const gradedAssignments = sortAssignmentsBySubchapter(
-          assignments.filter((assignment) => assignment.kind !== 'practice')
-        )
-        if (!isMounted) return
-
-        setCourseStructure(buildCourseStructure(gradedAssignments, 'Assignments'))
-
-        // completed tab: only when there is a submission for every question in the assignment
-        const completionResults = gradedAssignments.map((assignment) => {
-          const completedFlag = assignment.completed === true
-            || assignment.completed === 'true'
-            || assignment.completed === 1
-            || assignment.completed === 't'
-          if (completedFlag) return assignment.id
-          const questionCount = Number(assignment.question_count) || 0
-          const answeredCount = Number(assignment.answered_count) || 0
-          if (questionCount === 0) return null
-          return answeredCount === questionCount ? assignment.id : null
-        })
-        if (isMounted) {
-          setCompletedAssignments(new Set(completionResults.filter(Boolean)))
-        }
-      } catch (error) {
-        if (isMounted) {
-          console.warn('Failed to load assignments', error)
-          setCourseStructure([])
-          setCompletedAssignments(new Set())
-        }
-      } finally {
-        if (isMounted) {
-          setIsLoadingAssignments(false)
-        }
-      }
-    }
-
-    loadAssignments()
-
-    return () => {
-      isMounted = false
-    }
-  }, [courseIdForApi])
 
   const filterStructure = useCallback((structure, predicate) => {
     return structure.map((chapter) => {
@@ -195,37 +186,6 @@ export default function Assignments() {
       })
     }
   }
-
-  useEffect(() => {
-    let isMounted = true
-
-    const loadSummary = async () => {
-      try {
-        const grades = await fetchJson(`/api/users/${getActiveUserId()}/grades`)
-
-        if (!isMounted) return
-
-        const totalPoints = grades.reduce(
-          (sum, grade) => sum + (grade.max_score || 0),
-          0
-        )
-        const earnedPoints = grades.reduce((sum, grade) => sum + (grade.final_score || 0), 0)
-        const percent = totalPoints > 0 ? (earnedPoints / totalPoints) * 100 : null
-        setAveragePercent(percent)
-      } catch (error) {
-        if (isMounted) {
-          console.warn('Failed to load assignment summary', error)
-          setAveragePercent(null)
-        }
-      }
-    }
-
-    loadSummary()
-
-    return () => {
-      isMounted = false
-    }
-  }, [])
 
   const renderActivity = (activity, { chapter, subchapter }, datePrefix, showCompletionChip) => (
     <ThemedCard

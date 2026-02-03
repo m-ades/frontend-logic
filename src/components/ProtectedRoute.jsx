@@ -1,7 +1,8 @@
 import { Navigate, useLocation } from "react-router-dom";
-import { Box, CircularProgress } from "@mui/material";
+import { Box } from "@mui/material";
 import { useAuthState } from "../context/AuthContext";
 import { normalizeRole } from "../utils/auth.js";
+import LoadingSpinner from "./ui/LoadingSpinner.jsx";
 
 export default function ProtectedRoute({ children, allowedRoles = [] }) {
   const { isAuthenticated, user, isLoading } = useAuthState();
@@ -22,7 +23,7 @@ export default function ProtectedRoute({ children, allowedRoles = [] }) {
           minHeight: "100vh",
         }}
       >
-        <CircularProgress />
+        <LoadingSpinner label="Loading..." />
       </Box>
     );
   }
