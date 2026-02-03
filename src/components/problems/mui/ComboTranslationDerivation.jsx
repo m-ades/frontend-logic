@@ -12,6 +12,90 @@ import getFormulaClass from '../../../lib/logicpenguin/symbolic/formula.js'
 import { useProblemChecker } from '../../../hooks/useProblemChecker.js'
 import PromptText from '../../ui/PromptText.jsx'
 
+function FormulaInputField({ value, onValueChange, fieldReadOnly, formulaInputRef }) {
+  const theme = useTheme()
+  const containerRef = useRef(null)
+  const changeHandlerRef = useRef(null)
+
+  useEffect(() => {
+    if (!containerRef.current) return
+    if (!formulaInputRef.current) {
+      const formulaInput = FormulaInput.getnew({})
+      formulaInputRef.current = formulaInput
+      formulaInput.style.width = '100%'
+      formulaInput.style.padding = theme.spacing(1.5)
+      formulaInput.style.border = `1px solid ${theme.palette.divider}`
+      formulaInput.style.borderRadius = theme.shape.borderRadius
+      formulaInput.style.fontSize = '1rem'
+      formulaInput.style.fontFamily = 'monospace'
+      formulaInput.style.backgroundColor = theme.palette.background.paper
+      formulaInput.style.color = theme.palette.text.primary
+      containerRef.current.appendChild(formulaInput)
+    } else if (!containerRef.current.contains(formulaInputRef.current)) {
+      containerRef.current.appendChild(formulaInputRef.current)
+    }
+    return () => {
+      if (formulaInputRef.current) {
+        if (changeHandlerRef.current) {
+          formulaInputRef.current.removeEventListener('input', changeHandlerRef.current)
+          formulaInputRef.current.removeEventListener('change', changeHandlerRef.current)
+          changeHandlerRef.current = null
+        }
+        if (formulaInputRef.current.parentNode) {
+          formulaInputRef.current.parentNode.removeChild(formulaInputRef.current)
+        }
+        formulaInputRef.current = null
+      }
+    }
+  }, [formulaInputRef, theme])
+
+  useEffect(() => {
+    const formulaInput = formulaInputRef.current
+    if (!formulaInput) return
+    formulaInput.readOnly = fieldReadOnly
+    if (changeHandlerRef.current) {
+      formulaInput.removeEventListener('input', changeHandlerRef.current)
+      formulaInput.removeEventListener('change', changeHandlerRef.current)
+      changeHandlerRef.current = null
+    }
+    if (!fieldReadOnly && onValueChange) {
+      const handleChange = () => {
+        if (fieldReadOnly) return
+        const nextValue = formulaInput.value
+        onValueChange(nextValue)
+      }
+      changeHandlerRef.current = handleChange
+      formulaInput.addEventListener('input', handleChange)
+      formulaInput.addEventListener('change', handleChange)
+    }
+    return () => {
+      if (changeHandlerRef.current) {
+        formulaInput.removeEventListener('input', changeHandlerRef.current)
+        formulaInput.removeEventListener('change', changeHandlerRef.current)
+        changeHandlerRef.current = null
+      }
+    }
+  }, [fieldReadOnly, onValueChange, formulaInputRef])
+
+  useEffect(() => {
+    if (formulaInputRef.current && value !== undefined && formulaInputRef.current.value !== value) {
+      formulaInputRef.current.value = value
+    }
+  }, [value, formulaInputRef])
+
+  return (
+    <Box
+      ref={containerRef}
+      sx={{
+        width: '100%',
+        minHeight: '56px',
+        display: 'flex',
+        alignItems: 'center'
+      }}
+    />
+  )
+}
+
 const parseArgumentLine = (line) => {
   if (!line || typeof line !== 'string') {
     return { error: 'Enter the argument as a single line.' }
@@ -211,31 +295,11 @@ export default function ComboTranslationDerivation({
               <Typography variant="body2" sx={{ mb: 1, color: 'text.secondary', fontSize: '0.875rem' }}>
                 Use "/" for separate premises and "//" for the conclusion. Example: A ⊃ B / A // B.
               </Typography>
-              <Box
-                ref={(el) => {
-                  if (!el) return
-                  if (!inputRef.current) {
-                    const input = FormulaInput.getnew({})
-                    inputRef.current = input
-                    Object.assign(input.style, {
-                      width: '100%',
-                      padding: theme.spacing(1.5),
-                      border: `1px solid ${theme.palette.divider}`,
-                      borderRadius: theme.shape.borderRadius,
-                      fontSize: '1rem',
-                      fontFamily: 'monospace',
-                      backgroundColor: theme.palette.background.paper,
-                      color: theme.palette.text.primary,
-                    })
-                    input.value = argumentLine ?? ''
-                    input.addEventListener('input', () => handleArgumentChange(input.value))
-                    el.appendChild(input)
-                  } else {
-                    if (!el.contains(inputRef.current)) el.appendChild(inputRef.current)
-                    inputRef.current.value = argumentLine ?? ''
-                  }
-                }}
-                sx={{ width: '100%', minHeight: '56px' }}
+              <FormulaInputField
+                value={argumentLine}
+                onValueChange={handleArgumentChange}
+                fieldReadOnly={false}
+                formulaInputRef={inputRef}
               />
               <Box sx={{ mt: 1 }}>
                 <SymbolButtonRow

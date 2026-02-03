@@ -133,6 +133,7 @@ export default function SymbolButtonRow({
             type="button"
             size="medium"
             variant="outlined"
+            onMouseDown={(e) => e.preventDefault()}
             onClick={() => handleInsert({ op, quantifier, insert, pair })}
             disabled={disabled}
             aria-disabled={disabled}
