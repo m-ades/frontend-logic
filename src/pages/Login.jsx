@@ -308,7 +308,7 @@ export default function Login() {
           left: 0,
           right: 0,
           textAlign: 'center',
-          color: isDark ? theme.palette.text.primary : '#ffffff',
+          color: isDark ? theme.palette.text.primary : '#1e40af',
           py: 1.5,
           px: 2,
           fontWeight: 500,
