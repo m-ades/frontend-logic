@@ -24,24 +24,46 @@ import AddIcon from '@mui/icons-material/Add'
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
 import { fetchJson } from '../../utils/api.js'
 
-function buildMcSnapshot(proof, edited) {
+// deep merge. source overwrites. arrays replace.
+function deepMerge(target, source) {
+  if (source == null) return target
+  if (Array.isArray(source)) return source
+  if (typeof source !== 'object') return source
+  const existing = target != null && typeof target === 'object' && !Array.isArray(target) ? target : {}
+  const out = { ...existing }
+  for (const key of Object.keys(source)) {
+    out[key] = deepMerge(out[key], source[key])
+  }
+  return out
+}
+
+// use same type key as existing snapshot to preserve shape
+function typeKey(existing) {
+  const e = existing && typeof existing === 'object' ? existing : {}
+  return e.logic_problem_type !== undefined ? 'logic_problem_type' : (e.type !== undefined ? 'type' : 'logic_problem_type')
+}
+
+function buildMcSnapshot(proof, edited, existing) {
   const mc = proof.multipleChoice || {}
   const choices = edited.choices ?? mc.choices ?? []
   const prompt = edited.prompt ?? mc.prompt ?? proof.description ?? ''
   const answerIndex = edited.answerIndex !== undefined ? edited.answerIndex : (proof.answer ?? 0)
-  return {
-    type: 'multiple-choice',
-    prompt,
-    multipleChoice: {
-      prompt,
-      choices,
-    },
-    answerIndex: Number(answerIndex),
+  const e = existing && typeof existing === 'object' ? existing : {}
+  const patch = { [typeKey(e)]: 'multiple-choice', prompt }
+  if (Array.isArray(e.subquestions) && e.subquestions.length > 0) {
+    patch.subquestions = e.subquestions.map((sq, i) =>
+      i === 0 ? { ...sq, choices, answerIndex: Number(answerIndex) } : sq
+    )
+  } else {
+    patch.multipleChoice = { prompt, choices }
+    patch.answerIndex = Number(answerIndex)
   }
+  return patch
 }
 
-function buildTruthTableSnapshot(proof, edited) {
+function buildTruthTableSnapshot(proof, edited, existing) {
   const tt = proof.truthTable || {}
+  const e = existing && typeof existing === 'object' ? existing : {}
   const kind = edited.kind ?? tt.kind ?? 'formula'
   const prompt = edited.prompt ?? tt.prompt ?? proof.description ?? ''
   const options = {
@@ -49,62 +71,43 @@ function buildTruthTableSnapshot(proof, edited) {
     ...(edited.partialCredit !== undefined ? { partialCredit: edited.partialCredit } : {}),
     ...(edited.classificationQuestion !== undefined ? { question: edited.classificationQuestion } : {}),
   }
-  const truthTable = {
+  const truthTableData = {
     kind,
     options,
-    ...(kind === 'formula' && {
-      statement: edited.statement ?? tt.statement ?? tt.formula ?? '',
-    }),
-    ...(kind === 'equivalence' && {
-      left: edited.left ?? tt.left ?? '',
-      right: edited.right ?? tt.right ?? '',
-    }),
-    ...(kind === 'argument' && {
-      lefts: Array.isArray(edited.lefts) ? edited.lefts : (tt.lefts || []),
-      right: edited.right ?? tt.right ?? '',
-    }),
+    ...(kind === 'formula' && { statement: edited.statement ?? tt.statement ?? tt.formula ?? '' }),
+    ...(kind === 'equivalence' && { left: edited.left ?? tt.left ?? '', right: edited.right ?? tt.right ?? '' }),
+    ...(kind === 'argument' && { lefts: Array.isArray(edited.lefts) ? edited.lefts : (tt.lefts || []), right: edited.right ?? tt.right ?? '' }),
   }
-  return {
-    type: 'truth-table',
-    prompt,
-    truthTable,
-    options,
-  }
+  const patch = { [typeKey(e)]: 'truth-table', prompt, options }
+  const ttKey = e.truth_table !== undefined ? 'truth_table' : 'truthTable'
+  patch[ttKey] = deepMerge(e[ttKey], truthTableData)
+  return patch
 }
 
-function buildIndirectTruthTableSnapshot(proof, edited) {
+function buildIndirectTruthTableSnapshot(proof, edited, existing) {
   const itt = proof.indirectTruthTable || {}
+  const e = existing && typeof existing === 'object' ? existing : {}
   const prompt = edited.prompt ?? itt.prompt ?? proof.description ?? ''
   const argument = edited.argument ?? itt.argument ?? {}
   const questions = Array.isArray(edited.questions) ? edited.questions : (itt.questions || itt.subquestions || [])
   return {
-    type: 'indirect-truth-table',
+    [typeKey(e)]: 'indirect-truth-table',
     prompt,
     argument,
     questions,
     subquestions: questions,
-    choices: questions[0]?.choices ?? [],
-    choicePrompt: questions[0]?.prompt ?? '',
-    answerIndex: questions[0]?.answerIndex ?? questions[0]?.answer ?? 0,
-    answerIndices: questions.map((q) => q.answerIndex ?? q.answer ?? 0),
   }
 }
 
-function buildDerivationSnapshot(proof, edited) {
+function buildDerivationSnapshot(proof, edited, existing) {
+  const e = existing && typeof existing === 'object' ? existing : {}
   const prems = edited.premises ?? proof.premises ?? proof.prems ?? []
   const conclusion = edited.conclusion ?? proof.conclusion ?? proof.conc ?? ''
   const prompt = edited.prompt ?? proof.description ?? ''
-  return {
-    type: proof.type,
-    prompt,
-    description: prompt,
-    premises: prems,
-    prems,
-    conclusion,
-    conc: conclusion,
-    ruleset: proof.ruleset ?? proof.ruleSet ?? {},
-    options: proof.options ?? {},
-  }
+  const patch = { [typeKey(e)]: proof.type || 'derivation', prompt, description: prompt, prems, conc: conclusion }
+  if (e.premises !== undefined) patch.premises = prems
+  if (e.conclusion !== undefined) patch.conclusion = conclusion
+  return patch
 }
 
 function AttemptLimitField({ value, onChange }) {
@@ -498,84 +501,74 @@ function DerivationEditorForm({ proof, value, onChange }) {
   )
 }
 
-function buildTrueFalseSnapshot(proof, edited) {
+function buildTrueFalseSnapshot(proof, edited, existing) {
   const tf = proof.trueFalse || {}
+  const e = existing && typeof existing === 'object' ? existing : {}
   const prompt = edited.prompt ?? tf.prompt ?? proof.description ?? ''
   const answer = edited.answer !== undefined ? edited.answer : (proof.answer ?? false)
-  return {
-    type: 'true-false',
-    prompt,
-    trueFalse: { prompt },
-    answer: Boolean(answer),
-  }
+  const patch = { [typeKey(e)]: 'true-false', prompt, answer: Boolean(answer) }
+  if (e.trueFalse !== undefined) patch.trueFalse = { ...e.trueFalse, prompt }
+  return patch
 }
 
-function buildEvaluateTruthSnapshot(proof, edited) {
+function buildEvaluateTruthSnapshot(proof, edited, existing) {
+  const e = existing && typeof existing === 'object' ? existing : {}
   const statement = edited.statement ?? proof.evaluateTruth ?? proof.description ?? ''
   const answer = edited.answer !== undefined ? edited.answer : (proof.answer ?? false)
-  return {
-    type: 'evaluate-truth',
-    prompt: statement,
-    statement,
-    evaluateTruth: statement,
-    answer: Boolean(answer),
-  }
+  const patch = { [typeKey(e)]: 'evaluate-truth', prompt: statement, statement, answer: Boolean(answer) }
+  if (e.evaluateTruth !== undefined) patch.evaluateTruth = statement
+  return patch
 }
 
-function buildSymbolicTranslationSnapshot(proof, edited) {
+function buildSymbolicTranslationSnapshot(proof, edited, existing) {
   const tr = proof.translation || {}
+  const e = existing && typeof existing === 'object' ? existing : {}
   const prompt = edited.prompt ?? tr.prompt ?? proof.description ?? ''
   const legend = edited.legend ?? tr.legend ?? proof.legend ?? ''
   const rawKey = Array.isArray(edited.symbolizationKey) ? edited.symbolizationKey : (tr.symbolizationKey || [])
-  const symbolizationKey = rawKey.filter((e) => e != null && String(e).trim() !== '')
+  const symbolizationKey = rawKey.filter((x) => x != null && String(x).trim() !== '')
   const answer = edited.answer ?? proof.answer ?? tr.answer ?? ''
-  return {
-    type: 'symbolic-translation',
-    prompt,
-    legend,
-    translation: { legend, prompt, symbolizationKey, answer, options: tr.options || {} },
-    symbolizationKey,
-    answer,
-  }
+  const patch = { [typeKey(e)]: 'symbolic-translation', prompt, legend, answer }
+  const keyName = e.symbolization_key !== undefined ? 'symbolization_key' : 'symbolizationKey'
+  patch[keyName] = symbolizationKey
+  return patch
 }
 
-function buildSingleRowTruthTableSnapshot(proof, edited) {
+function buildSingleRowTruthTableSnapshot(proof, edited, existing) {
   const sr = proof.singleRowTruthTable || {}
   const statement = edited.statement ?? sr.statement ?? sr.formula ?? proof.description ?? ''
   const prompt = edited.prompt ?? sr.prompt ?? proof.description ?? ''
   const interpretation = edited.interpretation ?? sr.interpretation ?? {}
+  const interp = typeof interpretation === 'object' && interpretation !== null ? interpretation : {}
   return {
-    type: 'single-row-truth-table',
+    [typeKey(existing)]: 'single-row-truth-table',
     prompt,
     statement,
-    singleRowTruthTable: {
-      statement,
-      prompt,
-      interpretation: typeof interpretation === 'object' && interpretation !== null ? interpretation : {},
-    },
+    interpretation: interp,
   }
 }
 
-function buildPartialTruthTableSnapshot(proof, edited) {
+function buildPartialTruthTableSnapshot(proof, edited, existing) {
   const pt = proof.partialTruthTable || {}
+  const e = existing && typeof existing === 'object' ? existing : {}
   const statement = edited.statement ?? pt.statement ?? pt.formula ?? ''
   const prompt = edited.prompt ?? pt.prompt ?? proof.description ?? ''
   const row = Array.isArray(edited.row) ? edited.row : (pt.row || [])
   return {
-    type: 'partial-truth-table',
+    [typeKey(e)]: 'partial-truth-table',
     prompt,
     statement,
     formula: statement,
     row,
-    partialTruthTable: { ...pt, statement, prompt, row },
   }
 }
 
-function buildComboSnapshot(proof, edited, typeKey) {
-  const snapshot = proof[typeKey] || proof.snapshot || {}
+function buildComboSnapshot(proof, edited, existing, comboTypeKey) {
+  const snapshot = proof[comboTypeKey] || proof.snapshot || {}
+  const e = existing && typeof existing === 'object' ? existing : {}
   const prompt = edited.prompt ?? snapshot.prompt ?? proof.description ?? ''
-  const base = { ...snapshot, type: proof.type, prompt }
-  if (typeKey === 'comboTranslationTruthTable') {
+  const patch = { [typeKey(e)]: proof.type, prompt }
+  if (comboTypeKey === 'comboTranslationTruthTable') {
     const raw = edited.argumentLine ?? edited.answer
     const answer =
       raw != null && raw !== ''
@@ -583,9 +576,9 @@ function buildComboSnapshot(proof, edited, typeKey) {
           ? { argumentLine: raw }
           : raw
         : proof.answer ?? snapshot.answer
-    if (answer != null) base.answer = answer
+    if (answer != null) patch.answer = answer
   }
-  return base
+  return patch
 }
 
 function TrueFalseEditorForm({ proof, value, onChange }) {
@@ -740,18 +733,68 @@ function InstructorQuestionEditorInner({
   const [editValue, setEditValue] = React.useState({})
   const [saving, setSaving] = React.useState(false)
   const [error, setError] = React.useState('')
+  const initialEditValueRef = React.useRef(null)
 
   const questionId = proof?.questionId
   const supported = proof?.type && SUPPORTED_TYPES.has(proof.type)
 
   const handleOpen = React.useCallback(() => {
     const base = { attemptLimit: proof?.attemptLimit ?? 3 }
+    if (proof?.type === 'multiple-choice') {
+      const mc = proof.multipleChoice || {}
+      base.prompt = mc.prompt ?? proof.description ?? ''
+      base.choices = Array.isArray(mc.choices) ? [...mc.choices] : []
+      base.answerIndex = proof.answer ?? 0
+    }
     if (proof?.type === 'symbolic-translation') {
       const tr = proof.translation || {}
       base.prompt = proof.description ?? tr.prompt ?? ''
       base.legend = tr.legend ?? proof.legend ?? ''
-      base.symbolizationKey = tr.symbolizationKey ?? []
-      base.answer = proof.answer ?? tr.answer ?? ''
+      base.symbolizationKey = Array.isArray(tr.symbolizationKey) ? [...tr.symbolizationKey] : []
+      base.answer = tr.answer ?? proof.answer ?? ''
+    }
+    if (proof?.type === 'truth-table') {
+      const tt = proof.truthTable || {}
+      base.prompt = tt.prompt ?? proof.description ?? ''
+      base.kind = tt.kind ?? 'formula'
+      base.statement = tt.statement ?? tt.formula ?? ''
+      base.left = tt.left ?? ''
+      base.right = tt.right ?? ''
+      base.lefts = Array.isArray(tt.lefts) ? [...tt.lefts] : []
+      base.partialCredit = tt.options?.partialCredit ?? false
+      base.classificationQuestion = tt.options?.question ?? false
+    }
+    if (proof?.type === 'indirect-truth-table') {
+      const itt = proof.indirectTruthTable || {}
+      base.prompt = itt.prompt ?? proof.description ?? ''
+      base.argument = itt.argument ? { ...itt.argument } : {}
+      base.questions = Array.isArray(itt.questions) ? itt.questions.map((q) => ({ ...q })) : (Array.isArray(itt.subquestions) ? itt.subquestions.map((q) => ({ ...q })) : [])
+    }
+    if (proof?.type === 'derivation' || proof?.type === 'derivation-hurley') {
+      base.prompt = proof.description ?? ''
+      base.premises = Array.isArray(proof.premises) ? [...proof.premises] : (Array.isArray(proof.prems) ? [...proof.prems] : [])
+      base.conclusion = proof.conclusion ?? proof.conc ?? ''
+    }
+    if (proof?.type === 'true-false') {
+      const tf = proof.trueFalse || {}
+      base.prompt = tf.prompt ?? proof.description ?? ''
+      base.answer = proof.answer ?? false
+    }
+    if (proof?.type === 'evaluate-truth') {
+      base.statement = proof.evaluateTruth ?? proof.description ?? ''
+      base.answer = proof.answer ?? false
+    }
+    if (proof?.type === 'single-row-truth-table') {
+      const sr = proof.singleRowTruthTable || {}
+      base.statement = sr.statement ?? sr.formula ?? proof.description ?? ''
+      base.prompt = sr.prompt ?? proof.description ?? ''
+      base.interpretation = typeof sr.interpretation === 'object' && sr.interpretation !== null ? { ...sr.interpretation } : {}
+    }
+    if (proof?.type === 'partial-truth-table') {
+      const pt = proof.partialTruthTable || {}
+      base.statement = pt.statement ?? pt.formula ?? proof.description ?? ''
+      base.prompt = pt.prompt ?? proof.description ?? ''
+      base.row = Array.isArray(pt.row) ? [...pt.row] : []
     }
     if (proof?.type === 'combo-translation-truth-table') {
       const snap = proof.comboTranslationTruthTable || proof.snapshot || {}
@@ -759,10 +802,38 @@ function InstructorQuestionEditorInner({
       const ans = proof.answer ?? snap.answer
       base.argumentLine = typeof ans === 'string' ? ans : ans?.argumentLine ?? ans?.argument ?? ''
     }
+    if (proof?.type === 'combo-translation-derivation') {
+      const snap = proof.comboTranslationDerivation || proof.snapshot || {}
+      base.prompt = snap.prompt ?? proof.description ?? ''
+      const ans = proof.answer ?? snap.answer
+      base.argumentLine = typeof ans === 'string' ? ans : ans?.argumentLine ?? ans?.argument ?? ''
+    }
     setEditValue(base)
+    initialEditValueRef.current = JSON.parse(JSON.stringify(base))
     setError('')
     setOpen(true)
-  }, [proof?.attemptLimit, proof?.type, proof?.description, proof?.answer, proof?.translation, proof?.legend, proof?.comboTranslationTruthTable, proof?.snapshot])
+  }, [
+    proof?.attemptLimit,
+    proof?.type,
+    proof?.description,
+    proof?.answer,
+    proof?.translation,
+    proof?.legend,
+    proof?.multipleChoice,
+    proof?.truthTable,
+    proof?.indirectTruthTable,
+    proof?.premises,
+    proof?.prems,
+    proof?.conclusion,
+    proof?.conc,
+    proof?.trueFalse,
+    proof?.evaluateTruth,
+    proof?.singleRowTruthTable,
+    proof?.partialTruthTable,
+    proof?.comboTranslationTruthTable,
+    proof?.comboTranslationDerivation,
+    proof?.snapshot,
+  ])
 
   React.useImperativeHandle(forwardedRef, () => ({
     open: handleOpen,
@@ -773,37 +844,54 @@ function InstructorQuestionEditorInner({
     setSaving(true)
     setError('')
     try {
+      const existingSnapshot = proof?.questionSnapshot ?? {}
+      const existing = typeof existingSnapshot === 'object' && existingSnapshot !== null ? existingSnapshot : {}
       let question_snapshot
       if (proof.type === 'multiple-choice') {
-        question_snapshot = buildMcSnapshot(proof, editValue)
+        question_snapshot = buildMcSnapshot(proof, editValue, existing)
       } else if (proof.type === 'truth-table') {
-        question_snapshot = buildTruthTableSnapshot(proof, editValue)
+        question_snapshot = buildTruthTableSnapshot(proof, editValue, existing)
       } else if (proof.type === 'indirect-truth-table') {
-        question_snapshot = buildIndirectTruthTableSnapshot(proof, editValue)
+        question_snapshot = buildIndirectTruthTableSnapshot(proof, editValue, existing)
       } else if (proof.type === 'derivation' || proof.type === 'derivation-hurley') {
-        question_snapshot = buildDerivationSnapshot(proof, editValue)
+        question_snapshot = buildDerivationSnapshot(proof, editValue, existing)
       } else if (proof.type === 'true-false') {
-        question_snapshot = buildTrueFalseSnapshot(proof, editValue)
+        question_snapshot = buildTrueFalseSnapshot(proof, editValue, existing)
       } else if (proof.type === 'evaluate-truth') {
-        question_snapshot = buildEvaluateTruthSnapshot(proof, editValue)
+        question_snapshot = buildEvaluateTruthSnapshot(proof, editValue, existing)
       } else if (proof.type === 'symbolic-translation') {
-        question_snapshot = buildSymbolicTranslationSnapshot(proof, editValue)
+        question_snapshot = buildSymbolicTranslationSnapshot(proof, editValue, existing)
       } else if (proof.type === 'single-row-truth-table') {
-        question_snapshot = buildSingleRowTruthTableSnapshot(proof, editValue)
+        question_snapshot = buildSingleRowTruthTableSnapshot(proof, editValue, existing)
       } else if (proof.type === 'partial-truth-table') {
-        question_snapshot = buildPartialTruthTableSnapshot(proof, editValue)
+        question_snapshot = buildPartialTruthTableSnapshot(proof, editValue, existing)
       } else if (proof.type === 'combo-translation-truth-table') {
-        question_snapshot = buildComboSnapshot(proof, editValue, 'comboTranslationTruthTable')
+        question_snapshot = buildComboSnapshot(proof, editValue, existing, 'comboTranslationTruthTable')
       } else if (proof.type === 'combo-translation-derivation') {
-        question_snapshot = buildComboSnapshot(proof, editValue, 'comboTranslationDerivation')
+        question_snapshot = buildComboSnapshot(proof, editValue, existing, 'comboTranslationDerivation')
       } else {
         setSaving(false)
         return
       }
-      const body = { question_snapshot }
+      const mergedSnapshot = deepMerge(existing, question_snapshot)
+      const omitAttemptLimit = (v) => {
+        const { attemptLimit: _, ...rest } = v || {}
+        return rest
+      }
+      const formChanged =
+        initialEditValueRef.current != null &&
+        JSON.stringify(omitAttemptLimit(editValue)) !== JSON.stringify(omitAttemptLimit(initialEditValueRef.current))
+      const body = {}
       const attemptLimit = editValue.attemptLimit
       if (attemptLimit !== undefined && Number.isFinite(Number(attemptLimit))) {
         body.attempt_limit = Number(attemptLimit)
+      }
+      if (formChanged) {
+        body.question_snapshot = mergedSnapshot
+      }
+      if (Object.keys(body).length === 0) {
+        setSaving(false)
+        return
       }
       await fetchJson(`/api/assignment-questions/${questionId}`, {
         method: 'PUT',

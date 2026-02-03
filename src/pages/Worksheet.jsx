@@ -48,6 +48,7 @@ const mapQuestionToProof = (question, assignment, index) => {
     attemptLimit,
     legend,
     partialCredit: Boolean(snapshotPartial),
+    questionSnapshot: question?.question_snapshot ?? snapshot,
   }
 
   if (type === 'derivation' || type === 'derivation-hurley') {
