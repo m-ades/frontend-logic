@@ -27,7 +27,7 @@ export default function Contact({ isInstructorView = false }) {
       name: "Yuna Won",
       role: "Instructor",
       email: "yw1268@hunter.cuny.edu",
-      officeHours: "11-12:30 on Fridays and by appointment.",
+      officeHours: "11:00am-12:30pm on Fridays and by appointment.",
       officeLocation: "Hunter West 1447",
     },
     {
@@ -35,7 +35,7 @@ export default function Contact({ isInstructorView = false }) {
       name: "Mariya Adesman",
       role: "Tutor",
       email: "mariya.adesman@hunter.cuny.edu",
-      officeHours: "Mondays: 9-11am; 3-6pm / Wednesdays: 9-11am, 3-6pm",
+      officeHours: "Mondays: 9:00-11:15am, 2:45-5:30pm / Wednesdays: 9:00-11:15am, 2:45-5:30pm",
       officeLocation: "Hunter West 1409",
     },
     {
