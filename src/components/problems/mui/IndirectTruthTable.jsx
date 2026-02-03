@@ -23,6 +23,7 @@ import { multiTables } from '../../../lib/logicpenguin/symbolic/libsemantics.js'
 import ProblemSetButtons from './ProblemSetButtons.jsx'
 import StatusBanner, { isTerminalStatus } from '../../ui/StatusBanner.jsx'
 import { useProblemChecker } from '../../../hooks/useProblemChecker.js'
+import SolutionReveal from '../SolutionReveal.jsx'
 import PromptText from '../../ui/PromptText.jsx'
 
 const toSymbol = (value) => {
@@ -282,6 +283,12 @@ export default function IndirectTruthTable({
       initialAttemptCount: savedState?.attemptCount ?? 0,
     })
 
+  const correctIndices = Array.isArray(answer)
+    ? answer
+    : (answer !== undefined && answer !== null ? [answer] : [])
+  const hasCorrectAnswer = correctIndices.length > 0 || mcQuestions.some((q) => q.answerIndex != null || q.answer != null || q.correctIndex != null)
+  const showSolution = isLocked && status !== 'correct' && mcQuestions.length > 0 && hasCorrectAnswer
+
   return (
     <Stack spacing={3} sx={{ px: 0, width: '100%', alignItems: 'stretch', flexGrow: 1 }}>
       <Box className="logicpenguin" sx={{ width: '100%', flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
@@ -466,6 +473,27 @@ export default function IndirectTruthTable({
           attemptLimit={maxAttempts}
         />
       )}
+
+      <SolutionReveal show={showSolution} title="Correct Answer">
+        <Stack spacing={2}>
+          {mcQuestions.map((mcq, qIdx) => {
+            const correctIndex = correctIndices[qIdx] ?? mcq?.answerIndex ?? mcq?.answer ?? mcq?.correctIndex
+            const choices = mcq?.choices || []
+            const correctChoice = Number.isFinite(Number(correctIndex)) && choices[Number(correctIndex)] != null
+              ? choices[Number(correctIndex)]
+              : null
+            if (correctChoice == null && !Number.isFinite(Number(correctIndex))) return null
+            return (
+              <Box key={`solution-${qIdx}`}>
+                <PromptText content={mcq?.prompt} variant="subtitle2" sx={{ mb: 0.5, fontWeight: 600 }} />
+                <Typography component="div" variant="body2" color="text.secondary">
+                  {correctChoice != null ? correctChoice : `(Answer index: ${correctIndex})`}
+                </Typography>
+              </Box>
+            )
+          })}
+        </Stack>
+      </SolutionReveal>
     </Stack>
   )
 }
