@@ -17,8 +17,11 @@ import {
   TableHead,
   TableRow,
   Paper,
+  IconButton,
+  Tooltip,
 } from '@mui/material'
 import { useTheme } from '@mui/material/styles'
+import EditIcon from '@mui/icons-material/Edit'
 import StatusBanner, { isTerminalStatus } from '../ui/StatusBanner.jsx'
 import { getSubmissionScore } from '../../utils/problemHelpers.js'
 import getFormulaClass from '../../lib/logicpenguin/symbolic/formula.js'
@@ -31,6 +34,7 @@ import {
 } from '../../lib/logicpenguin/symbolic/libsemantics.js'
 import { fullTableMatch } from '../../lib/logicpenguin/checkers/truth-tables.js'
 import ProblemSetButtons from './mui/ProblemSetButtons.jsx'
+import InstructorQuestionEditor from './InstructorQuestionEditor.jsx'
 import { fetchJson, getActiveUserId } from '../../utils/api.js'
 import PromptText from '../ui/PromptText.jsx'
 
@@ -108,7 +112,11 @@ export default function TruthTableEditor({
   parentAttemptCount,
   parentAttemptLimit,
   isAssignmentLocked = false,
+  isInstructorView = false,
+  onQuestionSaved,
 }) {
+  const editorRef = React.useRef(null)
+  const openEdit = () => editorRef.current?.open?.()
   const truthTable = proof.truthTable ?? {}
   const syntax = React.useMemo(() => getSyntax(), [])
   const Formula = React.useMemo(() => getFormulaClass(), [])
@@ -889,9 +897,22 @@ export default function TruthTableEditor({
 
   const promptContent = !embedded && (proof.description || truthTable.prompt)
     ? (
-        <PromptText content={truthTable.prompt || proof.description} />
+        <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 0.5 }}>
+          <PromptText content={truthTable.prompt || proof.description} />
+        </Box>
       )
     : null
+
+  const formulasLabel =
+    !embedded && statements.length > 0
+      ? kind === 'formula'
+        ? statements[0]
+        : kind === 'equivalence'
+          ? `${statements[0]} ≡ ${statements[1]}`
+          : kind === 'argument'
+            ? `Premises: ${statements.slice(0, -1).join('; ')} → Conclusion: ${statements[statements.length - 1] ?? ''}`
+            : null
+      : null
 
   const tableCard = (
     <Box
@@ -906,8 +927,23 @@ export default function TruthTableEditor({
       className={embedded ? undefined : 'lp-problem-card'}
     >
       <Stack spacing={3} sx={{ p: { xs: embedded ? 0 : 2, md: embedded ? 0 : 2 } }}>
+        {!embedded && isInstructorView && (
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
+            <Tooltip title="Edit question">
+              <Box
+                component="span"
+                onClick={openEdit}
+                role="button"
+                aria-label="Edit question"
+                sx={{ display: 'inline-flex', alignItems: 'center', cursor: 'pointer', color: 'text.secondary', '&:hover': { opacity: 0.8 } }}
+              >
+                <EditIcon fontSize="small" />
+              </Box>
+            </Tooltip>
+          </Box>
+        )}
         {promptContent}
-        {!embedded && (
+        {!embedded && !formulasLabel && (
           <Typography variant="body2" sx={{ color: '#2f6bff' }}>
             Fill in each column to match the expected truth values.
           </Typography>
@@ -1031,6 +1067,16 @@ export default function TruthTableEditor({
           align="flex-start"
           attemptCount={attemptCount}
           attemptLimit={attemptLimit}
+          isInstructorView={isInstructorView}
+        />
+      )}
+      {isInstructorView && (
+        <InstructorQuestionEditor
+          ref={editorRef}
+          proof={proof}
+          isInstructorView
+          onSaved={onQuestionSaved}
+          trigger="none"
         />
       )}
     </Stack>

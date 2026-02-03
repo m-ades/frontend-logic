@@ -59,7 +59,7 @@ function a11yProps(index) {
   };
 }
 
-export default function ProofTabs({ 
+function ProofTabs({
   proofs,
   currentProofIndex, 
   onProofIndexChange, 
@@ -73,6 +73,8 @@ export default function ProofTabs({
   gradeLabel,
   isOverdue,
   isAssignmentLocked = true,
+  isInstructorView = false,
+  onQuestionSaved,
 }) {
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
@@ -339,6 +341,8 @@ export default function ProofTabs({
                               })}
                               onProofComplete={onProofComplete}
                               isAssignmentLocked={isAssignmentLocked}
+                              isInstructorView={isInstructorView}
+                              onQuestionSaved={onQuestionSaved}
                             />
                           )
                         }
@@ -369,6 +373,8 @@ export default function ProofTabs({
                               totalQuestions={proofs.length}
                               isCurrentCorrect={completedProofs.has(proof.id)}
                               currentQuestionScore={displayScoreForProof(proof, questionScores[proof.questionId])}
+                              isInstructorView={isInstructorView}
+                              onQuestionSaved={onQuestionSaved}
                             />
                           )
                         }
@@ -383,6 +389,8 @@ export default function ProofTabs({
                               assignmentQuestionId: proof.questionId
                             })}
                             isAssignmentLocked={isAssignmentLocked}
+                            isInstructorView={isInstructorView}
+                            onQuestionSaved={onQuestionSaved}
                           />
                         )
                       })()}
@@ -396,3 +404,5 @@ export default function ProofTabs({
     </Box>
   )
 }
+
+export default ProofTabs

@@ -1,15 +1,18 @@
-import { useState, useEffect, useId } from 'react'
-import { Box, Stack, Radio, RadioGroup, FormControlLabel, FormControl } from '@mui/material'
+import { useState, useEffect, useId, useRef } from 'react'
+import { Box, Stack, Radio, RadioGroup, FormControlLabel, FormControl, Tooltip } from '@mui/material'
+import EditIcon from '@mui/icons-material/Edit'
 import StatusBanner, { isTerminalStatus } from '../../ui/StatusBanner.jsx'
 import ProblemSetButtons from './ProblemSetButtons.jsx'
+import InstructorQuestionEditor from '../InstructorQuestionEditor.jsx'
 import { useProblemChecker } from '../../../hooks/useProblemChecker.js'
 import SolutionReveal from '../SolutionReveal.jsx'
 import PromptText from '../../ui/PromptText.jsx'
 
-export default function EvaluateTruth({ 
-  problem, 
-  answer, 
-  onStateChange, 
+export default function EvaluateTruth({
+  problem,
+  proof,
+  answer,
+  onStateChange,
   onComplete,
   savedState,
   assignmentQuestionId,
@@ -17,7 +20,11 @@ export default function EvaluateTruth({
   readOnly = false,
   hideActions = false,
   isAssignmentLocked = false,
+  isInstructorView = false,
+  onQuestionSaved,
 }) {
+  const editorRef = useRef(null)
+  const openEdit = () => editorRef.current?.open?.()
   const prompt = problem?.prompt || ''
   const [selectedValue, setSelectedValue] = useState(
     savedState?.ans !== undefined ? (savedState.ans ? 'true' : 'false') : ''
@@ -72,8 +79,19 @@ export default function EvaluateTruth({
           className="lp-problem-card"
         >
           <Stack spacing={3} sx={{ p: { xs: 2, md: 2 } }}>
+            {isInstructorView && proof && (
+              <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+                <Tooltip title="Edit question">
+                  <Box component="span" onClick={openEdit} role="button" aria-label="Edit question" sx={{ display: 'inline-flex', alignItems: 'center', cursor: 'pointer', color: 'text.secondary', '&:hover': { opacity: 0.8 } }}>
+                    <EditIcon fontSize="small" />
+                  </Box>
+                </Tooltip>
+              </Box>
+            )}
             {prompt && (
-              <PromptText content={prompt} />
+              <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 0.5 }}>
+                <PromptText content={prompt} />
+              </Box>
             )}
             <FormControl component="fieldset" sx={{ width: '100%' }}>
               <RadioGroup
@@ -134,7 +152,11 @@ export default function EvaluateTruth({
           align="flex-start"
           attemptCount={attemptCount}
           attemptLimit={maxAttempts}
+          isInstructorView={isInstructorView}
         />
+      )}
+      {isInstructorView && proof && (
+        <InstructorQuestionEditor ref={editorRef} proof={proof} isInstructorView onSaved={onQuestionSaved} trigger="none" />
       )}
     </Stack>
   )

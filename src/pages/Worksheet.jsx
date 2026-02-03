@@ -961,6 +961,8 @@ export default function Worksheet() {
           completionPercent={completionPercent}
           gradeLabel={gradeLabel}
           isOverdue={isOverdue}
+          isInstructorView={isInstructorView}
+          onQuestionSaved={currentWorksheet?.id ? (qId) => refreshQuestionSolutions(currentWorksheet.id, qId) : undefined}
         />
       </WorksheetLayout>
     </Box>

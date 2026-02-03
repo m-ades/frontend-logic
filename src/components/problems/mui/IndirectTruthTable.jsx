@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect } from 'react'
+import { useMemo, useState, useEffect, useRef } from 'react'
 import {
   Box,
   Stack,
@@ -15,7 +15,10 @@ import {
   FormControlLabel,
   FormControl,
   Button,
+  Tooltip,
 } from '@mui/material'
+import EditIcon from '@mui/icons-material/Edit'
+import InstructorQuestionEditor from '../InstructorQuestionEditor.jsx'
 import { useTheme } from '@mui/material/styles'
 import getFormulaClass from '../../../lib/logicpenguin/symbolic/formula.js'
 import getSyntax from '../../../lib/logicpenguin/symbolic/libsyntax.js'
@@ -105,6 +108,7 @@ const isStackedLayout = (layout) => {
 
 export default function IndirectTruthTable({
   problem,
+  proof,
   answer,
   onStateChange,
   onComplete,
@@ -113,8 +117,13 @@ export default function IndirectTruthTable({
   attemptLimit,
   readOnly = false,
   hideActions = false,
+  isAssignmentLocked = false,
+  isInstructorView = false,
+  onQuestionSaved,
 }) {
   const theme = useTheme()
+  const editorRef = useRef(null)
+  const openEdit = () => editorRef.current?.open?.()
   const syntax = useMemo(() => getSyntax(), [])
   const Formula = useMemo(() => getFormulaClass(), [])
   const prompt = problem?.prompt || ''
@@ -302,12 +311,29 @@ export default function IndirectTruthTable({
           className="lp-problem-card"
         >
           <Stack spacing={3} sx={{ p: { xs: 2, md: 2 } }}>
+            {isInstructorView && proof && (
+              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
+                <Tooltip title="Edit question">
+                  <Box
+                    component="span"
+                    onClick={openEdit}
+                    role="button"
+                    aria-label="Edit question"
+                    sx={{ display: 'inline-flex', alignItems: 'center', cursor: 'pointer', color: 'text.secondary', '&:hover': { opacity: 0.8 } }}
+                  >
+                    <EditIcon fontSize="small" />
+                  </Box>
+                </Tooltip>
+              </Box>
+            )}
             {prompt && (
-              <PromptText content={prompt} />
+              <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 0.5 }}>
+                <PromptText content={prompt} />
+              </Box>
             )}
 
             {argument?.premises?.length > 0 && (
-              <Box sx={{ width: '100%' }}>
+              <Box sx={{ width: '100%', display: 'flex', alignItems: 'flex-start', gap: 0.5 }}>
                 {isStackedLayout(layout) ? (
                   <Stack spacing={0.5} sx={{ fontSize: '1.1rem', fontFamily: 'monospace' }}>
                     {argument.premises.map((premise, idx) => (
@@ -471,6 +497,17 @@ export default function IndirectTruthTable({
           align="flex-start"
           attemptCount={attemptCount}
           attemptLimit={maxAttempts}
+          isInstructorView={isInstructorView}
+        />
+      )}
+
+      {isInstructorView && proof && (
+        <InstructorQuestionEditor
+          ref={editorRef}
+          proof={proof}
+          isInstructorView
+          onSaved={onQuestionSaved}
+          trigger="none"
         />
       )}
 

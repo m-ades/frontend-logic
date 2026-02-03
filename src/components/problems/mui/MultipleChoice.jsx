@@ -1,13 +1,16 @@
-import { useState, useEffect, useId } from 'react'
-import { Box, Stack, Radio, RadioGroup, FormControlLabel, FormControl, FormGroup, Checkbox, Typography } from '@mui/material'
+import { useState, useEffect, useId, useRef } from 'react'
+import { Box, Stack, Radio, RadioGroup, FormControlLabel, FormControl, FormGroup, Checkbox, Typography, IconButton, Tooltip } from '@mui/material'
+import EditIcon from '@mui/icons-material/Edit'
 import StatusBanner, { isTerminalStatus } from '../../ui/StatusBanner.jsx'
 import ProblemSetButtons from './ProblemSetButtons.jsx'
+import InstructorQuestionEditor from '../InstructorQuestionEditor.jsx'
 import { useProblemChecker } from '../../../hooks/useProblemChecker.js'
 import SolutionReveal from '../SolutionReveal.jsx'
 import PromptText from '../../ui/PromptText.jsx'
 
 export default function MultipleChoice({ 
   problem, 
+  proof,
   answer, 
   onStateChange, 
   onComplete,
@@ -18,7 +21,11 @@ export default function MultipleChoice({
   hideActions = false,
   suppressReveal = false,
   isAssignmentLocked = false,
+  isInstructorView = false,
+  onQuestionSaved,
 }) {
+  const editorRef = useRef(null)
+  const openEdit = () => editorRef.current?.open?.()
   const prompt = problem?.prompt || ''
   const subquestions = Array.isArray(problem?.subquestions) ? problem.subquestions : []
   const isComposite = subquestions.length > 0
@@ -191,8 +198,25 @@ export default function MultipleChoice({
           className="lp-problem-card"
         >
           <Stack spacing={3} sx={{ p: { xs: 2, md: 2 } }}>
+            {isInstructorView && proof && (
+              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
+                <Tooltip title="Edit question">
+                  <Box
+                    component="span"
+                    onClick={openEdit}
+                    role="button"
+                    aria-label="Edit question"
+                    sx={{ display: 'inline-flex', alignItems: 'center', cursor: 'pointer', color: 'text.secondary', '&:hover': { opacity: 0.8 } }}
+                  >
+                    <EditIcon fontSize="small" />
+                  </Box>
+                </Tooltip>
+              </Box>
+            )}
             {prompt && (
-              <PromptText content={prompt} sx={{ mb: 3 }} />
+              <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 0.5 }}>
+                <PromptText content={prompt} sx={{ mb: 3, flex: 1 }} />
+              </Box>
             )}
             {isComposite ? (
               <Stack spacing={3}>
@@ -257,6 +281,12 @@ export default function MultipleChoice({
                 })}
               </Stack>
             ) : (
+              <Box>
+                {isInstructorView && proof && (
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 1 }}>
+                    <Typography variant="subtitle2" color="text.secondary">Choices</Typography>
+                  </Box>
+                )}
               <FormControl component="fieldset" sx={{ width: '100%' }}>
                 {isMultiSelect ? (
                   <FormGroup>
@@ -298,6 +328,7 @@ export default function MultipleChoice({
                   </RadioGroup>
                 )}
               </FormControl>
+              </Box>
             )}
             {!suppressReveal && (
               /* show answer in card */
@@ -404,6 +435,16 @@ export default function MultipleChoice({
           align="flex-start"
           attemptCount={attemptCount}
           attemptLimit={maxAttempts}
+          isInstructorView={isInstructorView}
+        />
+      )}
+      {isInstructorView && proof && (
+        <InstructorQuestionEditor
+          ref={editorRef}
+          proof={proof}
+          isInstructorView
+          onSaved={onQuestionSaved}
+          trigger="none"
         />
       )}
     </Stack>

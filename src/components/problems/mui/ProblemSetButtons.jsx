@@ -16,6 +16,7 @@ export default function ProblemSetButtons({
   showAttempts = true,
   sx = {},
   scoreLabel,
+  isInstructorView = false,
 }) {
   const navigation = useProblemNavigation()
   const showNext = Boolean(navigation?.onNext)
@@ -93,12 +94,14 @@ export default function ProblemSetButtons({
         </Stack>
       )}
       {showAttempts && hasAttempts && (
-        <Typography
-          variant="caption"
-          sx={{ fontSize: '0.75rem', color: 'text.primary', textAlign }}
-        >
-          Attempts left: {attemptsLeft}/{attemptLimit} | Assignment grade updates with each submitted answer.
-        </Typography>
+        <Stack direction="row" alignItems="center" spacing={0.5} sx={{ flexWrap: 'wrap' }}>
+          <Typography
+            variant="caption"
+            sx={{ fontSize: '0.75rem', color: 'text.primary', textAlign }}
+          >
+            Attempts left: {attemptsLeft}/{attemptLimit} | Assignment grade updates with each submitted answer.
+          </Typography>
+        </Stack>
       )}
     </Stack>
   )

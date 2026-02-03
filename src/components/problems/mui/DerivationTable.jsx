@@ -23,6 +23,7 @@ import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome'
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
 import CancelIcon from '@mui/icons-material/Cancel'
 import RemoveIcon from '@mui/icons-material/Remove'
+import EditIcon from '@mui/icons-material/Edit'
 import { alpha } from '@mui/material/styles'
 import { fetchJson, getActiveUserId } from '../../../utils/api.js'
 import { getSubmissionScore } from '../../../utils/problemHelpers.js'
@@ -322,6 +323,8 @@ export default function DerivationTable({
   totalQuestions,
   isCurrentCorrect,
   currentQuestionScore,
+  isInstructorView = false,
+  onEditQuestion,
 }) {
   const formulaRefs = useRef({})
   const justRefs = useRef({})
@@ -1037,9 +1040,24 @@ export default function DerivationTable({
             }
         return (
           <Wrapper sx={wrapperSx}>
+        {isInstructorView && onEditQuestion && !isFullScreen && (
+          <Box sx={{ mb: 2, display: 'flex', justifyContent: 'flex-end' }}>
+            <Tooltip title="Edit question">
+              <Box
+                component="span"
+                onClick={onEditQuestion}
+                role="button"
+                aria-label="Edit question"
+                sx={{ display: 'inline-flex', alignItems: 'center', cursor: 'pointer', color: 'text.secondary', '&:hover': { opacity: 0.8 } }}
+              >
+                <EditIcon fontSize="small" />
+              </Box>
+            </Tooltip>
+          </Box>
+        )}
         {proof.description && !isFullScreen && (
-          <Box sx={{ mb: 2 }}>
-            <PromptText content={proof.description} sx={{ fontSize: 15 }} />
+          <Box sx={{ mb: 2, display: 'flex', alignItems: 'flex-start', gap: 0.5 }}>
+            <PromptText content={proof.description} sx={{ fontSize: 15, flex: 1 }} />
           </Box>
         )}
         {isPhone && !isFullScreen && canOpenFullScreen ? (

@@ -16,6 +16,8 @@ export default function LogicPenguinProblem({
   savedState, 
   onStateChange,
   isAssignmentLocked = false,
+  isInstructorView = false,
+  onQuestionSaved,
 }) {
   const [localState, setLocalState] = useState(savedState || {})
 
@@ -60,6 +62,7 @@ export default function LogicPenguinProblem({
     return (
       <SymbolicTranslation
         problem={problemData}
+        proof={proof}
         answer={proof.answer}
         attemptLimit={proof.attemptLimit}
         assignmentQuestionId={proof.questionId}
@@ -67,6 +70,8 @@ export default function LogicPenguinProblem({
         onComplete={handleComplete}
         savedState={localState}
         isAssignmentLocked={isAssignmentLocked}
+        isInstructorView={isInstructorView}
+        onQuestionSaved={onQuestionSaved}
       />
     )
   } else if (proof.type === 'multiple-choice') {
@@ -77,6 +82,7 @@ export default function LogicPenguinProblem({
     return (
       <MultipleChoice
         problem={problemData}
+        proof={proof}
         answer={proof.answer}
         attemptLimit={proof.attemptLimit}
         assignmentQuestionId={proof.questionId}
@@ -84,6 +90,8 @@ export default function LogicPenguinProblem({
         onComplete={handleComplete}
         savedState={localState}
         isAssignmentLocked={isAssignmentLocked}
+        isInstructorView={isInstructorView}
+        onQuestionSaved={onQuestionSaved}
       />
     )
   } else if (proof.type === 'true-false') {
@@ -93,6 +101,7 @@ export default function LogicPenguinProblem({
     return (
       <TrueFalse
         problem={problemData}
+        proof={proof}
         answer={proof.answer}
         attemptLimit={proof.attemptLimit}
         assignmentQuestionId={proof.questionId}
@@ -100,6 +109,8 @@ export default function LogicPenguinProblem({
         onComplete={handleComplete}
         savedState={localState}
         isAssignmentLocked={isAssignmentLocked}
+        isInstructorView={isInstructorView}
+        onQuestionSaved={onQuestionSaved}
       />
     )
   } else if (proof.type === 'evaluate-truth') {
@@ -107,6 +118,7 @@ export default function LogicPenguinProblem({
     return (
       <EvaluateTruth
         problem={problemData}
+        proof={proof}
         answer={proof.answer}
         attemptLimit={proof.attemptLimit}
         assignmentQuestionId={proof.questionId}
@@ -114,6 +126,8 @@ export default function LogicPenguinProblem({
         onComplete={handleComplete}
         savedState={localState}
         isAssignmentLocked={isAssignmentLocked}
+        isInstructorView={isInstructorView}
+        onQuestionSaved={onQuestionSaved}
       />
     )
   /* } else if (proof.type === 'valid-correct-sound') {
@@ -143,12 +157,15 @@ export default function LogicPenguinProblem({
     return (
       <SingleRowTruthTable
         problem={problemData}
+        proof={proof}
         attemptLimit={proof.attemptLimit}
         assignmentQuestionId={proof.questionId}
         onStateChange={handleStateChange}
         onComplete={handleComplete}
         savedState={localState}
         isAssignmentLocked={isAssignmentLocked}
+        isInstructorView={isInstructorView}
+        onQuestionSaved={onQuestionSaved}
       />
     )
   } else if (proof.type === 'combo-translation-truth-table') {
@@ -161,6 +178,8 @@ export default function LogicPenguinProblem({
         onComplete={handleComplete}
         savedState={localState}
         isAssignmentLocked={isAssignmentLocked}
+        isInstructorView={isInstructorView}
+        onQuestionSaved={onQuestionSaved}
       />
     )
   } else if (proof.type === 'combo-translation-derivation') {
@@ -173,6 +192,8 @@ export default function LogicPenguinProblem({
         onComplete={handleComplete}
         savedState={localState}
         isAssignmentLocked={isAssignmentLocked}
+        isInstructorView={isInstructorView}
+        onQuestionSaved={onQuestionSaved}
       />
     )
   } else if (proof.type === 'indirect-truth-table') {
@@ -196,6 +217,7 @@ export default function LogicPenguinProblem({
     return (
       <IndirectTruthTable
         problem={normalizedProblem}
+        proof={proof}
         answer={derivedAnswer}
         attemptLimit={proof.attemptLimit}
         assignmentQuestionId={proof.questionId}
@@ -203,6 +225,8 @@ export default function LogicPenguinProblem({
         onComplete={handleComplete}
         savedState={localState}
         isAssignmentLocked={isAssignmentLocked}
+        isInstructorView={isInstructorView}
+        onQuestionSaved={onQuestionSaved}
       />
     )
   } else if (proof.type === 'partial-truth-table') {
@@ -210,12 +234,15 @@ export default function LogicPenguinProblem({
     return (
       <PartialTruthTable
         problem={problemData}
+        proof={proof}
         attemptLimit={proof.attemptLimit}
         assignmentQuestionId={proof.questionId}
         onStateChange={handleStateChange}
         onComplete={handleComplete}
         savedState={localState}
         isAssignmentLocked={isAssignmentLocked}
+        isInstructorView={isInstructorView}
+        onQuestionSaved={onQuestionSaved}
       />
     )
   }

@@ -1,9 +1,10 @@
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import { Box, IconButton, Stack, useMediaQuery, useTheme } from '@mui/material'
 import StatusBanner from '../ui/StatusBanner.jsx'
 import CloseIcon from '@mui/icons-material/Close'
 import DerivationTable from './mui/DerivationTable.jsx'
+import InstructorQuestionEditor from './InstructorQuestionEditor.jsx'
 
 export default function ProofEditor({
   proof,
@@ -19,8 +20,12 @@ export default function ProofEditor({
   totalQuestions,
   isCurrentCorrect,
   currentQuestionScore,
+  isInstructorView = false,
+  onQuestionSaved,
 }) {
   const theme = useTheme()
+  const editorRef = useRef(null)
+  const openEdit = () => editorRef.current?.open?.()
   const isMobile = useMediaQuery(theme.breakpoints.down('md')) // compact layout: phone + tablet
   const isPhone = useMediaQuery(theme.breakpoints.down('sm')) // fullscreen only on phones
   const [internalOpen, setInternalOpen] = useState(false)
@@ -134,6 +139,8 @@ export default function ProofEditor({
         onCloseFullScreen={closeFullScreen}
         totalQuestions={totalQuestions}
         isCurrentCorrect={isCurrentCorrect}
+        isInstructorView={isInstructorView}
+        onEditQuestion={openEdit}
       />
     </Box>,
     document.body
@@ -160,15 +167,27 @@ export default function ProofEditor({
             setIsChecking={setIsChecking}
             isAssignmentLocked={isAssignmentLocked}
             isMobile={isMobile}
-        isPhone={isPhone}
+            isPhone={isPhone}
             isFullScreen={false}
             onOpenFullScreen={openFullScreen}
             onCloseFullScreen={closeFullScreen}
             totalQuestions={totalQuestions}
             isCurrentCorrect={isCurrentCorrect}
             currentQuestionScore={currentQuestionScore}
+            isInstructorView={isInstructorView}
+            onEditQuestion={openEdit}
           />
         )}
+
+      {isInstructorView && (
+        <InstructorQuestionEditor
+          ref={editorRef}
+          proof={proof}
+          isInstructorView
+          onSaved={onQuestionSaved}
+          trigger="none"
+        />
+      )}
 
       {StatusBanner.isTerminalStatus(statusBanner.status) && (
         <StatusBanner

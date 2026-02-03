@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { Alert, Box, Stack, Typography } from '@mui/material'
+import { Alert, Box, Stack, Typography, Tooltip } from '@mui/material'
+import EditIcon from '@mui/icons-material/Edit'
+import InstructorQuestionEditor from '../InstructorQuestionEditor.jsx'
 import StatusBanner, { isTerminalStatus } from '../../ui/StatusBanner.jsx'
 import { useTheme } from '@mui/material/styles'
 import ProblemSetButtons from './ProblemSetButtons.jsx'
@@ -50,8 +52,12 @@ export default function ComboTranslationDerivation({
   assignmentQuestionId,
   attemptLimit,
   isAssignmentLocked = false,
+  isInstructorView = false,
+  onQuestionSaved,
 }) {
   const theme = useTheme()
+  const editorRef = useRef(null)
+  const openEdit = () => editorRef.current?.open?.()
   const Formula = useMemo(() => getFormulaClass(), [])
   const snapshot = proof?.comboTranslationDerivation || proof?.snapshot || {}
   const promptText = snapshot?.prompt || proof?.description || ''
@@ -183,6 +189,15 @@ export default function ComboTranslationDerivation({
       <Box className="logicpenguin" sx={{ width: '100%' }}>
         <Box className="lp-problem-card">
           <Stack spacing={3} sx={{ p: { xs: 2, md: 2 } }}>
+            {isInstructorView && proof && (
+              <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+                <Tooltip title="Edit prompt">
+                  <Box component="span" onClick={openEdit} role="button" aria-label="Edit question" sx={{ display: 'inline-flex', alignItems: 'center', cursor: 'pointer', color: 'text.secondary', '&:hover': { opacity: 0.8 } }}>
+                    <EditIcon fontSize="small" />
+                  </Box>
+                </Tooltip>
+              </Box>
+            )}
             {promptText && (
               <PromptText content={promptText} sx={{ whiteSpace: 'pre-line' }} />
             )}
@@ -276,7 +291,11 @@ export default function ComboTranslationDerivation({
         align="flex-start"
         attemptCount={attemptCount}
         attemptLimit={maxAttempts}
+        isInstructorView={isInstructorView}
       />
+      {isInstructorView && proof && (
+        <InstructorQuestionEditor ref={editorRef} proof={proof} isInstructorView onSaved={onQuestionSaved} trigger="none" />
+      )}
     </Stack>
   )
 }

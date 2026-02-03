@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
-import { Box, Stack, Typography, Alert } from '@mui/material'
+import { Box, Stack, Typography, Alert, Tooltip } from '@mui/material'
+import EditIcon from '@mui/icons-material/Edit'
+import InstructorQuestionEditor from '../InstructorQuestionEditor.jsx'
 import { useTheme } from '@mui/material/styles'
 import ProblemSetButtons from './ProblemSetButtons.jsx'
 import FormulaInput from '../../ui/logicpenguin/formula-input.js'
@@ -107,10 +109,11 @@ function FormulaInputField({ value, onValueChange, fieldReadOnly, formulaInputRe
   )
 }
 
-export default function SymbolicTranslation({ 
-  problem, 
-  answer, 
-  onStateChange, 
+export default function SymbolicTranslation({
+  problem,
+  proof,
+  answer,
+  onStateChange,
   onComplete,
   savedState,
   assignmentQuestionId,
@@ -119,7 +122,11 @@ export default function SymbolicTranslation({
   hideActions = false,
   suppressReveal = false,
   isAssignmentLocked = false,
+  isInstructorView = false,
+  onQuestionSaved,
 }) {
+  const editorRef = useRef(null)
+  const openEdit = () => editorRef.current?.open?.()
   const [inputValue, setInputValue] = useState(savedState?.ans || '')
   const formulaInputRef = useRef(null)
   const solutionInputRef = useRef(null)
@@ -208,9 +215,20 @@ export default function SymbolicTranslation({
           className="lp-problem-card"
         >
           <Stack spacing={3} sx={{ p: { xs: 2, md: 2 } }}>
+            {isInstructorView && proof && (
+              <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+                <Tooltip title="Edit question">
+                  <Box component="span" onClick={openEdit} role="button" aria-label="Edit question" sx={{ display: 'inline-flex', alignItems: 'center', cursor: 'pointer', color: 'text.secondary', '&:hover': { opacity: 0.8 } }}>
+                    <EditIcon fontSize="small" />
+                  </Box>
+                </Tooltip>
+              </Box>
+            )}
             <Box>
               {prompt && (
-                <PromptText content={prompt} sx={{ mb: 1 }} />
+                <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 0.5 }}>
+                  <PromptText content={prompt} sx={{ mb: 1 }} />
+                </Box>
               )}
               {symbolizationKey.length > 0 && (
                 <Box sx={{ mb: 1, mt: 2.5 }}>
@@ -292,7 +310,11 @@ export default function SymbolicTranslation({
           align="flex-start"
           attemptCount={attemptCount}
           attemptLimit={maxAttempts}
+          isInstructorView={isInstructorView}
         />
+      )}
+      {isInstructorView && proof && (
+        <InstructorQuestionEditor ref={editorRef} proof={proof} isInstructorView onSaved={onQuestionSaved} trigger="none" />
       )}
     </Stack>
   )

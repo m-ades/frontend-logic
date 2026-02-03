@@ -34,7 +34,9 @@ export default function WorksheetTabs({
   total,
   completionPercent,
   gradeLabel,
-  isOverdue
+  isOverdue,
+  isInstructorView = false,
+  onQuestionSaved,
 }) {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
@@ -62,6 +64,8 @@ export default function WorksheetTabs({
             gradeLabel={gradeLabel}
             isOverdue={isOverdue}
             isAssignmentLocked={worksheet.isLocked ?? false}
+            isInstructorView={isInstructorView}
+            onQuestionSaved={onQuestionSaved}
           />
         </WorksheetTabPanel>
       ))}

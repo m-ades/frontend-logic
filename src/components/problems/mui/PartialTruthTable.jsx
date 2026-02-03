@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState, useRef } from 'react'
 import {
   Box,
   Stack,
@@ -12,7 +12,10 @@ import {
   Paper,
   Select,
   MenuItem,
+  Tooltip,
 } from '@mui/material'
+import EditIcon from '@mui/icons-material/Edit'
+import InstructorQuestionEditor from '../InstructorQuestionEditor.jsx'
 import { useTheme } from '@mui/material/styles'
 import getFormulaClass from '../../../lib/logicpenguin/symbolic/formula.js'
 import { multiTables } from '../../../lib/logicpenguin/symbolic/libsemantics.js'
@@ -37,6 +40,7 @@ const toSymbol = (value) => {
 
 export default function PartialTruthTable({
   problem,
+  proof,
   onStateChange,
   onComplete,
   savedState,
@@ -45,8 +49,12 @@ export default function PartialTruthTable({
   readOnly = false,
   hideActions = false,
   isAssignmentLocked = false,
+  isInstructorView = false,
+  onQuestionSaved,
 }) {
   const theme = useTheme()
+  const editorRef = useRef(null)
+  const openEdit = () => editorRef.current?.open?.()
   const Formula = useMemo(() => getFormulaClass(), [])
   const statement = problem?.statement || problem?.formula || ''
   const prompt = problem?.prompt || ''
@@ -127,6 +135,15 @@ export default function PartialTruthTable({
           className="lp-problem-card"
         >
           <Stack spacing={3} sx={{ p: { xs: 2, md: 2 } }}>
+            {isInstructorView && proof && (
+              <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+                <Tooltip title="Edit question">
+                  <Box component="span" onClick={openEdit} role="button" aria-label="Edit question" sx={{ display: 'inline-flex', alignItems: 'center', cursor: 'pointer', color: 'text.secondary', '&:hover': { opacity: 0.8 } }}>
+                    <EditIcon fontSize="small" />
+                  </Box>
+                </Tooltip>
+              </Box>
+            )}
             {prompt && (
               <PromptText content={prompt} />
             )}
@@ -219,7 +236,11 @@ export default function PartialTruthTable({
           align="flex-start"
           attemptCount={attemptCount}
           attemptLimit={maxAttempts}
+          isInstructorView={isInstructorView}
         />
+      )}
+      {isInstructorView && proof && (
+        <InstructorQuestionEditor ref={editorRef} proof={proof} isInstructorView onSaved={onQuestionSaved} trigger="none" />
       )}
     </Stack>
   )
