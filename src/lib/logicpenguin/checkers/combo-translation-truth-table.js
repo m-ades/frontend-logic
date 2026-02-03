@@ -9,6 +9,7 @@
 import tr from '../translate.js';
 import checkArgumentTT from './argument-truth-table.js';
 import getFormulaClass from '../symbolic/formula.js';
+import { equivtest } from '../symbolic/libequivalence.js';
 import { argumentTables } from '../symbolic/libsemantics.js';
 
 let defaultnotation = 'cambridge';
@@ -81,42 +82,71 @@ export default async function(
         correct = false;
         messages.push(given.error);
     } else if (!expected.error) {
+        const compareFormulas = (expStr, givenStr, indexLabel) => {
+            try {
+                const exp = Formula.from(expStr);
+                const giv = Formula.from(givenStr);
+                if (exp.normal === giv.normal) return { ok: true };
+                const eq = equivtest(exp, giv, notation);
+                if (eq?.determinate) {
+                    if (eq.equiv) return { ok: true };
+                    return { ok: false, message: tr(`The ${indexLabel} is not equivalent to the expected translation.`) };
+                }
+                return { ok: false, message: tr(`Could not determine if the ${indexLabel} is equivalent to the expected translation.`) };
+            } catch {
+                return { ok: false, message: tr('The argument line contains an invalid formula.') };
+            }
+        };
         try {
-            const normalize = (statement) => Formula.from(statement).normal;
-            const expectedPremises = expected.premises.map(normalize);
-            const givenPremises = given.premises.map(normalize);
-            const expectedConclusion = normalize(expected.conclusion);
-            const givenConclusion = normalize(given.conclusion);
-            const samePremiseCount = expectedPremises.length === givenPremises.length;
-            const samePremiseOrder = samePremiseCount &&
-                expectedPremises.every((premise, idx) => premise === givenPremises[idx]);
-            if (!samePremiseOrder || expectedConclusion !== givenConclusion) {
+            const usedGiven = new Set();
+            let premisesOk = true;
+            for (const expPrem of expected.premises) {
+                let matched = false;
+                for (let gIdx = 0; gIdx < given.premises.length; gIdx++) {
+                    if (usedGiven.has(gIdx)) continue;
+                    const res = compareFormulas(expPrem, given.premises[gIdx], tr('premise'));
+                    if (res.ok) {
+                        usedGiven.add(gIdx);
+                        matched = true;
+                        break;
+                    }
+                }
+                if (!matched) {
+                    premisesOk = false;
+                    break;
+                }
+            }
+            const conclusionOk = premisesOk && expected.premises.length === given.premises.length &&
+                compareFormulas(expected.conclusion, given.conclusion, tr('conclusion')).ok;
+            if (!conclusionOk) {
                 correct = false;
                 messages.push(tr('The argument line does not match the expected translation.'));
             } else {
-                transptsearned++;
+                transptsearned = transptsttl;
             }
         } catch {
             correct = false;
             messages.push(tr('The argument line contains an invalid formula.'));
         }
     }
-    // check tables
-    if (givenans.tableAns && !expected.error) {
-        const premises = expected.premises;
-        const conclusion = expected.conclusion;
-        const pwffs = premises.map((p)=>(Formula.from(p)));
+    // check tables: use the user's argument (given) so we validate their table
+    // and classification for their statement, not the expected one
+    if (givenans.tableAns && !given.error) {
+        const premises = given.premises;
+        const conclusion = given.conclusion;
+        const pwffs = premises.map((p)=> Formula.from(p));
         const cwff = Formula.from(conclusion);
-        const tablesShouldBe = argumentTables(pwffs, cwff, notation);
+        const tablesShouldBe = argumentTables(pwffs, cwff);
         const tcQ = {
             prems: premises,
             conc: conclusion
-        }
+        };
         const tableCheck = await checkArgumentTT(
-             tcQ, tablesShouldBe, givenans.tableAns,
-                partialcredit, ttTtl, cheat, { question: true }
+            tcQ, tablesShouldBe, givenans.tableAns,
+            partialcredit, ttTtl, cheat, { question: true }
         );
         ttEarned = tableCheck.points;
+        if (ttEarned > ttTtl) ttEarned = ttTtl;
         if ("qright" in tableCheck) {
             qright = tableCheck.qright;
         }

@@ -486,9 +486,10 @@ export default function Worksheet() {
     if (solutionRefreshRef.current.has(questionId)) return
     solutionRefreshRef.current.add(questionId)
     try {
-      const response = await fetchJson(
-        `/api/assignments/${assignmentId}?userId=${activeUserId}`
-      )
+      const [response, submissions] = await Promise.all([
+        fetchJson(`/api/assignments/${assignmentId}?userId=${activeUserId}`),
+        fetchJson(`/api/assignments/${assignmentId}/submissions?userId=${activeUserId}`).catch(() => null),
+      ])
       const questions = response.questions || []
       const assignmentInfo = response.assignment || { id: assignmentId }
       const targetQuestion = questions.find((question) => (
@@ -497,6 +498,16 @@ export default function Worksheet() {
       if (!targetQuestion) {
         solutionRefreshRef.current.delete(questionId)
         return
+      }
+      const qIdNum = Number(questionId)
+      let serverAttemptCount = null
+      if (Array.isArray(submissions)) {
+        serverAttemptCount = 0
+        for (const s of submissions) {
+          if (Number(s?.assignment_question_id) === qIdNum && Number.isFinite(s?.attempt)) {
+            if (s.attempt > serverAttemptCount) serverAttemptCount = s.attempt
+          }
+        }
       }
       setWorksheets((prev) => (
         prev.map((worksheet) => {
@@ -507,7 +518,7 @@ export default function Worksheet() {
             return {
               ...proof,
               ...updated,
-              attemptCount: proof.attemptCount,
+              attemptCount: serverAttemptCount ?? proof.attemptCount ?? 0,
               attemptLimit: updated.attemptLimit ?? proof.attemptLimit,
             }
           })

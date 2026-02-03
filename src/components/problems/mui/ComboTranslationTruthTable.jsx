@@ -67,6 +67,24 @@ const isTableComplete = (tableState) =>
 const hasClassification = (tableState) =>
   Array.isArray(tableState?.mcans) && tableState.mcans.length > 0
 
+// Resolve expected argument (premises + conclusion) from snapshot/answer for solution reveal
+function resolveExpectedAnswer(answer) {
+  if (!answer) return null
+  if (answer.argument || answer.argumentLine) {
+    const parsed = parseArgumentLine(answer.argument ?? answer.argumentLine)
+    return parsed.error ? null : parsed
+  }
+  if (Array.isArray(answer.premises) && answer.conclusion != null) {
+    return { premises: answer.premises, conclusion: answer.conclusion }
+  }
+  if (Array.isArray(answer.translations) && Number.isInteger(answer.index)) {
+    const conclusion = answer.translations[answer.index] ?? ''
+    const premises = answer.translations.filter((_, idx) => idx !== answer.index)
+    return premises.length && conclusion ? { premises, conclusion } : null
+  }
+  return null
+}
+
 export default function ComboTranslationTruthTable({
   proof,
   onStateChange,
@@ -181,36 +199,68 @@ export default function ComboTranslationTruthTable({
     }
   }, [parseStatus.ok, parseStatus.parsed, proof])
 
-  const { status, message, isChecking, handleCheck, handleStartOver, setMessage, attemptCount, maxAttempts, isLocked } =
-    useProblemChecker({
-      answer: proof?.answer ?? snapshot?.answer,
-      problemType: 'combo-translation-truth-table',
-      question: snapshot,
-      options: proof?.options ?? snapshot?.options,
-      getAnswer: () => {
-        const payload = { argumentLine }
-        const built = buildTableAnswer(tableState)
-        if (built) payload.tableAns = built
-        if (tableState && typeof tableState === 'object') payload.tableState = tableState
-        return payload
+  const expectedAnswer = useMemo(
+    () => resolveExpectedAnswer(proof?.answer ?? snapshot?.answer),
+    [proof?.answer, snapshot?.answer]
+  )
+  const answerProof = useMemo(() => {
+    if (!expectedAnswer) return null
+    return {
+      ...proof,
+      id: proof?.id ? `${proof.id}-answer` : 'answer',
+      truthTable: {
+        kind: 'argument',
+        lefts: expectedAnswer.premises,
+        right: expectedAnswer.conclusion,
+        options: { question: true },
       },
-      onComplete,
-      isDisabled: () =>
-        !parseStatus.ok ||
-        !tableState ||
-        !isTableComplete(tableState) ||
-        !hasClassification(tableState),
-      resetInput: () => {
-        setArgumentLine('')
-        setTableState(null)
-        if (inputRef.current) inputRef.current.value = ''
-        updateState({ argumentLine: '', tableState: null })
-      },
-      onStateChange: updateState,
-      assignmentQuestionId,
-      attemptLimit,
-      initialAttemptCount: savedState?.attemptCount ?? 0,
-    })
+    }
+  }, [expectedAnswer, proof])
+
+  const problemChecker = useProblemChecker({
+    answer: proof?.answer ?? snapshot?.answer,
+    problemType: 'combo-translation-truth-table',
+    question: snapshot,
+    options: proof?.options ?? snapshot?.options,
+    getAnswer: () => {
+      const payload = { argumentLine }
+      const built = buildTableAnswer(tableState)
+      if (built) payload.tableAns = built
+      if (tableState && typeof tableState === 'object') payload.tableState = tableState
+      return payload
+    },
+    onComplete,
+    isDisabled: () =>
+      !parseStatus.ok ||
+      !tableState ||
+      !isTableComplete(tableState) ||
+      !hasClassification(tableState),
+    resetInput: () => {
+      setArgumentLine('')
+      setTableState(null)
+      if (inputRef.current) inputRef.current.value = ''
+      updateState({ argumentLine: '', tableState: null })
+    },
+    onStateChange: updateState,
+    assignmentQuestionId,
+    attemptLimit,
+    initialAttemptCount: savedState?.attemptCount ?? 0,
+  })
+
+  const status = problemChecker.status
+  const message = problemChecker.message
+  const isChecking = problemChecker.isChecking
+  const handleCheck = problemChecker.handleCheck
+  const handleStartOver = problemChecker.handleStartOver
+  const setMessage = problemChecker.setMessage
+  const attemptCount = problemChecker.attemptCount
+  const maxAttempts = problemChecker.maxAttempts
+  const isLocked = problemChecker.isLocked
+
+  const showSolution = attemptCount >= maxAttempts && status !== 'correct' && expectedAnswer != null
+  const answerArgumentLine = expectedAnswer
+    ? expectedAnswer.premises.join(' / ') + ' // ' + expectedAnswer.conclusion
+    : ''
 
   const handleArgumentChange = (value) => {
     setArgumentLine(value)
@@ -264,7 +314,7 @@ export default function ComboTranslationTruthTable({
                   updateState({ tableState: next })
                 }}
                 hideActions
-                suppressReveal={status === 'correct' || attemptCount < maxAttempts}
+                suppressReveal={status === 'correct' || attemptCount < maxAttempts || showSolution}
                 embedded
                 parentStatus={status}
                 parentAttemptCount={attemptCount}
@@ -281,6 +331,35 @@ export default function ComboTranslationTruthTable({
           message={message}
           onClose={() => setMessage('')}
         />
+      )}
+
+      {showSolution && answerProof && (
+        <Box className="logicpenguin" sx={{ width: '100%' }}>
+          <Box className="lp-problem-card" sx={{ borderColor: 'primary.main', borderWidth: 1, borderStyle: 'solid' }}>
+            <Stack spacing={2} sx={{ p: 2 }}>
+              <Typography variant="h6" sx={{ fontWeight: 600, color: 'primary.main' }}>
+                Correct Answer
+              </Typography>
+              <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                Argument line
+              </Typography>
+              <Typography component="div" sx={{ fontFamily: 'monospace', fontSize: '1rem' }}>
+                {answerArgumentLine}
+              </Typography>
+              <TruthTableEditor
+                proof={answerProof}
+                savedState={null}
+                hideActions
+                suppressReveal={false}
+                embedded
+                solutionOnly
+                parentStatus={status}
+                parentAttemptCount={attemptCount}
+                parentAttemptLimit={maxAttempts}
+              />
+            </Stack>
+          </Box>
+        </Box>
       )}
 
       <ProblemSetButtons

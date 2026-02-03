@@ -2,7 +2,7 @@
  * Shared hook for problem checking logic used across all problem components in the mui folder
  * handles state management, answer validation, checking answers and resetting problems.
  */
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { localCheck } from '../lib/logicpenguin/common.js'
 import { fetchJson, getActiveUserId } from '../utils/api.js'
 import { getSubmissionScore } from '../utils/problemHelpers.js'
@@ -27,6 +27,19 @@ export function useProblemChecker({
   const [attemptCount, setAttemptCount] = useState(initialAttemptCount)
   const [maxAttempts, setMaxAttempts] = useState(attemptLimit)
   const isLocked = attemptCount >= maxAttempts
+
+  // Sync from parent (e.g. after refreshQuestionSolutions) but never decrease count:
+  // a submission response may have already set a higher value before parent state updates.
+  useEffect(() => {
+    if (typeof initialAttemptCount === 'number') {
+      setAttemptCount((prev) => Math.max(prev, initialAttemptCount))
+    }
+  }, [initialAttemptCount])
+  useEffect(() => {
+    if (typeof attemptLimit === 'number') {
+      setMaxAttempts(attemptLimit)
+    }
+  }, [attemptLimit])
 
   const handleCheck = async () => {
     if (isChecking || isDisabled() || isLocked) return

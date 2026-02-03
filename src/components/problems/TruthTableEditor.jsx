@@ -108,6 +108,7 @@ export default function TruthTableEditor({
   hideActions = false,
   suppressReveal = false,
   embedded = false,
+  solutionOnly = false,
   parentStatus,
   parentAttemptCount,
   parentAttemptLimit,
@@ -1027,6 +1028,36 @@ export default function TruthTableEditor({
       </Stack>
     </Box>
   )
+
+  if (solutionOnly && embedded && displaySolutionTables.length > 0) {
+    return (
+      <Stack spacing={2} sx={{ px: 0, width: '100%' }}>
+        {renderAnswerBlock(
+          'Correct Answer',
+          renderTableSet(
+            displaySolutionTables,
+            displaySolutionTables.map((table) => table.rows),
+            displaySolutionTables.length > 1,
+            true,
+            null,
+            kind === 'argument'
+          )
+        )}
+        {classificationEnabled && solutionMcValues.length > 0 && (
+          <Box sx={{ mt: 2 }}>
+            <Typography variant="h6" sx={{ fontWeight: 600, color: '#2f6bff' }}>
+              Correct classification
+            </Typography>
+            <Typography variant="body1" sx={{ mt: 1 }}>
+              {solutionMcValues
+                .map((v) => classificationOptions.find((o) => o.value === v)?.label ?? v)
+                .join(', ')}
+            </Typography>
+          </Box>
+        )}
+      </Stack>
+    )
+  }
 
   return (
     <Stack spacing={2} sx={{ px: 0, width: '100%', alignItems: 'stretch', flexGrow: 1 }}>
