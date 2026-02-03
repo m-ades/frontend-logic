@@ -338,6 +338,7 @@ export default function ProofTabs({
                                 assignmentQuestionId: proof.questionId
                               })}
                               onProofComplete={onProofComplete}
+                              isAssignmentLocked={isAssignmentLocked}
                             />
                           )
                         }
@@ -381,6 +382,7 @@ export default function ProofTabs({
                             onStateChange={(state) => handleProofStateChange(proof.id, state, {
                               assignmentQuestionId: proof.questionId
                             })}
+                            isAssignmentLocked={isAssignmentLocked}
                           />
                         )
                       })()}

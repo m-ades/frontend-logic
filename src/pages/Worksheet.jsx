@@ -942,6 +942,7 @@ export default function Worksheet() {
         onWorksheetIndexChange={handleWorksheetChange}
         completedProofs={completedProofs}
         isOverdue={isOverdue}
+        isLocked={currentWorksheet.isLocked ?? false}
       >
         <WorksheetTabs
           key={`worksheet-${currentWorksheet?.id ?? worksheetIdNum}`}

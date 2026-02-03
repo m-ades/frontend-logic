@@ -107,6 +107,7 @@ export default function TruthTableEditor({
   parentStatus,
   parentAttemptCount,
   parentAttemptLimit,
+  isAssignmentLocked = false,
 }) {
   const truthTable = proof.truthTable ?? {}
   const syntax = React.useMemo(() => getSyntax(), [])
@@ -1026,7 +1027,7 @@ export default function TruthTableEditor({
           onCheck={handleCheck}
           onStartOver={handleStartOver}
           isChecking={isChecking}
-          isDisabled={!tableFilled || attemptCount >= attemptLimit}
+          isDisabled={!tableFilled || attemptCount >= attemptLimit || isAssignmentLocked}
           align="flex-start"
           attemptCount={attemptCount}
           attemptLimit={attemptLimit}

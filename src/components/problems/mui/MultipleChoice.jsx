@@ -17,6 +17,7 @@ export default function MultipleChoice({
   readOnly = false,
   hideActions = false,
   suppressReveal = false,
+  isAssignmentLocked = false,
 }) {
   const prompt = problem?.prompt || ''
   const subquestions = Array.isArray(problem?.subquestions) ? problem.subquestions : []
@@ -91,7 +92,7 @@ export default function MultipleChoice({
   const correctAnswer = answer ?? problem?.answer ?? problem?.answerIndex ?? problem?.answerIndices
   const showSolution = isLocked && status !== 'correct' && (isComposite || correctAnswer !== undefined && correctAnswer !== null)
   // match checker rules
-  const isSubmitDisabled = isLocked || (
+  const isSubmitDisabled = isLocked || isAssignmentLocked || (
     isComposite
       ? subquestions.some((subq, idx) => {
           const value = selectedValue?.[idx]

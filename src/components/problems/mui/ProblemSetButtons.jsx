@@ -1,5 +1,6 @@
 import { Button, IconButton, Stack, Typography } from '@mui/material'
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward'
+import LockIcon from '@mui/icons-material/Lock'
 import { useProblemNavigation } from '../ProblemNavigationContext.jsx'
 
 // shared button component is 'submit answer' and 'start over' for now
@@ -8,6 +9,7 @@ export default function ProblemSetButtons({
   onStartOver, 
   isChecking = false, 
   isDisabled = false,
+  isAssignmentLocked = false,
   align = 'center',
   attemptCount,
   attemptLimit,

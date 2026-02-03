@@ -14,7 +14,8 @@ export default function LogicPenguinProblem({
   proof, 
   onProofComplete, 
   savedState, 
-  onStateChange 
+  onStateChange,
+  isAssignmentLocked = false,
 }) {
   const [localState, setLocalState] = useState(savedState || {})
 
@@ -65,6 +66,7 @@ export default function LogicPenguinProblem({
         onStateChange={handleStateChange}
         onComplete={handleComplete}
         savedState={localState}
+        isAssignmentLocked={isAssignmentLocked}
       />
     )
   } else if (proof.type === 'multiple-choice') {
@@ -81,6 +83,7 @@ export default function LogicPenguinProblem({
         onStateChange={handleStateChange}
         onComplete={handleComplete}
         savedState={localState}
+        isAssignmentLocked={isAssignmentLocked}
       />
     )
   } else if (proof.type === 'true-false') {
@@ -96,6 +99,7 @@ export default function LogicPenguinProblem({
         onStateChange={handleStateChange}
         onComplete={handleComplete}
         savedState={localState}
+        isAssignmentLocked={isAssignmentLocked}
       />
     )
   } else if (proof.type === 'evaluate-truth') {
@@ -109,6 +113,7 @@ export default function LogicPenguinProblem({
         onStateChange={handleStateChange}
         onComplete={handleComplete}
         savedState={localState}
+        isAssignmentLocked={isAssignmentLocked}
       />
     )
   /* } else if (proof.type === 'valid-correct-sound') {
@@ -143,6 +148,7 @@ export default function LogicPenguinProblem({
         onStateChange={handleStateChange}
         onComplete={handleComplete}
         savedState={localState}
+        isAssignmentLocked={isAssignmentLocked}
       />
     )
   } else if (proof.type === 'combo-translation-truth-table') {
@@ -154,6 +160,7 @@ export default function LogicPenguinProblem({
         onStateChange={handleStateChange}
         onComplete={handleComplete}
         savedState={localState}
+        isAssignmentLocked={isAssignmentLocked}
       />
     )
   } else if (proof.type === 'combo-translation-derivation') {
@@ -165,6 +172,7 @@ export default function LogicPenguinProblem({
         onStateChange={handleStateChange}
         onComplete={handleComplete}
         savedState={localState}
+        isAssignmentLocked={isAssignmentLocked}
       />
     )
   } else if (proof.type === 'indirect-truth-table') {
@@ -194,6 +202,7 @@ export default function LogicPenguinProblem({
         onStateChange={handleStateChange}
         onComplete={handleComplete}
         savedState={localState}
+        isAssignmentLocked={isAssignmentLocked}
       />
     )
   } else if (proof.type === 'partial-truth-table') {
@@ -206,6 +215,7 @@ export default function LogicPenguinProblem({
         onStateChange={handleStateChange}
         onComplete={handleComplete}
         savedState={localState}
+        isAssignmentLocked={isAssignmentLocked}
       />
     )
   }

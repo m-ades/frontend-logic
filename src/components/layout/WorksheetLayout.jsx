@@ -1,5 +1,6 @@
-import { Box, Typography, IconButton } from '@mui/material'
+import { Box, Typography, IconButton, Stack } from '@mui/material'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
+import LockIcon from '@mui/icons-material/Lock'
 
 export default function Layout({ 
   title, 
@@ -8,6 +9,7 @@ export default function Layout({
   inModal = false,
   onBackToLMS,
   isOverdue,
+  isLocked = false,
 }) {
   return (
     <Box sx={{ width: '100%', height: '100%', minWidth: 0, overflowX: 'hidden' }}>
@@ -40,9 +42,14 @@ export default function Layout({
               {title}
             </Typography>
             {subtitle && (
-              <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                {subtitle}
-              </Typography>
+              <Stack direction="row" spacing={1} alignItems="center">
+                <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                  {subtitle}
+                </Typography>
+                {isLocked && (
+                  <LockIcon sx={{ fontSize: '1rem', color: 'text.secondary', flexShrink: 0 }} />
+                )}
+              </Stack>
             )}
           </Box>
         </Box>

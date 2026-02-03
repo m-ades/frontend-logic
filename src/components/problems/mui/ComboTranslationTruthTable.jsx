@@ -72,6 +72,7 @@ export default function ComboTranslationTruthTable({
   savedState,
   assignmentQuestionId,
   attemptLimit,
+  isAssignmentLocked = false,
 }) {
   const theme = useTheme()
   const Formula = useMemo(() => getFormulaClass(), [])
@@ -258,7 +259,8 @@ export default function ComboTranslationTruthTable({
           !tableState ||
           !isTableComplete(tableState) ||
           !hasClassification(tableState) ||
-          isLocked
+          isLocked ||
+          isAssignmentLocked
         }
         align="flex-start"
         attemptCount={attemptCount}

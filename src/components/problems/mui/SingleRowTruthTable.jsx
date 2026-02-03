@@ -86,6 +86,7 @@ export default function SingleRowTruthTable({
   attemptLimit,
   readOnly = false,
   hideActions = false,
+  isAssignmentLocked = false,
 }) {
   const syntax = useMemo(() => getSyntax(), [])
   const Formula = useMemo(() => getFormulaClass(), [])
@@ -402,7 +403,7 @@ export default function SingleRowTruthTable({
           onCheck={handleCheck}
           onStartOver={handleStartOver}
           isChecking={isChecking}
-          isDisabled={!tableFilled || isLocked}
+          isDisabled={!tableFilled || isLocked || isAssignmentLocked}
           align="flex-start"
           attemptCount={attemptCount}
           attemptLimit={maxAttempts}

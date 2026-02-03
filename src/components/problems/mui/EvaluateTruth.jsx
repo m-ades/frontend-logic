@@ -16,6 +16,7 @@ export default function EvaluateTruth({
   attemptLimit,
   readOnly = false,
   hideActions = false,
+  isAssignmentLocked = false,
 }) {
   const prompt = problem?.prompt || ''
   const [selectedValue, setSelectedValue] = useState(
@@ -129,7 +130,7 @@ export default function EvaluateTruth({
           onCheck={handleCheck}
           onStartOver={handleStartOver}
           isChecking={isChecking}
-          isDisabled={selectedValue === '' || isLocked}
+          isDisabled={selectedValue === '' || isLocked || isAssignmentLocked}
           align="flex-start"
           attemptCount={attemptCount}
           attemptLimit={maxAttempts}

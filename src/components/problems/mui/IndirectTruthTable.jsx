@@ -467,7 +467,7 @@ export default function IndirectTruthTable({
           onCheck={handleCheck}
           onStartOver={handleStartOver}
           isChecking={isChecking}
-          isDisabled={mcQuestions.length === 0 || selectedValues.some((val) => val === '') || isLocked}
+          isDisabled={mcQuestions.length === 0 || selectedValues.some((val) => val === '') || isLocked || isAssignmentLocked}
           align="flex-start"
           attemptCount={attemptCount}
           attemptLimit={maxAttempts}

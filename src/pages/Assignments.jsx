@@ -1,6 +1,7 @@
 import { useState, useMemo, useCallback, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Box, Tabs, Tab, Typography, CardContent, Chip, Stack } from '@mui/material'
+import LockIcon from '@mui/icons-material/Lock'
 import ThemedCard from '../components/ui/ThemedCard.jsx'
 import ActivityAccordion from '../components/ui/ActivityAccordion.jsx'
 import { ACTIVITY_TYPES } from '../placeholder/courseActivities.js'
@@ -240,9 +241,14 @@ export default function Assignments() {
           spacing={2}
         >
           <Box sx={{ flex: 1, minWidth: 0 }}>
-            <Typography variant="h6" sx={{ mb: 1, wordBreak: 'break-word' }}>
-              {activity.title}
-            </Typography>
+            <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 1 }}>
+              <Typography variant="h6" sx={{ wordBreak: 'break-word' }}>
+                {activity.title}
+              </Typography>
+              {activity.isLocked && (
+                <LockIcon sx={{ fontSize: '1.25rem', color: 'text.secondary', flexShrink: 0 }} />
+              )}
+            </Stack>
             <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
               {chapter.title} • {subchapter.title}
             </Typography>

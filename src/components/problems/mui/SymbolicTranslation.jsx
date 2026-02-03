@@ -118,6 +118,7 @@ export default function SymbolicTranslation({
   readOnly = false,
   hideActions = false,
   suppressReveal = false,
+  isAssignmentLocked = false,
 }) {
   const [inputValue, setInputValue] = useState(savedState?.ans || '')
   const formulaInputRef = useRef(null)
@@ -287,7 +288,7 @@ export default function SymbolicTranslation({
           onCheck={handleCheck}
           onStartOver={handleStartOver}
           isChecking={isChecking}
-          isDisabled={!inputValue.trim() || isLocked}
+          isDisabled={!inputValue.trim() || isLocked || isAssignmentLocked}
           align="flex-start"
           attemptCount={attemptCount}
           attemptLimit={maxAttempts}

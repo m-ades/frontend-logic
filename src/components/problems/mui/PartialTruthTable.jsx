@@ -44,6 +44,7 @@ export default function PartialTruthTable({
   attemptLimit,
   readOnly = false,
   hideActions = false,
+  isAssignmentLocked = false,
 }) {
   const theme = useTheme()
   const Formula = useMemo(() => getFormulaClass(), [])
@@ -83,7 +84,7 @@ export default function PartialTruthTable({
     rowInputs.length === 0 ||
     rowInputs.some((cell, idx) => editableIndices[idx] && cell === '')
 
-  const { status, message, isChecking, handleCheck, handleStartOver, setStatus, setMessage, attemptCount, maxAttempts } = useProblemChecker({
+  const { status, message, isChecking, handleCheck, handleStartOver, setStatus, setMessage, attemptCount, maxAttempts, isLocked } = useProblemChecker({
     answer: null,
     problemType: 'partial-truth-table',
     question: problem,
@@ -214,7 +215,7 @@ export default function PartialTruthTable({
           onCheck={handleCheck}
           onStartOver={handleStartOver}
           isChecking={isChecking}
-          isDisabled={isDisabled()}
+          isDisabled={isDisabled() || isLocked || isAssignmentLocked}
           align="flex-start"
           attemptCount={attemptCount}
           attemptLimit={maxAttempts}

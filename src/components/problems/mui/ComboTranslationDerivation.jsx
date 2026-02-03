@@ -49,6 +49,7 @@ export default function ComboTranslationDerivation({
   savedState,
   assignmentQuestionId,
   attemptLimit,
+  isAssignmentLocked = false,
 }) {
   const theme = useTheme()
   const Formula = useMemo(() => getFormulaClass(), [])
@@ -271,7 +272,7 @@ export default function ComboTranslationDerivation({
         onCheck={handleCheck}
         onStartOver={handleStartOver}
         isChecking={isChecking}
-        isDisabled={!parseStatus.ok || isLocked}
+        isDisabled={!parseStatus.ok || isLocked || isAssignmentLocked}
         align="flex-start"
         attemptCount={attemptCount}
         attemptLimit={maxAttempts}
