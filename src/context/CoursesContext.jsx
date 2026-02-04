@@ -25,7 +25,7 @@ const DEFAULT_LATE_POLICY = {
 };
 
 const COURSE_COLORS = [
-  "#2563eb",
+  "#536DFE",
   "#16a34a",
   "#9333ea",
   "#f97316",

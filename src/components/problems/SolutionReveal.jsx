@@ -78,7 +78,7 @@ export default function SolutionReveal({ show = false, solution, title = 'Correc
         mt: 3
       }}
     >
-      <Typography variant="h6" sx={{ mb: 2, fontWeight: 600, color: '#2f6bff' }}>
+      <Typography variant="h6" sx={{ mb: 2, fontWeight: 600, color: 'primary.main' }}>
         {title}
       </Typography>
       {content}

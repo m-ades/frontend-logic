@@ -62,7 +62,7 @@ export default function CourseCard({ course, isInstructor, onSelect }) {
           sx={{
             height: 4,
             width: "100%",
-            backgroundColor: course.color || "#1976d2",
+            backgroundColor: course.color || "primary.main",
             flexShrink: 0,
           }}
         />
@@ -88,7 +88,7 @@ export default function CourseCard({ course, isInstructor, onSelect }) {
               sx={{
                 width: 56,
                 height: 56,
-                backgroundColor: course.color || "#1976d2",
+                backgroundColor: course.color || "primary.main",
                 boxShadow: 2,
                 flexShrink: 0,
               }}

@@ -17,6 +17,7 @@ import {
   Tabs,
   Tab,
   alpha,
+  useTheme,
 } from "@mui/material";
 import {
   X,
@@ -60,6 +61,7 @@ function getGradeColor(grade) {
 }
 
 export default function AssignmentDetailModal({ open, onClose, assignmentId }) {
+  const theme = useTheme();
   const [activeTab, setActiveTab] = useState(0);
   const navigate = useNavigate();
   const location = useLocation();
@@ -99,7 +101,7 @@ export default function AssignmentDetailModal({ open, onClose, assignmentId }) {
   // Calculate grade distribution
   const gradeDistribution = [
     { grade: "A", range: "90-100", count: 0, color: "#10b981" },
-    { grade: "B", range: "80-89", count: 0, color: "#3b82f6" },
+    { grade: "B", range: "80-89", count: 0, color: theme.palette.primary.main },
     { grade: "C", range: "70-79", count: 0, color: "#f59e0b" },
     { grade: "D", range: "60-69", count: 0, color: "#f97316" },
     { grade: "F", range: "0-59", count: 0, color: "#ef4444" },
@@ -254,9 +256,9 @@ export default function AssignmentDetailModal({ open, onClose, assignmentId }) {
           sx={{
             p: 2,
             mb: 3,
-            backgroundColor: alpha("#3b82f6", 0.05),
+            backgroundColor: alpha(theme.palette.primary.main, 0.05),
             border: "1px solid",
-            borderColor: alpha("#3b82f6", 0.1),
+            borderColor: alpha(theme.palette.primary.main, 0.1),
             borderRadius: 2,
           }}
         >
@@ -321,7 +323,7 @@ export default function AssignmentDetailModal({ open, onClose, assignmentId }) {
               value: `${averageGrade}%`,
               subtitle: getLetterGrade(averageGrade),
               icon: Award,
-              gradient: ["#3b82f6", "#1d4ed8"],
+              gradient: [theme.palette.primary.main, theme.palette.primary.dark],
             },
             {
               title: "Completion Rate",

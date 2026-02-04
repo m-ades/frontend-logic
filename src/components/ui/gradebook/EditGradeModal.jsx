@@ -16,6 +16,7 @@ import {
   Alert,
   Tab,
   Tabs,
+  useTheme,
 } from "@mui/material";
 import { X, Save, Trash2, Clock, Calendar, AlertCircle } from "lucide-react";
 import { formatDate } from "../../../utils/formatting.js";
@@ -38,6 +39,7 @@ export default function EditGradeModal({
   onSave,
   onDelete,
 }) {
+  const theme = useTheme();
   const [tabValue, setTabValue] = useState(0);
   const [grade, setGrade] = useState(currentGrade ?? "");
   const [extensionDays, setExtensionDays] = useState(0);
@@ -198,7 +200,7 @@ export default function EditGradeModal({
               <Box sx={{ display: "flex", alignItems: "flex-start", gap: 1 }}>
                 <AlertCircle
                   size={18}
-                  color="#3b82f6"
+                  color={theme.palette.primary.main}
                   style={{ marginTop: 2 }}
                 />
                 <Box>

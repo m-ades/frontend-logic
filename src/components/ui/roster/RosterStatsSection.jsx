@@ -1,4 +1,4 @@
-import { Box } from "@mui/material";
+import { Box, useTheme } from "@mui/material";
 import { MetricCard } from "../MetricCard";
 import { Users, TrendingUp, AlertTriangle } from "lucide-react";
 
@@ -8,6 +8,7 @@ export default function RosterStatsSection({
   studentsAtRisk,
   courseCode,
 }) {
+  const theme = useTheme();
   return (
     <Box
       sx={{
@@ -22,7 +23,7 @@ export default function RosterStatsSection({
         value={totalStudents}
         subtitle={`${courseCode} enrolled`}
         icon={Users}
-        gradient={["#3b82f6", "#2563eb"]}
+        gradient={[theme.palette.primary.main, theme.palette.primary.dark]}
       />
 
       <MetricCard

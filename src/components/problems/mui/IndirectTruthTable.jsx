@@ -16,6 +16,7 @@ import {
   FormControl,
   Button,
   Tooltip,
+  alpha,
 } from '@mui/material'
 import EditIcon from '@mui/icons-material/Edit'
 import InstructorQuestionEditor from '../InstructorQuestionEditor.jsx'
@@ -50,8 +51,9 @@ function TruthToggle({ value, onChange, ariaLabel, readOnly = false }) {
     onChange(cycleValue(value))
   }
 
+  const primary = theme.palette.primary.main
   const getColor = () => {
-    if (value === 'T') return '#2f6bff'
+    if (value === 'T') return primary
     if (value === 'F') return '#b22'
     return isDark ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.25)'
   }
@@ -82,10 +84,10 @@ function TruthToggle({ value, onChange, ariaLabel, readOnly = false }) {
         backgroundColor: 'transparent',
         transition: 'color 0.15s ease',
         '&:hover': {
-          color: readOnly ? undefined : (isDark ? '#7b93ff' : '#2f6bff'),
+          color: readOnly ? undefined : primary,
         },
         '&:focus-visible': {
-          outline: '2px solid rgba(47, 107, 255, 0.6)',
+          outline: (t) => `2px solid ${alpha(t.palette.primary.main, 0.6)}`,
           outlineOffset: 2,
         },
       }}

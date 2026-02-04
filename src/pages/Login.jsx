@@ -120,13 +120,13 @@ export default function Login() {
           <IconButton
             onClick={handleThemeToggle}
             sx={{
-              color: isDark ? theme.palette.text.primary : '#1d4ed8',
-              backgroundColor: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(29, 78, 216, 0.1)',
+              color: isDark ? theme.palette.text.primary : 'primary.main',
+              backgroundColor: isDark ? 'rgba(255, 255, 255, 0.1)' : (t) => `${t.palette.primary.main}1A`,
               '&:hover': {
-                backgroundColor: isDark ? 'rgba(255, 255, 255, 0.2)' : 'rgba(29, 78, 216, 0.2)',
+                backgroundColor: isDark ? 'rgba(255, 255, 255, 0.2)' : (t) => `${t.palette.primary.main}33`,
               },
               p: 1.5,
-              boxShadow: isDark ? '0 4px 12px rgba(0, 0, 0, 0.3)' : '0 4px 12px rgba(29, 78, 216, 0.2)'
+              boxShadow: isDark ? '0 4px 12px rgba(0, 0, 0, 0.3)' : (t) => `0 4px 12px ${t.palette.primary.main}33`
             }}
           >
             {isDark ? <LightMode /> : <DarkMode />}
@@ -141,7 +141,7 @@ export default function Login() {
             mb: 3,
             fontWeight: 900,
             textAlign: 'center',
-            color: '#1d4ed8',
+            color: 'primary.main',
             textShadow: isDark ? '0 4px 8px rgba(55, 66, 166, 1)' : '0 4px 8px rgba(0,0,0,0.1)',
             fontSize: { xs: '2.5rem', sm: '3.5rem', md: '5rem' },
             whiteSpace: 'nowrap'
@@ -167,8 +167,8 @@ export default function Login() {
           sx={{
             backdropFilter: 'blur(10px)',
             backgroundColor: isDark ? theme.palette.background.paper : 'rgba(255, 255, 255, 0.92)',
-            border: isDark ? `2px solid ${theme.palette.divider}` : '1px solid rgba(29, 78, 216, 0.25)',
-            boxShadow: isDark ? '0 4px 8px rgba(65, 77, 192, 1)' : '0 12px 40px rgba(29, 78, 216, 0.2)',
+            border: isDark ? `2px solid ${theme.palette.divider}` : (t) => `1px solid ${t.palette.primary.main}40`,
+            boxShadow: isDark ? '0 4px 8px rgba(65, 77, 192, 1)' : (t) => `0 12px 40px ${t.palette.primary.main}33`,
             borderRadius: 3
           }}
         >
@@ -308,7 +308,7 @@ export default function Login() {
           left: 0,
           right: 0,
           textAlign: 'center',
-          color: isDark ? theme.palette.text.primary : '#1e40af',
+          color: isDark ? theme.palette.text.primary : 'primary.main',
           py: 1.5,
           px: 2,
           fontWeight: 500,

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState, useRef } from 'react'
-import { Box, Stack, Typography, FormControl, Select, MenuItem, Tooltip } from '@mui/material'
+import { Box, Stack, Typography, FormControl, Select, MenuItem, Tooltip, alpha } from '@mui/material'
 import EditIcon from '@mui/icons-material/Edit'
 import InstructorQuestionEditor from '../InstructorQuestionEditor.jsx'
 import StatusBanner, { isTerminalStatus } from '../../ui/StatusBanner.jsx'
@@ -26,10 +26,11 @@ function TruthToggle({ value, onChange, ariaLabel, accent, readOnly = false }) {
     onChange(cycleValue(value))
   }
 
+  const primary = theme.palette.primary.main
   const getColor = () => {
-    if (value === 'T') return accent ? '#1e55ff' : '#2f6bff'
+    if (value === 'T') return primary
     if (value === 'F') return '#b22'
-    if (accent) return '#2f6bff'
+    if (accent) return primary
     return isDark ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.25)'
   }
 
@@ -59,10 +60,10 @@ function TruthToggle({ value, onChange, ariaLabel, accent, readOnly = false }) {
         backgroundColor: 'transparent',
         transition: 'color 0.15s ease',
         '&:hover': {
-          color: isDark ? '#7b93ff' : '#2f6bff',
+          color: primary,
         },
         '&:focus-visible': {
-          outline: '2px solid rgba(47, 107, 255, 0.6)',
+          outline: `2px solid ${alpha(primary, 0.6)}`,
           outlineOffset: 2,
         },
       }}
@@ -281,7 +282,7 @@ export default function SingleRowTruthTable({
 
   const renderAnswerBlock = (title, body) => (
     <Box sx={{ mt: 2 }}>
-      <Typography variant="h6" sx={{ fontWeight: 600, color: '#2f6bff' }}>
+      <Typography variant="h6" sx={{ fontWeight: 600, color: 'primary.main' }}>
         {title}
       </Typography>
       <Box sx={{ mt: 2 }}>
@@ -392,7 +393,7 @@ export default function SingleRowTruthTable({
             <Typography
               variant="body2"
               sx={{
-                color: '#2f6bff',
+                color: 'primary.main',
                 fontFamily: 'inherit',
                 fontWeight: 400,
               }}

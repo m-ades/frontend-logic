@@ -144,22 +144,22 @@ function ProofTabs({
             minWidth: { xs: 'auto', md: 200 },
             maxWidth: { xs: '100%', md: 200 },
             '& .MuiTab-root': {
-              color: '#2f6bff',
+              color: 'primary.main',
               transition: 'all 0.2s ease',
               minWidth: { xs: 'auto', md: 200 },
               fontSize: { xs: '0.875rem', md: '1rem' },
               textTransform: 'none',
               '&:hover': {
-                color: '#2f6bff',
+                color: 'primary.main',
                 backgroundColor: 'rgba(47, 107, 255, 0.08)',
               },
             },
             '& .MuiTab-root.Mui-selected': {
-              color: '#2f6bff',
+              color: 'primary.main',
               fontWeight: 600,
             },
             '& .MuiTabs-indicator': {
-              backgroundColor: '#2f6bff',
+              backgroundColor: 'primary.main',
             },
           }}
         >
@@ -253,15 +253,15 @@ function ProofTabs({
                 textAlign: 'center',
                 color: 'text.primary',
                 '&:hover': {
-                  color: '#2f6bff',
+                  color: 'primary.main',
                   '& span': {
-                    color: '#2f6bff',
+                    color: 'primary.main',
                   },
                 },
                 '&.Mui-selected': {
-                  color: '#2f6bff',
+                  color: 'primary.main',
                   '& span': {
-                    color: '#2f6bff',
+                    color: 'primary.main',
                   },
                 },
               }}
@@ -290,7 +290,7 @@ function ProofTabs({
             }}>
               <span>Total score: {gradeLabel}</span>
               {completionPercent === 100 && total > 0 && (
-                <CheckCircleIcon sx={{ color: '#2f6bff', fontSize: 16 }} />
+                <CheckCircleIcon sx={{ color: 'primary.main', fontSize: 16 }} />
               )}
             </Box>
             {isOverdue && (

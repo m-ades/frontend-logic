@@ -230,7 +230,7 @@ export default function ImportRosterDialog({ open, onClose, onImport }) {
               <Box>
                 <FileText
                   size={48}
-                  color="#1976d2"
+                  color="#536DFE"
                   style={{ marginBottom: 8 }}
                 />
                 <Typography variant="body1" fontWeight={600}>

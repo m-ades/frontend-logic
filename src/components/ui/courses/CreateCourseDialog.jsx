@@ -19,7 +19,7 @@ import { useState } from "react";
 const SEMESTER_TERMS = ["Spring", "Summer", "Fall", "Winter"];
 
 const COURSE_COLORS = [
-  { name: "Blue", value: "#1976d2" },
+  { name: "Blue", value: "#536DFE" },
   { name: "Purple", value: "#9c27b0" },
   { name: "Green", value: "#2e7d32" },
   { name: "Orange", value: "#ed6c02" },
@@ -104,7 +104,7 @@ export default function CreateCourseDialog({ open, onClose, onSubmit }) {
       code: "",
       term: "Spring",
       year: DEFAULT_YEAR.toString(),
-      color: "#1976d2",
+      color: "#536DFE",
     });
     setErrors({});
     onClose();

@@ -15,7 +15,7 @@ export default function CourseInfoSection({ course, onSave }) {
   const [courseName, setCourseName] = useState(course?.name || "");
   const [courseCode, setCourseCode] = useState(course?.code || "");
   const [semester, setSemester] = useState(course?.semester || "");
-  const [courseColor, setCourseColor] = useState(course?.color || "#1976d2");
+  const [courseColor, setCourseColor] = useState(course?.color || "#536DFE");
 
   const handleSave = () => {
     onSave({
@@ -86,7 +86,7 @@ export default function CourseInfoSection({ course, onSave }) {
                 size="small"
                 value={courseColor}
                 onChange={(e) => setCourseColor(e.target.value)}
-                placeholder="#1976d2"
+                placeholder="#536DFE"
                 sx={{ maxWidth: 150 }}
               />
             </Box>

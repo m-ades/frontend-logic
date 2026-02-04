@@ -87,6 +87,7 @@ export default function AppLayout({ children }) {
           sx={{
             flexGrow: 1,
             p: 3,
+            pt: /\/assignment\/[^/]+$/.test(location.pathname) ? 2 : 3,
             backgroundColor: "background.default",
             minHeight: "100vh",
             overflow: "auto",

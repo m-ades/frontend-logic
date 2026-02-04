@@ -14,13 +14,13 @@ export default function Layout({
   return (
     <Box sx={{ width: '100%', height: '100%', minWidth: 0, overflowX: 'hidden' }}>
 
-      <Box sx={{ mb: { xs: 3, md: 4 } }}>
+      <Box sx={{ mb: { xs: 2, md: 2.5 } }}>
         <Box
           sx={{
             display: 'flex',
             alignItems: { xs: 'flex-start', md: 'center' },
             justifyContent: 'space-between',
-            mb: 2,
+            mb: 1.5,
             flexWrap: 'wrap',
             gap: 2,
           }}
@@ -56,7 +56,7 @@ export default function Layout({
 
       </Box>
 
-      <Box sx={{ p: { xs: 1, sm: 2, md: 3 }, minWidth: 0, maxWidth: '100%', overflowX: 'hidden' }}>
+      <Box sx={{ px: { xs: 1, sm: 2, md: 3 }, pt: 0.5, pb: { xs: 1, sm: 2, md: 3 }, minWidth: 0, maxWidth: '100%', overflowX: 'hidden' }}>
         {/* single surface */}
         {children}
       </Box>

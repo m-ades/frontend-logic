@@ -1,4 +1,4 @@
-import { Box, Typography, Alert, LinearProgress } from "@mui/material";
+import { Box, Typography, Alert, LinearProgress, useTheme } from "@mui/material";
 import { useEffect, useMemo, useState } from "react";
 import { TrendingUp, Users, CheckCircle, Calendar } from "lucide-react";
 import {
@@ -17,6 +17,7 @@ import { sortAssignmentsBySubchapter } from "../../utils/assignmentSort.js";
 import { formatEasternDateTime } from "../../utils/easternTime.js";
 
 export default function InstructorDashboard() {
+  const theme = useTheme();
   const { courses, activeCourseId, assignmentsByCourse, gradebookByCourse } =
     useCoursesState();
   const [isLoadingAnalytics, setIsLoadingAnalytics] = useState(true);
@@ -268,7 +269,7 @@ export default function InstructorDashboard() {
           value={`${completionRate}%`}
           subtitle={`${totalSubmissions} of ${totalPossible}`}
           icon={CheckCircle}
-          gradient={["#3b82f6", "#2563eb"]}
+          gradient={[theme.palette.primary.main, theme.palette.primary.dark]}
         />
         <MetricCard
           title="Total Students"

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Box, Typography, Paper, Stack } from "@mui/material";
+import { Box, Typography, Paper, Stack, useTheme } from "@mui/material";
 import {
   LineChart,
   Line,
@@ -21,7 +21,7 @@ const CustomLineTooltip = ({ active, payload }) => {
           p: 2.5,
           backgroundColor: "background.paper",
           border: "2px solid",
-          borderColor: "#3b82f6",
+          borderColor: "primary.main",
           borderRadius: 2,
           minWidth: 200,
         }}
@@ -109,6 +109,8 @@ const CustomLineTooltip = ({ active, payload }) => {
 };
 
 export const PerformanceTrendsChart = ({ data, onAssignmentClick }) => {
+  const theme = useTheme();
+  const primary = theme.palette.primary.main;
   const [hoveredAssignment, setHoveredAssignment] = useState(null);
 
   return (
@@ -164,7 +166,7 @@ export const PerformanceTrendsChart = ({ data, onAssignmentClick }) => {
           <Line
             type="monotone"
             dataKey="average"
-            stroke="#3b82f6"
+            stroke={primary}
             strokeWidth={3}
             fill="url(#colorAverage)"
             dot={(props) => {
@@ -174,7 +176,7 @@ export const PerformanceTrendsChart = ({ data, onAssignmentClick }) => {
                   cx={cx}
                   cy={cy}
                   r={hoveredAssignment === payload.id ? 8 : 5}
-                  fill={payload.average < 70 ? "#ef4444" : "#3b82f6"}
+                  fill={payload.average < 70 ? "#ef4444" : primary}
                   stroke="#fff"
                   strokeWidth={2}
                   style={{ cursor: "pointer", transition: "all 0.2s" }}

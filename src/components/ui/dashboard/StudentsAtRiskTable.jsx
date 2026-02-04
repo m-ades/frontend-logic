@@ -103,7 +103,7 @@ export const StudentsAtRiskTable = ({ students, assignments }) => {
                 hover
                 sx={{
                   cursor: "pointer",
-                  "&:hover": { backgroundColor: alpha("#3b82f6", 0.04) },
+                  "&:hover": { backgroundColor: (theme) => alpha(theme.palette.primary.main, 0.04) },
                 }}
               >
                 <TableCell>

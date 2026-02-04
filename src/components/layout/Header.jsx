@@ -137,7 +137,7 @@ export default function Header() {
             startIcon={<MenuBookIcon />}
             sx={{ 
               textTransform: 'none',
-              color: '#2f6bff',
+              color: 'primary.main',
               '&:hover': {
                 backgroundColor: 'rgba(47, 107, 255, 0.08)',
               }

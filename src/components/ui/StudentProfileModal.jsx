@@ -16,6 +16,7 @@ import {
   TableBody,
   Divider,
   alpha,
+  useTheme,
 } from "@mui/material";
 import {
   X,
@@ -77,6 +78,7 @@ export default function StudentProfileModal({
   canToggleRole = false,
   onToggleRole,
 }) {
+  const theme = useTheme();
   const { courses, activeCourseId } = useCoursesState();
   const activeCourse = courses.find((c) => c.id === activeCourseId);
   const gradingScale = activeCourse?.gradingScale || getDefaultGradingScale();
@@ -201,9 +203,9 @@ export default function StudentProfileModal({
             p: 3,
             mb: 3,
             background: `linear-gradient(135deg, ${alpha(
-              "#3b82f6",
+              theme.palette.primary.main,
               0.1
-            )} 0%, ${alpha("#8b5cf6", 0.1)} 100%)`,
+            )} 0%, ${alpha(theme.palette.secondary?.main || "#8b5cf6", 0.1)} 100%)`,
             border: "1px solid",
             borderColor: "divider",
             borderRadius: 2,
@@ -304,7 +306,7 @@ export default function StudentProfileModal({
             value={`${highestGrade}%`}
             subtitle={getLetterGrade(highestGrade, gradingScale)}
             icon={TrendingUp}
-            gradient={["#3b82f6", "#2563eb"]}
+            gradient={[theme.palette.primary.main, theme.palette.primary.dark]}
           />
           <MetricCard
             title="Lowest"

@@ -143,10 +143,10 @@ export const AssignmentOverviewTable = ({
             spacing={3}
             sx={{
               p: 2,
-              backgroundColor: alpha("#3b82f6", 0.05),
+              backgroundColor: (theme) => alpha(theme.palette.primary.main, 0.05),
               borderRadius: 2,
               border: "1px solid",
-              borderColor: alpha("#3b82f6", 0.1),
+              borderColor: (theme) => alpha(theme.palette.primary.main, 0.1),
             }}
           >
             <Box sx={{ textAlign: "center", flex: 1 }}>
@@ -270,7 +270,7 @@ export const AssignmentOverviewTable = ({
                       cursor: "pointer",
                       transition: "all 0.2s",
                       "&:hover": {
-                        backgroundColor: alpha("#3b82f6", 0.04),
+                        backgroundColor: (theme) => alpha(theme.palette.primary.main, 0.04),
                         transform: "scale(1.001)",
                       },
                     }}

@@ -1,4 +1,4 @@
-import { Box, Typography, Paper, alpha } from "@mui/material";
+import { Box, Typography, Paper, alpha, useTheme } from "@mui/material";
 import {
   BarChart,
   Bar,
@@ -44,7 +44,10 @@ const CustomBarTooltip = ({ active, payload }) => {
   return null;
 };
 
-export const GradeDistributionChart = ({ data }) => (
+export const GradeDistributionChart = ({ data }) => {
+  const theme = useTheme();
+  const primary = theme.palette.primary.main;
+  return (
   <Paper
     elevation={0}
     sx={{
@@ -73,7 +76,7 @@ export const GradeDistributionChart = ({ data }) => (
         <YAxis tick={{ fontSize: 11 }} stroke="#94a3b8" />
         <Tooltip
           content={<CustomBarTooltip />}
-          cursor={{ fill: alpha("#3b82f6", 0.1) }}
+          cursor={{ fill: alpha(primary, 0.1) }}
         />
         <Bar dataKey="count" radius={[8, 8, 0, 0]} animationDuration={800}>
           {data.map((entry, index) => (
@@ -87,4 +90,5 @@ export const GradeDistributionChart = ({ data }) => (
       </BarChart>
     </ResponsiveContainer>
   </Paper>
-);
+  );
+};
