@@ -23,7 +23,6 @@ import ProblemSetButtons from './ProblemSetButtons.jsx'
 import StatusBanner, { isTerminalStatus } from '../../ui/StatusBanner.jsx'
 import { useProblemChecker } from '../../../hooks/useProblemChecker.js'
 import PromptText from '../../ui/PromptText.jsx'
-import RichText from '../../ui/RichText.jsx'
 
 const toTruth = (value) => {
   if (value === true || value === 'T' || value === 't' || value === 1) return true
@@ -148,7 +147,9 @@ export default function PartialTruthTable({
               <PromptText content={prompt} />
             )}
             {statement && (
-              <RichText content={statement} variant="body2" color="text.secondary" />
+              <Typography sx={{ fontSize: '1.1rem' }}>
+                {statement}
+              </Typography>
             )}
             <TableContainer 
               component={Paper} 
@@ -164,13 +165,23 @@ export default function PartialTruthTable({
                   background: 'transparent',
                   border: 'none',
                   boxShadow: 'none',
+                  fontSize: 'var(--tt-font-size)',
+                  fontFamily: 'inherit',
                 },
                 '& .MuiTableCell-root': {
                   color: 'text.primary',
                   borderColor: 'divider',
+                  fontFamily: 'inherit',
+                  fontSize: 'var(--tt-token-font-size)',
+                },
+                '& .MuiTableBody .MuiTableCell-root': {
+                  fontSize: 'var(--tt-font-size)',
                 },
                 '& .MuiTableHead-root .MuiTableCell-root': {
                   backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.04)' : undefined,
+                  fontFamily: 'inherit',
+                  fontSize: 'var(--tt-token-font-size)',
+                  fontWeight: 600,
                 },
               }}
             >
@@ -178,7 +189,12 @@ export default function PartialTruthTable({
                 <TableHead className="tt-head">
                   <TableRow className="tt-token-row">
                     {tokens.map((token, idx) => (
-                      <TableCell key={`partial-tt-token-${idx}`} className="tt-token" align="center">
+                      <TableCell 
+                        key={`partial-tt-token-${idx}`} 
+                        className="tt-token" 
+                        align="center"
+                        sx={{ fontFamily: 'inherit', fontSize: 'var(--tt-token-font-size)', fontWeight: 600 }}
+                      >
                         {token}
                       </TableCell>
                     ))}
@@ -198,17 +214,25 @@ export default function PartialTruthTable({
                               size="small"
                               displayEmpty
                               disabled={readOnly}
-                              sx={{ minWidth: 'var(--tt-select-min-width)' }}
+                              sx={{ 
+                                minWidth: 'var(--tt-select-min-width)',
+                                fontFamily: 'inherit',
+                                fontSize: 'var(--tt-font-size)',
+                                '& .MuiSelect-select': {
+                                  fontFamily: 'inherit',
+                                  fontSize: 'var(--tt-font-size)',
+                                },
+                              }}
                             >
-                              <MenuItem value="">
+                              <MenuItem value="" sx={{ fontFamily: 'inherit', fontSize: 'var(--tt-font-size)' }}>
                                 <em>?</em>
                               </MenuItem>
-                              <MenuItem value="T">T</MenuItem>
-                              <MenuItem value="F">F</MenuItem>
-                              <MenuItem value="U">U</MenuItem>
+                              <MenuItem value="T" sx={{ fontFamily: 'inherit', fontSize: 'var(--tt-font-size)' }}>T</MenuItem>
+                              <MenuItem value="F" sx={{ fontFamily: 'inherit', fontSize: 'var(--tt-font-size)' }}>F</MenuItem>
+                              <MenuItem value="U" sx={{ fontFamily: 'inherit', fontSize: 'var(--tt-font-size)' }}>U</MenuItem>
                             </Select>
                           ) : (
-                            <Typography sx={{ fontWeight: 700 }}>{value || toSymbol(givenRow[idx])}</Typography>
+                            <Typography sx={{ fontWeight: 700, fontFamily: 'inherit', fontSize: 'var(--tt-font-size)' }}>{value || toSymbol(givenRow[idx])}</Typography>
                           )}
                         </TableCell>
                       )
