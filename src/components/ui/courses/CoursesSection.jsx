@@ -28,7 +28,7 @@ export default function CoursesSection({
       </Box>
       <Grid container spacing={3}>
         {courses.map((course) => (
-          <Grid item xs={12} sm={6} md={4} key={course.id}>
+          <Grid size={{ xs: 12, sm: 6, md: 4 }} key={course.id}>
             <CourseCard
               course={course}
               isInstructor={isInstructor}
