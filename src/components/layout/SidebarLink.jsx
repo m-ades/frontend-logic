@@ -76,7 +76,7 @@ export default function SidebarLink({
         sx={{
           px: 2,
           py: 1,
-          fontSize: '0.75rem',
+          fontSize: '1rem',
           fontWeight: 600,
           color: 'text.secondary',
           letterSpacing: '0.08em',
@@ -140,7 +140,7 @@ export default function SidebarLink({
             <ListItemText
               primary={label}
               primaryTypographyProps={{
-                fontSize: '0.875rem',
+                fontSize: '1rem',
                 fontWeight: isLinkActive ? 600 : 400,
               }}
             />
@@ -200,7 +200,7 @@ export default function SidebarLink({
               <ListItemText
                 primary={label}
                 primaryTypographyProps={{
-                  fontSize: '0.875rem',
+                  fontSize: '1rem',
                   fontWeight: isLinkActive ? 600 : 400,
                 }}
               />

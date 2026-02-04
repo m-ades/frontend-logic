@@ -157,7 +157,7 @@ export default function CourseSelector({ isSidebarOpened }) {
                   px: 2,
                   pt: 1.5,
                   pb: 0.5,
-                  fontSize: "0.7rem",
+                  fontSize: "1rem",
                   fontWeight: 600,
                   color: "text.secondary",
                   display: "block",
@@ -194,10 +194,10 @@ export default function CourseSelector({ isSidebarOpened }) {
                     secondary={course.semester}
                     slotProps={{
                       primary: {
-                        fontSize: "0.875rem",
+                        fontSize: "1rem",
                         fontWeight: course.id === activeCourseId ? 600 : 400,
                       },
-                      secondary: { fontSize: "0.75rem" },
+                      secondary: { fontSize: "1rem" },
                     }}
                   />
                 </MenuItem>
@@ -214,7 +214,7 @@ export default function CourseSelector({ isSidebarOpened }) {
                   px: 2,
                   pt: 1,
                   pb: 0.5,
-                  fontSize: "0.7rem",
+                  fontSize: "1rem",
                   fontWeight: 600,
                   color: "text.secondary",
                   display: "block",
@@ -256,10 +256,10 @@ export default function CourseSelector({ isSidebarOpened }) {
                     secondary={course.semester}
                     slotProps={{
                       primary: {
-                        fontSize: "0.875rem",
+                        fontSize: "1rem",
                         fontWeight: course.id === activeCourseId ? 600 : 400,
                       },
-                      secondary: { fontSize: "0.75rem" },
+                      secondary: { fontSize: "1rem" },
                     }}
                   />
                 </MenuItem>
@@ -269,7 +269,7 @@ export default function CourseSelector({ isSidebarOpened }) {
 
           {courses.length === 0 && (
             <Box sx={{ px: 2, py: 3, textAlign: "center" }}>
-              <Typography variant="body2" color="text.secondary">
+              <Typography color="text.secondary" sx={{ fontSize: "1rem" }}>
                 No courses available
               </Typography>
             </Box>
@@ -336,8 +336,8 @@ export default function CourseSelector({ isSidebarOpened }) {
           </Box>
           <Box sx={{ overflow: "hidden", minWidth: 0 }}>
             <Typography
-              variant="body2"
               sx={{
+                fontSize: "1rem",
                 fontWeight: 600,
                 color: "text.primary",
                 overflow: "hidden",
@@ -348,9 +348,9 @@ export default function CourseSelector({ isSidebarOpened }) {
               {activeCourse?.code || "Select Course"}
             </Typography>
             <Typography
-              variant="caption"
               color="text.secondary"
               sx={{
+                fontSize: "1rem",
                 overflow: "hidden",
                 textOverflow: "ellipsis",
                 whiteSpace: "nowrap",
@@ -373,7 +373,7 @@ export default function CourseSelector({ isSidebarOpened }) {
           justifyContent: "flex-start",
           textTransform: "none",
           color: "text.secondary",
-          fontSize: "0.875rem",
+          fontSize: "1rem",
           py: 1,
           "&:hover": {
             backgroundColor: "action.hover",
@@ -409,7 +409,7 @@ export default function CourseSelector({ isSidebarOpened }) {
                 px: 2,
                 pt: 1.5,
                 pb: 0.5,
-                fontSize: "0.7rem",
+                fontSize: "1rem",
                 fontWeight: 600,
                 color: "text.secondary",
                 display: "block",
@@ -446,10 +446,10 @@ export default function CourseSelector({ isSidebarOpened }) {
                   secondary={course.semester}
                   slotProps={{
                     primary: {
-                      fontSize: "0.875rem",
+                      fontSize: "1rem",
                       fontWeight: course.id === activeCourseId ? 600 : 400,
                     },
-                    secondary: { fontSize: "0.75rem" },
+                    secondary: { fontSize: "1rem" },
                   }}
                 />
               </MenuItem>
@@ -466,7 +466,7 @@ export default function CourseSelector({ isSidebarOpened }) {
                 px: 2,
                 pt: 1,
                 pb: 0.5,
-                fontSize: "0.7rem",
+                fontSize: "1rem",
                 fontWeight: 600,
                 color: "text.secondary",
                 display: "block",
@@ -508,10 +508,10 @@ export default function CourseSelector({ isSidebarOpened }) {
                   secondary={course.semester}
                   slotProps={{
                     primary: {
-                      fontSize: "0.875rem",
+                      fontSize: "1rem",
                       fontWeight: course.id === activeCourseId ? 600 : 400,
                     },
-                    secondary: { fontSize: "0.75rem" },
+                    secondary: { fontSize: "1rem" },
                   }}
                 />
               </MenuItem>
@@ -521,7 +521,7 @@ export default function CourseSelector({ isSidebarOpened }) {
 
         {courses.length === 0 && (
           <Box sx={{ px: 2, py: 3, textAlign: "center" }}>
-            <Typography variant="body2" color="text.secondary">
+            <Typography color="text.secondary" sx={{ fontSize: "1rem" }}>
               No courses available
             </Typography>
           </Box>

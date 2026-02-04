@@ -141,6 +141,7 @@ export default function Sidebar({ structure, location, onSignOut, onOpenSettings
         <Typography
           variant="h6"
           sx={{
+            fontSize: '1rem',
             fontWeight: 700,
             color: "primary.main",
             letterSpacing: 1,
@@ -191,6 +192,7 @@ export default function Sidebar({ structure, location, onSignOut, onOpenSettings
                 </ListItemIcon>
                 <ListItemText
                   primary={isSidebarOpened ? "Collapse Sidebar" : ""}
+                  primaryTypographyProps={{ fontSize: '1rem' }}
                   sx={{ opacity: isSidebarOpened ? 1 : 0 }}
                 />
               </ListItemButton>
@@ -215,13 +217,14 @@ export default function Sidebar({ structure, location, onSignOut, onOpenSettings
                 }}
               >
                 <Avatar sx={{ width: 32, height: 32, bgcolor: "primary.main" }}>
-                  <Typography variant="caption" sx={{ fontWeight: 600 }}>
+                  <Typography sx={{ fontSize: '1rem', fontWeight: 600 }}>
                     {getUserInitials()}
                   </Typography>
                 </Avatar>
               </ListItemIcon>
               <ListItemText
                 primary={getDisplayName()}
+                primaryTypographyProps={{ fontSize: '1rem' }}
                 sx={{ opacity: isSidebarOpened ? 1 : 0 }}
               />
             </ListItemButton>
@@ -233,6 +236,7 @@ export default function Sidebar({ structure, location, onSignOut, onOpenSettings
             onClose={() => setProfileMenu(null)}
             anchorOrigin={{ vertical: "top", horizontal: "right" }}
             transformOrigin={{ vertical: "bottom", horizontal: "left" }}
+            slotProps={{ paper: { sx: { '& .MuiListItemText-primary': { fontSize: '1rem' } } } }}
           >
           <MenuItem
             onClick={() => {

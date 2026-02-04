@@ -1,6 +1,8 @@
+const appFont = '"IBM Plex Sans", sans-serif'
+
 const overrides = {
   typography: {
-    fontFamily: '"IBM Plex Sans", sans-serif',
+    fontFamily: appFont,
     h1: {
       fontSize: '3rem',
     },
@@ -32,13 +34,50 @@ const overrides = {
     MuiCssBaseline: {
       styleOverrides: {
         body: {
-          fontFamily: '"IBM Plex Sans", sans-serif',
+          fontFamily: appFont,
         },
         '.material-symbols-outlined': {
           fontFamily: 'Material Symbols Outlined',
         },
         '[class*="material-symbols"]': {
           fontFamily: 'Material Symbols Outlined',
+        },
+      },
+    },
+    MuiButton: {
+      styleOverrides: {
+        root: {
+          fontFamily: appFont,
+        },
+      },
+    },
+    MuiListItemText: {
+      styleOverrides: {
+        root: {
+          fontFamily: appFont,
+        },
+        primary: {
+          fontFamily: appFont,
+        },
+        secondary: {
+          fontFamily: appFont,
+        },
+      },
+    },
+    MuiMenuItem: {
+      styleOverrides: {
+        root: {
+          fontFamily: appFont,
+        },
+      },
+    },
+    MuiInputBase: {
+      styleOverrides: {
+        root: {
+          fontFamily: appFont,
+        },
+        input: {
+          fontFamily: appFont,
         },
       },
     },
@@ -66,6 +105,12 @@ const overrides = {
     },
     MuiSelect: {
       styleOverrides: {
+        root: {
+          fontFamily: appFont,
+        },
+        select: {
+          fontFamily: appFont,
+        },
         icon: {
           color: '#B9B9B9',
         },

@@ -12,7 +12,7 @@ import { sortAssignmentsBySubchapter } from '../utils/assignmentSort.js'
 function NoRowsOverlay() {
   return (
     <Box sx={{ p: 2, textAlign: 'center', width: '100%' }}>
-      <Typography variant="body2" color="text.secondary">
+      <Typography variant="body2" color="text.secondary" sx={{ fontSize: '1rem' }}>
         No unlocked assignments yet.
       </Typography>
     </Box>
@@ -128,10 +128,10 @@ export default function Grades() {
       </Typography>
 
       <ThemedCard>
-        <CardContent>
+        <CardContent sx={{ '& .MuiDataGrid-root': { fontSize: '1rem' } }}>
           <Stack direction={{ xs: 'column', sm: 'row' }} justifyContent="space-between" sx={{ mb: 2 }}>
-            <Typography variant="h6">Overall</Typography>
-            <Typography variant="body2" color="text.secondary">
+            <Typography variant="h6" sx={{ fontSize: '1rem' }}>Overall</Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ fontSize: '1rem' }}>
               {overallPercentage.toFixed(1)}%
             </Typography>
           </Stack>
