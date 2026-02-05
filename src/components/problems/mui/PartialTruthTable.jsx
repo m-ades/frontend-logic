@@ -183,6 +183,20 @@ export default function PartialTruthTable({
                   fontSize: 'var(--tt-token-font-size)',
                   fontWeight: 600,
                 },
+                '& .tt-row-selector-cell': {
+                  border: 'none !important',
+                  borderBottom: 'none !important',
+                  backgroundColor: 'transparent !important',
+                },
+                '& .tt-selector-row .MuiTableCell-root': {
+                  border: 'none !important',
+                  borderBottom: 'none !important',
+                  backgroundColor: 'transparent !important',
+                },
+                '& .tt-selector-corner, & .tt-selector-corner-bottom': {
+                  border: 'none !important',
+                  borderBottom: 'none !important',
+                },
               }}
             >
               <Table className="tt-table">

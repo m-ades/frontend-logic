@@ -747,7 +747,7 @@ export default function TruthTableEditor({
   }, [kind, proof?.solution, statements, Formula])
 
   const theme = useTheme()
-  const cellBorderColor = theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.4)'
+  const cellBorderColor = theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.12)' : 'var(--lpgray6)'
   const cornerBg = theme.palette.mode === 'dark' ? '#23232D' : '#fff'
   const highlightSx = (colMatch, rowMatch) => (colMatch || rowMatch) ? { backgroundColor: alpha(theme.palette.primary.main, 0.22) } : {}
   const tableSx = {
@@ -755,7 +755,7 @@ export default function TruthTableEditor({
     boxShadow: 'none !important',
     '&.MuiPaper-root': { boxShadow: 'none !important' },
     '& .MuiTable-root': { background: 'transparent', border: 'none', boxShadow: 'none' },
-    '& .MuiTableCell-root': { color: 'text.primary', border: `2px solid ${cellBorderColor} !important` },
+    '& .MuiTableCell-root': { color: 'text.primary', border: `1px solid ${cellBorderColor} !important` },
     '& .MuiTableHead-root .MuiTableCell-root:not(.tt-selector-corner)': { backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.04)' : undefined },
     '& .MuiTableRow-root:nth-of-type(even)': { backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.02)' : undefined },
     '& .tt-row-selector-cell': { border: 'none !important', backgroundColor: 'transparent !important' },
@@ -788,7 +788,7 @@ export default function TruthTableEditor({
             },
             '& .MuiTableCell-root': {
               color: 'text.primary',
-              border: `2px solid ${cellBorderColor} !important`,
+              border: `1px solid ${cellBorderColor} !important`,
               borderColor: `${cellBorderColor} !important`,
             },
             '& .MuiTableHead-root .MuiTableCell-root:not(.tt-selector-corner)': {
@@ -800,6 +800,11 @@ export default function TruthTableEditor({
             '& .tt-row-selector-cell, & .tt-selector-corner, & .tt-selector-corner-bottom': {
               border: 'none !important',
               borderBottom: 'none !important',
+            },
+            '& .tt-selector-row .MuiTableCell-root': {
+              border: 'none !important',
+              borderBottom: 'none !important',
+              backgroundColor: 'transparent !important',
             },
             '& .tt-row-selector-cell': {
               backgroundColor: 'transparent !important',
@@ -955,6 +960,11 @@ export default function TruthTableEditor({
                 '& .tt-row-selector-cell, & .tt-selector-corner, & .tt-selector-corner-bottom': {
                   border: 'none !important',
                   borderBottom: 'none !important',
+                },
+                '& .tt-selector-row .MuiTableCell-root': {
+                  border: 'none !important',
+                  borderBottom: 'none !important',
+                  backgroundColor: 'transparent !important',
                 },
                 '& .tt-row-selector-cell': {
                   backgroundColor: 'transparent !important',

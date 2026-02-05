@@ -391,6 +391,20 @@ export default function IndirectTruthTable({
                         '& .MuiTableRow-root:nth-of-type(even)': {
                           backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.02)' : undefined,
                         },
+                        '& .tt-row-selector-cell': {
+                          border: 'none !important',
+                          borderBottom: 'none !important',
+                          backgroundColor: 'transparent !important',
+                        },
+                        '& .tt-selector-row .MuiTableCell-root': {
+                          border: 'none !important',
+                          borderBottom: 'none !important',
+                          backgroundColor: 'transparent !important',
+                        },
+                        '& .tt-selector-corner, & .tt-selector-corner-bottom': {
+                          border: 'none !important',
+                          borderBottom: 'none !important',
+                        },
                       }}
                     >
                       <Table className="tt-table">
