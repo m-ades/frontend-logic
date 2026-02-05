@@ -109,7 +109,7 @@
 
 :where(.logicpenguin) .tt-table th,
 :where(.logicpenguin) .tt-table td {
-  border: 1px solid var(--lpgray6);
+  border: 2px solid rgba(0, 0, 0, 0.4);
   padding: var(--tt-cell-pad-y) var(--tt-cell-pad-x);
   text-align: center;
   vertical-align: middle;
@@ -130,6 +130,14 @@
   font-weight: 600;
   text-transform: uppercase;
   font-size: var(--tt-token-font-size);
+}
+
+:where(.logicpenguin) .tt-token-row th.tt-selector-corner,
+:where(.logicpenguin) .tt-selector-corner {
+  background: #fff !important;
+}
+:where(.logicpenguin) .tt-selector-corner-bottom {
+  background: #fff !important;
 }
 
 :where(.logicpenguin) .tt-cell {
@@ -1037,8 +1045,14 @@ a#lplogo:hover span {
 
 [data-theme="dark"] :where(.logicpenguin) table.tt-table th,
 [data-theme="dark"] :where(.logicpenguin) table.tt-table td {
-  border-color: rgba(255, 255, 255, 0.12);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.3);
   color: #fff;
+}
+
+[data-theme="dark"] :where(.logicpenguin) .tt-selector-corner,
+[data-theme="dark"] :where(.logicpenguin) .tt-selector-corner-bottom {
+  background: #23232D !important;
 }
 
 [data-theme="dark"] :where(.logicpenguin) input:not([class*="Mui"]) {
