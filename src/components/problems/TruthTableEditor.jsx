@@ -311,7 +311,6 @@ export default function TruthTableEditor({
   }
   const lastRestoredProofIdRef = React.useRef(undefined)
   React.useEffect(() => {
-    // use per-proof limit
     setAttemptLimit(proof?.attemptLimit ?? 3)
   }, [proof?.attemptLimit])
   const updateClassificationSelection = React.useCallback((next) => {
@@ -542,7 +541,7 @@ export default function TruthTableEditor({
         })
         const validation = resp?.validation || {}
         const success = validation.successstatus === 'correct'
-        // sync limit from server
+        // sync limit from server response
         if (typeof resp?.attempt_limit === 'number') {
           setAttemptLimit(resp.attempt_limit)
         }
@@ -691,7 +690,7 @@ export default function TruthTableEditor({
     if (kind === 'equivalence') {
       if (solution?.equiv === true) return ['equivalent']
       if (solution?.equiv === false) {
-        // need relationSet to know which of contradictory/consistent/inconsistent
+        // determine relation type contradictory consistent or inconsistent
         if (statements.length < 2) return []
         try {
           const fa = Formula.from(statements[0])
@@ -748,19 +747,29 @@ export default function TruthTableEditor({
   }, [kind, proof?.solution, statements, Formula])
 
   const theme = useTheme()
-  const cellBorderColor = theme.palette.mode === 'dark' 
-    ? 'rgba(255, 255, 255, 0.3)' 
-    : 'rgba(0, 0, 0, 0.4)'
-  /* Match lp-problem-card background (common.css: white / #23232D dark) */
+  const cellBorderColor = theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.4)'
   const cornerBg = theme.palette.mode === 'dark' ? '#23232D' : '#fff'
-  const highlightSx = (colMatch, rowMatch) => {
-    if (!colMatch && !rowMatch) return {}
-    return { backgroundColor: alpha(theme.palette.primary.main, 0.22) }
+  const highlightSx = (colMatch, rowMatch) => (colMatch || rowMatch) ? { backgroundColor: alpha(theme.palette.primary.main, 0.22) } : {}
+  const tableSx = {
+    background: 'transparent',
+    boxShadow: 'none !important',
+    '&.MuiPaper-root': { boxShadow: 'none !important' },
+    '& .MuiTable-root': { background: 'transparent', border: 'none', boxShadow: 'none' },
+    '& .MuiTableCell-root': { color: 'text.primary', border: `2px solid ${cellBorderColor} !important` },
+    '& .MuiTableHead-root .MuiTableCell-root:not(.tt-selector-corner)': { backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.04)' : undefined },
+    '& .MuiTableRow-root:nth-of-type(even)': { backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.02)' : undefined },
+    '& .tt-row-selector-cell': { border: 'none !important', backgroundColor: 'transparent !important' },
+    '& .tt-selector-row .MuiTableCell-root': { border: 'none !important', backgroundColor: 'transparent !important' },
+    '& .tt-selector-corner, & .tt-selector-corner-bottom': { border: 'none !important', background: `${cornerBg} !important` },
   }
+  const renderSelectorBox = (selected, onClick, ariaLabel) => (
+    <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+      <ColumnRowSelectorBox selected={selected} onClick={onClick} ariaLabel={ariaLabel} theme={theme} />
+    </Box>
+  )
   const renderTableSet = (tablesToRender, tableInputsToRender, combined, readOnly, onCellChange, showConclusionMarker, withSelectors = true) => {
     if (combined) {
       const rowCount = tablesToRender[0]?.rows?.length || 0
-      const showSelectors = withSelectors
       return (
         <TableContainer 
           component={Paper} 
@@ -832,9 +841,7 @@ export default function TruthTableEditor({
                     </React.Fragment>
                   )
                 })}
-                {showSelectors && (
-                  <TableCell className="tt-selector-corner" align="center" sx={{ width: 20, minWidth: 20, p: 0, border: 'none', backgroundColor: `${theme.palette.background.paper} !important` }} />
-                )}
+                {withSelectors && <TableCell className="tt-selector-corner" align="center" style={{ background: cornerBg }} sx={{ width: 20, minWidth: 20, p: 0 }} />}
               </TableRow>
             </TableHead>
             <TableBody>
@@ -863,7 +870,7 @@ export default function TruthTableEditor({
                                 isConclusion && colIndex === 0 ? 'tt-cell tt-conclusion-cell' : 'tt-cell'
                               }
                               align="center"
-                              sx={showSelectors ? highlightSx(colMatch, rowMatch) : {}}
+                              sx={withSelectors ? highlightSx(colMatch, rowMatch) : {}}
                             >
                               <TruthToggle
                                 value={tableInputsToRender[tableIndex]?.[rowIndex]?.[colIndex]}
@@ -878,45 +885,33 @@ export default function TruthTableEditor({
                       </React.Fragment>
                     )
                   })}
-                  {showSelectors && (
-                    <TableCell className="tt-row-selector-cell" align="center" sx={{ width: 20, minWidth: 20, p: 0.25, verticalAlign: 'middle', border: 'none', background: 'transparent' }}>
-                      <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-                        <ColumnRowSelectorBox
-                          selected={selectedRows.includes(rowIndex)}
-                          onClick={() => toggleRow(rowIndex)}
-                          ariaLabel={`Select row ${rowIndex + 1}`}
-                          theme={theme}
-                        />
-                      </Box>
+                  {withSelectors && (
+                    <TableCell className="tt-row-selector-cell" align="center" sx={{ width: 20, minWidth: 20, p: 0.25, verticalAlign: 'middle' }}>
+                      {renderSelectorBox(selectedRows.includes(rowIndex), () => toggleRow(rowIndex), `Select row ${rowIndex + 1}`)}
                     </TableCell>
                   )}
                 </TableRow>
               ))}
-              {showSelectors && (
-                <TableRow className="tt-selector-row" sx={{ '& .MuiTableCell-root': { border: 'none', background: 'transparent' } }}>
+              {withSelectors && (
+                <TableRow className="tt-selector-row">
                   {tablesToRender.map((table, tableIndex) => {
                     const headerTokens = table.headerTokens && table.headerTokens.length > 0 ? table.headerTokens : table.tokens
                     return (
                       <React.Fragment key={`colsel-frag-${tableIndex}`}>
-                        {tableIndex > 0 && (
-                          <TableCell sx={{ width: 16, minWidth: 16, p: 0, border: 'none', background: 'transparent' }} />
-                        )}
+                        {tableIndex > 0 && <TableCell sx={{ width: 16, minWidth: 16, p: 0, border: 'none !important' }} />}
                         {headerTokens.map((_, colIndex) => (
-                          <TableCell key={`colsel-${tableIndex}-${colIndex}`} align="center" sx={{ width: 20, minWidth: 20, p: 0.25, border: 'none', background: 'transparent' }}>
-                            <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-                              <ColumnRowSelectorBox
-                                selected={selectedColumns.some((c) => c.tableIndex === tableIndex && c.colIndex === colIndex)}
-                                onClick={() => toggleColumn(tableIndex, colIndex)}
-                                ariaLabel={`Select column ${colIndex + 1}`}
-                                theme={theme}
-                              />
-                            </Box>
+                          <TableCell key={`colsel-${tableIndex}-${colIndex}`} align="center" sx={{ width: 20, minWidth: 20, p: 0.25, border: 'none !important' }}>
+                            {renderSelectorBox(
+                              selectedColumns.some((c) => c.tableIndex === tableIndex && c.colIndex === colIndex),
+                              () => toggleColumn(tableIndex, colIndex),
+                              `Select column ${colIndex + 1}`
+                            )}
                           </TableCell>
                         ))}
                       </React.Fragment>
                     )
                   })}
-                  <TableCell className="tt-selector-corner-bottom" sx={{ width: 20, minWidth: 20, p: 0, border: 'none', backgroundColor: `${cornerBg} !important` }} />
+                  <TableCell className="tt-selector-corner-bottom" style={{ background: cornerBg }} sx={{ width: 20, minWidth: 20, p: 0, border: 'none !important' }} />
                 </TableRow>
               )}
             </TableBody>
@@ -986,9 +981,7 @@ export default function TruthTableEditor({
                         {token}
                       </TableCell>
                     ))}
-                    {showSelectors && (
-                      <TableCell className="tt-selector-corner" align="center" sx={{ width: 20, minWidth: 20, p: 0, border: 'none', backgroundColor: `${theme.palette.background.paper} !important` }} />
-                    )}
+                    {withSelectors && <TableCell className="tt-selector-corner" align="center" style={{ background: cornerBg }} sx={{ width: 20, minWidth: 20, p: 0 }} />}
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -1005,7 +998,7 @@ export default function TruthTableEditor({
                             key={`solution-cell-${tableIndex}-${rowIndex}-${colIndex}`}
                             className="tt-cell"
                             align="center"
-                            sx={showSelectors ? highlightSx(colMatch, rowMatch, rowIndex) : {}}
+                            sx={withSelectors ? highlightSx(colMatch, rowMatch) : {}}
                           >
                             <TruthToggle
                               value={tableInputsToRender[tableIndex]?.[rowIndex]?.[colIndex]}
@@ -1031,21 +1024,18 @@ export default function TruthTableEditor({
                       )}
                     </TableRow>
                   ))}
-                  {showSelectors && (
-                    <TableRow className="tt-selector-row" sx={{ '& .MuiTableCell-root': { border: 'none', background: 'transparent' } }}>
+                  {withSelectors && (
+                    <TableRow className="tt-selector-row">
                       {headerTokens.map((_, colIndex) => (
-                        <TableCell key={`colsel-${tableIndex}-${colIndex}`} align="center" sx={{ width: 20, minWidth: 20, p: 0.25, border: 'none', background: 'transparent' }}>
-                          <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-                            <ColumnRowSelectorBox
-                              selected={selectedColumns.some((c) => c.tableIndex === tableIndex && c.colIndex === colIndex)}
-                              onClick={() => toggleColumn(tableIndex, colIndex)}
-                              ariaLabel={`Select column ${colIndex + 1}`}
-                              theme={theme}
-                            />
-                          </Box>
+                        <TableCell key={`colsel-${tableIndex}-${colIndex}`} align="center" sx={{ width: 20, minWidth: 20, p: 0.25, border: 'none !important' }}>
+                          {renderSelectorBox(
+                            selectedColumns.some((c) => c.tableIndex === tableIndex && c.colIndex === colIndex),
+                            () => toggleColumn(tableIndex, colIndex),
+                            `Select column ${colIndex + 1}`
+                          )}
                         </TableCell>
                       ))}
-                      <TableCell className="tt-selector-corner-bottom" sx={{ width: 20, minWidth: 20, p: 0, border: 'none', backgroundColor: `${cornerBg} !important` }} />
+                      <TableCell className="tt-selector-corner-bottom" style={{ background: cornerBg }} sx={{ width: 20, minWidth: 20, p: 0, border: 'none !important' }} />
                     </TableRow>
                   )}
                 </TableBody>
@@ -1092,7 +1082,7 @@ export default function TruthTableEditor({
       sx={{
         mt: embedded ? 0 : 1,
         overflow: 'visible',
-        // no tall card
+        // no tall card styling
         minHeight: 'auto',
         flexGrow: 1,
         alignSelf: { xs: 'stretch', md: 'flex-start' },
