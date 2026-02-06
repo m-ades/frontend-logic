@@ -646,7 +646,7 @@ export default function DerivationTable({
   // click row number to append it to current line's line(s) field (with space after)
   const handleRowNumberClick = useCallback(
     (clickedLineNum) => {
-      const targetIdx = lastEditableIndexRef.current ?? premises.length
+      const targetIdx = activeFormulaIndex ?? lastEditableIndexRef.current ?? premises.length
       if (targetIdx < premises.length) return
       commitLines((prev) => {
         const line = prev[targetIdx]
@@ -663,7 +663,7 @@ export default function DerivationTable({
         return next
       })
     },
-    [premises.length, commitLines]
+    [activeFormulaIndex, premises.length, commitLines]
   )
 
   const canAddLine = useMemo(() => {
@@ -1222,7 +1222,17 @@ export default function DerivationTable({
                     <Box
                       component="span"
                       sx={(theme) => ({
-                        display: 'inline',
+                        display: isPhone && isFullScreen ? 'block' : 'inline',
+                        ...(isPhone && isFullScreen
+                          ? {
+                              width: '100%',
+                              maxWidth: '100%',
+                              overflowX: 'auto',
+                              overflowY: 'hidden',
+                              whiteSpace: 'nowrap',
+                              WebkitOverflowScrolling: 'touch',
+                            }
+                          : {}),
                         fontSize: 16,
                         py: isMobile ? 0.5 : 1,
                         ...getInputUnderlineSx(theme),
