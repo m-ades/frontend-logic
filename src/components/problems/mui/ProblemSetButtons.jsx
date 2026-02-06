@@ -91,6 +91,18 @@ export default function ProblemSetButtons({
           >
             Clear Answer
           </Button>
+          {scoreLabel?.text != null && (
+            <Typography
+              component="span"
+              sx={{
+                fontSize: '0.875rem',
+                fontWeight: 600,
+                color: scoreLabel.color ?? 'success.main',
+              }}
+            >
+              {scoreLabel.text}
+            </Typography>
+          )}
         </Stack>
       )}
       {showAttempts && hasAttempts && (

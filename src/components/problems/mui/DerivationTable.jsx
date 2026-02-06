@@ -345,6 +345,7 @@ export default function DerivationTable({
   }, [savedState, premises])
 
   const [lines, setLines] = useState(initialLines)
+  const [lastSubmitStatus, setLastSubmitStatus] = useState(null)
   const onStateChangeRef = useRef(onStateChange)
   const firstEditableIndex = premises.length
 
@@ -898,6 +899,7 @@ export default function DerivationTable({
     const blanks = Array.from({ length: 1 }, () => ({ formula: '', justification: '', readOnly: false }))
     const nextLines = [...premLines, ...blanks]
     setLines(nextLines)
+    setLastSubmitStatus(null)
     setStatusBanner({ status: 'unanswered', message: '' })
     emitState(nextLines)
   }
@@ -924,6 +926,7 @@ export default function DerivationTable({
       })
       const validation = resp?.validation || {}
       const successstatus = validation.successstatus || 'incorrect'
+      setLastSubmitStatus(successstatus)
       if (typeof resp?.attempt_limit === 'number') {
         setAttemptLimit(resp.attempt_limit)
       }
@@ -953,6 +956,7 @@ export default function DerivationTable({
       }
     } catch (err) {
       setStatusBanner({ status: 'malfunction', message: 'Error submitting answer' })
+      setLastSubmitStatus(null)
     } finally {
       setIsChecking(false)
     }
@@ -1731,6 +1735,8 @@ export default function DerivationTable({
               const color = score >= 100 ? 'success.main' : score > 0 ? 'text.secondary' : 'error.main'
               return { text: `${earnedLabel}/${maxLabel}`, color }
             }
+            if (lastSubmitStatus === 'correct') return { text: `${maxLabel}/${maxLabel}`, color: 'success.main' }
+            if (lastSubmitStatus === 'incorrect') return { text: `0/${maxLabel}`, color: 'error.main' }
             if (isCurrentCorrect) return { text: `${maxLabel}/${maxLabel}`, color: 'success.main' }
             if (isLockedOut) return { text: `0/${maxLabel}`, color: 'error.main' }
             return null

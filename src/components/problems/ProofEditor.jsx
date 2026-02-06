@@ -139,6 +139,7 @@ export default function ProofEditor({
         onCloseFullScreen={closeFullScreen}
         totalQuestions={totalQuestions}
         isCurrentCorrect={isCurrentCorrect}
+        currentQuestionScore={currentQuestionScore}
         isInstructorView={isInstructorView}
         onEditQuestion={openEdit}
       />
