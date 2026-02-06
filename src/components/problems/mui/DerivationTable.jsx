@@ -1031,7 +1031,7 @@ export default function DerivationTable({
         const Wrapper = isFullScreen ? Box : ThemedCard
         // fullscreen: no right padding. fill width. scrollable area so button row can stay sticky
         const wrapperSx = isFullScreen
-          ? { py: 2, pl: 0, pr: 0, position: 'relative', flex: 1, minHeight: 0, minWidth: 0, width: '100%', maxWidth: '100%', display: 'flex', flexDirection: 'column', boxSizing: 'border-box', overflow: 'auto' }
+          ? { py: 2, pl: 0, pr: 0, position: 'relative', flex: 1, minHeight: 0, minWidth: 0, width: '100%', maxWidth: '100%', display: 'flex', flexDirection: 'column', boxSizing: 'border-box', overflowY: 'auto', overflowX: 'hidden' }
           : {
               p: { xs: 1.25, md: 2.5 },
               borderRadius: 3,
@@ -1397,7 +1397,9 @@ export default function DerivationTable({
                               inputProps={{ autoComplete: 'off' }}
                               inputRef={(el) => { if (el) justRefs.current[idx] = el }}
                               sx={(theme) => ({
-                                width: { xs: '100%', sm: 76 },
+                                width: '7ch',
+                                maxWidth: '7ch',
+                                minWidth: '7ch',
                                 ...getInputUnderlineSx(theme),
                                 '& .MuiInputBase-input': {
                                   fontSize: 16,
@@ -1505,9 +1507,9 @@ export default function DerivationTable({
                           inputProps={{ autoComplete: 'off' }}
                           inputRef={(el) => { if (el) justRefs.current[idx] = el }}
                           sx={(theme) => ({
-                            width: isFullScreen ? '100%' : isMobile ? 90 : 110,
-                            maxWidth: isFullScreen ? '100%' : isMobile ? 90 : 110,
-                            minWidth: isFullScreen ? 0 : undefined,
+                            width: { xs: 'calc(7ch + 56px)', sm: 'calc(7ch + 70px)' },
+                            maxWidth: { xs: 'calc(7ch + 56px)', sm: 'calc(7ch + 70px)' },
+                            minWidth: { xs: 'calc(7ch + 56px)', sm: 'calc(7ch + 70px)' },
                             ...getInputUnderlineSx(theme),
                             '& .MuiInputBase-input': {
                               fontSize: 16,
