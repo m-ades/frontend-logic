@@ -19,7 +19,10 @@ export default function ActivityAccordion({
   renderActivity,
   emptyText = 'No activities available',
   showCollapseAll = true,
+  showExpandAll = false,
+  showExpandCollapseToggle = false,
   isLoading = false,
+  defaultExpanded = true,
 }) {
   const [expandedChapters, setExpandedChapters] = useState({})
   const [expandedSubchapters, setExpandedSubchapters] = useState({})
@@ -29,6 +32,16 @@ export default function ActivityAccordion({
       ...prev,
       [chapterId]: isExpanded,
     }))
+    if (!isExpanded) return
+    const chapter = courseStructure.find((item) => item.id === chapterId)
+    if (!chapter) return
+    setExpandedSubchapters((prev) => {
+      const next = { ...prev }
+      chapter.subchapters.forEach((subchapter) => {
+        next[subchapter.id] = true
+      })
+      return next
+    })
   }
 
   const handleSubchapterChange = (subchapterId) => (event, isExpanded) => {
@@ -38,17 +51,24 @@ export default function ActivityAccordion({
     }))
   }
 
-  const handleCollapseAll = () => {
-    const allCollapsed = {}
+  const setAllExpanded = (expanded) => {
+    const nextState = {}
     courseStructure.forEach((chapter) => {
-      allCollapsed[chapter.id] = false
+      nextState[chapter.id] = expanded
       chapter.subchapters.forEach((subchapter) => {
-        allCollapsed[subchapter.id] = false
+        nextState[subchapter.id] = expanded
       })
     })
-    setExpandedChapters(allCollapsed)
-    setExpandedSubchapters(allCollapsed)
+    setExpandedChapters(nextState)
+    setExpandedSubchapters(nextState)
   }
+
+  const isChapterExpandedById = (chapterId) => expandedChapters[chapterId] ?? defaultExpanded
+  const isSubchapterExpandedById = (subchapterId) => expandedSubchapters[subchapterId] ?? defaultExpanded
+  const isAnyCollapsed = courseStructure.some((chapter) => {
+    if (!isChapterExpandedById(chapter.id)) return true
+    return chapter.subchapters.some((subchapter) => !isSubchapterExpandedById(subchapter.id))
+  })
 
   if (isLoading) {
     return (
@@ -88,10 +108,26 @@ export default function ActivityAccordion({
         >
           {title}
         </Typography>
-        {showCollapseAll && (
+        {showExpandCollapseToggle && (
           <Typography
             variant="body2"
-            onClick={handleCollapseAll}
+            onClick={() => setAllExpanded(isAnyCollapsed)}
+            sx={{
+              cursor: 'pointer',
+              color: 'primary.main',
+              fontWeight: 500,
+              '&:hover': {
+                textDecoration: 'underline',
+              },
+            }}
+          >
+            {isAnyCollapsed ? 'Expand all' : 'Collapse all'}
+          </Typography>
+        )}
+        {!showExpandCollapseToggle && showCollapseAll && (
+          <Typography
+            variant="body2"
+            onClick={() => setAllExpanded(false)}
             sx={{
               cursor: 'pointer',
               color: 'primary.main',
@@ -104,6 +140,22 @@ export default function ActivityAccordion({
             Collapse all
           </Typography>
         )}
+        {!showExpandCollapseToggle && showExpandAll && (
+          <Typography
+            variant="body2"
+            onClick={() => setAllExpanded(true)}
+            sx={{
+              cursor: 'pointer',
+              color: 'primary.main',
+              fontWeight: 500,
+              '&:hover': {
+                textDecoration: 'underline',
+              },
+            }}
+          >
+            Expand all
+          </Typography>
+        )}
       </Box>
 
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
@@ -112,7 +164,7 @@ export default function ActivityAccordion({
             (total, subchapter) => total + subchapter.activities.length,
             0
           )
-          const isChapterExpanded = expandedChapters[chapter.id] !== false
+          const isChapterExpanded = isChapterExpandedById(chapter.id)
 
           return (
             <Accordion
@@ -183,7 +235,7 @@ export default function ActivityAccordion({
               <AccordionDetails sx={{ p: 0 }}>
                 <List sx={{ width: '100%', py: 1 }}>
                   {chapter.subchapters.map((subchapter) => {
-                    const isSubchapterExpanded = expandedSubchapters[subchapter.id] !== false
+                    const isSubchapterExpanded = isSubchapterExpandedById(subchapter.id)
 
                     return (
                       <ListItem

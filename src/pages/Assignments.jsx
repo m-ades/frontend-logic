@@ -242,12 +242,16 @@ export default function Assignments() {
     </ThemedCard>
   )
 
-  const renderAssignmentsAccordion = (emptyText, datePrefix, showCompletionChip) => (
+  const renderAssignmentsAccordion = (emptyText, datePrefix, showCompletionChip, defaultExpanded = true, showExpandAll = false, showCollapseAll = true, showExpandCollapseToggle = false) => (
     <ActivityAccordion
       title="Assignments"
       courseStructure={filteredStructure}
       isLoading={isLoadingAssignments}
       emptyText={emptyText}
+      defaultExpanded={defaultExpanded}
+      showExpandAll={showExpandAll}
+      showCollapseAll={showCollapseAll}
+      showExpandCollapseToggle={showExpandCollapseToggle}
       renderActivity={(activity, context) =>
         renderActivity(activity, context, datePrefix, showCompletionChip)
       }
@@ -270,15 +274,15 @@ export default function Assignments() {
       </Tabs>
 
       <TabPanel value={tabValue} index={0}>
-        {renderAssignmentsAccordion('No upcoming assignments', 'Due: ', false)}
+        {renderAssignmentsAccordion('No upcoming assignments', 'Due: ', false, true, false, false, true)}
       </TabPanel>
 
       <TabPanel value={tabValue} index={1}>
-        {renderAssignmentsAccordion('No assignments found', '', true)}
+        {renderAssignmentsAccordion('No assignments found', '', true, false, false, false, true)}
       </TabPanel>
 
       <TabPanel value={tabValue} index={2}>
-        {renderAssignmentsAccordion('No submitted assignments', 'Submitted: ', true)}
+        {renderAssignmentsAccordion('No submitted assignments', 'Submitted: ', true, true, false, false, true)}
       </TabPanel>
     </Box>
   )
