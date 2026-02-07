@@ -38,6 +38,15 @@ const toSymbol = (value) => {
   return ''
 }
 
+const rowsEqual = (left = [], right = []) => {
+  if (left === right) return true
+  if (left.length !== right.length) return false
+  for (let i = 0; i < left.length; i += 1) {
+    if (left[i] !== right[i]) return false
+  }
+  return true
+}
+
 function ColumnRowSelectorBox({ selected, onClick, ariaLabel, theme }) {
   const primary = theme.palette.primary.main
   const borderColor = theme.palette.mode === 'dark' 
@@ -128,10 +137,29 @@ export default function PartialTruthTable({
 
   const [rowInputs, setRowInputs] = useState(() => initialRow)
   const [selectedColumns, setSelectedColumns] = useState([])
+  const onStateChangeTimerRef = useRef(null)
+
+  useEffect(() => () => {
+    if (onStateChangeTimerRef.current) {
+      clearTimeout(onStateChangeTimerRef.current)
+      onStateChangeTimerRef.current = null
+    }
+  }, [])
 
   useEffect(() => {
-    setRowInputs(initialRow)
+    setRowInputs((prev) => (rowsEqual(prev, initialRow) ? prev : initialRow))
   }, [initialRow])
+
+  const scheduleStateChange = (next) => {
+    if (!onStateChange) return
+    if (onStateChangeTimerRef.current) {
+      clearTimeout(onStateChangeTimerRef.current)
+    }
+    onStateChangeTimerRef.current = setTimeout(() => {
+      onStateChangeTimerRef.current = null
+      onStateChange(next)
+    }, 150)
+  }
 
   const isDisabled = () =>
     rowInputs.length === 0 ||
@@ -159,7 +187,7 @@ export default function PartialTruthTable({
     setRowInputs((prev) => {
       const next = [...prev]
       next[index] = value
-      onStateChange?.({ row: next })
+      scheduleStateChange({ row: next })
       return next
     })
     setStatus('unanswered')
@@ -171,7 +199,10 @@ export default function PartialTruthTable({
       prev.includes(colIndex) ? prev.filter((idx) => idx !== colIndex) : [...prev, colIndex]
     ))
   }
-  const highlightSx = (colMatch) => (colMatch ? { backgroundColor: alpha(theme.palette.primary.main, 0.22) } : {})
+  const highlightStyle = useMemo(
+    () => ({ backgroundColor: alpha(theme.palette.primary.main, 0.22) }),
+    [theme.palette.primary.main]
+  )
 
   return (
     <Stack spacing={2} sx={{ px: 0, width: '100%', alignItems: 'stretch', flexGrow: 1 }}>
@@ -277,7 +308,7 @@ export default function PartialTruthTable({
                           key={`partial-tt-cell-${idx}`}
                           className="tt-cell"
                           align="center"
-                          sx={highlightSx(colMatch)}
+                          sx={colMatch ? highlightStyle : undefined}
                         >
                           {isEditable ? (
                             <Select

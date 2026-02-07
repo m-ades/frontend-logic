@@ -785,7 +785,10 @@ export default function TruthTableEditor({
   const theme = useTheme()
   const cellBorderColor = theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.12)' : 'var(--lpgray6)'
   const cornerBg = theme.palette.mode === 'dark' ? '#23232D' : '#fff'
-  const highlightSx = (colMatch, rowMatch) => (colMatch || rowMatch) ? { backgroundColor: alpha(theme.palette.primary.main, 0.22) } : {}
+  const highlightStyle = React.useMemo(
+    () => ({ backgroundColor: alpha(theme.palette.primary.main, 0.22) }),
+    [theme.palette.primary.main]
+  )
   const tableSx = {
     background: 'transparent',
     boxShadow: 'none !important',
@@ -911,7 +914,7 @@ export default function TruthTableEditor({
                                 isConclusion && colIndex === 0 ? 'tt-cell tt-conclusion-cell' : 'tt-cell'
                               }
                               align="center"
-                              sx={withSelectors ? highlightSx(colMatch, rowMatch) : {}}
+                              sx={withSelectors && (colMatch || rowMatch) ? highlightStyle : undefined}
                             >
                               <TruthToggle
                                 value={tableInputsToRender[tableIndex]?.[rowIndex]?.[colIndex]}
@@ -1044,7 +1047,7 @@ export default function TruthTableEditor({
                             key={`solution-cell-${tableIndex}-${rowIndex}-${colIndex}`}
                             className="tt-cell"
                             align="center"
-                            sx={withSelectors ? highlightSx(colMatch, rowMatch) : {}}
+                            sx={withSelectors && (colMatch || rowMatch) ? highlightStyle : undefined}
                           >
                             <TruthToggle
                               value={tableInputsToRender[tableIndex]?.[rowIndex]?.[colIndex]}

@@ -120,6 +120,14 @@ const toSymbol = (value) => {
   return ''
 }
 const toBoolean = (value) => (value === 'T' ? true : value === 'F' ? false : null)
+const rowsEqual = (left = [], right = []) => {
+  if (left === right) return true
+  if (left.length !== right.length) return false
+  for (let i = 0; i < left.length; i += 1) {
+    if (left[i] !== right[i]) return false
+  }
+  return true
+}
 
 export default function SingleRowTruthTable({
   problem,
@@ -226,13 +234,14 @@ export default function SingleRowTruthTable({
     savedState?.compound !== undefined ? toSymbol(savedState.compound) : ''
   )
   const [selectedColumns, setSelectedColumns] = useState([])
+  const onStateChangeTimerRef = useRef(null)
   const compoundOptions = [
     { value: 'T', label: 'True' },
     { value: 'F', label: 'False' },
   ]
 
   useEffect(() => {
-    setRowInputs(initialRow)
+    setRowInputs((prev) => (rowsEqual(prev, initialRow) ? prev : initialRow))
   }, [initialRow])
 
   useEffect(() => {
@@ -240,6 +249,24 @@ export default function SingleRowTruthTable({
       savedState?.compound !== undefined ? toSymbol(savedState.compound) : ''
     )
   }, [savedState?.compound, statement, interpretation])
+
+  useEffect(() => () => {
+    if (onStateChangeTimerRef.current) {
+      clearTimeout(onStateChangeTimerRef.current)
+      onStateChangeTimerRef.current = null
+    }
+  }, [])
+
+  const scheduleStateChange = useCallback((next) => {
+    if (!onStateChange) return
+    if (onStateChangeTimerRef.current) {
+      clearTimeout(onStateChangeTimerRef.current)
+    }
+    onStateChangeTimerRef.current = setTimeout(() => {
+      onStateChangeTimerRef.current = null
+      onStateChange(next)
+    }, 150)
+  }, [onStateChange])
 
   const isDisabled = () =>
     rowInputs.length === 0 ||
@@ -275,14 +302,14 @@ export default function SingleRowTruthTable({
     setRowInputs(next)
     setStatus('unanswered')
     setMessage('')
-    onStateChange?.({ row: next, compound: toBoolean(compoundInput) })
+    scheduleStateChange({ row: next, compound: toBoolean(compoundInput) })
   }
 
   const handleCompoundChange = (value) => {
     if (readOnly || isLocked) return
     const nextValue = value || ''
     setCompoundInput(nextValue)
-    onStateChange?.({ row: rowInputs, compound: toBoolean(nextValue) })
+    scheduleStateChange({ row: rowInputs, compound: toBoolean(nextValue) })
     setStatus('unanswered')
     setMessage('')
   }
@@ -292,7 +319,10 @@ export default function SingleRowTruthTable({
       prev.includes(colIndex) ? prev.filter((idx) => idx !== colIndex) : [...prev, colIndex]
     ))
   }
-  const highlightSx = (colMatch) => (colMatch ? { backgroundColor: alpha(theme.palette.primary.main, 0.22) } : {})
+  const highlightStyle = useMemo(
+    () => ({ backgroundColor: alpha(theme.palette.primary.main, 0.22) }),
+    [theme.palette.primary.main]
+  )
 
   const formatInterpretation = () => {
     const entries = Object.entries(interpretation)
@@ -322,7 +352,7 @@ export default function SingleRowTruthTable({
                   component="td"
                   key={`single-row-cell-${rowIndex}-${colIndex}`}
                   className="tt-cell"
-                  sx={highlightSx(selectedColumns.includes(colIndex))}
+                  sx={selectedColumns.includes(colIndex) ? highlightStyle : undefined}
                 >
                   <TruthToggle
                     value={rowInputsToRender[rowIndex]?.[colIndex]}

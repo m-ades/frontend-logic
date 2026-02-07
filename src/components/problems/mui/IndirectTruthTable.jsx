@@ -36,6 +36,26 @@ const toSymbol = (value) => {
   return ''
 }
 
+const rowsEqual = (left = [], right = []) => {
+  if (left === right) return true
+  if (left.length !== right.length) return false
+  for (let i = 0; i < left.length; i += 1) {
+    if (left[i] !== right[i]) return false
+  }
+  return true
+}
+
+const matrixEqual = (left = [], right = []) => {
+  if (left === right) return true
+  if (left.length !== right.length) return false
+  for (let r = 0; r < left.length; r += 1) {
+    const leftRow = left[r] || []
+    const rightRow = right[r] || []
+    if (!rowsEqual(leftRow, rightRow)) return false
+  }
+  return true
+}
+
 function ColumnRowSelectorBox({ selected, onClick, ariaLabel, theme }) {
   const primary = theme.palette.primary.main
   const borderColor = theme.palette.mode === 'dark'
@@ -261,18 +281,37 @@ export default function IndirectTruthTable({
   const [selectedValues, setSelectedValues] = useState(() => initialSelections)
   const [sandboxRows, setSandboxRows] = useState(() => initialSandboxRows)
   const [selectedColumns, setSelectedColumns] = useState([])
+  const onStateChangeTimerRef = useRef(null)
 
   useEffect(() => {
-    setSelectedValues(initialSelections)
+    setSelectedValues((prev) => (rowsEqual(prev, initialSelections) ? prev : initialSelections))
   }, [initialSelections])
 
   useEffect(() => {
-    setSandboxRows(initialSandboxRows)
+    setSandboxRows((prev) => (matrixEqual(prev, initialSandboxRows) ? prev : initialSandboxRows))
   }, [initialSandboxRows])
 
   useEffect(() => {
     setSelectedColumns([])
   }, [sandboxCellCount])
+
+  useEffect(() => () => {
+    if (onStateChangeTimerRef.current) {
+      clearTimeout(onStateChangeTimerRef.current)
+      onStateChangeTimerRef.current = null
+    }
+  }, [])
+
+  const scheduleStateChange = (next) => {
+    if (!onStateChange) return
+    if (onStateChangeTimerRef.current) {
+      clearTimeout(onStateChangeTimerRef.current)
+    }
+    onStateChangeTimerRef.current = setTimeout(() => {
+      onStateChangeTimerRef.current = null
+      onStateChange(next)
+    }, 150)
+  }
 
   const handleChoiceChange = (index, value) => {
     if (readOnly) return
@@ -280,7 +319,7 @@ export default function IndirectTruthTable({
       const next = [...prev]
       next[index] = value
       const answers = next.map((val) => (val === '' ? '' : parseInt(val, 10)))
-      onStateChange?.({ answers, ans: answers[0] ?? '', sandboxRows })
+      scheduleStateChange({ answers, ans: answers[0] ?? '', sandboxRows })
       return next
     })
   }
@@ -290,7 +329,10 @@ export default function IndirectTruthTable({
       prev.includes(colIndex) ? prev.filter((idx) => idx !== colIndex) : [...prev, colIndex]
     ))
   }
-  const highlightSx = (colMatch) => (colMatch ? { backgroundColor: alpha(theme.palette.primary.main, 0.22) } : {})
+  const highlightStyle = useMemo(
+    () => ({ backgroundColor: alpha(theme.palette.primary.main, 0.22) }),
+    [theme.palette.primary.main]
+  )
 
   const handleSandboxChange = (rowIndex, colIndex, value) => {
     if (readOnly) return
@@ -298,7 +340,7 @@ export default function IndirectTruthTable({
       const next = prev.map((row, idx) => (idx === rowIndex ? [...row] : row))
       next[rowIndex][colIndex] = value
       const answers = selectedValues.map((val) => (val === '' ? '' : parseInt(val, 10)))
-      onStateChange?.({ answers, ans: answers[0] ?? '', sandboxRows: next })
+      scheduleStateChange({ answers, ans: answers[0] ?? '', sandboxRows: next })
       return next
     })
   }
@@ -308,7 +350,7 @@ export default function IndirectTruthTable({
     setSandboxRows((prev) => {
       const next = [...prev, [...defaultRow]]
       const answers = selectedValues.map((val) => (val === '' ? '' : parseInt(val, 10)))
-      onStateChange?.({ answers, ans: answers[0] ?? '', sandboxRows: next })
+      scheduleStateChange({ answers, ans: answers[0] ?? '', sandboxRows: next })
       return next
     })
   }
@@ -488,7 +530,7 @@ export default function IndirectTruthTable({
                                     key={`itt-cell-${rowIndex}-${idx}`}
                                     className="tt-cell"
                                     align="center"
-                                    sx={highlightSx(colMatch)}
+                                    sx={colMatch ? highlightStyle : undefined}
                                   >
                                     <TruthToggle
                                       value={row?.[dataIndex] ?? ''}
