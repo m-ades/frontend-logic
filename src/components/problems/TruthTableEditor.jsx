@@ -39,6 +39,25 @@ import InstructorQuestionEditor from './InstructorQuestionEditor.jsx'
 import { fetchJson, getActiveUserId } from '../../utils/api.js'
 import PromptText from '../ui/PromptText.jsx'
 
+const tablesEqual = (left = [], right = []) => {
+  if (left === right) return true
+  if (left.length !== right.length) return false
+  for (let t = 0; t < left.length; t += 1) {
+    const leftRows = left[t] || []
+    const rightRows = right[t] || []
+    if (leftRows.length !== rightRows.length) return false
+    for (let r = 0; r < leftRows.length; r += 1) {
+      const leftRow = leftRows[r] || []
+      const rightRow = rightRows[r] || []
+      if (leftRow.length !== rightRow.length) return false
+      for (let c = 0; c < leftRow.length; c += 1) {
+        if (leftRow[c] !== rightRow[c]) return false
+      }
+    }
+  }
+  return true
+}
+
 function TruthToggle({ value, onChange, ariaLabel, accent, readOnly = false }) {
   const theme = useTheme()
   const isDark = theme.palette.mode === 'dark'
@@ -310,9 +329,26 @@ export default function TruthTableEditor({
     )
   }
   const lastRestoredProofIdRef = React.useRef(undefined)
+  const onStateChangeTimerRef = React.useRef(null)
   React.useEffect(() => {
     setAttemptLimit(proof?.attemptLimit ?? 3)
   }, [proof?.attemptLimit])
+  React.useEffect(() => () => {
+    if (onStateChangeTimerRef.current) {
+      clearTimeout(onStateChangeTimerRef.current)
+      onStateChangeTimerRef.current = null
+    }
+  }, [])
+  const scheduleStateChange = React.useCallback((nextState) => {
+    if (!onStateChange) return
+    if (onStateChangeTimerRef.current) {
+      clearTimeout(onStateChangeTimerRef.current)
+    }
+    onStateChangeTimerRef.current = setTimeout(() => {
+      onStateChangeTimerRef.current = null
+      onStateChange(nextState)
+    }, 150)
+  }, [onStateChange])
   const updateClassificationSelection = React.useCallback((next) => {
     setMcSelection(next)
     onStateChange?.({
@@ -355,7 +391,7 @@ export default function TruthTableEditor({
       }
       return [];
     }
-    setTableInputs(derivedInitialTables)
+    setTableInputs((prev) => (tablesEqual(prev, derivedInitialTables) ? prev : derivedInitialTables))
     setMcSelection(normalizeSavedSelection())
   }, [derivedInitialTables, kind, proof?.id, savedState])
 
@@ -370,7 +406,7 @@ export default function TruthTableEditor({
         : tableRows
     )
     setTableInputs(nextTables)
-    onStateChange?.({
+    scheduleStateChange({
       tables: nextTables.map((rows) => ({ rows })),
       ...(classificationEnabled ? {
         mcans: mcSelection,
