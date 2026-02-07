@@ -24,6 +24,7 @@ import ProblemSetButtons from './ProblemSetButtons.jsx'
 import StatusBanner, { isTerminalStatus } from '../../ui/StatusBanner.jsx'
 import { useProblemChecker } from '../../../hooks/useProblemChecker.js'
 import PromptText from '../../ui/PromptText.jsx'
+import { rowsEqual, clearDebounce, scheduleDebouncedChange } from '../../../utils/tablePerf.js'
 
 const toTruth = (value) => {
   if (value === true || value === 'T' || value === 't' || value === 1) return true
@@ -36,15 +37,6 @@ const toSymbol = (value) => {
   if (value === false || value === 'F' || value === 'f') return 'F'
   if (value === 'U' || value === 'u' || value === '?') return 'U'
   return ''
-}
-
-const rowsEqual = (left = [], right = []) => {
-  if (left === right) return true
-  if (left.length !== right.length) return false
-  for (let i = 0; i < left.length; i += 1) {
-    if (left[i] !== right[i]) return false
-  }
-  return true
 }
 
 function ColumnRowSelectorBox({ selected, onClick, ariaLabel, theme }) {
@@ -109,6 +101,7 @@ export default function PartialTruthTable({
   const statement = problem?.statement || problem?.formula || ''
   const prompt = problem?.prompt || ''
   const givenRow = Array.isArray(problem?.row) ? problem.row : []
+  const savedRow = savedState?.row ?? []
 
   const tokens = useMemo(() => {
     if (!statement) return []
@@ -132,34 +125,18 @@ export default function PartialTruthTable({
         const saved = savedState?.row?.[idx]
         return saved ? toSymbol(saved) : ''
       }),
-    [givenRow, savedState, tokens]
+    [givenRow, savedRow, tokens]
   )
 
   const [rowInputs, setRowInputs] = useState(() => initialRow)
   const [selectedColumns, setSelectedColumns] = useState([])
   const onStateChangeTimerRef = useRef(null)
 
-  useEffect(() => () => {
-    if (onStateChangeTimerRef.current) {
-      clearTimeout(onStateChangeTimerRef.current)
-      onStateChangeTimerRef.current = null
-    }
-  }, [])
+  useEffect(() => () => clearDebounce(onStateChangeTimerRef), [])
 
   useEffect(() => {
     setRowInputs((prev) => (rowsEqual(prev, initialRow) ? prev : initialRow))
   }, [initialRow])
-
-  const scheduleStateChange = (next) => {
-    if (!onStateChange) return
-    if (onStateChangeTimerRef.current) {
-      clearTimeout(onStateChangeTimerRef.current)
-    }
-    onStateChangeTimerRef.current = setTimeout(() => {
-      onStateChangeTimerRef.current = null
-      onStateChange(next)
-    }, 150)
-  }
 
   const isDisabled = () =>
     rowInputs.length === 0 ||
@@ -187,7 +164,7 @@ export default function PartialTruthTable({
     setRowInputs((prev) => {
       const next = [...prev]
       next[index] = value
-      scheduleStateChange({ row: next })
+      scheduleDebouncedChange(onStateChangeTimerRef, onStateChange, { row: next })
       return next
     })
     setStatus('unanswered')

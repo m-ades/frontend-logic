@@ -38,25 +38,7 @@ import ProblemSetButtons from './mui/ProblemSetButtons.jsx'
 import InstructorQuestionEditor from './InstructorQuestionEditor.jsx'
 import { fetchJson, getActiveUserId } from '../../utils/api.js'
 import PromptText from '../ui/PromptText.jsx'
-
-const tablesEqual = (left = [], right = []) => {
-  if (left === right) return true
-  if (left.length !== right.length) return false
-  for (let t = 0; t < left.length; t += 1) {
-    const leftRows = left[t] || []
-    const rightRows = right[t] || []
-    if (leftRows.length !== rightRows.length) return false
-    for (let r = 0; r < leftRows.length; r += 1) {
-      const leftRow = leftRows[r] || []
-      const rightRow = rightRows[r] || []
-      if (leftRow.length !== rightRow.length) return false
-      for (let c = 0; c < leftRow.length; c += 1) {
-        if (leftRow[c] !== rightRow[c]) return false
-      }
-    }
-  }
-  return true
-}
+import { tablesEqual, clearDebounce, scheduleDebouncedChange } from '../../utils/tablePerf.js'
 
 function TruthToggle({ value, onChange, ariaLabel, accent, readOnly = false }) {
   const theme = useTheme()
@@ -289,7 +271,7 @@ export default function TruthTableEditor({
           )
         )
       ),
-    [expectedTables, isAtomicToken, savedState, tables]
+    [expectedTables, isAtomicToken, savedState?.tables, tables]
   )
   const resetTables = React.useMemo(
     () =>
@@ -333,21 +315,9 @@ export default function TruthTableEditor({
   React.useEffect(() => {
     setAttemptLimit(proof?.attemptLimit ?? 3)
   }, [proof?.attemptLimit])
-  React.useEffect(() => () => {
-    if (onStateChangeTimerRef.current) {
-      clearTimeout(onStateChangeTimerRef.current)
-      onStateChangeTimerRef.current = null
-    }
-  }, [])
+  React.useEffect(() => () => clearDebounce(onStateChangeTimerRef), [])
   const scheduleStateChange = React.useCallback((nextState) => {
-    if (!onStateChange) return
-    if (onStateChangeTimerRef.current) {
-      clearTimeout(onStateChangeTimerRef.current)
-    }
-    onStateChangeTimerRef.current = setTimeout(() => {
-      onStateChangeTimerRef.current = null
-      onStateChange(nextState)
-    }, 150)
+    scheduleDebouncedChange(onStateChangeTimerRef, onStateChange, nextState)
   }, [onStateChange])
   const updateClassificationSelection = React.useCallback((next) => {
     setMcSelection(next)
@@ -393,7 +363,7 @@ export default function TruthTableEditor({
     }
     setTableInputs((prev) => (tablesEqual(prev, derivedInitialTables) ? prev : derivedInitialTables))
     setMcSelection(normalizeSavedSelection())
-  }, [derivedInitialTables, kind, proof?.id, savedState])
+  }, [derivedInitialTables, kind, proof?.id, savedState?.mcans, savedState?.taut, savedState?.contra, savedState?.valid, savedState?.equiv])
 
   const handleCellChange = (tableIndex, rowIndex, colIndex, value) => {
     const nextTables = tableInputs.map((tableRows, tIdx) =>

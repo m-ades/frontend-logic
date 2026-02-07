@@ -10,6 +10,7 @@ import { libtf } from '../../../lib/logicpenguin/symbolic/libsemantics.js'
 import ProblemSetButtons from './ProblemSetButtons.jsx'
 import { useProblemChecker } from '../../../hooks/useProblemChecker.js'
 import PromptText from '../../ui/PromptText.jsx'
+import { rowsEqual, clearDebounce, scheduleDebouncedChange } from '../../../utils/tablePerf.js'
 
 function TruthToggle({ value, onChange, ariaLabel, accent, readOnly = false }) {
   const theme = useTheme()
@@ -120,14 +121,6 @@ const toSymbol = (value) => {
   return ''
 }
 const toBoolean = (value) => (value === 'T' ? true : value === 'F' ? false : null)
-const rowsEqual = (left = [], right = []) => {
-  if (left === right) return true
-  if (left.length !== right.length) return false
-  for (let i = 0; i < left.length; i += 1) {
-    if (left[i] !== right[i]) return false
-  }
-  return true
-}
 
 export default function SingleRowTruthTable({
   problem,
@@ -248,24 +241,12 @@ export default function SingleRowTruthTable({
     setCompoundInput(
       savedState?.compound !== undefined ? toSymbol(savedState.compound) : ''
     )
-  }, [savedState?.compound, statement, interpretation])
+  }, [savedState?.compound])
 
-  useEffect(() => () => {
-    if (onStateChangeTimerRef.current) {
-      clearTimeout(onStateChangeTimerRef.current)
-      onStateChangeTimerRef.current = null
-    }
-  }, [])
+  useEffect(() => () => clearDebounce(onStateChangeTimerRef), [])
 
   const scheduleStateChange = useCallback((next) => {
-    if (!onStateChange) return
-    if (onStateChangeTimerRef.current) {
-      clearTimeout(onStateChangeTimerRef.current)
-    }
-    onStateChangeTimerRef.current = setTimeout(() => {
-      onStateChangeTimerRef.current = null
-      onStateChange(next)
-    }, 150)
+    scheduleDebouncedChange(onStateChangeTimerRef, onStateChange, next)
   }, [onStateChange])
 
   const isDisabled = () =>

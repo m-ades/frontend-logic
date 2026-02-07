@@ -29,31 +29,12 @@ import StatusBanner, { isTerminalStatus } from '../../ui/StatusBanner.jsx'
 import { useProblemChecker } from '../../../hooks/useProblemChecker.js'
 import SolutionReveal from '../SolutionReveal.jsx'
 import PromptText from '../../ui/PromptText.jsx'
+import { rowsEqual, matrixEqual, clearDebounce, scheduleDebouncedChange } from '../../../utils/tablePerf.js'
 
 const toSymbol = (value) => {
   if (value === true || value === 'T' || value === 't' || value === 1) return 'T'
   if (value === false || value === 'F' || value === 'f' || value === 0) return 'F'
   return ''
-}
-
-const rowsEqual = (left = [], right = []) => {
-  if (left === right) return true
-  if (left.length !== right.length) return false
-  for (let i = 0; i < left.length; i += 1) {
-    if (left[i] !== right[i]) return false
-  }
-  return true
-}
-
-const matrixEqual = (left = [], right = []) => {
-  if (left === right) return true
-  if (left.length !== right.length) return false
-  for (let r = 0; r < left.length; r += 1) {
-    const leftRow = left[r] || []
-    const rightRow = right[r] || []
-    if (!rowsEqual(leftRow, rightRow)) return false
-  }
-  return true
 }
 
 function ColumnRowSelectorBox({ selected, onClick, ariaLabel, theme }) {
@@ -295,22 +276,10 @@ export default function IndirectTruthTable({
     setSelectedColumns([])
   }, [sandboxCellCount])
 
-  useEffect(() => () => {
-    if (onStateChangeTimerRef.current) {
-      clearTimeout(onStateChangeTimerRef.current)
-      onStateChangeTimerRef.current = null
-    }
-  }, [])
+  useEffect(() => () => clearDebounce(onStateChangeTimerRef), [])
 
   const scheduleStateChange = (next) => {
-    if (!onStateChange) return
-    if (onStateChangeTimerRef.current) {
-      clearTimeout(onStateChangeTimerRef.current)
-    }
-    onStateChangeTimerRef.current = setTimeout(() => {
-      onStateChangeTimerRef.current = null
-      onStateChange(next)
-    }, 150)
+    scheduleDebouncedChange(onStateChangeTimerRef, onStateChange, next)
   }
 
   const handleChoiceChange = (index, value) => {
