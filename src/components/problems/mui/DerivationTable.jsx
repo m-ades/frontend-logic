@@ -825,7 +825,9 @@ export default function DerivationTable({
       return
     }
     if (!hasModifier && (key === '>' || key === '→' || key === '⇒' || key === '⊃')) {
-      insertSymbol('⊃')
+      const hyphenMatch = value.slice(0, start).match(/-+$/)
+      const replaceBefore = hyphenMatch ? hyphenMatch[0].length : 0
+      insertSymbol('⊃', replaceBefore)
       return
     }
     if (!hasModifier && key === '=' && start > 0 && value[start - 1] === '=') {
