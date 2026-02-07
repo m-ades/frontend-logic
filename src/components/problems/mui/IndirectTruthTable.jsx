@@ -233,7 +233,7 @@ export default function IndirectTruthTable({
   )
   const defaultRow = useMemo(() => Array(sandboxCellCount).fill(''), [sandboxCellCount])
 
-  const buildInitialSelections = () => {
+  const initialSelections = useMemo(() => {
     if (Array.isArray(savedState?.answers) && savedState.answers.length) {
       return mcQuestions.map((_, idx) => {
         const saved = savedState.answers[idx]
@@ -244,10 +244,9 @@ export default function IndirectTruthTable({
       return mcQuestions.map((_, idx) => (idx === 0 ? String(savedState.ans) : ''))
     }
     return mcQuestions.map(() => '')
-  }
+  }, [mcQuestions, savedState?.ans, savedState?.answers])
 
-  const [selectedValues, setSelectedValues] = useState(buildInitialSelections)
-  const [sandboxRows, setSandboxRows] = useState(() => {
+  const initialSandboxRows = useMemo(() => {
     if (Array.isArray(savedState?.sandboxRows) && savedState.sandboxRows.length > 0) {
       return savedState.sandboxRows.map((row) =>
         defaultRow.map((_, idx) => toSymbol(row?.[idx]) || '')
@@ -257,28 +256,19 @@ export default function IndirectTruthTable({
       return [defaultRow.map((_, idx) => toSymbol(savedState.sandboxRow[idx]) || '')]
     }
     return [defaultRow]
-  })
+  }, [defaultRow, savedState?.sandboxRow, savedState?.sandboxRows])
+
+  const [selectedValues, setSelectedValues] = useState(() => initialSelections)
+  const [sandboxRows, setSandboxRows] = useState(() => initialSandboxRows)
   const [selectedColumns, setSelectedColumns] = useState([])
 
   useEffect(() => {
-    setSelectedValues(buildInitialSelections())
-  }, [savedState?.ans, savedState?.answers, mcQuestions])
+    setSelectedValues(initialSelections)
+  }, [initialSelections])
 
   useEffect(() => {
-    if (Array.isArray(savedState?.sandboxRows) && savedState.sandboxRows.length > 0) {
-      setSandboxRows(
-        savedState.sandboxRows.map((row) =>
-          defaultRow.map((_, idx) => toSymbol(row?.[idx]) || '')
-        )
-      )
-      return
-    }
-    if (Array.isArray(savedState?.sandboxRow)) {
-      setSandboxRows([defaultRow.map((_, idx) => toSymbol(savedState.sandboxRow[idx]) || '')])
-    } else {
-      setSandboxRows([defaultRow])
-    }
-  }, [defaultRow, savedState?.sandboxRow, savedState?.sandboxRows])
+    setSandboxRows(initialSandboxRows)
+  }, [initialSandboxRows])
 
   useEffect(() => {
     setSelectedColumns([])

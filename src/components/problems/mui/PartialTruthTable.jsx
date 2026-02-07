@@ -113,22 +113,25 @@ export default function PartialTruthTable({
     [givenRow, tokens]
   )
 
-  const buildInitialRow = () =>
-    tokens.map((_, idx) => {
-      const given = toTruth(givenRow[idx])
-      if (given !== null) {
-        return toSymbol(givenRow[idx])
-      }
-      const saved = savedState?.row?.[idx]
-      return saved ? toSymbol(saved) : ''
-    })
+  const initialRow = useMemo(
+    () =>
+      tokens.map((_, idx) => {
+        const given = toTruth(givenRow[idx])
+        if (given !== null) {
+          return toSymbol(givenRow[idx])
+        }
+        const saved = savedState?.row?.[idx]
+        return saved ? toSymbol(saved) : ''
+      }),
+    [givenRow, savedState, tokens]
+  )
 
-  const [rowInputs, setRowInputs] = useState(buildInitialRow)
+  const [rowInputs, setRowInputs] = useState(() => initialRow)
   const [selectedColumns, setSelectedColumns] = useState([])
 
   useEffect(() => {
-    setRowInputs(buildInitialRow())
-  }, [savedState, tokens, statement, givenRow])
+    setRowInputs(initialRow)
+  }, [initialRow])
 
   const isDisabled = () =>
     rowInputs.length === 0 ||
@@ -142,9 +145,8 @@ export default function PartialTruthTable({
     onComplete,
     isDisabled,
     resetInput: () => {
-      const reset = buildInitialRow()
-      setRowInputs(reset)
-      onStateChange?.({ row: reset })
+      setRowInputs(initialRow)
+      onStateChange?.({ row: initialRow })
     },
     onStateChange,
     assignmentQuestionId,

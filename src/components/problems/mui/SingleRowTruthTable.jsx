@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, useRef } from 'react'
+import { useCallback, useEffect, useMemo, useState, useRef } from 'react'
 import { Box, Stack, Typography, FormControl, Select, MenuItem, Tooltip, alpha } from '@mui/material'
 import EditIcon from '@mui/icons-material/Edit'
 import InstructorQuestionEditor from '../InstructorQuestionEditor.jsx'
@@ -193,27 +193,35 @@ export default function SingleRowTruthTable({
   const expectedRow = (evaluation?.row || []).map(toSymbol)
   const expectedCompound = toSymbol(evaluation?.tv)
 
-  const isAtomicToken = (token) => {
+  const isAtomicToken = useCallback((token) => {
     if (!token) return false
     const stripped = token.replace(/[()\[\]{}]/g, '')
     if (stripped.length !== 1) return false
     return !operatorSet.has(stripped)
-  }
+  }, [operatorSet])
 
-  const buildInitialRow = () =>
-    tokens.map((token, idx) => {
-      if (isAtomicToken(token)) {
-        return toSymbol(interpretation?.[token])
-      }
-      if (savedState?.row?.[idx] !== undefined) {
-        return savedState.row[idx]
-      }
-      return ''
-    })
-  const buildResetRow = () =>
-    tokens.map((token) => (isAtomicToken(token) ? toSymbol(interpretation?.[token]) : ''))
+  const initialRow = useMemo(
+    () =>
+      tokens.map((token, idx) => {
+        if (isAtomicToken(token)) {
+          return toSymbol(interpretation?.[token])
+        }
+        if (savedState?.row?.[idx] !== undefined) {
+          return savedState.row[idx]
+        }
+        return ''
+      }),
+    [interpretation, isAtomicToken, savedState?.row, tokens]
+  )
+  const resetRow = useMemo(
+    () =>
+      tokens.map((token) =>
+        isAtomicToken(token) ? toSymbol(interpretation?.[token]) : ''
+      ),
+    [interpretation, isAtomicToken, tokens]
+  )
 
-  const [rowInputs, setRowInputs] = useState(buildInitialRow)
+  const [rowInputs, setRowInputs] = useState(() => initialRow)
   const [compoundInput, setCompoundInput] = useState(
     savedState?.compound !== undefined ? toSymbol(savedState.compound) : ''
   )
@@ -224,11 +232,14 @@ export default function SingleRowTruthTable({
   ]
 
   useEffect(() => {
-    setRowInputs(buildInitialRow())
+    setRowInputs(initialRow)
+  }, [initialRow])
+
+  useEffect(() => {
     setCompoundInput(
       savedState?.compound !== undefined ? toSymbol(savedState.compound) : ''
     )
-  }, [savedState, tokens, statement, interpretation])
+  }, [savedState?.compound, statement, interpretation])
 
   const isDisabled = () =>
     rowInputs.length === 0 ||
@@ -246,10 +257,9 @@ export default function SingleRowTruthTable({
     onComplete,
     isDisabled,
     resetInput: () => {
-      const reset = buildResetRow()
-      setRowInputs(reset)
+      setRowInputs(resetRow)
       setCompoundInput('')
-      onStateChange?.({ row: reset, compound: '' })
+      onStateChange?.({ row: resetRow, compound: '' })
     },
     onStateChange,
     assignmentQuestionId,
