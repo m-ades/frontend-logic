@@ -40,20 +40,24 @@ import ThemedCard from '../components/ui/ThemedCard.jsx'
 
 const formatPercent = (value) => (value === null || value === undefined ? '—' : `${value.toFixed(1)}%`)
 
+const GRADE_THRESHOLDS = [
+  { letter: 'A', min: 93 },
+  { letter: 'A-', min: 90 },
+  { letter: 'B+', min: 87 },
+  { letter: 'B', min: 83 },
+  { letter: 'B-', min: 80 },
+  { letter: 'C+', min: 77 },
+  { letter: 'C', min: 73 },
+  { letter: 'C-', min: 70 },
+  { letter: 'D+', min: 67 },
+  { letter: 'D', min: 63 },
+  { letter: 'D-', min: 60 },
+]
+
 const getLetterGrade = (percent) => {
   if (percent === null || percent === undefined) return null
-  if (percent >= 93) return 'A'
-  if (percent >= 90) return 'A-'
-  if (percent >= 87) return 'B+'
-  if (percent >= 83) return 'B'
-  if (percent >= 80) return 'B-'
-  if (percent >= 77) return 'C+'
-  if (percent >= 73) return 'C'
-  if (percent >= 70) return 'C-'
-  if (percent >= 67) return 'D+'
-  if (percent >= 63) return 'D'
-  if (percent >= 60) return 'D-'
-  return 'F'
+  const match = GRADE_THRESHOLDS.find((threshold) => percent >= threshold.min)
+  return match ? match.letter : 'F'
 }
 
 const emptyAnalytics = {
@@ -102,6 +106,8 @@ export default function Dashboard() {
   const gradebookResponse = gradebookQuery.data
   const isLoadingAnalytics =
     (analyticsQuery.isPending && !!courseIdForApi) || (gradebookQuery.isPending && !!courseIdForApi)
+  const analyticsError = analyticsQuery.isError
+  const gradebookError = gradebookQuery.isError
 
   const { analytics, gradeTimeline, gradeOverview, releaseOverview } = useMemo(() => {
     if (!courseIdForApi || !analyticsData) {
@@ -280,10 +286,10 @@ export default function Dashboard() {
 
     const loadInstructorAnalytics = async () => {
       try {
-        if (!courseId) {
+        if (!courseIdForApi) {
           return
         }
-        const data = await fetchJson(`/api/analytics/instructor?courseId=${courseId}`)
+        const data = await fetchJson(`/api/analytics/instructor?courseId=${courseIdForApi}`)
         if (isMounted) {
           setInstructorAnalytics(data)
         }
@@ -300,7 +306,7 @@ export default function Dashboard() {
     return () => {
       isMounted = false
     }
-  }, [dashboardMode])
+  }, [courseIdForApi, dashboardMode])
 
   const randomData = useMemo(() => {
     const base = analytics.performance.avg_attempt || 1
@@ -312,6 +318,8 @@ export default function Dashboard() {
 
   const assignmentStats = analytics.assignments || emptyAnalytics.assignments
 
+  const [useFullScale, setUseFullScale] = useState(false)
+
   const mainChartData = useMemo(
     () =>
       gradeTimeline.map((item) => ({
@@ -322,6 +330,27 @@ export default function Dashboard() {
       })),
     [gradeTimeline]
   )
+
+  const chartDomain = useMemo(() => {
+    if (useFullScale) return [0, 100]
+    const values = mainChartData
+      .flatMap((item) => [item.studentPercent, item.avgPercent, item.medianPercent])
+      .filter((value) => Number.isFinite(value))
+    if (!values.length) return [0, 100]
+    const min = Math.min(...values)
+    const max = Math.max(...values)
+    const pad = 5
+    const low = Math.max(0, Math.floor(min - pad))
+    const high = Math.min(100, Math.ceil(max + pad))
+    if (high - low < 10) {
+      const center = (high + low) / 2
+      return [
+        Math.max(0, Math.floor(center - 5)),
+        Math.min(100, Math.ceil(center + 5)),
+      ]
+    }
+    return [low, high]
+  }, [mainChartData, useFullScale])
 
   const activityStats = useMemo(() => {
     const avgMinutes = analytics.time.avg_minutes_per_question
@@ -348,6 +377,11 @@ export default function Dashboard() {
               </Typography>
             </Box>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+              {analyticsError || gradebookError ? (
+                <Typography variant="body2" color="text.secondary">
+                  Unable to load grade overview.
+                </Typography>
+              ) : null}
               <Box>
                 <Typography variant="h3" fontWeight="medium">
                   {formatPercent(gradeOverview.percent)}
@@ -409,6 +443,11 @@ export default function Dashboard() {
               </Typography>
             </Box>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+              {analyticsError ? (
+                <Typography variant="body2" color="text.secondary">
+                  Unable to load release summary.
+                </Typography>
+              ) : null}
               <Box sx={{ display: 'flex', justifyContent: 'flex-start', width: '100%' }}>
                 <Box
                   sx={{
@@ -425,24 +464,26 @@ export default function Dashboard() {
                   >
                     {releaseOverview.remainingPercent}%
                   </Typography>
-                  <ResponsiveContainer width="100%" height={200}>
-                    <PieChart>
-                      <Pie
-                        data={[
-                          { value: releaseOverview.pastDuePercent },
-                          { value: releaseOverview.remainingPercent },
-                        ]}
-                        innerRadius="62%"
-                        outerRadius="78%"
-                        dataKey="value"
-                        cx="50%"
-                        cy="50%"
-                      >
-                        <Cell fill={theme.palette.warning.main} />
-                        <Cell fill={theme.palette.primary.main} />
-                      </Pie>
-                    </PieChart>
-                  </ResponsiveContainer>
+                  <Box role="img" aria-label="Assignments remaining versus due">
+                    <ResponsiveContainer width="100%" height={200}>
+                      <PieChart>
+                        <Pie
+                          data={[
+                            { value: releaseOverview.pastDuePercent },
+                            { value: releaseOverview.remainingPercent },
+                          ]}
+                          innerRadius="62%"
+                          outerRadius="78%"
+                          dataKey="value"
+                          cx="50%"
+                          cy="50%"
+                        >
+                          <Cell fill={theme.palette.warning.main} />
+                          <Cell fill={theme.palette.primary.main} />
+                        </Pie>
+                      </PieChart>
+                    </ResponsiveContainer>
+                  </Box>
                 </Box>
               </Box>
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, alignItems: 'flex-start' }}>
@@ -493,7 +534,11 @@ export default function Dashboard() {
               </Typography>
             </Box>
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
-              {!isLoadingAnalytics && assignmentStats.upcomingList.length === 0 ? (
+              {analyticsError ? (
+                <Typography variant="body2" color="text.secondary">
+                  Unable to load upcoming assignments.
+                </Typography>
+              ) : !isLoadingAnalytics && assignmentStats.upcomingList.length === 0 ? (
                 <Typography variant="body2" color="text.secondary">
                   No upcoming assignments
                 </Typography>
@@ -523,6 +568,7 @@ export default function Dashboard() {
                       variant="outlined"
                       component={Link}
                       to={`/student/assignment/${assignment.id}`}
+                      aria-label={`Open ${assignment.title}`}
                     >
                       Open
                     </Button>
@@ -544,6 +590,11 @@ export default function Dashboard() {
               </Typography>
             </Box>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+              {analyticsError ? (
+                <Typography variant="body2" color="text.secondary">
+                  Unable to load activity metrics.
+                </Typography>
+              ) : null}
               {activityStats.map((item) => (
                 <Box key={item.label}>
                   <Typography variant="caption" color="text.secondary" display="block">
@@ -557,18 +608,20 @@ export default function Dashboard() {
                       {item.subtext}
                     </Typography>
                   </Box>
-                  <ResponsiveContainer width="100%" height={30}>
-                    <AreaChart data={randomData}>
-                      <Area
-                        type="monotone"
-                        dataKey="value"
-                        stroke={theme.palette.secondary.main}
-                        fill={theme.palette.secondary.light}
-                        strokeWidth={2}
-                        fillOpacity={0.3}
-                      />
-                    </AreaChart>
-                  </ResponsiveContainer>
+                  <Box role="img" aria-label={`${item.label} trend`}>
+                    <ResponsiveContainer width="100%" height={30}>
+                      <AreaChart data={randomData}>
+                        <Area
+                          type="monotone"
+                          dataKey="value"
+                          stroke={theme.palette.secondary.main}
+                          fill={theme.palette.secondary.light}
+                          strokeWidth={2}
+                          fillOpacity={0.3}
+                        />
+                      </AreaChart>
+                    </ResponsiveContainer>
+                  </Box>
                 </Box>
               ))}
             </Box>
@@ -602,6 +655,14 @@ export default function Dashboard() {
                 </Typography>
               </Box>
               <Box sx={{ display: 'flex', gap: 3, alignItems: 'center', flexWrap: 'wrap' }}>
+                <Button
+                  variant="outlined"
+                  size="small"
+                  onClick={() => setUseFullScale((prev) => !prev)}
+                  sx={{ textTransform: 'none' }}
+                >
+                  {useFullScale ? 'Zoomed scale' : 'Full scale (0–100)'}
+                </Button>
                 <Box display="flex" alignItems="center" gap={1}>
                   <Box sx={{ width: 12, height: 12, borderRadius: '50%', bgcolor: 'primary.main' }} />
                   <Typography variant="body2">Your score %</Typography>
@@ -616,48 +677,55 @@ export default function Dashboard() {
                 </Box>
               </Box>
             </Box>
-            <ResponsiveContainer width="100%" height={350}>
-              <LineChart data={mainChartData}>
-                <XAxis
-                  dataKey="name"
-                  tick={{ fill: theme.palette.text.secondary, fontSize: 12 }}
-                  stroke={theme.palette.divider}
-                />
-                <YAxis
-                  tick={{ fill: theme.palette.text.secondary, fontSize: 12 }}
-                  stroke={theme.palette.divider}
-                  domain={[0, 100]}
-                />
-                <Tooltip
-                  formatter={(value) =>
-                    value === null || value === undefined ? '—' : `${Number(value).toFixed(1)}%`
-                  }
-                />
-                <Line
-                  type="monotone"
-                  dataKey="studentPercent"
-                  stroke={theme.palette.primary.main}
-                  strokeWidth={2}
-                  dot={{ r: 3 }}
-                />
-                <Line
-                  type="monotone"
-                  dataKey="avgPercent"
-                  stroke={theme.palette.secondary.main}
-                  strokeWidth={2}
-                  dot={{ r: 3 }}
-                  connectNulls
-                />
-                <Line
-                  type="monotone"
-                  dataKey="medianPercent"
-                  stroke={theme.palette.success.main}
-                  strokeWidth={2}
-                  dot={{ r: 3 }}
-                  connectNulls
-                />
-              </LineChart>
-            </ResponsiveContainer>
+            {analyticsError || gradebookError ? (
+              <Typography variant="body2" color="text.secondary">
+                Unable to load assignment score trends.
+              </Typography>
+            ) : null}
+            <Box role="img" aria-label="Assignment scores over time">
+              <ResponsiveContainer width="100%" height={350}>
+                <LineChart data={mainChartData}>
+                  <XAxis
+                    dataKey="name"
+                    tick={{ fill: theme.palette.text.secondary, fontSize: 12 }}
+                    stroke={theme.palette.divider}
+                  />
+                  <YAxis
+                    tick={{ fill: theme.palette.text.secondary, fontSize: 12 }}
+                    stroke={theme.palette.divider}
+                    domain={chartDomain}
+                  />
+                  <Tooltip
+                    formatter={(value) =>
+                      value === null || value === undefined ? '—' : `${Number(value).toFixed(1)}%`
+                    }
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="studentPercent"
+                    stroke={theme.palette.primary.main}
+                    strokeWidth={2}
+                    dot={{ r: 3 }}
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="avgPercent"
+                    stroke={theme.palette.secondary.main}
+                    strokeWidth={2}
+                    dot={{ r: 3 }}
+                    connectNulls
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="medianPercent"
+                    stroke={theme.palette.success.main}
+                    strokeWidth={2}
+                    dot={{ r: 3 }}
+                    connectNulls
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </Box>
           </CardContent>
         </ThemedCard>
       </Grid>
