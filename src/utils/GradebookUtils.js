@@ -82,6 +82,20 @@ export function sortStudents(students, sortColumn, sortDirection) {
 }
 
 export function exportGradebookCSV(students, assignments, courseLabel) {
+  const splitAssignmentTitle = (name = "") => {
+    const trimmed = String(name || "").trim();
+    if (!trimmed) {
+      return { title: "Assignment", subtitle: "" };
+    }
+    const parts = trimmed.split(":");
+    if (parts.length === 1) {
+      return { title: trimmed, subtitle: "" };
+    }
+    const title = parts[0].trim();
+    const subtitle = parts.slice(1).join(":").trim();
+    return { title: title || trimmed, subtitle };
+  };
+
   const escapeCSVValue = (value) => {
     if (value === null || value === undefined) return "";
     const stringValue = String(value);
@@ -93,7 +107,11 @@ export function exportGradebookCSV(students, assignments, courseLabel) {
 
   const assignmentList = Array.isArray(assignments) ? assignments : [];
   const assignmentHeaders = assignmentList.map(
-    (assignment, index) => assignment?.name || `Assignment ${index + 1}`
+    (assignment, index) => {
+      const rawName = assignment?.name || `Assignment ${index + 1}`;
+      const { title } = splitAssignmentTitle(rawName);
+      return title || rawName;
+    }
   );
 
   const rows = [
