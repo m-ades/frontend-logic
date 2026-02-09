@@ -37,44 +37,46 @@ const toSymbol = (value) => {
   return ''
 }
 
-function ColumnRowSelectorBox({ selected, onClick, ariaLabel, theme }) {
+function ColumnRowSelectorBox({ selected, onClick, ariaLabel, theme, tooltip }) {
   const primary = theme.palette.primary.main
   const borderColor = theme.palette.mode === 'dark'
     ? 'rgba(255, 255, 255, 0.3)'
     : 'rgba(0, 0, 0, 0.4)'
   return (
-    <Box
-      role="button"
-      tabIndex={0}
-      aria-label={ariaLabel}
-      onClick={onClick}
-      onKeyDown={(event) => {
-        if (event.key === 'Enter' || event.key === ' ') {
-          event.preventDefault()
-          onClick()
-        }
-      }}
-      sx={{
-        width: 14,
-        height: 14,
-        minWidth: 14,
-        minHeight: 14,
-        border: `2px solid ${borderColor}`,
-        borderRadius: 0.5,
-        bgcolor: selected ? alpha(primary, 0.4) : 'transparent',
-        outline: selected ? `2px solid ${primary}` : 'none',
-        outlineOffset: -1,
-        cursor: 'pointer',
-        '&:hover': {
-          bgcolor: selected ? alpha(primary, 0.5) : alpha(primary, 0.12),
-          borderColor: selected ? primary : borderColor,
-        },
-        '&:focus-visible': {
-          outline: `2px solid ${alpha(primary, 0.6)}`,
-          outlineOffset: 1,
-        },
-      }}
-    />
+    <Tooltip title={tooltip || ''}>
+      <Box
+        role="button"
+        tabIndex={0}
+        aria-label={ariaLabel}
+        onClick={onClick}
+        onKeyDown={(event) => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault()
+            onClick()
+          }
+        }}
+        sx={{
+          width: 14,
+          height: 14,
+          minWidth: 14,
+          minHeight: 14,
+          border: `2px solid ${borderColor}`,
+          borderRadius: 0.5,
+          bgcolor: selected ? alpha(primary, 0.4) : 'transparent',
+          outline: selected ? `2px solid ${primary}` : 'none',
+          outlineOffset: -1,
+          cursor: 'pointer',
+          '&:hover': {
+            bgcolor: selected ? alpha(primary, 0.5) : alpha(primary, 0.12),
+            borderColor: selected ? primary : borderColor,
+          },
+          '&:focus-visible': {
+            outline: `2px solid ${alpha(primary, 0.6)}`,
+            outlineOffset: 1,
+          },
+        }}
+      />
+    </Tooltip>
   )
 }
 
@@ -538,6 +540,7 @@ export default function IndirectTruthTable({
                                       onClick={() => toggleColumn(dataIndex)}
                                       ariaLabel={`Select column ${dataIndex + 1}`}
                                       theme={theme}
+                                      tooltip="highlight column"
                                     />
                                   </Box>
                                 </TableCell>

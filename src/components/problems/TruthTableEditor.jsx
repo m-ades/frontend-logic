@@ -103,39 +103,41 @@ function TruthToggle({ value, onChange, ariaLabel, accent, readOnly = false }) {
   )
 }
 
-function ColumnRowSelectorBox({ selected, onClick, ariaLabel, theme }) {
+function ColumnRowSelectorBox({ selected, onClick, ariaLabel, theme, tooltip }) {
   const primary = theme.palette.primary.main
   const borderColor = theme.palette.mode === 'dark' 
     ? 'rgba(255, 255, 255, 0.3)' 
     : 'rgba(0, 0, 0, 0.4)'
   return (
-    <Box
-      role="button"
-      tabIndex={0}
-      aria-label={ariaLabel}
-      onClick={onClick}
-      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onClick(); } }}
-      sx={{
-        width: 14,
-        height: 14,
-        minWidth: 14,
-        minHeight: 14,
-        border: `2px solid ${borderColor}`,
-        borderRadius: 0.5,
-        bgcolor: selected ? alpha(primary, 0.4) : 'transparent',
-        outline: selected ? `2px solid ${primary}` : 'none',
-        outlineOffset: -1,
-        cursor: 'pointer',
-        '&:hover': {
-          bgcolor: selected ? alpha(primary, 0.5) : alpha(primary, 0.12),
-          borderColor: selected ? primary : borderColor,
-        },
-        '&:focus-visible': {
-          outline: `2px solid ${alpha(primary, 0.6)}`,
-          outlineOffset: 1,
-        },
-      }}
-    />
+    <Tooltip title={tooltip || ''}>
+      <Box
+        role="button"
+        tabIndex={0}
+        aria-label={ariaLabel}
+        onClick={onClick}
+        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onClick(); } }}
+        sx={{
+          width: 14,
+          height: 14,
+          minWidth: 14,
+          minHeight: 14,
+          border: `2px solid ${borderColor}`,
+          borderRadius: 0.5,
+          bgcolor: selected ? alpha(primary, 0.4) : 'transparent',
+          outline: selected ? `2px solid ${primary}` : 'none',
+          outlineOffset: -1,
+          cursor: 'pointer',
+          '&:hover': {
+            bgcolor: selected ? alpha(primary, 0.5) : alpha(primary, 0.12),
+            borderColor: selected ? primary : borderColor,
+          },
+          '&:focus-visible': {
+            outline: `2px solid ${alpha(primary, 0.6)}`,
+            outlineOffset: 1,
+          },
+        }}
+      />
+    </Tooltip>
   )
 }
 
@@ -771,9 +773,9 @@ export default function TruthTableEditor({
     '& .tt-selector-row .MuiTableCell-root': { border: 'none !important', backgroundColor: 'transparent !important' },
     '& .tt-selector-corner, & .tt-selector-corner-bottom': { border: 'none !important', background: `${cornerBg} !important` },
   }
-  const renderSelectorBox = (selected, onClick, ariaLabel) => (
+  const renderSelectorBox = (selected, onClick, ariaLabel, tooltip) => (
     <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-      <ColumnRowSelectorBox selected={selected} onClick={onClick} ariaLabel={ariaLabel} theme={theme} />
+      <ColumnRowSelectorBox selected={selected} onClick={onClick} ariaLabel={ariaLabel} theme={theme} tooltip={tooltip} />
     </Box>
   )
   const renderTableSet = (tablesToRender, tableInputsToRender, combined, readOnly, onCellChange, showConclusionMarker, withSelectors = true) => {
@@ -901,7 +903,7 @@ export default function TruthTableEditor({
                   })}
                   {withSelectors && (
                     <TableCell className="tt-row-selector-cell" align="center" sx={{ width: 20, minWidth: 20, p: 0.25, verticalAlign: 'middle' }}>
-                      {renderSelectorBox(selectedRows.includes(rowIndex), () => toggleRow(rowIndex), `Select row ${rowIndex + 1}`)}
+                      {renderSelectorBox(selectedRows.includes(rowIndex), () => toggleRow(rowIndex), `Select row ${rowIndex + 1}`, 'highlight row')}
                     </TableCell>
                   )}
                 </TableRow>
@@ -918,7 +920,8 @@ export default function TruthTableEditor({
                             {renderSelectorBox(
                               selectedColumns.some((c) => c.tableIndex === tableIndex && c.colIndex === colIndex),
                               () => toggleColumn(tableIndex, colIndex),
-                              `Select column ${colIndex + 1}`
+                              `Select column ${colIndex + 1}`,
+                              'highlight column'
                             )}
                           </TableCell>
                         ))}
@@ -1037,6 +1040,7 @@ export default function TruthTableEditor({
                               onClick={() => toggleRow(rowIndex)}
                               ariaLabel={`Select row ${rowIndex + 1}`}
                               theme={theme}
+                              tooltip="highlight row"
                             />
                           </Box>
                         </TableCell>
@@ -1050,7 +1054,8 @@ export default function TruthTableEditor({
                           {renderSelectorBox(
                             selectedColumns.some((c) => c.tableIndex === tableIndex && c.colIndex === colIndex),
                             () => toggleColumn(tableIndex, colIndex),
-                            `Select column ${colIndex + 1}`
+                            `Select column ${colIndex + 1}`,
+                            'highlight column'
                           )}
                         </TableCell>
                       ))}
