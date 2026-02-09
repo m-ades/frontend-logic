@@ -1,15 +1,6 @@
-import {
-  Paper,
-  Stack,
-  TextField,
-  MenuItem,
-  InputAdornment,
-} from "@mui/material";
-import { Search } from "lucide-react";
+import { Paper, Stack, TextField, MenuItem } from "@mui/material";
 
 export default function GradebookFilters({
-  searchTerm,
-  setSearchTerm,
   selectedAssignment,
   setSelectedAssignment,
   gradeFilter,
@@ -19,21 +10,6 @@ export default function GradebookFilters({
   return (
     <Paper elevation={1} sx={{ p: 2, mb: 3, maxWidth: "100%" }}>
       <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
-        <TextField
-          placeholder="Search students..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          size="small"
-          sx={{ flex: 1, minWidth: 200 }}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <Search size={18} />
-              </InputAdornment>
-            ),
-          }}
-        />
-
         <TextField
           select
           label="Assignment"

@@ -10,6 +10,7 @@ import {
   TableBody,
   TableSortLabel,
   Chip,
+  Tooltip,
   alpha,
 } from "@mui/material";
 import { useCoursesState } from "../../../context/CoursesContext";
@@ -30,6 +31,20 @@ function calculateAverage(grades) {
   return Math.round(
     validGrades.reduce((sum, grade) => sum + grade, 0) / validGrades.length
   );
+}
+
+function splitAssignmentTitle(name = "") {
+  const trimmed = String(name || "").trim();
+  if (!trimmed) {
+    return { title: "Assignment", subtitle: "" };
+  }
+  const parts = trimmed.split(":");
+  if (parts.length === 1) {
+    return { title: trimmed, subtitle: "" };
+  }
+  const title = parts[0].trim();
+  const subtitle = parts.slice(1).join(":").trim();
+  return { title: title || trimmed, subtitle };
 }
 
 export default function GradebookTable({
@@ -68,21 +83,19 @@ export default function GradebookTable({
         <Box
           sx={{
             width: "100%",
-            height: "calc(100vh - 320px)",
             overflowX: "auto",
-            overflowY: "auto",
             borderRadius: 3,
           }}
         >
-          <Table stickyHeader>
+          <Table stickyHeader size="small">
             <TableHead>
               <TableRow>
                 <TableCell
                   sx={{
                     fontWeight: 600,
                     backgroundColor: "background.paper",
-                    width: 180,
-                    minWidth: 180,
+                    width: 130,
+                    minWidth: 130,
                     position: "sticky",
                     left: 0,
                     zIndex: 3,
@@ -90,6 +103,8 @@ export default function GradebookTable({
                     borderColor: "divider",
                     cursor: "pointer",
                     transition: "background-color 0.1s",
+                    px: 1,
+                    py: 0.75,
                   }}
                   onClick={() => handleSort("username")}
                   onMouseEnter={() => setHoveredColumn("username")}
@@ -109,15 +124,17 @@ export default function GradebookTable({
                   sx={{
                     fontWeight: 600,
                     backgroundColor: "background.paper",
-                    width: 140,
-                    minWidth: 140,
+                    width: 90,
+                    minWidth: 90,
                     position: "sticky",
-                    left: 180,
+                    left: 130,
                     zIndex: 3,
                     borderRight: "2px solid",
                     borderColor: "divider",
                     cursor: "pointer",
                     transition: "background-color 0.1s",
+                    px: 1,
+                    py: 0.75,
                   }}
                   onClick={() => handleSort("average")}
                   onMouseEnter={() => setHoveredColumn("average")}
@@ -130,32 +147,50 @@ export default function GradebookTable({
                     Average
                   </TableSortLabel>
                 </TableCell>
-                {assignments.map((assignment) => (
-                  <TableCell
-                    key={assignment.id}
-                    align="center"
-                    sx={{
-                      fontWeight: 600,
-                      backgroundColor: "background.paper",
-                      width: 110,
-                      minWidth: 110,
-                      cursor: "pointer",
-                      transition: "background-color 0.1s",
-                    }}
-                    onClick={() => handleSort(assignment.id)}
-                    onMouseEnter={() => setHoveredColumn(assignment.id)}
-                    onMouseLeave={() => setHoveredColumn(null)}
-                  >
-                    <TableSortLabel
-                      active={sortColumn === assignment.id}
-                      direction={
-                        sortColumn === assignment.id ? sortDirection : "asc"
-                      }
+                {assignments.map((assignment) => {
+                  const { title, subtitle } = splitAssignmentTitle(
+                    assignment.name
+                  );
+                  const tooltipTitle = subtitle || assignment.name || "";
+
+                  return (
+                    <TableCell
+                      key={assignment.id}
+                      align="center"
+                      sx={{
+                        fontWeight: 600,
+                        backgroundColor: "background.paper",
+                        width: 58,
+                        minWidth: 58,
+                        whiteSpace: "nowrap",
+                        px: 0.5,
+                        py: 0.75,
+                        cursor: "pointer",
+                        transition: "background-color 0.1s",
+                      }}
+                      onClick={() => handleSort(assignment.id)}
+                      onMouseEnter={() => setHoveredColumn(assignment.id)}
+                      onMouseLeave={() => setHoveredColumn(null)}
                     >
-                      {assignment.name}
-                    </TableSortLabel>
-                  </TableCell>
-                ))}
+                      <TableSortLabel
+                        active={sortColumn === assignment.id}
+                        direction={
+                          sortColumn === assignment.id ? sortDirection : "asc"
+                        }
+                      >
+                        {tooltipTitle ? (
+                          <Tooltip title={tooltipTitle} arrow>
+                            <Box component="span" sx={{ whiteSpace: "nowrap" }}>
+                              {title}
+                            </Box>
+                          </Tooltip>
+                        ) : (
+                          title
+                        )}
+                      </TableSortLabel>
+                    </TableCell>
+                  );
+                })}
               </TableRow>
             </TableHead>
 
@@ -193,6 +228,10 @@ export default function GradebookTable({
                         borderColor: "divider",
                         cursor: "pointer",
                         transition: "background-image 0.1s",
+                        width: 130,
+                        minWidth: 130,
+                        px: 1,
+                        py: 0.75,
                         "&:hover": {
                           color: "primary.main",
                           textDecoration: "underline",
@@ -209,7 +248,7 @@ export default function GradebookTable({
                       align="center"
                       sx={{
                         position: "sticky",
-                        left: 180,
+                        left: 130,
                         backgroundColor: "background.paper",
                         backgroundImage: isRowHovered
                           ? (theme) =>
@@ -222,6 +261,10 @@ export default function GradebookTable({
                         borderRight: "2px solid",
                         borderColor: "divider",
                         transition: "background-image 0.1s",
+                        width: 90,
+                        minWidth: 90,
+                        px: 1,
+                        py: 0.75,
                       }}
                       onMouseEnter={() => setHoveredColumn("average")}
                       onMouseLeave={() => setHoveredColumn(null)}
@@ -263,6 +306,11 @@ export default function GradebookTable({
                           key={assignment.id}
                           align="center"
                           sx={{
+                            width: 58,
+                            minWidth: 58,
+                            whiteSpace: "nowrap",
+                            px: 0.5,
+                            py: 0.75,
                             backgroundColor: isRowHovered
                               ? (theme) =>
                                   alpha(theme.palette.primary.main, 0.08)
