@@ -9,11 +9,10 @@ import {
   Button,
   useMediaQuery,
   useTheme,
-  Tooltip,
 } from "@mui/material";
 import { Menu as MenuIcon, MenuBook as MenuBookIcon } from "@mui/icons-material";
 import { ChevronRight } from "lucide-react";
-import { useLocation } from "react-router-dom";
+import { Link as RouterLink, useLocation } from "react-router-dom";
 import { useCoursesState } from "../../context/CoursesContext";
 import ThemeToggle from "./ThemeToggle.jsx";
 import {
@@ -22,38 +21,44 @@ import {
   openRulesReference,
 } from "../../context/LayoutContext.jsx";
 
-// Map routes to readable page names
-const getPageName = (pathname) => {
+const getBreadcrumbInfo = (pathname) => {
   if (pathname.startsWith("/instructor/assignment/")) {
-    return "Assignment";
+    return { label: "Assignment", path: "/instructor/assignments" };
   }
   if (pathname.startsWith("/student/assignment/")) {
-    return "Assignment";
+    return { label: "Assignment", path: "/student/assignments" };
   }
   if (pathname.startsWith("/student/worksheet/")) {
-    return "Worksheet";
+    return { label: "Worksheet", path: "/student/assignments" };
   }
   const routes = {
-    "/instructor/dashboard": "Dashboard",
-    "/instructor/courses": "All Courses",
-    "/instructor/assignments": "Assignments",
-    "/instructor/gradebook": "Gradebook",
-    "/instructor/controls": "Course Controls",
-    "/instructor/contact": "Contact",
-    "/instructor/assignment-builder": "Assignments",
-    "/instructor/roster": "Roster",
-    "/instructor/profile": "Profile & Preferences",
-    "/instructor/practice": "Practice",
-    "/student/dashboard": "Dashboard",
-    "/student/courses": "My Courses",
-    "/student/assignments": "Assignments",
-    "/student/grades": "Grades",
-    "/student/practice": "Practice",
-    "/student/contact": "Contact",
-    "/student/profile": "Profile & Preferences",
+    "/instructor/dashboard": { label: "Dashboard", path: "/instructor/dashboard" },
+    "/instructor/courses": { label: "All Courses", path: "/instructor/courses" },
+    "/instructor/assignments": { label: "Assignments", path: "/instructor/assignments" },
+    "/instructor/gradebook": { label: "Gradebook", path: "/instructor/gradebook" },
+    "/instructor/controls": { label: "Course Controls", path: "/instructor/controls" },
+    "/instructor/contact": { label: "Contact", path: "/instructor/contact" },
+    "/instructor/assignment-builder": { label: "Assignments", path: "/instructor/assignments" },
+    "/instructor/roster": { label: "Roster", path: "/instructor/roster" },
+    "/instructor/profile": { label: "Profile & Preferences", path: "/instructor/profile" },
+    "/instructor/practice": { label: "Practice", path: "/instructor/practice" },
+    "/student/dashboard": { label: "Dashboard", path: "/student/dashboard" },
+    "/student/courses": { label: "My Courses", path: "/student/courses" },
+    "/student/assignments": { label: "Assignments", path: "/student/assignments" },
+    "/student/grades": { label: "Grades", path: "/student/grades" },
+    "/student/practice": { label: "Practice", path: "/student/practice" },
+    "/student/contact": { label: "Contact", path: "/student/contact" },
+    "/student/profile": { label: "Profile & Preferences", path: "/student/profile" },
   };
 
-  return routes[pathname] || "Dashboard";
+  return routes[pathname] || { label: "Dashboard", path: "/student/dashboard" };
+};
+
+const getCourseListPath = (pathname) => {
+  if (pathname.startsWith("/instructor/")) {
+    return "/instructor/courses";
+  }
+  return "/student/courses";
 };
 
 export default function Header() {
@@ -64,7 +69,8 @@ export default function Header() {
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 
   const activeCourse = courses.find((c) => c.id === activeCourseId);
-  const pageName = getPageName(location.pathname);
+  const pageInfo = getBreadcrumbInfo(location.pathname);
+  const courseListPath = getCourseListPath(location.pathname);
 
   return (
     <AppBar
@@ -101,23 +107,25 @@ export default function Header() {
                 },
               }}
             >
-              <Typography
+              <Link
+                component={RouterLink}
+                to={courseListPath}
+                underline="hover"
+                color="text.primary"
                 variant="body1"
-                sx={{
-                  fontWeight: 600,
-                  color: "text.primary",
-                }}
+                sx={{ fontWeight: 600 }}
               >
                 {activeCourse.code}
-              </Typography>
-              <Typography
+              </Link>
+              <Link
+                component={RouterLink}
+                to={pageInfo.path}
+                underline="hover"
+                color="text.secondary"
                 variant="body1"
-                sx={{
-                  color: "text.secondary",
-                }}
               >
-                {pageName}
-              </Typography>
+                {pageInfo.label}
+              </Link>
             </Breadcrumbs>
           ) : (
             <Typography
@@ -127,7 +135,7 @@ export default function Header() {
                 color: "text.primary",
               }}
             >
-              {pageName}
+              {pageInfo.label}
             </Typography>
           )}
         </Box>

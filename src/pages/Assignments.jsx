@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from 'react'
+import { useEffect, useMemo, useCallback, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { Box, Tabs, Tab, Typography, CardContent, Chip, Stack } from '@mui/material'
@@ -70,12 +70,37 @@ function TabPanel({ children, value, index }) {
 }
 
 export default function Assignments() {
-  const [tabValue, setTabValue] = useState(0)
   const { activeCourseId } = useCoursesState()
   const courseId = activeCourseId ?? API_CONFIG.courseId
   const navigate = useNavigate()
   const courseIdForApi = activeCourseId ?? null
   const userId = getActiveUserId()
+  const tabStorageKey = useMemo(() => {
+    const suffix = courseIdForApi ? `course-${courseIdForApi}` : 'default'
+    return `assignments:last-tab:${suffix}`
+  }, [courseIdForApi])
+  const accordionStorageKey = useMemo(() => {
+    const parts = ['assignments', 'accordion']
+    if (courseIdForApi) parts.push(`course-${courseIdForApi}`)
+    if (userId) parts.push(`user-${userId}`)
+    return parts.join(':')
+  }, [courseIdForApi, userId])
+
+  const readStoredTab = useCallback(() => {
+    if (typeof window === 'undefined') return null
+    const raw = window.localStorage.getItem(tabStorageKey)
+    const parsed = raw === null ? null : Number(raw)
+    if (!Number.isFinite(parsed)) return null
+    if (parsed < 0 || parsed > 2) return null
+    return parsed
+  }, [tabStorageKey])
+
+  const [tabValue, setTabValue] = useState(() => readStoredTab() ?? 0)
+
+  useEffect(() => {
+    const stored = readStoredTab()
+    setTabValue(stored ?? 0)
+  }, [readStoredTab])
 
   const assignmentsQuery = useQuery({
     queryKey: ['course-assignments', courseIdForApi],
@@ -177,6 +202,9 @@ export default function Assignments() {
 
   const handleTabChange = (e, newValue) => {
     setTabValue(newValue)
+    if (typeof window !== 'undefined') {
+      window.localStorage.setItem(tabStorageKey, String(newValue))
+    }
   }
 
   const handleActivityClick = (activity) => {
@@ -252,6 +280,7 @@ export default function Assignments() {
       showExpandAll={showExpandAll}
       showCollapseAll={showCollapseAll}
       showExpandCollapseToggle={showExpandCollapseToggle}
+      persistKey={accordionStorageKey}
       renderActivity={(activity, context) =>
         renderActivity(activity, context, datePrefix, showCompletionChip)
       }

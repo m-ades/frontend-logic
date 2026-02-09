@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import {
   Box,
   Typography,
@@ -23,9 +23,47 @@ export default function ActivityAccordion({
   showExpandCollapseToggle = false,
   isLoading = false,
   defaultExpanded = true,
+  persistKey = null,
 }) {
   const [expandedChapters, setExpandedChapters] = useState({})
   const [expandedSubchapters, setExpandedSubchapters] = useState({})
+  const hasHydratedRef = useRef(false)
+
+  const storageKey = persistKey ? `activity-accordion:${persistKey}` : null
+
+  useEffect(() => {
+    if (!storageKey || typeof window === 'undefined') return
+    if (hasHydratedRef.current) return
+    if (!courseStructure?.length) return
+    try {
+      const raw = window.localStorage.getItem(storageKey)
+      if (raw) {
+        const parsed = JSON.parse(raw)
+        setExpandedChapters(parsed?.expandedChapters || {})
+        setExpandedSubchapters(parsed?.expandedSubchapters || {})
+      }
+      hasHydratedRef.current = true
+    } catch (error) {
+      console.warn('Failed to restore accordion state', error)
+      hasHydratedRef.current = true
+    }
+  }, [courseStructure, storageKey])
+
+  useEffect(() => {
+    if (!storageKey || typeof window === 'undefined') return
+    if (!hasHydratedRef.current) return
+    try {
+      window.localStorage.setItem(
+        storageKey,
+        JSON.stringify({
+          expandedChapters,
+          expandedSubchapters,
+        })
+      )
+    } catch (error) {
+      console.warn('Failed to persist accordion state', error)
+    }
+  }, [expandedChapters, expandedSubchapters, storageKey])
 
   const handleChapterChange = (chapterId) => (event, isExpanded) => {
     setExpandedChapters((prev) => ({
