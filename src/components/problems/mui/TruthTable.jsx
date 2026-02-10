@@ -90,9 +90,14 @@ function TruthToggle({ value, onChange, ariaLabel, accent, readOnly = false }) {
         alignItems: 'center',
         border: 'none',
         backgroundColor: 'transparent',
-        transition: 'color 0.15s ease',
-        '&:hover': {
-          color: getColor(),
+        transition: 'color 0.15s ease, transform 0.12s ease',
+        transform: 'scale(1)',
+        '@media (hover: hover)': {
+          '&:hover': {
+            color: getColor(),
+            transform: 'scale(1.06)',
+            fontWeight: 800,
+          },
         },
         '&:focus-visible': {
           outline: `2px solid ${alpha(primary, 0.6)}`,

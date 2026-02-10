@@ -126,9 +126,14 @@ function TruthToggle({ value, onChange, ariaLabel, readOnly = false }) {
         alignItems: 'center',
         border: 'none',
         backgroundColor: 'transparent',
-        transition: 'color 0.15s ease',
-        '&:hover': {
-          color: readOnly ? undefined : getColor(),
+        transition: 'color 0.15s ease, transform 0.12s ease',
+        transform: 'scale(1)',
+        '@media (hover: hover)': {
+          '&:hover': {
+            color: readOnly ? undefined : getColor(),
+            transform: 'scale(1.06)',
+            fontWeight: 800,
+          },
         },
         '&:focus-visible': {
           outline: (t) => `2px solid ${alpha(t.palette.primary.main, 0.6)}`,
