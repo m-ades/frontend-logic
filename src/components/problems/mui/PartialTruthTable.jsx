@@ -179,7 +179,7 @@ export default function PartialTruthTable({
     ))
   }
   const highlightStyle = useMemo(
-    () => ({ backgroundColor: alpha(theme.palette.primary.main, 0.22) }),
+    () => ({ backgroundColor: alpha(theme.palette.primary.main, 0.14) }),
     [theme.palette.primary.main]
   )
 

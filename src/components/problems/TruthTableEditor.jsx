@@ -90,7 +90,7 @@ function TruthToggle({ value, onChange, ariaLabel, accent, readOnly = false }) {
         backgroundColor: 'transparent',
         transition: 'color 0.15s ease',
         '&:hover': {
-          color: primary,
+          color: getColor(),
         },
         '&:focus-visible': {
           outline: `2px solid ${alpha(primary, 0.6)}`,
@@ -758,7 +758,7 @@ export default function TruthTableEditor({
   const cellBorderColor = theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.12)' : 'var(--lpgray6)'
   const cornerBg = theme.palette.mode === 'dark' ? '#23232D' : '#fff'
   const highlightStyle = React.useMemo(
-    () => ({ backgroundColor: alpha(theme.palette.primary.main, 0.22) }),
+    () => ({ backgroundColor: alpha(theme.palette.primary.main, 0.14) }),
     [theme.palette.primary.main]
   )
   const tableSx = {
@@ -886,6 +886,7 @@ export default function TruthTableEditor({
                                 isConclusion && colIndex === 0 ? 'tt-cell tt-conclusion-cell' : 'tt-cell'
                               }
                               align="center"
+                              data-tt-highlight={withSelectors && (colMatch || rowMatch) ? 'true' : undefined}
                               sx={withSelectors && (colMatch || rowMatch) ? highlightStyle : undefined}
                             >
                               <TruthToggle
@@ -1020,6 +1021,7 @@ export default function TruthTableEditor({
                             key={`solution-cell-${tableIndex}-${rowIndex}-${colIndex}`}
                             className="tt-cell"
                             align="center"
+                            data-tt-highlight={withSelectors && (colMatch || rowMatch) ? 'true' : undefined}
                             sx={withSelectors && (colMatch || rowMatch) ? highlightStyle : undefined}
                           >
                             <TruthToggle

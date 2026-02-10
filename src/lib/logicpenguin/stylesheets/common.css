@@ -179,14 +179,6 @@
   background: #f3fbf1;
 }
 
-:where(.logicpenguin) .tt-conclusion {
-  background: #f1f4ff;
-}
-
-:where(.logicpenguin) .tt-conclusion-cell {
-  background: #f7f9ff;
-}
-
 
 @media (max-width: 900px) {
   :where(.logicpenguin) {

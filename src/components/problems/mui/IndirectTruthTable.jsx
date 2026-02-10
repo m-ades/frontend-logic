@@ -128,7 +128,7 @@ function TruthToggle({ value, onChange, ariaLabel, readOnly = false }) {
         backgroundColor: 'transparent',
         transition: 'color 0.15s ease',
         '&:hover': {
-          color: readOnly ? undefined : primary,
+          color: readOnly ? undefined : getColor(),
         },
         '&:focus-visible': {
           outline: (t) => `2px solid ${alpha(t.palette.primary.main, 0.6)}`,
@@ -301,7 +301,7 @@ export default function IndirectTruthTable({
     ))
   }
   const highlightStyle = useMemo(
-    () => ({ backgroundColor: alpha(theme.palette.primary.main, 0.22) }),
+    () => ({ backgroundColor: alpha(theme.palette.primary.main, 0.14) }),
     [theme.palette.primary.main]
   )
 

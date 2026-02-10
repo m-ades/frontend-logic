@@ -92,7 +92,7 @@ function TruthToggle({ value, onChange, ariaLabel, accent, readOnly = false }) {
         backgroundColor: 'transparent',
         transition: 'color 0.15s ease',
         '&:hover': {
-          color: primary,
+          color: getColor(),
         },
         '&:focus-visible': {
           outline: `2px solid ${alpha(primary, 0.6)}`,

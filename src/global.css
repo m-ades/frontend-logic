@@ -83,10 +83,6 @@ body[data-theme='dark'] .logicpenguin .tt-row-ok {
   background: #203226;
 }
 
-body[data-theme='dark'] .logicpenguin .tt-conclusion,
-body[data-theme='dark'] .logicpenguin .tt-conclusion-cell {
-  background: #242a38;
-}
 
 body[data-theme='dark'] .logicpenguin .derivationline input.justification,
 body[data-theme='dark'] .logicpenguin .derivationline input.formulainput {
