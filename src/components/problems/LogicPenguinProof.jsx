@@ -74,9 +74,6 @@ export default function LogicPenguinProof({ premises, conclusion, questionId, sa
     if (typeof attemptLimit === 'number') {
       el.attemptLimit = attemptLimit
     }
-    if (el.checksaveButton && typeof el.attemptLimit === 'number' && typeof el.attemptCount === 'number') {
-      el.checksaveButton.disabled = el.attemptCount >= el.attemptLimit
-    }
   }, [attemptCount, attemptLimit])
 
   useEffect(() => {

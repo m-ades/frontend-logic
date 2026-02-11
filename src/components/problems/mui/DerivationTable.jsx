@@ -906,8 +906,16 @@ export default function DerivationTable({
     emitState(nextLines)
   }
 
+  const hasStartedLine = lines.some((line) => (
+    !line.readOnly && (
+      String(line.formula || '').trim() ||
+      String(line.justification || '').trim()
+    )
+  ))
+
   const handleSubmit = async () => {
     if (isAssignmentLocked) return
+    if (!hasStartedLine) return
     setIsChecking(true)
     try {
       const submission_data = buildSubmission(
@@ -965,7 +973,7 @@ export default function DerivationTable({
   }
 
   const isLocked = Number.isFinite(attemptLimit) && attemptCount >= attemptLimit
-  const submitDisabled = isLocked || isAssignmentLocked
+  const submitDisabled = isLocked || isAssignmentLocked || !hasStartedLine
 
   const handleSymbolInsert = ({ insert, pair }) => {
     const targetIdx = resolveEditableIndex()

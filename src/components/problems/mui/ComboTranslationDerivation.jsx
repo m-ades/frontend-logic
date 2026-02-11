@@ -192,6 +192,21 @@ export default function ComboTranslationDerivation({
     }
   }, [parseStatus.ok, parseStatus.parsed])
 
+  const hasStartedDerivationLine = useMemo(() => {
+    const snapshot = derivationState?.ans ?? derivationState
+    if (!snapshot || !Array.isArray(snapshot.parts)) return false
+    const subderivations = snapshot.parts.filter((part) => part && Array.isArray(part.parts))
+    const targets = subderivations.length ? subderivations : snapshot.parts
+    const hasContent = (nodes) => nodes.some((node) => {
+      if (!node) return false
+      if (Array.isArray(node.parts)) return hasContent(node.parts)
+      const formula = typeof node.s === 'string' ? node.s.trim() : ''
+      const justification = typeof node.j === 'string' ? node.j.trim() : ''
+      return formula !== '' || justification !== ''
+    })
+    return hasContent(targets)
+  }, [derivationState])
+
   const getDerivationElement = () =>
     proofWrapperRef.current?.querySelector('derivation-hurley') || null
 
@@ -351,7 +366,7 @@ export default function ComboTranslationDerivation({
         onCheck={handleCheck}
         onStartOver={handleStartOver}
         isChecking={isChecking}
-        isDisabled={!parseStatus.ok || isLocked || isAssignmentLocked}
+        isDisabled={!parseStatus.ok || isLocked || isAssignmentLocked || !hasStartedDerivationLine}
         align="flex-start"
         attemptCount={attemptCount}
         attemptLimit={maxAttempts}
