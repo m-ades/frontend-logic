@@ -203,6 +203,7 @@ export default function InstructorRoster() {
         student={selectedStudent}
         assignments={assignments}
         canToggleRole={isInstructor}
+        canEditAccommodations={isInstructor}
         onToggleRole={handleToggleRole}
       />
 

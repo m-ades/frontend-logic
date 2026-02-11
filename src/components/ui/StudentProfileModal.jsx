@@ -1,3 +1,4 @@
+import { useEffect, useMemo, useState } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -17,6 +18,11 @@ import {
   Divider,
   alpha,
   useTheme,
+  TextField,
+  Button,
+  Switch,
+  FormControlLabel,
+  Alert,
 } from "@mui/material";
 import {
   X,
@@ -36,7 +42,9 @@ import {
   getDefaultGradingScale,
 } from "../../utils/gradingUtils";
 import { formatDate } from "../../utils/formatting.js";
+import { formatEasternFromIso, formatEasternDateTime } from "../../utils/easternTime.js";
 import { MetricCard } from "./MetricCard";
+import { fetchJson } from "../../utils/api.js";
 
 // Helper function to calculate average
 function calculateAverage(grades) {
@@ -76,12 +84,171 @@ export default function StudentProfileModal({
   student,
   assignments,
   canToggleRole = false,
+  canEditAccommodations = false,
   onToggleRole,
 }) {
   const theme = useTheme();
   const { courses, activeCourseId } = useCoursesState();
   const activeCourse = courses.find((c) => c.id === activeCourseId);
   const gradingScale = activeCourse?.gradingScale || getDefaultGradingScale();
+
+  // pull any existing accommodations for this student
+  const [accommodationLoading, setAccommodationLoading] = useState(false);
+  const [accommodationError, setAccommodationError] = useState("");
+  const [accommodationSaved, setAccommodationSaved] = useState(false);
+  const [extraLateDays, setExtraLateDays] = useState(0);
+  const [latePenaltyWaived, setLatePenaltyWaived] = useState(false);
+
+  // per assignment override for just this student
+  const [extensionAssignmentId, setExtensionAssignmentId] = useState("");
+  const [extensionDate, setExtensionDate] = useState("");
+  const [extensionTime, setExtensionTime] = useState("23:59");
+  const [extensionSaving, setExtensionSaving] = useState(false);
+  const [extensionError, setExtensionError] = useState("");
+  const [extensionSaved, setExtensionSaved] = useState(false);
+  const [deadlineMap, setDeadlineMap] = useState({});
+
+  const nonPracticeAssignments = useMemo(
+    () => assignments.filter((a) => a.kind !== "practice"),
+    [assignments]
+  );
+
+  // hydrate accommodations when the modal opens
+  useEffect(() => {
+    const courseId = Number(activeCourseId);
+    if (!open || !student || !Number.isFinite(courseId) || !canEditAccommodations) return;
+    let isMounted = true;
+    const load = async () => {
+      setAccommodationLoading(true);
+      setAccommodationError("");
+      try {
+        const rows = await fetchJson(
+          `/api/instructor/courses/${courseId}/accommodations`
+        );
+        if (!isMounted) return;
+        const record = (rows || []).find((r) => r.user_id === student.id);
+        setExtraLateDays(
+          Number.isFinite(Number(record?.extra_late_days))
+            ? Number(record.extra_late_days)
+            : 0
+        );
+        setLatePenaltyWaived(Boolean(record?.late_penalty_waived));
+      } catch (err) {
+        if (!isMounted) return;
+        setAccommodationError("Failed to load accommodations.");
+      } finally {
+        if (isMounted) setAccommodationLoading(false);
+      }
+    };
+    load();
+    return () => {
+      isMounted = false;
+    };
+  }, [open, student, activeCourseId, canEditAccommodations]);
+
+  useEffect(() => {
+    const courseId = Number(activeCourseId);
+    if (!open || !student || !Number.isFinite(courseId) || !canEditAccommodations) return;
+    let isMounted = true;
+    const load = async () => {
+      try {
+        const rows = await fetchJson(
+          `/api/instructor/courses/${courseId}/deadlines/${student.id}`
+        );
+        if (!isMounted) return;
+        const map = {};
+        (rows || []).forEach((row) => {
+          if (!row?.assignment_id) return;
+          map[row.assignment_id] = row;
+        });
+        setDeadlineMap(map);
+      } catch (err) {
+        if (!isMounted) return;
+        setDeadlineMap({});
+      }
+    };
+    load();
+    return () => {
+      isMounted = false;
+    };
+  }, [open, student, activeCourseId, canEditAccommodations]);
+
+  // default extension picker to the assignment due date
+  useEffect(() => {
+    if (!extensionAssignmentId) return;
+    const assignment = nonPracticeAssignments.find(
+      (a) => String(a.id) === String(extensionAssignmentId)
+    );
+    if (!assignment) return;
+    setExtensionDate(assignment.dueDate || "");
+    setExtensionTime(assignment.dueTime || "23:59");
+  }, [extensionAssignmentId, nonPracticeAssignments]);
+
+  // compose a single timestamp for the api
+  const buildIsoDateTime = (date, time) => {
+    if (!date) return null;
+    const safeTime = time || "00:00";
+    return new Date(`${date}T${safeTime}:00`).toISOString();
+  };
+
+  // store course level accommodations for this student
+  const handleSaveAccommodation = async () => {
+    const courseId = Number(activeCourseId);
+    if (!Number.isFinite(courseId) || !student) return;
+    setAccommodationSaved(false);
+    setAccommodationError("");
+    try {
+      await fetchJson(`/api/instructor/courses/${courseId}/accommodations`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          user_id: student.id,
+          extra_late_days: Math.max(0, parseInt(extraLateDays, 10) || 0),
+          late_penalty_waived: Boolean(latePenaltyWaived),
+        }),
+      });
+      setAccommodationSaved(true);
+      setTimeout(() => setAccommodationSaved(false), 1500);
+    } catch (err) {
+      setAccommodationError("Failed to save accommodations.");
+    }
+  };
+
+  // store a per assignment due date override
+  const handleSaveExtension = async () => {
+    setExtensionError("");
+    setExtensionSaved(false);
+    const assignmentId = Number(extensionAssignmentId);
+    if (!Number.isFinite(assignmentId)) {
+      setExtensionError("Choose an assignment.");
+      return;
+    }
+    const iso = buildIsoDateTime(extensionDate, extensionTime);
+    if (!iso) {
+      setExtensionError("Choose a valid date/time.");
+      return;
+    }
+    setExtensionSaving(true);
+    try {
+      await fetchJson(
+        `/api/instructor/assignments/${assignmentId}/extensions`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            user_id: student.id,
+            extended_due_date: iso,
+          }),
+        }
+      );
+      setExtensionSaved(true);
+      setTimeout(() => setExtensionSaved(false), 1500);
+    } catch (err) {
+      setExtensionError("Failed to save extension.");
+    } finally {
+      setExtensionSaving(false);
+    }
+  };
 
   if (!student) return null;
 
@@ -122,6 +289,21 @@ export default function StudentProfileModal({
     status:
       student.grades[assignment.id] !== undefined ? "completed" : "missing",
   }));
+
+  const getEffectiveDueLabel = (assignment) => {
+    const policy = deadlineMap?.[assignment.id];
+    if (policy?.due_at) {
+      return formatEasternFromIso(policy.due_at, { includeTime: true }) ?? "—";
+    }
+    if (assignment.dueDate) {
+      return (
+        formatEasternDateTime(assignment.dueDate, assignment.dueTime) ??
+        formatDate(assignment.dueDate) ??
+        "—"
+      );
+    }
+    return "—";
+  };
 
   return (
     <Dialog
@@ -422,6 +604,137 @@ export default function StudentProfileModal({
           </Paper>
         )}
 
+        {canEditAccommodations && (
+          <>
+            <Typography variant="h6" fontWeight={600} mb={2}>
+              Accommodations
+            </Typography>
+            <Paper
+              elevation={0}
+              sx={{
+                p: 2.5,
+                mb: 3,
+                border: "1px solid",
+                borderColor: "divider",
+                borderRadius: 2,
+              }}
+            >
+              <Stack spacing={2}>
+                {accommodationError && (
+                  <Alert severity="error">{accommodationError}</Alert>
+                )}
+                {accommodationSaved && (
+                  <Alert severity="success">Accommodations saved.</Alert>
+                )}
+                <TextField
+                  label="Extra Late Days"
+                  type="number"
+                  value={extraLateDays}
+                  onChange={(e) =>
+                    setExtraLateDays(Math.max(0, parseInt(e.target.value, 10) || 0))
+                  }
+                  inputProps={{ min: 0, max: 365 }}
+                  helperText="Extra days added to the late window for this student"
+                  fullWidth
+                  disabled={accommodationLoading}
+                />
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={latePenaltyWaived}
+                      onChange={(e) => setLatePenaltyWaived(e.target.checked)}
+                      disabled={accommodationLoading}
+                    />
+                  }
+                  label="Waive late penalty"
+                />
+                <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
+                  <Button
+                    variant="contained"
+                    onClick={handleSaveAccommodation}
+                    disabled={accommodationLoading}
+                  >
+                    Save Accommodations
+                  </Button>
+                </Box>
+              </Stack>
+            </Paper>
+
+            <Typography variant="h6" fontWeight={600} mb={2}>
+              Assignment Extension
+            </Typography>
+            <Paper
+              elevation={0}
+              sx={{
+                p: 2.5,
+                mb: 3,
+                border: "1px solid",
+                borderColor: "divider",
+                borderRadius: 2,
+              }}
+            >
+              <Stack spacing={2}>
+                {extensionError && <Alert severity="error">{extensionError}</Alert>}
+                {extensionSaved && (
+                  <Alert severity="success">Extension saved.</Alert>
+                )}
+                <TextField
+                  label="Assignment"
+                  select
+                  SelectProps={{ native: true }}
+                  value={extensionAssignmentId}
+                  onChange={(e) => setExtensionAssignmentId(e.target.value)}
+                  InputLabelProps={{ shrink: true }}
+                  fullWidth
+                >
+                  <option value="" disabled hidden />
+                  {nonPracticeAssignments.map((assignment) => (
+                    <option key={assignment.id} value={assignment.id}>
+                      {assignment.name}
+                    </option>
+                  ))}
+                </TextField>
+                <Box
+                  sx={{
+                    display: "grid",
+                    gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" },
+                    gap: 2,
+                  }}
+                >
+                  <TextField
+                    label="New Due Date"
+                    type="date"
+                    value={extensionDate}
+                    onChange={(e) => setExtensionDate(e.target.value)}
+                    InputLabelProps={{ shrink: true }}
+                    fullWidth
+                  />
+                  <TextField
+                    label="New Due Time"
+                    type="time"
+                    value={extensionTime}
+                    onChange={(e) => setExtensionTime(e.target.value)}
+                    InputLabelProps={{ shrink: true }}
+                    fullWidth
+                  />
+                </Box>
+                <Typography variant="caption" color="text.secondary">
+                  This overrides the due date/time for this student only.
+                </Typography>
+                <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
+                  <Button
+                    variant="contained"
+                    onClick={handleSaveExtension}
+                    disabled={extensionSaving}
+                  >
+                    Save Extension
+                  </Button>
+                </Box>
+              </Stack>
+            </Paper>
+          </>
+        )}
+
         {/* Assignment Details Table */}
         <Typography variant="h6" fontWeight={600} mb={2}>
           Assignment Details
@@ -511,7 +824,7 @@ export default function StudentProfileModal({
                       </TableCell>
                       <TableCell>
                         <Typography variant="body2" color="text.secondary">
-                          {formatDate(assignment.dueDate) ?? "—"}
+                          {getEffectiveDueLabel(assignment)}
                         </Typography>
                       </TableCell>
                       <TableCell align="center">

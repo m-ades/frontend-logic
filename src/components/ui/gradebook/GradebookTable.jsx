@@ -57,6 +57,7 @@ export default function GradebookTable({
   const { courses, activeCourseId } = useCoursesState();
   const activeCourse = courses.find((c) => c.id === activeCourseId);
   const gradingScale = activeCourse?.gradingScale || getDefaultGradingScale();
+  const isInstructor = activeCourse?.role === "instructor";
 
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [profileModalOpen, setProfileModalOpen] = useState(false);
@@ -354,6 +355,7 @@ export default function GradebookTable({
         onClose={handleCloseProfileModal}
         student={selectedStudent}
         assignments={assignments}
+        canEditAccommodations={isInstructor}
       />
     </>
   );
