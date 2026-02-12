@@ -60,6 +60,13 @@ const getLetterGrade = (percent) => {
   return match ? match.letter : 'F'
 }
 
+const shortAssignmentLabel = (title = '') => {
+  const trimmed = String(title || '').trim()
+  if (!trimmed) return 'Assignment'
+  const parts = trimmed.split(':')
+  return (parts[0] || trimmed).trim()
+}
+
 const emptyAnalytics = {
   assignments: { upcoming: 0, pending: 0, overdue: 0, upcomingList: [] },
   performance: { avg_score: null, avg_attempt: null, correct_rate: null, first_try_correct_rate: null },
@@ -323,7 +330,7 @@ export default function Dashboard() {
   const mainChartData = useMemo(
     () =>
       gradeTimeline.map((item) => ({
-        name: item.title,
+        name: shortAssignmentLabel(item.title),
         studentPercent: item.studentPercent !== null ? Number(item.studentPercent.toFixed(1)) : null,
         avgPercent: item.avgPercent !== null ? Number(item.avgPercent.toFixed(1)) : null,
         medianPercent: item.medianPercent !== null ? Number(item.medianPercent.toFixed(1)) : null,
@@ -464,13 +471,22 @@ export default function Dashboard() {
                   >
                     {releaseOverview.remainingPercent}%
                   </Typography>
-                  <Box role="img" aria-label="Assignments remaining versus due">
-                    <ResponsiveContainer width="100%" height={200}>
+                  <Box
+                    role="img"
+                    aria-label="Assignments remaining versus due"
+                    sx={{
+                      width: '100%',
+                      height: { xs: 160, sm: 200 },
+                      minHeight: { xs: 160, sm: 200 },
+                      minWidth: 0,
+                    }}
+                  >
+                    <ResponsiveContainer width="100%" height="100%">
                       <PieChart>
                         <Pie
                           data={[
-                            { value: releaseOverview.pastDuePercent },
-                            { value: releaseOverview.remainingPercent },
+                            { value: Number(releaseOverview.pastDuePercent) || 0 },
+                            { value: Number(releaseOverview.remainingPercent) || 0 },
                           ]}
                           innerRadius="62%"
                           outerRadius="78%"
