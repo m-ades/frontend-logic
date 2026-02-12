@@ -373,8 +373,8 @@ export default function Dashboard() {
       {isLoadingAnalytics && (
         <LinearProgress sx={{ position: 'sticky', top: 0, zIndex: 10, mb: 0 }} />
       )}
-      <Grid container spacing={3} alignItems="stretch">
-      <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
+      <Grid container spacing={3} alignItems="stretch" sx={{ minWidth: 0 }}>
+      <Grid size={{ xs: 12, sm: 6, lg: 3 }} sx={{ minWidth: 0 }}>
         <ThemedCard sx={statCardSx}>
           <CardContent sx={statCardContentSx}>
             <Box display="flex" alignItems="center" mb={1}>
@@ -440,7 +440,7 @@ export default function Dashboard() {
         </ThemedCard>
       </Grid>
 
-      <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
+      <Grid size={{ xs: 12, sm: 6, lg: 3 }} sx={{ minWidth: 0 }}>
         <ThemedCard sx={statCardSx}>
           <CardContent sx={statCardContentSx}>
             <Box display="flex" alignItems="center" mb={2}>
@@ -459,9 +459,10 @@ export default function Dashboard() {
                 <Box
                   sx={{
                     position: 'relative',
-                    display: 'inline-flex',
+                    display: 'block',
                     p: 0.5,
                     width: '100%',
+                    minWidth: 0,
                   }}
                 >
                   <Typography
@@ -481,7 +482,7 @@ export default function Dashboard() {
                       minWidth: 0,
                     }}
                   >
-                    <ResponsiveContainer width="100%" height="100%">
+                    <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                       <PieChart>
                         <Pie
                           data={[
@@ -540,7 +541,7 @@ export default function Dashboard() {
         </ThemedCard>
       </Grid>
 
-      <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
+      <Grid size={{ xs: 12, sm: 6, lg: 3 }} sx={{ minWidth: 0 }}>
         <ThemedCard sx={statCardSx}>
           <CardContent sx={statCardContentSx}>
             <Box display="flex" alignItems="center" mb={2}>
@@ -596,7 +597,7 @@ export default function Dashboard() {
         </ThemedCard>
       </Grid>
 
-      <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
+      <Grid size={{ xs: 12, sm: 6, lg: 3 }} sx={{ minWidth: 0 }}>
         <ThemedCard sx={statCardSx}>
           <CardContent sx={statCardContentSx}>
             <Box display="flex" alignItems="center" mb={2}>
@@ -625,7 +626,7 @@ export default function Dashboard() {
                     </Typography>
                   </Box>
                   <Box role="img" aria-label={`${item.label} trend`}>
-                    <ResponsiveContainer width="100%" height={30}>
+                    <ResponsiveContainer width="100%" height={30} minWidth={0} minHeight={0}>
                       <AreaChart data={randomData}>
                         <Area
                           type="monotone"
@@ -699,7 +700,7 @@ export default function Dashboard() {
               </Typography>
             ) : null}
             <Box role="img" aria-label="Assignment scores over time">
-              <ResponsiveContainer width="100%" height={350}>
+              <ResponsiveContainer width="100%" height={350} minWidth={0} minHeight={0}>
                 <LineChart data={mainChartData}>
                   <XAxis
                     dataKey="name"

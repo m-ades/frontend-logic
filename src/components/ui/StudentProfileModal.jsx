@@ -24,6 +24,7 @@ import {
   Switch,
   FormControlLabel,
   Alert,
+  LinearProgress,
 } from "@mui/material";
 import {
   X,
@@ -230,6 +231,7 @@ export default function StudentProfileModal({
         setDeadlineMap((prev) => prev);
       }
       setAccommodationSaved(true);
+      setAccommodationAnchorEl(null);
       setTimeout(() => setAccommodationSaved(false), 1500);
     } catch (err) {
       setAccommodationError("Failed to save accommodations.");
@@ -248,7 +250,6 @@ export default function StudentProfileModal({
   // store a per assignment due date override
   const handleSaveExtension = async () => {
     setExtensionError("");
-    setExtensionSaved(false);
     const assignmentId = Number(extensionAssignmentId);
     if (!Number.isFinite(assignmentId)) {
       setExtensionError("Choose an assignment.");
@@ -272,13 +273,26 @@ export default function StudentProfileModal({
           }),
         }
       );
-      setDeadlineMap((prev) => ({
-        ...prev,
-        [assignmentId]: {
-          ...(prev?.[assignmentId] ?? {}),
-          due_at: iso,
-        },
-      }));
+      try {
+        const courseId = Number(activeCourseId);
+        const rows = await fetchJson(
+          `/api/instructor/courses/${courseId}/deadlines/${student.id}`
+        );
+        const map = {};
+        (rows || []).forEach((row) => {
+          if (!row?.assignment_id) return;
+          map[row.assignment_id] = row;
+        });
+        setDeadlineMap(map);
+      } catch (err) {
+        setDeadlineMap((prev) => ({
+          ...prev,
+          [assignmentId]: {
+            ...(prev?.[assignmentId] ?? {}),
+            due_at: iso,
+          },
+        }));
+      }
       setExtensionAnchorEl(null);
       setExtensionPopoverAssignmentId(null);
     } catch (err) {
@@ -359,7 +373,7 @@ export default function StudentProfileModal({
 
   const getExtensionInfo = (assignment) => {
     const policy = deadlineMap?.[assignment.id];
-    if (!policy?.due_at) return null;
+    if (!policy?.extension_due_at) return null;
     const originalSource = assignment?.dueAt
       ? assignment.dueAt
       : assignment?.dueDate
@@ -367,11 +381,11 @@ export default function StudentProfileModal({
       : null;
     if (!originalSource) return null;
     const originalTs = Date.parse(originalSource);
-    const extendedTs = Date.parse(policy.due_at);
+    const extendedTs = Date.parse(policy.extension_due_at);
     if (!Number.isFinite(originalTs) || !Number.isFinite(extendedTs)) return null;
     if (Math.abs(extendedTs - originalTs) < 1000) return null;
     const extendedLabel =
-      formatEasternFromIso(policy.due_at, { includeTime: true }) ?? null;
+      formatEasternFromIso(policy.extension_due_at, { includeTime: true }) ?? null;
     if (!extendedLabel) return null;
     return { extendedLabel };
   };
@@ -384,9 +398,9 @@ export default function StudentProfileModal({
     if (extraLateDays <= 0 && !penaltyWaived) return null;
     const parts = [];
     if (extraLateDays > 0) {
-      const cutoffLabel =
-        formatEasternFromIso(policy.cutoff_at, { includeTime: true }) ?? null;
-      parts.push(cutoffLabel ? cutoffLabel : `+${extraLateDays} days`);
+      const accommodationLabel =
+        formatEasternFromIso(policy.accommodation_due_at, { includeTime: true }) ?? null;
+      parts.push(accommodationLabel ? accommodationLabel : `+${extraLateDays} days`);
     }
     if (penaltyWaived) {
       parts.push("Late penalty waived");
@@ -907,6 +921,7 @@ export default function StudentProfileModal({
               {extensionPopoverAssignment?.name ?? "Assignment"}
             </Typography>
           </Box>
+          {extensionSaving && <LinearProgress />}
           {extensionError && <Alert severity="error">{extensionError}</Alert>}
           <TextField
             label="New Due Date"
@@ -953,6 +968,7 @@ export default function StudentProfileModal({
               {student?.username ?? "Student"}
             </Typography>
           </Box>
+          {accommodationLoading && <LinearProgress />}
           {accommodationError && (
             <Alert severity="error">{accommodationError}</Alert>
           )}

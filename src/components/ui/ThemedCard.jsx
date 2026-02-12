@@ -7,6 +7,8 @@ const ThemedCard = forwardRef(function ThemedCard({ sx, elevation, ...props }, r
   const baseSx = (theme) => ({
     boxShadow: theme.customShadows?.widget || theme.shadows[2],
     backgroundColor: theme.palette.background.paper,
+    minWidth: 0,
+    minHeight: 0,
   })
 
   return (
