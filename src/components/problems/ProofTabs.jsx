@@ -71,6 +71,7 @@ function ProofTabs({
   total,
   completionPercent,
   gradeLabel,
+  policySummary = [],
   isOverdue,
   isAssignmentLocked = true,
   isInstructorView = false,
@@ -293,6 +294,30 @@ function ProofTabs({
                 <CheckCircleIcon sx={{ color: 'primary.main', fontSize: 16 }} />
               )}
             </Box>
+            {!isInstructorView && policySummary.length > 0 && (
+              <Box sx={{
+                px: 3,
+                pb: 1.5,
+                color: 'text.secondary',
+                fontSize: '0.8rem',
+                textAlign: 'right',
+                minWidth: { xs: 'auto', md: 200 },
+                width: '100%',
+              }}>
+                {policySummary.map((line) => (
+                  <div key={line.label}>
+                    {line.value ? (
+                      <>
+                        <div>{line.label}:</div>
+                        <div>{line.value}</div>
+                      </>
+                    ) : (
+                      <div>{line.label}</div>
+                    )}
+                  </div>
+                ))}
+              </Box>
+            )}
             {isOverdue && (
               <Box sx={{
                 fontSize: { xs: '0.875rem', md: '1rem' },

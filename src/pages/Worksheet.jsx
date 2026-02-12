@@ -7,6 +7,7 @@ import WorksheetTabs from '../components/problems/WorksheetTabs.jsx'
 import { useScoring } from '../hooks/usescoring.js'
 import { useProofState } from '../hooks/useproofstate.js'
 import { useWorksheetMetrics } from '../hooks/useWorksheetMetrics.js'
+import { formatEasternFromIso } from '../utils/easternTime.js'
 // import { exportWorksheetPDF } from '../utils/exportPDF.js'
 import { API_CONFIG, fetchJson, getActiveUserId } from '../utils/api.js'
 import { sortAssignmentsBySubchapter } from '../utils/assignmentSort.js'
@@ -783,22 +784,27 @@ export default function Worksheet() {
     }
 
     const loadWorksheetDetails = async (assignmentId, assignmentMeta) => {
-      const response = await fetchJson(
-        `/api/assignments/${assignmentId}?userId=${activeUserId}`
-      )
-      const questions = response.questions || []
-      const assignmentInfo = response.assignment
-        || assignmentMeta
-        || { id: assignmentId, title: 'Assignment' }
-      const worksheet = {
-        id: assignmentInfo.id,
-        title: assignmentInfo.title,
-        due_at: assignmentInfo.due_at ?? assignmentInfo.due_date ?? null,
-        isLocked: assignmentInfo.is_locked ?? false,
-        proofs: questions.map((question, idx) =>
-          mapQuestionToProof(question, assignmentInfo, idx)
-        ),
-      }
+    const response = await fetchJson(
+      `/api/assignments/${assignmentId}?userId=${activeUserId}`
+    )
+    const questions = response.questions || []
+    const policy = response.policy || null
+    const assignmentInfo = response.assignment
+      || assignmentMeta
+      || { id: assignmentId, title: 'Assignment' }
+    const originalDueAt = assignmentInfo.due_at ?? assignmentInfo.due_date ?? null
+    const effectiveDueAt = policy?.due_at ?? originalDueAt
+    const worksheet = {
+      id: assignmentInfo.id,
+      title: assignmentInfo.title,
+      due_at: effectiveDueAt,
+      original_due_at: originalDueAt,
+      policy,
+      isLocked: assignmentInfo.is_locked ?? false,
+      proofs: questions.map((question, idx) =>
+        mapQuestionToProof(question, assignmentInfo, idx)
+      ),
+    }
       const { attemptCountMap, completedProofIds, scoreByQuestion } = await loadSavedStates([worksheet])
       setCompletedProofs(completedProofIds)
       if (scoreByQuestion?.size) {
@@ -933,6 +939,24 @@ export default function Worksheet() {
   //   }
   // }
 
+  const policySummary = useMemo(() => {
+    if (!currentWorksheet?.policy) return []
+    const policy = currentWorksheet.policy
+    const lines = []
+    const extensionLabel = policy?.extension_due_at
+      ? formatEasternFromIso(policy.extension_due_at, { includeTime: true })
+      : null
+    const accommodationLabel = policy?.accommodation_due_at
+      ? formatEasternFromIso(policy.accommodation_due_at, { includeTime: true })
+      : null
+    if (extensionLabel) lines.push({ label: 'Extension', value: extensionLabel })
+    if (accommodationLabel) lines.push({ label: 'Accommodation', value: accommodationLabel })
+    if (policy.late_penalty_waived) {
+      lines.push({ label: 'Late penalty waived', value: null })
+    }
+    return lines
+  }, [currentWorksheet?.policy, currentWorksheet?.due_at, currentWorksheet?.original_due_at])
+
   if (isLoading) {
     return <LoadingSpinner label="Loading assignment..." />
   }
@@ -956,6 +980,7 @@ export default function Worksheet() {
         completedProofs={completedProofs}
         isOverdue={isOverdue}
         isLocked={currentWorksheet.isLocked ?? false}
+        showPolicyInfo={false}
       >
         <WorksheetTabs
           key={`worksheet-${currentWorksheet?.id ?? worksheetIdNum}`}
@@ -972,6 +997,7 @@ export default function Worksheet() {
           total={total}
           completionPercent={completionPercent}
           gradeLabel={gradeLabel}
+          policySummary={policySummary}
           isOverdue={isOverdue}
           isInstructorView={isInstructorView}
           onQuestionSaved={currentWorksheet?.id ? (qId) => refreshQuestionSolutions(currentWorksheet.id, qId) : undefined}

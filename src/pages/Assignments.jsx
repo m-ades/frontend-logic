@@ -25,6 +25,8 @@ const buildCourseStructure = (assignments, sectionTitle) => {
       title: assignment.title,
       description: assignment.description || '',
       dueDate: assignment.due_at ?? assignment.due_date,
+      originalDueDate: assignment.due_at ?? assignment.due_date ?? null,
+      policy: assignment.policy ?? null,
       type: ACTIVITY_TYPES.HOMEWORK,
       worksheet: { id: assignment.id, proofs: [] },
       isLocked: assignment.is_locked ?? assignment.isLocked ?? false,
@@ -215,7 +217,15 @@ export default function Assignments() {
     }
   }
 
-  const renderActivity = (activity, { chapter, subchapter }, datePrefix, showCompletionChip) => (
+  const renderActivity = (activity, { chapter, subchapter }, datePrefix, showCompletionChip) => {
+    const policy = activity.policy
+    const extensionDueLabel = policy?.extension_due_at
+      ? formatDateTime(policy.extension_due_at)
+      : null
+    const accommodationDueLabel = policy?.accommodation_due_at
+      ? formatDateTime(policy.accommodation_due_at)
+      : null
+    return (
     <ThemedCard
       key={activity.id}
       sx={{ cursor: 'pointer', '&:hover': { boxShadow: 4 } }}
@@ -261,6 +271,25 @@ export default function Assignments() {
             <Typography variant="body2" color="text.secondary">
               {datePrefix}{formatDateTime(activity.dueDate) || 'No due date'}
             </Typography>
+            {(extensionDueLabel || accommodationDueLabel) && (
+              <Stack spacing={0.25} alignItems="flex-end">
+                {extensionDueLabel && (
+                  <Typography variant="caption" color="text.secondary" align="right">
+                    Extension: {extensionDueLabel}
+                  </Typography>
+                )}
+                {accommodationDueLabel && (
+                  <Typography variant="caption" color="text.secondary" align="right">
+                    Accommodation: {accommodationDueLabel}
+                  </Typography>
+                )}
+              </Stack>
+            )}
+            {policy?.late_penalty_waived && (
+              <Typography variant="caption" color="text.secondary" align="right">
+                Late penalty waived
+              </Typography>
+            )}
             {showCompletionChip && getCompletionStatus(activity.id) && (
               <Chip label="Completed" size="small" color="success" />
             )}
@@ -268,7 +297,8 @@ export default function Assignments() {
         </Stack>
       </CardContent>
     </ThemedCard>
-  )
+    )
+  }
 
   const renderAssignmentsAccordion = (emptyText, datePrefix, showCompletionChip, defaultExpanded = true, showExpandAll = false, showCollapseAll = true, showExpandCollapseToggle = false) => (
     <ActivityAccordion

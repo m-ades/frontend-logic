@@ -1,6 +1,7 @@
 import { Box, Typography, IconButton, Stack } from '@mui/material'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import LockIcon from '@mui/icons-material/Lock'
+import { formatEasternFromIso } from '../../utils/easternTime.js'
 
 export default function Layout({ 
   title, 
@@ -10,7 +11,46 @@ export default function Layout({
   onBackToLMS,
   isOverdue,
   isLocked = false,
+  dueAt = null,
+  originalDueAt = null,
+  cutoffAt = null,
+  extraFullCreditDays = 0,
+  latePenaltyWaived = false,
+  showPolicyInfo = false,
 }) {
+  const dueLabel = dueAt ? formatEasternFromIso(dueAt, { includeTime: true }) : null
+  const originalLabel = originalDueAt
+    ? formatEasternFromIso(originalDueAt, { includeTime: true })
+    : null
+  const cutoffLabel = cutoffAt
+    ? formatEasternFromIso(cutoffAt, { includeTime: true })
+    : null
+  const dueTs = dueAt ? Date.parse(dueAt) : NaN
+  const originalTs = originalDueAt ? Date.parse(originalDueAt) : NaN
+  const hasAdjustedDue = Number.isFinite(dueTs) && Number.isFinite(originalTs) && dueTs !== originalTs
+  const extraDays = Number(extraFullCreditDays) || 0
+  const policyLines = []
+  if (dueLabel) {
+    policyLines.push({
+      label: hasAdjustedDue ? 'Due (extended)' : 'Due',
+      value: dueLabel,
+    })
+  }
+  if (hasAdjustedDue && originalLabel) {
+    policyLines.push({ label: 'Original due', value: originalLabel })
+  }
+  if (extraDays > 0) {
+    policyLines.push({
+      label: 'Accommodation',
+      value: `+${extraDays} full-credit day${extraDays === 1 ? '' : 's'}`,
+    })
+  }
+  if (latePenaltyWaived) {
+    policyLines.push({ label: 'Late penalty', value: 'Waived' })
+  }
+  if (cutoffLabel) {
+    policyLines.push({ label: 'Late window until', value: cutoffLabel })
+  }
   return (
     <Box sx={{ width: '100%', height: '100%', minWidth: 0, overflowX: 'hidden' }}>
 
@@ -42,12 +82,23 @@ export default function Layout({
               {title}
             </Typography>
             {subtitle && (
-              <Stack direction="row" spacing={1} alignItems="center">
-                <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                  {subtitle}
-                </Typography>
-                {isLocked && (
-                  <LockIcon sx={{ fontSize: '1rem', color: 'text.secondary', flexShrink: 0 }} />
+              <Stack spacing={0.5}>
+                <Stack direction="row" spacing={1} alignItems="center">
+                  <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                    {subtitle}
+                  </Typography>
+                  {isLocked && (
+                    <LockIcon sx={{ fontSize: '1rem', color: 'text.secondary', flexShrink: 0 }} />
+                  )}
+                </Stack>
+                {showPolicyInfo && policyLines.length > 0 && (
+                  <Stack spacing={0.25}>
+                    {policyLines.map((line) => (
+                      <Typography key={line.label} variant="caption" sx={{ color: 'text.secondary' }}>
+                        {line.label}: {line.value}
+                      </Typography>
+                    ))}
+                  </Stack>
                 )}
               </Stack>
             )}

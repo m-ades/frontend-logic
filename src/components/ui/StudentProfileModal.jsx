@@ -343,10 +343,9 @@ export default function StudentProfileModal({
       student.grades[assignment.id] !== undefined ? "completed" : "missing",
   }));
 
-  const getEffectiveDueLabel = (assignment) => {
-    const policy = deadlineMap?.[assignment.id];
-    if (policy?.due_at) {
-      return formatEasternFromIso(policy.due_at, { includeTime: true }) ?? "—";
+  const getBaseDueLabel = (assignment) => {
+    if (assignment.dueAt) {
+      return formatEasternFromIso(assignment.dueAt, { includeTime: true }) ?? "—";
     }
     if (assignment.dueDate) {
       return (
@@ -835,7 +834,7 @@ export default function StudentProfileModal({
                       </TableCell>
                       <TableCell>
                         <Typography variant="body2" color="text.secondary">
-                          {getEffectiveDueLabel(assignment)}
+                          {getBaseDueLabel(assignment)}
                         </Typography>
                       </TableCell>
                       <TableCell align="center">

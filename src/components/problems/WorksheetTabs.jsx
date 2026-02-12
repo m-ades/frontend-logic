@@ -34,6 +34,7 @@ export default function WorksheetTabs({
   total,
   completionPercent,
   gradeLabel,
+  policySummary = [],
   isOverdue,
   isInstructorView = false,
   onQuestionSaved,
@@ -62,6 +63,7 @@ export default function WorksheetTabs({
             total={total}
             completionPercent={completionPercent}
             gradeLabel={gradeLabel}
+            policySummary={policySummary}
             isOverdue={isOverdue}
             isAssignmentLocked={worksheet.isLocked ?? false}
             isInstructorView={isInstructorView}
