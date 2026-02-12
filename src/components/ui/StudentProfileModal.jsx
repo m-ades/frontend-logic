@@ -15,6 +15,7 @@ import {
   TableRow,
   TableCell,
   TableBody,
+  Popover,
   Divider,
   alpha,
   useTheme,
@@ -96,8 +97,9 @@ export default function StudentProfileModal({
   const [accommodationLoading, setAccommodationLoading] = useState(false);
   const [accommodationError, setAccommodationError] = useState("");
   const [accommodationSaved, setAccommodationSaved] = useState(false);
-  const [extraLateDays, setExtraLateDays] = useState(0);
+  const [extraLateDays, setExtraLateDays] = useState("0");
   const [latePenaltyWaived, setLatePenaltyWaived] = useState(false);
+  const [accommodationAnchorEl, setAccommodationAnchorEl] = useState(null);
 
   // per assignment override for just this student
   const [extensionAssignmentId, setExtensionAssignmentId] = useState("");
@@ -105,13 +107,21 @@ export default function StudentProfileModal({
   const [extensionTime, setExtensionTime] = useState("23:59");
   const [extensionSaving, setExtensionSaving] = useState(false);
   const [extensionError, setExtensionError] = useState("");
-  const [extensionSaved, setExtensionSaved] = useState(false);
   const [deadlineMap, setDeadlineMap] = useState({});
+  const [extensionAnchorEl, setExtensionAnchorEl] = useState(null);
+  const [extensionPopoverAssignmentId, setExtensionPopoverAssignmentId] =
+    useState(null);
 
   const nonPracticeAssignments = useMemo(
     () => assignments.filter((a) => a.kind !== "practice"),
     [assignments]
   );
+  const extensionPopoverAssignment = useMemo(() => {
+    if (!extensionPopoverAssignmentId) return null;
+    return assignments.find(
+      (a) => String(a.id) === String(extensionPopoverAssignmentId)
+    );
+  }, [assignments, extensionPopoverAssignmentId]);
 
   // hydrate accommodations when the modal opens
   useEffect(() => {
@@ -127,11 +137,10 @@ export default function StudentProfileModal({
         );
         if (!isMounted) return;
         const record = (rows || []).find((r) => r.user_id === student.id);
-        setExtraLateDays(
-          Number.isFinite(Number(record?.extra_late_days))
-            ? Number(record.extra_late_days)
-            : 0
-        );
+        const lateDaysValue = Number.isFinite(Number(record?.extra_late_days))
+          ? String(record.extra_late_days)
+          : "0";
+        setExtraLateDays(lateDaysValue);
         setLatePenaltyWaived(Boolean(record?.late_penalty_waived));
       } catch (err) {
         if (!isMounted) return;
@@ -203,15 +212,37 @@ export default function StudentProfileModal({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           user_id: student.id,
-          extra_late_days: Math.max(0, parseInt(extraLateDays, 10) || 0),
+          extra_late_days: Math.max(0, parseInt(extraLateDays || "0", 10) || 0),
           late_penalty_waived: Boolean(latePenaltyWaived),
         }),
       });
+      try {
+        const rows = await fetchJson(
+          `/api/instructor/courses/${courseId}/deadlines/${student.id}`
+        );
+        const map = {};
+        (rows || []).forEach((row) => {
+          if (!row?.assignment_id) return;
+          map[row.assignment_id] = row;
+        });
+        setDeadlineMap(map);
+      } catch (err) {
+        setDeadlineMap((prev) => prev);
+      }
       setAccommodationSaved(true);
       setTimeout(() => setAccommodationSaved(false), 1500);
     } catch (err) {
       setAccommodationError("Failed to save accommodations.");
     }
+  };
+
+  const handleOpenAccommodationPopover = (event) => {
+    if (!canEditAccommodations) return;
+    setAccommodationAnchorEl(event.currentTarget);
+  };
+
+  const handleCloseAccommodationPopover = () => {
+    setAccommodationAnchorEl(null);
   };
 
   // store a per assignment due date override
@@ -248,13 +279,28 @@ export default function StudentProfileModal({
           due_at: iso,
         },
       }));
-      setExtensionSaved(true);
-      setTimeout(() => setExtensionSaved(false), 1500);
+      setExtensionAnchorEl(null);
+      setExtensionPopoverAssignmentId(null);
     } catch (err) {
       setExtensionError("Failed to save extension.");
     } finally {
       setExtensionSaving(false);
     }
+  };
+
+  const handleSelectExtensionAssignment = (event, assignment) => {
+    if (!canEditAccommodations) return;
+    setExtensionError("");
+    setExtensionAssignmentId(String(assignment.id));
+    setExtensionDate(assignment.dueDate || "");
+    setExtensionTime(assignment.dueTime || "23:59");
+    setExtensionPopoverAssignmentId(assignment.id);
+    setExtensionAnchorEl(event.currentTarget);
+  };
+
+  const handleCloseExtensionPopover = () => {
+    setExtensionAnchorEl(null);
+    setExtensionPopoverAssignmentId(null);
   };
 
   if (!student) return null;
@@ -314,8 +360,14 @@ export default function StudentProfileModal({
 
   const getExtensionInfo = (assignment) => {
     const policy = deadlineMap?.[assignment.id];
-    if (!policy?.due_at || !assignment?.dueAt) return null;
-    const originalTs = Date.parse(assignment.dueAt);
+    if (!policy?.due_at) return null;
+    const originalSource = assignment?.dueAt
+      ? assignment.dueAt
+      : assignment?.dueDate
+      ? `${assignment.dueDate}T${assignment.dueTime || "23:59"}:00`
+      : null;
+    if (!originalSource) return null;
+    const originalTs = Date.parse(originalSource);
     const extendedTs = Date.parse(policy.due_at);
     if (!Number.isFinite(originalTs) || !Number.isFinite(extendedTs)) return null;
     if (Math.abs(extendedTs - originalTs) < 1000) return null;
@@ -323,6 +375,24 @@ export default function StudentProfileModal({
       formatEasternFromIso(policy.due_at, { includeTime: true }) ?? null;
     if (!extendedLabel) return null;
     return { extendedLabel };
+  };
+
+  const getAccommodationInfo = (assignment) => {
+    const policy = deadlineMap?.[assignment.id];
+    if (!policy) return null;
+    const extraLateDays = Number(policy.extra_late_days) || 0;
+    const penaltyWaived = Boolean(policy.late_penalty_waived);
+    if (extraLateDays <= 0 && !penaltyWaived) return null;
+    const parts = [];
+    if (extraLateDays > 0) {
+      const cutoffLabel =
+        formatEasternFromIso(policy.cutoff_at, { includeTime: true }) ?? null;
+      parts.push(cutoffLabel ? cutoffLabel : `+${extraLateDays} days`);
+    }
+    if (penaltyWaived) {
+      parts.push("Late penalty waived");
+    }
+    return { parts };
   };
 
   return (
@@ -356,39 +426,58 @@ export default function StudentProfileModal({
                 alignItems: "center",
                 gap: 1,
                 mt: 0.5,
-                ...(canToggleRole && onToggleRole
-                  ? {
-                      cursor: "pointer",
-                      "&:hover": { opacity: 0.85 },
-                    }
-                  : {}),
+                flexWrap: "wrap",
               }}
-              onClick={canToggleRole && onToggleRole ? handleRoleClick : undefined}
-              role={canToggleRole && onToggleRole ? "button" : undefined}
-              aria-label={
-                canToggleRole && onToggleRole
-                  ? `Change role to ${student.role === "ta" ? "Student" : "TA"}`
-                  : undefined
-              }
             >
               <Box
-                component="span"
                 sx={{
                   display: "inline-flex",
                   alignItems: "center",
-                  color: "text.secondary",
+                  gap: 1,
+                  ...(canToggleRole && onToggleRole
+                    ? {
+                        cursor: "pointer",
+                        "&:hover": { opacity: 0.85 },
+                      }
+                    : {}),
                 }}
-                aria-hidden
+                onClick={canToggleRole && onToggleRole ? handleRoleClick : undefined}
+                role={canToggleRole && onToggleRole ? "button" : undefined}
+                aria-label={
+                  canToggleRole && onToggleRole
+                    ? `Change role to ${student.role === "ta" ? "Student" : "TA"}`
+                    : undefined
+                }
               >
-                <User size={18} strokeWidth={2} />
+                <Box
+                  component="span"
+                  sx={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    color: "text.secondary",
+                  }}
+                  aria-hidden
+                >
+                  <User size={18} strokeWidth={2} />
+                </Box>
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  sx={{ textTransform: "capitalize", fontWeight: 500 }}
+                >
+                  {roleLabel}
+                </Typography>
               </Box>
-              <Typography
-                variant="body2"
-                color="text.secondary"
-                sx={{ textTransform: "capitalize", fontWeight: 500 }}
-              >
-                {roleLabel}
-              </Typography>
+              {canEditAccommodations && (
+                <Button
+                  variant="outlined"
+                  size="small"
+                  onClick={handleOpenAccommodationPopover}
+                  disabled={accommodationLoading}
+                >
+                  Accommodations
+                </Button>
+              )}
             </Box>
           </Box>
           <IconButton onClick={onClose} size="small">
@@ -414,7 +503,7 @@ export default function StudentProfileModal({
           }}
         >
           <Grid container spacing={2} alignItems="center">
-            <Grid item xs={12} sm={6}>
+            <Grid item xs={12} md={6}>
               <Typography
                 variant="caption"
                 color="text.secondary"
@@ -435,8 +524,8 @@ export default function StudentProfileModal({
                 />
               </Box>
             </Grid>
-            <Grid item xs={12} sm={6}>
-              <Stack spacing={1}>
+            <Grid item xs={12} md={6}>
+              <Stack spacing={1.5}>
                 <Box sx={{ display: "flex", justifyContent: "space-between" }}>
                   <Typography variant="body2" color="text.secondary">
                     Completion Rate
@@ -624,137 +713,6 @@ export default function StudentProfileModal({
           </Paper>
         )}
 
-        {canEditAccommodations && (
-          <>
-            <Typography variant="h6" fontWeight={600} mb={2}>
-              Accommodations
-            </Typography>
-            <Paper
-              elevation={0}
-              sx={{
-                p: 2.5,
-                mb: 3,
-                border: "1px solid",
-                borderColor: "divider",
-                borderRadius: 2,
-              }}
-            >
-              <Stack spacing={2}>
-                {accommodationError && (
-                  <Alert severity="error">{accommodationError}</Alert>
-                )}
-                {accommodationSaved && (
-                  <Alert severity="success">Accommodations saved.</Alert>
-                )}
-                <TextField
-                  label="Extra Late Days"
-                  type="number"
-                  value={extraLateDays}
-                  onChange={(e) =>
-                    setExtraLateDays(Math.max(0, parseInt(e.target.value, 10) || 0))
-                  }
-                  inputProps={{ min: 0, max: 365 }}
-                  helperText="Extra days added to the late window for this student"
-                  fullWidth
-                  disabled={accommodationLoading}
-                />
-                <FormControlLabel
-                  control={
-                    <Switch
-                      checked={latePenaltyWaived}
-                      onChange={(e) => setLatePenaltyWaived(e.target.checked)}
-                      disabled={accommodationLoading}
-                    />
-                  }
-                  label="Waive late penalty"
-                />
-                <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
-                  <Button
-                    variant="contained"
-                    onClick={handleSaveAccommodation}
-                    disabled={accommodationLoading}
-                  >
-                    Save Accommodations
-                  </Button>
-                </Box>
-              </Stack>
-            </Paper>
-
-            <Typography variant="h6" fontWeight={600} mb={2}>
-              Assignment Extension
-            </Typography>
-            <Paper
-              elevation={0}
-              sx={{
-                p: 2.5,
-                mb: 3,
-                border: "1px solid",
-                borderColor: "divider",
-                borderRadius: 2,
-              }}
-            >
-              <Stack spacing={2}>
-                {extensionError && <Alert severity="error">{extensionError}</Alert>}
-                {extensionSaved && (
-                  <Alert severity="success">Extension saved.</Alert>
-                )}
-                <TextField
-                  label="Assignment"
-                  select
-                  SelectProps={{ native: true }}
-                  value={extensionAssignmentId}
-                  onChange={(e) => setExtensionAssignmentId(e.target.value)}
-                  InputLabelProps={{ shrink: true }}
-                  fullWidth
-                >
-                  <option value="" disabled hidden />
-                  {nonPracticeAssignments.map((assignment) => (
-                    <option key={assignment.id} value={assignment.id}>
-                      {assignment.name}
-                    </option>
-                  ))}
-                </TextField>
-                <Box
-                  sx={{
-                    display: "grid",
-                    gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" },
-                    gap: 2,
-                  }}
-                >
-                  <TextField
-                    label="New Due Date"
-                    type="date"
-                    value={extensionDate}
-                    onChange={(e) => setExtensionDate(e.target.value)}
-                    InputLabelProps={{ shrink: true }}
-                    fullWidth
-                  />
-                  <TextField
-                    label="New Due Time"
-                    type="time"
-                    value={extensionTime}
-                    onChange={(e) => setExtensionTime(e.target.value)}
-                    InputLabelProps={{ shrink: true }}
-                    fullWidth
-                  />
-                </Box>
-                <Typography variant="caption" color="text.secondary">
-                  This overrides the due date/time for this student only.
-                </Typography>
-                <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
-                  <Button
-                    variant="contained"
-                    onClick={handleSaveExtension}
-                    disabled={extensionSaving}
-                  >
-                    Save Extension
-                  </Button>
-                </Box>
-              </Stack>
-            </Paper>
-          </>
-        )}
-
         {/* Assignment Details Table */}
         <Typography variant="h6" fontWeight={600} mb={2}>
           Assignment Details
@@ -820,6 +778,7 @@ export default function StudentProfileModal({
               <TableBody>
                 {assignmentDetails.map((assignment) => {
                   const extensionInfo = getExtensionInfo(assignment);
+                  const accommodationInfo = getAccommodationInfo(assignment);
                   const assignmentLetterGrade =
                     assignment.studentGrade !== undefined
                       ? getLetterGrade(assignment.studentGrade, gradingScale)
@@ -839,14 +798,40 @@ export default function StudentProfileModal({
                   return (
                     <TableRow key={assignment.id} hover>
                       <TableCell>
-                        <Typography variant="body2" fontWeight={500}>
-                          {assignment.name}
-                        </Typography>
-                        {extensionInfo && (
-                          <Typography variant="caption" color="text.secondary">
-                            Extension: {extensionInfo.extendedLabel}
+                        <Stack spacing={0.25}>
+                          <Typography
+                            variant="body2"
+                            fontWeight={500}
+                            onClick={(event) =>
+                              handleSelectExtensionAssignment(event, assignment)
+                            }
+                            sx={{
+                              cursor: canEditAccommodations
+                                ? "pointer"
+                                : "default",
+                              "&:hover": canEditAccommodations
+                                ? { textDecoration: "underline" }
+                                : undefined,
+                            }}
+                          >
+                            {assignment.name}
                           </Typography>
-                        )}
+                          {extensionInfo && (
+                            <Typography variant="caption" color="text.secondary">
+                              Extension: {extensionInfo.extendedLabel}
+                            </Typography>
+                          )}
+                          {accommodationInfo &&
+                            accommodationInfo.parts.map((part, index) => (
+                              <Typography
+                                key={`accommodation-${assignment.id}-${index}`}
+                                variant="caption"
+                                color="text.secondary"
+                              >
+                                Accommodation: {part}
+                              </Typography>
+                            ))}
+                        </Stack>
                       </TableCell>
                       <TableCell>
                         <Typography variant="body2" color="text.secondary">
@@ -906,6 +891,116 @@ export default function StudentProfileModal({
           </Box>
         </Paper>
       </DialogContent>
+      <Popover
+        open={Boolean(extensionAnchorEl)}
+        anchorEl={extensionAnchorEl}
+        onClose={handleCloseExtensionPopover}
+        anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+        transformOrigin={{ vertical: "top", horizontal: "left" }}
+        PaperProps={{ sx: { p: 2, width: 320 } }}
+      >
+        <Stack spacing={2}>
+          <Box>
+            <Typography variant="subtitle2" fontWeight={600}>
+              Extension
+            </Typography>
+            <Typography variant="caption" color="text.secondary">
+              {extensionPopoverAssignment?.name ?? "Assignment"}
+            </Typography>
+          </Box>
+          {extensionError && <Alert severity="error">{extensionError}</Alert>}
+          <TextField
+            label="New Due Date"
+            type="date"
+            value={extensionDate}
+            onChange={(e) => setExtensionDate(e.target.value)}
+            InputLabelProps={{ shrink: true }}
+            fullWidth
+          />
+          <TextField
+            label="New Due Time"
+            type="time"
+            value={extensionTime}
+            onChange={(e) => setExtensionTime(e.target.value)}
+            InputLabelProps={{ shrink: true }}
+            fullWidth
+          />
+          <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 1 }}>
+            <Button onClick={handleCloseExtensionPopover}>Cancel</Button>
+            <Button
+              variant="contained"
+              onClick={handleSaveExtension}
+              disabled={extensionSaving}
+            >
+              Save Extension
+            </Button>
+          </Box>
+        </Stack>
+      </Popover>
+      <Popover
+        open={Boolean(accommodationAnchorEl)}
+        anchorEl={accommodationAnchorEl}
+        onClose={handleCloseAccommodationPopover}
+        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+        transformOrigin={{ vertical: "top", horizontal: "right" }}
+        PaperProps={{ sx: { p: 2, width: 320 } }}
+      >
+        <Stack spacing={2}>
+          <Box>
+            <Typography variant="subtitle2" fontWeight={600}>
+              Accommodations
+            </Typography>
+            <Typography variant="caption" color="text.secondary">
+              {student?.username ?? "Student"}
+            </Typography>
+          </Box>
+          {accommodationError && (
+            <Alert severity="error">{accommodationError}</Alert>
+          )}
+          {accommodationSaved && (
+            <Alert severity="success">Accommodations saved.</Alert>
+          )}
+          <TextField
+            label="Extra Late Days"
+            type="number"
+            value={extraLateDays}
+            onChange={(e) => {
+              const next = e.target.value;
+              if (next === "") {
+                setExtraLateDays("");
+                return;
+              }
+              const parsed = parseInt(next, 10);
+              if (Number.isNaN(parsed)) return;
+              setExtraLateDays(String(Math.max(0, parsed)));
+            }}
+            inputProps={{ min: 0, max: 365 }}
+            size="small"
+            fullWidth
+            disabled={accommodationLoading}
+          />
+          <FormControlLabel
+            control={
+              <Switch
+                checked={latePenaltyWaived}
+                onChange={(e) => setLatePenaltyWaived(e.target.checked)}
+                disabled={accommodationLoading}
+              />
+            }
+            label="Waive late penalty"
+          />
+          <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 1 }}>
+            <Button onClick={handleCloseAccommodationPopover}>Cancel</Button>
+            <Button
+              variant="contained"
+              onClick={handleSaveAccommodation}
+              disabled={accommodationLoading}
+            >
+              Save
+            </Button>
+          </Box>
+        </Stack>
+      </Popover>
     </Dialog>
   );
 }
