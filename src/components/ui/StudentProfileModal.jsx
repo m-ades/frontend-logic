@@ -241,6 +241,13 @@ export default function StudentProfileModal({
           }),
         }
       );
+      setDeadlineMap((prev) => ({
+        ...prev,
+        [assignmentId]: {
+          ...(prev?.[assignmentId] ?? {}),
+          due_at: iso,
+        },
+      }));
       setExtensionSaved(true);
       setTimeout(() => setExtensionSaved(false), 1500);
     } catch (err) {
@@ -303,6 +310,19 @@ export default function StudentProfileModal({
       );
     }
     return "—";
+  };
+
+  const getExtensionInfo = (assignment) => {
+    const policy = deadlineMap?.[assignment.id];
+    if (!policy?.due_at || !assignment?.dueAt) return null;
+    const originalTs = Date.parse(assignment.dueAt);
+    const extendedTs = Date.parse(policy.due_at);
+    if (!Number.isFinite(originalTs) || !Number.isFinite(extendedTs)) return null;
+    if (Math.abs(extendedTs - originalTs) < 1000) return null;
+    const extendedLabel =
+      formatEasternFromIso(policy.due_at, { includeTime: true }) ?? null;
+    if (!extendedLabel) return null;
+    return { extendedLabel };
   };
 
   return (
@@ -799,6 +819,7 @@ export default function StudentProfileModal({
               </TableHead>
               <TableBody>
                 {assignmentDetails.map((assignment) => {
+                  const extensionInfo = getExtensionInfo(assignment);
                   const assignmentLetterGrade =
                     assignment.studentGrade !== undefined
                       ? getLetterGrade(assignment.studentGrade, gradingScale)
@@ -821,6 +842,11 @@ export default function StudentProfileModal({
                         <Typography variant="body2" fontWeight={500}>
                           {assignment.name}
                         </Typography>
+                        {extensionInfo && (
+                          <Typography variant="caption" color="text.secondary">
+                            Extension: {extensionInfo.extendedLabel}
+                          </Typography>
+                        )}
                       </TableCell>
                       <TableCell>
                         <Typography variant="body2" color="text.secondary">
