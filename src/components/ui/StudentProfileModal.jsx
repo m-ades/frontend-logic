@@ -336,13 +336,22 @@ export default function StudentProfileModal({
   const letterGrade = getLetterGrade(average, gradingScale);
   const gradeColorVariant = getGradeColorVariant(average, gradingScale);
 
-  // Calculate stats
-  const totalAssignments = assignments.length;
-  const completedAssignments = Object.keys(student.grades).length;
-  const missingAssignments = totalAssignments - completedAssignments;
-  const completionRate = Math.round(
-    (completedAssignments / totalAssignments) * 100
+  const isAssignmentLocked = (assignment) =>
+    assignment.is_locked === true || assignment.isLocked === true;
+  const unlockedAssignments = assignments.filter(
+    (assignment) => !isAssignmentLocked(assignment)
   );
+
+  // Calculate stats (unlocked only)
+  const totalAssignments = unlockedAssignments.length;
+  const completedAssignments = unlockedAssignments.filter((assignment) => {
+    const grade = student.grades[assignment.id];
+    return typeof grade === "number" && grade > 0;
+  }).length;
+  const missingAssignments = totalAssignments - completedAssignments;
+  const completionRate = totalAssignments
+    ? Math.round((completedAssignments / totalAssignments) * 100)
+    : 0;
 
   // Grade distribution
   const gradeValues = Object.values(student.grades);
@@ -353,12 +362,17 @@ export default function StudentProfileModal({
   const trend = calculateTrend(student.grades, assignments);
 
   // Assignment details with grades
-  const assignmentDetails = assignments.map((assignment) => ({
-    ...assignment,
-    studentGrade: student.grades[assignment.id],
-    status:
-      student.grades[assignment.id] !== undefined ? "completed" : "missing",
-  }));
+  const assignmentDetails = assignments.map((assignment) => {
+    const grade = student.grades[assignment.id];
+    const hasGrade = typeof grade === "number" && grade > 0;
+    const isUnlocked = !isAssignmentLocked(assignment);
+    const status = hasGrade ? "completed" : isUnlocked ? "missing" : "locked";
+    return {
+      ...assignment,
+      studentGrade: grade,
+      status,
+    };
+  });
 
   const getBaseDueLabel = (assignment) => {
     if (assignment.dueAt) {
@@ -519,7 +533,7 @@ export default function StudentProfileModal({
           }}
         >
           <Grid container spacing={2} alignItems="center">
-            <Grid item xs={12} md={6}>
+            <Grid size={{ xs: 12, md: 6 }}>
               <Typography
                 variant="caption"
                 color="text.secondary"
@@ -540,7 +554,7 @@ export default function StudentProfileModal({
                 />
               </Box>
             </Grid>
-            <Grid item xs={12} md={6}>
+            <Grid size={{ xs: 12, md: 6 }}>
               <Stack spacing={1.5}>
                 <Box sx={{ display: "flex", justifyContent: "space-between" }}>
                   <Typography variant="body2" color="text.secondary">
@@ -888,15 +902,19 @@ export default function StudentProfileModal({
                           label={
                             assignment.status === "completed"
                               ? "Completed"
+                              : assignment.status === "locked"
+                              ? "Not released"
                               : "Missing"
                           }
                           color={
                             assignment.status === "completed"
                               ? "success"
+                              : assignment.status === "locked"
+                              ? "default"
                               : "error"
                           }
                           size="small"
-                          sx={{ minWidth: 80 }}
+                          sx={{ minWidth: 96 }}
                         />
                       </TableCell>
                     </TableRow>
