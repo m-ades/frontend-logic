@@ -207,6 +207,7 @@ export default function StudentProfileModal({
     if (!Number.isFinite(courseId) || !student) return;
     setAccommodationSaved(false);
     setAccommodationError("");
+    setAccommodationLoading(true);
     try {
       await fetchJson(`/api/instructor/courses/${courseId}/accommodations`, {
         method: "POST",
@@ -235,6 +236,8 @@ export default function StudentProfileModal({
       setTimeout(() => setAccommodationSaved(false), 1500);
     } catch (err) {
       setAccommodationError("Failed to save accommodations.");
+    } finally {
+      setAccommodationLoading(false);
     }
   };
 
