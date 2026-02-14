@@ -1,13 +1,15 @@
 import * as React from 'react'
-import { Box, Stack, Tabs, Tab, useTheme, useMediaQuery, Chip } from '@mui/material'
+import { Box, Stack, Tabs, Tab, useTheme, useMediaQuery, Chip, Button, Menu, MenuItem } from '@mui/material'
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
 import CancelIcon from '@mui/icons-material/Cancel'
 import WarningAmberIcon from '@mui/icons-material/WarningAmber'
+import AddIcon from '@mui/icons-material/Add'
 import ProofEditor from './ProofEditor.jsx'
 import LogicPenguinProblem from './LogicPenguinProblem.jsx'
 import TruthTableEditor from './TruthTableEditor.jsx'
 import { ProblemNavigationContext } from './ProblemNavigationContext.jsx'
 import { allowPartialForProof, displayScoreForProof } from '../../utils/problemHelpers.js'
+import InstructorQuestionEditor from './InstructorQuestionEditor.jsx'
 
 function TabPanel(props) {
   const { children, value, index, direction, isMobile, ...other } = props;
@@ -76,6 +78,8 @@ function ProofTabs({
   isAssignmentLocked = true,
   isInstructorView = false,
   onQuestionSaved,
+  onQuestionCreated,
+  assignmentId,
 }) {
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
@@ -86,6 +90,138 @@ function ProofTabs({
   // lift fullscreen so Next keeps fullscreen and shows next question in fullscreen
   const [fullScreenOpen, setFullScreenOpen] = React.useState(false)
   const [fullScreenFocusTarget, setFullScreenFocusTarget] = React.useState(null)
+
+  const [createAnchorEl, setCreateAnchorEl] = React.useState(null)
+  const [createProof, setCreateProof] = React.useState(null)
+  const createEditorRef = React.useRef(null)
+  const pendingCreateOpenRef = React.useRef(false)
+
+  const nextOrderIndex = React.useMemo(() => {
+    if (!proofs?.length) return 0
+    const maxIndex = proofs.reduce((max, proof) => {
+      const v = Number(proof.orderIndex)
+      return Number.isFinite(v) ? Math.max(max, v) : max
+    }, -1)
+    return maxIndex >= 0 ? maxIndex + 1 : proofs.length
+  }, [proofs])
+
+  const buildEmptyProof = React.useCallback((type) => {
+    const base = {
+      type,
+      description: '',
+      attemptLimit: 3,
+      questionSnapshot: {},
+    }
+    if (type === 'multiple-choice') {
+      return {
+        ...base,
+        multipleChoice: { prompt: '', choices: ['', ''] },
+        answer: 0,
+      }
+    }
+    if (type === 'truth-table') {
+      return {
+        ...base,
+        truthTable: { kind: 'formula', statement: '', options: {} },
+      }
+    }
+    if (type === 'indirect-truth-table') {
+      return {
+        ...base,
+        indirectTruthTable: {
+          prompt: '',
+          argument: { premises: [], conclusion: '' },
+          questions: [{ prompt: '', choices: [''], answerIndex: 0 }],
+        },
+      }
+    }
+    if (type === 'nonclassical-truth-table') {
+      return {
+        ...base,
+        nonclassicalTruthTable: {
+          prompt: '',
+          argument: { premises: [], conclusion: '' },
+          questions: [{ prompt: '', choices: [''], answerIndex: 0 }],
+          truthValueToggle: ['T', 'F', 'N'],
+        },
+      }
+    }
+    if (type === 'derivation' || type === 'derivation-hurley') {
+      return {
+        ...base,
+        premises: [],
+        conclusion: '',
+      }
+    }
+    if (type === 'true-false') {
+      return {
+        ...base,
+        trueFalse: { prompt: '' },
+        answer: false,
+      }
+    }
+    if (type === 'evaluate-truth') {
+      return {
+        ...base,
+        evaluateTruth: '',
+        answer: false,
+      }
+    }
+    if (type === 'symbolic-translation') {
+      return {
+        ...base,
+        translation: { prompt: '', legend: '', symbolizationKey: [] },
+        answer: '',
+      }
+    }
+    if (type === 'single-row-truth-table') {
+      return {
+        ...base,
+        singleRowTruthTable: { statement: '', interpretation: {}, prompt: '' },
+      }
+    }
+    if (type === 'partial-truth-table') {
+      return {
+        ...base,
+        partialTruthTable: { statement: '', row: [] },
+      }
+    }
+    if (type === 'combo-translation-truth-table') {
+      return {
+        ...base,
+        comboTranslationTruthTable: { prompt: '' },
+        answer: '',
+      }
+    }
+    if (type === 'combo-translation-derivation') {
+      return {
+        ...base,
+        comboTranslationDerivation: { prompt: '' },
+        answer: '',
+      }
+    }
+    return base
+  }, [])
+
+  const handleCreateMenuOpen = (event) => {
+    setCreateAnchorEl(event.currentTarget)
+  }
+
+  const handleCreateMenuClose = () => {
+    setCreateAnchorEl(null)
+  }
+
+  const handleCreateStart = (type) => {
+    setCreateProof(buildEmptyProof(type))
+    pendingCreateOpenRef.current = true
+    setCreateAnchorEl(null)
+  }
+
+  React.useEffect(() => {
+    if (!pendingCreateOpenRef.current || !createProof) return
+    pendingCreateOpenRef.current = false
+    createEditorRef.current?.open?.()
+  }, [createProof])
   
   const handleTabChange = (e, newValue) => {
     const currentProof = proofs[currentProofIndex]
@@ -276,6 +412,62 @@ function ProofTabs({
             flexDirection: 'column', 
             gap: 0
           }}>
+            {isInstructorView && (
+              <Box sx={{ display: 'flex', justifyContent: 'flex-end', pb: 1, px: 1 }}>
+                <Button
+                  size="small"
+                  startIcon={<AddIcon />}
+                  variant="text"
+                  onClick={handleCreateMenuOpen}
+                  disabled={!assignmentId}
+                  sx={{
+                    width: 160,
+                    justifyContent: 'flex-start',
+                    textTransform: 'none',
+                    fontSize: { xs: '0.875rem', md: '1rem' },
+                    fontWeight: 400,
+                    color: 'primary.main',
+                    '&:hover': { backgroundColor: 'rgba(47, 107, 255, 0.08)' },
+                  }}
+                >
+                  Add question
+                </Button>
+                <Menu
+                  anchorEl={createAnchorEl}
+                  open={Boolean(createAnchorEl)}
+                  onClose={handleCreateMenuClose}
+                  anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+                >
+                  <MenuItem onClick={() => handleCreateStart('derivation')}>Derivation</MenuItem>
+                  <MenuItem onClick={() => handleCreateStart('truth-table')}>Truth table</MenuItem>
+                  <MenuItem onClick={() => handleCreateStart('partial-truth-table')}>Partial truth table</MenuItem>
+                  <MenuItem onClick={() => handleCreateStart('single-row-truth-table')}>Single-row truth table</MenuItem>
+                  <MenuItem onClick={() => handleCreateStart('indirect-truth-table')}>Indirect truth table</MenuItem>
+                  <MenuItem onClick={() => handleCreateStart('nonclassical-truth-table')}>Nonclassical truth table</MenuItem>
+                  <MenuItem onClick={() => handleCreateStart('symbolic-translation')}>Symbolic translation</MenuItem>
+                  <MenuItem onClick={() => handleCreateStart('multiple-choice')}>Multiple choice</MenuItem>
+                  <MenuItem onClick={() => handleCreateStart('true-false')}>True/false</MenuItem>
+                  <MenuItem onClick={() => handleCreateStart('evaluate-truth')}>Evaluate truth</MenuItem>
+                  <MenuItem onClick={() => handleCreateStart('combo-translation-truth-table')}>Combo translation + truth table</MenuItem>
+                  <MenuItem onClick={() => handleCreateStart('combo-translation-derivation')}>Combo translation + derivation</MenuItem>
+                </Menu>
+                {createProof && (
+                  <InstructorQuestionEditor
+                    ref={createEditorRef}
+                    proof={createProof}
+                    isInstructorView
+                    trigger="none"
+                    mode="create"
+                    assignmentId={assignmentId}
+                    orderIndex={nextOrderIndex}
+                    onCreated={(created) => {
+                      onQuestionCreated?.(assignmentId, created)
+                      setCreateProof(null)
+                    }}
+                  />
+                )}
+              </Box>
+            )}
             <Box sx={{
               fontSize: { xs: '0.875rem', md: '1rem' },
               color: 'text.primary',

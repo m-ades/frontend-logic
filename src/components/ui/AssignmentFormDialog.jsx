@@ -23,7 +23,6 @@ export default function AssignmentFormDialog({
 }) {
   const isPractice = type === "practice";
   const isCreate = mode === "create";
-
   const title = isCreate
     ? isPractice
       ? "Create New Practice Assignment"
@@ -83,20 +82,6 @@ export default function AssignmentFormDialog({
               required
             />
           </Stack>
-
-          <TextField
-            label="Total Points"
-            type="number"
-            fullWidth
-            value={formData.totalPoints}
-            onChange={(e) =>
-              setFormData({
-                ...formData,
-                totalPoints: parseInt(e.target.value) || 0,
-              })
-            }
-            required
-          />
 
           <Box>
             <Typography
@@ -175,18 +160,6 @@ export default function AssignmentFormDialog({
             )}
           </Box>
 
-          <FormControlLabel
-            control={
-              <Switch
-                checked={formData.isPublished}
-                onChange={(e) =>
-                  setFormData({ ...formData, isPublished: e.target.checked })
-                }
-              />
-            }
-            label={isCreate ? "Publish immediately" : "Published"}
-          />
-
           {isPractice && (
             <>
               <FormControlLabel
@@ -230,11 +203,7 @@ export default function AssignmentFormDialog({
                 }
               />
             }
-            label={
-              isPractice
-                ? "Lock assignment (prevent access)"
-                : "Lock assignment (prevent submissions)"
-            }
+            label="Lock assignment"
           />
         </Stack>
       </DialogContent>
@@ -247,8 +216,6 @@ export default function AssignmentFormDialog({
             !formData.name ||
             !formData.chapter ||
             !formData.subchapter ||
-            formData.totalPoints === null ||
-            formData.totalPoints === undefined ||
             !formData.publishDate ||
             !formData.publishTime ||
             (!isPractice && (!formData.dueDate || !formData.dueTime))

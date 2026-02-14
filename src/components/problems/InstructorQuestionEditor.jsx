@@ -23,6 +23,7 @@ import EditIcon from '@mui/icons-material/Edit'
 import AddIcon from '@mui/icons-material/Add'
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
 import { fetchJson } from '../../utils/api.js'
+import getHurleyRuleset from '../../lib/logicpenguin/checkers/rules/hurley-rules.js'
 
 // deep merge. source overwrites. arrays replace.
 function deepMerge(target, source) {
@@ -43,6 +44,63 @@ function typeKey(existing) {
   return e.logic_problem_type !== undefined ? 'logic_problem_type' : (e.type !== undefined ? 'type' : 'logic_problem_type')
 }
 
+const FORCE_UPPER_RULES = new Set(['UI', 'UG', 'EI', 'EG', 'MP', 'MT', 'HS', 'DS', 'CD', 'DN', 'DM', 'CQ', 'QN', 'CP', 'IP', 'ACP', 'AIP', 'PR'])
+const ALL_DERIVATION_RULES = Object.keys(getHurleyRuleset()).map((rule) => {
+  const upper = String(rule || '').toUpperCase()
+  if (FORCE_UPPER_RULES.has(upper)) return upper
+  const lower = String(rule || '').toLowerCase()
+  return lower ? lower.charAt(0).toUpperCase() + lower.slice(1) : ''
+})
+const DERIVATION_RULE_LOOKUP = new Map(
+  ALL_DERIVATION_RULES.map((rule) => [rule.toLowerCase(), rule])
+)
+
+function normalizeRuleToken(token) {
+  const raw = String(token || '').trim()
+  if (!raw) return ''
+  const fromLookup = DERIVATION_RULE_LOOKUP.get(raw.toLowerCase())
+  if (fromLookup) return fromLookup
+  const upper = raw.toUpperCase()
+  if (FORCE_UPPER_RULES.has(upper)) return upper
+  return raw
+}
+
+function parseRuleList(value) {
+  const source = Array.isArray(value) ? value : String(value || '').split(',')
+  const out = []
+  const seen = new Set()
+  source.forEach((entry) => {
+    const normalized = normalizeRuleToken(entry)
+    if (!normalized) return
+    const key = normalized.toLowerCase()
+    if (seen.has(key)) return
+    seen.add(key)
+    out.push(normalized)
+  })
+  return out
+}
+
+function normalizeDerivationRuleset(ruleset) {
+  const source = ruleset && typeof ruleset === 'object' ? ruleset : {}
+  const allowFromInput = parseRuleList(source.allow ?? source.allowed)
+  const disallow = parseRuleList(source.disallow ?? source.disallowed ?? source.forbidden ?? source.forbid)
+  const require = parseRuleList(source.require ?? source.required ?? source.necessary)
+  const requireAny = parseRuleList(source.requireAny ?? source.requiredAny)
+  const disallowSet = new Set(disallow.map((rule) => rule.toLowerCase()))
+  const allow = allowFromInput.length
+    ? allowFromInput
+    : (disallow.length
+      ? ALL_DERIVATION_RULES.filter((rule) => !disallowSet.has(rule.toLowerCase()))
+      : [])
+
+  const normalized = {}
+  if (allow.length) normalized.allow = allow
+  if (disallow.length) normalized.disallow = disallow
+  if (require.length) normalized.require = require
+  if (requireAny.length) normalized.requireAny = requireAny
+  return Object.keys(normalized).length ? normalized : null
+}
+
 function buildMcSnapshot(proof, edited, existing) {
   const mc = proof.multipleChoice || {}
   const choices = edited.choices ?? mc.choices ?? []
@@ -50,7 +108,14 @@ function buildMcSnapshot(proof, edited, existing) {
   const answerIndex = edited.answerIndex !== undefined ? edited.answerIndex : (proof.answer ?? 0)
   const e = existing && typeof existing === 'object' ? existing : {}
   const patch = { [typeKey(e)]: 'multiple-choice', prompt }
-  if (Array.isArray(e.subquestions) && e.subquestions.length > 0) {
+  if (Array.isArray(edited.subquestions) && edited.subquestions.length > 0) {
+    patch.subquestions = edited.subquestions.map((sq) => ({
+      ...(sq && typeof sq === 'object' ? sq : {}),
+      prompt: sq?.prompt ?? '',
+      choices: Array.isArray(sq?.choices) ? sq.choices : [],
+      answerIndex: Number(sq?.answerIndex ?? sq?.answer ?? 0),
+    }))
+  } else if (Array.isArray(e.subquestions) && e.subquestions.length > 0) {
     patch.subquestions = e.subquestions.map((sq, i) =>
       i === 0 ? { ...sq, choices, answerIndex: Number(answerIndex) } : sq
     )
@@ -91,6 +156,9 @@ function buildIndirectTruthTableSnapshot(proof, edited, existing) {
   const argument = edited.argument ?? itt.argument ?? {}
   const questions = Array.isArray(edited.questions) ? edited.questions : (itt.questions || itt.subquestions || [])
   const patch = { [typeKey(e)]: 'indirect-truth-table', prompt, argument, questions }
+  if (edited.partialCredit !== undefined) {
+    patch.partialCredit = edited.partialCredit
+  }
   if (e.subquestions !== undefined) patch.subquestions = questions
   return patch
 }
@@ -105,6 +173,9 @@ function buildNonClassicalTruthTableSnapshot(proof, edited, existing) {
     ? edited.truthValueToggle
     : (Array.isArray(nctt.truthValueToggle) ? nctt.truthValueToggle : undefined)
   const patch = { [typeKey(e)]: 'nonclassical-truth-table', prompt, argument, questions }
+  if (edited.partialCredit !== undefined) {
+    patch.partialCredit = edited.partialCredit
+  }
   if (truthValueToggle) {
     patch.truthValueToggle = truthValueToggle
   }
@@ -118,7 +189,12 @@ function buildDerivationSnapshot(proof, edited, existing) {
   const conclusion = edited.conclusion ?? proof.conclusion ?? proof.conc ?? ''
   const prompt = edited.prompt ?? proof.description ?? ''
   const patch = { [typeKey(e)]: 'derivation', prompt, prems, conc: conclusion }
-  if (e.ruleset !== undefined) patch.ruleset = proof.ruleset ?? proof.ruleSet ?? e.ruleset
+  const mergedRuleset = normalizeDerivationRuleset(
+    edited.ruleset ?? proof.ruleset ?? proof.ruleSet ?? e.ruleset
+  )
+  if (mergedRuleset) {
+    patch.ruleset = mergedRuleset
+  }
   return patch
 }
 
@@ -142,6 +218,9 @@ function AttemptLimitField({ value, onChange }) {
 
 function McEditorForm({ proof, value, onChange }) {
   const mc = proof?.multipleChoice || {}
+  const subquestions = Array.isArray(value.subquestions)
+    ? value.subquestions
+    : (Array.isArray(mc.subquestions) ? mc.subquestions : [])
   const choices = value.choices ?? mc.choices ?? []
   const prompt = value.prompt ?? mc.prompt ?? proof?.description ?? ''
   const answerIndex = value.answerIndex ?? proof?.answer ?? 0
@@ -149,6 +228,38 @@ function McEditorForm({ proof, value, onChange }) {
   const setChoices = (next) => onChange({ ...value, choices: next })
   const setPrompt = (v) => onChange({ ...value, prompt: v })
   const setAnswerIndex = (v) => onChange({ ...value, answerIndex: Number(v) })
+  const setSubquestions = (next) => onChange({ ...value, subquestions: next })
+
+  const addSubquestion = () => {
+    const next = [...subquestions, { prompt: '', choices: ['', ''], answerIndex: 0 }]
+    setSubquestions(next)
+  }
+  const removeSubquestion = (idx) => setSubquestions(subquestions.filter((_, i) => i !== idx))
+  const updateSubquestion = (idx, updates) => {
+    const next = [...subquestions]
+    next[idx] = { ...(next[idx] || {}), ...updates }
+    setSubquestions(next)
+  }
+  const addSubquestionChoice = (qIdx) => {
+    const q = subquestions[qIdx] || {}
+    const nextChoices = [...(Array.isArray(q.choices) ? q.choices : []), '']
+    updateSubquestion(qIdx, { choices: nextChoices })
+  }
+  const removeSubquestionChoice = (qIdx, cIdx) => {
+    const q = subquestions[qIdx] || {}
+    const nextChoices = (Array.isArray(q.choices) ? q.choices : []).filter((_, i) => i !== cIdx)
+    const nextAnswerIndex = Number(q.answerIndex ?? q.answer ?? 0)
+    updateSubquestion(qIdx, {
+      choices: nextChoices,
+      answerIndex: nextChoices.length === 0 ? 0 : Math.min(nextAnswerIndex, nextChoices.length - 1),
+    })
+  }
+  const updateSubquestionChoice = (qIdx, cIdx, text) => {
+    const q = subquestions[qIdx] || {}
+    const nextChoices = [...(Array.isArray(q.choices) ? q.choices : [''])]
+    nextChoices[cIdx] = text
+    updateSubquestion(qIdx, { choices: nextChoices })
+  }
 
   const addChoice = () => setChoices([...choices, ''])
   const removeChoice = (idx) => setChoices(choices.filter((_, i) => i !== idx))
@@ -156,6 +267,84 @@ function McEditorForm({ proof, value, onChange }) {
     const next = [...choices]
     next[idx] = text
     setChoices(next)
+  }
+
+  if (subquestions.length > 0) {
+    return (
+      <Stack spacing={2}>
+        <TextField
+          label="Prompt"
+          multiline
+          minRows={2}
+          value={prompt}
+          onChange={(e) => setPrompt(e.target.value)}
+          fullWidth
+          variant="outlined"
+        />
+        <Box>
+          <Typography variant="subtitle2" sx={{ mb: 1 }}>Subquestions</Typography>
+          {subquestions.map((subq, qIdx) => {
+            const subChoices = Array.isArray(subq?.choices) && subq.choices.length > 0 ? subq.choices : ['']
+            const subAnswerIndex = Number(subq?.answerIndex ?? subq?.answer ?? 0)
+            return (
+              <Box key={qIdx} sx={{ mb: 2, p: 1, border: '1px solid', borderColor: 'divider', borderRadius: 1 }}>
+                <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1 }}>
+                  <Typography variant="body2" sx={{ fontWeight: 600, flexGrow: 1 }}>
+                    Subquestion {qIdx + 1}
+                  </Typography>
+                  <IconButton size="small" onClick={() => removeSubquestion(qIdx)} aria-label="Remove subquestion">
+                    <DeleteOutlineIcon />
+                  </IconButton>
+                </Stack>
+                <TextField
+                  size="small"
+                  label="Prompt"
+                  value={subq?.prompt ?? ''}
+                  onChange={(e) => updateSubquestion(qIdx, { prompt: e.target.value })}
+                  fullWidth
+                  sx={{ mb: 1 }}
+                />
+                <Typography variant="caption" sx={{ display: 'block', mb: 0.5 }}>Choices</Typography>
+                {subChoices.map((choice, cIdx) => (
+                  <Stack key={`${qIdx}-${cIdx}`} direction="row" alignItems="center" spacing={1} sx={{ mb: 0.5 }}>
+                    <TextField
+                      size="small"
+                      value={choice}
+                      onChange={(e) => updateSubquestionChoice(qIdx, cIdx, e.target.value)}
+                      fullWidth
+                      placeholder={`Choice ${cIdx + 1}`}
+                    />
+                    <IconButton size="small" onClick={() => removeSubquestionChoice(qIdx, cIdx)} aria-label="Remove choice">
+                      <DeleteOutlineIcon />
+                    </IconButton>
+                  </Stack>
+                ))}
+                <Button size="small" onClick={() => addSubquestionChoice(qIdx)} sx={{ mb: 1 }}>
+                  Add choice
+                </Button>
+                <FormControl fullWidth size="small">
+                  <InputLabel>Correct answer</InputLabel>
+                  <Select
+                    value={String(Math.max(0, Math.min(subAnswerIndex, subChoices.length - 1)))}
+                    label="Correct answer"
+                    onChange={(e) => updateSubquestion(qIdx, { answerIndex: Number(e.target.value) })}
+                  >
+                    {subChoices.map((_, idx) => (
+                      <MenuItem key={idx} value={String(idx)}>
+                        Choice {idx + 1}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Box>
+            )
+          })}
+          <Button startIcon={<AddIcon />} onClick={addSubquestion} size="small">
+            Add subquestion
+          </Button>
+        </Box>
+      </Stack>
+    )
   }
 
   return (
@@ -203,6 +392,22 @@ function McEditorForm({ proof, value, onChange }) {
           ))}
         </Select>
       </FormControl>
+      <Box>
+        <Button
+          startIcon={<AddIcon />}
+          size="small"
+          onClick={() => {
+            const initialChoices = choices.length ? choices : ['', '']
+            setSubquestions([{
+              prompt: prompt || '',
+              choices: initialChoices,
+              answerIndex: Number(answerIndex ?? 0),
+            }])
+          }}
+        >
+          Add subquestion mode
+        </Button>
+      </Box>
     </Stack>
   )
 }
@@ -350,6 +555,7 @@ function IndirectTruthTableEditorForm({ proof, value, onChange }) {
   const premises = Array.isArray(argument.premises) ? argument.premises : (argument.premises ? [argument.premises] : [])
   const conclusion = argument.conclusion ?? ''
   const questions = Array.isArray(value.questions) ? value.questions : (itt.questions || itt.subquestions || [])
+  const partialCredit = value.partialCredit ?? proof?.partialCredit ?? false
 
   const update = (updates) => onChange({ ...value, ...updates })
   const setArgument = (arg) => update({ argument: { ...argument, ...arg } })
@@ -456,6 +662,15 @@ function IndirectTruthTableEditorForm({ proof, value, onChange }) {
           Add question
         </Button>
       </Box>
+      <FormControlLabel
+        control={
+          <Checkbox
+            checked={Boolean(partialCredit)}
+            onChange={(e) => update({ partialCredit: e.target.checked })}
+          />
+        }
+        label="Allow partial credit"
+      />
     </Stack>
   )
 }
@@ -490,9 +705,18 @@ function DerivationEditorForm({ proof, value, onChange }) {
   const premises = value.premises ?? proof.premises ?? proof.prems ?? []
   const conclusion = value.conclusion ?? proof.conclusion ?? proof.conc ?? ''
   const prompt = value.prompt ?? proof.description ?? ''
+  const ruleset = value.ruleset ?? proof.ruleset ?? proof.ruleSet ?? {}
 
   const update = (updates) => onChange({ ...value, ...updates })
   const premsList = Array.isArray(premises) ? premises : (premises ? [premises] : [])
+  const toRuleText = (entries) => parseRuleList(entries).join(', ')
+  const setRulesetField = (field, text) => {
+    const nextRuleset = {
+      ...ruleset,
+      [field]: parseRuleList(text),
+    }
+    update({ ruleset: nextRuleset })
+  }
 
   return (
     <Stack spacing={2}>
@@ -535,6 +759,38 @@ function DerivationEditorForm({ proof, value, onChange }) {
         onChange={(e) => update({ conclusion: e.target.value })}
         fullWidth
         variant="outlined"
+      />
+      <TextField
+        label="Allowed rules"
+        value={toRuleText(ruleset.allow)}
+        onChange={(e) => setRulesetField('allow', e.target.value)}
+        fullWidth
+        variant="outlined"
+        placeholder="e.g. MP, MT, DS, CP, IP"
+      />
+      <TextField
+        label="Disallowed rules"
+        value={toRuleText(ruleset.disallow)}
+        onChange={(e) => setRulesetField('disallow', e.target.value)}
+        fullWidth
+        variant="outlined"
+        placeholder="e.g. DN, DM"
+      />
+      <TextField
+        label="Required rules (all)"
+        value={toRuleText(ruleset.require)}
+        onChange={(e) => setRulesetField('require', e.target.value)}
+        fullWidth
+        variant="outlined"
+        placeholder="e.g. CP, IP"
+      />
+      <TextField
+        label="Required rules (any)"
+        value={toRuleText(ruleset.requireAny)}
+        onChange={(e) => setRulesetField('requireAny', e.target.value)}
+        fullWidth
+        variant="outlined"
+        placeholder="e.g. UI, UG, EI, EG"
       />
     </Stack>
   )
@@ -756,6 +1012,10 @@ function InstructorQuestionEditorInner({
   proof,
   isInstructorView,
   onSaved,
+  onCreated,
+  assignmentId,
+  orderIndex,
+  mode = 'edit',
   trigger = 'button',
   forwardedRef,
 }) {
@@ -767,6 +1027,7 @@ function InstructorQuestionEditorInner({
 
   const questionId = proof?.questionId
   const supported = proof?.type && SUPPORTED_TYPES.has(proof.type)
+  const isCreate = mode === 'create'
 
   const handleOpen = React.useCallback(() => {
     const base = { attemptLimit: proof?.attemptLimit ?? 3 }
@@ -775,6 +1036,14 @@ function InstructorQuestionEditorInner({
       base.prompt = mc.prompt ?? proof.description ?? ''
       base.choices = Array.isArray(mc.choices) ? [...mc.choices] : []
       base.answerIndex = proof.answer ?? 0
+      if (Array.isArray(mc.subquestions) && mc.subquestions.length > 0) {
+        base.subquestions = mc.subquestions.map((subq) => ({
+          ...(subq && typeof subq === 'object' ? subq : {}),
+          prompt: subq?.prompt ?? '',
+          choices: Array.isArray(subq?.choices) ? [...subq.choices] : [],
+          answerIndex: Number(subq?.answerIndex ?? subq?.answer ?? 0),
+        }))
+      }
     }
     if (proof?.type === 'symbolic-translation') {
       const tr = proof.translation || {}
@@ -801,6 +1070,7 @@ function InstructorQuestionEditorInner({
       base.prompt = itt.prompt ?? proof.description ?? ''
       base.argument = itt.argument ? { ...itt.argument } : {}
       base.questions = Array.isArray(itt.questions) ? itt.questions.map((q) => ({ ...q })) : (Array.isArray(itt.subquestions) ? itt.subquestions.map((q) => ({ ...q })) : [])
+      base.partialCredit = Boolean(proof.partialCredit)
     }
     if (proof?.type === 'nonclassical-truth-table') {
       const nctt = proof.nonclassicalTruthTable || {}
@@ -808,11 +1078,15 @@ function InstructorQuestionEditorInner({
       base.argument = nctt.argument ? { ...nctt.argument } : {}
       base.questions = Array.isArray(nctt.questions) ? nctt.questions.map((q) => ({ ...q })) : (Array.isArray(nctt.subquestions) ? nctt.subquestions.map((q) => ({ ...q })) : [])
       base.truthValueToggle = Array.isArray(nctt.truthValueToggle) ? [...nctt.truthValueToggle] : ['T', 'F', 'N']
+      base.partialCredit = Boolean(proof.partialCredit)
     }
     if (proof?.type === 'derivation' || proof?.type === 'derivation-hurley') {
       base.prompt = proof.description ?? ''
       base.premises = Array.isArray(proof.premises) ? [...proof.premises] : (Array.isArray(proof.prems) ? [...proof.prems] : [])
       base.conclusion = proof.conclusion ?? proof.conc ?? ''
+      base.ruleset = {
+        ...(proof.ruleset && typeof proof.ruleset === 'object' ? proof.ruleset : {}),
+      }
     }
     if (proof?.type === 'true-false') {
       const tf = proof.trueFalse || {}
@@ -879,7 +1153,7 @@ function InstructorQuestionEditorInner({
   }), [handleOpen])
 
   const handleSave = async () => {
-    if (!questionId) return
+    if (!isCreate && !questionId) return
     setSaving(true)
     setError('')
     try {
@@ -918,6 +1192,31 @@ function InstructorQuestionEditorInner({
       if (proof.type === 'single-row-truth-table') {
         delete mergedSnapshot.singleRowTruthTable
       }
+      const attemptLimit = editValue.attemptLimit
+
+      if (isCreate) {
+        if (!assignmentId) {
+          setError('Assignment id required')
+          setSaving(false)
+          return
+        }
+        const payload = {
+          assignment_id: assignmentId,
+          order_index: Number.isFinite(Number(orderIndex)) ? Number(orderIndex) : 0,
+          points_value: 100,
+          attempt_limit: Number.isFinite(Number(attemptLimit)) ? Number(attemptLimit) : 3,
+          question_snapshot: mergedSnapshot,
+        }
+        const created = await fetchJson('/api/assignment-questions', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        })
+        setOpen(false)
+        onCreated?.(created)
+        return
+      }
+
       const omitAttemptLimit = (v) => {
         const { attemptLimit: _, ...rest } = v || {}
         return rest
@@ -926,7 +1225,6 @@ function InstructorQuestionEditorInner({
         initialEditValueRef.current != null &&
         JSON.stringify(omitAttemptLimit(editValue)) !== JSON.stringify(omitAttemptLimit(initialEditValueRef.current))
       const body = {}
-      const attemptLimit = editValue.attemptLimit
       if (attemptLimit !== undefined && Number.isFinite(Number(attemptLimit))) {
         body.attempt_limit = Number(attemptLimit)
       }
@@ -981,7 +1279,7 @@ function InstructorQuestionEditorInner({
     <>
       {triggerEl}
       <Dialog open={open} onClose={() => setOpen(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>Edit question</DialogTitle>
+        <DialogTitle>{isCreate ? 'Create question' : 'Edit question'}</DialogTitle>
         <DialogContent>
           <Stack spacing={2} sx={{ mt: 0.5 }}>
             {error && (
@@ -1034,7 +1332,7 @@ function InstructorQuestionEditorInner({
         <DialogActions>
           <Button onClick={() => setOpen(false)}>Cancel</Button>
           <Button variant="contained" onClick={handleSave} disabled={saving}>
-            {saving ? 'Saving…' : 'Save'}
+            {saving ? 'Saving…' : isCreate ? 'Create' : 'Save'}
           </Button>
         </DialogActions>
       </Dialog>
@@ -1043,7 +1341,7 @@ function InstructorQuestionEditorInner({
 }
 
 const InstructorQuestionEditor = React.forwardRef(function InstructorQuestionEditor(
-  { proof, isInstructorView, onSaved, trigger = 'button' },
+  { proof, isInstructorView, onSaved, onCreated, assignmentId, orderIndex, mode = 'edit', trigger = 'button' },
   ref
 ) {
   return (
@@ -1051,6 +1349,10 @@ const InstructorQuestionEditor = React.forwardRef(function InstructorQuestionEdi
       proof={proof}
       isInstructorView={isInstructorView}
       onSaved={onSaved}
+      onCreated={onCreated}
+      assignmentId={assignmentId}
+      orderIndex={orderIndex}
+      mode={mode}
       trigger={trigger}
       forwardedRef={ref}
     />

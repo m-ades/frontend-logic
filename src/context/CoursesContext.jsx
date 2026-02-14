@@ -100,6 +100,11 @@ const mapAssignmentRecord = (assignment) => {
   const dueAt = assignment.due_at ?? assignment.dueAt ?? assignment.due_date ?? null;
   const due = splitDateTime(dueAt);
   const publish = splitDateTime(assignment.created_at);
+  const questionCount = Number(assignment.question_count) || 0;
+  const derivedPoints = questionCount * 100;
+  const totalPoints = Number.isFinite(Number(assignment.total_points))
+    ? Number(assignment.total_points)
+    : derivedPoints;
 
   return {
     id: assignment.id,
@@ -114,7 +119,8 @@ const mapAssignmentRecord = (assignment) => {
     dueAt,
     dueDate: due.date,
     dueTime: due.time,
-    totalPoints: assignment.total_points,
+    totalPoints,
+    questionCount,
     lateWindowDays: assignment.late_window_days,
     latePenaltyPercent: assignment.late_penalty_percent,
     isPublished: !assignment.is_locked,

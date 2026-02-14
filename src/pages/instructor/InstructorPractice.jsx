@@ -26,10 +26,8 @@ const INITIAL_FORM_DATA = {
   dueTime: "23:59",
   publishDate: "",
   publishTime: "00:00",
-  totalPoints: 0,
   chapter: 1,
   subchapter: "A",
-  isPublished: true,
   isLocked: false,
   allowRetakes: true,
   showSolutions: true,
@@ -60,7 +58,10 @@ export default function InstructorPractice() {
   };
 
   // Handlers
-  const handleCreateOpen = () => {
+  const handleCreateOpen = (event) => {
+    if (event?.currentTarget?.blur) {
+      event.currentTarget.blur();
+    }
     setFormData({
       ...INITIAL_FORM_DATA,
       publishDate: getCurrentEasternDate(),
@@ -75,15 +76,12 @@ export default function InstructorPractice() {
         kind: "practice",
         title: formData.name,
         description: formData.description || null,
-        is_locked: formData.isLocked || !formData.isPublished,
+        is_locked: formData.isLocked,
         chapter: Number(formData.chapter) || 1,
         subchapter: formData.subchapter || "A",
         due_date: null,
         late_window_days: null,
         late_penalty_percent: null,
-        total_points: Number.isFinite(formData.totalPoints)
-          ? formData.totalPoints
-          : 0,
       };
       const created = await fetchJson("/api/assignments", {
         method: "POST",
@@ -111,10 +109,8 @@ export default function InstructorPractice() {
       dueTime: practice.dueTime || "23:59",
       publishDate: practice.publishDate || getCurrentEasternDate(),
       publishTime: practice.publishTime || "00:00",
-      totalPoints: practice.totalPoints ?? 0,
       chapter: practice.chapter || 1,
       subchapter: practice.subchapter || "A",
-      isPublished: practice.isPublished ?? true,
       isLocked: practice.isLocked ?? false,
       allowRetakes: practice.allowRetakes ?? true,
       showSolutions: practice.showSolutions ?? true,
@@ -130,15 +126,12 @@ export default function InstructorPractice() {
         kind: "practice",
         title: formData.name,
         description: formData.description || null,
-        is_locked: formData.isLocked || !formData.isPublished,
+        is_locked: formData.isLocked,
         chapter: Number(formData.chapter) || 1,
         subchapter: formData.subchapter || "A",
         due_date: null,
         late_window_days: null,
         late_penalty_percent: null,
-        total_points: Number.isFinite(formData.totalPoints)
-          ? formData.totalPoints
-          : 0,
       };
       await fetchJson(`/api/assignments/${selectedPractice.id}`, {
         method: "PUT",
@@ -212,9 +205,6 @@ export default function InstructorPractice() {
         due_date: null,
         late_window_days: null,
         late_penalty_percent: null,
-        total_points: Number.isFinite(practice.totalPoints)
-          ? practice.totalPoints
-          : 0,
       };
       await fetchJson("/api/assignments", {
         method: "POST",

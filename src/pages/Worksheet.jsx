@@ -23,6 +23,7 @@ const mapQuestionToProof = (question, assignment, index) => {
   const type = normalizeType(snapshot)
   const description = snapshot.prompt || snapshot.description || snapshot.text || 'Solve.'
   const questionId = question?.id ?? question?.assignment_question_id ?? question?.assignmentQuestionId ?? null
+  const orderIndex = question?.order_index ?? question?.orderIndex ?? index
   const proofId = `${assignment.id}-${questionId ?? index}`
   const solution = snapshot.solution
   const attemptLimit = question?.attempt_limit ?? 3
@@ -50,6 +51,7 @@ const mapQuestionToProof = (question, assignment, index) => {
     legend,
     partialCredit: Boolean(snapshotPartial),
     questionSnapshot: question?.question_snapshot ?? snapshot,
+    orderIndex,
   }
 
   if (type === 'derivation' || type === 'derivation-hurley') {
@@ -564,6 +566,28 @@ export default function Worksheet() {
     }
   }, [activeUserId])
 
+  const handleQuestionCreated = useCallback((assignmentId, createdQuestion) => {
+    if (!assignmentId || !createdQuestion) return
+    setWorksheets((prev) => (
+      prev.map((worksheet) => {
+        if (worksheet.id !== assignmentId) return worksheet
+        const exists = worksheet.proofs.some(
+          (proof) => Number(proof.questionId) === Number(createdQuestion.id)
+        )
+        if (exists) return worksheet
+        const nextProof = mapQuestionToProof(createdQuestion, worksheet, worksheet.proofs.length)
+        return {
+          ...worksheet,
+          proofs: [...worksheet.proofs, nextProof],
+        }
+      })
+    ))
+    if (currentWorksheet?.id === assignmentId) {
+      const nextIndex = currentWorksheet?.proofs?.length ?? 0
+      setCurrentProofIndex(nextIndex)
+    }
+  }, [currentWorksheet?.id, currentWorksheet?.proofs?.length, setCurrentProofIndex])
+
   useEffect(() => {
     setCurrentDueAt(currentWorksheet?.due_at ?? currentWorksheet?.due_date ?? null)
   }, [currentWorksheet?.id, currentWorksheet?.due_at, currentWorksheet?.due_date])
@@ -834,6 +858,7 @@ export default function Worksheet() {
       original_due_at: originalDueAt,
       policy,
       isLocked: assignmentInfo.is_locked ?? false,
+      hasLoadedDetails: true,
       proofs: questions.map((question, idx) =>
         mapQuestionToProof(question, assignmentInfo, idx)
       ),
@@ -865,7 +890,7 @@ export default function Worksheet() {
           const existingIndex = worksheets.findIndex((worksheet) => worksheet.id === targetAssignmentId)
           if (existingIndex !== -1) {
             const existing = worksheets[existingIndex]
-            if (existing.proofs.length) {
+            if (existing.hasLoadedDetails || existing.proofs.length) {
               if (isMounted) {
                 setIsLoading(false)
               }
@@ -900,7 +925,7 @@ export default function Worksheet() {
           ? orderedAssignments.map((assignment) => (
             assignment.id === fallbackAssignmentId
               ? loadedWorksheet
-              : { id: assignment.id, title: assignment.title, proofs: [] }
+              : { id: assignment.id, title: assignment.title, proofs: [], hasLoadedDetails: false }
           ))
           : [loadedWorksheet]
 
@@ -1034,6 +1059,7 @@ export default function Worksheet() {
           isOverdue={isOverdue}
           isInstructorView={isInstructorView}
           onQuestionSaved={currentWorksheet?.id ? (qId) => refreshQuestionSolutions(currentWorksheet.id, qId) : undefined}
+          onQuestionCreated={handleQuestionCreated}
         />
       </WorksheetLayout>
     </Box>

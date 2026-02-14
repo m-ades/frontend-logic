@@ -239,8 +239,7 @@ export default function AssignmentDetailModal({ open, onClose, assignmentId }) {
               )}
             </Box>
             <Typography variant="body2" color="text.secondary">
-              Due: {formatEasternDateTime(assignment.dueDate, assignment.dueTime) ?? "—"} •{" "}
-              {assignment.totalPoints || 100} points • Avg time: {avgTime}
+              Due: {formatEasternDateTime(assignment.dueDate, assignment.dueTime) ?? "—"} • Avg time: {avgTime}
             </Typography>
           </Box>
           <IconButton onClick={onClose} size="small">

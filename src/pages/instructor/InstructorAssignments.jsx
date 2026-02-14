@@ -51,13 +51,10 @@ const buildAssignmentPayload = (formData, courseId, overrides = {}) => {
     kind: "assignment",
     title: formData.name,
     description: formData.description || null,
-    is_locked: formData.isLocked || !formData.isPublished,
+    is_locked: formData.isLocked,
     chapter: Number(formData.chapter) || 1,
     subchapter: formData.subchapter || "A",
     due_date: dueDate,
-    total_points: Number.isFinite(formData.totalPoints)
-      ? formData.totalPoints
-      : 0,
     ...overrides,
   };
 };
@@ -68,10 +65,8 @@ const INITIAL_FORM_DATA = {
   publishTime: "00:00",
   dueDate: getCurrentDate(),
   dueTime: "23:59",
-  totalPoints: 100,
   chapter: 1,
   subchapter: "A",
-  isPublished: true,
   isLocked: false,
 };
 
@@ -116,7 +111,10 @@ export default function InstructorAssignments() {
   });
 
   // Handlers
-  const handleCreateOpen = () => {
+  const handleCreateOpen = (event) => {
+    if (event?.currentTarget?.blur) {
+      event.currentTarget.blur();
+    }
     setFormData({
       ...INITIAL_FORM_DATA,
       publishDate: getCurrentDate(),
@@ -157,10 +155,8 @@ export default function InstructorAssignments() {
       publishTime: assignment.publishTime || "00:00",
       dueDate: assignment.dueDate || getCurrentDate(),
       dueTime: assignment.dueTime || "23:59",
-      totalPoints: assignment.totalPoints || 100,
       chapter: assignment.chapter || 1,
       subchapter: assignment.subchapter || "A",
-      isPublished: assignment.isPublished ?? true,
       isLocked: assignment.isLocked ?? false,
     });
 
@@ -243,9 +239,6 @@ export default function InstructorAssignments() {
         due_date: assignment.dueDate
           ? toIsoDateTime(assignment.dueDate, assignment.dueTime || "23:59")
           : null,
-        total_points: Number.isFinite(assignment.totalPoints)
-          ? assignment.totalPoints
-          : 0,
         late_window_days: assignment.lateWindowDays,
         late_penalty_percent: assignment.latePenaltyPercent,
       };

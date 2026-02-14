@@ -5,7 +5,6 @@ export function getInitialAssignmentFormData(type = "assignment") {
   const isPractice = type === "practice";
   return {
     name: "",
-    totalPoints: isPractice ? 0 : 100,
     publishDate: getCurrentDate(),
     publishTime: "00:00",
     dueDate: getCurrentDate(),
@@ -21,7 +20,6 @@ export function getEditAssignmentFormData(assignment, type = "assignment") {
   const isPractice = type === "practice";
   return {
     name: assignment.name || "",
-    totalPoints: assignment.totalPoints || (isPractice ? 0 : 100),
     publishDate: assignment.publishDate || getCurrentDate(),
     publishTime: assignment.publishTime || "00:00",
     dueDate: assignment.dueDate || getCurrentDate(),
@@ -38,9 +36,6 @@ export function validateAssignmentForm(formData, type = "assignment") {
   const isPractice = type === "practice";
 
   if (!formData.name?.trim()) errors.push("Assignment name is required");
-  if (!isPractice && (!formData.totalPoints || formData.totalPoints <= 0)) {
-    errors.push("Total points must be greater than 0");
-  }
   if (!formData.publishDate) errors.push("Publish date is required");
   if (!formData.publishTime) errors.push("Publish time is required");
   if (!isPractice && !formData.dueDate) errors.push("Due date is required");

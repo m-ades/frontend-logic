@@ -38,6 +38,7 @@ export default function WorksheetTabs({
   isOverdue,
   isInstructorView = false,
   onQuestionSaved,
+  onQuestionCreated,
 }) {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
@@ -68,6 +69,8 @@ export default function WorksheetTabs({
             isAssignmentLocked={worksheet.isLocked ?? false}
             isInstructorView={isInstructorView}
             onQuestionSaved={onQuestionSaved}
+            onQuestionCreated={onQuestionCreated}
+            assignmentId={worksheet.id}
           />
         </WorksheetTabPanel>
       ))}
