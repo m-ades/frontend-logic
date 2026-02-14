@@ -146,6 +146,37 @@ const mapQuestionToProof = (question, assignment, index) => {
     }
   }
 
+  if (type === 'nonclassical-truth-table') {
+    const snapshotQuestions = snapshot.questions || snapshot.subquestions || []
+    const choiceList = Array.isArray(snapshot.choices) ? snapshot.choices : []
+    const questions = Array.isArray(snapshotQuestions) && snapshotQuestions.length > 0
+      ? snapshotQuestions
+      : (choiceList.length > 0
+        ? [{
+            prompt: snapshot.choicePrompt || snapshot.question || '',
+            choices: choiceList,
+            answerIndex: snapshot.answerIndex ?? snapshot.answer ?? (Array.isArray(snapshot.answerIndices) ? snapshot.answerIndices[0] : undefined),
+          }]
+        : [])
+    const derivedAnswer = questions.length
+      ? questions.map((q) => q.answerIndex ?? q.answer ?? q.correctIndex)
+      : (snapshot.answerIndex ?? snapshot.answer ?? snapshot.answerIndices)
+    return {
+      ...proofBase,
+      type: 'nonclassical-truth-table',
+      answer: derivedAnswer,
+      nonclassicalTruthTable: {
+        prompt: snapshot.prompt || '',
+        argument: snapshot.argument || {},
+        questions,
+        subquestions: questions,
+        choices: choiceList,
+        truthValueToggle: snapshot.truthValueToggle || snapshot.truth_value_toggle || snapshot.truthValueCycle || snapshot.truth_value_cycle,
+        sandbox: snapshot.sandbox || {},
+      },
+    }
+  }
+
   if (type === 'true-false') {
     return {
       ...proofBase,
@@ -527,6 +558,8 @@ export default function Worksheet() {
         })
       ))
     } catch (err) {
+      // ignore refresh errors
+    } finally {
       solutionRefreshRef.current.delete(questionId)
     }
   }, [activeUserId])

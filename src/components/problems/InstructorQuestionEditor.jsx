@@ -95,6 +95,23 @@ function buildIndirectTruthTableSnapshot(proof, edited, existing) {
   return patch
 }
 
+function buildNonClassicalTruthTableSnapshot(proof, edited, existing) {
+  const nctt = proof.nonclassicalTruthTable || {}
+  const e = existing && typeof existing === 'object' ? existing : {}
+  const prompt = edited.prompt ?? nctt.prompt ?? proof.description ?? ''
+  const argument = (edited.argument && typeof edited.argument === 'object') ? edited.argument : {}
+  const questions = Array.isArray(edited.questions) ? edited.questions : (nctt.questions || nctt.subquestions || [])
+  const truthValueToggle = Array.isArray(edited.truthValueToggle)
+    ? edited.truthValueToggle
+    : (Array.isArray(nctt.truthValueToggle) ? nctt.truthValueToggle : undefined)
+  const patch = { [typeKey(e)]: 'nonclassical-truth-table', prompt, argument, questions }
+  if (truthValueToggle) {
+    patch.truthValueToggle = truthValueToggle
+  }
+  if (e.subquestions !== undefined) patch.subquestions = questions
+  return patch
+}
+
 function buildDerivationSnapshot(proof, edited, existing) {
   const e = existing && typeof existing === 'object' ? existing : {}
   const prems = edited.premises ?? proof.premises ?? proof.prems ?? []
@@ -443,6 +460,32 @@ function IndirectTruthTableEditorForm({ proof, value, onChange }) {
   )
 }
 
+function NonClassicalTruthTableEditorForm({ proof, value, onChange }) {
+  const rawToggle = value.truthValueToggle ?? proof?.nonclassicalTruthTable?.truthValueToggle ?? ['T', 'F', 'N']
+  const toggleText = Array.isArray(rawToggle) ? rawToggle.join(',') : String(rawToggle || '')
+
+  const updateToggle = (text) => {
+    const next = text
+      .split(',')
+      .map((v) => v.trim())
+      .filter(Boolean)
+    onChange({ ...value, truthValueToggle: next })
+  }
+
+  return (
+    <Stack spacing={2}>
+      <TextField
+        label="Truth value cycle"
+        value={toggleText}
+        onChange={(e) => updateToggle(e.target.value)}
+        fullWidth
+        helperText="Comma-separated values (e.g., T, F, N or T, F, B or T, F, N, B)."
+      />
+      <IndirectTruthTableEditorForm proof={proof} value={value} onChange={onChange} />
+    </Stack>
+  )
+}
+
 function DerivationEditorForm({ proof, value, onChange }) {
   const premises = value.premises ?? proof.premises ?? proof.prems ?? []
   const conclusion = value.conclusion ?? proof.conclusion ?? proof.conc ?? ''
@@ -697,6 +740,7 @@ const SUPPORTED_TYPES = new Set([
   'multiple-choice',
   'truth-table',
   'indirect-truth-table',
+  'nonclassical-truth-table',
   'derivation',
   'derivation-hurley',
   'true-false',
@@ -757,6 +801,13 @@ function InstructorQuestionEditorInner({
       base.prompt = itt.prompt ?? proof.description ?? ''
       base.argument = itt.argument ? { ...itt.argument } : {}
       base.questions = Array.isArray(itt.questions) ? itt.questions.map((q) => ({ ...q })) : (Array.isArray(itt.subquestions) ? itt.subquestions.map((q) => ({ ...q })) : [])
+    }
+    if (proof?.type === 'nonclassical-truth-table') {
+      const nctt = proof.nonclassicalTruthTable || {}
+      base.prompt = nctt.prompt ?? proof.description ?? ''
+      base.argument = nctt.argument ? { ...nctt.argument } : {}
+      base.questions = Array.isArray(nctt.questions) ? nctt.questions.map((q) => ({ ...q })) : (Array.isArray(nctt.subquestions) ? nctt.subquestions.map((q) => ({ ...q })) : [])
+      base.truthValueToggle = Array.isArray(nctt.truthValueToggle) ? [...nctt.truthValueToggle] : ['T', 'F', 'N']
     }
     if (proof?.type === 'derivation' || proof?.type === 'derivation-hurley') {
       base.prompt = proof.description ?? ''
@@ -841,6 +892,8 @@ function InstructorQuestionEditorInner({
         question_snapshot = buildTruthTableSnapshot(proof, editValue, existing)
       } else if (proof.type === 'indirect-truth-table') {
         question_snapshot = buildIndirectTruthTableSnapshot(proof, editValue, existing)
+      } else if (proof.type === 'nonclassical-truth-table') {
+        question_snapshot = buildNonClassicalTruthTableSnapshot(proof, editValue, existing)
       } else if (proof.type === 'derivation' || proof.type === 'derivation-hurley') {
         question_snapshot = buildDerivationSnapshot(proof, editValue, existing)
       } else if (proof.type === 'true-false') {
@@ -948,6 +1001,9 @@ function InstructorQuestionEditorInner({
             )}
             {proof.type === 'indirect-truth-table' && (
               <IndirectTruthTableEditorForm proof={proof} value={editValue} onChange={setEditValue} />
+            )}
+            {proof.type === 'nonclassical-truth-table' && (
+              <NonClassicalTruthTableEditorForm proof={proof} value={editValue} onChange={setEditValue} />
             )}
             {(proof.type === 'derivation' || proof.type === 'derivation-hurley') && (
               <DerivationEditorForm proof={proof} value={editValue} onChange={setEditValue} />

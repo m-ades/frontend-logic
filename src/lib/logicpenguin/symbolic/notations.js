@@ -22,6 +22,22 @@ const notations = {
         schematicLetters: '𝒜𝒜𝓍𝒶𝓃',
         useTermParensCommas: false,
         variableRange: 'x-z'
+    },
+    nonclassical: {
+        OR      : 'V',
+        AND     : '&',
+        IFTHEN  : '→',
+        IFF     : '↔',
+        NOT     : '~',
+        FORALL  : '∀',
+        EXISTS  : '∃',
+        FALSUM  : '✖',
+        constantsRange: 'a-w',
+        predicatesRange: '=≠A-Za-zΑ-Ωα-ω',
+        quantifierForm: 'Qx',
+        schematicLetters: '𝒜𝒜𝓍𝒶𝓃',
+        useTermParensCommas: false,
+        variableRange: 'x-z'
     }
 }
 

@@ -9,6 +9,7 @@ import ComboTranslationTruthTable from './mui/ComboTranslationTruthTable.jsx'
 import ComboTranslationDerivation from './mui/ComboTranslationDerivation.jsx'
 import IndirectTruthTable from './mui/IndirectTruthTable.jsx'
 import PartialTruthTable from './mui/PartialTruthTable.jsx'
+import NonClassicalTruthTable from './mui/NonClassicalTruthTable.jsx'
 
 export default function LogicPenguinProblem({ 
   proof, 
@@ -216,6 +217,39 @@ export default function LogicPenguinProblem({
     const normalizedProblem = { ...problemData, questions, subquestions: questions }
     return (
       <IndirectTruthTable
+        problem={normalizedProblem}
+        proof={proof}
+        answer={derivedAnswer}
+        attemptLimit={proof.attemptLimit}
+        assignmentQuestionId={proof.questionId}
+        onStateChange={handleStateChange}
+        onComplete={handleComplete}
+        savedState={localState}
+        isAssignmentLocked={isAssignmentLocked}
+        isInstructorView={isInstructorView}
+        onQuestionSaved={onQuestionSaved}
+      />
+    )
+  } else if (proof.type === 'nonclassical-truth-table') {
+    const problemData = proof.nonclassicalTruthTable || {
+      prompt: proof.description || '',
+      choices: proof.choices || [],
+    }
+    const questions = Array.isArray(problemData?.questions) && problemData.questions.length > 0
+      ? problemData.questions
+      : (Array.isArray(problemData?.choices) && problemData.choices.length > 0
+        ? [{
+            prompt: problemData?.choicePrompt || '',
+            choices: problemData.choices,
+            answerIndex: proof.answerIndex ?? proof.answer ?? (Array.isArray(proof.answerIndices) ? proof.answerIndices[0] : undefined),
+          }]
+        : [])
+    const derivedAnswer = questions.length
+      ? questions.map((q) => q.answerIndex ?? q.answer ?? q.correctIndex)
+      : proof.answer
+    const normalizedProblem = { ...problemData, questions, subquestions: questions }
+    return (
+      <NonClassicalTruthTable
         problem={normalizedProblem}
         proof={proof}
         answer={derivedAnswer}
