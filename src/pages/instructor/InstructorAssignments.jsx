@@ -77,6 +77,7 @@ export default function InstructorAssignments() {
   const navigate = useNavigate();
 
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
+  const [isCreating, setIsCreating] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [selectedAssignment, setSelectedAssignment] = useState(null);
   const [menuAnchor, setMenuAnchor] = useState(null);
@@ -124,6 +125,8 @@ export default function InstructorAssignments() {
   };
 
   const handleCreateSubmit = async () => {
+    if (isCreating) return;
+    setIsCreating(true);
     try {
       const payload = buildAssignmentPayload(formData, activeCourseId);
       const created = await fetchJson("/api/assignments", {
@@ -143,6 +146,8 @@ export default function InstructorAssignments() {
       });
     } catch (error) {
       console.error("Failed to create assignment", error);
+    } finally {
+      setIsCreating(false);
     }
   };
 
@@ -406,6 +411,7 @@ export default function InstructorAssignments() {
         onSubmit={handleCreateSubmit}
         formData={formData}
         setFormData={setFormData}
+        isSubmitting={isCreating}
         mode="create"
         type="assignment"
       />

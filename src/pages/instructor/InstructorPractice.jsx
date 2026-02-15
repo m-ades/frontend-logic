@@ -39,6 +39,7 @@ export default function InstructorPractice() {
   const navigate = useNavigate();
 
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
+  const [isCreating, setIsCreating] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [selectedPractice, setSelectedPractice] = useState(null);
   const [menuAnchor, setMenuAnchor] = useState(null);
@@ -70,6 +71,8 @@ export default function InstructorPractice() {
   };
 
   const handleCreateSubmit = async () => {
+    if (isCreating) return;
+    setIsCreating(true);
     try {
       const payload = {
         course_id: activeCourseId,
@@ -98,6 +101,8 @@ export default function InstructorPractice() {
       navigateToPractice(created?.id ?? payload.id);
     } catch (error) {
       console.error("Failed to create practice", error);
+    } finally {
+      setIsCreating(false);
     }
   };
 
@@ -338,6 +343,7 @@ export default function InstructorPractice() {
         onSubmit={handleCreateSubmit}
         formData={formData}
         setFormData={setFormData}
+        isSubmitting={isCreating}
         mode="create"
         type="practice"
       />

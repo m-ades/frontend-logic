@@ -20,6 +20,7 @@ export default function AssignmentFormDialog({
   setFormData,
   mode = "create",
   type = "assignment",
+  isSubmitting = false,
 }) {
   const isPractice = type === "practice";
   const isCreate = mode === "create";
@@ -208,6 +209,7 @@ export default function AssignmentFormDialog({
           onClick={onSubmit}
           variant="contained"
           disabled={
+            isSubmitting ||
             !formData.name ||
             !formData.chapter ||
             !formData.subchapter ||
@@ -216,7 +218,7 @@ export default function AssignmentFormDialog({
             (!isPractice && (!formData.dueDate || !formData.dueTime))
           }
         >
-          {buttonText}
+          {isSubmitting ? "Saving..." : buttonText}
         </Button>
       </DialogActions>
     </Dialog>
