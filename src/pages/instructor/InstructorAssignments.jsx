@@ -53,7 +53,7 @@ const buildAssignmentPayload = (formData, courseId, overrides = {}) => {
     description: formData.description || null,
     is_locked: formData.isLocked,
     chapter: Number(formData.chapter) || 1,
-    subchapter: formData.subchapter || "A",
+    subchapter: formData.subchapter || "",
     due_date: dueDate,
     ...overrides,
   };
@@ -66,7 +66,7 @@ const INITIAL_FORM_DATA = {
   dueDate: getCurrentDate(),
   dueTime: "23:59",
   chapter: 1,
-  subchapter: "A",
+  subchapter: "",
   isLocked: false,
 };
 
@@ -156,7 +156,7 @@ export default function InstructorAssignments() {
       dueDate: assignment.dueDate || getCurrentDate(),
       dueTime: assignment.dueTime || "23:59",
       chapter: assignment.chapter || 1,
-      subchapter: assignment.subchapter || "A",
+      subchapter: assignment.subchapter || "",
       isLocked: assignment.isLocked ?? false,
     });
 
@@ -235,7 +235,7 @@ export default function InstructorAssignments() {
         description: assignment.description || null,
         is_locked: true,
         chapter: assignment.chapter || 1,
-        subchapter: assignment.subchapter || "A",
+        subchapter: assignment.subchapter || "",
         due_date: assignment.dueDate
           ? toIsoDateTime(assignment.dueDate, assignment.dueTime || "23:59")
           : null,

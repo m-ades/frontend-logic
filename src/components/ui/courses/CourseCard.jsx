@@ -31,8 +31,7 @@ export default function CourseCard({ course, isInstructor, onSelect }) {
     <Card
       sx={{
         height: "100%",
-        minWidth: "300px",
-        maxWidth: "300px",
+        width: "100%",
         display: "flex",
         flexDirection: "column",
         transition: "all 0.3s ease",

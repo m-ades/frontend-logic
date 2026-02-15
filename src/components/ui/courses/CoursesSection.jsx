@@ -13,7 +13,7 @@ export default function CoursesSection({
   if (courses.length === 0) return null;
 
   return (
-    <Box sx={{ mb: 5 }}>
+    <Box sx={{ mb: 3 }}>
       <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}>
         <Icon sx={{ color: iconColor, fontSize: 20 }} />
         <Typography variant="h6" sx={{ fontWeight: 600 }}>
@@ -26,7 +26,7 @@ export default function CoursesSection({
           sx={{ fontWeight: 600 }}
         />
       </Box>
-      <Grid container spacing={3}>
+      <Grid container spacing={2}>
         {courses.map((course) => (
           <Grid size={{ xs: 12, sm: 6, md: 4 }} key={course.id}>
             <CourseCard

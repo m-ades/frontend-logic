@@ -47,7 +47,6 @@ export default function AssignmentFormDialog({
             fullWidth
             value={formData.name}
             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-            required
             placeholder={
               isPractice
                 ? "e.g., Chapter 3 Practice Problems"
@@ -67,7 +66,6 @@ export default function AssignmentFormDialog({
                   chapter: parseInt(e.target.value) || 1,
                 })
               }
-              required
             />
             <TextField
               label="Subchapter"
@@ -79,43 +77,42 @@ export default function AssignmentFormDialog({
                   subchapter: e.target.value,
                 })
               }
-              required
             />
           </Stack>
 
-          <Box>
-            <Typography
-              variant="subtitle2"
-              color="text.secondary"
-              sx={{ mb: 1 }}
-            >
-              Publish Date & Time
-            </Typography>
-            <Stack direction="row" spacing={2}>
-              <TextField
-                label="Date"
-                type="date"
-                fullWidth
-                value={formData.publishDate}
-                onChange={(e) =>
-                  setFormData({ ...formData, publishDate: e.target.value })
-                }
-                InputLabelProps={{ shrink: true }}
-                required
-              />
-              <TextField
-                label="Time"
-                type="time"
-                fullWidth
-                value={formData.publishTime || "00:00"}
-                onChange={(e) =>
-                  setFormData({ ...formData, publishTime: e.target.value })
-                }
-                InputLabelProps={{ shrink: true }}
-                required
-              />
-            </Stack>
-          </Box>
+          {!isCreate && (
+            <Box>
+              <Typography
+                variant="subtitle2"
+                color="text.secondary"
+                sx={{ mb: 1 }}
+              >
+                Publish Date & Time
+              </Typography>
+              <Stack direction="row" spacing={2}>
+                <TextField
+                  label="Date"
+                  type="date"
+                  fullWidth
+                  value={formData.publishDate}
+                  onChange={(e) =>
+                    setFormData({ ...formData, publishDate: e.target.value })
+                  }
+                  InputLabelProps={{ shrink: true }}
+                />
+                <TextField
+                  label="Time"
+                  type="time"
+                  fullWidth
+                  value={formData.publishTime || "00:00"}
+                  onChange={(e) =>
+                    setFormData({ ...formData, publishTime: e.target.value })
+                  }
+                  InputLabelProps={{ shrink: true }}
+                />
+              </Stack>
+            </Box>
+          )}
 
           <Box>
             <Typography
@@ -135,7 +132,6 @@ export default function AssignmentFormDialog({
                   setFormData({ ...formData, dueDate: e.target.value })
                 }
                 InputLabelProps={{ shrink: true }}
-                required={!isPractice}
               />
               <TextField
                 label="Time"
@@ -146,7 +142,6 @@ export default function AssignmentFormDialog({
                   setFormData({ ...formData, dueTime: e.target.value })
                 }
                 InputLabelProps={{ shrink: true }}
-                required={!isPractice}
               />
             </Stack>
             {isPractice && (
