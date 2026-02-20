@@ -2,10 +2,11 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import { Box, Stack, Typography, Alert, Tooltip } from '@mui/material'
 import EditIcon from '@mui/icons-material/Edit'
 import InstructorQuestionEditor from '../InstructorQuestionEditor.jsx'
-import { useTheme } from '@mui/material/styles'
+import { useTheme, useMediaQuery } from '@mui/material'
 import ProblemSetButtons from './ProblemSetButtons.jsx'
 import FormulaInput from '../../ui/logicpenguin/formula-input.js'
 import SymbolButtonRow from '../../ui/logicpenguin/SymbolButtonRow.jsx'
+import { MobileLogicInput } from '../../ui/LogicKeyboard/index.js'
 import { useProblemChecker } from '../../../hooks/useProblemChecker.js'
 import SolutionReveal from '../SolutionReveal.jsx'
 import StatusBanner, { isTerminalStatus } from '../../ui/StatusBanner.jsx'
@@ -125,6 +126,8 @@ export default function SymbolicTranslation({
   isInstructorView = false,
   onQuestionSaved,
 }) {
+  const theme = useTheme()
+  const isPhone = useMediaQuery(theme.breakpoints.down('sm'))
   const editorRef = useRef(null)
   const openEdit = () => editorRef.current?.open?.()
   const [inputValue, setInputValue] = useState(savedState?.ans || '')
@@ -255,28 +258,46 @@ export default function SymbolicTranslation({
               <Typography variant="body2" sx={{ mb: 1, mt: 2.5, color: 'text.secondary' }}>
                 Your translation:
               </Typography>
-              <FormulaInputField
-                value={inputValue}
-                onValueChange={(value) => {
-                  if (readOnly) return
-                  setInputValue(value)
-                  scheduleStateSave(value)
-                }}
-                fieldReadOnly={readOnly}
-                formulaInputRef={formulaInputRef}
-                onEnterKey={!readOnly && !hideActions ? handleCheck : undefined}
-              />
-              <Box sx={{ mt: 1 }}>
-                <SymbolButtonRow
-                  inputRef={formulaInputRef}
-                  disabled={readOnly}
-                  onValueChange={(value) => {
+              {isPhone ? (
+                <MobileLogicInput
+                  value={inputValue}
+                  onChange={(value) => {
                     if (readOnly) return
                     setInputValue(value)
                     scheduleStateSave(value)
                   }}
+                  disabled={readOnly}
+                  placeholder="e.g. P • Q"
+                  aria-label="Formula translation"
+                  symbolizationKey={symbolizationKey}
+                  includeQuantifiers
                 />
-              </Box>
+              ) : (
+                <>
+                  <FormulaInputField
+                    value={inputValue}
+                    onValueChange={(value) => {
+                      if (readOnly) return
+                      setInputValue(value)
+                      scheduleStateSave(value)
+                    }}
+                    fieldReadOnly={readOnly}
+                    formulaInputRef={formulaInputRef}
+                    onEnterKey={!readOnly && !hideActions ? handleCheck : undefined}
+                  />
+                  <Box sx={{ mt: 1 }}>
+                    <SymbolButtonRow
+                      inputRef={formulaInputRef}
+                      disabled={readOnly}
+                      onValueChange={(value) => {
+                        if (readOnly) return
+                        setInputValue(value)
+                        scheduleStateSave(value)
+                      }}
+                    />
+                  </Box>
+                </>
+              )}
             </Box>
             {!suppressReveal && (
               /* show answer in card */
