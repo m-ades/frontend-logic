@@ -30,6 +30,7 @@ import { getSubmissionScore } from '../../../utils/problemHelpers.js'
 import PromptText from '../../ui/PromptText.jsx'
 import ThemedCard from '../../ui/ThemedCard.jsx'
 import ProblemSetButtons from './ProblemSetButtons.jsx'
+import { MobileLogicInput } from '../../ui/LogicKeyboard/index.js'
 import checkDerivation from '../../../lib/logicpenguin/checkers/derivation-hurley.js'
 import getHurleyRuleset from '../../../lib/logicpenguin/checkers/rules/hurley-rules.js'
 import getFormulaClass from '../../../lib/logicpenguin/symbolic/formula.js'
@@ -1368,6 +1369,16 @@ export default function DerivationTable({
                         )
                       })}
                     </Box>
+                  ) : isPhone ? (
+                    <MobileLogicInput
+                      value={line.formula ?? ''}
+                      onChange={(v) => handleLineChange(idx, 'formula', v)}
+                      disabled={line.readOnly}
+                      onBlur={() => handleLineCommit(idx, 'formula', normalizeFormulaForCheck(line.formula ?? ''))}
+                      placeholder=""
+                      aria-label={`Formula line ${idx + 1}`}
+                      includeQuantifiers
+                    />
                   ) : (
                   <TextField
                     variant="standard"

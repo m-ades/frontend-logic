@@ -3,11 +3,12 @@ import { Box, Stack, Typography, Tooltip } from '@mui/material'
 import EditIcon from '@mui/icons-material/Edit'
 import InstructorQuestionEditor from '../InstructorQuestionEditor.jsx'
 import StatusBanner, { isTerminalStatus } from '../../ui/StatusBanner.jsx'
-import { useTheme } from '@mui/material/styles'
+import { useTheme, useMediaQuery } from '@mui/material'
 import getSyntax from '../../../lib/logicpenguin/symbolic/libsyntax.js'
 import ProblemSetButtons from './ProblemSetButtons.jsx'
 import FormulaInput from '../../ui/logicpenguin/formula-input.js'
 import SymbolButtonRow from '../../ui/logicpenguin/SymbolButtonRow.jsx'
+import { MobileLogicInput } from '../../ui/LogicKeyboard/index.js'
 import TruthTableEditor from '../TruthTableEditor.jsx'
 import getFormulaClass from '../../../lib/logicpenguin/symbolic/formula.js'
 import { useProblemChecker } from '../../../hooks/useProblemChecker.js'
@@ -97,6 +98,7 @@ export default function ComboTranslationTruthTable({
   onQuestionSaved,
 }) {
   const theme = useTheme()
+  const isPhone = useMediaQuery(theme.breakpoints.down('sm'))
   const editorRef = useRef(null)
   const openEdit = () => editorRef.current?.open?.()
   const Formula = useMemo(() => getFormulaClass(), [])
@@ -109,6 +111,7 @@ export default function ComboTranslationTruthTable({
   const inputContainerRef = useRef(null)
 
   useEffect(() => {
+    if (isPhone) return
     const container = inputContainerRef.current
     if (!container) return
     const inp = FormulaInput.getnew({})
@@ -138,14 +141,15 @@ export default function ComboTranslationTruthTable({
       if (inp.parentNode) inp.parentNode.removeChild(inp)
       inputRef.current = null
     }
-  }, [theme])
+  }, [theme, isPhone])
 
   useEffect(() => {
+    if (isPhone) return
     const inp = inputRef.current
     if (!inp || argumentLine === undefined || inp.value === argumentLine) return
     if (document.activeElement === inp) return
     inp.value = argumentLine
-  }, [argumentLine])
+  }, [argumentLine, isPhone])
 
   useEffect(() => {
     if (savedState?.argumentLine !== undefined) {
@@ -292,17 +296,29 @@ export default function ComboTranslationTruthTable({
               <Typography variant="body2" sx={{ mb: 1, fontWeight: 600 }}>
                 Argument line
               </Typography>
-              <Box
-                ref={inputContainerRef}
-                sx={{ width: '100%', minHeight: 56, display: 'flex', alignItems: 'center' }}
-              />
-              <Box sx={{ mt: 1 }}>
-                <SymbolButtonRow
-                  inputRef={inputRef}
-                  onValueChange={handleArgumentChange}
+              {isPhone ? (
+                <MobileLogicInput
+                  value={argumentLine}
+                  onChange={handleArgumentChange}
+                  placeholder="e.g. P ⊃ Q / P // Q"
+                  aria-label="Argument line"
                   includeQuantifiers={false}
                 />
-              </Box>
+              ) : (
+                <>
+                  <Box
+                    ref={inputContainerRef}
+                    sx={{ width: '100%', minHeight: 56, display: 'flex', alignItems: 'center' }}
+                  />
+                  <Box sx={{ mt: 1 }}>
+                    <SymbolButtonRow
+                      inputRef={inputRef}
+                      onValueChange={handleArgumentChange}
+                      includeQuantifiers={false}
+                    />
+                  </Box>
+                </>
+              )}
             </Box>
             {parseStatus.ok && tableProof && (
               <TruthTableEditor
