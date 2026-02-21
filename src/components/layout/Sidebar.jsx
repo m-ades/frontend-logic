@@ -117,6 +117,9 @@ export default function Sidebar({ structure, location, onSignOut, onOpenSettings
             duration: theme.transitions.duration.standard,
           }),
           willChange: "width, transform",
+          display: "flex",
+          flexDirection: "column",
+          height: "100vh",
           overflowX: "hidden",
           borderRight: "1px solid",
           borderColor: "divider",
@@ -153,8 +156,8 @@ export default function Sidebar({ structure, location, onSignOut, onOpenSettings
 
       <CourseSelector isSidebarOpened={isSidebarOpened} />
 
-      <Box sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
-        <List sx={{ mt: 1, px: 1, flexGrow: 1 }}>
+      <Box sx={{ display: "flex", flexDirection: "column", flexGrow: 1, minHeight: 0 }}>
+        <List sx={{ mt: 1, px: 1, flexGrow: 1, minHeight: 0, overflowY: "auto" }}>
           {structure.map((link) => (
             <SidebarLink
               key={link.id}
