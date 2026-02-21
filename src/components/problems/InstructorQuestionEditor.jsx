@@ -66,7 +66,9 @@ function normalizeRuleToken(token) {
 }
 
 function parseRuleList(value) {
-  const source = Array.isArray(value) ? value : String(value || '').split(',')
+  const source = Array.isArray(value)
+    ? value.flatMap((entry) => String(entry || '').split(/[,\s]+/g))
+    : String(value || '').split(/[,\s]+/g)
   const out = []
   const seen = new Set()
   source.forEach((entry) => {
@@ -710,10 +712,12 @@ function DerivationEditorForm({ proof, value, onChange }) {
   const update = (updates) => onChange({ ...value, ...updates })
   const premsList = Array.isArray(premises) ? premises : (premises ? [premises] : [])
   const toRuleText = (entries) => parseRuleList(entries).join(', ')
+  const getRulesetFieldText = (fieldValue) =>
+    Array.isArray(fieldValue) ? toRuleText(fieldValue) : String(fieldValue ?? '')
   const setRulesetField = (field, text) => {
     const nextRuleset = {
       ...ruleset,
-      [field]: parseRuleList(text),
+      [field]: text,
     }
     update({ ruleset: nextRuleset })
   }
@@ -762,7 +766,7 @@ function DerivationEditorForm({ proof, value, onChange }) {
       />
       <TextField
         label="Allowed rules"
-        value={toRuleText(ruleset.allow)}
+        value={getRulesetFieldText(ruleset.allow)}
         onChange={(e) => setRulesetField('allow', e.target.value)}
         fullWidth
         variant="outlined"
@@ -770,7 +774,7 @@ function DerivationEditorForm({ proof, value, onChange }) {
       />
       <TextField
         label="Disallowed rules"
-        value={toRuleText(ruleset.disallow)}
+        value={getRulesetFieldText(ruleset.disallow)}
         onChange={(e) => setRulesetField('disallow', e.target.value)}
         fullWidth
         variant="outlined"
@@ -778,7 +782,7 @@ function DerivationEditorForm({ proof, value, onChange }) {
       />
       <TextField
         label="Required rules (all)"
-        value={toRuleText(ruleset.require)}
+        value={getRulesetFieldText(ruleset.require)}
         onChange={(e) => setRulesetField('require', e.target.value)}
         fullWidth
         variant="outlined"
@@ -786,7 +790,7 @@ function DerivationEditorForm({ proof, value, onChange }) {
       />
       <TextField
         label="Required rules (any)"
-        value={toRuleText(ruleset.requireAny)}
+        value={getRulesetFieldText(ruleset.requireAny)}
         onChange={(e) => setRulesetField('requireAny', e.target.value)}
         fullWidth
         variant="outlined"
