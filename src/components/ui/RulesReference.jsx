@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Box, Typography, IconButton, Drawer, alpha } from '@mui/material'
+import { Box, Typography, IconButton, Drawer, alpha, useMediaQuery, useTheme } from '@mui/material'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import ExpandLessIcon from '@mui/icons-material/ExpandLess'
 import { useLayoutState, useLayoutDispatch, closeRulesReference } from '../../context/LayoutContext.jsx'
@@ -75,6 +75,10 @@ function RulesCard({ title, children, defaultExpanded = false }) {
 export default function RulesReference() {
   const { isRulesReferenceOpen } = useLayoutState()
   const dispatch = useLayoutDispatch()
+  const theme = useTheme()
+  const isLargeScreen = useMediaQuery(theme.breakpoints.up('lg'))
+  const hasDesktopPointer = useMediaQuery('(hover: hover) and (pointer: fine)')
+  const isDesktop = isLargeScreen && hasDesktopPointer
   
   const blurActiveElement = () => {
     const el = document.activeElement
@@ -195,6 +199,52 @@ export default function RulesReference() {
     </Box>
   )
   
+  const header = (
+    <Box sx={{ p: 2, borderBottom: 1, borderColor: 'divider', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <Box>
+        <Typography variant="h6">Rulebook</Typography>
+        <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.75rem' }}>
+          Logic Rules & Shortcuts
+        </Typography>
+      </Box>
+      <IconButton onClick={handleClose}>
+        <ExpandLessIcon />
+      </IconButton>
+    </Box>
+  )
+
+  if (isDesktop) {
+    return (
+      <Box
+        sx={{
+          width: isRulesReferenceOpen ? 'clamp(280px, 24vw, 360px)' : 0,
+          maxWidth: isRulesReferenceOpen ? 'min(360px, 32vw)' : 0,
+          minWidth: 0,
+          flexShrink: 0,
+          overflow: 'hidden',
+          borderLeft: isRulesReferenceOpen ? 1 : 0,
+          borderColor: 'divider',
+          backgroundColor: 'background.paper',
+          transition: (t) => t.transitions.create(['width', 'border-color'], {
+            duration: t.transitions.duration.shorter,
+          }),
+          display: 'flex',
+          flexDirection: 'column',
+          height: '100vh',
+          position: 'sticky',
+          top: 0,
+        }}
+      >
+        {isRulesReferenceOpen && (
+          <>
+            {header}
+            {rulesContent}
+          </>
+        )}
+      </Box>
+    )
+  }
+
   return (
     <Drawer
       anchor="right"
@@ -211,17 +261,7 @@ export default function RulesReference() {
         },
       }}
     >
-      <Box sx={{ p: 2, borderBottom: 1, borderColor: 'divider', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Box>
-          <Typography variant="h6">Rulebook</Typography>
-          <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.75rem' }}>
-            Logic Rules & Shortcuts
-          </Typography>
-        </Box>
-        <IconButton onClick={handleClose}>
-          <ExpandLessIcon />
-        </IconButton>
-      </Box>
+      {header}
       {rulesContent}
     </Drawer>
   )

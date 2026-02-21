@@ -17,7 +17,9 @@ import { useCoursesState } from "../../context/CoursesContext";
 import ThemeToggle from "./ThemeToggle.jsx";
 import {
   useLayoutDispatch,
+  useLayoutState,
   toggleSidebar,
+  closeRulesReference,
   openRulesReference,
 } from "../../context/LayoutContext.jsx";
 
@@ -65,6 +67,7 @@ export default function Header() {
   const location = useLocation();
   const { courses, activeCourseId } = useCoursesState();
   const layoutDispatch = useLayoutDispatch();
+  const { isRulesReferenceOpen } = useLayoutState();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 
@@ -141,8 +144,15 @@ export default function Header() {
         </Box>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <Button
-            onClick={() => openRulesReference(layoutDispatch)}
+            onClick={() => {
+              if (isRulesReferenceOpen) {
+                closeRulesReference(layoutDispatch);
+                return;
+              }
+              openRulesReference(layoutDispatch);
+            }}
             startIcon={<MenuBookIcon />}
+            aria-pressed={isRulesReferenceOpen}
             sx={{ 
               textTransform: 'none',
               color: 'primary.main',
