@@ -27,6 +27,7 @@ import { useProblemChecker } from '../../../hooks/useProblemChecker.js'
 import SolutionReveal from '../SolutionReveal.jsx'
 import PromptText from '../../ui/PromptText.jsx'
 import { rowsEqual, matrixEqual, clearDebounce, scheduleDebouncedChange } from '../../../utils/tablePerf.js'
+import { getTokenSpeechLabel } from '../../ui/logicpenguin/LogicSymbol.jsx'
 
 const DEFAULT_TOGGLE = ['T', 'F']
 
@@ -488,11 +489,12 @@ export default function SandboxTruthTable({
                                 key={`stt-label-${idx}`}
                                 className="tt-token"
                                 align="center"
+                                aria-label={getTokenSpeechLabel(col.token)}
                                 sx={col.separator
                                   ? { width: 18, px: 0, background: 'transparent', color: 'text.secondary', textTransform: tokenTextTransform }
                                   : { textTransform: tokenTextTransform }}
                               >
-                                {col.token}
+                                <span aria-hidden="true">{col.token}</span>
                               </TableCell>
                             ))}
                           </TableRow>

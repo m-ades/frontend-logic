@@ -1,6 +1,7 @@
 import { Box, Button, Stack } from '@mui/material'
 import { alpha } from '@mui/material/styles'
 import getSyntax from '../../../lib/logicpenguin/symbolic/libsyntax.js'
+import LogicSymbol, { getInsertSymbolLabel } from './LogicSymbol.jsx'
 
 const FALLBACK_SYMBOLS = {
   NOT: '~',
@@ -128,39 +129,49 @@ export default function SymbolButtonRow({
     <Box aria-label="Symbol shortcuts">
       <Stack direction="row" spacing={0.5} flexWrap="wrap" useFlexGap>
         {visibleButtons.map(({ op, quantifier, insert, pair }) => (
-          <Button
-            key={op || insert || pair}
-            type="button"
-            size="medium"
-            variant="outlined"
-            onMouseDown={(e) => e.preventDefault()}
-            onClick={() => handleInsert({ op, quantifier, insert, pair })}
-            disabled={disabled}
-            aria-disabled={disabled}
-            title={`Insert ${resolveLabel(op, quantifier, insert, pair)}`}
-            sx={{
-              minWidth: 34,
-              px: 1,
-              py: 0.45,
-              fontSize: '1rem',
-              lineHeight: 1.1,
-              minHeight: 34,
-              fontWeight: 600,
-              textTransform: 'none',
-              boxShadow: 'none',
-              border: 'none',
-              '&:hover': (theme) => ({
-                boxShadow: 'none',
-                border: 'none',
-                backgroundColor: alpha(
-                  theme.palette.primary.main,
-                  theme.palette.action.hoverOpacity,
-                ),
-              }),
-            }}
-          >
-            {resolveLabel(op, quantifier, insert, pair)}
-          </Button>
+          (() => {
+            const visualSymbol = resolveLabel(op, quantifier, insert, pair)
+            const a11yLabel = getInsertSymbolLabel({
+              insert: pair ? null : visualSymbol,
+              pair,
+            })
+            return (
+              <Button
+                key={op || insert || pair}
+                type="button"
+                size="medium"
+                variant="outlined"
+                onMouseDown={(e) => e.preventDefault()}
+                onClick={() => handleInsert({ op, quantifier, insert, pair })}
+                disabled={disabled}
+                aria-disabled={disabled}
+                aria-label={a11yLabel}
+                title={a11yLabel}
+                sx={{
+                  minWidth: 34,
+                  px: 1,
+                  py: 0.45,
+                  fontSize: '1rem',
+                  lineHeight: 1.1,
+                  minHeight: 34,
+                  fontWeight: 600,
+                  textTransform: 'none',
+                  boxShadow: 'none',
+                  border: 'none',
+                  '&:hover': (theme) => ({
+                    boxShadow: 'none',
+                    border: 'none',
+                    backgroundColor: alpha(
+                      theme.palette.primary.main,
+                      theme.palette.action.hoverOpacity,
+                    ),
+                  }),
+                }}
+              >
+                <LogicSymbol symbol={visualSymbol} />
+              </Button>
+            )
+          })()
         ))}
       </Stack>
     </Box>

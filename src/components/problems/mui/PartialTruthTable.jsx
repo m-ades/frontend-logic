@@ -20,6 +20,7 @@ import InstructorQuestionEditor from '../InstructorQuestionEditor.jsx'
 import { useTheme } from '@mui/material/styles'
 import getFormulaClass from '../../../lib/logicpenguin/symbolic/formula.js'
 import { multiTables } from '../../../lib/logicpenguin/symbolic/libsemantics.js'
+import { getTokenSpeechLabel } from '../../ui/logicpenguin/LogicSymbol.jsx'
 import ProblemSetButtons from './ProblemSetButtons.jsx'
 import StatusBanner, { isTerminalStatus } from '../../ui/StatusBanner.jsx'
 import { useProblemChecker } from '../../../hooks/useProblemChecker.js'
@@ -269,9 +270,10 @@ export default function PartialTruthTable({
                         key={`partial-tt-token-${idx}`} 
                         className="tt-token" 
                         align="center"
+                        aria-label={getTokenSpeechLabel(token)}
                         sx={{ fontFamily: 'inherit', fontSize: 'var(--tt-token-font-size)', fontWeight: 600 }}
                       >
-                        {token}
+                        <span aria-hidden="true">{token}</span>
                       </TableCell>
                     ))}
                   </TableRow>

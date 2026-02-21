@@ -7,6 +7,7 @@ import { useTheme } from '@mui/material/styles'
 import getFormulaClass from '../../../lib/logicpenguin/symbolic/formula.js'
 import getSyntax from '../../../lib/logicpenguin/symbolic/libsyntax.js'
 import { libtf } from '../../../lib/logicpenguin/symbolic/libsemantics.js'
+import { getTokenSpeechLabel } from '../../ui/logicpenguin/LogicSymbol.jsx'
 import ProblemSetButtons from './ProblemSetButtons.jsx'
 import { useProblemChecker } from '../../../hooks/useProblemChecker.js'
 import PromptText from '../../ui/PromptText.jsx'
@@ -326,8 +327,8 @@ export default function SingleRowTruthTable({
         <Box component="thead" className="tt-head">
           <Box component="tr" className="tt-token-row">
             {(headerTokens.length > 0 ? headerTokens : tokens).map((token, idx) => (
-              <Box component="th" key={`single-row-header-${idx}`} className="tt-token">
-                {token}
+              <Box component="th" key={`single-row-header-${idx}`} className="tt-token" aria-label={getTokenSpeechLabel(token)}>
+                <span aria-hidden="true">{token}</span>
               </Box>
             ))}
           </Box>

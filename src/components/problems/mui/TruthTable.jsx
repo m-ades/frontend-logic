@@ -35,6 +35,7 @@ import ProblemSetButtons from './ProblemSetButtons.jsx'
 import { fetchJson, getActiveUserId } from '../../../utils/api.js'
 import PromptText from '../../ui/PromptText.jsx'
 import { tablesEqual, clearDebounce, scheduleDebouncedChange } from '../../../utils/tablePerf.js'
+import { getTokenSpeechLabel } from '../../ui/logicpenguin/LogicSymbol.jsx'
 
 const KIND_BY_PROOF_TYPE = {
   'formula-truth-table': 'formula',
@@ -790,9 +791,10 @@ export default function TruthTable({
                         <TableCell 
                           className="tt-token tt-separator" 
                           align="center"
+                          aria-label={isConclusion ? 'slash slash' : 'slash'}
                           sx={{ background: 'transparent', color: 'text.secondary' }}
                         >
-                          {isConclusion ? '//' : '/'}
+                          <span aria-hidden="true">{isConclusion ? '//' : '/'}</span>
                         </TableCell>
                       )}
                       {headerTokens.map((token, tokenIndex) => (
@@ -802,8 +804,9 @@ export default function TruthTable({
                             isConclusion && tokenIndex === 0 ? 'tt-token tt-conclusion' : 'tt-token'
                           }
                           align="center"
+                          aria-label={getTokenSpeechLabel(token)}
                         >
-                          {token}
+                          <span aria-hidden="true">{token}</span>
                         </TableCell>
                       ))}
                     </React.Fragment>
@@ -913,8 +916,9 @@ export default function TruthTable({
                       key={`solution-header-${tableIndex}-${idx}`}
                       className="tt-token"
                       align="center"
+                      aria-label={getTokenSpeechLabel(token)}
                     >
-                      {token}
+                      <span aria-hidden="true">{token}</span>
                     </TableCell>
                   ))}
                 </TableRow>
