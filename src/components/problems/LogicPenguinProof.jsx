@@ -168,6 +168,66 @@ export default function LogicPenguinProof({ premises, conclusion, questionId, sa
     }
   }, [onStateChange])
 
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+    let focusOutTimer = null
+
+    const clearFocusState = () => {
+      const prev = el.querySelector('.lp-active-derivation-line')
+      if (prev) prev.classList.remove('lp-active-derivation-line')
+    }
+
+    const setActiveLineFromNode = (node) => {
+      if (!(node instanceof HTMLElement)) return
+      const line = node.closest('.derivationline')
+      if (!line) return
+      const prev = el.querySelector('.lp-active-derivation-line')
+      if (prev === line) return
+      if (prev) prev.classList.remove('lp-active-derivation-line')
+      line.classList.add('lp-active-derivation-line')
+    }
+
+    const handleFocusIn = (event) => {
+      setActiveLineFromNode(event.target)
+    }
+
+    const handlePointerDown = (event) => {
+      setActiveLineFromNode(event.target)
+    }
+
+    const handleFocusOut = () => {
+      // Delay to allow focus to move between inputs inside the same line.
+      if (focusOutTimer) clearTimeout(focusOutTimer)
+      focusOutTimer = setTimeout(() => {
+        const active = document.activeElement
+        if (!(active instanceof HTMLElement) || !el.contains(active)) {
+          clearFocusState()
+          return
+        }
+        const activeLine = active.closest('.derivationline')
+        if (!activeLine) {
+          clearFocusState()
+          return
+        }
+        const prev = el.querySelector('.lp-active-derivation-line')
+        if (prev && prev !== activeLine) prev.classList.remove('lp-active-derivation-line')
+        activeLine.classList.add('lp-active-derivation-line')
+      }, 0)
+    }
+
+    el.addEventListener('focusin', handleFocusIn, true)
+    el.addEventListener('pointerdown', handlePointerDown, true)
+    el.addEventListener('focusout', handleFocusOut, true)
+    return () => {
+      el.removeEventListener('focusin', handleFocusIn, true)
+      el.removeEventListener('pointerdown', handlePointerDown, true)
+      el.removeEventListener('focusout', handleFocusOut, true)
+      if (focusOutTimer) clearTimeout(focusOutTimer)
+      clearFocusState()
+    }
+  }, [])
+
   return (
     <div className="logicpenguin" style={{ width: "100%", overflowX: "auto", minWidth: 0 }}>
       <derivation-hurley

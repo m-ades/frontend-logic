@@ -35,6 +35,7 @@ import getHurleyRuleset from '../../../lib/logicpenguin/checkers/rules/hurley-ru
 import getFormulaClass from '../../../lib/logicpenguin/symbolic/formula.js'
 import getSyntax from '../../../lib/logicpenguin/symbolic/libsyntax.js'
 import { justParse } from '../../ui/logicpenguin/justification-parse.js'
+import { getInsertSymbolLabel } from '../../ui/logicpenguin/LogicSymbol.jsx'
 
 /** Compare formula strings by canonical form so ∃x(~Hx) and ∃x~Hx count equal */
 function formulasEqualNormally(a, b, normalizeForFallback) {
@@ -229,24 +230,30 @@ const buildErrorRows = (errors, linesSnapshot = [], { skipCompletion = false } =
       for (const severity of Object.keys(severities)) {
         const items = severities[severity] || {}
         for (const desc of Object.keys(items)) {
+          const displayDesc = String(desc || '')
+            .replace(/^syntax error:\s*/i, '')
+            .replace(
+              'formulas must start with an uppercase predicate letter (A–Z) or =/≠; lowercase predicates are not accepted.',
+              'derivations must start with an uppercase predicate letter (A–Z); lowercase predicates are not accepted.'
+            )
           if (
             lineRule &&
             (lineRule === 'CP' || lineRule === 'IP') &&
-            desc === 'cites the wrong number of subderivation line ranges for the rule specified'
+            displayDesc === 'cites the wrong number of subderivation line ranges for the rule specified'
           ) {
-            descs.push(`${desc} (e.g. 3-9)`)
+            descs.push(`${displayDesc} (e.g. 3-9)`)
           } else {
-            descs.push(desc)
+            descs.push(displayDesc)
           }
         }
       }
       if (descs.length === 0) continue
+      const isWarning = category === 'dependency'
+      const baseLabel = `${category.charAt(0).toUpperCase()}${category.slice(1)}`
       entries.push({
-        label: category === 'dependency'
-          ? 'Warning'
-          : `${category.charAt(0).toUpperCase()}${category.slice(1)} errors`,
+        label: isWarning ? 'Warning' : `${baseLabel} ${descs.length === 1 ? 'error' : 'errors'}`,
         messages: descs,
-        isWarning: category === 'dependency',
+        isWarning,
       })
     }
     if (entries.length > 0) {
@@ -400,12 +407,33 @@ export default function DerivationTable({
   })
   const [autoCheckState, setAutoCheckState] = useState({ perLine: {}, rows: [] })
   const autoCheckTimerRef = useRef(null)
-  const [lineGateNotice, setLineGateNotice] = useState({ index: null, message: '' })
+  const [lineGateNotice, setLineGateNotice] = useState({ index: null, message: '', tone: 'error' })
+  const clearLineGateNotice = useCallback(() => {
+    setLineGateNotice({ index: null, message: '', tone: 'error' })
+  }, [])
+  const setLineGateErrorNotice = useCallback((index, message) => {
+    setLineGateNotice({ index, message, tone: 'error' })
+  }, [])
+  const setLineGateSuccessNotice = useCallback((index, message) => {
+    setLineGateNotice({ index, message, tone: 'success' })
+  }, [])
   const [lineDrafts, setLineDrafts] = useState({})
   const pendingFocusRef = useRef(null)
+  const effectiveLines = useMemo(
+    () =>
+      lines.map((line, idx) => {
+        if (!useRuleDropdown || !(idx in lineDrafts)) return line
+        return {
+          ...line,
+          // Keep indentation/reactivity in sync while line(s) drafts are being edited.
+          justification: applyLinesToJustification(line.justification, lineDrafts[idx]),
+        }
+      }),
+    [lineDrafts, lines, useRuleDropdown]
+  )
   const indentLevels = useMemo(() => {
     let level = 0
-    return lines.map((line) => {
+    return effectiveLines.map((line) => {
       const rule = getRuleFromJustification(line.justification).toUpperCase()
       if (INDENT_END_RULES.has(rule)) {
         level = Math.max(0, level - 1)
@@ -415,7 +443,7 @@ export default function DerivationTable({
       }
       return level
     })
-  }, [lines])
+  }, [effectiveLines])
 
   const normalizeFormulaForCheck = useMemo(
     () => (value) => {
@@ -588,6 +616,7 @@ export default function DerivationTable({
             const conclusionStr = proof?.conclusion || ''
             if (!conclusionStr) return prev
             if (formulasEqualNormally(last.formula || '', conclusionStr, normalizeFormulaForCheck)) return prev
+            pendingFocusRef.current = prev.length
             return [...prev, { formula: '', justification: '', readOnly: false }]
           })
         }
@@ -607,6 +636,48 @@ export default function DerivationTable({
     window.sessionStorage.setItem(AUTO_CHECK_STORAGE_KEY, String(autoCheckEnabled))
   }, [autoCheckEnabled])
 
+  const derivationLooksGood = useMemo(() => {
+    if (!autoCheckEnabled) return { ok: false, index: null }
+    const conclusion = proof?.conclusion || ''
+    if (!String(conclusion).trim()) return { ok: false, index: null }
+    const filledEditableIndices = lines
+      .map((line, idx) => ({
+        idx,
+        hasContent: idx >= premises.length && Boolean((line?.formula || '').trim() || (line?.justification || '').trim()),
+      }))
+      .filter((entry) => entry.hasContent)
+      .map((entry) => entry.idx)
+    if (filledEditableIndices.length === 0) return { ok: false, index: null }
+    const lastFilledIndex = filledEditableIndices[filledEditableIndices.length - 1]
+    const lastFilled = lines[lastFilledIndex]
+    if (!lastFilled || lastFilled.readOnly) return { ok: false, index: null }
+    if (!isLineCompleteForCheck(lastFilled)) return { ok: false, index: null }
+    if (autoCheckState.perLine[lastFilledIndex] !== 'ok') return { ok: false, index: null }
+    const matchesConclusion = formulasEqualNormally(
+      lastFilled.formula || '',
+      conclusion,
+      normalizeFormulaForCheck
+    )
+    if (!matchesConclusion) return { ok: false, index: null }
+    return { ok: true, index: lastFilledIndex }
+  }, [autoCheckEnabled, autoCheckState.perLine, isLineCompleteForCheck, lines, normalizeFormulaForCheck, premises.length, proof?.conclusion])
+
+  useEffect(() => {
+    if (derivationLooksGood.ok) {
+      if (
+        lineGateNotice.tone !== 'success' ||
+        lineGateNotice.message !== 'Derivation looks good.' ||
+        lineGateNotice.index !== derivationLooksGood.index
+      ) {
+        setLineGateSuccessNotice(derivationLooksGood.index, 'Derivation looks good.')
+      }
+      return
+    }
+    if (lineGateNotice.tone === 'success') {
+      clearLineGateNotice()
+    }
+  }, [clearLineGateNotice, derivationLooksGood, lineGateNotice.index, lineGateNotice.message, lineGateNotice.tone, setLineGateSuccessNotice])
+
   const applyLineChange = (currentLines, index, field, value) =>
     currentLines.map((line, idx) =>
       idx === index ? { ...line, [field]: value } : line
@@ -615,7 +686,7 @@ export default function DerivationTable({
   const handleLineChange = (index, field, value) => {
     setLines((prev) => applyLineChange(prev, index, field, value))
     if (lineGateNotice.index === index) {
-      setLineGateNotice({ index: null, message: '' })
+      clearLineGateNotice()
     }
   }
 
@@ -626,9 +697,9 @@ export default function DerivationTable({
       return nextLines
     })
     if (clearNoticeIndex !== null && lineGateNotice.index === clearNoticeIndex) {
-      setLineGateNotice({ index: null, message: '' })
+      clearLineGateNotice()
     }
-  }, [emitState, lineGateNotice.index])
+  }, [clearLineGateNotice, emitState, lineGateNotice.index])
 
   useEffect(() => {
     if (pendingFocusRef.current === null) return
@@ -653,7 +724,11 @@ export default function DerivationTable({
         const line = prev[targetIdx]
         if (!line) return prev
         const { nums, ranges, citedrules } = justParse(String(line.justification || ''))
-        const newNums = [...nums, clickedLineNum]
+        const hasLineNum = nums.includes(clickedLineNum)
+        const nextNums = hasLineNum
+          ? nums.filter((n) => n !== clickedLineNum)
+          : [...nums, clickedLineNum]
+        const newNums = [...new Set(nextNums)].sort((a, b) => a - b)
         const newJust = formatJustificationParts(newNums, ranges, citedrules)
         return applyLineChange(prev, targetIdx, 'justification', newJust)
       })
@@ -677,7 +752,7 @@ export default function DerivationTable({
 
   const addLine = () => {
     if (autoCheckEnabled && !canAddLine) {
-      setLineGateNotice({ index: lines.length - 1, message: 'Re-check current line to move onto the next line.' })
+      setLineGateErrorNotice(lines.length - 1, 'Re-check current line to move onto the next line.')
       return
     }
     const nextIndex = lines.length
@@ -877,11 +952,11 @@ export default function DerivationTable({
           const result = await runAutoCheck(nextLines)
           setAutoCheckState(result)
           if (result.perLine[index] !== 'ok') {
-            setLineGateNotice({ index, message: 'Re-check current line to move onto the next line.' })
+            setLineGateErrorNotice(index, 'Re-check current line to move onto the next line.')
             return
           }
         } catch (err) {
-          setLineGateNotice({ index, message: 'Re-check current line to move onto the next line.' })
+          setLineGateErrorNotice(index, 'Re-check current line to move onto the next line.')
           return
         }
       }
@@ -1181,7 +1256,7 @@ export default function DerivationTable({
                     {(`// ${proof.conclusion || ''}`).split('').map((char, i) => {
                       const isLetter = /^[a-zA-Z]$/.test(char)
                       return isLetter ? (
-                        <Box component="span" key={`conc-${i}`} className="clickable-char" onPointerDown={(e) => e.preventDefault()} onClick={() => handleSymbolInsert({ insert: char })} aria-label={`Insert ${char}`}>
+                        <Box component="span" key={`conc-${i}`} className="clickable-char" onPointerDown={(e) => e.preventDefault()} onClick={() => handleSymbolInsert({ insert: char })} aria-label={getInsertSymbolLabel({ insert: char })}>
                           {char}
                         </Box>
                       ) : (
@@ -1193,21 +1268,39 @@ export default function DerivationTable({
               </TableRow>
             )}
             {lines.map((line, idx) => {
+              const isActiveLine = activeFormulaIndex === idx
               const indentPx = (indentLevels[idx] || 0) * INDENT_PX
                 + (indentLevels[idx] ? ASSUMPTION_INDENT_PX : 0)
               return (
               <TableRow
                 key={`line-${idx}`}
                 sx={{
+                  transform: indentPx ? `translateX(${indentPx}px)` : 'none',
+                  transition: 'transform 120ms ease',
                   '& td': {
                     py: isMobile ? 0.25 : 0.5,
                     position: 'relative',
-                    left: indentPx ? `${indentPx}px` : 0,
                     verticalAlign: 'middle',
+                    transition: 'background-color 160ms ease',
                   },
+                  ...(isActiveLine && {
+                    '& td': {
+                      backgroundColor: (t) => alpha(t.palette.primary.main, t.palette.mode === 'dark' ? 0.12 : 0.06),
+                    },
+                    '& td:first-of-type': {
+                      borderTopLeftRadius: 10,
+                      borderBottomLeftRadius: 10,
+                      clipPath: 'polygon(0 0, 100% 0, 100% 100%, 10px 100%, 0 50%)',
+                    },
+                    '& td:last-of-type': {
+                      borderTopRightRadius: 10,
+                      borderBottomRightRadius: 10,
+                      clipPath: 'polygon(0 0, calc(100% - 10px) 0, 100% 50%, calc(100% - 10px) 100%, 0 100%)',
+                    },
+                  }),
                 }}
               >
-                <TableCell sx={{ width: isFullScreen || isMobile ? 36 : 48, minWidth: isFullScreen || isMobile ? 36 : undefined, borderBottom: 'none', color: '#4f5b7a', fontWeight: 600, verticalAlign: 'middle', ...(isFullScreen && { pr: 1 }) }}>
+                <TableCell sx={{ width: isFullScreen || isMobile ? 36 : 48, minWidth: isFullScreen || isMobile ? 36 : undefined, borderBottom: 'none', color: (t) => alpha(t.palette.text.primary, t.palette.mode === 'dark' ? 0.78 : 0.7), fontWeight: 600, verticalAlign: 'middle', ...(isFullScreen && { pr: 1 }) }}>
                   <Box
                     component="button"
                     type="button"
@@ -1266,7 +1359,7 @@ export default function DerivationTable({
                             className="clickable-char"
                             onPointerDown={(e) => e.preventDefault()}
                             onClick={() => handleSymbolInsert({ insert: char })}
-                            aria-label={`Insert ${char}`}
+                            aria-label={getInsertSymbolLabel({ insert: char })}
                           >
                             {char}
                           </Box>
@@ -1359,7 +1452,7 @@ export default function DerivationTable({
                         {(proof?.conclusion ? `// ${proof.conclusion}` : '').split('').map((char, i) => {
                           const isLetter = /^[a-zA-Z]$/.test(char)
                           return isLetter ? (
-                            <Box component="span" key={`conc-row-${idx}-${i}`} className="clickable-char" onPointerDown={(e) => e.preventDefault()} onClick={() => handleSymbolInsert({ insert: char })} aria-label={`Insert ${char}`}>
+                            <Box component="span" key={`conc-row-${idx}-${i}`} className="clickable-char" onPointerDown={(e) => e.preventDefault()} onClick={() => handleSymbolInsert({ insert: char })} aria-label={getInsertSymbolLabel({ insert: char })}>
                               {char}
                             </Box>
                           ) : (
@@ -1381,6 +1474,10 @@ export default function DerivationTable({
                               value={lineDrafts[idx] ?? formatJustificationLines(line.justification)}
                               onFocus={() => {
                                 if (!line.readOnly && isPhone && isFullScreen) {
+                                  setActiveFormulaIndex(idx)
+                                  lastEditableIndexRef.current = idx
+                                }
+                                if (!line.readOnly) {
                                   setActiveFormulaIndex(idx)
                                   lastEditableIndexRef.current = idx
                                 }
@@ -1442,6 +1539,10 @@ export default function DerivationTable({
                                     setActiveFormulaIndex(idx)
                                     lastEditableIndexRef.current = idx
                                   }
+                                  if (!line.readOnly) {
+                                    setActiveFormulaIndex(idx)
+                                    lastEditableIndexRef.current = idx
+                                  }
                                 }}
                                 onChange={(e) => {
                                   const selectedRule = String(e.target.value || '')
@@ -1468,6 +1569,7 @@ export default function DerivationTable({
                                           newLine,
                                           ...nextLines.slice(nextIdx),
                                         ]
+                                        pendingFocusRef.current = nextIdx
                                       }
                                     }
                                     return nextLines
@@ -1507,8 +1609,14 @@ export default function DerivationTable({
                       ) : (
                         <TextField
                           variant="standard"
-                          placeholder={idx === premises.length ? 'Line(s) and rule' : ''}
+                          placeholder={idx === premises.length ? 'line(s) and rule' : ''}
                           value={line.justification}
+                          onFocus={() => {
+                            if (!line.readOnly) {
+                              setActiveFormulaIndex(idx)
+                              lastEditableIndexRef.current = idx
+                            }
+                          }}
                           onPointerDown={(e) => {
                             if (line.readOnly) return
                             if (canOpenFullScreen) {
@@ -1611,6 +1719,8 @@ export default function DerivationTable({
                               variant="outlined"
                               onMouseDown={(e) => e.preventDefault()}
                               onClick={() => handleSymbolInsert({ insert: btn.insert, pair: btn.pair })}
+                              aria-label={getInsertSymbolLabel({ insert: btn.insert, pair: btn.pair })}
+                              title={getInsertSymbolLabel({ insert: btn.insert, pair: btn.pair })}
                               sx={symbolBtnSx(isFullScreen, isMobile, isPhone)}
                             >
                               {btn.label}
@@ -1628,6 +1738,8 @@ export default function DerivationTable({
                               variant="outlined"
                               onMouseDown={(e) => e.preventDefault()}
                               onClick={() => handleSymbolInsert({ insert: btn.insert, pair: btn.pair })}
+                              aria-label={getInsertSymbolLabel({ insert: btn.insert, pair: btn.pair })}
+                              title={getInsertSymbolLabel({ insert: btn.insert, pair: btn.pair })}
                               sx={symbolBtnSx(isFullScreen, isMobile, isPhone)}
                             >
                               {btn.label}
@@ -1659,6 +1771,8 @@ export default function DerivationTable({
                             variant="outlined"
                             onMouseDown={(e) => e.preventDefault()}
                             onClick={() => handleSymbolInsert({ insert, pair })}
+                            aria-label={getInsertSymbolLabel({ insert, pair })}
+                            title={getInsertSymbolLabel({ insert, pair })}
                             sx={symbolBtnSx(isFullScreen, isMobile, isPhone)}
                           >
                             {label}
@@ -1675,7 +1789,14 @@ export default function DerivationTable({
         </TableContainer>
 
         {lineGateNotice.message && (
-          <Typography variant="body2" sx={{ mt: 1, color: 'error.main', ...(isFullScreen && { pl: 2 }) }}>
+          <Typography
+            variant="body2"
+            sx={{
+              mt: 1,
+              color: lineGateNotice.tone === 'success' ? 'success.main' : 'error.main',
+              ...(isFullScreen && { pl: 2 }),
+            }}
+          >
             {lineGateNotice.message}
           </Typography>
         )}
