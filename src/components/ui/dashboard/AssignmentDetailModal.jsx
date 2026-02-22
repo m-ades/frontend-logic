@@ -83,7 +83,7 @@ export default function AssignmentDetailModal({ open, onClose, assignmentId }) {
   // Metrics use students only (TAs are roster-only, excluded from calculations)
   const totalStudents = activeCourse?.studentCount ?? gradebookStudentsOnly.length;
   const submissions = gradebookStudentsOnly.filter(
-    (student) => student.grades[assignment.id] !== undefined
+    (student) => Boolean(student.submittedAssignments?.[assignment.id])
   ).length;
 
   const completionRate =
@@ -122,13 +122,14 @@ export default function AssignmentDetailModal({ open, onClose, assignmentId }) {
     .map((student) => {
       const grade = student.grades[assignment.id];
       const isLate = student.lateSubmissions?.[assignment.id] || false;
+      const submitted = Boolean(student.submittedAssignments?.[assignment.id]);
 
       return {
         ...student,
         grade,
         isLate,
-        submitted: grade !== undefined && grade !== null,
-        letterGrade: grade !== undefined ? getLetterGrade(grade) : "—",
+        submitted,
+        letterGrade: submitted && grade !== undefined ? getLetterGrade(grade) : "—",
       };
     })
     .sort((a, b) => {

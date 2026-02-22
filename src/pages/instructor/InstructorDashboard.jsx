@@ -126,7 +126,7 @@ export default function InstructorDashboard() {
           ? Math.round(averagePercent * 100)
           : calculateAssignmentAverage(assignment.id, studentsForAssignments);
       const submissionsFallback = studentsForAssignments.filter(
-        (student) => student.grades[assignment.id] !== undefined
+        (student) => Boolean(student.submittedAssignments?.[assignment.id])
       ).length;
       const submissionsRaw =
         stats?.students_submitted ?? submissionsFallback;

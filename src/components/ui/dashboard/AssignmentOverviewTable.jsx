@@ -50,7 +50,7 @@ export const AssignmentOverviewTable = ({
     const assignmentId = assignment?.id;
     const submissions =
       assignment.submissions ??
-      gradebookStudentsOnly.filter((student) => student.grades[assignmentId] !== undefined)
+      gradebookStudentsOnly.filter((student) => Boolean(student.submittedAssignments?.[assignmentId]))
         .length;
 
     const grades = gradebookStudentsOnly
@@ -69,7 +69,7 @@ export const AssignmentOverviewTable = ({
       assignment.lateSubmissions ??
       gradebookStudentsOnly.filter(
         (student) =>
-          student.grades[assignmentId] !== undefined &&
+          Boolean(student.submittedAssignments?.[assignmentId]) &&
           student.lateSubmissions?.[assignmentId]
       ).length;
 

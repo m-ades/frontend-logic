@@ -204,7 +204,11 @@ export async function fetchCourseGradebook(courseId) {
   const data = await fetchJson(`/api/analytics/gradebook?courseId=${courseId}`);
   const students = (data?.students || []).map((student) => {
     const grades = {};
+    const submittedAssignments = {};
     (student.assignments || []).forEach((assignment) => {
+      if (assignment.has_submission) {
+        submittedAssignments[assignment.assignment_id] = true;
+      }
       if (assignment.has_grade && assignment.max_score > 0) {
         grades[assignment.assignment_id] = Math.round(
           (assignment.final_score / assignment.max_score) * 100
@@ -219,6 +223,7 @@ export async function fetchCourseGradebook(courseId) {
       username: student.username,
       role,
       grades,
+      submittedAssignments,
       lateSubmissions: {},
       submissionDates: {},
       practices: {},

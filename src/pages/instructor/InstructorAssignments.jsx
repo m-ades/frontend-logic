@@ -101,7 +101,7 @@ export default function InstructorAssignments() {
   ).map((assignment) => {
     const average = calculateAssignmentAverage(assignment.id, gradebook);
     const submissions = gradebook.filter(
-      (student) => student.grades[assignment.id] !== undefined
+      (student) => Boolean(student.submittedAssignments?.[assignment.id])
     ).length;
 
     return {
