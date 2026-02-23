@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { Box, Button, Stack } from '@mui/material'
 import { alpha } from '@mui/material/styles'
 import { useTheme, useMediaQuery } from '@mui/material'
@@ -197,41 +198,42 @@ export default function MobileLogicInput({
         placeholder={placeholder}
         aria-label={ariaLabel}
       />
-      {showPanel ? (
-        <Box
-          onMouseDown={(e) => e.preventDefault()}
-          onTransitionEnd={handlePanelTransitionEnd}
-          role="region"
-          aria-label="Formula keyboard: insert logic symbols and letters, move cursor with arrow buttons"
-          sx={{
-            position: 'fixed',
-            left: 0,
-            right: 0,
-            bottom: 0,
-            zIndex: 1300,
-            boxSizing: 'border-box',
-            width: '100%',
-            maxWidth: '100vw',
-            p: 1.5,
-            pb: 'max(8px, env(safe-area-inset-bottom, 0px))',
-            bgcolor: (t) =>
-              t.palette.mode === 'dark'
-                ? alpha(t.palette.background.paper, 0.98)
-                : t.palette.grey[100],
-            borderTop: '1px solid',
-            borderColor: 'divider',
-            boxShadow: (t) => t.shadows[8],
-            overflow: 'hidden',
-            borderTopLeftRadius: 12,
-            borderTopRightRadius: 12,
-            transform: isVisible ? 'translateY(0)' : 'translateY(100%)',
-            transition: 'transform 0.28s ease-in-out',
-            willChange: 'transform',
-            '@media (prefers-reduced-motion: reduce)': {
-              transition: 'none',
-            },
-          }}
-        >
+      {showPanel && typeof document !== 'undefined'
+        ? createPortal(
+            <Box
+              onMouseDown={(e) => e.preventDefault()}
+              onTransitionEnd={handlePanelTransitionEnd}
+              role="region"
+              aria-label="Formula keyboard: insert logic symbols and letters, move cursor with arrow buttons"
+              sx={{
+                position: 'fixed',
+                left: 0,
+                right: 0,
+                bottom: 0,
+                zIndex: 1300,
+                boxSizing: 'border-box',
+                width: '100%',
+                maxWidth: '100vw',
+                p: 1.5,
+                pb: 'max(8px, env(safe-area-inset-bottom, 0px))',
+                bgcolor: (t) =>
+                  t.palette.mode === 'dark'
+                    ? alpha(t.palette.background.paper, 0.98)
+                    : t.palette.grey[100],
+                borderTop: '1px solid',
+                borderColor: 'divider',
+                boxShadow: (t) => t.shadows[8],
+                overflow: 'hidden',
+                borderTopLeftRadius: 12,
+                borderTopRightRadius: 12,
+                transform: isVisible ? 'translateY(0)' : 'translateY(100%)',
+                transition: 'transform 0.28s ease-in-out',
+                willChange: 'transform',
+                '@media (prefers-reduced-motion: reduce)': {
+                  transition: 'none',
+                },
+              }}
+            >
           <Stack spacing={1} sx={{ width: '100%' }}>
             <Box role="group" sx={{ width: '100%' }} aria-label="Logic symbols: connectives, quantifiers, parentheses, backspace">
               <SymbolButtonRow
@@ -336,8 +338,10 @@ export default function MobileLogicInput({
               </Stack>
             </Box>
           </Stack>
-        </Box>
-      ) : null}
+        </Box>,
+            document.body
+          )
+        : null}
     </>
   )
 }
