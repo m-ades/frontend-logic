@@ -61,8 +61,12 @@ export default function MobileLogicInput({
 
   const onChangeRef = useRef(onChange)
   const setCursorRef = useRef(setCursorPosition)
+  const valueRef = useRef(value ?? '')
+  const cursorRef = useRef(cursorPosition)
   onChangeRef.current = onChange
   setCursorRef.current = setCursorPosition
+  valueRef.current = value ?? ''
+  cursorRef.current = cursorPosition
 
   const syntax = getSyntax()
   const symbols = syntax?.symbols || {}
@@ -85,12 +89,15 @@ export default function MobileLogicInput({
         this.value = newVal
         this.selectionStart = newPos
         this.selectionEnd = newPos
+        valueRef.current = newVal
+        cursorRef.current = newPos
         setCursorRef.current(newPos)
         onChangeRef.current?.(newVal)
       },
       setSelectionRange(s, e) {
         this.selectionStart = s
         this.selectionEnd = e ?? s
+        cursorRef.current = s
         setCursorRef.current(s)
       },
       insOp(op) {
@@ -149,11 +156,29 @@ export default function MobileLogicInput({
       f.value = newVal
       f.selectionStart = newPos
       f.selectionEnd = newPos
+      valueRef.current = newVal
+      cursorRef.current = newPos
       setCursorPosition(newPos)
       onChange?.(newVal)
     },
     [onChange]
   )
+
+  useEffect(() => {
+    const val = value ?? ''
+    if (cursorRef.current > val.length) setCursorPosition(val.length)
+  }, [value])
+
+  const handleNavLeft = useCallback(() => {
+    setCursorPosition((prev) => Math.max(0, prev - 1))
+  }, [])
+  const handleNavRight = useCallback(() => {
+    setCursorPosition((prev) => Math.min((valueRef.current ?? '').length, prev + 1))
+  }, [])
+  const handleNavStart = useCallback(() => setCursorPosition(0), [])
+  const handleNavEnd = useCallback(() => {
+    setCursorPosition((valueRef.current ?? '').length)
+  }, [])
 
   if (!isPhone) {
     return children ?? null
@@ -174,7 +199,10 @@ export default function MobileLogicInput({
       />
       {showPanel ? (
         <Box
+          onMouseDown={(e) => e.preventDefault()}
           onTransitionEnd={handlePanelTransitionEnd}
+          role="region"
+          aria-label="Formula keyboard: insert logic symbols and letters, move cursor with arrow buttons"
           sx={{
             position: 'fixed',
             left: 0,
@@ -199,12 +227,13 @@ export default function MobileLogicInput({
             transform: isVisible ? 'translateY(0)' : 'translateY(100%)',
             transition: 'transform 0.28s ease-in-out',
             willChange: 'transform',
+            '@media (prefers-reduced-motion: reduce)': {
+              transition: 'none',
+            },
           }}
-          role="group"
-          aria-label="Formula input shortcuts"
         >
           <Stack spacing={1} sx={{ width: '100%' }}>
-            <Box sx={{ width: '100%' }} aria-label="Logic symbols">
+            <Box role="group" sx={{ width: '100%' }} aria-label="Logic symbols: connectives, quantifiers, parentheses, backspace">
               <SymbolButtonRow
                 inputRef={facadeRef}
                 onValueChange={onChange}
@@ -213,7 +242,7 @@ export default function MobileLogicInput({
                 centerButtons
               />
             </Box>
-            <Box sx={{ width: '100%' }} aria-label="Variable letters">
+            <Box role="group" sx={{ width: '100%' }} aria-label="Variable letters: tap to insert at cursor">
               <Stack
                 direction="row"
                 spacing={0.5}
@@ -238,6 +267,72 @@ export default function MobileLogicInput({
                     {letter}
                   </Button>
                 ))}
+              </Stack>
+            </Box>
+            <Box role="group" sx={{ width: '100%' }} aria-label="Cursor navigation: move to start, left, right, or end">
+              <Stack
+                direction="row"
+                spacing={0.5}
+                flexWrap="wrap"
+                useFlexGap
+                justifyContent="center"
+              >
+                <Button
+                  type="button"
+                  size="medium"
+                  variant="outlined"
+                  disabled={disabled}
+                  aria-disabled={disabled}
+                  onClick={handleNavStart}
+                  onMouseDown={(e) => e.preventDefault()}
+                  aria-label="Move cursor to start"
+                  title="Move cursor to start"
+                  sx={symbolRowButtonSx}
+                >
+                  ⇤
+                </Button>
+                <Button
+                  type="button"
+                  size="medium"
+                  variant="outlined"
+                  disabled={disabled}
+                  aria-disabled={disabled}
+                  onClick={handleNavLeft}
+                  onMouseDown={(e) => e.preventDefault()}
+                  aria-label="Move cursor left"
+                  title="Move cursor left"
+                  sx={symbolRowButtonSx}
+                >
+                  ←
+                </Button>
+                <Button
+                  type="button"
+                  size="medium"
+                  variant="outlined"
+                  disabled={disabled}
+                  aria-disabled={disabled}
+                  onClick={handleNavRight}
+                  onMouseDown={(e) => e.preventDefault()}
+                  aria-label="Move cursor right"
+                  title="Move cursor right"
+                  sx={symbolRowButtonSx}
+                >
+                  →
+                </Button>
+                <Button
+                  type="button"
+                  size="medium"
+                  variant="outlined"
+                  disabled={disabled}
+                  aria-disabled={disabled}
+                  onClick={handleNavEnd}
+                  onMouseDown={(e) => e.preventDefault()}
+                  aria-label="Move cursor to end"
+                  title="Move cursor to end"
+                  sx={symbolRowButtonSx}
+                >
+                  ⇥
+                </Button>
               </Stack>
             </Box>
           </Stack>

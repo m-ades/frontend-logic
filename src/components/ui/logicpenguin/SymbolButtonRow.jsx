@@ -26,11 +26,12 @@ const BUTTONS = [
   { backspace: true },
 ]
 
-/** Shared sx for symbol (and variable) keyboard buttons. */
+/** Shared sx for symbol, variable, and navigation keyboard buttons. */
 export const symbolRowButtonSx = {
   minWidth: 34,
+  height: 34,
   px: 1,
-  py: 0.45,
+  py: 0,
   fontSize: '1rem',
   lineHeight: 1.1,
   minHeight: 34,
@@ -38,6 +39,10 @@ export const symbolRowButtonSx = {
   textTransform: 'none',
   boxShadow: 'none',
   border: 'none',
+  display: 'inline-flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  '& .MuiButton-label': { fontSize: '1rem' },
   '&:hover': (theme) => ({
     boxShadow: 'none',
     border: 'none',

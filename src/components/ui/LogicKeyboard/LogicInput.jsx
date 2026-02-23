@@ -1,9 +1,22 @@
-import { useCallback, useState, useEffect } from 'react'
+import { useCallback, useState, useEffect, useRef } from 'react'
 import { Box } from '@mui/material'
+
+const visuallyHiddenSx = {
+  position: 'absolute',
+  width: 1,
+  height: 1,
+  p: 0,
+  m: -1,
+  overflow: 'hidden',
+  clip: 'rect(0, 0, 0, 0)',
+  whiteSpace: 'nowrap',
+  border: 0,
+}
 
 /**
  * Controlled "input" that displays value and a blinking cursor; tap-to-place cursor.
  * No native <input> so the OS does not open the system keyboard (for use with LogicKeyboard on mobile).
+ * Accessible: role=textbox, aria-label, aria-placeholder, live region for cursor position.
  */
 export default function LogicInput({
   value = '',
@@ -20,6 +33,8 @@ export default function LogicInput({
 }) {
   const [internalCursor, setInternalCursor] = useState(0)
   const [isFocused, setIsFocused] = useState(false)
+  const [cursorAnnouncement, setCursorAnnouncement] = useState('')
+  const lastAnnouncedCursorRef = useRef(-1)
 
   const isControlledCursor = controlledCursor !== undefined
   const cursorPosition = isControlledCursor ? controlledCursor : internalCursor
@@ -50,6 +65,14 @@ export default function LogicInput({
     }
   }, [len])
 
+  useEffect(() => {
+    if (!isFocused || lastAnnouncedCursorRef.current === clampedCursor) return
+    lastAnnouncedCursorRef.current = clampedCursor
+    const total = len
+    const pos = clampedCursor
+    setCursorAnnouncement(total === 0 ? 'Empty. Position 0.' : `Position ${pos} of ${total}.`)
+  }, [isFocused, clampedCursor, len])
+
   const handleContainerClick = useCallback(
     (e) => {
       if (disabled) return
@@ -58,16 +81,19 @@ export default function LogicInput({
       if (index !== null) {
         const i = parseInt(index, 10)
         if (Number.isFinite(i)) setCursor(i + 1)
+      } else {
+        setCursor(len)
       }
     },
-    [disabled, setCursor]
+    [disabled, setCursor, len]
   )
 
   const handleFocus = useCallback(() => {
     if (disabled) return
     setIsFocused(true)
+    if (value.length > 0 && clampedCursor === 0) setCursor(value.length)
     onFocus?.()
-  }, [disabled, onFocus])
+  }, [disabled, onFocus, value.length, clampedCursor, setCursor])
 
   const handleBlur = useCallback(() => {
     setIsFocused(false)
@@ -111,6 +137,8 @@ export default function LogicInput({
       role="textbox"
       aria-label={ariaLabel}
       aria-multiline={false}
+      aria-placeholder={placeholder || undefined}
+      aria-readonly={disabled ? 'true' : undefined}
       tabIndex={disabled ? undefined : 0}
       onClick={handleContainerClick}
       onFocus={handleFocus}
@@ -137,6 +165,16 @@ export default function LogicInput({
         ...sx,
       }}
     >
+      {cursorAnnouncement ? (
+        <Box
+          component="span"
+          aria-live="polite"
+          aria-atomic
+          sx={visuallyHiddenSx}
+        >
+          {cursorAnnouncement}
+        </Box>
+      ) : null}
       {value.length === 0 && !isFocused && placeholder ? (
         <Box component="span" sx={{ color: 'text.disabled' }}>
           {placeholder}
@@ -153,9 +191,10 @@ export default function LogicInput({
                 width: 2,
                 height: '1.2em',
                 bgcolor: 'primary.main',
+                verticalAlign: 'text-bottom',
                 animation: `logic-cursor-blink ${cursorBlinkMs}ms step-end infinite`,
                 '@keyframes logic-cursor-blink': { '50%': { opacity: 0 } },
-                verticalAlign: 'text-bottom',
+                '@media (prefers-reduced-motion: reduce)': { animation: 'none' },
               }}
             />
           ) : null}
