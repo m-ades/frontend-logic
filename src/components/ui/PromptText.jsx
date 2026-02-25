@@ -50,6 +50,12 @@ const promptSx = {
   '& em, & i': {
     fontStyle: 'normal !important',
   },
+  // Dark-mode compatibility for legacy prompt HTML that hardcodes light backgrounds.
+  'body[data-theme="dark"] & [style*="background-color"], body[data-theme="dark"] & [style*="background:"]': {
+    backgroundColor: 'rgba(255, 255, 255, 0.06) !important',
+    borderColor: 'rgba(255, 255, 255, 0.22) !important',
+    color: 'inherit !important',
+  },
 }
 
 export default function PromptText({ content, variant = 'body1', sx, ...props }) {
