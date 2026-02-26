@@ -15,21 +15,17 @@ function isBinaryOp(symbolcat, op) {
 }
 
 /**
- * From symbolization key lines like "P=It is raining", extract only the symbol (e.g. "P").
- * Definitions stay in the question text; the keyboard shows only the letter for quick insert.
+ * Variable letters for the mobile keyboard. Uses the DB symbolizationKey directly
+ * (array of "Symbol = definition" strings); we do not parse premises.
+ * Returns the symbol (letter) from each key line for quick-insert buttons.
  */
 function getVariableLettersOnly(symbolizationKey) {
-  if (!symbolizationKey || !Array.isArray(symbolizationKey) || symbolizationKey.length === 0) {
-    return DEFAULT_LETTERS
-  }
+  if (!Array.isArray(symbolizationKey) || symbolizationKey.length === 0) return DEFAULT_LETTERS
   const letters = symbolizationKey
     .map((line) => {
-      if (line != null && typeof line === 'object' && line.symbol != null) {
-        return String(line.symbol).trim() || null
-      }
       const s = typeof line === 'string' ? line : String(line ?? '')
-      const beforeEquals = s.split('=')[0].trim()
-      return beforeEquals || null
+      const symbol = s.split('=')[0].trim()
+      return symbol || null
     })
     .filter(Boolean)
   return letters.length > 0 ? letters : DEFAULT_LETTERS
