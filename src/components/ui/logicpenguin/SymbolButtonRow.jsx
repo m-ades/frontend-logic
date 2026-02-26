@@ -55,6 +55,7 @@ export default function SymbolButtonRow({
   onValueChange,
   disabled = false,
   includeQuantifiers = true,
+  extraInsertButtons,
   centerButtons = false,
 }) {
   const syntax = getSyntax()
@@ -166,9 +167,12 @@ export default function SymbolButtonRow({
     finalizeChange(input)
   }
 
-  const visibleButtons = includeQuantifiers
+  const baseButtons = includeQuantifiers
     ? BUTTONS
     : BUTTONS.filter((btn) => !btn.quantifier)
+  const visibleButtons = baseButtons.length > 0 && baseButtons[baseButtons.length - 1].backspace
+    ? [...baseButtons.slice(0, -1), ...(extraInsertButtons || []), { backspace: true }]
+    : [...baseButtons, ...(extraInsertButtons || [])]
 
   return (
     <Box aria-label="Symbol shortcuts">

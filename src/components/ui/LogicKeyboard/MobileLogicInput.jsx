@@ -46,6 +46,7 @@ export default function MobileLogicInput({
   'aria-label': ariaLabel,
   symbolizationKey,
   includeQuantifiers = true,
+  extraInsertButtons,
   children,
 }) {
   const theme = useTheme()
@@ -237,6 +238,7 @@ export default function MobileLogicInput({
                 onValueChange={onChange}
                 disabled={disabled}
                 includeQuantifiers={includeQuantifiers}
+                extraInsertButtons={extraInsertButtons}
                 centerButtons
               />
             </Box>
