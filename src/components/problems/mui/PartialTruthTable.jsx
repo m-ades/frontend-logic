@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState, useRef } from 'react'
 import {
   Box,
-  Stack,
   Typography,
   Table,
   TableBody,
@@ -15,16 +14,14 @@ import {
   Tooltip,
   alpha,
 } from '@mui/material'
-import EditIcon from '@mui/icons-material/Edit'
 import InstructorQuestionEditor from '../InstructorQuestionEditor.jsx'
 import { useTheme } from '@mui/material/styles'
 import getFormulaClass from '../../../lib/logicpenguin/symbolic/formula.js'
 import { multiTables } from '../../../lib/logicpenguin/symbolic/libsemantics.js'
 import { getTokenSpeechLabel } from '../../ui/logicpenguin/LogicSymbol.jsx'
 import ProblemSetButtons from './ProblemSetButtons.jsx'
-import StatusBanner, { isTerminalStatus } from '../../ui/StatusBanner.jsx'
+import ProblemFrame from './ProblemFrame.jsx'
 import { useProblemChecker } from '../../../hooks/useProblemChecker.js'
-import PromptText from '../../ui/PromptText.jsx'
 import { rowsEqual, clearDebounce, scheduleDebouncedChange } from '../../../utils/tablePerf.js'
 
 const toTruth = (value) => {
@@ -185,172 +182,15 @@ export default function PartialTruthTable({
   )
 
   return (
-    <Stack spacing={2} sx={{ px: 0, width: '100%', alignItems: 'stretch', flexGrow: 1 }}>
-      <Box className="logicpenguin" sx={{ width: '100%', flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
-        <Box
-          sx={{
-            overflow: 'visible',
-            minHeight: '200px',
-            flexGrow: 1,
-            alignSelf: { xs: 'stretch', md: 'flex-start' },
-          }}
-          className="lp-problem-card"
-        >
-          <Stack spacing={3} sx={{ p: { xs: 2, md: 2 } }}>
-            {isInstructorView && proof && (
-              <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-                <Tooltip title="Edit question">
-                  <Box component="span" onClick={openEdit} role="button" aria-label="Edit question" sx={{ display: 'inline-flex', alignItems: 'center', cursor: 'pointer', color: 'text.secondary', '&:hover': { opacity: 0.8 } }}>
-                    <EditIcon fontSize="small" />
-                  </Box>
-                </Tooltip>
-              </Box>
-            )}
-            {prompt && (
-              <PromptText content={prompt} />
-            )}
-            {statement && (
-              <Typography sx={{ fontSize: '1.1rem' }}>
-                {statement}
-              </Typography>
-            )}
-            <TableContainer 
-              component={Paper} 
-              className="tt-table-wrap" 
-              elevation={0} 
-              sx={{ 
-                background: 'transparent', 
-                boxShadow: 'none !important',
-                '&.MuiPaper-root': {
-                  boxShadow: 'none !important',
-                },
-                '& .MuiTable-root': {
-                  background: 'transparent',
-                  border: 'none',
-                  boxShadow: 'none',
-                  fontSize: 'var(--tt-font-size)',
-                  fontFamily: 'inherit',
-                },
-                '& .MuiTableCell-root': {
-                  color: 'text.primary',
-                  borderColor: 'divider',
-                  fontFamily: 'inherit',
-                  fontSize: 'var(--tt-token-font-size)',
-                },
-                '& .MuiTableBody .MuiTableCell-root': {
-                  fontSize: 'var(--tt-font-size)',
-                },
-                '& .MuiTableHead-root .MuiTableCell-root': {
-                  backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.04)' : undefined,
-                  fontFamily: 'inherit',
-                  fontSize: 'var(--tt-token-font-size)',
-                  fontWeight: 600,
-                },
-                '& .tt-row-selector-cell': {
-                  border: 'none !important',
-                  borderBottom: 'none !important',
-                  backgroundColor: 'transparent !important',
-                },
-                '& .tt-selector-row .MuiTableCell-root': {
-                  border: 'none !important',
-                  borderBottom: 'none !important',
-                  backgroundColor: 'transparent !important',
-                },
-                '& .tt-selector-corner, & .tt-selector-corner-bottom': {
-                  border: 'none !important',
-                  borderBottom: 'none !important',
-                },
-              }}
-            >
-              <Table className="tt-table">
-                <TableHead className="tt-head">
-                  <TableRow className="tt-token-row">
-                    {tokens.map((token, idx) => (
-                      <TableCell 
-                        key={`partial-tt-token-${idx}`} 
-                        className="tt-token" 
-                        align="center"
-                        aria-label={getTokenSpeechLabel(token)}
-                        sx={{ fontFamily: 'inherit', fontSize: 'var(--tt-token-font-size)', fontWeight: 600 }}
-                      >
-                        <span aria-hidden="true">{token}</span>
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  <TableRow className="tt-row">
-                    {tokens.map((_, idx) => {
-                      const isEditable = editableIndices[idx]
-                      const value = rowInputs[idx] ?? ''
-                      const colMatch = selectedColumns.includes(idx)
-                      return (
-                        <TableCell
-                          key={`partial-tt-cell-${idx}`}
-                          className="tt-cell"
-                          align="center"
-                          sx={colMatch ? highlightStyle : undefined}
-                        >
-                          {isEditable ? (
-                            <Select
-                              value={value}
-                              onChange={(event) => handleCellChange(idx, event.target.value)}
-                              size="small"
-                              displayEmpty
-                              disabled={readOnly}
-                              sx={{ 
-                                minWidth: 'var(--tt-select-min-width)',
-                                fontFamily: 'inherit',
-                                fontSize: 'var(--tt-font-size)',
-                                '& .MuiSelect-select': {
-                                  fontFamily: 'inherit',
-                                  fontSize: 'var(--tt-font-size)',
-                                },
-                              }}
-                            >
-                              <MenuItem value="" sx={{ fontFamily: 'inherit', fontSize: 'var(--tt-font-size)' }}>
-                                <em>?</em>
-                              </MenuItem>
-                              <MenuItem value="T" sx={{ fontFamily: 'inherit', fontSize: 'var(--tt-font-size)' }}>T</MenuItem>
-                              <MenuItem value="F" sx={{ fontFamily: 'inherit', fontSize: 'var(--tt-font-size)' }}>F</MenuItem>
-                              <MenuItem value="U" sx={{ fontFamily: 'inherit', fontSize: 'var(--tt-font-size)' }}>U</MenuItem>
-                            </Select>
-                          ) : (
-                            <Typography sx={{ fontWeight: 700, fontFamily: 'inherit', fontSize: 'var(--tt-font-size)' }}>{value || toSymbol(givenRow[idx])}</Typography>
-                          )}
-                        </TableCell>
-                      )
-                    })}
-                  </TableRow>
-                  <TableRow className="tt-selector-row">
-                    {tokens.map((_, idx) => (
-                      <TableCell key={`partial-tt-colsel-${idx}`} align="center" sx={{ width: 20, minWidth: 20, p: 0.25 }}>
-                        <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-                          <ColumnRowSelectorBox
-                            selected={selectedColumns.includes(idx)}
-                            onClick={() => toggleColumn(idx)}
-                            ariaLabel={`Select column ${idx + 1}`}
-                            theme={theme}
-                            tooltip="highlight column"
-                          />
-                        </Box>
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                </TableBody>
-              </Table>
-            </TableContainer>
-          </Stack>
-        </Box>
-      </Box>
-      {isTerminalStatus(status) && (
-        <StatusBanner
-          status={status}
-          message={message}
-          onClose={() => setMessage('')}
-        />
-      )}
-      {!hideActions && (
+    <ProblemFrame
+      prompt={prompt}
+      minHeight="200px"
+      isInstructorView={isInstructorView && !!proof}
+      onEditQuestion={proof ? openEdit : undefined}
+      status={status}
+      message={message}
+      onCloseStatus={() => setMessage('')}
+      actionNode={!hideActions ? (
         <ProblemSetButtons
           onCheck={handleCheck}
           onStartOver={handleStartOver}
@@ -361,10 +201,142 @@ export default function PartialTruthTable({
           attemptLimit={maxAttempts}
           isInstructorView={isInstructorView}
         />
-      )}
-      {isInstructorView && proof && (
+      ) : null}
+      editorNode={isInstructorView && proof ? (
         <InstructorQuestionEditor ref={editorRef} proof={proof} isInstructorView onSaved={onQuestionSaved} trigger="none" />
+      ) : null}
+    >
+      {statement && (
+        <Typography sx={{ fontSize: '1.1rem' }}>
+          {statement}
+        </Typography>
       )}
-    </Stack>
+      <TableContainer
+        component={Paper}
+        className="tt-table-wrap"
+        elevation={0}
+        sx={{
+          background: 'transparent',
+          boxShadow: 'none !important',
+          '&.MuiPaper-root': {
+            boxShadow: 'none !important',
+          },
+          '& .MuiTable-root': {
+            background: 'transparent',
+            border: 'none',
+            boxShadow: 'none',
+            fontSize: 'var(--tt-font-size)',
+            fontFamily: 'inherit',
+          },
+          '& .MuiTableCell-root': {
+            color: 'text.primary',
+            borderColor: 'divider',
+            fontFamily: 'inherit',
+            fontSize: 'var(--tt-token-font-size)',
+          },
+          '& .MuiTableBody .MuiTableCell-root': {
+            fontSize: 'var(--tt-font-size)',
+          },
+          '& .MuiTableHead-root .MuiTableCell-root': {
+            backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.04)' : undefined,
+            fontFamily: 'inherit',
+            fontSize: 'var(--tt-token-font-size)',
+            fontWeight: 600,
+          },
+          '& .tt-row-selector-cell': {
+            border: 'none !important',
+            borderBottom: 'none !important',
+            backgroundColor: 'transparent !important',
+          },
+          '& .tt-selector-row .MuiTableCell-root': {
+            border: 'none !important',
+            borderBottom: 'none !important',
+            backgroundColor: 'transparent !important',
+          },
+          '& .tt-selector-corner, & .tt-selector-corner-bottom': {
+            border: 'none !important',
+            borderBottom: 'none !important',
+          },
+        }}
+      >
+        <Table className="tt-table">
+          <TableHead className="tt-head">
+            <TableRow className="tt-token-row">
+              {tokens.map((token, idx) => (
+                <TableCell
+                  key={`partial-tt-token-${idx}`}
+                  className="tt-token"
+                  align="center"
+                  aria-label={getTokenSpeechLabel(token)}
+                  sx={{ fontFamily: 'inherit', fontSize: 'var(--tt-token-font-size)', fontWeight: 600 }}
+                >
+                  <span aria-hidden="true">{token}</span>
+                </TableCell>
+              ))}
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            <TableRow className="tt-row">
+              {tokens.map((_, idx) => {
+                const isEditable = editableIndices[idx]
+                const value = rowInputs[idx] ?? ''
+                const colMatch = selectedColumns.includes(idx)
+                return (
+                  <TableCell
+                    key={`partial-tt-cell-${idx}`}
+                    className="tt-cell"
+                    align="center"
+                    sx={colMatch ? highlightStyle : undefined}
+                  >
+                    {isEditable ? (
+                      <Select
+                        value={value}
+                        onChange={(event) => handleCellChange(idx, event.target.value)}
+                        size="small"
+                        displayEmpty
+                        disabled={readOnly}
+                        sx={{
+                          minWidth: 'var(--tt-select-min-width)',
+                          fontFamily: 'inherit',
+                          fontSize: 'var(--tt-font-size)',
+                          '& .MuiSelect-select': {
+                            fontFamily: 'inherit',
+                            fontSize: 'var(--tt-font-size)',
+                          },
+                        }}
+                      >
+                        <MenuItem value="" sx={{ fontFamily: 'inherit', fontSize: 'var(--tt-font-size)' }}>
+                          <em>?</em>
+                        </MenuItem>
+                        <MenuItem value="T" sx={{ fontFamily: 'inherit', fontSize: 'var(--tt-font-size)' }}>T</MenuItem>
+                        <MenuItem value="F" sx={{ fontFamily: 'inherit', fontSize: 'var(--tt-font-size)' }}>F</MenuItem>
+                        <MenuItem value="U" sx={{ fontFamily: 'inherit', fontSize: 'var(--tt-font-size)' }}>U</MenuItem>
+                      </Select>
+                    ) : (
+                      <Typography sx={{ fontWeight: 700, fontFamily: 'inherit', fontSize: 'var(--tt-font-size)' }}>{value || toSymbol(givenRow[idx])}</Typography>
+                    )}
+                  </TableCell>
+                )
+              })}
+            </TableRow>
+            <TableRow className="tt-selector-row">
+              {tokens.map((_, idx) => (
+                <TableCell key={`partial-tt-colsel-${idx}`} align="center" sx={{ width: 20, minWidth: 20, p: 0.25 }}>
+                  <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                    <ColumnRowSelectorBox
+                      selected={selectedColumns.includes(idx)}
+                      onClick={() => toggleColumn(idx)}
+                      ariaLabel={`Select column ${idx + 1}`}
+                      theme={theme}
+                      tooltip="highlight column"
+                    />
+                  </Box>
+                </TableCell>
+              ))}
+            </TableRow>
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </ProblemFrame>
   )
 }

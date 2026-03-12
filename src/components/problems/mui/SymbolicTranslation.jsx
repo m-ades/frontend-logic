@@ -1,15 +1,13 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
-import { Box, Stack, Typography, Alert, Tooltip } from '@mui/material'
-import EditIcon from '@mui/icons-material/Edit'
+import { Box, Typography } from '@mui/material'
 import InstructorQuestionEditor from '../InstructorQuestionEditor.jsx'
 import { useTheme } from '@mui/material/styles'
 import ProblemSetButtons from './ProblemSetButtons.jsx'
+import ProblemFrame from './ProblemFrame.jsx'
 import FormulaInput from '../../ui/logicpenguin/formula-input.js'
 import SymbolButtonRow from '../../ui/logicpenguin/SymbolButtonRow.jsx'
 import { useProblemChecker } from '../../../hooks/useProblemChecker.js'
 import SolutionReveal from '../SolutionReveal.jsx'
-import StatusBanner, { isTerminalStatus } from '../../ui/StatusBanner.jsx'
-import PromptText from '../../ui/PromptText.jsx'
 import RichText from '../../ui/RichText.jsx'
 
 function FormulaInputField({ value, onValueChange, fieldReadOnly, formulaInputRef, onEnterKey }) {
@@ -203,105 +201,16 @@ export default function SymbolicTranslation({
 
 
   return (
-    <Stack spacing={3} sx={{ px: 0, width: '100%', alignItems: 'stretch', flexGrow: 1 }}>
-      <Box className="logicpenguin" sx={{ width: '100%', flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
-        <Box
-          sx={{
-            overflow: 'visible',
-            minHeight: '150px',
-            flexGrow: 1,
-            alignSelf: { xs: 'stretch', md: 'flex-start' },
-          }}
-          className="lp-problem-card"
-        >
-          <Stack spacing={3} sx={{ p: { xs: 2, md: 2 } }}>
-            {isInstructorView && proof && (
-              <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-                <Tooltip title="Edit question">
-                  <Box component="span" onClick={openEdit} role="button" aria-label="Edit question" sx={{ display: 'inline-flex', alignItems: 'center', cursor: 'pointer', color: 'text.secondary', '&:hover': { opacity: 0.8 } }}>
-                    <EditIcon fontSize="small" />
-                  </Box>
-                </Tooltip>
-              </Box>
-            )}
-            <Box>
-              {prompt && (
-                <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 0.5 }}>
-                  <PromptText content={prompt} sx={{ mb: 1 }} />
-                </Box>
-              )}
-              {symbolizationKey.length > 0 && (
-                <Box sx={{ mb: 1, mt: 2.5 }}>
-                  <Typography variant="body2" sx={{ mb: 0.5, fontWeight: 600 }}>
-                    Symbolization key
-                  </Typography>
-                  <Box component="ul" sx={{ pl: 3, m: 0, color: 'text.secondary' }}>
-                    {symbolizationKey.map((line, index) => (
-                      <Typography
-                        key={`${line}-${index}`}
-                        component="li"
-                        variant="body2"
-                        sx={{ mb: 0.5 }}
-                      >
-                        {line}
-                      </Typography>
-                    ))}
-                  </Box>
-                </Box>
-              )}
-              {legend && (
-                <RichText content={legend} variant="body2" sx={{ mb: 1, color: 'text.secondary' }} />
-              )}
-              <Typography variant="body2" sx={{ mb: 1, mt: 2.5, color: 'text.secondary' }}>
-                Your translation:
-              </Typography>
-              <FormulaInputField
-                value={inputValue}
-                onValueChange={(value) => {
-                  if (readOnly) return
-                  setInputValue(value)
-                  scheduleStateSave(value)
-                }}
-                fieldReadOnly={readOnly}
-                formulaInputRef={formulaInputRef}
-                onEnterKey={!readOnly && !hideActions ? handleCheck : undefined}
-              />
-              <Box sx={{ mt: 1 }}>
-                <SymbolButtonRow
-                  inputRef={formulaInputRef}
-                  disabled={readOnly}
-                  onValueChange={(value) => {
-                    if (readOnly) return
-                    setInputValue(value)
-                    scheduleStateSave(value)
-                  }}
-                />
-              </Box>
-            </Box>
-            {!suppressReveal && (
-              /* show answer in card */
-              <SolutionReveal show={showSolution}>
-                <FormulaInputField
-                  value={answer ?? ''}
-                  onValueChange={null}
-                  fieldReadOnly
-                  formulaInputRef={solutionInputRef}
-                />
-              </SolutionReveal>
-            )}
-          </Stack>
-        </Box>
-      </Box>
-
-      {isTerminalStatus(status) && (
-        <StatusBanner
-          status={status}
-          message={message}
-          onClose={() => setMessage('')}
-        />
-      )}
-
-      {!hideActions && (
+    <ProblemFrame
+      prompt={prompt}
+      promptSx={{ mb: 1 }}
+      minHeight="150px"
+      isInstructorView={isInstructorView && !!proof}
+      onEditQuestion={proof ? openEdit : undefined}
+      status={status}
+      message={message}
+      onCloseStatus={() => setMessage('')}
+      actionNode={!hideActions ? (
         <ProblemSetButtons
           onCheck={handleCheck}
           onStartOver={handleStartOver}
@@ -312,10 +221,70 @@ export default function SymbolicTranslation({
           attemptLimit={maxAttempts}
           isInstructorView={isInstructorView}
         />
-      )}
-      {isInstructorView && proof && (
+      ) : null}
+      editorNode={isInstructorView && proof ? (
         <InstructorQuestionEditor ref={editorRef} proof={proof} isInstructorView onSaved={onQuestionSaved} trigger="none" />
+      ) : null}
+    >
+      <Box>
+        {symbolizationKey.length > 0 && (
+          <Box sx={{ mb: 1, mt: 2.5 }}>
+            <Typography variant="body2" sx={{ mb: 0.5, fontWeight: 600 }}>
+              Symbolization key
+            </Typography>
+            <Box component="ul" sx={{ pl: 3, m: 0, color: 'text.secondary' }}>
+              {symbolizationKey.map((line, index) => (
+                <Typography
+                  key={`${line}-${index}`}
+                  component="li"
+                  variant="body2"
+                  sx={{ mb: 0.5 }}
+                >
+                  {line}
+                </Typography>
+              ))}
+            </Box>
+          </Box>
+        )}
+        {legend && (
+          <RichText content={legend} variant="body2" sx={{ mb: 1, color: 'text.secondary' }} />
+        )}
+        <Typography variant="body2" sx={{ mb: 1, mt: 2.5, color: 'text.secondary' }}>
+          Your translation:
+        </Typography>
+        <FormulaInputField
+          value={inputValue}
+          onValueChange={(value) => {
+            if (readOnly) return
+            setInputValue(value)
+            scheduleStateSave(value)
+          }}
+          fieldReadOnly={readOnly}
+          formulaInputRef={formulaInputRef}
+          onEnterKey={!readOnly && !hideActions ? handleCheck : undefined}
+        />
+        <Box sx={{ mt: 1 }}>
+          <SymbolButtonRow
+            inputRef={formulaInputRef}
+            disabled={readOnly}
+            onValueChange={(value) => {
+              if (readOnly) return
+              setInputValue(value)
+              scheduleStateSave(value)
+            }}
+          />
+        </Box>
+      </Box>
+      {!suppressReveal && (
+        <SolutionReveal show={showSolution}>
+          <FormulaInputField
+            value={answer ?? ''}
+            onValueChange={null}
+            fieldReadOnly
+            formulaInputRef={solutionInputRef}
+          />
+        </SolutionReveal>
       )}
-    </Stack>
+    </ProblemFrame>
   )
 }

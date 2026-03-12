@@ -1,16 +1,14 @@
 import { useCallback, useEffect, useMemo, useState, useRef } from 'react'
-import { Box, Stack, Typography, FormControl, Select, MenuItem, Tooltip, alpha } from '@mui/material'
-import EditIcon from '@mui/icons-material/Edit'
+import { Box, Typography, FormControl, Select, MenuItem, Tooltip, alpha } from '@mui/material'
 import InstructorQuestionEditor from '../InstructorQuestionEditor.jsx'
-import StatusBanner, { isTerminalStatus } from '../../ui/StatusBanner.jsx'
 import { useTheme } from '@mui/material/styles'
 import getFormulaClass from '../../../lib/logicpenguin/symbolic/formula.js'
 import getSyntax from '../../../lib/logicpenguin/symbolic/libsyntax.js'
 import { libtf } from '../../../lib/logicpenguin/symbolic/libsemantics.js'
 import { getTokenSpeechLabel } from '../../ui/logicpenguin/LogicSymbol.jsx'
 import ProblemSetButtons from './ProblemSetButtons.jsx'
+import ProblemFrame from './ProblemFrame.jsx'
 import { useProblemChecker } from '../../../hooks/useProblemChecker.js'
-import PromptText from '../../ui/PromptText.jsx'
 import { rowsEqual, clearDebounce, scheduleDebouncedChange } from '../../../utils/tablePerf.js'
 
 function TruthToggle({ value, onChange, ariaLabel, accent, readOnly = false }) {
@@ -406,42 +404,73 @@ export default function SingleRowTruthTable({
     compoundInput === expectedCompound
 
   return (
-    <Stack spacing={3} sx={{ px: 0, width: '100%', alignItems: 'stretch', flexGrow: 1 }}>
-      <Box className="logicpenguin" sx={{ width: '100%', flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
-        <Box
-          sx={{
-            overflow: 'visible',
-            minHeight: '260px',
-            flexGrow: 1,
-            alignSelf: { xs: 'stretch', md: 'flex-start' },
-          }}
-          className="lp-problem-card"
-        >
-          <Stack spacing={3} sx={{ p: { xs: 2, md: 2 } }}>
-            {isInstructorView && proof && (
-              <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-                <Tooltip title="Edit question">
-                  <Box component="span" onClick={openEdit} role="button" aria-label="Edit question" sx={{ display: 'inline-flex', alignItems: 'center', cursor: 'pointer', color: 'text.secondary', '&:hover': { opacity: 0.8 } }}>
-                    <EditIcon fontSize="small" />
-                  </Box>
-                </Tooltip>
-              </Box>
-            )}
-            {prompt && (
-              <PromptText content={prompt} />
-            )}
-            {renderTableSet(tableRows, tableRows, false)}
-            <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mt: 2 }}>
+    <ProblemFrame
+      prompt={prompt}
+      minHeight="260px"
+      isInstructorView={isInstructorView && !!proof}
+      onEditQuestion={proof ? openEdit : undefined}
+      status={status}
+      message={message}
+      onCloseStatus={() => setMessage('')}
+      actionNode={!hideActions ? (
+        <ProblemSetButtons
+          onCheck={handleCheck}
+          onStartOver={handleStartOver}
+          isChecking={isChecking}
+          isDisabled={!tableFilled || isLocked || isAssignmentLocked}
+          align="flex-start"
+          attemptCount={attemptCount}
+          attemptLimit={maxAttempts}
+          isInstructorView={isInstructorView}
+        />
+      ) : null}
+      editorNode={isInstructorView && proof ? (
+        <InstructorQuestionEditor ref={editorRef} proof={proof} isInstructorView onSaved={onQuestionSaved} trigger="none" />
+      ) : null}
+    >
+      {renderTableSet(tableRows, tableRows, false)}
+      <Box sx={{ display: 'flex', flexDirection: 'row', gap: 1.5, alignItems: 'center', mt: 2 }}>
+        <Typography variant="body2" sx={{ fontWeight: 600 }}>
+          Truth value of compound statement:
+        </Typography>
+        <FormControl size="small" sx={{ minWidth: 'var(--tt-select-min-width)' }}>
+          <Select
+            value={compoundInput}
+            displayEmpty
+            onChange={(event) => handleCompoundChange(event.target.value)}
+            inputProps={{ 'aria-label': 'Truth value of compound statement' }}
+            disabled={readOnly || isLocked}
+            sx={{
+              borderRadius: 0,
+              '& .MuiOutlinedInput-notchedOutline': { borderRadius: 0 },
+            }}
+          >
+            <MenuItem value="">
+              <em>Select</em>
+            </MenuItem>
+            {compoundOptions.map((option) => (
+              <MenuItem key={option.value} value={option.value}>
+                {option.label}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      </Box>
+      {isLocked && status !== 'correct' && expectedRow.length > 0 && (
+        renderAnswerBlock(
+          'Correct Answer',
+          <Box sx={{ display: 'grid', gap: 2 }}>
+            {renderTableSet([expectedRow], [expectedRow], true)}
+            <Box sx={{ display: 'flex', flexDirection: 'row', gap: 1.5, alignItems: 'center' }}>
               <Typography variant="body2" sx={{ fontWeight: 600 }}>
                 Truth value of compound statement:
               </Typography>
               <FormControl size="small" sx={{ minWidth: 'var(--tt-select-min-width)' }}>
                 <Select
-                  value={compoundInput}
+                  value={expectedCompound}
                   displayEmpty
-                  onChange={(event) => handleCompoundChange(event.target.value)}
-                  inputProps={{ 'aria-label': 'Truth value of compound statement' }}
-                  disabled={readOnly || isLocked}
+                  inputProps={{ 'aria-label': 'Truth value (answer)' }}
+                  disabled
                   sx={{
                     borderRadius: 0,
                     '& .MuiOutlinedInput-notchedOutline': { borderRadius: 0 },
@@ -457,82 +486,24 @@ export default function SingleRowTruthTable({
                   ))}
                 </Select>
               </FormControl>
-            </Stack>
-            {isLocked && status !== 'correct' && expectedRow.length > 0 && (
-              /* show answer in card */
-              renderAnswerBlock(
-                'Correct Answer',
-                <Stack spacing={2}>
-                  {renderTableSet([expectedRow], [expectedRow], true)}
-                  <Stack direction="row" spacing={1.5} alignItems="center">
-                    <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                      Truth value of compound statement:
-                    </Typography>
-                    <FormControl size="small" sx={{ minWidth: 'var(--tt-select-min-width)' }}>
-                      <Select
-                        value={expectedCompound}
-                        displayEmpty
-                        inputProps={{ 'aria-label': 'Truth value (answer)' }}
-                        disabled
-                        sx={{
-                          borderRadius: 0,
-                          '& .MuiOutlinedInput-notchedOutline': { borderRadius: 0 },
-                        }}
-                      >
-                        <MenuItem value="">
-                          <em>Select</em>
-                        </MenuItem>
-                        {compoundOptions.map((option) => (
-                          <MenuItem key={option.value} value={option.value}>
-                            {option.label}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  </Stack>
-                </Stack>
-              )
-            )}
-            <Typography
-              variant="body2"
-              sx={{
-                color: 'primary.main',
-                fontFamily: 'inherit',
-                fontWeight: 400,
-              }}
-            >
-              {status === 'correct' || isCurrentlyCorrect
-                ? 'Truth table looks good.'
-                : tableFilled
-                  ? 'Recheck your truth values.'
-                  : 'Click cells to toggle truth values - fill in every cell to finish.'}
-            </Typography>
-          </Stack>
-        </Box>
-      </Box>
-      {isTerminalStatus(status) && (
-        <StatusBanner
-          status={status}
-          message={message}
-          onClose={() => setMessage('')}
-        />
+            </Box>
+          </Box>
+        )
       )}
-
-      {!hideActions && (
-        <ProblemSetButtons
-          onCheck={handleCheck}
-          onStartOver={handleStartOver}
-          isChecking={isChecking}
-          isDisabled={!tableFilled || isLocked || isAssignmentLocked}
-          align="flex-start"
-          attemptCount={attemptCount}
-          attemptLimit={maxAttempts}
-          isInstructorView={isInstructorView}
-        />
-      )}
-      {isInstructorView && proof && (
-        <InstructorQuestionEditor ref={editorRef} proof={proof} isInstructorView onSaved={onQuestionSaved} trigger="none" />
-      )}
-    </Stack>
+      <Typography
+        variant="body2"
+        sx={{
+          color: 'primary.main',
+          fontFamily: 'inherit',
+          fontWeight: 400,
+        }}
+      >
+        {status === 'correct' || isCurrentlyCorrect
+          ? 'Truth table looks good.'
+          : tableFilled
+            ? 'Recheck your truth values.'
+            : 'Click cells to toggle truth values - fill in every cell to finish.'}
+      </Typography>
+    </ProblemFrame>
   )
 }
