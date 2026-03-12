@@ -1128,7 +1128,7 @@ export default function DerivationTable({
               position: 'relative',
             }
         return (
-          <Wrapper sx={wrapperSx}>
+          <Wrapper data-problem-card-root={!isFullScreen ? 'true' : undefined} sx={wrapperSx}>
         {isInstructorView && onEditQuestion && !isFullScreen && (
           <Box sx={{ mb: 2, display: 'flex', justifyContent: 'flex-end' }}>
             <Tooltip title="Edit question">

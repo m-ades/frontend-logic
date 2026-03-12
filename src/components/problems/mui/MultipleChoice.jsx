@@ -1,9 +1,8 @@
 import { useState, useEffect, useId, useRef } from 'react'
-import { Box, Stack, Radio, RadioGroup, FormControlLabel, FormControl, FormGroup, Checkbox, Typography, Tooltip } from '@mui/material'
-import EditIcon from '@mui/icons-material/Edit'
-import StatusBanner, { isTerminalStatus } from '../../ui/StatusBanner.jsx'
+import { Box, Checkbox, FormControl, FormControlLabel, FormGroup, Radio, RadioGroup, Typography } from '@mui/material'
 import ProblemSetButtons from './ProblemSetButtons.jsx'
 import InstructorQuestionEditor from '../InstructorQuestionEditor.jsx'
+import ProblemFrame from './ProblemFrame.jsx'
 import { useProblemChecker } from '../../../hooks/useProblemChecker.js'
 import SolutionReveal from '../SolutionReveal.jsx'
 import PromptText from '../../ui/PromptText.jsx'
@@ -249,143 +248,16 @@ export default function MultipleChoice({
   }
 
   return (
-    <Stack spacing={3} sx={{ px: 0, width: '100%', alignItems: 'stretch', flexGrow: 1 }}>
-      <Box className="logicpenguin" sx={{ width: '100%', flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
-        <Box
-          sx={{
-            overflow: 'visible',
-            minHeight: '200px',
-            flexGrow: 1,
-            alignSelf: { xs: 'stretch', md: 'flex-start' },
-          }}
-          className="lp-problem-card"
-        >
-          <Stack spacing={3} sx={{ p: { xs: 2, md: 2 } }}>
-            {isInstructorView && proof && (
-              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
-                <Tooltip title="Edit question">
-                  <Box
-                    component="span"
-                    onClick={openEdit}
-                    role="button"
-                    aria-label="Edit question"
-                    sx={{ display: 'inline-flex', alignItems: 'center', cursor: 'pointer', color: 'text.secondary', '&:hover': { opacity: 0.8 } }}
-                  >
-                    <EditIcon fontSize="small" />
-                  </Box>
-                </Tooltip>
-              </Box>
-            )}
-            {prompt && (
-              <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 0.5 }}>
-                <PromptText content={prompt} sx={{ mb: 3, flex: 1 }} />
-              </Box>
-            )}
-            {isComposite ? (
-              <Stack spacing={3}>
-                {subquestions.map((subq, subIdx) => {
-                  const choices = subq?.type === 'true-false'
-                    ? (subq?.choices?.length ? subq.choices : defaultTrueFalseChoices)
-                    : (Array.isArray(subq?.choices) ? subq.choices : [])
-
-                  return (
-                    <Box key={`mc-subq-${subIdx}`}>
-                      <PromptText content={subq?.prompt} variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }} />
-                      <FormControl component="fieldset" sx={{ width: '100%' }}>
-                        <ChoiceGroup
-                          choices={choices}
-                          isMultiSelect={isMultiSelectSubquestion(subq)}
-                          selectedValue={selectedValue?.[subIdx]}
-                          name={`${groupBase}-subq-${subIdx}`}
-                          disabled={readOnly || isLocked}
-                          onSingleChange={(value) => {
-                            const nextValue = value === '' ? '' : Number(value)
-                            handleCompositeSingleChange(subIdx, nextValue)
-                          }}
-                          onMultiChange={(choiceIndex, checked) => {
-                            handleCompositeMultiChange(subIdx, choiceIndex, checked)
-                          }}
-                        />
-                      </FormControl>
-                    </Box>
-                  )
-                })}
-              </Stack>
-            ) : (
-              <Box>
-                {isInstructorView && proof && (
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 1 }}>
-                    <Typography variant="subtitle2" color="text.secondary">Choices</Typography>
-                  </Box>
-                )}
-                <FormControl component="fieldset" sx={{ width: '100%' }}>
-                  <ChoiceGroup
-                    choices={Array.isArray(problem?.choices) ? problem.choices : []}
-                    isMultiSelect={isMultiSelect}
-                    selectedValue={selectedValue}
-                    name={`${groupBase}-single`}
-                    disabled={readOnly}
-                    onSingleChange={handleSingleChange}
-                    onMultiChange={handleMultiChange}
-                  />
-                </FormControl>
-              </Box>
-            )}
-            {!suppressReveal && (
-              <SolutionReveal show={showSolution}>
-                {isComposite ? (
-                  <Stack spacing={3}>
-                    {subquestions.map((subq, subIdx) => {
-                      const choices = subq?.type === 'true-false'
-                        ? (subq?.choices?.length ? subq.choices : defaultTrueFalseChoices)
-                        : (Array.isArray(subq?.choices) ? subq.choices : [])
-                      const isMulti = isMultiSelectSubquestion(subq)
-                      const expected = isMulti
-                        ? (Array.isArray(subq.answerIndices) ? subq.answerIndices : [])
-                        : (Number.isFinite(subq.answerIndex) ? subq.answerIndex : null)
-
-                      return (
-                        <Box key={`solution-${subIdx}`}>
-                          <PromptText content={subq?.prompt} variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }} />
-                          <FormControl component="fieldset" sx={{ width: '100%' }}>
-                            <ChoiceGroup
-                              choices={choices}
-                              isMultiSelect={isMulti}
-                              selectedValue={expected}
-                              name={`${groupBase}-reveal-${subIdx}`}
-                              disabled
-                            />
-                          </FormControl>
-                        </Box>
-                      )
-                    })}
-                  </Stack>
-                ) : (
-                  <FormControl component="fieldset" sx={{ width: '100%' }}>
-                    <ChoiceGroup
-                      choices={Array.isArray(problem?.choices) ? problem.choices : []}
-                      isMultiSelect={isMultiSelect}
-                      selectedValue={correctAnswer}
-                      name={`${groupBase}-reveal`}
-                      disabled
-                    />
-                  </FormControl>
-                )}
-              </SolutionReveal>
-            )}
-          </Stack>
-        </Box>
-      </Box>
-
-      {isTerminalStatus(status) && (
-        <StatusBanner
-          status={status}
-          message={message}
-          onClose={() => setMessage('')}
-        />
-      )}
-
-      {!hideActions && (
+    <ProblemFrame
+      prompt={prompt}
+      promptSx={{ mb: 3, flex: 1 }}
+      minHeight="200px"
+      isInstructorView={isInstructorView && !!proof}
+      onEditQuestion={proof ? openEdit : undefined}
+      status={status}
+      message={message}
+      onCloseStatus={() => setMessage('')}
+      actionNode={!hideActions ? (
         <ProblemSetButtons
           onCheck={handleCheck}
           onStartOver={handleStartOver}
@@ -396,8 +268,8 @@ export default function MultipleChoice({
           attemptLimit={maxAttempts}
           isInstructorView={isInstructorView}
         />
-      )}
-      {isInstructorView && proof && (
+      ) : null}
+      editorNode={isInstructorView && proof ? (
         <InstructorQuestionEditor
           ref={editorRef}
           proof={proof}
@@ -405,7 +277,100 @@ export default function MultipleChoice({
           onSaved={onQuestionSaved}
           trigger="none"
         />
+      ) : null}
+    >
+      {isComposite ? (
+        <Box sx={{ display: 'grid', gap: 3 }}>
+          {subquestions.map((subq, subIdx) => {
+            const choices = subq?.type === 'true-false'
+              ? (subq?.choices?.length ? subq.choices : defaultTrueFalseChoices)
+              : (Array.isArray(subq?.choices) ? subq.choices : [])
+
+            return (
+              <Box key={`mc-subq-${subIdx}`}>
+                <PromptText content={subq?.prompt} variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }} />
+                <FormControl component="fieldset" sx={{ width: '100%' }}>
+                  <ChoiceGroup
+                    choices={choices}
+                    isMultiSelect={isMultiSelectSubquestion(subq)}
+                    selectedValue={selectedValue?.[subIdx]}
+                    name={`${groupBase}-subq-${subIdx}`}
+                    disabled={readOnly || isLocked}
+                    onSingleChange={(value) => {
+                      const nextValue = value === '' ? '' : Number(value)
+                      handleCompositeSingleChange(subIdx, nextValue)
+                    }}
+                    onMultiChange={(choiceIndex, checked) => {
+                      handleCompositeMultiChange(subIdx, choiceIndex, checked)
+                    }}
+                  />
+                </FormControl>
+              </Box>
+            )
+          })}
+        </Box>
+      ) : (
+        <Box>
+          {isInstructorView && proof && (
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 1 }}>
+              <Typography variant="subtitle2" color="text.secondary">Choices</Typography>
+            </Box>
+          )}
+          <FormControl component="fieldset" sx={{ width: '100%' }}>
+            <ChoiceGroup
+              choices={Array.isArray(problem?.choices) ? problem.choices : []}
+              isMultiSelect={isMultiSelect}
+              selectedValue={selectedValue}
+              name={`${groupBase}-single`}
+              disabled={readOnly}
+              onSingleChange={handleSingleChange}
+              onMultiChange={handleMultiChange}
+            />
+          </FormControl>
+        </Box>
       )}
-    </Stack>
+      {!suppressReveal && (
+        <SolutionReveal show={showSolution}>
+          {isComposite ? (
+            <Box sx={{ display: 'grid', gap: 3 }}>
+              {subquestions.map((subq, subIdx) => {
+                const choices = subq?.type === 'true-false'
+                  ? (subq?.choices?.length ? subq.choices : defaultTrueFalseChoices)
+                  : (Array.isArray(subq?.choices) ? subq.choices : [])
+                const isMulti = isMultiSelectSubquestion(subq)
+                const expected = isMulti
+                  ? (Array.isArray(subq.answerIndices) ? subq.answerIndices : [])
+                  : (Number.isFinite(subq.answerIndex) ? subq.answerIndex : null)
+
+                return (
+                  <Box key={`solution-${subIdx}`}>
+                    <PromptText content={subq?.prompt} variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }} />
+                    <FormControl component="fieldset" sx={{ width: '100%' }}>
+                      <ChoiceGroup
+                        choices={choices}
+                        isMultiSelect={isMulti}
+                        selectedValue={expected}
+                        name={`${groupBase}-reveal-${subIdx}`}
+                        disabled
+                      />
+                    </FormControl>
+                  </Box>
+                )
+              })}
+            </Box>
+          ) : (
+            <FormControl component="fieldset" sx={{ width: '100%' }}>
+              <ChoiceGroup
+                choices={Array.isArray(problem?.choices) ? problem.choices : []}
+                isMultiSelect={isMultiSelect}
+                selectedValue={correctAnswer}
+                name={`${groupBase}-reveal`}
+                disabled
+              />
+            </FormControl>
+          )}
+        </SolutionReveal>
+      )}
+    </ProblemFrame>
   )
 }

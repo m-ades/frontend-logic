@@ -1,12 +1,10 @@
 import { useState, useEffect, useId, useRef } from 'react'
-import { Box, Stack, Radio, RadioGroup, FormControlLabel, FormControl, Tooltip } from '@mui/material'
-import EditIcon from '@mui/icons-material/Edit'
-import StatusBanner, { isTerminalStatus } from '../../ui/StatusBanner.jsx'
+import { FormControl, FormControlLabel, Radio, RadioGroup } from '@mui/material'
 import ProblemSetButtons from './ProblemSetButtons.jsx'
 import InstructorQuestionEditor from '../InstructorQuestionEditor.jsx'
+import ProblemFrame from './ProblemFrame.jsx'
 import { useProblemChecker } from '../../../hooks/useProblemChecker.js'
 import SolutionReveal from '../SolutionReveal.jsx'
-import PromptText from '../../ui/PromptText.jsx'
 
 export default function EvaluateTruth({
   problem,
@@ -25,7 +23,7 @@ export default function EvaluateTruth({
 }) {
   const editorRef = useRef(null)
   const openEdit = () => editorRef.current?.open?.()
-  const prompt = problem?.prompt || ''
+  const prompt = typeof problem === 'string' ? problem : (problem?.prompt || '')
   const [selectedValue, setSelectedValue] = useState(
     savedState?.ans !== undefined ? (savedState.ans ? 'true' : 'false') : ''
   )
@@ -67,83 +65,15 @@ export default function EvaluateTruth({
   }
 
   return (
-    <Stack spacing={3} sx={{ px: 0, width: '100%', alignItems: 'stretch', flexGrow: 1 }}>
-      <Box className="logicpenguin" sx={{ width: '100%', flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
-        <Box
-          sx={{
-            overflow: 'visible',
-            minHeight: '150px',
-            flexGrow: 1,
-            alignSelf: { xs: 'stretch', md: 'flex-start' },
-          }}
-          className="lp-problem-card"
-        >
-          <Stack spacing={3} sx={{ p: { xs: 2, md: 2 } }}>
-            {isInstructorView && proof && (
-              <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-                <Tooltip title="Edit question">
-                  <Box component="span" onClick={openEdit} role="button" aria-label="Edit question" sx={{ display: 'inline-flex', alignItems: 'center', cursor: 'pointer', color: 'text.secondary', '&:hover': { opacity: 0.8 } }}>
-                    <EditIcon fontSize="small" />
-                  </Box>
-                </Tooltip>
-              </Box>
-            )}
-            {prompt && (
-              <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 0.5 }}>
-                <PromptText content={prompt} />
-              </Box>
-            )}
-            <FormControl component="fieldset" sx={{ width: '100%' }}>
-              <RadioGroup
-                value={selectedValue}
-                onChange={handleChange}
-                name={groupName}
-              >
-                <FormControlLabel
-                  value="true"
-                  control={<Radio disabled={readOnly} />}
-                  label="True"
-                  sx={{
-                    mb: 1,
-                    '& .MuiFormControlLabel-label': {
-                      fontSize: '1rem'
-                    }
-                  }}
-                />
-                <FormControlLabel
-                  value="false"
-                  control={<Radio disabled={readOnly} />}
-                  label="False"
-                  sx={{
-                    '& .MuiFormControlLabel-label': {
-                      fontSize: '1rem'
-                    }
-                  }}
-                />
-              </RadioGroup>
-            </FormControl>
-            {/* show answer in card */}
-            <SolutionReveal show={showSolution}>
-              <FormControl component="fieldset" sx={{ width: '100%' }}>
-                <RadioGroup value={answer ? 'true' : 'false'} name={`${groupName}-reveal`}>
-                  <FormControlLabel value="true" control={<Radio disabled />} label="True" />
-                  <FormControlLabel value="false" control={<Radio disabled />} label="False" />
-                </RadioGroup>
-              </FormControl>
-            </SolutionReveal>
-          </Stack>
-        </Box>
-      </Box>
-
-      {isTerminalStatus(status) && (
-        <StatusBanner
-          status={status}
-          message={message}
-          onClose={() => setMessage('')}
-        />
-      )}
-
-      {!hideActions && (
+    <ProblemFrame
+      prompt={prompt}
+      minHeight="150px"
+      isInstructorView={isInstructorView && !!proof}
+      onEditQuestion={proof ? openEdit : undefined}
+      status={status}
+      message={message}
+      onCloseStatus={() => setMessage('')}
+      actionNode={!hideActions ? (
         <ProblemSetButtons
           onCheck={handleCheck}
           onStartOver={handleStartOver}
@@ -154,10 +84,48 @@ export default function EvaluateTruth({
           attemptLimit={maxAttempts}
           isInstructorView={isInstructorView}
         />
-      )}
-      {isInstructorView && proof && (
+      ) : null}
+      editorNode={isInstructorView && proof ? (
         <InstructorQuestionEditor ref={editorRef} proof={proof} isInstructorView onSaved={onQuestionSaved} trigger="none" />
-      )}
-    </Stack>
+      ) : null}
+    >
+      <FormControl component="fieldset" sx={{ width: '100%' }}>
+        <RadioGroup
+          value={selectedValue}
+          onChange={handleChange}
+          name={groupName}
+        >
+          <FormControlLabel
+            value="true"
+            control={<Radio disabled={readOnly} />}
+            label="True"
+            sx={{
+              mb: 1,
+              '& .MuiFormControlLabel-label': {
+                fontSize: '1rem'
+              }
+            }}
+          />
+          <FormControlLabel
+            value="false"
+            control={<Radio disabled={readOnly} />}
+            label="False"
+            sx={{
+              '& .MuiFormControlLabel-label': {
+                fontSize: '1rem'
+              }
+            }}
+          />
+        </RadioGroup>
+      </FormControl>
+      <SolutionReveal show={showSolution}>
+        <FormControl component="fieldset" sx={{ width: '100%' }}>
+          <RadioGroup value={answer ? 'true' : 'false'} name={`${groupName}-reveal`}>
+            <FormControlLabel value="true" control={<Radio disabled />} label="True" />
+            <FormControlLabel value="false" control={<Radio disabled />} label="False" />
+          </RadioGroup>
+        </FormControl>
+      </SolutionReveal>
+    </ProblemFrame>
   )
 }
