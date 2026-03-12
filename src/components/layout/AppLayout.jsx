@@ -79,12 +79,22 @@ export default function AppLayout({ children }) {
   };
 
   return (
-    <Box sx={{ display: "flex", minHeight: "100vh", minWidth: 0 }}>
+    <Box
+      sx={{
+        display: "flex",
+        minHeight: "100vh",
+        minWidth: 0,
+        height: { xs: "auto", md: "100dvh" },
+        overflow: { xs: "visible", md: "hidden" },
+      }}
+    >
       <Box
         sx={{
           display: "flex",
           flexGrow: 1,
           minWidth: 0,
+          minHeight: { xs: "auto", md: 0 },
+          overflow: { xs: "visible", md: "hidden" },
           transform: shouldShiftShellForRulebook ? "translateX(16px)" : "translateX(0)",
           transition: (t) =>
             t.transitions.create("transform", {
@@ -108,7 +118,7 @@ export default function AppLayout({ children }) {
               p: 3,
               pt: /\/assignment\/[^/]+$/.test(location.pathname) ? 2 : 3,
               backgroundColor: "background.default",
-              minHeight: "100vh",
+              minHeight: { xs: "100vh", md: 0 },
               overflow: "auto",
               overflowX: "hidden",
               minWidth: 0,

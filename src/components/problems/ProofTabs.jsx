@@ -84,6 +84,8 @@ function ProofTabs({
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
   const isPhone = useMediaQuery(theme.breakpoints.down('sm')) // fullscreen layout only on phones
+  const desktopStickyTop = 0
+  const desktopSidebarMaxHeight = `min(calc(100dvh - ${theme.spacing(8)}), 650px)`
   const proofRefs = React.useRef({})
   const [direction, setDirection] = React.useState('forward')
   const prevIndexRef = React.useRef(currentProofIndex)
@@ -264,11 +266,16 @@ function ProofTabs({
         flexDirection: 'column',
         minWidth: { xs: 'auto', md: 200 },
         maxWidth: { xs: '100%', md: 200 },
+        position: { xs: 'static', md: 'sticky' },
+        top: { xs: 'auto', md: desktopStickyTop },
+        alignSelf: { xs: 'stretch', md: 'flex-start' },
+        maxHeight: { xs: 'none', md: desktopSidebarMaxHeight },
+        overflow: { xs: 'visible', md: 'hidden' },
       }}>
         <Tabs
           orientation={isMobile ? 'horizontal' : 'vertical'}
           variant="scrollable"
-          scrollButtons="auto"
+          scrollButtons={isMobile ? 'auto' : false}
           allowScrollButtonsMobile
           value={currentProofIndex}
           onChange={handleTabChange}
@@ -280,6 +287,13 @@ function ProofTabs({
             borderBottom: { xs: 0, md: 0 },
             minWidth: { xs: 'auto', md: 200 },
             maxWidth: { xs: '100%', md: 200 },
+            flex: { xs: '0 0 auto', md: '1 1 auto' },
+            minHeight: 0,
+            overflow: 'hidden',
+            '& .MuiTabs-scroller': {
+              overflowY: { xs: 'visible', md: 'auto !important' },
+              overflowX: { xs: 'auto !important', md: 'hidden !important' },
+            },
             '& .MuiTab-root': {
               color: 'primary.main',
               transition: 'all 0.2s ease',

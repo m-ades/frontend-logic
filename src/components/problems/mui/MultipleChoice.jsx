@@ -1,5 +1,5 @@
 import { useState, useEffect, useId, useRef } from 'react'
-import { Box, Stack, Radio, RadioGroup, FormControlLabel, FormControl, FormGroup, Checkbox, Typography, IconButton, Tooltip } from '@mui/material'
+import { Box, Stack, Radio, RadioGroup, FormControlLabel, FormControl, FormGroup, Checkbox, Typography, Tooltip } from '@mui/material'
 import EditIcon from '@mui/icons-material/Edit'
 import StatusBanner, { isTerminalStatus } from '../../ui/StatusBanner.jsx'
 import ProblemSetButtons from './ProblemSetButtons.jsx'
@@ -264,14 +264,15 @@ export default function MultipleChoice({
             {isInstructorView && proof && (
               <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
                 <Tooltip title="Edit question">
-                  <IconButton
-                    size="small"
+                  <Box
+                    component="span"
                     onClick={openEdit}
+                    role="button"
                     aria-label="Edit question"
-                    sx={{ color: 'text.secondary', '&:hover': { opacity: 0.8 } }}
+                    sx={{ display: 'inline-flex', alignItems: 'center', cursor: 'pointer', color: 'text.secondary', '&:hover': { opacity: 0.8 } }}
                   >
                     <EditIcon fontSize="small" />
-                  </IconButton>
+                  </Box>
                 </Tooltip>
               </Box>
             )}
