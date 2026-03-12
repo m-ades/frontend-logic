@@ -8,6 +8,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 // partial credit isn't really possible with multiple choice, alas
+import { isMultiSelectSubquestion } from '../multiple-choice-utils.js';
 
 const toNumber = (value) => {
     const num = Number(value);
@@ -29,13 +30,8 @@ const normalizeAnswerValue = (value) => {
     return value;
 };
 
-const isMultiSelectSubq = (subq) =>
-    subq?.type === 'multi-select'
-    || Boolean(subq?.multiSelect)
-    || Array.isArray(subq?.answerIndices);
-
 const getExpectedForSubq = (subq) => {
-    if (isMultiSelectSubq(subq)) {
+    if (isMultiSelectSubquestion(subq)) {
         return normalizeIndexArray(subq?.answerIndices || []);
     }
     const idx = subq?.answerIndex ?? (Array.isArray(subq?.answerIndices) ? subq.answerIndices[0] : undefined);

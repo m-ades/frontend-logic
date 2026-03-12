@@ -58,16 +58,46 @@ export function getActiveUserId() {
 
 export async function fetchJson(path, options = {}) {
   const apiKey = import.meta.env.VITE_API_KEY;
+  const fetchOptions = { ...options };
+  const timeoutMs = Number(
+    fetchOptions.timeoutMs
+      ?? import.meta.env.VITE_API_TIMEOUT_MS
+      ?? 20000
+  );
+  delete fetchOptions.timeoutMs;
+  const userSignal = fetchOptions.signal;
+  delete fetchOptions.signal;
+  const controller = new AbortController();
+  const timeoutId = Number.isFinite(timeoutMs) && timeoutMs > 0
+    ? setTimeout(() => controller.abort('timeout'), timeoutMs)
+    : null;
+  const signal = userSignal
+    ? AbortSignal.any([controller.signal, userSignal])
+    : controller.signal;
   const headers = {
-    ...(options.headers || {}),
+    ...(fetchOptions.headers || {}),
     // api key is still required for backend requests
     ...(apiKey ? { "x-api-key": apiKey } : {}),
   };
-  const res = await fetch(`${API_CONFIG.baseUrl}${path}`, {
-    ...options,
-    headers,
-    credentials: options.credentials || 'include',
-  });
+  let res;
+  try {
+    res = await fetch(`${API_CONFIG.baseUrl}${path}`, {
+      ...fetchOptions,
+      signal,
+      headers,
+      credentials: fetchOptions.credentials || 'include',
+    });
+  } catch (error) {
+    if (error?.name === 'AbortError') {
+      if (controller.signal.reason === 'timeout') {
+        throw new Error(`Request timed out after ${timeoutMs}ms`);
+      }
+      throw new Error('Request was canceled');
+    }
+    throw error;
+  } finally {
+    if (timeoutId) clearTimeout(timeoutId);
+  }
   if (!res.ok) {
     if (res.status === 401) {
       try {
@@ -82,17 +112,13 @@ export async function fetchJson(path, options = {}) {
       }
     }
     const text = await res.text();
+    let message = text;
     try {
-      const parsed = JSON.parse(text);
-      if (parsed?.message) {
-        throw new Error(parsed.message);
-      }
-    } catch (error) {
-      if (error instanceof Error && error.message !== text) {
-        throw error;
-      }
+      message = JSON.parse(text)?.message || text;
+    } catch {
+      // text wasn't json; keep raw message
     }
-    throw new Error(text || `Request failed: ${res.status}`);
+    throw new Error(message || `Request failed: ${res.status}`);
   }
   return res.json();
 }
