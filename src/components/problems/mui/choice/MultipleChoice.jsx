@@ -281,7 +281,7 @@ export default function MultipleChoice({
 
             return (
               <Box key={`mc-subq-${subIdx}`}>
-                <PromptText content={subq?.prompt} variant="subtitle2" sx={{ ...sectionLabelSx, fontWeight: 600 }} />
+                <PromptText content={subq?.prompt} sx={{ mb: 1, fontWeight: 500 }} />
                 <FormControl component="fieldset" sx={{ width: '100%' }}>
                   <ChoiceGroup
                     choices={choices}
@@ -337,7 +337,7 @@ export default function MultipleChoice({
 
                       return (
                         <Box key={`solution-${subIdx}`}>
-                          <PromptText content={subq?.prompt} variant="subtitle2" sx={{ ...sectionLabelSx, fontWeight: 600 }} />
+                          <PromptText content={subq?.prompt} sx={{ mb: 1, fontWeight: 500 }} />
                           <FormControl component="fieldset" sx={{ width: '100%' }}>
                       <ChoiceGroup
                         choices={choices}
