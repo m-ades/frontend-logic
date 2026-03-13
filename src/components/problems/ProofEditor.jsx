@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom'
 import { Box, IconButton, Stack, useMediaQuery, useTheme } from '@mui/material'
 import StatusBanner from '../ui/StatusBanner.jsx'
 import CloseIcon from '@mui/icons-material/Close'
-import DerivationTable from './mui/DerivationTable.jsx'
+import DerivationTable from './derivation/DerivationTable.jsx'
 import InstructorQuestionEditor from './InstructorQuestionEditor.jsx'
 
 export default function ProofEditor({
