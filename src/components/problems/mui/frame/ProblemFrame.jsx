@@ -25,10 +25,12 @@ export function ProblemCard({ minHeight = '150px', cardMaxWidth = '100%', cardSx
       <Card
         elevation={0}
         sx={{
+          border: '1px solid',
+          borderColor: 'divider',
+          borderRadius: 2,
           boxShadow: (theme) => theme.customShadows?.widget || theme.shadows[2],
           backgroundColor: 'background.paper',
           minWidth: 0,
-          minHeight: 0,
           overflow: 'visible',
           minHeight,
           flexGrow: 1,
