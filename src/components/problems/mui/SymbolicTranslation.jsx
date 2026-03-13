@@ -1,111 +1,13 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { Box, Typography } from '@mui/material'
 import InstructorQuestionEditor from '../InstructorQuestionEditor.jsx'
-import { useTheme } from '@mui/material/styles'
 import ProblemSetButtons from './ProblemSetButtons.jsx'
 import ProblemFrame from './ProblemFrame.jsx'
-import FormulaInput from '../../ui/logicpenguin/formula-input.js'
-import SymbolButtonRow from '../../ui/logicpenguin/SymbolButtonRow.jsx'
+import FormulaField from './FormulaField.jsx'
+import SymbolToolbar from './SymbolToolbar.jsx'
 import { useProblemChecker } from '../../../hooks/useProblemChecker.js'
 import SolutionReveal from '../SolutionReveal.jsx'
 import RichText from '../../ui/RichText.jsx'
-
-function FormulaInputField({ value, onValueChange, fieldReadOnly, formulaInputRef, onEnterKey }) {
-  const theme = useTheme()
-  const containerRef = useRef(null)
-  const changeHandlerRef = useRef(null)
-
-  useEffect(() => {
-    if (!containerRef.current) return
-    if (!formulaInputRef.current) {
-      const formulaInput = FormulaInput.getnew({})
-      formulaInputRef.current = formulaInput
-      formulaInput.style.width = '100%'
-      formulaInput.style.padding = theme.spacing(1.5)
-      formulaInput.style.border = `1px solid ${theme.palette.divider}`
-      formulaInput.style.borderRadius = theme.shape.borderRadius
-      formulaInput.style.fontSize = '1rem'
-      formulaInput.style.fontFamily = 'monospace'
-      formulaInput.style.backgroundColor = theme.palette.background.paper
-      formulaInput.style.color = theme.palette.text.primary
-      containerRef.current.appendChild(formulaInput)
-    } else if (!containerRef.current.contains(formulaInputRef.current)) {
-      containerRef.current.appendChild(formulaInputRef.current)
-    }
-    return () => {
-      if (formulaInputRef.current) {
-        if (changeHandlerRef.current) {
-          formulaInputRef.current.removeEventListener('input', changeHandlerRef.current)
-          formulaInputRef.current.removeEventListener('change', changeHandlerRef.current)
-          changeHandlerRef.current = null
-        }
-        if (formulaInputRef.current.parentNode) {
-          formulaInputRef.current.parentNode.removeChild(formulaInputRef.current)
-        }
-        formulaInputRef.current = null
-      }
-    }
-  }, [formulaInputRef, theme])
-
-  useEffect(() => {
-    const formulaInput = formulaInputRef.current
-    if (!formulaInput) return
-    formulaInput.readOnly = fieldReadOnly
-    if (changeHandlerRef.current) {
-      formulaInput.removeEventListener('input', changeHandlerRef.current)
-      formulaInput.removeEventListener('change', changeHandlerRef.current)
-      changeHandlerRef.current = null
-    }
-    if (!fieldReadOnly && onValueChange) {
-      const handleChange = () => {
-        if (fieldReadOnly) return
-        const nextValue = formulaInput.value
-        onValueChange(nextValue)
-      }
-      changeHandlerRef.current = handleChange
-      formulaInput.addEventListener('input', handleChange)
-      formulaInput.addEventListener('change', handleChange)
-    }
-    return () => {
-      if (changeHandlerRef.current) {
-        formulaInput.removeEventListener('input', changeHandlerRef.current)
-        formulaInput.removeEventListener('change', changeHandlerRef.current)
-        changeHandlerRef.current = null
-      }
-    }
-  }, [fieldReadOnly, onValueChange, formulaInputRef])
-
-  useEffect(() => {
-    if (formulaInputRef.current && value !== undefined && formulaInputRef.current.value !== value) {
-      formulaInputRef.current.value = value
-    }
-  }, [value, formulaInputRef])
-
-  useEffect(() => {
-    const formulaInput = formulaInputRef.current
-    if (!formulaInput || !onEnterKey) return
-    const handleKeyDown = (e) => {
-      if (e.key === 'Enter') {
-        e.preventDefault()
-        onEnterKey()
-      }
-    }
-    formulaInput.addEventListener('keydown', handleKeyDown)
-    return () => formulaInput.removeEventListener('keydown', handleKeyDown)
-  }, [formulaInputRef, onEnterKey])
-
-  return (
-    <Box
-      ref={containerRef}
-      sx={{
-        width: '100%',
-        minHeight: '56px',
-        display: 'flex',
-        alignItems: 'center'
-      }}
-    />
-  )
-}
 
 export default function SymbolicTranslation({
   problem,
@@ -122,6 +24,7 @@ export default function SymbolicTranslation({
   isAssignmentLocked = false,
   isInstructorView = false,
   onQuestionSaved,
+  problemLabel,
 }) {
   const editorRef = useRef(null)
   const openEdit = () => editorRef.current?.open?.()
@@ -137,7 +40,6 @@ export default function SymbolicTranslation({
     ?? problem?.symbolization_key
     ?? problem?.question_snapshot?.symbolizationKey
     ?? problem?.question_snapshot?.symbolization_key
-  // key lines
   const symbolizationKey = Array.isArray(symbolizationKeyRaw)
     ? symbolizationKeyRaw.filter(Boolean)
     : (typeof symbolizationKeyRaw === 'string'
@@ -155,7 +57,7 @@ export default function SymbolicTranslation({
       onStateChange({ ans: nextValue })
     }, 200)
   }, [onStateChange])
-  
+
   const { status, message, isChecking, handleCheck, handleStartOver, setMessage, attemptCount, maxAttempts, isLocked } = useProblemChecker({
     answer,
     problemType: 'symbolic-translation',
@@ -165,9 +67,6 @@ export default function SymbolicTranslation({
     isDisabled: () => !inputValue.trim(),
     resetInput: () => {
       setInputValue('')
-      if (formulaInputRef.current) {
-        formulaInputRef.current.value = ''
-      }
       lastSavedValueRef.current = ''
     },
     onStateChange: (state) => {
@@ -199,11 +98,10 @@ export default function SymbolicTranslation({
     }
   }, [])
 
-
   return (
     <ProblemFrame
+      problemLabel={problemLabel}
       prompt={prompt}
-      promptSx={{ mb: 1 }}
       minHeight="150px"
       isInstructorView={isInstructorView && !!proof}
       onEditQuestion={proof ? openEdit : undefined}
@@ -252,19 +150,19 @@ export default function SymbolicTranslation({
         <Typography variant="body2" sx={{ mb: 1, mt: 2.5, color: 'text.secondary' }}>
           Your translation:
         </Typography>
-        <FormulaInputField
+        <FormulaField
           value={inputValue}
           onValueChange={(value) => {
             if (readOnly) return
             setInputValue(value)
             scheduleStateSave(value)
           }}
-          fieldReadOnly={readOnly}
-          formulaInputRef={formulaInputRef}
+          readOnly={readOnly}
+          ref={formulaInputRef}
           onEnterKey={!readOnly && !hideActions ? handleCheck : undefined}
         />
         <Box sx={{ mt: 1 }}>
-          <SymbolButtonRow
+          <SymbolToolbar
             inputRef={formulaInputRef}
             disabled={readOnly}
             onValueChange={(value) => {
@@ -277,11 +175,11 @@ export default function SymbolicTranslation({
       </Box>
       {!suppressReveal && (
         <SolutionReveal show={showSolution}>
-          <FormulaInputField
+          <FormulaField
             value={answer ?? ''}
             onValueChange={null}
-            fieldReadOnly
-            formulaInputRef={solutionInputRef}
+            readOnly
+            ref={solutionInputRef}
           />
         </SolutionReveal>
       )}

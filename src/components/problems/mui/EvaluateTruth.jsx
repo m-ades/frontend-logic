@@ -2,7 +2,7 @@ import { useState, useEffect, useId, useRef } from 'react'
 import { FormControl, FormControlLabel, Radio, RadioGroup } from '@mui/material'
 import ProblemSetButtons from './ProblemSetButtons.jsx'
 import InstructorQuestionEditor from '../InstructorQuestionEditor.jsx'
-import ProblemFrame from './ProblemFrame.jsx'
+import ProblemFrame, { choiceLabelSx, choiceLabelWithGapSx } from './ProblemFrame.jsx'
 import { useProblemChecker } from '../../../hooks/useProblemChecker.js'
 import SolutionReveal from '../SolutionReveal.jsx'
 
@@ -20,6 +20,7 @@ export default function EvaluateTruth({
   isAssignmentLocked = false,
   isInstructorView = false,
   onQuestionSaved,
+  problemLabel,
 }) {
   const editorRef = useRef(null)
   const openEdit = () => editorRef.current?.open?.()
@@ -66,6 +67,7 @@ export default function EvaluateTruth({
 
   return (
     <ProblemFrame
+      problemLabel={problemLabel}
       prompt={prompt}
       minHeight="150px"
       isInstructorView={isInstructorView && !!proof}
@@ -99,22 +101,13 @@ export default function EvaluateTruth({
             value="true"
             control={<Radio disabled={readOnly} />}
             label="True"
-            sx={{
-              mb: 1,
-              '& .MuiFormControlLabel-label': {
-                fontSize: '1rem'
-              }
-            }}
+            sx={choiceLabelWithGapSx}
           />
           <FormControlLabel
             value="false"
             control={<Radio disabled={readOnly} />}
             label="False"
-            sx={{
-              '& .MuiFormControlLabel-label': {
-                fontSize: '1rem'
-              }
-            }}
+            sx={choiceLabelSx}
           />
         </RadioGroup>
       </FormControl>
