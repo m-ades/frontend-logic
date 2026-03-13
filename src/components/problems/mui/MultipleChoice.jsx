@@ -2,7 +2,7 @@ import { useState, useEffect, useId, useRef } from 'react'
 import { Box, Checkbox, FormControl, FormControlLabel, FormGroup, Radio, RadioGroup, Typography } from '@mui/material'
 import ProblemSetButtons from './ProblemSetButtons.jsx'
 import InstructorQuestionEditor from '../InstructorQuestionEditor.jsx'
-import ProblemFrame from './ProblemFrame.jsx'
+import ProblemFrame, { choiceLabelWithGapSx, sectionLabelSx } from './ProblemFrame.jsx'
 import { useProblemChecker } from '../../../hooks/useProblemChecker.js'
 import SolutionReveal from '../SolutionReveal.jsx'
 import PromptText from '../../ui/PromptText.jsx'
@@ -10,16 +10,8 @@ import { hasNonEmptyAnswerIndices, isMultiSelectSubquestion } from '../../../lib
 
 const defaultTrueFalseChoices = ['True', 'False']
 
-const multiSelectLabelSx = {
-  mb: 1,
-  ml: 2,
-  '& .MuiFormControlLabel-label': { fontSize: '1rem' },
-}
-
-const singleSelectLabelSx = {
-  mb: 1,
-  '& .MuiFormControlLabel-label': { fontSize: '1rem' }
-}
+const multiSelectLabelSx = { ...choiceLabelWithGapSx, ml: 2 }
+const singleSelectLabelSx = choiceLabelWithGapSx
 
 const isMissingSingleValue = (value) => (
   value === '' || value === null || value === undefined
@@ -103,6 +95,7 @@ export default function MultipleChoice({
   isAssignmentLocked = false,
   isInstructorView = false,
   onQuestionSaved,
+  problemLabel,
 }) {
   const editorRef = useRef(null)
   const openEdit = () => editorRef.current?.open?.()
@@ -249,8 +242,8 @@ export default function MultipleChoice({
 
   return (
     <ProblemFrame
+      problemLabel={problemLabel}
       prompt={prompt}
-      promptSx={{ mb: 3, flex: 1 }}
       minHeight="200px"
       isInstructorView={isInstructorView && !!proof}
       onEditQuestion={proof ? openEdit : undefined}
@@ -288,7 +281,7 @@ export default function MultipleChoice({
 
             return (
               <Box key={`mc-subq-${subIdx}`}>
-                <PromptText content={subq?.prompt} variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }} />
+                <PromptText content={subq?.prompt} variant="subtitle2" sx={{ ...sectionLabelSx, fontWeight: 600 }} />
                 <FormControl component="fieldset" sx={{ width: '100%' }}>
                   <ChoiceGroup
                     choices={choices}
@@ -312,7 +305,7 @@ export default function MultipleChoice({
       ) : (
         <Box>
           {isInstructorView && proof && (
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 1 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, ...sectionLabelSx }}>
               <Typography variant="subtitle2" color="text.secondary">Choices</Typography>
             </Box>
           )}
@@ -342,10 +335,10 @@ export default function MultipleChoice({
                   ? (Array.isArray(subq.answerIndices) ? subq.answerIndices : [])
                   : (Number.isFinite(subq.answerIndex) ? subq.answerIndex : null)
 
-                return (
-                  <Box key={`solution-${subIdx}`}>
-                    <PromptText content={subq?.prompt} variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }} />
-                    <FormControl component="fieldset" sx={{ width: '100%' }}>
+                      return (
+                        <Box key={`solution-${subIdx}`}>
+                          <PromptText content={subq?.prompt} variant="subtitle2" sx={{ ...sectionLabelSx, fontWeight: 600 }} />
+                          <FormControl component="fieldset" sx={{ width: '100%' }}>
                       <ChoiceGroup
                         choices={choices}
                         isMultiSelect={isMulti}

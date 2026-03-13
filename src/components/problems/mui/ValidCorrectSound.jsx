@@ -1,15 +1,34 @@
-/*
-import { useState, useEffect } from 'react'
-import { Box, Stack, Radio, RadioGroup, FormControlLabel, FormControl, Typography, Table, TableBody, TableRow, TableCell } from '@mui/material'
-import StatusBanner, { isTerminalStatus } from '../../ui/StatusBanner.jsx'
+import { useEffect, useRef, useState } from 'react'
+import { FormControl, FormControlLabel, Radio, RadioGroup, Stack, Table, TableBody, TableCell, TableRow, Typography } from '@mui/material'
+import ProblemFrame, { choiceLabelSx, choiceLabelWithGapSx, sectionLabelSx } from './ProblemFrame.jsx'
 import ProblemSetButtons from './ProblemSetButtons.jsx'
-import { useProblemChecker } from '../../../hooks/useProblemChecker.js'
+import InstructorQuestionEditor from '../InstructorQuestionEditor.jsx'
 import SolutionReveal from '../SolutionReveal.jsx'
+import { useProblemChecker } from '../../../hooks/useProblemChecker.js'
 
-export default function ValidCorrectSound({ 
-  problem, 
-  answer, 
-  onStateChange, 
+const questionRows = [
+  { key: 'correct', label: 'Factually correct' },
+  { key: 'valid', label: 'Valid' },
+  { key: 'sound', label: 'Sound' },
+]
+
+const toStoredValue = (value) => {
+  if (value === 'true') return true
+  if (value === 'false') return false
+  return ''
+}
+
+const toRadioValue = (value) => {
+  if (value === true) return 'true'
+  if (value === false) return 'false'
+  return ''
+}
+
+export default function ValidCorrectSound({
+  problem,
+  proof,
+  answer,
+  onStateChange,
   onComplete,
   savedState,
   assignmentQuestionId,
@@ -17,69 +36,57 @@ export default function ValidCorrectSound({
   readOnly = false,
   hideActions = false,
   suppressReveal = false,
+  isAssignmentLocked = false,
+  isInstructorView = false,
+  onQuestionSaved,
+  problemLabel,
 }) {
-  const [answers, setAnswers] = useState({
-    correct: savedState?.ans?.correct !== undefined ? String(savedState.ans.correct) : '',
-    valid: savedState?.ans?.valid !== undefined ? String(savedState.ans.valid) : '',
-    sound: savedState?.ans?.sound !== undefined ? String(savedState.ans.sound) : ''
-  })
+  const editorRef = useRef(null)
+  const openEdit = () => editorRef.current?.open?.()
+  const [answers, setAnswers] = useState(() => ({
+    correct: toRadioValue(savedState?.ans?.correct),
+    valid: toRadioValue(savedState?.ans?.valid),
+    sound: toRadioValue(savedState?.ans?.sound),
+  }))
 
   const buildAnswerPayload = (values) => ({
-    correct: values.correct === '' ? -2 : (values.correct === 'true' ? true : false),
-    valid: values.valid === '' ? -2 : (values.valid === 'true' ? true : false),
-    sound: values.sound === '' ? -2 : (values.sound === 'true' ? true : false)
+    correct: toStoredValue(values.correct),
+    valid: toStoredValue(values.valid),
+    sound: toStoredValue(values.sound),
   })
-  const hasAnyAnswer = (values) => Object.values(values).some((value) => value !== '')
-  
-  const { status, message, isChecking, handleCheck: baseHandleCheck, handleStartOver, setStatus, setMessage, attemptCount, maxAttempts, isLocked } = useProblemChecker({
+
+  const isComplete = (values) => questionRows.every(({ key }) => values[key] !== '')
+
+  const { status, message, isChecking, handleCheck, handleStartOver, setStatus, setMessage, attemptCount, maxAttempts, isLocked } = useProblemChecker({
     answer,
     problemType: 'valid-correct-sound',
     question: problem,
-    getAnswer: () => ({
-      correct: answers.correct === '' ? -2 : (answers.correct === 'true' ? true : false),
-      valid: answers.valid === '' ? -2 : (answers.valid === 'true' ? true : false),
-      sound: answers.sound === '' ? -2 : (answers.sound === 'true' ? true : false)
-    }),
+    getAnswer: () => buildAnswerPayload(answers),
     onComplete,
-    isDisabled: () => false, // Custom validation in handleCheck
+    isDisabled: () => !isComplete(answers),
     resetInput: () => setAnswers({ correct: '', valid: '', sound: '' }),
     onStateChange,
     assignmentQuestionId,
     attemptLimit,
     initialAttemptCount: savedState?.attemptCount ?? 0,
   })
-  const showSolution = isLocked && status !== 'correct'
-  
-  const handleCheck = async () => {
-    const ans = buildAnswerPayload(answers)
-    if (ans.correct === -2 || ans.valid === -2 || ans.sound === -2) {
-      setStatus('unanswered')
-      setMessage('Please answer all questions')
-      return
-    }
-    await baseHandleCheck()
-  }
+
+  const showSolution = !suppressReveal && isLocked && status !== 'correct'
 
   useEffect(() => {
-    if (savedState?.ans) {
-      setAnswers({
-        correct: savedState.ans.correct !== undefined ? String(savedState.ans.correct) : '',
-        valid: savedState.ans.valid !== undefined ? String(savedState.ans.valid) : '',
-        sound: savedState.ans.sound !== undefined ? String(savedState.ans.sound) : ''
-      })
-      return
-    }
-    setAnswers({ correct: '', valid: '', sound: '' })
-  }, [savedState?.ans?.correct, savedState?.ans?.sound, savedState?.ans?.valid])
+    setAnswers({
+      correct: toRadioValue(savedState?.ans?.correct),
+      valid: toRadioValue(savedState?.ans?.valid),
+      sound: toRadioValue(savedState?.ans?.sound),
+    })
+  }, [savedState?.ans?.correct, savedState?.ans?.valid, savedState?.ans?.sound])
 
-  const handleChange = (question, value) => {
+  const handleValueChange = (key, value) => {
     if (readOnly) return
     setAnswers((prev) => {
-      const nextAnswers = { ...prev, [question]: value }
-      if (hasAnyAnswer(nextAnswers)) {
-        onStateChange?.({ ans: buildAnswerPayload(nextAnswers) })
-      }
-      return nextAnswers
+      const next = { ...prev, [key]: value }
+      onStateChange?.({ ans: buildAnswerPayload(next) })
+      return next
     })
     setStatus('unanswered')
     setMessage('')
@@ -88,23 +95,35 @@ export default function ValidCorrectSound({
   const renderAnswerTable = (values, tableReadOnly) => (
     <Table>
       <TableBody>
-        {['correct', 'valid', 'sound'].map((q) => (
-          <TableRow key={q}>
-            <TableCell sx={{ border: 'none', py: 1 }}>
-              <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                {q === 'correct' ? 'Factually correct?' : q === 'valid' ? 'Valid?' : 'Sound?'}
+        {questionRows.map(({ key, label }) => (
+          <TableRow key={key}>
+            <TableCell sx={{ border: 'none', py: 1, pl: 0, verticalAlign: 'top' }}>
+              <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                {label}
               </Typography>
             </TableCell>
-            <TableCell sx={{ border: 'none', py: 1 }}>
-              <RadioGroup
-                row
-                value={values[q]}
-                onChange={(e) => handleChange(q, e.target.value)}
-                name={q}
-              >
-                <FormControlLabel value="true" control={<Radio size="small" disabled={tableReadOnly} />} label="Yes" />
-                <FormControlLabel value="false" control={<Radio size="small" disabled={tableReadOnly} />} label="No" />
-              </RadioGroup>
+            <TableCell sx={{ border: 'none', py: 0.5, pr: 0 }}>
+              <FormControl component="fieldset" sx={{ width: '100%' }}>
+                <RadioGroup
+                  row
+                  value={values[key]}
+                  onChange={(event) => handleValueChange(key, event.target.value)}
+                  name={`vcs-${key}`}
+                >
+                  <FormControlLabel
+                    value="true"
+                    control={<Radio size="small" disabled={tableReadOnly} />}
+                    label="Yes"
+                    sx={choiceLabelWithGapSx}
+                  />
+                  <FormControlLabel
+                    value="false"
+                    control={<Radio size="small" disabled={tableReadOnly} />}
+                    label="No"
+                    sx={choiceLabelSx}
+                  />
+                </RadioGroup>
+              </FormControl>
             </TableCell>
           </TableRow>
         ))}
@@ -112,65 +131,68 @@ export default function ValidCorrectSound({
     </Table>
   )
 
-  const isComplete = answers.correct !== '' && answers.valid !== '' && answers.sound !== ''
-
   return (
-    <Stack spacing={3} sx={{ px: 0, width: '100%', alignItems: 'stretch', flexGrow: 1 }}>
-      <Box className="logicpenguin" sx={{ width: '100%', flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
-        <Box
-          sx={{
-            overflow: 'visible',
-            minHeight: '250px',
-            flexGrow: 1,
-            alignSelf: { xs: 'stretch', md: 'flex-start' },
-          }}
-          className="lp-problem-card"
-        >
-          <Stack spacing={3} sx={{ p: { xs: 2, md: 2 } }}>
-            <Box>
-              <Typography variant="body2" sx={{ mb: 1, fontWeight: 600 }}>Premises:</Typography>
-              {problem.prems.map((prem, idx) => (
-                <Typography key={idx} variant="body2" sx={{ mb: 0.5 }}>
-                  {idx + 1}. {prem}
-                </Typography>
-              ))}
-              <Typography variant="body2" sx={{ mt: 2, fontWeight: 600 }}>Conclusion:</Typography>
-              <Typography variant="body2">{problem.conc}</Typography>
-            </Box>
-            {renderAnswerTable(answers, readOnly)}
-          </Stack>
-        </Box>
-      </Box>
-
-      {isTerminalStatus(status) && (
-        <StatusBanner
-          status={status}
-          message={message}
-          onClose={() => setMessage('')}
-        />
-      )}
-
-      {!hideActions && (
+    <ProblemFrame
+      problemLabel={problemLabel}
+      prompt={problem?.prompt || proof?.description || ''}
+      minHeight="220px"
+      isInstructorView={isInstructorView && !!proof}
+      onEditQuestion={proof ? openEdit : undefined}
+      status={status}
+      message={message}
+      onCloseStatus={() => setMessage('')}
+      actionNode={!hideActions ? (
         <ProblemSetButtons
           onCheck={handleCheck}
           onStartOver={handleStartOver}
           isChecking={isChecking}
-          isDisabled={!isComplete || isLocked}
+          isDisabled={!isComplete(answers) || isLocked || isAssignmentLocked}
           align="flex-start"
           attemptCount={attemptCount}
           attemptLimit={maxAttempts}
+          isInstructorView={isInstructorView}
         />
+      ) : null}
+      editorNode={isInstructorView && proof ? (
+        <InstructorQuestionEditor
+          ref={editorRef}
+          proof={proof}
+          isInstructorView
+          onSaved={onQuestionSaved}
+          trigger="none"
+        />
+      ) : null}
+    >
+      {Array.isArray(problem?.prems) && problem.prems.length > 0 && (
+        <Stack spacing={1}>
+          <Typography variant="body2" sx={{ ...sectionLabelSx, mb: 0, fontWeight: 600, color: 'text.primary' }}>
+            Premises
+          </Typography>
+          {problem.prems.map((premise, index) => (
+            <Typography key={`${premise}-${index}`} variant="body2">
+              {index + 1}. {premise}
+            </Typography>
+          ))}
+          {problem?.conc && (
+            <>
+              <Typography variant="body2" sx={{ ...sectionLabelSx, mb: 0, mt: 1, fontWeight: 600, color: 'text.primary' }}>
+                Conclusion
+              </Typography>
+              <Typography variant="body2">{problem.conc}</Typography>
+            </>
+          )}
+        </Stack>
       )}
-      {!suppressReveal && (
+      {renderAnswerTable(answers, readOnly)}
+      {showSolution && (
         <SolutionReveal show={showSolution}>
           {renderAnswerTable({
-            correct: answer?.correct === true ? 'true' : answer?.correct === false ? 'false' : '',
-            valid: answer?.valid === true ? 'true' : answer?.valid === false ? 'false' : '',
-            sound: answer?.sound === true ? 'true' : answer?.sound === false ? 'false' : '',
+            correct: toRadioValue(answer?.correct),
+            valid: toRadioValue(answer?.valid),
+            sound: toRadioValue(answer?.sound),
           }, true)}
         </SolutionReveal>
       )}
-    </Stack>
+    </ProblemFrame>
   )
 }
-*/

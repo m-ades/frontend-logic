@@ -61,27 +61,6 @@ function a11yProps(index) {
   };
 }
 
-function problemLabelSx(index) {
-  const content = `"Problem ${index + 1}"`
-  return {
-    '& .lp-problem-card:first-of-type, & [data-problem-card-root="true"]:first-of-type': {
-      position: 'relative',
-      pt: { xs: 5, md: 5.5 },
-    },
-    '& .lp-problem-card:first-of-type::before, & [data-problem-card-root="true"]:first-of-type::before': {
-      content,
-      position: 'absolute',
-      top: { xs: 16, md: 18 },
-      left: { xs: 16, md: 20 },
-      color: 'text.secondary',
-      fontSize: '0.875rem',
-      lineHeight: 1.2,
-      zIndex: 1,
-      pointerEvents: 'none',
-    },
-  }
-}
-
 function ProofTabs({
   proofs,
   currentProofIndex, 
@@ -564,6 +543,7 @@ function ProofTabs({
         {proofs.map((proof, idx) => {
           const isLast = idx >= proofs.length - 1
           const handleNext = isLast ? null : () => handleTabChange(null, idx + 1)
+          const problemLabel = `Problem ${idx + 1}`
           return (
             <ProblemNavigationContext.Provider key={proof.id} value={{ onNext: handleNext }}>
               <TabPanel
@@ -573,7 +553,7 @@ function ProofTabs({
                 isMobile={isMobile}
               >
                 <Stack spacing={3} sx={{ minWidth: 0 }}>
-                  <Box sx={{ minWidth: 0, ...problemLabelSx(idx) }}>
+                  <Box sx={{ minWidth: 0 }}>
                     <div ref={el => { if (el) proofRefs.current[proof.id] = el }}>
                       {(() => {
                         const savedState = getSavedProofState(proof.id)
@@ -587,6 +567,7 @@ function ProofTabs({
                           return (
                             <TruthTableEditor
                               proof={proof}
+                              problemLabel={problemLabel}
                               savedState={savedStateWithAttempts}
                               onStateChange={(state) => handleProofStateChange(proof.id, state, {
                                 assignmentQuestionId: proof.questionId
@@ -606,6 +587,7 @@ function ProofTabs({
                             <ProofEditor
                               key={`proof-${proof.id}`}
                               proof={proof}
+                              problemLabel={problemLabel}
                               onProofComplete={onProofComplete}
                               savedState={savedStateWithAttempts}
                               onStateChange={(state) => handleProofStateChange(proof.id, state, {
@@ -635,6 +617,7 @@ function ProofTabs({
                           <LogicPenguinProblem
                             key={`proof-${proof.id}`}
                             proof={proof}
+                            problemLabel={problemLabel}
                             onProofComplete={onProofComplete}
                             savedState={savedStateWithAttempts}
                             onStateChange={(state) => handleProofStateChange(proof.id, state, {
