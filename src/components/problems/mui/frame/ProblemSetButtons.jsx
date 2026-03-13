@@ -1,4 +1,5 @@
 import { Button, IconButton, Stack, Typography } from '@mui/material'
+import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward'
 import LockIcon from '@mui/icons-material/Lock'
 import { useProblemNavigation } from '../../ProblemNavigationContext.jsx'
@@ -19,7 +20,9 @@ export default function ProblemSetButtons({
   isInstructorView = false,
 }) {
   const navigation = useProblemNavigation()
+  const showPrev = Boolean(navigation?.onPrev)
   const showNext = Boolean(navigation?.onNext)
+  const isPrevDisabled = Boolean(navigation?.isPrevDisabled)
   const isNextDisabled = Boolean(navigation?.isNextDisabled)
   const hasAttempts = Number.isFinite(attemptCount) && Number.isFinite(attemptLimit)
   const attemptsLeft = hasAttempts ? Math.max(0, attemptLimit - attemptCount) : null
@@ -33,6 +36,17 @@ export default function ProblemSetButtons({
           justifyContent={align}
           alignItems="center"
         >
+          {showPrev && (
+            <IconButton
+              onClick={navigation?.onPrev}
+              disabled={isChecking || isPrevDisabled}
+              size="small"
+              sx={{ color: 'primary.main' }}
+              aria-label="Previous problem"
+            >
+              <ArrowBackIcon />
+            </IconButton>
+          )}
           <Button
             variant="contained"
             onClick={onCheck}
@@ -76,6 +90,17 @@ export default function ProblemSetButtons({
           spacing={2} 
           justifyContent={align}
         >
+          {showPrev && (
+            <IconButton
+              onClick={navigation?.onPrev}
+              disabled={isChecking || isPrevDisabled}
+              size="small"
+              sx={{ color: 'primary.main' }}
+              aria-label="Previous problem"
+            >
+              <ArrowBackIcon />
+            </IconButton>
+          )}
           <Button
             variant="contained"
             onClick={onCheck}

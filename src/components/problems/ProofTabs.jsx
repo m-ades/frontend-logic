@@ -541,11 +541,19 @@ function ProofTabs({
         )}
       </Box>
         {proofs.map((proof, idx) => {
+          const isFirst = idx === 0
           const isLast = idx >= proofs.length - 1
+          const handlePrev = isFirst ? null : () => handleTabChange(null, idx - 1)
           const handleNext = isLast ? null : () => handleTabChange(null, idx + 1)
           const problemLabel = `Problem ${idx + 1}`
           return (
-            <ProblemNavigationContext.Provider key={proof.id} value={{ onNext: handleNext }}>
+            <ProblemNavigationContext.Provider
+              key={proof.id}
+              value={{
+                onPrev: handlePrev,
+                onNext: handleNext,
+              }}
+            >
               <TabPanel
                 value={currentProofIndex}
                 index={idx}

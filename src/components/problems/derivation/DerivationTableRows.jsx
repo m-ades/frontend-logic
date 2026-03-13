@@ -209,7 +209,7 @@ export default function DerivationTableRows({
               ) : (
                 <TextField
                   variant="standard"
-                  placeholder={idx === premises.length ? 'statement' : ''}
+                  placeholder={idx === premises.length ? 'Statement' : ''}
                   value={line.formula}
                   onChange={(e) => handleLineChange(idx, 'formula', e.target.value)}
                   onKeyDown={(e) => handleFormulaKeyDown(e, idx, line.readOnly)}
