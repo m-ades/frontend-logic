@@ -50,6 +50,75 @@ function formulasEqualNormally(a, b, normalizeForFallback) {
   }
 }
 
+/**
+ * Propositional derivations: extract unique uppercase letters from premises + conclusion.
+ * Used for the mobile keyboard letter row (e.g. premises "P ⊃ Q", "P", conclusion "Q" → ["P","Q"]).
+ */
+function getPropositionalLettersFromFormulas(premises, conclusion) {
+  const formulas = [...(Array.isArray(premises) ? premises : []), conclusion].filter(Boolean).map(String)
+  const text = formulas.join(' ')
+  const letters = []
+  const seen = new Set()
+  const match = text.match(/[A-Z]/g)
+  if (match) {
+    for (const c of match) {
+      if (!seen.has(c)) {
+        seen.add(c)
+        letters.push(c)
+      }
+    }
+  }
+  return letters.length > 0 ? letters : null
+}
+
+/**
+ * Predicate-logic keyboard: parse letter rows from proof.
+ * Predicates: leading uppercase letter(s) from each symbolizationKey entry (e.g. "Mx: ..." → "M").
+ * Constants: first 3 lowercase letters [a-z] not used in the prompt (skip letters that appear in question text).
+ * Variables: always x, y, z.
+ */
+function getPredicateLettersFromKey(symbolizationKey) {
+  if (!Array.isArray(symbolizationKey) || symbolizationKey.length === 0) return []
+  const seen = new Set()
+  return symbolizationKey
+    .map((line) => {
+      const s = typeof line === 'string' ? line : String(line ?? '')
+      const left = s.split(':')[0].trim()
+      const match = left.match(/^[A-Z]+/)
+      return match ? match[0] : null
+    })
+    .filter((letter) => letter && !seen.has(letter) && (seen.add(letter), true))
+}
+
+/** Alphabet a-w (exclude x,y,z — reserved for variables). */
+const CONSTANT_POOL = 'abcdefghijklmnopqrstuvw'.split('')
+
+function getConstantLettersFromPrompt(promptText, count = 3) {
+  if (!promptText || typeof promptText !== 'string') {
+    return CONSTANT_POOL.slice(0, count)
+  }
+  const text = promptText.replace(/<[^>]+>/g, ' ').toLowerCase()
+  const used = new Set(text.match(/[a-z]/g) || [])
+  const result = []
+  for (const c of CONSTANT_POOL) {
+    if (!used.has(c)) {
+      result.push(c)
+      if (result.length >= count) break
+    }
+  }
+  return result.length > 0 ? result : ['a', 'b', 'c']
+}
+
+const PREDICATE_VARIABLES = ['x', 'y', 'z']
+
+function isPredicateLogicKey(symbolizationKey) {
+  if (!Array.isArray(symbolizationKey) || symbolizationKey.length === 0) return false
+  return symbolizationKey.some((line) => {
+    const s = typeof line === 'string' ? line : String(line ?? '')
+    return s.includes(':') && /^[A-Z]/.test(s.split(':')[0].trim())
+  })
+}
+
 const SYMBOL_BUTTONS = [
   { label: '~', insert: '~' },
   { label: '•', insert: '•' },
@@ -385,6 +454,51 @@ export default function DerivationTable({
     }
     return ALL_DERIVATION_RULES
   }, [proof?.ruleset, proof?.options?.ruleset])
+
+  /** Keyboard config for derivations.
+   * - Predicate mode: three letter rows (predicates, constants, variables).
+   * - Propositional mode: only propositional letters (no lowercase constants/variables, no quantifiers).
+   */
+  const derivationKeyboardConfig = useMemo(() => {
+    const qSnap = proof?.questionSnapshot ?? proof?.snapshot ?? proof?.question_snapshot
+    const rawKey =
+      proof?.symbolizationKey ??
+      proof?.snapshot?.symbolizationKey ??
+      proof?.question_snapshot?.symbolizationKey ??
+      qSnap?.symbolizationKey ??
+      qSnap?.symbolization_key
+    const key = Array.isArray(rawKey) ? rawKey : []
+    const premises = Array.isArray(proof?.premises) ? proof.premises : []
+    const conclusion = proof?.conclusion ?? proof?.conc ?? ''
+    const formulaText = [...premises, conclusion].filter(Boolean).map(String).join(' ')
+
+    const isPredicate = isPredicateLogicKey(key) || /[∀∃]/.test(formulaText)
+
+    if (isPredicate) {
+      // For predicate logic, constants should not reuse letters from formulas or symbolization key.
+      const keyText = key.map((line) => (typeof line === 'string' ? line : String(line ?? ''))).join(' ')
+      const textForConstants = [formulaText, keyText].filter(Boolean).join(' ') || ''
+      const constantLetters = getConstantLettersFromPrompt(textForConstants, 3)
+      const variableLetters = PREDICATE_VARIABLES
+      // Prefer predicate letters from the symbolization key; if missing, fall back to uppercase letters in formulas.
+      const fromKey = getPredicateLettersFromKey(key)
+      const fromFormulas = getPropositionalLettersFromFormulas(premises, conclusion) ?? []
+      const predicateLetters = fromKey.length > 0 ? fromKey : fromFormulas
+      return {
+        isPredicateMode: true,
+        predicateLetters,
+        constantLetters,
+        variableLetters,
+      }
+    }
+
+    // Propositional derivation: only show propositional letters (no lowercase rows, no quantifiers).
+    const predicateLetters = getPropositionalLettersFromFormulas(premises, conclusion) ?? []
+    return {
+      isPredicateMode: false,
+      symbolizationKey: predicateLetters,
+    }
+  }, [proof])
   const isLineCompleteForCheck = useCallback((line) => {
     if (!line) return false
     const formulaFilled = (line.formula || '').trim().length > 0
@@ -1377,7 +1491,11 @@ export default function DerivationTable({
                       onBlur={() => handleLineCommit(idx, 'formula', normalizeFormulaForCheck(line.formula ?? ''))}
                       placeholder=""
                       aria-label={`Formula line ${idx + 1}`}
-                      includeQuantifiers
+                      includeQuantifiers={derivationKeyboardConfig.isPredicateMode}
+                      predicateLetters={derivationKeyboardConfig.isPredicateMode ? derivationKeyboardConfig.predicateLetters : undefined}
+                      constantLetters={derivationKeyboardConfig.isPredicateMode ? derivationKeyboardConfig.constantLetters : undefined}
+                      variableLetters={derivationKeyboardConfig.isPredicateMode ? derivationKeyboardConfig.variableLetters : undefined}
+                      symbolizationKey={derivationKeyboardConfig.symbolizationKey}
                     />
                   ) : (
                   <TextField
@@ -1709,56 +1827,16 @@ export default function DerivationTable({
                     }}
                   >
                     {isPhone && isFullScreen ? (
-                      <>
-                        {/* row 1: autochecker + first five */}
-                        <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: isFullScreen ? 0.5 : 0.75, flexShrink: 0 }}>
-                          <Tooltip title={autoCheckEnabled ? 'Turn off autochecker' : 'Turn on autochecker'}>
-                            <IconButton
-                              onClick={() => setAutoCheckEnabled((prev) => !prev)}
-                              size="small"
-                              aria-label="Toggle autochecker"
-                              sx={{ color: autoCheckEnabled ? 'primary.main' : 'text.disabled', position: 'relative' }}
-                            >
-                              <AutoAwesomeIcon />
-                            </IconButton>
-                          </Tooltip>
-                          {SYMBOL_BUTTONS.slice(0, 5).map((btn) => (
-                            <Button
-                              key={btn.label}
-                              type="button"
-                              size="small"
-                              variant="outlined"
-                              onMouseDown={(e) => e.preventDefault()}
-                              onClick={() => handleSymbolInsert({ insert: btn.insert, pair: btn.pair })}
-                              aria-label={getInsertSymbolLabel({ insert: btn.insert, pair: btn.pair })}
-                              title={getInsertSymbolLabel({ insert: btn.insert, pair: btn.pair })}
-                              sx={symbolBtnSx(isFullScreen, isMobile, isPhone)}
-                            >
-                              {btn.label}
-                            </Button>
-                          ))}
-                        </Box>
-                        {/* row 2: spacer (under autochecker) then (∀x) (∃x) ( ) [ ] then spacer under ≡ */}
-                        <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: isFullScreen ? 0.5 : 0.75, flexShrink: 0 }}>
-                          <Box sx={{ width: 40, minWidth: 40, flexShrink: 0 }} aria-hidden />
-                          {SYMBOL_ROW2.map((btn) => (
-                            <Button
-                              key={btn.label}
-                              type="button"
-                              size="small"
-                              variant="outlined"
-                              onMouseDown={(e) => e.preventDefault()}
-                              onClick={() => handleSymbolInsert({ insert: btn.insert, pair: btn.pair })}
-                              aria-label={getInsertSymbolLabel({ insert: btn.insert, pair: btn.pair })}
-                              title={getInsertSymbolLabel({ insert: btn.insert, pair: btn.pair })}
-                              sx={symbolBtnSx(isFullScreen, isMobile, isPhone)}
-                            >
-                              {btn.label}
-                            </Button>
-                          ))}
-                          <Box sx={{ minWidth: (isPhone && isFullScreen) ? 42 : (isFullScreen ? 28 : 34), px: (isPhone && isFullScreen) ? 1.25 : (isFullScreen ? 0.75 : 1), flexShrink: 0 }} aria-hidden />
-                        </Box>
-                      </>
+                      <Tooltip title={autoCheckEnabled ? 'Turn off autochecker' : 'Turn on autochecker'}>
+                        <IconButton
+                          onClick={() => setAutoCheckEnabled((prev) => !prev)}
+                          size="small"
+                          aria-label="Toggle autochecker"
+                          sx={{ color: autoCheckEnabled ? 'primary.main' : 'text.disabled', position: 'relative' }}
+                        >
+                          <AutoAwesomeIcon />
+                        </IconButton>
+                      </Tooltip>
                     ) : (
                       <>
                         <Tooltip title={autoCheckEnabled ? 'Turn off autochecker' : 'Turn on autochecker'}>
