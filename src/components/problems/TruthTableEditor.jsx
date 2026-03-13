@@ -17,13 +17,10 @@ import {
   TableHead,
   TableRow,
   Paper,
-  IconButton,
   Tooltip,
   alpha,
 } from '@mui/material'
 import { useTheme } from '@mui/material/styles'
-import EditIcon from '@mui/icons-material/Edit'
-import StatusBanner, { isTerminalStatus } from '../ui/StatusBanner.jsx'
 import { getSubmissionScore } from '../../utils/problemHelpers.js'
 import getFormulaClass from '../../lib/logicpenguin/symbolic/formula.js'
 import getSyntax from '../../lib/logicpenguin/symbolic/libsyntax.js'
@@ -36,6 +33,7 @@ import {
 import { fullTableMatch } from '../../lib/logicpenguin/checkers/truth-tables.js'
 import ProblemSetButtons from './mui/ProblemSetButtons.jsx'
 import InstructorQuestionEditor from './InstructorQuestionEditor.jsx'
+import ProblemFrame from './mui/ProblemFrame.jsx'
 import { fetchJson, getActiveUserId } from '../../utils/api.js'
 import PromptText from '../ui/PromptText.jsx'
 import { tablesEqual, clearDebounce, scheduleDebouncedChange } from '../../utils/tablePerf.js'
@@ -79,6 +77,7 @@ function TruthToggle({ value, onChange, ariaLabel, accent, readOnly = false }) {
         }
       }}
       sx={{
+        fontSize: '1.125rem',
         fontWeight: 700,
         color: getColor(),
         cursor: 'pointer',
@@ -110,9 +109,9 @@ function TruthToggle({ value, onChange, ariaLabel, accent, readOnly = false }) {
 
 function ColumnRowSelectorBox({ selected, onClick, ariaLabel, theme, tooltip }) {
   const primary = theme.palette.primary.main
-  const borderColor = theme.palette.mode === 'dark' 
-    ? 'rgba(255, 255, 255, 0.3)' 
-    : 'rgba(0, 0, 0, 0.4)'
+  const borderColor = theme.palette.mode === 'dark'
+    ? 'rgba(255, 255, 255, 0.18)'
+    : 'rgba(0, 0, 0, 0.16)'
   return (
     <Tooltip title={tooltip || ''}>
       <Box
@@ -126,19 +125,18 @@ function ColumnRowSelectorBox({ selected, onClick, ariaLabel, theme, tooltip }) 
           height: 14,
           minWidth: 14,
           minHeight: 14,
-          border: `2px solid ${borderColor}`,
+          border: `1px solid ${selected ? primary : borderColor}`,
           borderRadius: 0.5,
-          bgcolor: selected ? alpha(primary, 0.4) : 'transparent',
-          outline: selected ? `2px solid ${primary}` : 'none',
-          outlineOffset: -1,
+          bgcolor: 'transparent',
+          boxShadow: 'none',
           cursor: 'pointer',
+          transition: 'background-color 0.16s ease, border-color 0.16s ease, transform 0.12s ease',
           '&:hover': {
-            bgcolor: selected ? alpha(primary, 0.5) : alpha(primary, 0.12),
-            borderColor: selected ? primary : borderColor,
+            borderColor: primary,
           },
           '&:focus-visible': {
             outline: `2px solid ${alpha(primary, 0.6)}`,
-            outlineOffset: 1,
+            outlineOffset: 2,
           },
         }}
       />
@@ -161,6 +159,7 @@ export default function TruthTableEditor({
   isAssignmentLocked = false,
   isInstructorView = false,
   onQuestionSaved,
+  problemLabel,
 }) {
   const editorRef = React.useRef(null)
   const openEdit = () => editorRef.current?.open?.()
@@ -762,6 +761,12 @@ export default function TruthTableEditor({
   const theme = useTheme()
   const cellBorderColor = theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.12)' : 'var(--lpgray6)'
   const cornerBg = theme.palette.mode === 'dark' ? '#23232D' : '#fff'
+  const headerBg = theme.palette.mode === 'dark'
+    ? alpha(theme.palette.primary.light, 0.16)
+    : alpha(theme.palette.primary.main, 0.08)
+  const stripeBg = theme.palette.mode === 'dark'
+    ? alpha(theme.palette.common.white, 0.04)
+    : alpha(theme.palette.common.black, 0.028)
   const highlightStyle = React.useMemo(
     () => ({ backgroundColor: alpha(theme.palette.primary.main, 0.14) }),
     [theme.palette.primary.main]
@@ -772,14 +777,31 @@ export default function TruthTableEditor({
     '&.MuiPaper-root': { boxShadow: 'none !important' },
     '& .MuiTable-root': { background: 'transparent', border: 'none', boxShadow: 'none' },
     '& .MuiTableCell-root': { color: 'text.primary', border: `1px solid ${cellBorderColor} !important` },
-    '& .MuiTableHead-root .MuiTableCell-root:not(.tt-selector-corner)': { backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.04)' : undefined },
-    '& .MuiTableRow-root:nth-of-type(even)': { backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.02)' : undefined },
+    '& .MuiTableHead-root .MuiTableCell-root:not(.tt-selector-corner)': { backgroundColor: headerBg },
+    '& .MuiTableRow-root:nth-of-type(even)': { backgroundColor: stripeBg },
     '& .tt-row-selector-cell': { border: 'none !important', backgroundColor: 'transparent !important' },
-    '& .tt-selector-row .MuiTableCell-root': { border: 'none !important', backgroundColor: 'transparent !important' },
+    '& .tt-selector-row .MuiTableCell-root': { border: 'none !important', backgroundColor: 'transparent !important', pt: 0.75, pb: 0, verticalAlign: 'top' },
     '& .tt-selector-corner, & .tt-selector-corner-bottom': { border: 'none !important', background: `${cornerBg} !important` },
   }
+  const compactTableSx = { width: 'auto', tableLayout: 'fixed' }
+  const compactCellSx = {
+    px: 0.5,
+    py: 0.5,
+    width: 76,
+    minWidth: 76,
+    maxWidth: 80,
+    boxSizing: 'border-box',
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+  }
+  const compactHeaderCellSx = {
+    ...compactCellSx,
+    fontSize: '1.125rem',
+    fontWeight: 600,
+  }
+  const separatorCellSx = { width: 36, minWidth: 36, maxWidth: 36, px: 0 }
   const renderSelectorBox = (selected, onClick, ariaLabel, tooltip) => (
-    <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
       <ColumnRowSelectorBox selected={selected} onClick={onClick} ariaLabel={ariaLabel} theme={theme} tooltip={tooltip} />
     </Box>
   )
@@ -808,10 +830,10 @@ export default function TruthTableEditor({
               borderColor: `${cellBorderColor} !important`,
             },
             '& .MuiTableHead-root .MuiTableCell-root:not(.tt-selector-corner)': {
-              backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.04)' : undefined,
+              backgroundColor: headerBg,
             },
                 '& .MuiTableRow-root:nth-of-type(even)': {
-              backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.02)' : undefined,
+              backgroundColor: stripeBg,
             },
             '& .tt-row-selector-cell, & .tt-selector-corner, & .tt-selector-corner-bottom': {
               border: 'none !important',
@@ -821,6 +843,9 @@ export default function TruthTableEditor({
               border: 'none !important',
               borderBottom: 'none !important',
               backgroundColor: 'transparent !important',
+              pt: 0.75,
+              pb: 0,
+              verticalAlign: 'top',
             },
             '& .tt-row-selector-cell': {
               backgroundColor: 'transparent !important',
@@ -830,7 +855,7 @@ export default function TruthTableEditor({
             },
           }}
         >
-          <Table className="tt-table">
+          <Table className="tt-table" sx={compactTableSx}>
             <TableHead className="tt-head">
               <TableRow className="tt-token-row">
                 {tablesToRender.map((table, tableIndex) => {
@@ -843,7 +868,7 @@ export default function TruthTableEditor({
                         <TableCell 
                           className="tt-token tt-separator" 
                           align="center"
-                          sx={{ background: 'transparent', color: 'text.secondary' }}
+                          sx={{ ...separatorCellSx, background: 'transparent', color: 'text.secondary' }}
                         >
                           {isConclusion ? '//' : '/'}
                         </TableCell>
@@ -855,6 +880,7 @@ export default function TruthTableEditor({
                             isConclusion && tokenIndex === 0 ? 'tt-token tt-conclusion' : 'tt-token'
                           }
                           align="center"
+                          sx={compactHeaderCellSx}
                         >
                           {token}
                         </TableCell>
@@ -876,7 +902,7 @@ export default function TruthTableEditor({
                           <TableCell 
                             className="tt-cell tt-separator-cell" 
                             align="center"
-                            sx={{ background: 'transparent' }}
+                            sx={{ ...separatorCellSx, background: 'transparent' }}
                           >
                             {/* separator column intentionally blank */}
                           </TableCell>
@@ -892,7 +918,7 @@ export default function TruthTableEditor({
                               }
                               align="center"
                               data-tt-highlight={withSelectors && (colMatch || rowMatch) ? 'true' : undefined}
-                              sx={withSelectors && (colMatch || rowMatch) ? highlightStyle : undefined}
+                              sx={withSelectors && (colMatch || rowMatch) ? { ...compactCellSx, ...highlightStyle } : compactCellSx}
                             >
                               <TruthToggle
                                 value={tableInputsToRender[tableIndex]?.[rowIndex]?.[colIndex]}
@@ -908,7 +934,7 @@ export default function TruthTableEditor({
                     )
                   })}
                   {withSelectors && (
-                    <TableCell className="tt-row-selector-cell" align="center" sx={{ width: 20, minWidth: 20, p: 0.25, verticalAlign: 'middle' }}>
+                    <TableCell className="tt-row-selector-cell" align="center" sx={{ width: 20, minWidth: 20, pl: 0.75, pr: 0, pt: 0.25, pb: 0.25, verticalAlign: 'middle' }}>
                       {renderSelectorBox(selectedRows.includes(rowIndex), () => toggleRow(rowIndex), `Select row ${rowIndex + 1}`, 'highlight row')}
                     </TableCell>
                   )}
@@ -920,9 +946,9 @@ export default function TruthTableEditor({
                     const headerTokens = table.headerTokens && table.headerTokens.length > 0 ? table.headerTokens : table.tokens
                     return (
                       <React.Fragment key={`colsel-frag-${tableIndex}`}>
-                        {tableIndex > 0 && <TableCell sx={{ width: 16, minWidth: 16, p: 0, border: 'none !important' }} />}
+                        {tableIndex > 0 && <TableCell sx={{ width: 16, minWidth: 16, p: 0, pt: 0.75, pb: 0, border: 'none !important' }} />}
                         {headerTokens.map((_, colIndex) => (
-                          <TableCell key={`colsel-${tableIndex}-${colIndex}`} align="center" sx={{ width: 20, minWidth: 20, p: 0.25, border: 'none !important' }}>
+                          <TableCell key={`colsel-${tableIndex}-${colIndex}`} align="center" sx={{ width: 20, minWidth: 20, p: 0.25, pt: 0.75, pb: 0, border: 'none !important' }}>
                             {renderSelectorBox(
                               selectedColumns.some((c) => c.tableIndex === tableIndex && c.colIndex === colIndex),
                               () => toggleColumn(tableIndex, colIndex),
@@ -969,11 +995,11 @@ export default function TruthTableEditor({
                   color: 'text.primary',
                   borderColor: 'divider',
                 },
-                '& .MuiTableHead-root .MuiTableCell-root:not(.tt-selector-corner)': {
-                  backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.04)' : undefined,
+            '& .MuiTableHead-root .MuiTableCell-root:not(.tt-selector-corner)': {
+                  backgroundColor: headerBg,
                 },
                 '& .MuiTableRow-root:nth-of-type(even)': {
-                  backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.02)' : undefined,
+                  backgroundColor: stripeBg,
                 },
                 '& .tt-row-selector-cell, & .tt-selector-corner, & .tt-selector-corner-bottom': {
                   border: 'none !important',
@@ -983,6 +1009,9 @@ export default function TruthTableEditor({
                   border: 'none !important',
                   borderBottom: 'none !important',
                   backgroundColor: 'transparent !important',
+                  pt: 0.75,
+                  pb: 0,
+                  verticalAlign: 'top',
                 },
                 '& .tt-row-selector-cell': {
                   backgroundColor: 'transparent !important',
@@ -997,15 +1026,16 @@ export default function TruthTableEditor({
                   {table.label}
                 </Typography>
               )}
-              <Table className="tt-table">
+            <Table className="tt-table" sx={compactTableSx}>
                 <TableHead className="tt-head">
                   <TableRow className="tt-token-row">
                     {headerTokens.map((token, idx) => (
-                      <TableCell
-                        key={`solution-header-${tableIndex}-${idx}`}
-                        className="tt-token"
-                        align="center"
-                      >
+                    <TableCell
+                      key={`solution-header-${tableIndex}-${idx}`}
+                      className="tt-token"
+                      align="center"
+                      sx={compactHeaderCellSx}
+                    >
                         {token}
                       </TableCell>
                     ))}
@@ -1027,7 +1057,7 @@ export default function TruthTableEditor({
                             className="tt-cell"
                             align="center"
                             data-tt-highlight={withSelectors && (colMatch || rowMatch) ? 'true' : undefined}
-                            sx={withSelectors && (colMatch || rowMatch) ? highlightStyle : undefined}
+                            sx={withSelectors && (colMatch || rowMatch) ? { ...compactCellSx, ...highlightStyle } : compactCellSx}
                           >
                             <TruthToggle
                               value={tableInputsToRender[tableIndex]?.[rowIndex]?.[colIndex]}
@@ -1040,7 +1070,7 @@ export default function TruthTableEditor({
                         )
                       })}
                       {showSelectors && (
-                        <TableCell className="tt-row-selector-cell" align="center" sx={{ width: 20, minWidth: 20, p: 0.25, verticalAlign: 'middle', border: 'none', background: 'transparent' }}>
+                        <TableCell className="tt-row-selector-cell" align="center" sx={{ width: 20, minWidth: 20, pl: 0.75, pr: 0, pt: 0.25, pb: 0.25, verticalAlign: 'middle', border: 'none', background: 'transparent' }}>
                           <Box sx={{ display: 'flex', justifyContent: 'center' }}>
                             <ColumnRowSelectorBox
                               selected={selectedRows.includes(rowIndex)}
@@ -1057,7 +1087,7 @@ export default function TruthTableEditor({
                   {withSelectors && (
                     <TableRow className="tt-selector-row">
                       {headerTokens.map((_, colIndex) => (
-                        <TableCell key={`colsel-${tableIndex}-${colIndex}`} align="center" sx={{ width: 20, minWidth: 20, p: 0.25, border: 'none !important' }}>
+                        <TableCell key={`colsel-${tableIndex}-${colIndex}`} align="center" sx={{ width: 20, minWidth: 20, p: 0.25, pt: 0.75, pb: 0, border: 'none !important' }}>
                           {renderSelectorBox(
                             selectedColumns.some((c) => c.tableIndex === tableIndex && c.colIndex === colIndex),
                             () => toggleColumn(tableIndex, colIndex),
@@ -1089,7 +1119,7 @@ export default function TruthTableEditor({
     </Box>
   )
 
-  const promptContent = !embedded && (proof.description || truthTable.prompt)
+  const promptContent = embedded && (proof.description || truthTable.prompt)
     ? (
         <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 0.5 }}>
           <PromptText content={truthTable.prompt || proof.description} />
@@ -1112,30 +1142,9 @@ export default function TruthTableEditor({
     <Box
       sx={{
         mt: embedded ? 0 : 1,
-        overflow: 'visible',
-        // no tall card styling
-        minHeight: 'auto',
-        flexGrow: 1,
-        alignSelf: { xs: 'stretch', md: 'flex-start' },
       }}
-      className={embedded ? undefined : 'lp-problem-card'}
     >
       <Stack spacing={3} sx={{ p: { xs: embedded ? 0 : 2, md: embedded ? 0 : 2 } }}>
-        {!embedded && isInstructorView && (
-          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
-            <Tooltip title="Edit question">
-              <Box
-                component="span"
-                onClick={openEdit}
-                role="button"
-                aria-label="Edit question"
-                sx={{ display: 'inline-flex', alignItems: 'center', cursor: 'pointer', color: 'text.secondary', '&:hover': { opacity: 0.8 } }}
-              >
-                <EditIcon fontSize="small" />
-              </Box>
-            </Tooltip>
-          </Box>
-        )}
         {promptContent}
         {!embedded && !formulasLabel && (
           <Typography variant="body2" sx={{ color: 'primary.main' }}>
@@ -1255,56 +1264,57 @@ export default function TruthTableEditor({
   }
 
   return (
-    <Stack spacing={2} sx={{ px: 0, width: '100%', alignItems: 'stretch', flexGrow: 1 }}>
-      {embedded ? (
-        tableCard
-      ) : (
-        <Box className="logicpenguin" sx={{ width: '100%', flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
-          {tableCard}
-        </Box>
-      )}
-      <Typography
-        variant="body2"
-        sx={{
-          color: 'primary.main',
-          fontFamily: 'inherit',
-          fontWeight: 400,
-        }}
+    embedded ? (
+      tableCard
+    ) : (
+      <ProblemFrame
+        problemLabel={problemLabel}
+        prompt={truthTable.prompt || proof.description}
+        minHeight="auto"
+        cardMaxWidth="980px"
+        isInstructorView={isInstructorView}
+        onEditQuestion={openEdit}
+        status={status}
+        message={message}
+        onCloseStatus={() => setMessage('')}
+        actionNode={!hideActions ? (
+          <ProblemSetButtons
+            onCheck={handleCheck}
+            onStartOver={handleStartOver}
+            isChecking={isChecking}
+            isDisabled={!tableFilled || attemptCount >= attemptLimit || isAssignmentLocked}
+            align="flex-start"
+            attemptCount={attemptCount}
+            attemptLimit={attemptLimit}
+            isInstructorView={isInstructorView}
+          />
+        ) : null}
+        editorNode={isInstructorView ? (
+          <InstructorQuestionEditor
+            ref={editorRef}
+            proof={proof}
+            isInstructorView
+            onSaved={onQuestionSaved}
+            trigger="none"
+          />
+        ) : null}
       >
-        {tableCorrect
-          ? 'Truth table looks good.'
-          : tableFilledOnly
-            ? 'Recheck your rows.'
-            : 'Click cells to toggle truth values - fill in every cell to finish.'}
-      </Typography>
-      {isTerminalStatus(status) && (
-        <StatusBanner
-          status={status}
-          message={message}
-          onClose={() => setMessage('')}
-        />
-      )}
-      {!hideActions && (
-        <ProblemSetButtons
-          onCheck={handleCheck}
-          onStartOver={handleStartOver}
-          isChecking={isChecking}
-          isDisabled={!tableFilled || attemptCount >= attemptLimit || isAssignmentLocked}
-          align="flex-start"
-          attemptCount={attemptCount}
-          attemptLimit={attemptLimit}
-          isInstructorView={isInstructorView}
-        />
-      )}
-      {isInstructorView && (
-        <InstructorQuestionEditor
-          ref={editorRef}
-          proof={proof}
-          isInstructorView
-          onSaved={onQuestionSaved}
-          trigger="none"
-        />
-      )}
-    </Stack>
+        {tableCard}
+        <Typography
+          variant="body2"
+          sx={{
+            color: 'primary.main',
+            fontFamily: 'inherit',
+            fontWeight: 400,
+          }}
+        >
+          {tableCorrect
+            ? 'Truth table looks good.'
+            : tableFilledOnly
+              ? 'Recheck your rows.'
+              : 'Click cells to toggle truth values - fill in every cell to finish.'}
+        </Typography>
+      </ProblemFrame>
+    )
   )
 }

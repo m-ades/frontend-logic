@@ -18,11 +18,10 @@ import {
   Tooltip,
   alpha,
 } from '@mui/material'
-import EditIcon from '@mui/icons-material/Edit'
 import InstructorQuestionEditor from '../InstructorQuestionEditor.jsx'
 import { useTheme } from '@mui/material/styles'
 import ProblemSetButtons from './ProblemSetButtons.jsx'
-import StatusBanner, { isTerminalStatus } from '../../ui/StatusBanner.jsx'
+import ProblemFrame, { choiceLabelWithGapSx, sectionLabelSx } from './ProblemFrame.jsx'
 import { useProblemChecker } from '../../../hooks/useProblemChecker.js'
 import SolutionReveal from '../SolutionReveal.jsx'
 import PromptText from '../../ui/PromptText.jsx'
@@ -134,6 +133,7 @@ function TruthToggle({ value, onChange, ariaLabel, toggleValues, readOnly = fals
         }
       }}
       sx={{
+        fontSize: '1.125rem',
         fontWeight: 700,
         color: getColor(),
         cursor: readOnly ? 'default' : 'pointer',
@@ -195,6 +195,7 @@ export default function SandboxTruthTable({
   toggleValues,
   defaultToggleValues = DEFAULT_TOGGLE,
   tokenTextTransform = 'uppercase',
+  problemLabel,
 }) {
   const theme = useTheme()
   const editorRef = useRef(null)
@@ -370,39 +371,38 @@ export default function SandboxTruthTable({
   const showSolution = isLocked && status !== 'correct' && mcQuestions.length > 0 && hasCorrectAnswer
 
   return (
-    <Stack spacing={3} sx={{ px: 0, width: '100%', alignItems: 'stretch', flexGrow: 1 }}>
-      <Box className="logicpenguin" sx={{ width: '100%', flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
-        <Box
-          sx={{
-            overflow: 'visible',
-            minHeight: '200px',
-            flexGrow: 1,
-            alignSelf: { xs: 'stretch', md: 'flex-start' },
-          }}
-          className="lp-problem-card"
-        >
-          <Stack spacing={3} sx={{ p: { xs: 2, md: 2 } }}>
-            {isInstructorView && proof && (
-              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
-                <Tooltip title="Edit question">
-                  <Box
-                    component="span"
-                    onClick={openEdit}
-                    role="button"
-                    aria-label="Edit question"
-                    sx={{ display: 'inline-flex', alignItems: 'center', cursor: 'pointer', color: 'text.secondary', '&:hover': { opacity: 0.8 } }}
-                  >
-                    <EditIcon fontSize="small" />
-                  </Box>
-                </Tooltip>
-              </Box>
-            )}
-            {prompt && (
-              <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 0.5 }}>
-                <PromptText content={prompt} />
-              </Box>
-            )}
-
+    <ProblemFrame
+      problemLabel={problemLabel}
+      prompt={prompt}
+      minHeight="200px"
+      cardMaxWidth="980px"
+      isInstructorView={isInstructorView && !!proof}
+      onEditQuestion={proof ? openEdit : undefined}
+      status={status}
+      message={message}
+      onCloseStatus={() => setMessage('')}
+      actionNode={!hideActions ? (
+        <ProblemSetButtons
+          onCheck={handleCheck}
+          onStartOver={handleStartOver}
+          isChecking={isChecking}
+          isDisabled={mcQuestions.length === 0 || selectedValues.some((val) => val === '') || isLocked || isAssignmentLocked}
+          align="flex-start"
+          attemptCount={attemptCount}
+          attemptLimit={maxAttempts}
+          isInstructorView={isInstructorView}
+        />
+      ) : null}
+      editorNode={isInstructorView && proof ? (
+        <InstructorQuestionEditor
+          ref={editorRef}
+          proof={proof}
+          isInstructorView
+          onSaved={onQuestionSaved}
+          trigger="none"
+        />
+      ) : null}
+    >
             {argument?.premises?.length > 0 && (
               <Box sx={{ width: '100%', display: 'flex', alignItems: 'flex-start', gap: 0.5 }}>
                 {isStackedLayout(layout) ? (
@@ -586,7 +586,7 @@ export default function SandboxTruthTable({
               <Stack spacing={2}>
                 {mcQuestions.map((mcq, qIdx) => (
                   <Box key={`stt-mc-${qIdx}`} sx={{ width: '100%' }}>
-                    <PromptText content={mcq.prompt} sx={{ mb: 1, fontWeight: 500 }} />
+                    <PromptText content={mcq.prompt} sx={{ ...sectionLabelSx, fontWeight: 500 }} />
                     <RadioGroup
                       value={selectedValues[qIdx] ?? ''}
                       onChange={(event) => handleChoiceChange(qIdx, event.target.value)}
@@ -598,10 +598,7 @@ export default function SandboxTruthTable({
                           value={String(index)}
                           control={<Radio disabled={readOnly || isLocked} />}
                           label={choice}
-                          sx={{
-                            mb: 1,
-                            '& .MuiFormControlLabel-label': { fontSize: '1rem' },
-                          }}
+                          sx={choiceLabelWithGapSx}
                         />
                       ))}
                     </RadioGroup>
@@ -609,40 +606,6 @@ export default function SandboxTruthTable({
                 ))}
               </Stack>
             </FormControl>
-          </Stack>
-        </Box>
-      </Box>
-
-      {isTerminalStatus(status) && (
-        <StatusBanner
-          status={status}
-          message={message}
-          onClose={() => setMessage('')}
-        />
-      )}
-
-      {!hideActions && (
-        <ProblemSetButtons
-          onCheck={handleCheck}
-          onStartOver={handleStartOver}
-          isChecking={isChecking}
-          isDisabled={mcQuestions.length === 0 || selectedValues.some((val) => val === '') || isLocked || isAssignmentLocked}
-          align="flex-start"
-          attemptCount={attemptCount}
-          attemptLimit={maxAttempts}
-          isInstructorView={isInstructorView}
-        />
-      )}
-
-      {isInstructorView && proof && (
-        <InstructorQuestionEditor
-          ref={editorRef}
-          proof={proof}
-          isInstructorView
-          onSaved={onQuestionSaved}
-          trigger="none"
-        />
-      )}
 
       <SolutionReveal show={showSolution} title="Correct Answer">
         <Stack spacing={2}>
@@ -655,7 +618,7 @@ export default function SandboxTruthTable({
             if (correctChoice == null && !Number.isFinite(Number(correctIndex))) return null
             return (
               <Box key={`solution-${qIdx}`}>
-                <PromptText content={mcq?.prompt} variant="subtitle2" sx={{ mb: 0.5, fontWeight: 600 }} />
+                <PromptText content={mcq?.prompt} variant="subtitle2" sx={{ ...sectionLabelSx, mb: 0.5, fontWeight: 600 }} />
                 <Typography component="div" variant="body2" color="text.secondary">
                   {correctChoice != null ? correctChoice : `(Answer index: ${correctIndex})`}
                 </Typography>
@@ -664,6 +627,6 @@ export default function SandboxTruthTable({
           })}
         </Stack>
       </SolutionReveal>
-    </Stack>
+    </ProblemFrame>
   )
 }

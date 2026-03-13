@@ -20,7 +20,6 @@ import {
   alpha,
 } from '@mui/material'
 import { useTheme } from '@mui/material/styles'
-import StatusBanner, { isTerminalStatus } from '../../ui/StatusBanner.jsx'
 import { getSubmissionScore } from '../../../utils/problemHelpers.js'
 import getFormulaClass from '../../../lib/logicpenguin/symbolic/formula.js'
 import getSyntax from '../../../lib/logicpenguin/symbolic/libsyntax.js'
@@ -32,6 +31,7 @@ import {
 } from '../../../lib/logicpenguin/symbolic/libsemantics.js'
 import { fullTableMatch } from '../../../lib/logicpenguin/checkers/truth-tables.js'
 import ProblemSetButtons from './ProblemSetButtons.jsx'
+import ProblemFrame from './ProblemFrame.jsx'
 import { fetchJson, getActiveUserId } from '../../../utils/api.js'
 import PromptText from '../../ui/PromptText.jsx'
 import { tablesEqual, clearDebounce, scheduleDebouncedChange } from '../../../utils/tablePerf.js'
@@ -82,6 +82,7 @@ function TruthToggle({ value, onChange, ariaLabel, accent, readOnly = false }) {
         }
       }}
       sx={{
+        fontSize: '1.125rem',
         fontWeight: 700,
         color: getColor(),
         cursor: 'pointer',
@@ -965,7 +966,7 @@ export default function TruthTable({
     </Box>
   )
 
-  const promptContent = !embedded && (proof.description || tableConfig.prompt)
+  const promptContent = embedded && (proof.description || tableConfig.prompt)
     ? (
         <PromptText content={tableConfig.prompt || proof.description} />
       )
@@ -975,13 +976,7 @@ export default function TruthTable({
     <Box
       sx={{
         mt: embedded ? 0 : 1,
-        overflow: 'visible',
-        // no tall card
-        minHeight: 'auto',
-        flexGrow: 1,
-        alignSelf: { xs: 'stretch', md: 'flex-start' },
       }}
-      className={embedded ? undefined : 'lp-problem-card'}
     >
       <Stack spacing={3} sx={{ p: { xs: embedded ? 0 : 2, md: embedded ? 0 : 2 } }}>
         {promptContent}
@@ -1071,46 +1066,60 @@ export default function TruthTable({
   )
 
   return (
-    <Stack spacing={2} sx={{ px: 0, width: '100%', alignItems: 'stretch', flexGrow: 1 }}>
-      {embedded ? (
-        tableCard
-      ) : (
-        <Box className="logicpenguin" sx={{ width: '100%', flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
-          {tableCard}
-        </Box>
-      )}
-      <Typography
-        variant="body2"
-        sx={{
-          color: 'primary.main',
-          fontFamily: 'inherit',
-          fontWeight: 400,
-        }}
+    embedded ? (
+      <Stack spacing={2} sx={{ px: 0, width: '100%', alignItems: 'stretch', flexGrow: 1 }}>
+        {tableCard}
+        <Typography
+          variant="body2"
+          sx={{
+            color: 'primary.main',
+            fontFamily: 'inherit',
+            fontWeight: 400,
+          }}
+        >
+          {tableCorrect
+            ? 'Truth table looks good.'
+            : tableFilledOnly
+              ? 'Recheck your rows.'
+              : 'Click cells to toggle truth values - fill in every cell to finish.'}
+        </Typography>
+      </Stack>
+    ) : (
+      <ProblemFrame
+        prompt={tableConfig.prompt || proof.description}
+        minHeight="auto"
+        cardMaxWidth="980px"
+        status={status}
+        message={message}
+        onCloseStatus={() => setMessage('')}
+        actionNode={!hideActions ? (
+          <ProblemSetButtons
+            onCheck={handleCheck}
+            onStartOver={handleStartOver}
+            isChecking={isChecking}
+            isDisabled={!tableFilled || attemptCount >= attemptLimit}
+            align="flex-start"
+            attemptCount={attemptCount}
+            attemptLimit={attemptLimit}
+          />
+        ) : null}
       >
-        {tableCorrect
-          ? 'Truth table looks good.'
-          : tableFilledOnly
-            ? 'Recheck your rows.'
-            : 'Click cells to toggle truth values - fill in every cell to finish.'}
-      </Typography>
-      {isTerminalStatus(status) && (
-        <StatusBanner
-          status={status}
-          message={message}
-          onClose={() => setMessage('')}
-        />
-      )}
-      {!hideActions && (
-        <ProblemSetButtons
-          onCheck={handleCheck}
-          onStartOver={handleStartOver}
-          isChecking={isChecking}
-          isDisabled={!tableFilled || attemptCount >= attemptLimit}
-          align="flex-start"
-          attemptCount={attemptCount}
-          attemptLimit={attemptLimit}
-        />
-      )}
-    </Stack>
+        {tableCard}
+        <Typography
+          variant="body2"
+          sx={{
+            color: 'primary.main',
+            fontFamily: 'inherit',
+            fontWeight: 400,
+          }}
+        >
+          {tableCorrect
+            ? 'Truth table looks good.'
+            : tableFilledOnly
+              ? 'Recheck your rows.'
+              : 'Click cells to toggle truth values - fill in every cell to finish.'}
+        </Typography>
+      </ProblemFrame>
+    )
   )
 }

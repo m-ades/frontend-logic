@@ -93,6 +93,7 @@ export default function PartialTruthTable({
   isAssignmentLocked = false,
   isInstructorView = false,
   onQuestionSaved,
+  problemLabel,
 }) {
   const theme = useTheme()
   const editorRef = useRef(null)
@@ -183,8 +184,10 @@ export default function PartialTruthTable({
 
   return (
     <ProblemFrame
+      problemLabel={problemLabel}
       prompt={prompt}
       minHeight="200px"
+      cardMaxWidth="980px"
       isInstructorView={isInstructorView && !!proof}
       onEditQuestion={proof ? openEdit : undefined}
       status={status}

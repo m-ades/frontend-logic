@@ -49,6 +49,7 @@ function TruthToggle({ value, onChange, ariaLabel, accent, readOnly = false }) {
         }
       }}
       sx={{
+        fontSize: '1.125rem',
         fontWeight: 700,
         color: getColor(),
         cursor: 'pointer',
@@ -141,6 +142,7 @@ export default function SingleRowTruthTable({
   isAssignmentLocked = false,
   isInstructorView = false,
   onQuestionSaved,
+  problemLabel,
 }) {
   const theme = useTheme()
   const editorRef = useRef(null)
@@ -320,7 +322,11 @@ export default function SingleRowTruthTable({
   }
 
   const renderTableSet = (rowsToRender, rowInputsToRender, readOnlyTable) => (
-    <Box className="tt-table-wrap">
+    <Box
+      className="tt-table-wrap"
+      sx={{
+      }}
+    >
       <Box component="table" className="tt-table">
         <Box component="thead" className="tt-head">
           <Box component="tr" className="tt-token-row">
@@ -405,8 +411,10 @@ export default function SingleRowTruthTable({
 
   return (
     <ProblemFrame
+      problemLabel={problemLabel}
       prompt={prompt}
       minHeight="260px"
+      cardMaxWidth="980px"
       isInstructorView={isInstructorView && !!proof}
       onEditQuestion={proof ? openEdit : undefined}
       status={status}
