@@ -47,6 +47,10 @@ export default function MobileLogicInput({
   symbolizationKey,
   includeQuantifiers = true,
   extraInsertButtons,
+  /** Predicate-logic mode: when all three are provided, show predicates / constants / variables rows instead of a single letter row. */
+  predicateLetters,
+  constantLetters,
+  variableLetters: variableLettersProp,
   children,
 }) {
   const theme = useTheme()
@@ -69,7 +73,9 @@ export default function MobileLogicInput({
   const syntax = getSyntax()
   const symbols = syntax?.symbols || {}
   const symbolcat = syntax?.symbolcat || {}
-  const variableLetters = useMemo(() => getVariableLettersOnly(symbolizationKey), [symbolizationKey])
+  const usePredicateLayout = Array.isArray(predicateLetters) && Array.isArray(constantLetters) && Array.isArray(variableLettersProp)
+  const variableLettersFromKey = useMemo(() => getVariableLettersOnly(symbolizationKey), [symbolizationKey])
+  const variableLetters = usePredicateLayout ? variableLettersProp : variableLettersFromKey
 
   const facadeRef = useRef(null)
   if (!facadeRef.current) {
@@ -242,33 +248,102 @@ export default function MobileLogicInput({
                 centerButtons
               />
             </Box>
-            <Box role="group" sx={{ width: '100%' }} aria-label="Variable letters: tap to insert at cursor">
-              <Stack
-                direction="row"
-                spacing={0.5}
-                flexWrap="wrap"
-                useFlexGap
-                justifyContent="center"
+            {usePredicateLayout ? (
+              <Box
+                role="group"
+                sx={{ width: '100%' }}
+                aria-label="Letters: predicates, constants, variables. Tap to insert at cursor"
               >
-                {variableLetters.map((letter) => (
-                  <Button
-                    key={letter}
-                    type="button"
-                    size="medium"
-                    variant="outlined"
-                    disabled={disabled}
-                    aria-disabled={disabled}
-                    onClick={() => handleLetterInsert(letter)}
-                    onMouseDown={(e) => e.preventDefault()}
-                    aria-label={`Insert ${letter}`}
-                    title={`Insert ${letter}`}
-                    sx={symbolRowButtonSx}
-                  >
-                    {letter}
-                  </Button>
-                ))}
-              </Stack>
-            </Box>
+                <Stack
+                  direction="row"
+                  spacing={0.5}
+                  flexWrap="wrap"
+                  useFlexGap
+                  justifyContent="center"
+                  sx={{ rowGap: 0.5 }}
+                >
+                  {predicateLetters.map((letter) => (
+                    <Button
+                      key={`pred-${letter}`}
+                      type="button"
+                      size="medium"
+                      variant="outlined"
+                      disabled={disabled}
+                      aria-disabled={disabled}
+                      onClick={() => handleLetterInsert(letter)}
+                      onMouseDown={(e) => e.preventDefault()}
+                      aria-label={`Insert predicate ${letter}`}
+                      title={`Insert ${letter}`}
+                      sx={symbolRowButtonSx}
+                    >
+                      {letter}
+                    </Button>
+                  ))}
+                  {constantLetters.map((letter) => (
+                    <Button
+                      key={`const-${letter}`}
+                      type="button"
+                      size="medium"
+                      variant="outlined"
+                      disabled={disabled}
+                      aria-disabled={disabled}
+                      onClick={() => handleLetterInsert(letter)}
+                      onMouseDown={(e) => e.preventDefault()}
+                      aria-label={`Insert constant ${letter}`}
+                      title={`Insert ${letter}`}
+                      sx={symbolRowButtonSx}
+                    >
+                      {letter}
+                    </Button>
+                  ))}
+                  {variableLettersProp.map((letter) => (
+                    <Button
+                      key={`var-${letter}`}
+                      type="button"
+                      size="medium"
+                      variant="outlined"
+                      disabled={disabled}
+                      aria-disabled={disabled}
+                      onClick={() => handleLetterInsert(letter)}
+                      onMouseDown={(e) => e.preventDefault()}
+                      aria-label={`Insert variable ${letter}`}
+                      title={`Insert ${letter}`}
+                      sx={symbolRowButtonSx}
+                    >
+                      {letter}
+                    </Button>
+                  ))}
+                </Stack>
+              </Box>
+            ) : (
+              <Box role="group" sx={{ width: '100%' }} aria-label="Variable letters: tap to insert at cursor">
+                <Stack
+                  direction="row"
+                  spacing={0.5}
+                  flexWrap="wrap"
+                  useFlexGap
+                  justifyContent="center"
+                >
+                  {variableLetters.map((letter) => (
+                    <Button
+                      key={letter}
+                      type="button"
+                      size="medium"
+                      variant="outlined"
+                      disabled={disabled}
+                      aria-disabled={disabled}
+                      onClick={() => handleLetterInsert(letter)}
+                      onMouseDown={(e) => e.preventDefault()}
+                      aria-label={`Insert ${letter}`}
+                      title={`Insert ${letter}`}
+                      sx={symbolRowButtonSx}
+                    >
+                      {letter}
+                    </Button>
+                  ))}
+                </Stack>
+              </Box>
+            )}
             <Box role="group" sx={{ width: '100%' }} aria-label="Cursor navigation: move to start, left, right, or end">
               <Stack
                 direction="row"
