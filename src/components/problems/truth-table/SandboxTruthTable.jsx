@@ -312,7 +312,7 @@ export default function SandboxTruthTable({
       problemLabel={problemLabel}
       prompt={prompt}
       minHeight="200px"
-      cardMaxWidth="980px"
+      cardMaxWidth="1060px"
       isInstructorView={isInstructorView && !!proof}
       onEditQuestion={proof ? openEdit : undefined}
       status={status}

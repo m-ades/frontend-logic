@@ -459,11 +459,6 @@ export default function TruthTable({
     >
       <Stack spacing={3} sx={{ p: { xs: embedded ? 0 : 2, md: embedded ? 0 : 2 } }}>
         {promptContent}
-        {!embedded && (
-          <Typography variant="body2" sx={{ color: 'primary.main' }}>
-            Fill in each column to match the expected truth values.
-          </Typography>
-        )}
         <TruthTableGrid
           tables={tables}
           tableInputs={tableInputs}
@@ -578,7 +573,7 @@ export default function TruthTable({
       <ProblemFrame
         prompt={tableConfig.prompt || proof.description}
         minHeight="auto"
-        cardMaxWidth="980px"
+        cardMaxWidth="1060px"
         status={status}
         message={message}
         onCloseStatus={() => setMessage('')}

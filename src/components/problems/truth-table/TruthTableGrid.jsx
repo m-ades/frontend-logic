@@ -48,8 +48,8 @@ export default function TruthTableGrid({
 
   const compactTableSx = { width: 'auto', tableLayout: 'fixed' }
   const compactCellSx = {
-    px: 0.5,
-    py: 0.5,
+    px: 0,
+    py: 0,
     width: tableDensity.cell,
     minWidth: tableDensity.cell,
     maxWidth: tableDensity.cellMax,
@@ -71,6 +71,7 @@ export default function TruthTableGrid({
   const selectorLaneSx = {
     width: tableDensity.selectorLane,
     minWidth: tableDensity.selectorLane,
+    backgroundColor: cornerBg,
   }
 
   const tableContainerSx = {
@@ -101,13 +102,13 @@ export default function TruthTableGrid({
     '& .tt-selector-row .MuiTableCell-root': {
       border: 'none',
       borderBottom: 'none',
-      backgroundColor: 'transparent',
+      backgroundColor: cornerBg,
       pt: 0.75,
       pb: 0,
       verticalAlign: 'top',
     },
     '& .tt-row-selector-cell': {
-      backgroundColor: 'transparent',
+      backgroundColor: cornerBg,
     },
     '& .MuiTableHead-root .MuiTableCell-root.tt-selector-corner, & .tt-selector-corner-bottom': {
       backgroundColor: cornerBg,
@@ -312,7 +313,7 @@ export default function TruthTableGrid({
                       )
                     })}
                     {withSelectors && (
-                      <TableCell className="tt-row-selector-cell" align="center" sx={{ ...selectorLaneSx, pl: 0.75, pr: 0, pt: 0.25, pb: 0.25, verticalAlign: 'middle', border: 'none', background: 'transparent' }}>
+                      <TableCell className="tt-row-selector-cell" align="center" sx={{ ...selectorLaneSx, pl: 0.75, pr: 0, pt: 0.25, pb: 0.25, verticalAlign: 'middle', border: 'none' }}>
                         {renderSelector(selectedRows.includes(rowIndex), () => onToggleRow?.(rowIndex), `Select row ${rowIndex + 1}`, 'highlight row')}
                       </TableCell>
                     )}

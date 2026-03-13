@@ -251,7 +251,7 @@ export default function SingleRowTruthTable({
       problemLabel={problemLabel}
       prompt={prompt}
       minHeight="260px"
-      cardMaxWidth="980px"
+      cardMaxWidth="1060px"
       isInstructorView={isInstructorView && !!proof}
       onEditQuestion={proof ? openEdit : undefined}
       status={status}

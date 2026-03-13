@@ -226,7 +226,7 @@ export default function ComboTranslationTruthTable({
       problemLabel={problemLabel}
       prompt={promptText}
       promptSx={{ whiteSpace: 'pre-line' }}
-      cardMaxWidth="980px"
+      cardMaxWidth="1060px"
       isInstructorView={isInstructorView && !!proof}
       onEditQuestion={proof ? openEdit : undefined}
       status={status}

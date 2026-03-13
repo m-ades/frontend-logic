@@ -435,11 +435,6 @@ export default function TruthTableEditor({
     >
       <Stack spacing={3} sx={{ p: { xs: embedded ? 0 : 2, md: embedded ? 0 : 2 } }}>
         {promptContent}
-        {!embedded && (
-          <Typography variant="body2" sx={{ color: 'primary.main' }}>
-            Fill in each column to match the expected truth values.
-          </Typography>
-        )}
         <TruthTableGrid
           tables={tables}
           tableInputs={tableInputs}
@@ -568,7 +563,7 @@ export default function TruthTableEditor({
         problemLabel={problemLabel}
         prompt={truthTable.prompt || proof.description}
         minHeight="auto"
-        cardMaxWidth="980px"
+        cardMaxWidth="1060px"
         isInstructorView={isInstructorView}
         onEditQuestion={openEdit}
         status={status}
