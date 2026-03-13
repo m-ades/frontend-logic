@@ -22,6 +22,7 @@ export default function ProofEditor({
   currentQuestionScore,
   isInstructorView = false,
   onQuestionSaved,
+  problemLabel,
 }) {
   const theme = useTheme()
   const editorRef = useRef(null)
@@ -142,6 +143,7 @@ export default function ProofEditor({
         currentQuestionScore={currentQuestionScore}
         isInstructorView={isInstructorView}
         onEditQuestion={openEdit}
+        problemLabel={problemLabel}
       />
     </Box>,
     document.body
@@ -177,6 +179,7 @@ export default function ProofEditor({
             currentQuestionScore={currentQuestionScore}
             isInstructorView={isInstructorView}
             onEditQuestion={openEdit}
+            problemLabel={problemLabel}
           />
         )}
 

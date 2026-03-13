@@ -28,7 +28,7 @@ import { alpha } from '@mui/material/styles'
 import { fetchJson, getActiveUserId } from '../../../utils/api.js'
 import { getSubmissionScore } from '../../../utils/problemHelpers.js'
 import PromptText from '../../ui/PromptText.jsx'
-import ThemedCard from '../../ui/ThemedCard.jsx'
+import { ProblemCard } from './ProblemFrame.jsx'
 import ProblemSetButtons from './ProblemSetButtons.jsx'
 import checkDerivation from '../../../lib/logicpenguin/checkers/derivation-hurley.js'
 import getHurleyRuleset from '../../../lib/logicpenguin/checkers/rules/hurley-rules.js'
@@ -101,6 +101,18 @@ const symbolBtnSx = (isFullScreen, isMobile, isPhone) => {
       backgroundColor: alpha(theme.palette.primary.main, theme.palette.action.hoverOpacity),
     }),
   }
+}
+
+const plainIconButtonSx = {
+  p: 0.25,
+  borderRadius: 0,
+  backgroundColor: 'transparent',
+  '&:hover': {
+    backgroundColor: 'transparent',
+  },
+  '&.Mui-disabled': {
+    backgroundColor: 'transparent',
+  },
 }
 
 const getUnderlineColors = (theme) => {
@@ -332,6 +344,8 @@ export default function DerivationTable({
   currentQuestionScore,
   isInstructorView = false,
   onEditQuestion,
+  problemLabel,
+  hideActions = false,
 }) {
   const formulaRefs = useRef({})
   const justRefs = useRef({})
@@ -1117,20 +1131,23 @@ export default function DerivationTable({
       }
     >
       {(() => {
-        const Wrapper = isFullScreen ? Box : ThemedCard
+        const Wrapper = isFullScreen ? Box : ProblemCard
+        const cardSx = {
+          px: { xs: 1.25, md: 2.5 },
+          pb: { xs: 1.25, md: 2.5 },
+          pt: { xs: 0.625, md: 1 },
+          position: 'relative',
+        }
         // fullscreen: no right padding. fill width. scrollable area so button row can stay sticky
         const wrapperSx = isFullScreen
           ? { py: 2, pl: 0, pr: 0, position: 'relative', flex: 1, minHeight: 0, minWidth: 0, width: '100%', maxWidth: '100%', display: 'flex', flexDirection: 'column', boxSizing: 'border-box', overflowY: 'auto', overflowX: 'hidden' }
-          : {
-              p: { xs: 1.25, md: 2.5 },
-              borderRadius: 3,
-              border: (theme) => `1px solid ${theme.palette.divider}`,
-              position: 'relative',
-            }
+          : undefined
         return (
-          <Wrapper data-problem-card-root={!isFullScreen ? 'true' : undefined} sx={wrapperSx}>
+          <Wrapper
+            {...(isFullScreen ? { sx: wrapperSx } : { minHeight: 'auto', cardSx })}
+          >
         {isInstructorView && onEditQuestion && !isFullScreen && (
-          <Box sx={{ mb: 2, display: 'flex', justifyContent: 'flex-end' }}>
+          <Box sx={{ position: 'absolute', top: { xs: 10, md: 14 }, right: { xs: 10, md: 14 }, zIndex: 1 }}>
             <Tooltip title="Edit question">
               <Box
                 component="span"
@@ -1144,8 +1161,13 @@ export default function DerivationTable({
             </Tooltip>
           </Box>
         )}
+        {problemLabel && !isFullScreen && (
+          <Box sx={{ mb: 0.75, color: 'text.secondary', fontSize: '0.875rem', lineHeight: 1.2, pr: 4 }}>
+            {problemLabel}
+          </Box>
+        )}
         {proof.description && !isFullScreen && (
-          <Box sx={{ mb: 2, display: 'flex', alignItems: 'flex-start', gap: 0.5 }}>
+          <Box sx={{ mb: 0.75, display: 'flex', alignItems: 'flex-start', gap: 0.5 }}>
             <PromptText content={proof.description} sx={{ fontSize: 15, flex: 1 }} />
           </Box>
         )}
@@ -1663,6 +1685,7 @@ export default function DerivationTable({
                             size="small"
                             aria-label={`Delete line ${idx + 1}`}
                             className="line-delete"
+                            sx={plainIconButtonSx}
                           >
                             <RemoveIcon />
                           </IconButton>
@@ -1678,7 +1701,7 @@ export default function DerivationTable({
               <TableCell sx={{ width: isFullScreen || isMobile ? 36 : 48, minWidth: isFullScreen || isMobile ? 36 : undefined, borderBottom: 'none', verticalAlign: 'middle', ...(isFullScreen && { pr: 1 }) }}>
                 <Tooltip title="New line">
                   <span style={{ display: 'inline-flex' }}>
-                    <IconButton onClick={addLine} size="small" aria-label="Add line" disabled={!canAddLine}>
+                    <IconButton onClick={addLine} size="small" aria-label="Add line" disabled={!canAddLine} sx={plainIconButtonSx}>
                       <SubdirectoryArrowRightIcon />
                     </IconButton>
                   </span>
@@ -1706,7 +1729,7 @@ export default function DerivationTable({
                               onClick={() => setAutoCheckEnabled((prev) => !prev)}
                               size="small"
                               aria-label="Toggle autochecker"
-                              sx={{ color: autoCheckEnabled ? 'primary.main' : 'text.disabled', position: 'relative' }}
+                              sx={{ ...plainIconButtonSx, color: autoCheckEnabled ? 'primary.main' : 'text.disabled', position: 'relative' }}
                             >
                               <AutoAwesomeIcon />
                             </IconButton>
@@ -1756,6 +1779,7 @@ export default function DerivationTable({
                             size="small"
                             aria-label="Toggle autochecker"
                             sx={{
+                              ...plainIconButtonSx,
                               color: autoCheckEnabled ? 'primary.main' : 'text.disabled',
                               position: 'relative',
                             }}
@@ -1831,49 +1855,51 @@ export default function DerivationTable({
         )
       })()}
       {/* fullscreen: sticky button row at bottom; non-fullscreen: normal flow */}
-      <Box
-        sx={{
-          mt: 1,
-          ...(isFullScreen && {
-            flexShrink: 0,
-            pl: 2,
-            pr: 0,
-            pt: 1.5,
-            pb: 2,
-            bgcolor: 'background.paper',
-            borderTop: 1,
-            borderColor: 'divider',
-          }),
-        }}
-      >
-        <ProblemSetButtons
-          onCheck={handleSubmit}
-          onStartOver={handleStartOver}
-          isChecking={isChecking}
-          isDisabled={submitDisabled}
-          align="flex-start"
-          attemptCount={attemptCount}
-          attemptLimit={attemptLimit}
-          sx={{ mt: 1 }}
-          scoreLabel={isPhone && isFullScreen && Number.isFinite(totalQuestions) && totalQuestions > 0 ? (() => {
-            const pointsPerQuestion = 100 / totalQuestions
-            const maxLabel = pointsPerQuestion % 1 === 0 ? String(Math.round(pointsPerQuestion)) : pointsPerQuestion.toFixed(1)
-            const isLockedOut = Number.isFinite(attemptLimit) && attemptCount >= attemptLimit
-            const score = currentQuestionScore != null && Number.isFinite(Number(currentQuestionScore)) ? Number(currentQuestionScore) : null
-            if (score != null) {
-              const earned = (score / 100) * pointsPerQuestion
-              const earnedLabel = earned % 1 === 0 ? String(Math.round(earned)) : earned.toFixed(1)
-              const color = score >= 100 ? 'success.main' : score > 0 ? 'text.secondary' : 'error.main'
-              return { text: `${earnedLabel}/${maxLabel}`, color }
-            }
-            if (lastSubmitStatus === 'correct') return { text: `${maxLabel}/${maxLabel}`, color: 'success.main' }
-            if (lastSubmitStatus === 'incorrect') return { text: `0/${maxLabel}`, color: 'error.main' }
-            if (isCurrentCorrect) return { text: `${maxLabel}/${maxLabel}`, color: 'success.main' }
-            if (isLockedOut) return { text: `0/${maxLabel}`, color: 'error.main' }
-            return null
-          })() : null}
-        />
-      </Box>
+      {!hideActions && (
+        <Box
+          sx={{
+            mt: 1,
+            ...(isFullScreen && {
+              flexShrink: 0,
+              pl: 2,
+              pr: 0,
+              pt: 1.5,
+              pb: 2,
+              bgcolor: 'background.paper',
+              borderTop: 1,
+              borderColor: 'divider',
+            }),
+          }}
+        >
+          <ProblemSetButtons
+            onCheck={handleSubmit}
+            onStartOver={handleStartOver}
+            isChecking={isChecking}
+            isDisabled={submitDisabled}
+            align="flex-start"
+            attemptCount={attemptCount}
+            attemptLimit={attemptLimit}
+            sx={{ mt: 1 }}
+            scoreLabel={isPhone && isFullScreen && Number.isFinite(totalQuestions) && totalQuestions > 0 ? (() => {
+              const pointsPerQuestion = 100 / totalQuestions
+              const maxLabel = pointsPerQuestion % 1 === 0 ? String(Math.round(pointsPerQuestion)) : pointsPerQuestion.toFixed(1)
+              const isLockedOut = Number.isFinite(attemptLimit) && attemptCount >= attemptLimit
+              const score = currentQuestionScore != null && Number.isFinite(Number(currentQuestionScore)) ? Number(currentQuestionScore) : null
+              if (score != null) {
+                const earned = (score / 100) * pointsPerQuestion
+                const earnedLabel = earned % 1 === 0 ? String(Math.round(earned)) : earned.toFixed(1)
+                const color = score >= 100 ? 'success.main' : score > 0 ? 'text.secondary' : 'error.main'
+                return { text: `${earnedLabel}/${maxLabel}`, color }
+              }
+              if (lastSubmitStatus === 'correct') return { text: `${maxLabel}/${maxLabel}`, color: 'success.main' }
+              if (lastSubmitStatus === 'incorrect') return { text: `0/${maxLabel}`, color: 'error.main' }
+              if (isCurrentCorrect) return { text: `${maxLabel}/${maxLabel}`, color: 'success.main' }
+              if (isLockedOut) return { text: `0/${maxLabel}`, color: 'error.main' }
+              return null
+            })() : null}
+          />
+        </Box>
+      )}
     </Stack>
   )
 }
