@@ -133,6 +133,16 @@ export default function InstructorDashboard() {
       const submissions = totalStudents
         ? Math.min(submissionsRaw, totalStudents)
         : submissionsRaw;
+      const medianMinutesPerQuestion =
+        typeof stats?.median_minutes_per_question === "number"
+          ? stats.median_minutes_per_question
+          : typeof stats?.median_minutes === "number"
+          ? stats.median_minutes
+          : null;
+      const avgMinutesPerQuestion =
+        typeof stats?.avg_minutes_per_question === "number"
+          ? stats.avg_minutes_per_question
+          : null;
       const dueAtValue = assignment.dueAt
         || (assignment.dueDate
           ? `${assignment.dueDate}T${assignment.dueTime || "23:59:59"}`
@@ -142,6 +152,8 @@ export default function InstructorDashboard() {
         ...assignment,
         average,
         avgAttempts: stats?.avg_attempt ?? null,
+        medianMinutesPerQuestion,
+        avgMinutesPerQuestion,
         submissions,
         totalStudents,
         dueDate: formatEasternDateTime(assignment.dueDate, assignment.dueTime) ?? "—",
@@ -202,6 +214,8 @@ export default function InstructorDashboard() {
     totalPossible > 0
       ? Math.round((Math.min(totalSubmissions, totalPossible) / totalPossible) * 100)
       : 0;
+
+  const timeByCategory = analytics.timeByCategory || [];
 
   const handleAssignmentClick = (data) => {
     // This can be used for chart clicks or other navigation
@@ -300,6 +314,45 @@ export default function InstructorDashboard() {
           onAssignmentClick={handleAssignmentClick}
         />
         <GradeDistributionChart data={gradeDistribution} />
+      </Box>
+
+      {/* Time-on-task by category */}
+      <Box>
+        <Typography variant="h6" fontWeight={600} mb={1}>
+          Time-on-task by category
+        </Typography>
+        <Typography variant="body2" color="text.secondary" mb={2}>
+          Average active minutes students spend, grouped by assignment category.
+        </Typography>
+        {timeByCategory.length === 0 ? (
+          <Alert severity="info">
+            Time-on-task analytics are not yet available for this course.
+          </Alert>
+        ) : (
+          <Box
+            sx={{
+              p: 2,
+              borderRadius: 2,
+              border: "1px solid",
+              borderColor: "divider",
+            }}
+          >
+            <ul style={{ margin: 0, paddingLeft: "1.2rem" }}>
+              {timeByCategory.map((item) => (
+                <li key={item.key || item.category || item.label}>
+                  <Typography variant="body2">
+                    <strong>{item.label || item.category || item.key}:</strong>{" "}
+                    {typeof item.avg_minutes === "number"
+                      ? `${Math.round(item.avg_minutes)} mins`
+                      : typeof item.avgMinutes === "number"
+                      ? `${Math.round(item.avgMinutes)} mins`
+                      : "—"}
+                  </Typography>
+                </li>
+              ))}
+            </ul>
+          </Box>
+        )}
       </Box>
 
       {/* Assignment Overview Table */}

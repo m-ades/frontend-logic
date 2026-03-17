@@ -74,6 +74,14 @@ export const AssignmentOverviewTable = ({
       ).length;
 
     const avgAttempts = assignment.avgAttempts ?? null;
+    const medianMinutesPerQuestion =
+      typeof assignment.medianMinutesPerQuestion === "number"
+        ? assignment.medianMinutesPerQuestion
+        : typeof assignment.avgMinutesPerQuestion === "number"
+        ? assignment.avgMinutesPerQuestion
+        : null;
+
+    const difficultyLabel = assignment.difficultyLabel || assignment.difficulty_label || null;
 
     return {
       ...assignment,
@@ -85,6 +93,8 @@ export const AssignmentOverviewTable = ({
       lateSubmissions,
       avgAttempts,
       totalStudents,
+      medianMinutesPerQuestion,
+      difficultyLabel,
     };
   });
 
@@ -245,6 +255,18 @@ export const AssignmentOverviewTable = ({
                 >
                   Late
                 </TableCell>
+                <TableCell
+                  align="center"
+                  sx={{ fontWeight: 600, fontSize: 13 }}
+                >
+                  Median Time
+                </TableCell>
+                <TableCell
+                  align="center"
+                  sx={{ fontWeight: 600, fontSize: 13 }}
+                >
+                  Difficulty
+                </TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -341,6 +363,63 @@ export const AssignmentOverviewTable = ({
                           color="warning"
                           sx={{ minWidth: 32 }}
                         />
+                      ) : (
+                        <Typography variant="body2" color="text.secondary">
+                          —
+                        </Typography>
+                      )}
+                    </TableCell>
+                    <TableCell align="center">
+                      <MuiTooltip title="Median minutes per question for this assignment">
+                        <Typography variant="body2" color="text.secondary">
+                          {assignment.medianMinutesPerQuestion != null
+                            ? `${Math.round(assignment.medianMinutesPerQuestion)} min${
+                                Math.round(assignment.medianMinutesPerQuestion) === 1 ? "" : "s"
+                              }`
+                            : "—"}
+                        </Typography>
+                      </MuiTooltip>
+                    </TableCell>
+                    <TableCell align="center">
+                      {assignment.difficultyLabel ? (
+                        <MuiTooltip
+                          title={
+                            assignment.difficultyLabel === "too_easy"
+                              ? "Students finish quickly with high correctness; good as a warm-up."
+                              : assignment.difficultyLabel === "balanced"
+                              ? "Time and correctness are in a healthy range for practice."
+                              : assignment.difficultyLabel === "too_hard"
+                              ? "Students spend a long time with low correctness; consider revising or scaffolding."
+                              : assignment.difficultyLabel === "confusing"
+                              ? "Short time but low correctness; wording or concepts may be unclear."
+                              : ""
+                          }
+                        >
+                          <Chip
+                            label={
+                              assignment.difficultyLabel === "too_easy"
+                                ? "Quick & Easy"
+                                : assignment.difficultyLabel === "balanced"
+                                ? "Balanced"
+                                : assignment.difficultyLabel === "too_hard"
+                                ? "High Struggle"
+                                : assignment.difficultyLabel === "confusing"
+                                ? "Confusing"
+                                : assignment.difficultyLabel
+                            }
+                            size="small"
+                            color={
+                              assignment.difficultyLabel === "too_easy"
+                                ? "success"
+                                : assignment.difficultyLabel === "balanced"
+                                ? "primary"
+                                : assignment.difficultyLabel === "too_hard"
+                                ? "error"
+                                : "warning"
+                            }
+                            sx={{ minWidth: 80 }}
+                          />
+                        </MuiTooltip>
                       ) : (
                         <Typography variant="body2" color="text.secondary">
                           —

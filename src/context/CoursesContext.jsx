@@ -265,13 +265,6 @@ export async function updateCourse(courseId, updates) {
 // UTILITY FUNCTIONS
 // ============================================================================
 
-// Average time to complete assignments - generates mock data
-export function generateAvgTime(assignmentId) {
-  const times = ["2.5 hrs", "3.2 hrs", "1.8 hrs", "4.1 hrs", "2.9 hrs"];
-  const numericId = parseInt(String(assignmentId ?? "").replace(/\D/g, "")) || 0;
-  return times[numericId % times.length];
-}
-
 // Calculate assignment average from gradebook
 export function calculateAssignmentAverage(assignmentId, students) {
   const grades = students

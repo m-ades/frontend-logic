@@ -307,6 +307,8 @@ export default function Worksheet() {
   const courseIdForApi = activeCourseId ?? null
   const sessionId = useRef(null)
   const questionSessionId = useRef(null)
+  const lastActivityRef = useRef(null)
+  const idleTimeoutIdRef = useRef(null)
   const activeUserId = getActiveUserId()
   const isMountedRef = useRef(true)
   const currentWorksheetIdRef = useRef(null)
@@ -415,11 +417,49 @@ export default function Worksheet() {
     setLastQuestionIndex(assignmentId, currentProofIndex)
   }, [currentWorksheet?.id, currentProofIndex, setLastQuestionIndex])
 
+  const endQuestionSession = useCallback(async () => {
+    if (!questionSessionId.current) return
+    const id = questionSessionId.current
+    try {
+      await fetchJson(`/api/question-sessions/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ended_at: new Date().toISOString() }),
+      })
+    } catch (err) {
+      // ignore for now
+    } finally {
+      if (questionSessionId.current === id) {
+        questionSessionId.current = null
+      }
+    }
+  }, [])
+
+  const startQuestionSession = useCallback(async (questionId) => {
+    if (!questionId || !activeUserId) return
+    // avoid starting a new session if one is already active
+    if (questionSessionId.current) return
+    try {
+      const session = await fetchJson('/api/question-sessions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          assignment_question_id: questionId,
+          user_id: activeUserId,
+          started_at: new Date().toISOString(),
+        }),
+      })
+      questionSessionId.current = session?.id ?? null
+    } catch (err) {
+      // ignore for now
+    }
+  }, [activeUserId])
+
   useEffect(() => {
     let keepGoing = true
 
     const startSession = async () => {
-      if (!currentWorksheet?.id) return
+      if (!currentWorksheet?.id || !activeUserId) return
       try {
         const session = await fetchJson('/api/assignment-sessions', {
           method: 'POST',
@@ -440,8 +480,9 @@ export default function Worksheet() {
 
     const endSession = async () => {
       if (!sessionId.current) return
+      const id = sessionId.current
       try {
-        await fetchJson(`/api/assignment-sessions/${sessionId.current}`, {
+        await fetchJson(`/api/assignment-sessions/${id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ ended_at: new Date().toISOString() }),
@@ -449,7 +490,9 @@ export default function Worksheet() {
       } catch (err) {
         // ignore for now
       } finally {
-        sessionId.current = null
+        if (sessionId.current === id) {
+          sessionId.current = null
+        }
       }
     }
 
@@ -463,57 +506,98 @@ export default function Worksheet() {
       keepGoing = false
       endSession()
     }
-  }, [currentWorksheet?.id])
+  }, [activeUserId, currentWorksheet?.id])
 
   useEffect(() => {
     let keepGoing = true
 
-    const startQuestion = async () => {
-      if (!currentProof?.questionId) return
-      try {
-        const session = await fetchJson('/api/question-sessions', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            assignment_question_id: currentProof.questionId,
-            user_id: activeUserId,
-            started_at: new Date().toISOString(),
-          }),
-        })
-        if (keepGoing) {
-          questionSessionId.current = session?.id ?? null
-        }
-      } catch (err) {
-        // ignore for now
+    // end any existing question session before starting a new one
+    const switchQuestionSession = async () => {
+      if (!keepGoing) return
+      await endQuestionSession()
+      if (currentProof?.questionId) {
+        await startQuestionSession(currentProof.questionId)
       }
     }
 
-    const endQuestion = async () => {
-      if (!questionSessionId.current) return
-      try {
-        await fetchJson(`/api/question-sessions/${questionSessionId.current}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ ended_at: new Date().toISOString() }),
-        })
-      } catch (err) {
-        // ignore for now
-      } finally {
-        questionSessionId.current = null
-      }
-    }
+    switchQuestionSession()
 
-    // start session when a question becomes 'active'
-    if (currentProof?.questionId) {
-      startQuestion()
-    }
-
-    // end it upon any nav away from the question
     return () => {
       keepGoing = false
-      endQuestion()
+      endQuestionSession()
     }
-  }, [currentProof?.questionId])
+  }, [currentProof?.questionId, endQuestionSession, startQuestionSession])
+
+  useEffect(() => {
+    if (typeof window === 'undefined' || typeof document === 'undefined') return undefined
+
+    const IDLE_TIMEOUT_MS = 90_000
+
+    const clearIdleTimeout = () => {
+      if (idleTimeoutIdRef.current) {
+        clearTimeout(idleTimeoutIdRef.current)
+        idleTimeoutIdRef.current = null
+      }
+    }
+
+    const scheduleIdleTimeout = () => {
+      clearIdleTimeout()
+      if (!questionSessionId.current) return
+      idleTimeoutIdRef.current = setTimeout(() => {
+        endQuestionSession()
+      }, IDLE_TIMEOUT_MS)
+    }
+
+    const handleActivity = () => {
+      lastActivityRef.current = Date.now()
+      scheduleIdleTimeout()
+    }
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'hidden') {
+        clearIdleTimeout()
+        endQuestionSession()
+      } else if (document.visibilityState === 'visible') {
+        if (currentProof?.questionId && !questionSessionId.current) {
+          startQuestionSession(currentProof.questionId)
+        }
+      }
+    }
+
+    const handleBlur = () => {
+      clearIdleTimeout()
+      endQuestionSession()
+    }
+
+    const handleFocus = () => {
+      handleActivity()
+      if (currentProof?.questionId && !questionSessionId.current) {
+        startQuestionSession(currentProof.questionId)
+      }
+    }
+
+    window.addEventListener('keydown', handleActivity)
+    window.addEventListener('click', handleActivity)
+    window.addEventListener('mousemove', handleActivity)
+    window.addEventListener('scroll', handleActivity)
+    window.addEventListener('blur', handleBlur)
+    window.addEventListener('focus', handleFocus)
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+
+    // initialize timers when mounted
+    handleActivity()
+
+    return () => {
+      clearIdleTimeout()
+      window.removeEventListener('keydown', handleActivity)
+      window.removeEventListener('click', handleActivity)
+      window.removeEventListener('mousemove', handleActivity)
+      window.removeEventListener('scroll', handleActivity)
+      window.removeEventListener('blur', handleBlur)
+      window.removeEventListener('focus', handleFocus)
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
+    }
+  }, [currentProof?.questionId, endQuestionSession, startQuestionSession])
 
   const refreshQuestionSolutions = useCallback(async (assignmentId, questionId) => {
     if (!assignmentId || !questionId || !activeUserId) return

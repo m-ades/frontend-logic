@@ -70,7 +70,11 @@ const shortAssignmentLabel = (title = '') => {
 const emptyAnalytics = {
   assignments: { upcoming: 0, pending: 0, overdue: 0, upcomingList: [] },
   performance: { avg_score: null, avg_attempt: null, correct_rate: null, first_try_correct_rate: null },
-  time: { avg_minutes_per_question: null },
+  time: {
+    avg_minutes_per_question: null,
+    median_minutes_per_question: null,
+    p75_minutes_per_question: null,
+  },
   submissionCount: 0,
   submittedAssignmentIds: [],
 }
@@ -360,13 +364,31 @@ export default function Dashboard() {
   }, [mainChartData, useFullScale])
 
   const activityStats = useMemo(() => {
-    const avgMinutes = analytics.time.avg_minutes_per_question
-    const timeLabel = avgMinutes ? `${Math.round(avgMinutes)} mins` : '—'
+    const median = analytics.time.median_minutes_per_question ?? analytics.time.avg_minutes_per_question
+    const p75 = analytics.time.p75_minutes_per_question
+    const medianLabel = median != null ? `${Math.round(median)} mins` : '—'
+    const rangeLabel =
+      median != null && p75 != null
+        ? `${Math.round(median)}–${Math.round(p75)} mins`
+        : median != null
+        ? `${Math.round(median)} mins`
+        : '—'
+    const cohortMedian = analytics.time.cohort_median_minutes_per_question
+    const relativeToCohort =
+      median != null && cohortMedian != null && cohortMedian > 0
+        ? median / cohortMedian
+        : null
     return [
-      { label: 'Avg time per question', value: timeLabel, subtext: 'Recent' },
+      { label: 'Typical time per question', value: medianLabel, subtext: 'Median (recent)' },
+      { label: 'Most questions fall in', value: rangeLabel, subtext: 'Median–75th percentile' },
       { label: 'Submissions', value: `${analytics.submissionCount}`, subtext: 'Total' },
     ]
-  }, [analytics.submissionCount, analytics.time.avg_minutes_per_question])
+  }, [
+    analytics.submissionCount,
+    analytics.time.cohort_median_minutes_per_question,
+    analytics.time.median_minutes_per_question,
+    analytics.time.p75_minutes_per_question,
+  ])
 
   return (
     <Box sx={{ width: '100%' }}>
@@ -612,6 +634,23 @@ export default function Dashboard() {
                   Unable to load activity metrics.
                 </Typography>
               ) : null}
+              {!analyticsError && analytics.time?.cohort_median_minutes_per_question != null && (
+                <Typography variant="body2" color="text.secondary">
+                  Your typical time per question is{' '}
+                  {analytics.time.median_minutes_per_question != null &&
+                  analytics.time.cohort_median_minutes_per_question
+                    ? (() => {
+                        const ratio =
+                          analytics.time.median_minutes_per_question /
+                          analytics.time.cohort_median_minutes_per_question
+                        if (!Number.isFinite(ratio)) return 'similar to the class median.'
+                        if (ratio < 0.8) return 'faster than most classmates.'
+                        if (ratio > 1.25) return 'slightly slower than most classmates.'
+                        return 'similar to the class median.'
+                      })()
+                    : 'similar to the class median.'}
+                </Typography>
+              )}
               {activityStats.map((item) => (
                 <Box key={item.label}>
                   <Typography variant="caption" color="text.secondary" display="block">
