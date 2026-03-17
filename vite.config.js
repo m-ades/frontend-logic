@@ -5,7 +5,8 @@ export default defineConfig({
   plugins: [react()],
   base: '/',
   server: {
-    host: true, // listen on 0.0.0.0 so you can open the app from your phone (same Wi‑Fi)
+    // Default Vite dev server host (localhost). For ad‑hoc device testing,
+    // run: npm run dev -- --host
   },
 })
 
