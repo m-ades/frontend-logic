@@ -406,6 +406,8 @@ export default function DerivationTable({
   const formulaRefs = useRef({})
   const justRefs = useRef({})
   const [activeFormulaIndex, setActiveFormulaIndex] = useState(null)
+  const activeKeyboardFormulaIndexRef = useRef(null)
+  const lastFormulaIndexRef = useRef(null)
   const lastEditableIndexRef = useRef(null)
   const cursorPositionsRef = useRef({})
   const syntax = useMemo(() => getSyntax(), [])
@@ -833,7 +835,8 @@ export default function DerivationTable({
   // click row number to append it to current line's line(s) field (with space after)
   const handleRowNumberClick = useCallback(
     (clickedLineNum) => {
-      const targetIdx = activeFormulaIndex ?? lastEditableIndexRef.current ?? premises.length
+      const targetIdx =
+        activeKeyboardFormulaIndexRef.current ?? lastFormulaIndexRef.current ?? premises.length
       if (targetIdx < premises.length) return
       commitLines((prev) => {
         const line = prev[targetIdx]
@@ -854,7 +857,7 @@ export default function DerivationTable({
         return next
       })
     },
-    [activeFormulaIndex, premises.length, commitLines]
+    [premises.length, commitLines]
   )
 
   const canAddLine = useMemo(() => {
@@ -1487,6 +1490,13 @@ export default function DerivationTable({
                     <MobileLogicInput
                       value={line.formula ?? ''}
                       onChange={(v) => handleLineChange(idx, 'formula', v)}
+                      onFocus={() => {
+                        if (line.readOnly) return
+                        setActiveFormulaIndex(idx)
+                        activeKeyboardFormulaIndexRef.current = idx
+                        lastFormulaIndexRef.current = idx
+                        lastEditableIndexRef.current = idx
+                      }}
                       disabled={line.readOnly}
                       onBlur={() => handleLineCommit(idx, 'formula', normalizeFormulaForCheck(line.formula ?? ''))}
                       placeholder=""
@@ -1514,21 +1524,25 @@ export default function DerivationTable({
                     }}
                     onClick={(e) => {
                       if (line.readOnly) return
+                      lastFormulaIndexRef.current = idx
                       lastEditableIndexRef.current = idx
                       updateCursorPosition(idx, e)
                     }}
                     onMouseUp={(e) => {
                       if (line.readOnly) return
+                      lastFormulaIndexRef.current = idx
                       lastEditableIndexRef.current = idx
                       updateCursorPosition(idx, e)
                     }}
                     onKeyUp={(e) => {
                       if (line.readOnly) return
+                      lastFormulaIndexRef.current = idx
                       lastEditableIndexRef.current = idx
                       updateCursorPosition(idx, e)
                     }}
                     onSelect={(e) => {
                       if (line.readOnly) return
+                      lastFormulaIndexRef.current = idx
                       lastEditableIndexRef.current = idx
                       updateCursorPosition(idx, e)
                     }}
@@ -1542,6 +1556,8 @@ export default function DerivationTable({
                     onFocus={(e) => {
                       if (line.readOnly) return
                       setActiveFormulaIndex(idx)
+                      activeKeyboardFormulaIndexRef.current = idx
+                      lastFormulaIndexRef.current = idx
                       lastEditableIndexRef.current = idx
                       updateCursorPosition(idx, e)
                     }}
