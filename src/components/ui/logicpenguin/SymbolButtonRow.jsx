@@ -63,7 +63,7 @@ export default function SymbolButtonRow({
   const symbols = inputSymbols || syntax?.symbols || {}
 
   const resolveLabel = (op, quantifier = false, insert = null, pair = null, backspace = false) => {
-    if (backspace) return '⌫'
+    if (backspace) return '←'
     if (insert) return insert
     if (pair) {
       const open = pair[0]

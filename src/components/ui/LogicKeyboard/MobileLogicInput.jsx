@@ -392,7 +392,7 @@ export default function MobileLogicInput({
                   title="Move cursor right"
                   sx={symbolRowButtonSx}
                 >
-                  →
+                  {'>'}
                 </Button>
                 <Button
                   type="button"
@@ -406,7 +406,7 @@ export default function MobileLogicInput({
                   title="Move cursor to end"
                   sx={symbolRowButtonSx}
                 >
-                  ⇥
+                  ←
                 </Button>
               </Stack>
             </Box>
