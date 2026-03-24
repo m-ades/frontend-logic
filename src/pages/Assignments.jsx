@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useCallback, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
-import { Box, Tabs, Tab, Typography, CardContent, Chip, Stack } from '@mui/material'
+import { Box, Tabs, Tab, Typography, CardContent, Chip, Stack, LinearProgress } from '@mui/material'
 import LockIcon from '@mui/icons-material/Lock'
 import ThemedCard from '../components/ui/ThemedCard.jsx'
 import ActivityAccordion from '../components/ui/ActivityAccordion.jsx'
@@ -30,6 +30,8 @@ const buildCourseStructure = (assignments, sectionTitle) => {
       type: ACTIVITY_TYPES.HOMEWORK,
       worksheet: { id: assignment.id, proofs: [] },
       isLocked: assignment.is_locked ?? assignment.isLocked ?? false,
+      questionCount: Number(assignment.question_count) || 0,
+      answeredCount: Number(assignment.answered_count) || 0,
     })
     chapterEntry.set(subLabel, items)
     chapters.set(chapterLabel, chapterEntry)
@@ -225,18 +227,24 @@ export default function Assignments() {
     const accommodationDueLabel = policy?.accommodation_due_at
       ? formatDateTime(policy.accommodation_due_at)
       : null
+    const totalQuestions = Number(activity.questionCount) || 0
+    const completedQuestions = Math.min(Number(activity.answeredCount) || 0, totalQuestions)
+    const completionValue = totalQuestions > 0 ? (completedQuestions / totalQuestions) * 100 : 0
     return (
     <ThemedCard
       key={activity.id}
       sx={{ cursor: 'pointer', '&:hover': { boxShadow: 4 } }}
       onClick={() => handleActivityClick(activity)}
     >
-      <CardContent sx={{ pl: 0, pr: 2, pt: 2, pb: 2, '&:last-child': { pb: 2 } }}>
-        <Stack
-          direction={{ xs: 'column', sm: 'row' }}
-          justifyContent="space-between"
-          alignItems={{ xs: 'flex-start', sm: 'flex-start' }}
-          spacing={2}
+      <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
+        <Box
+          sx={{
+            display: 'grid',
+            gridTemplateColumns: { xs: '1fr', md: 'minmax(0, 1fr) 440px' },
+            columnGap: { xs: 0, md: 4 },
+            rowGap: 2,
+            alignItems: 'start',
+          }}
         >
           <Box sx={{ flex: 1, minWidth: 0 }}>
             <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 1 }}>
@@ -248,7 +256,7 @@ export default function Assignments() {
               )}
             </Stack>
             <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-              {chapter.title} • {subchapter.title}
+              {subchapter.title || chapter.title}
             </Typography>
             {activity.description && (
               <Typography variant="body2" color="text.secondary" sx={{ wordBreak: 'break-word' }}>
@@ -256,45 +264,81 @@ export default function Assignments() {
               </Typography>
             )}
           </Box>
-          <Stack spacing={1} alignItems={{ xs: 'flex-start', sm: 'flex-end' }} width={{ xs: '100%', sm: 'auto' }}>
-            <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap">
+          <Stack spacing={0.75} alignItems={{ xs: 'flex-start', md: 'flex-end' }} width="100%">
+            <Stack
+              direction="row"
+              spacing={1}
+              alignItems="center"
+              flexWrap={{ xs: 'wrap', md: 'nowrap' }}
+              justifyContent={{ xs: 'flex-start', md: 'flex-end' }}
+              sx={{ width: '100%' }}
+            >
+              {totalQuestions > 0 && (
+                <Stack
+                  direction="row"
+                  spacing={0.75}
+                  alignItems="center"
+                  sx={{
+                    minWidth: { xs: '100%', md: 'auto' },
+                    flex: { xs: '1 1 100%', md: '0 0 auto' },
+                    flexShrink: 0,
+                  }}
+                >
+                  <Box sx={{ width: { xs: '100%', md: 140 } }}>
+                    <LinearProgress
+                      variant="determinate"
+                      value={completionValue}
+                      aria-label={`Assignment completion: ${completedQuestions} of ${totalQuestions} complete`}
+                      sx={{
+                        height: 8,
+                        borderRadius: 999,
+                        bgcolor: 'action.hover',
+                        '& .MuiLinearProgress-bar': { borderRadius: 999 },
+                      }}
+                    />
+                  </Box>
+                  <Typography variant="body2" sx={{ color: 'text.primary', fontWeight: 600, whiteSpace: 'nowrap' }}>
+                    {completedQuestions}/{totalQuestions}
+                  </Typography>
+                </Stack>
+              )}
               <Chip
                 label={activity.type === ACTIVITY_TYPES.HOMEWORK ? 'Homework' : activity.type === ACTIVITY_TYPES.QUIZ ? 'Quiz' : 'Exam'}
                 size="small"
                 color="primary"
                 variant="outlined"
               />
-              {activity.dueDate && parseDueDateAsEastern(activity.dueDate, activity.dueTime) < new Date() && (
+              {activity.dueDate && !getCompletionStatus(activity.id) && parseDueDateAsEastern(activity.dueDate, activity.dueTime) < new Date() && (
                 <Chip label="Past due" size="small" color="error" />
               )}
+              {showCompletionChip && getCompletionStatus(activity.id) && (
+                <Chip label="Completed" size="small" color="success" />
+              )}
             </Stack>
-            <Typography variant="body2" color="text.secondary">
+            <Typography variant="body2" color="text.secondary" sx={{ width: '100%', textAlign: { xs: 'left', md: 'right' } }}>
               {datePrefix}{formatDateTime(activity.dueDate) || 'No due date'}
             </Typography>
             {(extensionDueLabel || accommodationDueLabel) && (
-              <Stack spacing={0.25} alignItems="flex-end">
-                {extensionDueLabel && (
-                  <Typography variant="caption" color="text.secondary" align="right">
-                    Extension: {extensionDueLabel}
-                  </Typography>
-                )}
-                {accommodationDueLabel && (
-                  <Typography variant="caption" color="text.secondary" align="right">
-                    Accommodation: {accommodationDueLabel}
-                  </Typography>
-                )}
-              </Stack>
-            )}
+              <Stack spacing={0.25} alignItems={{ xs: 'flex-start', md: 'flex-end' }} sx={{ width: '100%' }}>
+              {extensionDueLabel && (
+                <Typography variant="caption" color="text.secondary" align="right">
+                  Extension: {extensionDueLabel}
+                </Typography>
+              )}
+              {accommodationDueLabel && (
+                <Typography variant="caption" color="text.secondary" align="right">
+                  Accommodation: {accommodationDueLabel}
+                </Typography>
+              )}
+            </Stack>
+          )}
             {policy?.late_penalty_waived && (
-              <Typography variant="caption" color="text.secondary" align="right">
+              <Typography variant="caption" color="text.secondary" align="right" sx={{ width: '100%', textAlign: { xs: 'left', md: 'right' } }}>
                 Late penalty waived
               </Typography>
             )}
-            {showCompletionChip && getCompletionStatus(activity.id) && (
-              <Chip label="Completed" size="small" color="success" />
-            )}
           </Stack>
-        </Stack>
+        </Box>
       </CardContent>
     </ThemedCard>
     )

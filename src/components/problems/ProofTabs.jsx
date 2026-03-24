@@ -35,9 +35,9 @@ function TabPanel(props) {
         <Box 
           sx={{ 
             // let page scroll
-            pl: { xs: 0, md: 3 }, 
-            pr: { xs: 0, md: 3 }, 
-            pt: { xs: 2, md: 0 }, 
+            pl: { xs: 0, md: 5, lg: 7, xl: 9 },
+            pr: { xs: 0, md: 5, lg: 7, xl: 9 },
+            pt: { xs: 2, md: 1 },
             pb: 0, 
             overflowX: 'auto',
             overflowY: 'visible',
@@ -258,7 +258,7 @@ function ProofTabs({
   React.useEffect(() => {
     prevIndexRef.current = currentProofIndex
   }, [currentProofIndex])
-  
+
   return (
     <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: { xs: 'column', md: 'row' }, mt: 0, minWidth: 0, maxWidth: '100%' }}>
       <Box sx={{ 

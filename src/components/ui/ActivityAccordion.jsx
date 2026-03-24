@@ -282,64 +282,71 @@ export default function ActivityAccordion({
                         sx={{
                           flexDirection: 'column',
                           alignItems: 'stretch',
-                          borderBottom: '1px solid',
-                          borderColor: 'divider',
-                          '&:last-child': {
-                            borderBottom: 'none',
+                          '&:not(:last-child) .subchapter-shell': {
+                            borderBottom: '1px solid',
+                            borderColor: 'divider',
                           },
                         }}
                       >
-                        <Accordion
-                          expanded={isSubchapterExpanded}
-                          onChange={handleSubchapterChange(subchapter.id)}
-                          elevation={0}
+                        <Box
+                          className="subchapter-shell"
                           sx={{
                             width: '100%',
-                            boxShadow: 'none',
-                            '&:before': { display: 'none' },
-                            backgroundColor: 'transparent',
+                            px: { xs: 1.5, md: 2.5 },
                           }}
                         >
-                          <AccordionSummary
-                            expandIcon={<ExpandMoreIcon sx={{ fontSize: 20 }} />}
+                          <Accordion
+                            expanded={isSubchapterExpanded}
+                            onChange={handleSubchapterChange(subchapter.id)}
+                            elevation={0}
                             sx={{
-                              px: 3,
-                              py: 1.5,
-                              minHeight: 48,
-                              '&.Mui-expanded': {
-                                minHeight: 48,
-                              },
-                              '& .MuiAccordionSummary-content': {
-                                my: 0,
-                                '&.Mui-expanded': {
-                                  my: 0,
-                                },
-                              },
+                              width: '100%',
+                              boxShadow: 'none',
+                              '&:before': { display: 'none' },
+                              backgroundColor: 'transparent',
                             }}
                           >
-                            <Typography
-                              variant="subtitle1"
+                            <AccordionSummary
+                              expandIcon={<ExpandMoreIcon sx={{ fontSize: 20 }} />}
                               sx={{
-                                fontWeight: 500,
-                                color: 'text.primary',
+                                px: 1.5,
+                                py: 1.5,
+                                minHeight: 48,
+                                '&.Mui-expanded': {
+                                  minHeight: 48,
+                                },
+                                '& .MuiAccordionSummary-content': {
+                                  my: 0,
+                                  '&.Mui-expanded': {
+                                    my: 0,
+                                  },
+                                },
                               }}
                             >
-                              {subchapter.title}
-                            </Typography>
-                          </AccordionSummary>
+                              <Typography
+                                variant="subtitle1"
+                                sx={{
+                                  fontWeight: 500,
+                                  color: 'text.primary',
+                                }}
+                              >
+                                {subchapter.title}
+                              </Typography>
+                            </AccordionSummary>
 
-                          <AccordionDetails sx={{ px: 3, py: 2, pt: 1 }}>
-                            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
-                              {subchapter.activities.map((activity, idx) =>
-                                renderActivity(activity, {
-                                  chapter,
-                                  subchapter,
-                                  activityIndex: idx,
-                                })
-                              )}
-                            </Box>
-                          </AccordionDetails>
-                        </Accordion>
+                            <AccordionDetails sx={{ px: 1.5, py: 2, pt: 1 }}>
+                              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+                                {subchapter.activities.map((activity, idx) =>
+                                  renderActivity(activity, {
+                                    chapter,
+                                    subchapter,
+                                    activityIndex: idx,
+                                  })
+                                )}
+                              </Box>
+                            </AccordionDetails>
+                          </Accordion>
+                        </Box>
                       </ListItem>
                     )
                   })}
