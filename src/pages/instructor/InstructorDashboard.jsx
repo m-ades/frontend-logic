@@ -46,7 +46,7 @@ export default function InstructorDashboard() {
       }
       try {
         const [instructorAnalytics, summary] = await Promise.all([
-          fetchJson(`/api/analytics/instructor?courseId=${activeCourseId}`),
+          fetchJson(`/api/analytics/instructor-dashboard?courseId=${activeCourseId}`),
           fetchJson(`/api/analytics/gradebook-summary?courseId=${activeCourseId}`),
         ]);
         if (isMounted) {
