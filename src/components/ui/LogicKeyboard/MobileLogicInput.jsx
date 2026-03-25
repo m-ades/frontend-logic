@@ -184,6 +184,21 @@ export default function MobileLogicInput({
     setCursorPosition((valueRef.current ?? '').length)
   }, [])
 
+  const handleBackspace = useCallback(() => {
+    if (disabled) return
+    const f = facadeRef.current
+    if (!f) return
+    const start = f.selectionStart ?? 0
+    const end = f.selectionEnd ?? start
+    const val = f.value ?? ''
+    if (start === 0 && end === 0) return
+    if (start === end) {
+      f.setRangeText('', start - 1, end, 'end')
+    } else {
+      f.setRangeText('', start, end, 'end')
+    }
+  }, [disabled])
+
   if (!isPhone) {
     return children ?? null
   }
@@ -238,12 +253,13 @@ export default function MobileLogicInput({
               }}
             >
           <Stack spacing={1} sx={{ width: '100%' }}>
-            <Box role="group" sx={{ width: '100%' }} aria-label="Logic symbols: connectives, quantifiers, parentheses, backspace">
+            <Box role="group" sx={{ width: '100%' }} aria-label="Logic symbols: connectives, quantifiers, parentheses">
               <SymbolButtonRow
                 inputRef={facadeRef}
                 onValueChange={onChange}
                 disabled={disabled}
                 includeQuantifiers={includeQuantifiers}
+                showBackspace={false}
                 extraInsertButtons={extraInsertButtons}
                 centerButtons
               />
@@ -344,7 +360,7 @@ export default function MobileLogicInput({
                 </Stack>
               </Box>
             )}
-            <Box role="group" sx={{ width: '100%' }} aria-label="Cursor navigation: move to start, left, right, or end">
+            <Box role="group" sx={{ width: '100%' }} aria-label="Cursor navigation and backspace">
               <Stack
                 direction="row"
                 spacing={0.5}
@@ -378,7 +394,7 @@ export default function MobileLogicInput({
                   title="Move cursor left"
                   sx={symbolRowButtonSx}
                 >
-                  ←
+                  {'<'}
                 </Button>
                 <Button
                   type="button"
@@ -404,6 +420,20 @@ export default function MobileLogicInput({
                   onMouseDown={(e) => e.preventDefault()}
                   aria-label="Move cursor to end"
                   title="Move cursor to end"
+                  sx={symbolRowButtonSx}
+                >
+                  ⇥
+                </Button>
+                <Button
+                  type="button"
+                  size="medium"
+                  variant="outlined"
+                  disabled={disabled}
+                  aria-disabled={disabled}
+                  onClick={handleBackspace}
+                  onMouseDown={(e) => e.preventDefault()}
+                  aria-label="Backspace"
+                  title="Backspace"
                   sx={symbolRowButtonSx}
                 >
                   ←

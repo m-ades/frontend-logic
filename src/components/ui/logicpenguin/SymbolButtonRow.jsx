@@ -55,6 +55,8 @@ export default function SymbolButtonRow({
   onValueChange,
   disabled = false,
   includeQuantifiers = true,
+  /** When false, omit the backspace button (e.g. mobile keyboard places it on the nav row). */
+  showBackspace = true,
   extraInsertButtons,
   centerButtons = false,
 }) {
@@ -167,9 +169,12 @@ export default function SymbolButtonRow({
     finalizeChange(input)
   }
 
-  const baseButtons = includeQuantifiers
+  const baseButtonsRaw = includeQuantifiers
     ? BUTTONS
     : BUTTONS.filter((btn) => !btn.quantifier)
+  const baseButtons = showBackspace
+    ? baseButtonsRaw
+    : baseButtonsRaw.filter((btn) => !btn.backspace)
   const visibleButtons = baseButtons.length > 0 && baseButtons[baseButtons.length - 1].backspace
     ? [...baseButtons.slice(0, -1), ...(extraInsertButtons || []), { backspace: true }]
     : [...baseButtons, ...(extraInsertButtons || [])]
