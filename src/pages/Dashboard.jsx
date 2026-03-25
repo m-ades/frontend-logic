@@ -102,7 +102,7 @@ export default function Dashboard() {
   const analyticsQuery = useQuery({
     queryKey: ['analytics-student', userId, courseIdForApi],
     queryFn: () =>
-      fetchJson(`/api/analytics/student?userId=${userId}&courseId=${courseIdForApi}`),
+      fetchJson(`/api/analytics/student-dashboard?userId=${userId}&courseId=${courseIdForApi}`),
     enabled: !!courseIdForApi && !!userId,
   })
 
@@ -300,7 +300,7 @@ export default function Dashboard() {
         if (!courseIdForApi) {
           return
         }
-        const data = await fetchJson(`/api/analytics/instructor?courseId=${courseIdForApi}`)
+        const data = await fetchJson(`/api/analytics/instructor-dashboard?courseId=${courseIdForApi}`)
         if (isMounted) {
           setInstructorAnalytics(data)
         }
