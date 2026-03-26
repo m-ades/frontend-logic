@@ -309,6 +309,7 @@ export default function Worksheet() {
   const questionSessionId = useRef(null)
   const lastActivityRef = useRef(null)
   const idleTimeoutIdRef = useRef(null)
+  const scheduleIdleTimeoutRef = useRef(() => {})
   const activeUserId = getActiveUserId()
   const isMountedRef = useRef(true)
   const currentWorksheetIdRef = useRef(null)
@@ -450,6 +451,9 @@ export default function Worksheet() {
         }),
       })
       questionSessionId.current = session?.id ?? null
+      if (questionSessionId.current) {
+        scheduleIdleTimeoutRef.current()
+      }
     } catch (err) {
       // ignore for now
     }
@@ -547,6 +551,7 @@ export default function Worksheet() {
         endQuestionSession()
       }, IDLE_TIMEOUT_MS)
     }
+    scheduleIdleTimeoutRef.current = scheduleIdleTimeout
 
     const handleActivity = () => {
       lastActivityRef.current = Date.now()
@@ -589,6 +594,7 @@ export default function Worksheet() {
 
     return () => {
       clearIdleTimeout()
+      scheduleIdleTimeoutRef.current = () => {}
       window.removeEventListener('keydown', handleActivity)
       window.removeEventListener('click', handleActivity)
       window.removeEventListener('mousemove', handleActivity)
