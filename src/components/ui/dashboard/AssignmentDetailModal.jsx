@@ -35,7 +35,6 @@ import {
   useCoursesState,
   useCoursesDispatch,
   calculateAssignmentAverage,
-  generateAvgTime,
 } from "../../../context/CoursesContext";
 import { MetricCard } from "../MetricCard";
 import { GradeDistributionChart } from "./GradeDistributionChart";
@@ -95,8 +94,17 @@ export default function AssignmentDetailModal({ open, onClose, assignmentId }) {
     (student) => student.lateSubmissions?.[assignment.id]
   ).length;
 
-  // Get average time from context utility
-  const avgTime = generateAvgTime(assignment.id);
+  // Time-on-task analytics (backend-provided if available)
+  const avgMinutesPerQuestion =
+    typeof assignment.avgMinutesPerQuestion === "number"
+      ? assignment.avgMinutesPerQuestion
+      : typeof assignment.avg_minutes_per_question === "number"
+      ? assignment.avg_minutes_per_question
+      : null;
+  const avgMinutesLabel =
+    avgMinutesPerQuestion != null
+      ? `${Math.round(avgMinutesPerQuestion)} min${Math.round(avgMinutesPerQuestion) === 1 ? "" : "s"} / question`
+      : "—";
 
   // Calculate grade distribution
   const gradeDistribution = [
@@ -240,7 +248,7 @@ export default function AssignmentDetailModal({ open, onClose, assignmentId }) {
               )}
             </Box>
             <Typography variant="body2" color="text.secondary">
-              Due: {formatEasternDateTime(assignment.dueDate, assignment.dueTime) ?? "—"} • Avg time: {avgTime}
+              Due: {formatEasternDateTime(assignment.dueDate, assignment.dueTime) ?? "—"} • Avg time: {avgMinutesLabel}
             </Typography>
           </Box>
           <IconButton onClick={onClose} size="small">
