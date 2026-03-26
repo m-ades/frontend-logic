@@ -3,10 +3,11 @@ import { Alert, Box, Stack, Typography, Tooltip } from '@mui/material'
 import EditIcon from '@mui/icons-material/Edit'
 import InstructorQuestionEditor from '../InstructorQuestionEditor.jsx'
 import StatusBanner, { isTerminalStatus } from '../../ui/StatusBanner.jsx'
-import { useTheme } from '@mui/material/styles'
+import { useTheme, useMediaQuery } from '@mui/material'
 import ProblemSetButtons from './ProblemSetButtons.jsx'
 import FormulaInput from '../../ui/logicpenguin/formula-input.js'
 import SymbolButtonRow from '../../ui/logicpenguin/SymbolButtonRow.jsx'
+import { MobileLogicInput } from '../../ui/LogicKeyboard/index.js'
 import LogicPenguinProof from '../LogicPenguinProof.jsx'
 import getFormulaClass from '../../../lib/logicpenguin/symbolic/formula.js'
 import { useProblemChecker } from '../../../hooks/useProblemChecker.js'
@@ -140,6 +141,7 @@ export default function ComboTranslationDerivation({
   onQuestionSaved,
 }) {
   const theme = useTheme()
+  const isPhone = useMediaQuery(theme.breakpoints.down('sm'))
   const editorRef = useRef(null)
   const openEdit = () => editorRef.current?.open?.()
   const Formula = useMemo(() => getFormulaClass(), [])
@@ -310,18 +312,30 @@ export default function ComboTranslationDerivation({
               <Typography variant="body2" sx={{ mb: 1, color: 'text.secondary', fontSize: '0.875rem' }}>
                 Use "/" for separate premises and "//" for the conclusion. Example: A ⊃ B / A // B.
               </Typography>
-              <FormulaInputField
-                value={argumentLine}
-                onValueChange={handleArgumentChange}
-                fieldReadOnly={false}
-                formulaInputRef={inputRef}
-              />
-              <Box sx={{ mt: 1 }}>
-                <SymbolButtonRow
-                  inputRef={inputRef}
-                  onValueChange={handleArgumentChange}
+              {isPhone ? (
+                <MobileLogicInput
+                  value={argumentLine}
+                  onChange={handleArgumentChange}
+                  placeholder="e.g. A ⊃ B / A // B"
+                  aria-label="Argument line"
+                  includeQuantifiers
                 />
-              </Box>
+              ) : (
+                <>
+                  <FormulaInputField
+                    value={argumentLine}
+                    onValueChange={handleArgumentChange}
+                    fieldReadOnly={false}
+                    formulaInputRef={inputRef}
+                  />
+                  <Box sx={{ mt: 1 }}>
+                    <SymbolButtonRow
+                      inputRef={inputRef}
+                      onValueChange={handleArgumentChange}
+                    />
+                  </Box>
+                </>
+              )}
             </Box>
 
             {parseStatus.ok && derivationProblem && (

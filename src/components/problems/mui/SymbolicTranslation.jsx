@@ -2,15 +2,93 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import { Box, Stack, Typography, Alert, Tooltip } from '@mui/material'
 import EditIcon from '@mui/icons-material/Edit'
 import InstructorQuestionEditor from '../InstructorQuestionEditor.jsx'
-import { useTheme } from '@mui/material/styles'
+import { useTheme, useMediaQuery } from '@mui/material'
 import ProblemSetButtons from './ProblemSetButtons.jsx'
 import FormulaInput from '../../ui/logicpenguin/formula-input.js'
 import SymbolButtonRow from '../../ui/logicpenguin/SymbolButtonRow.jsx'
+import { MobileLogicInput } from '../../ui/LogicKeyboard/index.js'
 import { useProblemChecker } from '../../../hooks/useProblemChecker.js'
 import SolutionReveal from '../SolutionReveal.jsx'
 import StatusBanner, { isTerminalStatus } from '../../ui/StatusBanner.jsx'
 import PromptText from '../../ui/PromptText.jsx'
 import RichText from '../../ui/RichText.jsx'
+
+// Predicate / propositional helpers for symbolization keys.
+// Key can use "=" or ":" (e.g. "Mx: x is a musician", "a = Alice", "P = It is raining").
+// Propositional keys: single uppercase letters only (P, Q, R). Predicate keys: constants (a, b)
+// and/or predicate-plus-variables (Mx, Pxy).
+function getLeftPart(line) {
+  const s = typeof line === 'string' ? line : String(line ?? '')
+  const idx = s.search(/[=:]/)
+  return idx === -1 ? s.trim() : s.slice(0, idx).trim()
+}
+
+function isPredicateLogicKey(symbolizationKey) {
+  if (!Array.isArray(symbolizationKey) || symbolizationKey.length === 0) return false
+  return symbolizationKey.some((line) => {
+    const left = getLeftPart(line)
+    // Constant: single lowercase a–w (e.g. "a = Alice")
+    const isConstantStyle =
+      left.length === 1 && /^[a-z]$/.test(left) && !['x', 'y', 'z'].includes(left)
+    // Predicate form: starts with uppercase and has more than one char (e.g. Mx, Pxy), not single P/Q/R
+    const isPredicateStyle = left.length > 1 && /^[A-Z]/.test(left)
+    return isConstantStyle || isPredicateStyle
+  })
+}
+
+function getPredicateLettersFromKey(symbolizationKey) {
+  if (!Array.isArray(symbolizationKey) || symbolizationKey.length === 0) return []
+  const seen = new Set()
+  return symbolizationKey
+    .map((line) => {
+      const left = getLeftPart(line)
+      const match = left.match(/^[A-Z]+/)
+      return match ? match[0] : null
+    })
+    .filter((letter) => letter && !seen.has(letter) && (seen.add(letter), true))
+}
+
+/** Constants from key: lines whose left part is a single lowercase letter (a–w, not x,y,z). */
+function getConstantLettersFromKey(symbolizationKey) {
+  if (!Array.isArray(symbolizationKey) || symbolizationKey.length === 0) return []
+  const result = []
+  const seen = new Set()
+  for (const line of symbolizationKey) {
+    const left = getLeftPart(line)
+    if (
+      left.length === 1 &&
+      /^[a-z]$/.test(left) &&
+      !['x', 'y', 'z'].includes(left) &&
+      !seen.has(left)
+    ) {
+      seen.add(left)
+      result.push(left)
+    }
+  }
+  return result
+}
+
+const ST_CONSTANT_POOL = 'abcdefghijklmnopqrstuvw'.split('') // exclude x,y,z
+const ST_PREDICATE_VARIABLES = ['x', 'y', 'z']
+
+function getConstantLettersFromPromptAndKey(promptText, symbolizationKey, count = 3) {
+  const prompt = typeof promptText === 'string' ? promptText : String(promptText ?? '')
+  const keyText = Array.isArray(symbolizationKey)
+    ? symbolizationKey.map((line) => (typeof line === 'string' ? line : String(line ?? ''))).join(' ')
+    : ''
+  const combined = [prompt, keyText].filter(Boolean).join(' ')
+  if (!combined) return ST_CONSTANT_POOL.slice(0, count)
+  const text = combined.replace(/<[^>]+>/g, ' ').toLowerCase()
+  const used = new Set(text.match(/[a-z]/g) || [])
+  const result = []
+  for (const c of ST_CONSTANT_POOL) {
+    if (!used.has(c)) {
+      result.push(c)
+      if (result.length >= count) break
+    }
+  }
+  return result.length > 0 ? result : ['a', 'b', 'c']
+}
 
 function FormulaInputField({ value, onValueChange, fieldReadOnly, formulaInputRef, onEnterKey }) {
   const theme = useTheme()
@@ -125,6 +203,8 @@ export default function SymbolicTranslation({
   isInstructorView = false,
   onQuestionSaved,
 }) {
+  const theme = useTheme()
+  const isPhone = useMediaQuery(theme.breakpoints.down('sm'))
   const editorRef = useRef(null)
   const openEdit = () => editorRef.current?.open?.()
   const [inputValue, setInputValue] = useState(savedState?.ans || '')
@@ -145,6 +225,16 @@ export default function SymbolicTranslation({
     : (typeof symbolizationKeyRaw === 'string'
       ? symbolizationKeyRaw.split('\n').map((line) => line.trim()).filter(Boolean)
       : [])
+
+  const isPredicate = isPredicateLogicKey(symbolizationKey)
+  const predicateLetters = isPredicate ? getPredicateLettersFromKey(symbolizationKey) : []
+  const constantsFromKey = getConstantLettersFromKey(symbolizationKey)
+  const constantLetters = isPredicate
+    ? (constantsFromKey.length > 0
+        ? constantsFromKey
+        : getConstantLettersFromPromptAndKey(prompt, symbolizationKey, 3))
+    : []
+  const variableLetters = isPredicate ? ST_PREDICATE_VARIABLES : []
 
   const scheduleStateSave = useCallback((nextValue) => {
     if (!onStateChange) return
@@ -255,28 +345,50 @@ export default function SymbolicTranslation({
               <Typography variant="body2" sx={{ mb: 1, mt: 2.5, color: 'text.secondary' }}>
                 Your translation:
               </Typography>
-              <FormulaInputField
-                value={inputValue}
-                onValueChange={(value) => {
-                  if (readOnly) return
-                  setInputValue(value)
-                  scheduleStateSave(value)
-                }}
-                fieldReadOnly={readOnly}
-                formulaInputRef={formulaInputRef}
-                onEnterKey={!readOnly && !hideActions ? handleCheck : undefined}
-              />
-              <Box sx={{ mt: 1 }}>
-                <SymbolButtonRow
-                  inputRef={formulaInputRef}
-                  disabled={readOnly}
-                  onValueChange={(value) => {
+              {isPhone ? (
+                <MobileLogicInput
+                  value={inputValue}
+                  onChange={(value) => {
                     if (readOnly) return
                     setInputValue(value)
                     scheduleStateSave(value)
                   }}
+                  disabled={readOnly}
+                  placeholder="e.g. P • Q"
+                  aria-label="Formula translation"
+                  symbolizationKey={symbolizationKey}
+                  includeQuantifiers={isPredicate}
+                  predicateLetters={isPredicate ? predicateLetters : undefined}
+                  constantLetters={isPredicate ? constantLetters : undefined}
+                  variableLetters={isPredicate ? variableLetters : undefined}
                 />
-              </Box>
+              ) : (
+                <>
+                  <FormulaInputField
+                    value={inputValue}
+                    onValueChange={(value) => {
+                      if (readOnly) return
+                      setInputValue(value)
+                      scheduleStateSave(value)
+                    }}
+                    fieldReadOnly={readOnly}
+                    formulaInputRef={formulaInputRef}
+                    onEnterKey={!readOnly && !hideActions ? handleCheck : undefined}
+                  />
+                  <Box sx={{ mt: 1 }}>
+                    <SymbolButtonRow
+                      inputRef={formulaInputRef}
+                      disabled={readOnly}
+                      includeQuantifiers={isPredicate}
+                      onValueChange={(value) => {
+                        if (readOnly) return
+                        setInputValue(value)
+                        scheduleStateSave(value)
+                      }}
+                    />
+                  </Box>
+                </>
+              )}
             </Box>
             {!suppressReveal && (
               /* show answer in card */

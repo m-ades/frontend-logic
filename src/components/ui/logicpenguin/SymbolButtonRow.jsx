@@ -23,19 +23,49 @@ const BUTTONS = [
   { op: 'EXISTS', quantifier: true },
   { pair: '()' },
   { pair: '[]' },
+  { backspace: true },
 ]
+
+/** Shared sx for symbol, variable, and navigation keyboard buttons. */
+export const symbolRowButtonSx = {
+  minWidth: 34,
+  height: 34,
+  px: 1,
+  py: 0,
+  fontSize: '1rem',
+  lineHeight: 1.1,
+  minHeight: 34,
+  fontWeight: 600,
+  textTransform: 'none',
+  boxShadow: 'none',
+  border: 'none',
+  display: 'inline-flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  '& .MuiButton-label': { fontSize: '1rem' },
+  '&:hover': (theme) => ({
+    boxShadow: 'none',
+    border: 'none',
+    backgroundColor: alpha(theme.palette.primary.main, theme.palette.action.hoverOpacity),
+  }),
+}
 
 export default function SymbolButtonRow({
   inputRef,
   onValueChange,
   disabled = false,
   includeQuantifiers = true,
+  /** When false, omit the backspace button (e.g. mobile keyboard places it on the nav row). */
+  showBackspace = true,
+  extraInsertButtons,
+  centerButtons = false,
 }) {
   const syntax = getSyntax()
   const inputSymbols = inputRef?.current?.symbols
   const symbols = inputSymbols || syntax?.symbols || {}
 
-  const resolveLabel = (op, quantifier = false, insert = null, pair = null) => {
+  const resolveLabel = (op, quantifier = false, insert = null, pair = null, backspace = false) => {
+    if (backspace) return '←'
     if (insert) return insert
     if (pair) {
       const open = pair[0]
@@ -97,10 +127,28 @@ export default function SymbolButtonRow({
     markChanged(input)
   }
 
-  const handleInsert = ({ op, quantifier = false, insert = null, pair = null }) => {
+  const handleBackspace = (input) => {
+    const start = input.selectionStart ?? input.value.length
+    const end = input.selectionEnd ?? start
+    if (start === 0 && end === 0) return
+    if (start === end) {
+      input.setRangeText('', start - 1, end, 'end')
+    } else {
+      input.setRangeText('', start, end, 'end')
+    }
+    input.focus()
+    markChanged(input)
+    finalizeChange(input)
+  }
+
+  const handleInsert = ({ op, quantifier = false, insert = null, pair = null, backspace = false }) => {
     if (disabled) return
     const input = inputRef?.current
     if (!input) return
+    if (backspace) {
+      handleBackspace(input)
+      return
+    }
     if (insert) {
       insertLiteral(input, insert)
       finalizeChange(input)
@@ -121,58 +169,49 @@ export default function SymbolButtonRow({
     finalizeChange(input)
   }
 
-  const visibleButtons = includeQuantifiers
+  const baseButtonsRaw = includeQuantifiers
     ? BUTTONS
     : BUTTONS.filter((btn) => !btn.quantifier)
+  const baseButtons = showBackspace
+    ? baseButtonsRaw
+    : baseButtonsRaw.filter((btn) => !btn.backspace)
+  const visibleButtons = baseButtons.length > 0 && baseButtons[baseButtons.length - 1].backspace
+    ? [...baseButtons.slice(0, -1), ...(extraInsertButtons || []), { backspace: true }]
+    : [...baseButtons, ...(extraInsertButtons || [])]
 
   return (
     <Box aria-label="Symbol shortcuts">
-      <Stack direction="row" spacing={0.5} flexWrap="wrap" useFlexGap>
-        {visibleButtons.map(({ op, quantifier, insert, pair }) => (
-          (() => {
-            const visualSymbol = resolveLabel(op, quantifier, insert, pair)
-            const a11yLabel = getInsertSymbolLabel({
-              insert: pair ? null : visualSymbol,
-              pair,
-            })
-            return (
-              <Button
-                key={op || insert || pair}
-                type="button"
-                size="medium"
-                variant="outlined"
-                onMouseDown={(e) => e.preventDefault()}
-                onClick={() => handleInsert({ op, quantifier, insert, pair })}
-                disabled={disabled}
-                aria-disabled={disabled}
-                aria-label={a11yLabel}
-                title={a11yLabel}
-                sx={{
-                  minWidth: 34,
-                  px: 1,
-                  py: 0.45,
-                  fontSize: '1rem',
-                  lineHeight: 1.1,
-                  minHeight: 34,
-                  fontWeight: 600,
-                  textTransform: 'none',
-                  boxShadow: 'none',
-                  border: 'none',
-                  '&:hover': (theme) => ({
-                    boxShadow: 'none',
-                    border: 'none',
-                    backgroundColor: alpha(
-                      theme.palette.primary.main,
-                      theme.palette.action.hoverOpacity,
-                    ),
-                  }),
-                }}
-              >
-                <LogicSymbol symbol={visualSymbol} />
-              </Button>
-            )
-          })()
-        ))}
+      <Stack
+        direction="row"
+        spacing={0.5}
+        flexWrap="wrap"
+        useFlexGap
+        sx={centerButtons ? { justifyContent: 'center' } : undefined}
+      >
+        {visibleButtons.map(({ op, quantifier, insert, pair, backspace }) => {
+          const visualSymbol = resolveLabel(op, quantifier, insert, pair, backspace)
+          const a11yLabel = backspace ? 'Backspace' : getInsertSymbolLabel({
+            insert: pair ? null : visualSymbol,
+            pair,
+          })
+          return (
+            <Button
+              key={backspace ? 'backspace' : (op || insert || pair)}
+              type="button"
+              size="medium"
+              variant="outlined"
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={() => handleInsert({ op, quantifier, insert, pair, backspace })}
+              disabled={disabled}
+              aria-disabled={disabled}
+              aria-label={a11yLabel}
+              title={a11yLabel}
+              sx={symbolRowButtonSx}
+            >
+              <LogicSymbol symbol={visualSymbol} />
+            </Button>
+          )
+        })}
       </Stack>
     </Box>
   )
