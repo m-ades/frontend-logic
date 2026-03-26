@@ -24,7 +24,8 @@ function getVariableLettersOnly(symbolizationKey) {
   const letters = symbolizationKey
     .map((line) => {
       const s = typeof line === 'string' ? line : String(line ?? '')
-      const symbol = s.split('=')[0].trim()
+      const splitAt = s.search(/[=:]/)
+      const symbol = (splitAt === -1 ? s : s.slice(0, splitAt)).trim()
       return symbol || null
     })
     .filter(Boolean)
