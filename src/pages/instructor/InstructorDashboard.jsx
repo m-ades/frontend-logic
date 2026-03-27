@@ -217,10 +217,7 @@ export default function InstructorDashboard() {
 
   const timeByCategory = analytics.timeByCategory || [];
 
-  const handleAssignmentClick = (data) => {
-    // This can be used for chart clicks or other navigation
-    console.log("Assignment clicked:", data);
-  };
+  const handleAssignmentClick = () => {};
 
   // Show message if no course selected
     if (!activeCourseId || !course) {

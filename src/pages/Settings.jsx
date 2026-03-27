@@ -185,11 +185,6 @@ export default function Settings() {
     setSubmitSuccess(false)
 
     if (validateForm()) {  //need to be implemented with backend
-      console.log('Password change submitted', {
-        currentPassword,
-        newPassword
-      })
-
       setCurrentPassword('')
       setNewPassword('')
       setConfirmPassword('')
@@ -262,8 +257,6 @@ export default function Settings() {
     const { deviceId } = confirmationDialog
     
     //need to be implemented with backend
-    console.log('Logging out device:', deviceId)
-    
     setDevices(prev => prev.filter(device => device.id !== deviceId))
     
     setLogoutSuccess(true)
@@ -276,8 +269,6 @@ export default function Settings() {
 
   const handleConfirmLogoutAllDevices = () => {
     //need to be implemented with backend
-    console.log('Logging out all devices')
-    
     setDevices(prev => prev.filter(device => device.currentDevice))
     
     setLogoutSuccess(true)
@@ -604,9 +595,7 @@ export default function Settings() {
               <Button
                 variant="text"
                 size="small"
-                onClick={() => {
-                  console.log('Refreshing devices list')
-                }}
+                onClick={() => {}}
               >
                 Refresh list
               </Button>

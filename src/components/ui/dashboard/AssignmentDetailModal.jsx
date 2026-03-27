@@ -396,8 +396,7 @@ export default function AssignmentDetailModal({ open, onClose, assignmentId }) {
         {activeTab === 1 && (
           <StudentSubmissionsTable
             students={studentSubmissions}
-            onView={(student) => {
-              console.log("View submission:", student);
+            onView={() => {
               // TODO: Implement view submission functionality
             }}
           />

@@ -359,14 +359,6 @@ export default class LogicPenguinProblem extends HTMLElement {
                     message: 'Error checking answer: ' + err.toString()
                 });
             });
-        } else {
-            // Debug: log why local check isn't happening
-            console.log("localCheck not called:", {
-                hasMyanswer: "myanswer" in this,
-                hasMyproblemtype: "myproblemtype" in this,
-                myanswer: this.myanswer,
-                myproblemtype: this.myproblemtype
-            });
         }
     }
 
