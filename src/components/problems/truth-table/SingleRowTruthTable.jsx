@@ -228,6 +228,7 @@ export default function SingleRowTruthTable({
       tableInputs={tableInputsToRender}
       combined={false}
       readOnly={readOnlyTable}
+      isCellReadOnly={({ colIndex }) => isAtomicToken(tokens[colIndex])}
       selectedColumns={selectedColumns}
       selectedRows={selectedRows}
       onToggleColumn={toggleColumn}
@@ -315,7 +316,7 @@ export default function SingleRowTruthTable({
           ? 'Truth table looks good.'
           : tableFilled
             ? 'Recheck your truth values.'
-            : 'Click cells to toggle truth values - fill in every cell to finish.'}
+            : 'Click editable cells to toggle truth values - fill in every blank cell to finish.'}
       </Typography>
     </ProblemFrame>
   )

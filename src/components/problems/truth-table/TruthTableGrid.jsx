@@ -30,6 +30,7 @@ export default function TruthTableGrid({
   toggleValues,
   shrinkWrap = false,
   renderCell,
+  isCellReadOnly,
 }) {
   const theme = useTheme()
   const cellBorderColor = theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.12)' : 'var(--lpgray6)'
@@ -180,6 +181,13 @@ export default function TruthTableGrid({
                         const colMatch = selectedColumns.some((col) => col.tableIndex === tableIndex && col.colIndex === colIndex)
                         const rowMatch = selectedRows.includes(rowIndex)
                         const cellValue = tableInputs[tableIndex]?.[rowIndex]?.[colIndex]
+                        const cellReadOnly = readOnly || Boolean(isCellReadOnly?.({
+                          table,
+                          tableIndex,
+                          rowIndex,
+                          colIndex,
+                          cellValue,
+                        }))
                         if (renderCell) {
                           return renderCell({
                             tableIndex,
@@ -203,7 +211,7 @@ export default function TruthTableGrid({
                               onChange={(token) => onCellChange?.(tableIndex, rowIndex, colIndex, token)}
                               ariaLabel={getCellAriaLabel(table, rowIndex, colIndex)}
                               accent={false}
-                              readOnly={readOnly}
+                              readOnly={cellReadOnly}
                               toggleValues={toggleValues}
                             />
                           </TableCell>
@@ -283,6 +291,13 @@ export default function TruthTableGrid({
                       const colMatch = selectedColumns.some((col) => col.tableIndex === tableIndex && col.colIndex === colIndex)
                       const rowMatch = selectedRows.includes(rowIndex)
                       const cellValue = tableInputs[tableIndex]?.[rowIndex]?.[colIndex]
+                      const cellReadOnly = readOnly || Boolean(isCellReadOnly?.({
+                        table,
+                        tableIndex,
+                        rowIndex,
+                        colIndex,
+                        cellValue,
+                      }))
                       if (renderCell) {
                         return renderCell({
                           tableIndex,
@@ -306,7 +321,7 @@ export default function TruthTableGrid({
                             onChange={(token) => onCellChange?.(tableIndex, rowIndex, colIndex, token)}
                             ariaLabel={getCellAriaLabel(table, rowIndex, colIndex)}
                             accent={false}
-                            readOnly={readOnly}
+                            readOnly={cellReadOnly}
                             toggleValues={toggleValues}
                           />
                         </TableCell>

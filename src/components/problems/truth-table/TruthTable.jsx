@@ -22,6 +22,7 @@ import ProblemFrame from '../mui/frame/ProblemFrame.jsx'
 import TruthTableGrid from './TruthTableGrid.jsx'
 import TruthTableSection from './TruthTableSection.jsx'
 import {
+  buildDisplaySolutionTables,
   buildTruthTableStatePayload,
   buildTruthTableSubmissionData,
   deriveTruthTableSolutionClassification,
@@ -393,33 +394,10 @@ export default function TruthTable({
     setStatus('unanswered')
     setMessage('')
   }
-
-  const solutionTables = React.useMemo(() => {
-    const solution = proof?.solution
-    if (!solution) return []
-    if (solution.format === 'truth-table' && Array.isArray(solution.rows)) {
-      return [{
-        label: solution.label || proof?.description || 'Answer',
-        tokens: solution.tokens || [],
-        rows: solution.rows
-      }]
-    }
-    if (solution.format === 'truth-table-row' && Array.isArray(solution.row)) {
-      return [{
-        label: solution.label || proof?.description || 'Answer',
-        tokens: solution.tokens || [],
-        rows: [solution.row]
-      }]
-    }
-    if (Array.isArray(solution.tables)) {
-      return solution.tables.map((table) => ({
-        label: table.label || '',
-        tokens: table.tokens || [],
-        rows: table.rows || []
-      }))
-    }
-    return []
-  }, [proof])
+  const isPrefilledCell = React.useCallback(
+    ({ tableIndex, colIndex }) => isAtomicToken(tables[tableIndex]?.tokens?.[colIndex]),
+    [isAtomicToken, tables]
+  )
   const solutionTablesFromProblem = React.useMemo(
     () =>
       tables.map((table) => ({
@@ -432,10 +410,10 @@ export default function TruthTable({
       })),
     [tables]
   )
-  const displaySolutionTables =
-    solutionTables.length > 0
-      ? solutionTables
-      : solutionTablesFromProblem
+  const displaySolutionTables = React.useMemo(
+    () => buildDisplaySolutionTables(proof?.solution, solutionTablesFromProblem, proof?.description || 'Answer'),
+    [proof?.description, proof?.solution, solutionTablesFromProblem]
+  )
   const showSolution =
     attemptCount >= attemptLimit && status !== 'correct' && displaySolutionTables.length > 0
 
@@ -471,6 +449,7 @@ export default function TruthTable({
           selectedRows={selectedRows}
           onToggleColumn={toggleColumn}
           onToggleRow={toggleRow}
+          isCellReadOnly={isPrefilledCell}
         />
         {classificationEnabled && classificationOptions.length > 0 && (
           <Box sx={{ width: '100%' }}>
@@ -566,7 +545,7 @@ export default function TruthTable({
             ? 'Truth table looks good.'
             : tableFilledOnly
               ? 'Recheck your rows.'
-              : 'Click cells to toggle truth values - fill in every cell to finish.'}
+              : 'Click editable cells to toggle truth values - fill in every blank cell to finish.'}
         </Typography>
       </Stack>
     ) : (
@@ -602,7 +581,7 @@ export default function TruthTable({
             ? 'Truth table looks good.'
             : tableFilledOnly
               ? 'Recheck your rows.'
-              : 'Click cells to toggle truth values - fill in every cell to finish.'}
+              : 'Click editable cells to toggle truth values - fill in every blank cell to finish.'}
         </Typography>
       </ProblemFrame>
     )

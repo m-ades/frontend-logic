@@ -1,3 +1,9 @@
+/* 
+Shared truth table helpers for truthtable and truthtableeditor
+  creates state and submission payloads
+  tokenizes headers and supports grid density 
+*/  
+
 import { fetchJson, getActiveUserId } from '../../../utils/api.js'
 import { getSubmissionScore } from '../../../utils/problemHelpers.js'
 import {
@@ -5,6 +11,7 @@ import {
   equivTables,
   formulaTable,
 } from '../../../lib/logicpenguin/symbolic/libsemantics.js'
+
 
 export function buildClassificationState(selection = []) {
   return {
@@ -177,6 +184,122 @@ export function deriveTruthTableSolutionClassification(kind, solution, statement
   }
 
   return []
+}
+
+export function normalizeTruthTableCellValue(cell) {
+  if (cell === true || cell === 'T' || cell === 't' || cell === 1) return 'T'
+  if (cell === false || cell === 'F' || cell === 'f' || cell === 0) return 'F'
+  return cell ?? ''
+}
+
+export function normalizeTruthTableRows(rows) {
+  if (!Array.isArray(rows) || rows.length === 0) return []
+  if (rows.every((row) => Array.isArray(row))) {
+    return rows.map((row) => row.map((cell) => normalizeTruthTableCellValue(cell)))
+  }
+  return [rows.map((cell) => normalizeTruthTableCellValue(cell))]
+}
+
+export function buildDisplaySolutionTables(solution, fallbackTables = [], defaultLabel = 'Answer') {
+  // keep a table shape the ui can actually use
+  const normalizedFallbackTables = (fallbackTables || []).map((table) => ({
+    label: table?.label || '',
+    tokens: Array.isArray(table?.tokens) ? table.tokens : [],
+    headerTokens: Array.isArray(table?.headerTokens) && table.headerTokens.length > 0
+      ? table.headerTokens
+      : (Array.isArray(table?.tokens) ? table.tokens : []),
+    rows: normalizeTruthTableRows(table?.rows),
+  }))
+
+  let candidateTables = []
+
+  if (solution?.format === 'truth-table' && Array.isArray(solution.rows)) {
+    candidateTables = [{
+      label: solution.label || defaultLabel,
+      tokens: Array.isArray(solution.tokens) ? solution.tokens : [],
+      headerTokens: Array.isArray(solution.headerTokens) && solution.headerTokens.length > 0
+        ? solution.headerTokens
+        : (Array.isArray(solution.tokens) ? solution.tokens : []),
+      rows: normalizeTruthTableRows(solution.rows),
+    }]
+  } else if (solution?.format === 'truth-table-row' && Array.isArray(solution.row)) {
+    candidateTables = [{
+      label: solution.label || defaultLabel,
+      tokens: Array.isArray(solution.tokens) ? solution.tokens : [],
+      headerTokens: Array.isArray(solution.headerTokens) && solution.headerTokens.length > 0
+        ? solution.headerTokens
+        : (Array.isArray(solution.tokens) ? solution.tokens : []),
+      rows: [solution.row.map((cell) => normalizeTruthTableCellValue(cell))],
+    }]
+  } else if (Array.isArray(solution?.tables)) {
+    candidateTables = solution.tables.map((table) => ({
+      label: table?.label || '',
+      tokens: Array.isArray(table?.tokens) ? table.tokens : [],
+      headerTokens: Array.isArray(table?.headerTokens) && table.headerTokens.length > 0
+        ? table.headerTokens
+        : (Array.isArray(table?.tokens) ? table.tokens : []),
+      rows: normalizeTruthTableRows(table?.rows),
+    }))
+  }
+
+  const splitCombinedCandidateToFallbackTables = (table) => {
+    // some older answers store one wide table where the ui expects many
+    if (normalizedFallbackTables.length <= 1) return null
+    const expectedColumnCounts = normalizedFallbackTables.map((fallbackTable) => fallbackTable.tokens.length)
+    const totalExpectedColumns = expectedColumnCounts.reduce((sum, count) => sum + count, 0)
+    if (totalExpectedColumns === 0 || table.rows.length === 0) return null
+    const rowsMatchCombinedShape = table.rows.every((row) => row.length === totalExpectedColumns)
+    if (!rowsMatchCombinedShape) return null
+
+    return normalizedFallbackTables.map((fallbackTable, tableIndex) => {
+      const start = expectedColumnCounts.slice(0, tableIndex).reduce((sum, count) => sum + count, 0)
+      const end = start + expectedColumnCounts[tableIndex]
+      return {
+        label: fallbackTable.label || table.label || '',
+        tokens: fallbackTable.tokens,
+        headerTokens: fallbackTable.headerTokens,
+        rows: table.rows.map((row) => row.slice(start, end)),
+      }
+    })
+  }
+
+  const hydratedCandidateTables = candidateTables.map((table, index) => {
+    const fallbackTable = normalizedFallbackTables[index]
+    const tokens = table.tokens.length > 0 ? table.tokens : (fallbackTable?.tokens || [])
+    const headerTokens = table.headerTokens.length > 0
+      ? table.headerTokens
+      : (fallbackTable?.headerTokens || tokens)
+    return {
+      label: table.label || fallbackTable?.label || '',
+      tokens,
+      headerTokens,
+      rows: table.rows,
+    }
+  })
+  const candidateTablesWithSplitSupport =
+    hydratedCandidateTables.length === 1
+    && normalizedFallbackTables.length > 1
+      // split a combined answer before we give up and fall back
+      ? (splitCombinedCandidateToFallbackTables(hydratedCandidateTables[0]) || hydratedCandidateTables)
+      : hydratedCandidateTables
+
+  const hasCompatibleShape =
+    candidateTablesWithSplitSupport.length > 0 &&
+    (normalizedFallbackTables.length === 0 || (
+      candidateTablesWithSplitSupport.length === normalizedFallbackTables.length &&
+      candidateTablesWithSplitSupport.every((table, index) => {
+        const fallbackTable = normalizedFallbackTables[index]
+        if (!fallbackTable) return table.rows.length > 0
+        if (fallbackTable.tokens.length > 0 && table.tokens.length !== fallbackTable.tokens.length) return false
+        if (fallbackTable.rows.length > 0 && table.rows.length !== fallbackTable.rows.length) return false
+        return table.rows.every((row, rowIndex) => {
+          const fallbackRow = fallbackTable.rows[rowIndex]
+          return !fallbackRow || row.length === fallbackRow.length
+        })
+      })
+    ))
+
+  return hasCompatibleShape ? candidateTablesWithSplitSupport : normalizedFallbackTables
 }
 
 export async function submitTruthTableAnswer({
