@@ -1,5 +1,5 @@
-import { Button, Stack } from '@mui/material'
-import { alpha } from '@mui/material/styles'
+import { Button, Stack, useMediaQuery } from '@mui/material'
+import { alpha, useTheme } from '@mui/material/styles'
 import getSyntax from '../../../../lib/logicpenguin/symbolic/libsyntax.js'
 
 const FALLBACK_SYMBOLS = {
@@ -90,11 +90,16 @@ export default function SymbolToolbar({
   disabled = false,
   includeQuantifiers = true,
 }) {
+  const theme = useTheme()
+  const isPhone = useMediaQuery(theme.breakpoints.down('sm'))
   const syntax = getSyntax()
   const symbols = syntax?.symbols || {}
   const visibleButtons = includeQuantifiers
     ? BUTTONS
     : BUTTONS.filter((button) => !button.quantifier)
+
+  // mobilelogicinput already brings its own symbol controls
+  if (isPhone) return null
 
   return (
     <Stack direction="row" spacing={0.5} flexWrap="wrap" useFlexGap aria-label="Symbol shortcuts">

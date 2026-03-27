@@ -262,7 +262,12 @@ export default function ComboTranslationTruthTable({
         <Typography variant="body2" sx={{ ...sectionLabelSx, mb: 1, fontWeight: 600, color: 'text.primary' }}>
           Argument line
         </Typography>
-        <FormulaField value={argumentLine} onValueChange={handleArgumentChange} ref={inputRef} />
+        <FormulaField
+          value={argumentLine}
+          onValueChange={handleArgumentChange}
+          ref={inputRef}
+          includeQuantifiers={false}
+        />
         <Box sx={{ mt: 1 }}>
           <SymbolToolbar
             inputRef={inputRef}

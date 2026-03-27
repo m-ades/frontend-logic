@@ -1,5 +1,7 @@
 import { forwardRef } from 'react'
-import { TextField } from '@mui/material'
+import { TextField, useMediaQuery } from '@mui/material'
+import { useTheme } from '@mui/material/styles'
+import MobileLogicInput from '../../../ui/LogicKeyboard/MobileLogicInput.jsx'
 
 // shared formula field for symbolic inputs
 const FormulaField = forwardRef(function FormulaField({
@@ -8,8 +10,28 @@ const FormulaField = forwardRef(function FormulaField({
   readOnly = false,
   onEnterKey,
   placeholder = '',
+  symbolizationKey,
+  includeQuantifiers = true,
   sx,
 }, ref) {
+  const theme = useTheme()
+  const isPhone = useMediaQuery(theme.breakpoints.down('sm'))
+
+  if (isPhone) {
+    // on phones route back through the existing custom keyboard path
+    return (
+      <MobileLogicInput
+        value={value}
+        onChange={(nextValue) => onValueChange?.(nextValue)}
+        disabled={readOnly}
+        placeholder={placeholder}
+        aria-label={placeholder || 'Formula input'}
+        symbolizationKey={symbolizationKey}
+        includeQuantifiers={includeQuantifiers}
+      />
+    )
+  }
+
   return (
     <TextField
       fullWidth

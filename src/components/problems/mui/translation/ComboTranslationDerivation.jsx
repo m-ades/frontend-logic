@@ -210,6 +210,7 @@ export default function ComboTranslationDerivation({
           onValueChange={handleArgumentChange}
           readOnly={false}
           ref={inputRef}
+          includeQuantifiers={false}
         />
         <Box sx={{ mt: 1 }}>
           <SymbolToolbar

@@ -160,6 +160,7 @@ export default function SymbolicTranslation({
           readOnly={readOnly}
           ref={formulaInputRef}
           onEnterKey={!readOnly && !hideActions ? handleCheck : undefined}
+          symbolizationKey={symbolizationKey}
         />
         <Box sx={{ mt: 1 }}>
           <SymbolToolbar
