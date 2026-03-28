@@ -27,6 +27,24 @@ export default function ProblemSetButtons({
   const hasAttempts = Number.isFinite(attemptCount) && Number.isFinite(attemptLimit)
   const attemptsLeft = hasAttempts ? Math.max(0, attemptLimit - attemptCount) : null
   const textAlign = align === 'center' ? 'center' : align === 'flex-end' ? 'right' : 'left'
+  const submitButtonSx = {
+    minWidth: 120,
+    minHeight: 36,
+    px: 1.5,
+    borderRadius: 1,
+    textTransform: 'none',
+    fontWeight: 500,
+    boxShadow: 2,
+    whiteSpace: 'nowrap',
+  }
+  const clearButtonSx = {
+    minHeight: 36,
+    px: 1.25,
+    borderRadius: 1,
+    textTransform: 'none',
+    fontWeight: 500,
+    whiteSpace: 'nowrap',
+  }
   return (
     <Stack spacing={0.75} sx={{ mt: 3, ...sx }}>
       {showNext ? (
@@ -51,7 +69,7 @@ export default function ProblemSetButtons({
             variant="contained"
             onClick={onCheck}
             disabled={isChecking || isDisabled}
-            sx={{ minWidth: 120 }}
+            sx={submitButtonSx}
           >
             {isChecking ? 'Submitting...' : 'Submit Answer'}
           </Button>
@@ -59,6 +77,7 @@ export default function ProblemSetButtons({
             variant="outlined"
             onClick={onStartOver}
             disabled={isChecking || (hasAttempts && attemptsLeft === 0)}
+            sx={clearButtonSx}
           >
             Clear Answer
           </Button>
@@ -105,7 +124,7 @@ export default function ProblemSetButtons({
             variant="contained"
             onClick={onCheck}
             disabled={isChecking || isDisabled}
-            sx={{ minWidth: 120 }}
+            sx={submitButtonSx}
           >
             {isChecking ? 'Submitting...' : 'Submit Answer'}
           </Button>
@@ -113,6 +132,7 @@ export default function ProblemSetButtons({
             variant="outlined"
             onClick={onStartOver}
             disabled={isChecking || (hasAttempts && attemptsLeft === 0)}
+            sx={clearButtonSx}
           >
             Clear Answer
           </Button>

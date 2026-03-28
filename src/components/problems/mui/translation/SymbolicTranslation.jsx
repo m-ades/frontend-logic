@@ -126,6 +126,7 @@ export default function SymbolicTranslation({
     <ProblemFrame
       problemLabel={problemLabel}
       prompt={prompt}
+      promptSx={{ mb: 1, color: 'text.secondary' }}
       minHeight="150px"
       isInstructorView={isInstructorView && !!proof}
       onEditQuestion={proof ? openEdit : undefined}
@@ -182,6 +183,7 @@ export default function SymbolicTranslation({
             scheduleStateSave(value)
           }}
           readOnly={readOnly}
+          placeholder="e.g. P • Q"
           ref={formulaInputRef}
           onEnterKey={!readOnly && !hideActions ? handleCheck : undefined}
           symbolizationKey={symbolizationKey}
