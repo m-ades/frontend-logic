@@ -20,13 +20,6 @@ import {
   submitDerivationAnswer,
 } from './derivationWorkflow.js'
 import {
-  getConstantLettersFromPrompt,
-  getPredicateLettersFromKey,
-  getPropositionalLettersFromFormulas,
-  isPredicateLogicKey,
-  PREDICATE_VARIABLES,
-} from '../../ui/LogicKeyboard/mobileKeyboardConfig.js'
-import {
   ALL_DERIVATION_RULES,
   AUTO_CHECK_STORAGE_KEY,
   applyLinesToJustification,
@@ -35,9 +28,14 @@ import {
     formatJustificationParts,
     formatRuleName,
     formulasEqualNormally,
+    getConstantLettersFromPrompt,
     getInputUnderlineSx,
     getJustificationMeta,
+    getPredicateLettersFromKey,
+    getPropositionalLettersFromFormulas,
     getRuleFromJustification,
+    isPredicateLogicKey,
+    PREDICATE_VARIABLES,
   getSelectUnderlineSx,
   INDENT_END_RULES,
   INDENT_START_RULES,
