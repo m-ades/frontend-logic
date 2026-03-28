@@ -104,20 +104,20 @@ export default function ProblemFrame({
               {children}
             </Stack>
         </ProblemCard>
-
-        {statusNode ?? (
-          isTerminalStatus(status) && (
-            <StatusBanner
-              status={status}
-              message={message}
-              onClose={onCloseStatus}
-            />
-          )
-        )}
-
-        {actionNode}
-        {editorNode}
       </Box>
+
+      {statusNode ?? (
+        isTerminalStatus(status) && (
+          <StatusBanner
+            status={status}
+            message={message}
+            onClose={onCloseStatus}
+          />
+        )
+      )}
+
+      {actionNode}
+      {editorNode}
     </Stack>
   )
 }
