@@ -172,12 +172,13 @@ export default function TruthTableGrid({
                 {tables.map((table, tableIndex) => {
                   const isConclusion = showConclusionMarker && tableIndex === tables.length - 1 && tables.length > 1
                   const row = table.rows[rowIndex] ?? []
+                  const headerTokens = table.headerTokens && table.headerTokens.length > 0 ? table.headerTokens : table.tokens
                   return (
                     <React.Fragment key={`combined-rowfrag-${tableIndex}`}>
                       {tableIndex > 0 && (
                         <TableCell className="tt-cell tt-separator-cell" align="center" sx={{ ...separatorCellSx, background: 'transparent' }} />
                       )}
-                      {row.map((_, colIndex) => {
+                      {headerTokens.map((_, colIndex) => {
                         const colMatch = selectedColumns.some((col) => col.tableIndex === tableIndex && col.colIndex === colIndex)
                         const rowMatch = selectedRows.includes(rowIndex)
                         const cellValue = tableInputs[tableIndex]?.[rowIndex]?.[colIndex]

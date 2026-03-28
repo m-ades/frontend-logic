@@ -16,6 +16,12 @@ import {
   PREDICATE_VARIABLES,
 } from '../../../ui/LogicKeyboard/mobileKeyboardConfig.js'
 
+function promptImpliesPredicateLogic(promptText) {
+  const prompt = typeof promptText === 'string' ? promptText : String(promptText ?? '')
+  const text = prompt.replace(/<[^>]+>/g, ' ').toLowerCase()
+  return /\bpredicate logic\b/.test(text)
+}
+
 export default function SymbolicTranslation({
   problem,
   proof,
@@ -52,13 +58,15 @@ export default function SymbolicTranslation({
     : (typeof symbolizationKeyRaw === 'string'
       ? symbolizationKeyRaw.split('\n').map((line) => line.trim()).filter(Boolean)
       : [])
-  const isPredicate = isPredicateLogicKey(symbolizationKey)
+  const isPredicate = isPredicateLogicKey(symbolizationKey) || promptImpliesPredicateLogic(prompt)
   const predicateLetters = isPredicate ? getPredicateLettersFromKey(symbolizationKey) : []
   const constantsFromKey = getConstantLettersFromKey(symbolizationKey)
   const constantLetters = isPredicate
     ? (constantsFromKey.length > 0
         ? constantsFromKey
-        : getConstantLettersFromPromptAndKey(prompt, symbolizationKey, 3))
+        : (symbolizationKey.length === 0
+            ? getConstantLettersFromPromptAndKey(prompt, symbolizationKey, 3)
+            : []))
     : []
   const variableLetters = isPredicate ? PREDICATE_VARIABLES : []
 
