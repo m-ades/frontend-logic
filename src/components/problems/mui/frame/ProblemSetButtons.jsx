@@ -27,39 +27,41 @@ export default function ProblemSetButtons({
   const hasAttempts = Number.isFinite(attemptCount) && Number.isFinite(attemptLimit)
   const attemptsLeft = hasAttempts ? Math.max(0, attemptLimit - attemptCount) : null
   const textAlign = align === 'center' ? 'center' : align === 'flex-end' ? 'right' : 'left'
-  const submitButtonSx = {
-    minWidth: 120,
-    minHeight: 36,
-    px: 1.5,
+  const actionButtonBaseSx = {
+    minWidth: { xs: 0, sm: 120 },
+    minHeight: { xs: 28, sm: 32 },
+    px: { xs: 0.25, sm: 0.75 },
+    py: { xs: 0.125, sm: 0.375 },
     borderRadius: 1,
-    textTransform: 'none',
+    fontSize: { xs: '0.875rem', sm: '0.875rem' },
+    lineHeight: 1.25,
     fontWeight: 500,
-    boxShadow: 2,
     whiteSpace: 'nowrap',
+    flex: { xs: '1 1 0', sm: '0 0 auto' },
+  }
+  const submitButtonSx = {
+    ...actionButtonBaseSx,
+    boxShadow: 2,
   }
   const clearButtonSx = {
-    minHeight: 36,
-    px: 1.25,
-    borderRadius: 1,
-    textTransform: 'none',
-    fontWeight: 500,
-    whiteSpace: 'nowrap',
+    ...actionButtonBaseSx,
   }
   return (
     <Stack spacing={0.75} sx={{ mt: 3, ...sx }}>
       {showNext ? (
         <Stack
           direction="row"
-          spacing={2}
+          spacing={{ xs: 1.25, sm: 2 }}
           justifyContent={align}
           alignItems="center"
+          sx={{ width: '100%', flexWrap: 'nowrap', minWidth: 0 }}
         >
           {showPrev && (
             <IconButton
               onClick={navigation?.onPrev}
               disabled={isChecking || isPrevDisabled}
               size="small"
-              sx={{ color: 'primary.main' }}
+              sx={{ color: 'primary.main', flex: '0 0 auto', p: { xs: 0.5, sm: 1 } }}
               aria-label="Previous problem"
             >
               <ArrowBackIcon />
@@ -97,7 +99,7 @@ export default function ProblemSetButtons({
             onClick={navigation?.onNext}
             disabled={isChecking || isNextDisabled}
             size="small"
-            sx={{ color: 'primary.main' }}
+            sx={{ color: 'primary.main', flex: '0 0 auto', p: { xs: 0.5, sm: 1 } }}
             aria-label="Next problem"
           >
             <ArrowForwardIcon />
@@ -106,15 +108,17 @@ export default function ProblemSetButtons({
       ) : (
         <Stack 
           direction="row" 
-          spacing={2} 
+          spacing={{ xs: 1.25, sm: 2 }} 
           justifyContent={align}
+          alignItems="center"
+          sx={{ width: '100%', flexWrap: 'nowrap', minWidth: 0 }}
         >
           {showPrev && (
             <IconButton
               onClick={navigation?.onPrev}
               disabled={isChecking || isPrevDisabled}
               size="small"
-              sx={{ color: 'primary.main' }}
+              sx={{ color: 'primary.main', flex: '0 0 auto', p: { xs: 0.5, sm: 1 } }}
               aria-label="Previous problem"
             >
               <ArrowBackIcon />
