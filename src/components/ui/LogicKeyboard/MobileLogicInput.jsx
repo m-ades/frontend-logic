@@ -135,7 +135,6 @@ export default function MobileLogicInput({
       inputRef.current = null
     }
   }, [facade, inputRef])
-
   const handleFocus = useCallback(() => {
     setKeyboardFocused(true)
     onFocus?.()
