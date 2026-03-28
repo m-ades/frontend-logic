@@ -177,6 +177,7 @@ export default function SymbolicTranslation({
           ref={formulaInputRef}
           onEnterKey={!readOnly && !hideActions ? handleCheck : undefined}
           symbolizationKey={symbolizationKey}
+          includeQuantifiers={isPredicate}
           predicateLetters={isPredicate ? predicateLetters : undefined}
           constantLetters={isPredicate ? constantLetters : undefined}
           variableLetters={isPredicate ? variableLetters : undefined}
@@ -185,6 +186,7 @@ export default function SymbolicTranslation({
           <SymbolToolbar
             inputRef={formulaInputRef}
             disabled={readOnly}
+            includeQuantifiers={isPredicate}
             onValueChange={(value) => {
               if (readOnly) return
               setInputValue(value)
