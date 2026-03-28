@@ -2,6 +2,13 @@ import { alpha } from '@mui/material/styles'
 import getHurleyRuleset from '../../../lib/logicpenguin/checkers/rules/hurley-rules.js'
 import getFormulaClass from '../../../lib/logicpenguin/symbolic/formula.js'
 import { justParse } from '../../ui/logicpenguin/justification-parse.js'
+import {
+  getConstantLettersFromPrompt,
+  getPredicateLettersFromKey,
+  getPropositionalLettersFromFormulas,
+  isPredicateLogicKey,
+  PREDICATE_VARIABLES,
+} from '../../ui/LogicKeyboard/mobileKeyboardConfig.js'
 
 export const SYMBOL_BUTTONS = [
   { label: '~', insert: '~' },

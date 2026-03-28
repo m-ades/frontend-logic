@@ -13,7 +13,6 @@ import { getInsertSymbolLabel } from '../../ui/logicpenguin/LogicSymbol.jsx'
 import {
   plainIconButtonSx,
   SYMBOL_BUTTONS,
-  SYMBOL_ROW2,
   symbolBtnSx,
 } from './derivationUtils.js'
 
@@ -52,54 +51,16 @@ export default function DerivationToolbarRow({
             }}
           >
             {isPhone && isFullScreen ? (
-              <>
-                <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: isFullScreen ? 0.5 : 0.75, flexShrink: 0 }}>
-                  <Tooltip title={autoCheckEnabled ? 'Turn off autochecker' : 'Turn on autochecker'}>
-                    <IconButton
-                      onClick={() => setAutoCheckEnabled((prev) => !prev)}
-                      size="small"
-                      aria-label="Toggle autochecker"
-                      sx={{ ...plainIconButtonSx, color: autoCheckEnabled ? 'primary.main' : 'text.disabled', position: 'relative' }}
-                    >
-                      <AutoAwesomeIcon />
-                    </IconButton>
-                  </Tooltip>
-                  {SYMBOL_BUTTONS.slice(0, 5).map((btn) => (
-                    <Button
-                      key={btn.label}
-                      type="button"
-                      size="small"
-                      variant="outlined"
-                      onMouseDown={(e) => e.preventDefault()}
-                      onClick={() => handleSymbolInsert({ insert: btn.insert, pair: btn.pair })}
-                      aria-label={getInsertSymbolLabel({ insert: btn.insert, pair: btn.pair })}
-                      title={getInsertSymbolLabel({ insert: btn.insert, pair: btn.pair })}
-                      sx={symbolBtnSx(isFullScreen, isMobile, isPhone)}
-                    >
-                      {btn.label}
-                    </Button>
-                  ))}
-                </Box>
-                <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: isFullScreen ? 0.5 : 0.75, flexShrink: 0 }}>
-                  <Box sx={{ width: 40, minWidth: 40, flexShrink: 0 }} aria-hidden />
-                  {SYMBOL_ROW2.map((btn) => (
-                    <Button
-                      key={btn.label}
-                      type="button"
-                      size="small"
-                      variant="outlined"
-                      onMouseDown={(e) => e.preventDefault()}
-                      onClick={() => handleSymbolInsert({ insert: btn.insert, pair: btn.pair })}
-                      aria-label={getInsertSymbolLabel({ insert: btn.insert, pair: btn.pair })}
-                      title={getInsertSymbolLabel({ insert: btn.insert, pair: btn.pair })}
-                      sx={symbolBtnSx(isFullScreen, isMobile, isPhone)}
-                    >
-                      {btn.label}
-                    </Button>
-                  ))}
-                  <Box sx={{ minWidth: isPhone && isFullScreen ? 42 : (isFullScreen ? 28 : 34), px: isPhone && isFullScreen ? 1.25 : (isFullScreen ? 0.75 : 1), flexShrink: 0 }} aria-hidden />
-                </Box>
-              </>
+              <Tooltip title={autoCheckEnabled ? 'Turn off autochecker' : 'Turn on autochecker'}>
+                <IconButton
+                  onClick={() => setAutoCheckEnabled((prev) => !prev)}
+                  size="small"
+                  aria-label="Toggle autochecker"
+                  sx={{ ...plainIconButtonSx, color: autoCheckEnabled ? 'primary.main' : 'text.disabled', position: 'relative' }}
+                >
+                  <AutoAwesomeIcon />
+                </IconButton>
+              </Tooltip>
             ) : (
               <>
                 <Tooltip title={autoCheckEnabled ? 'Turn off autochecker' : 'Turn on autochecker'}>

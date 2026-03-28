@@ -8,6 +8,13 @@ import SymbolToolbar from '../inputs/SymbolToolbar.jsx'
 import { useProblemChecker } from '../../../../hooks/useProblemChecker.js'
 import SolutionReveal from '../../SolutionReveal.jsx'
 import RichText from '../../../ui/RichText.jsx'
+import {
+  getConstantLettersFromKey,
+  getConstantLettersFromPromptAndKey,
+  getPredicateLettersFromKey,
+  isPredicateLogicKey,
+  PREDICATE_VARIABLES,
+} from '../../../ui/LogicKeyboard/mobileKeyboardConfig.js'
 
 export default function SymbolicTranslation({
   problem,
@@ -45,6 +52,15 @@ export default function SymbolicTranslation({
     : (typeof symbolizationKeyRaw === 'string'
       ? symbolizationKeyRaw.split('\n').map((line) => line.trim()).filter(Boolean)
       : [])
+  const isPredicate = isPredicateLogicKey(symbolizationKey)
+  const predicateLetters = isPredicate ? getPredicateLettersFromKey(symbolizationKey) : []
+  const constantsFromKey = getConstantLettersFromKey(symbolizationKey)
+  const constantLetters = isPredicate
+    ? (constantsFromKey.length > 0
+        ? constantsFromKey
+        : getConstantLettersFromPromptAndKey(prompt, symbolizationKey, 3))
+    : []
+  const variableLetters = isPredicate ? PREDICATE_VARIABLES : []
 
   const scheduleStateSave = useCallback((nextValue) => {
     if (!onStateChange) return
@@ -161,6 +177,9 @@ export default function SymbolicTranslation({
           ref={formulaInputRef}
           onEnterKey={!readOnly && !hideActions ? handleCheck : undefined}
           symbolizationKey={symbolizationKey}
+          predicateLetters={isPredicate ? predicateLetters : undefined}
+          constantLetters={isPredicate ? constantLetters : undefined}
+          variableLetters={isPredicate ? variableLetters : undefined}
         />
         <Box sx={{ mt: 1 }}>
           <SymbolToolbar

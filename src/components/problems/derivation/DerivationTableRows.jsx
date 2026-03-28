@@ -16,6 +16,7 @@ import CancelIcon from '@mui/icons-material/Cancel'
 import RemoveIcon from '@mui/icons-material/Remove'
 import { alpha } from '@mui/material/styles'
 import { getInsertSymbolLabel } from '../../ui/logicpenguin/LogicSymbol.jsx'
+import MobileLogicInput from '../../ui/LogicKeyboard/MobileLogicInput.jsx'
 import {
   applyLinesToJustification,
   applyRuleToJustification,
@@ -38,6 +39,7 @@ export default function DerivationTableRows({
   canOpenFullScreen,
   commitLines,
   deleteLine,
+  derivationKeyboardConfig,
   formulaRefs,
   getStoredSelection,
   handleFormulaKeyDown,
@@ -207,58 +209,95 @@ export default function DerivationTableRows({
                   })}
                 </Box>
               ) : (
-                <TextField
-                  variant="standard"
-                  placeholder={idx === premises.length ? 'Statement' : ''}
-                  value={line.formula}
-                  onChange={(e) => handleLineChange(idx, 'formula', e.target.value)}
-                  onKeyDown={(e) => handleFormulaKeyDown(e, idx, line.readOnly)}
-                  onPointerDown={(e) => {
-                    if (line.readOnly) return
-                    if (canOpenFullScreen) {
-                      e.preventDefault()
-                      e.stopPropagation()
-                      handleInputRequestFullScreen(idx, 'formula')
-                    }
-                  }}
-                  onClick={(e) => {
-                    if (line.readOnly) return
-                    updateCursorPosition(idx, e)
-                  }}
-                  onMouseUp={(e) => {
-                    if (line.readOnly) return
-                    updateCursorPosition(idx, e)
-                  }}
-                  onKeyUp={(e) => {
-                    if (line.readOnly) return
-                    updateCursorPosition(idx, e)
-                  }}
-                  onSelect={(e) => {
-                    if (line.readOnly) return
-                    updateCursorPosition(idx, e)
-                  }}
-                  onBlur={(e) => {
-                    updateCursorPosition(idx, e)
-                    handleLineCommit(idx, 'formula', normalizeFormulaForCheck(e.target.value))
-                  }}
-                  InputProps={{ readOnly: line.readOnly }}
-                  inputProps={{ autoComplete: 'off' }}
-                  inputRef={(el) => { if (el) formulaRefs.current[idx] = el }}
-                  onFocus={(e) => {
-                    if (line.readOnly) return
-                    setActiveFormulaIndex(idx)
-                    updateCursorPosition(idx, e)
-                  }}
-                  sx={(theme) => ({
-                    width: isFullScreen ? '100%' : { xs: '100%', md: 280 },
-                    minWidth: isFullScreen ? 0 : undefined,
-                    ...inputUnderlineSx(theme),
-                    '& .MuiInputBase-input': {
-                      fontSize: 16,
-                      py: isMobile ? 0.5 : 1,
-                    },
-                  })}
-                />
+                // use the custom keyboard for formula entry on phones
+                isPhone ? (
+                  <Box sx={{ width: '100%' }}>
+                    <MobileLogicInput
+                      value={line.formula}
+                      onChange={(nextValue) => handleLineChange(idx, 'formula', nextValue)}
+                      onFocus={() => {
+                        if (line.readOnly) return
+                        setActiveFormulaIndex(idx)
+                      }}
+                      onBlur={() => {
+                        handleLineCommit(idx, 'formula', normalizeFormulaForCheck(line.formula))
+                      }}
+                      onCursorChange={(position) => {
+                        if (line.readOnly) return
+                        const safePosition = Number.isFinite(position) ? position : 0
+                        const maxPosition = (line.formula || '').length
+                        const clamped = Math.max(0, Math.min(safePosition, maxPosition))
+                        formulaRefs.current[idx]?.setSelectionRange?.(clamped, clamped)
+                      }}
+                      inputRef={(el) => {
+                        if (el) {
+                          formulaRefs.current[idx] = el
+                        }
+                      }}
+                      disabled={line.readOnly}
+                      placeholder={idx === premises.length ? 'Statement' : ''}
+                      aria-label={`Formula for line ${idx + 1}`}
+                      includeQuantifiers={derivationKeyboardConfig?.isPredicateMode}
+                      predicateLetters={derivationKeyboardConfig?.isPredicateMode ? derivationKeyboardConfig.predicateLetters : undefined}
+                      constantLetters={derivationKeyboardConfig?.isPredicateMode ? derivationKeyboardConfig.constantLetters : undefined}
+                      variableLetters={derivationKeyboardConfig?.isPredicateMode ? derivationKeyboardConfig.variableLetters : undefined}
+                      symbolizationKey={derivationKeyboardConfig?.symbolizationKey}
+                    />
+                  </Box>
+                ) : (
+                  <TextField
+                    variant="standard"
+                    placeholder={idx === premises.length ? 'Statement' : ''}
+                    value={line.formula}
+                    onChange={(e) => handleLineChange(idx, 'formula', e.target.value)}
+                    onKeyDown={(e) => handleFormulaKeyDown(e, idx, line.readOnly)}
+                    onPointerDown={(e) => {
+                      if (line.readOnly) return
+                      if (canOpenFullScreen) {
+                        e.preventDefault()
+                        e.stopPropagation()
+                        handleInputRequestFullScreen(idx, 'formula')
+                      }
+                    }}
+                    onClick={(e) => {
+                      if (line.readOnly) return
+                      updateCursorPosition(idx, e)
+                    }}
+                    onMouseUp={(e) => {
+                      if (line.readOnly) return
+                      updateCursorPosition(idx, e)
+                    }}
+                    onKeyUp={(e) => {
+                      if (line.readOnly) return
+                      updateCursorPosition(idx, e)
+                    }}
+                    onSelect={(e) => {
+                      if (line.readOnly) return
+                      updateCursorPosition(idx, e)
+                    }}
+                    onBlur={(e) => {
+                      updateCursorPosition(idx, e)
+                      handleLineCommit(idx, 'formula', normalizeFormulaForCheck(e.target.value))
+                    }}
+                    InputProps={{ readOnly: line.readOnly }}
+                    inputProps={{ autoComplete: 'off' }}
+                    inputRef={(el) => { if (el) formulaRefs.current[idx] = el }}
+                    onFocus={(e) => {
+                      if (line.readOnly) return
+                      setActiveFormulaIndex(idx)
+                      updateCursorPosition(idx, e)
+                    }}
+                    sx={(theme) => ({
+                      width: isFullScreen ? '100%' : { xs: '100%', md: 280 },
+                      minWidth: isFullScreen ? 0 : undefined,
+                      ...inputUnderlineSx(theme),
+                      '& .MuiInputBase-input': {
+                        fontSize: 16,
+                        py: isMobile ? 0.5 : 1,
+                      },
+                    })}
+                  />
+                )
               )}
             </TableCell>
             <TableCell

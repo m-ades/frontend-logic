@@ -10,6 +10,14 @@ import TruthTableEditor from '../../truth-table/TruthTableEditor.jsx'
 import getFormulaClass from '../../../../lib/logicpenguin/symbolic/formula.js'
 import { useProblemChecker } from '../../../../hooks/useProblemChecker.js'
 
+function parseSymbolizationKeyFromPrompt(promptText) {
+  if (!promptText || typeof promptText !== 'string') return []
+  return promptText
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter((line) => /^[A-Za-z]+\s*=/.test(line))
+}
+
 const parseArgumentLine = (line) => {
   if (!line || typeof line !== 'string') {
     return { error: 'Enter the argument as a single line.' }
@@ -97,6 +105,10 @@ export default function ComboTranslationTruthTable({
   const syntax = useMemo(() => getSyntax(), [])
   const snapshot = proof?.comboTranslationTruthTable || proof?.snapshot || {}
   const promptText = snapshot?.prompt || proof?.description || ''
+  const symbolizationKey = useMemo(
+    () => parseSymbolizationKeyFromPrompt(promptText),
+    [promptText]
+  )
   const [argumentLine, setArgumentLine] = useState(savedState?.argumentLine ?? '')
   const [tableState, setTableState] = useState(savedState?.tableState ?? null)
   const inputRef = useRef(null)
@@ -266,7 +278,9 @@ export default function ComboTranslationTruthTable({
           value={argumentLine}
           onValueChange={handleArgumentChange}
           ref={inputRef}
+          symbolizationKey={symbolizationKey}
           includeQuantifiers={false}
+          extraInsertButtons={[{ insert: '/' }, { insert: '//' }]}
         />
         <Box sx={{ mt: 1 }}>
           <SymbolToolbar

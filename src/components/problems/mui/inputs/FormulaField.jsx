@@ -12,6 +12,10 @@ const FormulaField = forwardRef(function FormulaField({
   placeholder = '',
   symbolizationKey,
   includeQuantifiers = true,
+  extraInsertButtons,
+  predicateLetters,
+  constantLetters,
+  variableLetters,
   sx,
 }, ref) {
   const theme = useTheme()
@@ -28,6 +32,10 @@ const FormulaField = forwardRef(function FormulaField({
         aria-label={placeholder || 'Formula input'}
         symbolizationKey={symbolizationKey}
         includeQuantifiers={includeQuantifiers}
+        extraInsertButtons={extraInsertButtons}
+        predicateLetters={predicateLetters}
+        constantLetters={constantLetters}
+        variableLetters={variableLetters}
       />
     )
   }

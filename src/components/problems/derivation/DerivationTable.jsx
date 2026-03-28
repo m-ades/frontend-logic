@@ -20,6 +20,13 @@ import {
   submitDerivationAnswer,
 } from './derivationWorkflow.js'
 import {
+  getConstantLettersFromPrompt,
+  getPredicateLettersFromKey,
+  getPropositionalLettersFromFormulas,
+  isPredicateLogicKey,
+  PREDICATE_VARIABLES,
+} from '../../ui/LogicKeyboard/mobileKeyboardConfig.js'
+import {
   ALL_DERIVATION_RULES,
   AUTO_CHECK_STORAGE_KEY,
   applyLinesToJustification,
@@ -117,6 +124,40 @@ export default function DerivationTable({
     }
     return ALL_DERIVATION_RULES
   }, [proof?.ruleset, proof?.options?.ruleset])
+  // rebuild mobile keyboard letters used in the old derivation path
+  const derivationKeyboardConfig = useMemo(() => {
+    const qSnap = proof?.questionSnapshot ?? proof?.snapshot ?? proof?.question_snapshot
+    const rawKey =
+      proof?.symbolizationKey ??
+      proof?.snapshot?.symbolizationKey ??
+      proof?.question_snapshot?.symbolizationKey ??
+      qSnap?.symbolizationKey ??
+      qSnap?.symbolization_key
+    const key = Array.isArray(rawKey) ? rawKey : []
+    const conclusion = proof?.conclusion ?? proof?.conc ?? ''
+    const formulaText = [...premises, conclusion].filter(Boolean).map(String).join(' ')
+    const predicateMode = isPredicateLogicKey(key) || /[∀∃]/.test(formulaText)
+
+    if (predicateMode) {
+      const keyText = key.map((line) => (typeof line === 'string' ? line : String(line ?? ''))).join(' ')
+      const textForConstants = [formulaText, keyText].filter(Boolean).join(' ') || ''
+      const constantLetters = getConstantLettersFromPrompt(textForConstants, 3)
+      const fromKey = getPredicateLettersFromKey(key)
+      const fromFormulas = getPropositionalLettersFromFormulas(premises, conclusion) ?? []
+      const predicateLetters = fromKey.length > 0 ? fromKey : fromFormulas
+      return {
+        isPredicateMode: true,
+        predicateLetters,
+        constantLetters,
+        variableLetters: PREDICATE_VARIABLES,
+      }
+    }
+
+    return {
+      isPredicateMode: false,
+      symbolizationKey: getPropositionalLettersFromFormulas(premises, conclusion) ?? [],
+    }
+  }, [premises, proof])
   const isLineCompleteForCheck = useCallback((line) => {
     if (!line) return false
     const formulaFilled = (line.formula || '').trim().length > 0
@@ -646,6 +687,7 @@ export default function DerivationTable({
               canOpenFullScreen={canOpenFullScreen}
               commitLines={commitLines}
               deleteLine={deleteLine}
+              derivationKeyboardConfig={derivationKeyboardConfig}
               formulaRefs={formulaRefs}
               getStoredSelection={getStoredSelection}
               handleFormulaKeyDown={handleFormulaKeyDown}
