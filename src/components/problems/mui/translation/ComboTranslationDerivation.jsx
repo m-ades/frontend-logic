@@ -1,13 +1,101 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { Alert, Box, Typography } from '@mui/material'
+import { Alert, Box, Stack, Typography, Tooltip } from '@mui/material'
+import EditIcon from '@mui/icons-material/Edit'
 import InstructorQuestionEditor from '../../InstructorQuestionEditor.jsx'
+import StatusBanner, { isTerminalStatus } from '../../../ui/StatusBanner.jsx'
+import { useTheme, useMediaQuery } from '@mui/material'
 import ProblemSetButtons from '../frame/ProblemSetButtons.jsx'
-import ProblemFrame, { sectionLabelSx } from '../frame/ProblemFrame.jsx'
-import FormulaField from '../inputs/FormulaField.jsx'
-import SymbolToolbar from '../inputs/SymbolToolbar.jsx'
+import FormulaInput from '../../../ui/logicpenguin/formula-input.js'
+import SymbolButtonRow from '../../../ui/logicpenguin/SymbolButtonRow.jsx'
+import { MobileLogicInput } from '../../../ui/LogicKeyboard/index.js'
 import DerivationTable from '../../derivation/DerivationTable.jsx'
 import getFormulaClass from '../../../../lib/logicpenguin/symbolic/formula.js'
 import { useProblemChecker } from '../../../../hooks/useProblemChecker.js'
+import PromptText from '../../../ui/PromptText.jsx'
+
+function FormulaInputField({ value, onValueChange, fieldReadOnly, formulaInputRef }) {
+  const theme = useTheme()
+  const containerRef = useRef(null)
+  const changeHandlerRef = useRef(null)
+
+  useEffect(() => {
+    if (!containerRef.current) return
+    if (!formulaInputRef.current) {
+      const formulaInput = FormulaInput.getnew({})
+      formulaInputRef.current = formulaInput
+      formulaInput.style.width = '100%'
+      formulaInput.style.padding = theme.spacing(1.5)
+      formulaInput.style.border = `1px solid ${theme.palette.divider}`
+      formulaInput.style.borderRadius = theme.shape.borderRadius
+      formulaInput.style.fontSize = '1rem'
+      formulaInput.style.fontFamily = 'monospace'
+      formulaInput.style.backgroundColor = theme.palette.background.paper
+      formulaInput.style.color = theme.palette.text.primary
+      containerRef.current.appendChild(formulaInput)
+    } else if (!containerRef.current.contains(formulaInputRef.current)) {
+      containerRef.current.appendChild(formulaInputRef.current)
+    }
+    return () => {
+      if (formulaInputRef.current) {
+        if (changeHandlerRef.current) {
+          formulaInputRef.current.removeEventListener('input', changeHandlerRef.current)
+          formulaInputRef.current.removeEventListener('change', changeHandlerRef.current)
+          changeHandlerRef.current = null
+        }
+        if (formulaInputRef.current.parentNode) {
+          formulaInputRef.current.parentNode.removeChild(formulaInputRef.current)
+        }
+        formulaInputRef.current = null
+      }
+    }
+  }, [formulaInputRef, theme])
+
+  useEffect(() => {
+    const formulaInput = formulaInputRef.current
+    if (!formulaInput) return
+    formulaInput.readOnly = fieldReadOnly
+    if (changeHandlerRef.current) {
+      formulaInput.removeEventListener('input', changeHandlerRef.current)
+      formulaInput.removeEventListener('change', changeHandlerRef.current)
+      changeHandlerRef.current = null
+    }
+    if (!fieldReadOnly && onValueChange) {
+      const handleChange = () => {
+        if (fieldReadOnly) return
+        const nextValue = formulaInput.value
+        onValueChange(nextValue)
+      }
+      changeHandlerRef.current = handleChange
+      formulaInput.addEventListener('input', handleChange)
+      formulaInput.addEventListener('change', handleChange)
+    }
+    return () => {
+      if (changeHandlerRef.current) {
+        formulaInput.removeEventListener('input', changeHandlerRef.current)
+        formulaInput.removeEventListener('change', changeHandlerRef.current)
+        changeHandlerRef.current = null
+      }
+    }
+  }, [fieldReadOnly, onValueChange, formulaInputRef])
+
+  useEffect(() => {
+    if (formulaInputRef.current && value !== undefined && formulaInputRef.current.value !== value) {
+      formulaInputRef.current.value = value
+    }
+  }, [value, formulaInputRef])
+
+  return (
+    <Box
+      ref={containerRef}
+      sx={{
+        width: '100%',
+        minHeight: '56px',
+        display: 'flex',
+        alignItems: 'center'
+      }}
+    />
+  )
+}
 
 const parseArgumentLine = (line) => {
   if (!line || typeof line !== 'string') {
@@ -51,8 +139,9 @@ export default function ComboTranslationDerivation({
   isAssignmentLocked = false,
   isInstructorView = false,
   onQuestionSaved,
-  problemLabel,
 }) {
+  const theme = useTheme()
+  const isPhone = useMediaQuery(theme.breakpoints.down('sm'))
   const editorRef = useRef(null)
   const openEdit = () => editorRef.current?.open?.()
   const Formula = useMemo(() => getFormulaClass(), [])
@@ -140,6 +229,9 @@ export default function ComboTranslationDerivation({
     setArgumentLine('')
     setDerivationState(null)
     setDerivationStatusBanner({ status: 'unanswered', message: '' })
+    if (inputRef.current) {
+      inputRef.current.value = ''
+    }
     updateState({ argumentLine: '', derivationState: null })
   }
 
@@ -170,52 +262,85 @@ export default function ComboTranslationDerivation({
   }
 
   return (
-    <ProblemFrame
-      problemLabel={problemLabel}
-      prompt={promptText}
-      promptSx={{ whiteSpace: 'pre-line' }}
-      isInstructorView={isInstructorView && !!proof}
-      onEditQuestion={proof ? openEdit : undefined}
-      status={status}
-      message={message}
-      onCloseStatus={() => setMessage('')}
-      actionNode={(
-        <ProblemSetButtons
-          onCheck={handleCheck}
-          onStartOver={handleStartOver}
-          isChecking={isChecking}
-          isDisabled={!parseStatus.ok || isLocked || isAssignmentLocked || !hasStartedDerivationLine}
-          align="flex-start"
-          attemptCount={attemptCount}
-          attemptLimit={maxAttempts}
-          isInstructorView={isInstructorView}
-        />
-      )}
-      editorNode={isInstructorView && proof ? (
-        <InstructorQuestionEditor ref={editorRef} proof={proof} isInstructorView onSaved={onQuestionSaved} trigger="none" />
-      ) : null}
-    >
-      <Typography variant="body2" sx={sectionLabelSx}>
-        Enter the argument as a single line, then build a derivation for it.
-      </Typography>
-      <Box>
-        <Typography variant="body2" sx={{ ...sectionLabelSx, mb: 1, fontWeight: 600, color: 'text.primary' }}>
-          Argument line
-        </Typography>
-        <Typography variant="body2" sx={{ ...sectionLabelSx, fontSize: '0.875rem' }}>
-          Use "/" for separate premises and "//" for the conclusion. Example: A ⊃ B / A // B.
-        </Typography>
-        <FormulaField
-          value={argumentLine}
-          onValueChange={handleArgumentChange}
-          readOnly={false}
-          ref={inputRef}
-        />
-        <Box sx={{ mt: 1 }}>
-          <SymbolToolbar
-            inputRef={inputRef}
-            onValueChange={handleArgumentChange}
-          />
+    <Stack spacing={3} sx={{ px: 0, width: '100%' }}>
+      <Box className="logicpenguin" sx={{ width: '100%' }}>
+        <Box className="lp-problem-card">
+          <Stack spacing={3} sx={{ p: { xs: 2, md: 2 } }}>
+            {isInstructorView && proof && (
+              <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+                <Tooltip title="Edit prompt">
+                  <Box component="span" onClick={openEdit} role="button" aria-label="Edit question" sx={{ display: 'inline-flex', alignItems: 'center', cursor: 'pointer', color: 'text.secondary', '&:hover': { opacity: 0.8 } }}>
+                    <EditIcon fontSize="small" />
+                  </Box>
+                </Tooltip>
+              </Box>
+            )}
+            {promptText && (
+              <PromptText content={promptText} sx={{ whiteSpace: 'pre-line' }} />
+            )}
+            <Typography variant="body2" color="text.secondary">
+              Enter the argument as a single line, then build a derivation for it.
+            </Typography>
+            <Box>
+              <Typography variant="body2" sx={{ mb: 1, fontWeight: 600 }}>
+                Argument line
+              </Typography>
+              <Typography variant="body2" sx={{ mb: 1, color: 'text.secondary', fontSize: '0.875rem' }}>
+                Use "/" for separate premises and "//" for the conclusion. Example: A ⊃ B / A // B.
+              </Typography>
+              {isPhone ? (
+                <MobileLogicInput
+                  value={argumentLine}
+                  onChange={handleArgumentChange}
+                  placeholder="e.g. A ⊃ B / A // B"
+                  aria-label="Argument line"
+                  includeQuantifiers
+                />
+              ) : (
+                <>
+                  <FormulaInputField
+                    value={argumentLine}
+                    onValueChange={handleArgumentChange}
+                    fieldReadOnly={false}
+                    formulaInputRef={inputRef}
+                  />
+                  <Box sx={{ mt: 1 }}>
+                    <SymbolButtonRow
+                      inputRef={inputRef}
+                      onValueChange={handleArgumentChange}
+                    />
+                  </Box>
+                </>
+              )}
+            </Box>
+
+            {parseStatus.ok && derivationProblem && (
+              <DerivationTable
+                key={argumentLine}
+                proof={{
+                  ...proof,
+                  premises: derivationProblem.premises,
+                  conclusion: derivationProblem.conclusion,
+                }}
+                savedState={derivationState}
+                onStateChange={(state) => {
+                  setDerivationState(state)
+                  updateState({ derivationState: state })
+                }}
+                onAttempt={() => {}}
+                onProofComplete={() => {}}
+                attemptCount={derivationAttemptCount}
+                attemptLimit={derivationAttemptLimit}
+                isChecking={derivationChecking}
+                setAttemptCount={setDerivationAttemptCount}
+                setAttemptLimit={setDerivationAttemptLimit}
+                setStatusBanner={setDerivationStatusBanner}
+                setIsChecking={setDerivationChecking}
+                isAssignmentLocked={isAssignmentLocked}
+                hideActions
+              />
+            )}
+          </Stack>
         </Box>
       </Box>
 
@@ -223,34 +348,27 @@ export default function ComboTranslationDerivation({
         <Alert severity="info">{parseStatus.reason}</Alert>
       )}
 
-      {parseStatus.ok && derivationProblem && (
-        <Box sx={{ width: '100%' }}>
-          <DerivationTable
-            key={argumentLine}
-            proof={{
-              ...proof,
-              premises: derivationProblem.premises,
-              conclusion: derivationProblem.conclusion,
-            }}
-            savedState={derivationState}
-            onStateChange={(state) => {
-              setDerivationState(state)
-              updateState({ derivationState: state })
-            }}
-            onAttempt={() => {}}
-            onProofComplete={() => {}}
-            attemptCount={derivationAttemptCount}
-            attemptLimit={derivationAttemptLimit}
-            isChecking={derivationChecking}
-            setAttemptCount={setDerivationAttemptCount}
-            setAttemptLimit={setDerivationAttemptLimit}
-            setStatusBanner={setDerivationStatusBanner}
-            setIsChecking={setDerivationChecking}
-            isAssignmentLocked={isAssignmentLocked}
-            hideActions
-          />
-        </Box>
+      {isTerminalStatus(status) && (
+        <StatusBanner
+          status={status}
+          message={message}
+          onClose={() => setMessage('')}
+        />
       )}
-    </ProblemFrame>
+
+      <ProblemSetButtons
+        onCheck={handleCheck}
+        onStartOver={handleStartOver}
+        isChecking={isChecking}
+        isDisabled={!parseStatus.ok || isLocked || isAssignmentLocked || !hasStartedDerivationLine}
+        align="flex-start"
+        attemptCount={attemptCount}
+        attemptLimit={maxAttempts}
+        isInstructorView={isInstructorView}
+      />
+      {isInstructorView && proof && (
+        <InstructorQuestionEditor ref={editorRef} proof={proof} isInstructorView onSaved={onQuestionSaved} trigger="none" />
+      )}
+    </Stack>
   )
 }
