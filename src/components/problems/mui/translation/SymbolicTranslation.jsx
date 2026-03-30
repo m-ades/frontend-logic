@@ -1,17 +1,22 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
-import { Box, Typography } from '@mui/material'
+import { Box, Stack, Typography, Alert, Tooltip } from '@mui/material'
+import EditIcon from '@mui/icons-material/Edit'
 import InstructorQuestionEditor from '../../InstructorQuestionEditor.jsx'
+import { useTheme, useMediaQuery } from '@mui/material'
 import ProblemSetButtons from '../frame/ProblemSetButtons.jsx'
-import ProblemFrame from '../frame/ProblemFrame.jsx'
-import FormulaField from '../inputs/FormulaField.jsx'
-import SymbolToolbar from '../inputs/SymbolToolbar.jsx'
+import FormulaInput from '../../../ui/logicpenguin/formula-input.js'
+import SymbolButtonRow from '../../../ui/logicpenguin/SymbolButtonRow.jsx'
+import { MobileLogicInput } from '../../../ui/LogicKeyboard/index.js'
 import { useProblemChecker } from '../../../../hooks/useProblemChecker.js'
 import SolutionReveal from '../../SolutionReveal.jsx'
+import StatusBanner, { isTerminalStatus } from '../../../ui/StatusBanner.jsx'
+import PromptText from '../../../ui/PromptText.jsx'
 import RichText from '../../../ui/RichText.jsx'
 
-const PREDICATE_VARIABLES = ['x', 'y', 'z']
-const CONSTANT_POOL = 'abcdefghijklmnopqrstuvw'.split('')
-
+// Predicate / propositional helpers for symbolization keys.
+// Key can use "=" or ":" (e.g. "Mx: x is a musician", "a = Alice", "P = It is raining").
+// Propositional keys: single uppercase letters only (P, Q, R). Predicate keys: constants (a, b)
+// and/or predicate-plus-variables (Mx, Pxy).
 function getLeftPart(line) {
   const s = typeof line === 'string' ? line : String(line ?? '')
   const idx = s.search(/[=:]/)
@@ -22,11 +27,19 @@ function isPredicateLogicKey(symbolizationKey) {
   if (!Array.isArray(symbolizationKey) || symbolizationKey.length === 0) return false
   return symbolizationKey.some((line) => {
     const left = getLeftPart(line)
+    // Constant: single lowercase a–w (e.g. "a = Alice")
     const isConstantStyle =
       left.length === 1 && /^[a-z]$/.test(left) && !['x', 'y', 'z'].includes(left)
+    // Predicate form: starts with uppercase and has more than one char (e.g. Mx, Pxy), not single P/Q/R
     const isPredicateStyle = left.length > 1 && /^[A-Z]/.test(left)
     return isConstantStyle || isPredicateStyle
   })
+}
+
+function promptImpliesPredicateLogic(promptText) {
+  const prompt = typeof promptText === 'string' ? promptText : String(promptText ?? '')
+  const text = prompt.replace(/<[^>]+>/g, ' ').toLowerCase()
+  return /\bpredicate logic\b/.test(text)
 }
 
 function getPredicateLettersFromKey(symbolizationKey) {
@@ -41,6 +54,7 @@ function getPredicateLettersFromKey(symbolizationKey) {
     .filter((letter) => letter && !seen.has(letter) && (seen.add(letter), true))
 }
 
+/** Constants from key: lines whose left part is a single lowercase letter (a–w, not x,y,z). */
 function getConstantLettersFromKey(symbolizationKey) {
   if (!Array.isArray(symbolizationKey) || symbolizationKey.length === 0) return []
   const result = []
@@ -60,17 +74,20 @@ function getConstantLettersFromKey(symbolizationKey) {
   return result
 }
 
+const ST_CONSTANT_POOL = 'abcdefghijklmnopqrstuvw'.split('') // exclude x,y,z
+const ST_PREDICATE_VARIABLES = ['x', 'y', 'z']
+
 function getConstantLettersFromPromptAndKey(promptText, symbolizationKey, count = 3) {
   const prompt = typeof promptText === 'string' ? promptText : String(promptText ?? '')
   const keyText = Array.isArray(symbolizationKey)
     ? symbolizationKey.map((line) => (typeof line === 'string' ? line : String(line ?? ''))).join(' ')
     : ''
   const combined = [prompt, keyText].filter(Boolean).join(' ')
-  if (!combined) return CONSTANT_POOL.slice(0, count)
+  if (!combined) return ST_CONSTANT_POOL.slice(0, count)
   const text = combined.replace(/<[^>]+>/g, ' ').toLowerCase()
   const used = new Set(text.match(/[a-z]/g) || [])
   const result = []
-  for (const c of CONSTANT_POOL) {
+  for (const c of ST_CONSTANT_POOL) {
     if (!used.has(c)) {
       result.push(c)
       if (result.length >= count) break
@@ -79,10 +96,101 @@ function getConstantLettersFromPromptAndKey(promptText, symbolizationKey, count 
   return result.length > 0 ? result : ['a', 'b', 'c']
 }
 
-function promptImpliesPredicateLogic(promptText) {
-  const prompt = typeof promptText === 'string' ? promptText : String(promptText ?? '')
-  const text = prompt.replace(/<[^>]+>/g, ' ').toLowerCase()
-  return /\bpredicate logic\b/.test(text)
+function FormulaInputField({ value, onValueChange, fieldReadOnly, formulaInputRef, onEnterKey }) {
+  const theme = useTheme()
+  const containerRef = useRef(null)
+  const changeHandlerRef = useRef(null)
+
+  useEffect(() => {
+    if (!containerRef.current) return
+    if (!formulaInputRef.current) {
+      const formulaInput = FormulaInput.getnew({})
+      formulaInputRef.current = formulaInput
+      formulaInput.style.width = '100%'
+      formulaInput.style.padding = theme.spacing(1.5)
+      formulaInput.style.border = `1px solid ${theme.palette.divider}`
+      formulaInput.style.borderRadius = theme.shape.borderRadius
+      formulaInput.style.fontSize = '1rem'
+      formulaInput.style.fontFamily = 'monospace'
+      formulaInput.style.backgroundColor = theme.palette.background.paper
+      formulaInput.style.color = theme.palette.text.primary
+      containerRef.current.appendChild(formulaInput)
+    } else if (!containerRef.current.contains(formulaInputRef.current)) {
+      containerRef.current.appendChild(formulaInputRef.current)
+    }
+    return () => {
+      if (formulaInputRef.current) {
+        if (changeHandlerRef.current) {
+          formulaInputRef.current.removeEventListener('input', changeHandlerRef.current)
+          formulaInputRef.current.removeEventListener('change', changeHandlerRef.current)
+          changeHandlerRef.current = null
+        }
+        if (formulaInputRef.current.parentNode) {
+          formulaInputRef.current.parentNode.removeChild(formulaInputRef.current)
+        }
+        formulaInputRef.current = null
+      }
+    }
+  }, [formulaInputRef, theme])
+
+  useEffect(() => {
+    const formulaInput = formulaInputRef.current
+    if (!formulaInput) return
+    formulaInput.readOnly = fieldReadOnly
+    if (changeHandlerRef.current) {
+      formulaInput.removeEventListener('input', changeHandlerRef.current)
+      formulaInput.removeEventListener('change', changeHandlerRef.current)
+      changeHandlerRef.current = null
+    }
+    if (!fieldReadOnly && onValueChange) {
+      const handleChange = () => {
+        if (fieldReadOnly) return
+        const nextValue = formulaInput.value
+        onValueChange(nextValue)
+      }
+      changeHandlerRef.current = handleChange
+      formulaInput.addEventListener('input', handleChange)
+      formulaInput.addEventListener('change', handleChange)
+    }
+    return () => {
+      if (changeHandlerRef.current) {
+        formulaInput.removeEventListener('input', changeHandlerRef.current)
+        formulaInput.removeEventListener('change', changeHandlerRef.current)
+        changeHandlerRef.current = null
+      }
+    }
+  }, [fieldReadOnly, onValueChange, formulaInputRef])
+
+  useEffect(() => {
+    if (formulaInputRef.current && value !== undefined && formulaInputRef.current.value !== value) {
+      formulaInputRef.current.value = value
+    }
+  }, [value, formulaInputRef])
+
+  useEffect(() => {
+    const formulaInput = formulaInputRef.current
+    if (!formulaInput || !onEnterKey) return
+    const handleKeyDown = (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault()
+        onEnterKey()
+      }
+    }
+    formulaInput.addEventListener('keydown', handleKeyDown)
+    return () => formulaInput.removeEventListener('keydown', handleKeyDown)
+  }, [formulaInputRef, onEnterKey])
+
+  return (
+    <Box
+      ref={containerRef}
+      sx={{
+        width: '100%',
+        minHeight: '56px',
+        display: 'flex',
+        alignItems: 'center'
+      }}
+    />
+  )
 }
 
 export default function SymbolicTranslation({
@@ -100,8 +208,9 @@ export default function SymbolicTranslation({
   isAssignmentLocked = false,
   isInstructorView = false,
   onQuestionSaved,
-  problemLabel,
 }) {
+  const theme = useTheme()
+  const isPhone = useMediaQuery(theme.breakpoints.down('sm'))
   const editorRef = useRef(null)
   const openEdit = () => editorRef.current?.open?.()
   const [inputValue, setInputValue] = useState(savedState?.ans || '')
@@ -116,11 +225,13 @@ export default function SymbolicTranslation({
     ?? problem?.symbolization_key
     ?? problem?.question_snapshot?.symbolizationKey
     ?? problem?.question_snapshot?.symbolization_key
+  // key lines
   const symbolizationKey = Array.isArray(symbolizationKeyRaw)
     ? symbolizationKeyRaw.filter(Boolean)
     : (typeof symbolizationKeyRaw === 'string'
       ? symbolizationKeyRaw.split('\n').map((line) => line.trim()).filter(Boolean)
       : [])
+
   const isPredicate = isPredicateLogicKey(symbolizationKey) || promptImpliesPredicateLogic(prompt)
   const predicateLetters = isPredicate ? getPredicateLettersFromKey(symbolizationKey) : []
   const constantsFromKey = getConstantLettersFromKey(symbolizationKey)
@@ -131,7 +242,7 @@ export default function SymbolicTranslation({
             ? getConstantLettersFromPromptAndKey(prompt, symbolizationKey, 3)
             : []))
     : []
-  const variableLetters = isPredicate ? PREDICATE_VARIABLES : []
+  const variableLetters = isPredicate ? ST_PREDICATE_VARIABLES : []
 
   const scheduleStateSave = useCallback((nextValue) => {
     if (!onStateChange) return
@@ -144,7 +255,7 @@ export default function SymbolicTranslation({
       onStateChange({ ans: nextValue })
     }, 200)
   }, [onStateChange])
-
+  
   const { status, message, isChecking, handleCheck, handleStartOver, setMessage, attemptCount, maxAttempts, isLocked } = useProblemChecker({
     answer,
     problemType: 'symbolic-translation',
@@ -154,6 +265,9 @@ export default function SymbolicTranslation({
     isDisabled: () => !inputValue.trim(),
     resetInput: () => {
       setInputValue('')
+      if (formulaInputRef.current) {
+        formulaInputRef.current.value = ''
+      }
       lastSavedValueRef.current = ''
     },
     onStateChange: (state) => {
@@ -185,18 +299,129 @@ export default function SymbolicTranslation({
     }
   }, [])
 
+
   return (
-    <ProblemFrame
-      problemLabel={problemLabel}
-      prompt={prompt}
-      promptSx={{ mb: 1, color: 'text.secondary' }}
-      minHeight="150px"
-      isInstructorView={isInstructorView && !!proof}
-      onEditQuestion={proof ? openEdit : undefined}
-      status={status}
-      message={message}
-      onCloseStatus={() => setMessage('')}
-      actionNode={!hideActions ? (
+    <Stack spacing={3} sx={{ px: 0, width: '100%', alignItems: 'stretch', flexGrow: 1 }}>
+      <Box className="logicpenguin" sx={{ width: '100%', flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
+        <Box
+          sx={{
+            overflow: 'visible',
+            minHeight: '150px',
+            flexGrow: 1,
+            alignSelf: { xs: 'stretch', md: 'flex-start' },
+          }}
+          className="lp-problem-card"
+        >
+          <Stack spacing={3} sx={{ p: { xs: 2, md: 2 } }}>
+            {isInstructorView && proof && (
+              <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+                <Tooltip title="Edit question">
+                  <Box component="span" onClick={openEdit} role="button" aria-label="Edit question" sx={{ display: 'inline-flex', alignItems: 'center', cursor: 'pointer', color: 'text.secondary', '&:hover': { opacity: 0.8 } }}>
+                    <EditIcon fontSize="small" />
+                  </Box>
+                </Tooltip>
+              </Box>
+            )}
+            <Box>
+              {prompt && (
+                <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 0.5 }}>
+                  <PromptText content={prompt} sx={{ mb: 1 }} />
+                </Box>
+              )}
+              {symbolizationKey.length > 0 && (
+                <Box sx={{ mb: 1, mt: 2.5 }}>
+                  <Typography variant="body2" sx={{ mb: 0.5, fontWeight: 600 }}>
+                    Symbolization key
+                  </Typography>
+                  <Box component="ul" sx={{ pl: 3, m: 0, color: 'text.secondary' }}>
+                    {symbolizationKey.map((line, index) => (
+                      <Typography
+                        key={`${line}-${index}`}
+                        component="li"
+                        variant="body2"
+                        sx={{ mb: 0.5 }}
+                      >
+                        {line}
+                      </Typography>
+                    ))}
+                  </Box>
+                </Box>
+              )}
+              {legend && (
+                <RichText content={legend} variant="body2" sx={{ mb: 1, color: 'text.secondary' }} />
+              )}
+              <Typography variant="body2" sx={{ mb: 1, mt: 2.5, color: 'text.secondary' }}>
+                Your translation:
+              </Typography>
+              {isPhone ? (
+                <MobileLogicInput
+                  value={inputValue}
+                  onChange={(value) => {
+                    if (readOnly) return
+                    setInputValue(value)
+                    scheduleStateSave(value)
+                  }}
+                  disabled={readOnly}
+                  placeholder="e.g. P • Q"
+                  aria-label="Formula translation"
+                  symbolizationKey={symbolizationKey}
+                  includeQuantifiers={isPredicate}
+                  predicateLetters={isPredicate ? predicateLetters : undefined}
+                  constantLetters={isPredicate ? constantLetters : undefined}
+                  variableLetters={isPredicate ? variableLetters : undefined}
+                />
+              ) : (
+                <>
+                  <FormulaInputField
+                    value={inputValue}
+                    onValueChange={(value) => {
+                      if (readOnly) return
+                      setInputValue(value)
+                      scheduleStateSave(value)
+                    }}
+                    fieldReadOnly={readOnly}
+                    formulaInputRef={formulaInputRef}
+                    onEnterKey={!readOnly && !hideActions ? handleCheck : undefined}
+                  />
+                  <Box sx={{ mt: 1 }}>
+                    <SymbolButtonRow
+                      inputRef={formulaInputRef}
+                      disabled={readOnly}
+                      includeQuantifiers={isPredicate}
+                      onValueChange={(value) => {
+                        if (readOnly) return
+                        setInputValue(value)
+                        scheduleStateSave(value)
+                      }}
+                    />
+                  </Box>
+                </>
+              )}
+            </Box>
+            {!suppressReveal && (
+              /* show answer in card */
+              <SolutionReveal show={showSolution}>
+                <FormulaInputField
+                  value={answer ?? ''}
+                  onValueChange={null}
+                  fieldReadOnly
+                  formulaInputRef={solutionInputRef}
+                />
+              </SolutionReveal>
+            )}
+          </Stack>
+        </Box>
+      </Box>
+
+      {isTerminalStatus(status) && (
+        <StatusBanner
+          status={status}
+          message={message}
+          onClose={() => setMessage('')}
+        />
+      )}
+
+      {!hideActions && (
         <ProblemSetButtons
           onCheck={handleCheck}
           onStartOver={handleStartOver}
@@ -207,77 +432,10 @@ export default function SymbolicTranslation({
           attemptLimit={maxAttempts}
           isInstructorView={isInstructorView}
         />
-      ) : null}
-      editorNode={isInstructorView && proof ? (
-        <InstructorQuestionEditor ref={editorRef} proof={proof} isInstructorView onSaved={onQuestionSaved} trigger="none" />
-      ) : null}
-    >
-      <Box>
-        {symbolizationKey.length > 0 && (
-          <Box sx={{ mb: 1, mt: 2.5 }}>
-            <Typography variant="body2" sx={{ mb: 0.5, fontWeight: 600 }}>
-              Symbolization key
-            </Typography>
-            <Box component="ul" sx={{ pl: 3, m: 0, color: 'text.secondary' }}>
-              {symbolizationKey.map((line, index) => (
-                <Typography
-                  key={`${line}-${index}`}
-                  component="li"
-                  variant="body2"
-                  sx={{ mb: 0.5 }}
-                >
-                  {line}
-                </Typography>
-              ))}
-            </Box>
-          </Box>
-        )}
-        {legend && (
-          <RichText content={legend} variant="body2" sx={{ mb: 1, color: 'text.secondary' }} />
-        )}
-        <Typography variant="body2" sx={{ mb: 1, mt: 2.5, color: 'text.secondary' }}>
-          Your translation:
-        </Typography>
-        <FormulaField
-          value={inputValue}
-          onValueChange={(value) => {
-            if (readOnly) return
-            setInputValue(value)
-            scheduleStateSave(value)
-          }}
-          readOnly={readOnly}
-          placeholder="e.g. P • Q"
-          ref={formulaInputRef}
-          onEnterKey={!readOnly && !hideActions ? handleCheck : undefined}
-          symbolizationKey={symbolizationKey}
-          includeQuantifiers={isPredicate}
-          predicateLetters={isPredicate ? predicateLetters : undefined}
-          constantLetters={isPredicate ? constantLetters : undefined}
-          variableLetters={isPredicate ? variableLetters : undefined}
-        />
-        <Box sx={{ mt: 1 }}>
-          <SymbolToolbar
-            inputRef={formulaInputRef}
-            disabled={readOnly}
-            includeQuantifiers={isPredicate}
-            onValueChange={(value) => {
-              if (readOnly) return
-              setInputValue(value)
-              scheduleStateSave(value)
-            }}
-          />
-        </Box>
-      </Box>
-      {!suppressReveal && (
-        <SolutionReveal show={showSolution}>
-          <FormulaField
-            value={answer ?? ''}
-            onValueChange={null}
-            readOnly
-            ref={solutionInputRef}
-          />
-        </SolutionReveal>
       )}
-    </ProblemFrame>
+      {isInstructorView && proof && (
+        <InstructorQuestionEditor ref={editorRef} proof={proof} isInstructorView onSaved={onQuestionSaved} trigger="none" />
+      )}
+    </Stack>
   )
 }
