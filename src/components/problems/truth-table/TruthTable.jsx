@@ -435,7 +435,7 @@ export default function TruthTable({
         mt: embedded ? 0 : 1,
       }}
     >
-      <Stack spacing={3} sx={{ p: { xs: embedded ? 0 : 2, md: embedded ? 0 : 2 } }}>
+      <Stack spacing={1.5} sx={{ p: { xs: embedded ? 0 : 2, md: embedded ? 0 : 2 } }}>
         {promptContent}
         <TruthTableGrid
           tables={tables}

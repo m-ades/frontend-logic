@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState, useRef } from 'react'
-import { Box, Typography } from '@mui/material'
+import { Box, FormControl, FormControlLabel, FormLabel, Radio, RadioGroup, Typography } from '@mui/material'
 import InstructorQuestionEditor from '../InstructorQuestionEditor.jsx'
 import getFormulaClass from '../../../lib/logicpenguin/symbolic/formula.js'
 import getSyntax from '../../../lib/logicpenguin/symbolic/libsyntax.js'
@@ -207,20 +207,6 @@ export default function SingleRowTruthTable({
     [columns, expectedRow, tokens]
   )
   const gridInputs = useMemo(() => [[rowInputs]], [rowInputs])
-  const compoundTables = useMemo(
-    () => [{ tokens: [statement], headerTokens: [statement], rows: [[expectedCompound]] }],
-    [expectedCompound, statement]
-  )
-  const compoundInputs = useMemo(() => [[[compoundInput]]], [compoundInput])
-  const compoundAnswerInputs = useMemo(() => [[[expectedCompound]]], [expectedCompound])
-
-  const formatInterpretation = () => {
-    const entries = Object.entries(interpretation)
-    if (!entries.length) return ''
-    return entries
-      .map(([key, value]) => `${key} = ${value ? 'T' : 'F'}`)
-      .join(', ')
-  }
 
   const renderTableSet = (tableInputsToRender, readOnlyTable) => (
     <TruthTableGrid
@@ -274,33 +260,41 @@ export default function SingleRowTruthTable({
         <InstructorQuestionEditor ref={editorRef} proof={proof} isInstructorView onSaved={onQuestionSaved} trigger="none" />
       ) : null}
     >
-      {formatInterpretation() && (
-        <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-          Interpretation: {formatInterpretation()}
-        </Typography>
-      )}
       {renderTableSet(gridInputs, false)}
-      <TruthTableSection title="Truth value of compound statement">
-        <TruthTableGrid
-          tables={compoundTables}
-          tableInputs={compoundInputs}
-          combined={false}
-          readOnly={readOnly || isLocked}
-          withSelectors={false}
-          onCellChange={(_, __, ___, value) => handleCompoundChange(value)}
-        />
-      </TruthTableSection>
+      <Box sx={{ mt: 2 }}>
+        <FormControl component="fieldset" variant="standard" sx={{ width: '100%' }}>
+          <FormLabel component="legend">Truth value of compound statement:</FormLabel>
+          <RadioGroup
+            value={compoundInput === 'T' ? 'true' : compoundInput === 'F' ? 'false' : ''}
+            onChange={(event) => handleCompoundChange(event.target.value === 'true' ? 'T' : 'F')}
+            name={`single-row-truth-value-${assignmentQuestionId ?? 'local'}`}
+          >
+            <FormControlLabel
+              value="true"
+              control={<Radio disabled={readOnly || isLocked} />}
+              label="True"
+            />
+            <FormControlLabel
+              value="false"
+              control={<Radio disabled={readOnly || isLocked} />}
+              label="False"
+            />
+          </RadioGroup>
+        </FormControl>
+      </Box>
       {isLocked && status !== 'correct' && expectedRow.length > 0 && (
         <TruthTableSection title="Correct Answer">
           <Box sx={{ display: 'grid', gap: 2 }}>
             {renderTableSet([[expectedRow]], true)}
-            <TruthTableGrid
-              tables={compoundTables}
-              tableInputs={compoundAnswerInputs}
-              combined={false}
-              readOnly
-              withSelectors={false}
-            />
+            <FormControl component="fieldset" sx={{ width: '100%' }}>
+              <RadioGroup
+                value={expectedCompound === 'T' ? 'true' : 'false'}
+                name={`single-row-truth-value-answer-${assignmentQuestionId ?? 'local'}`}
+              >
+                <FormControlLabel value="true" control={<Radio disabled />} label="True" />
+                <FormControlLabel value="false" control={<Radio disabled />} label="False" />
+              </RadioGroup>
+            </FormControl>
           </Box>
         </TruthTableSection>
       )}
