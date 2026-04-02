@@ -112,6 +112,7 @@ export const PerformanceTrendsChart = ({ data, onAssignmentClick }) => {
   const theme = useTheme();
   const primary = theme.palette.primary.main;
   const [hoveredAssignment, setHoveredAssignment] = useState(null);
+  const isInteractive = typeof onAssignmentClick === "function";
 
   return (
     <Paper
@@ -132,7 +133,7 @@ export const PerformanceTrendsChart = ({ data, onAssignmentClick }) => {
           Performance Trends
         </Typography>
         <Typography variant="body2" color="text.secondary">
-          Click any point to view assignment details
+          Class averages across recent assignments
         </Typography>
       </Box>
       <ResponsiveContainer width="100%" height={320}>
@@ -179,16 +180,23 @@ export const PerformanceTrendsChart = ({ data, onAssignmentClick }) => {
                   fill={payload.average < 70 ? "#ef4444" : primary}
                   stroke="#fff"
                   strokeWidth={2}
-                  style={{ cursor: "pointer", transition: "all 0.2s" }}
+                  style={{
+                    cursor: isInteractive ? "pointer" : "default",
+                    transition: "all 0.2s",
+                  }}
                   onMouseEnter={() => setHoveredAssignment(payload.id)}
                 />
               );
             }}
-            activeDot={{
-              r: 8,
-              cursor: "pointer",
-              onClick: (_, data) => onAssignmentClick(data.payload),
-            }}
+            activeDot={
+              isInteractive
+                ? {
+                    r: 8,
+                    cursor: "pointer",
+                    onClick: (_, data) => onAssignmentClick(data.payload),
+                  }
+                : { r: 8, cursor: "default" }
+            }
           />
         </LineChart>
       </ResponsiveContainer>

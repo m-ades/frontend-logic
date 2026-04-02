@@ -217,8 +217,6 @@ export default function InstructorDashboard() {
 
   const timeByCategory = analytics.timeByCategory || [];
 
-  const handleAssignmentClick = () => {};
-
   // Show message if no course selected
     if (!activeCourseId || !course) {
     return (
@@ -308,7 +306,6 @@ export default function InstructorDashboard() {
       >
         <PerformanceTrendsChart
           data={enrichedAssignments}
-          onAssignmentClick={handleAssignmentClick}
         />
         <GradeDistributionChart data={gradeDistribution} />
       </Box>
@@ -375,7 +372,6 @@ export default function InstructorDashboard() {
         />
         <UpcomingDeadlinesTable
           assignments={nonPracticeAssignments}
-          onAssignmentClick={handleAssignmentClick}
         />
       </Box>
     </Box>
