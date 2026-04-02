@@ -416,9 +416,6 @@ export default class TruthTable extends LogicPenguinProblem {
         }
         // restore column checkboxes
         // TODO: get rid of this
-        if (tdata.colhls.length != table.colcheckboxes.length) {
-            this.style.backgroundColor = 'yellow';
-        }
         for (let c = 0; c < tdata.colhls.length; c++) {
             table.colcheckboxes[c].checked = tdata.colhls[c];
         }
