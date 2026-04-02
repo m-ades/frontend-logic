@@ -1,7 +1,7 @@
-import { Box, Card, Stack, Tooltip } from '@mui/material'
-import EditIcon from '@mui/icons-material/Edit'
+import { Box, Card, Stack } from '@mui/material'
 import StatusBanner, { isTerminalStatus } from '../../../ui/StatusBanner.jsx'
 import PromptText from '../../../ui/PromptText.jsx'
+import EditQuestionButton from './EditQuestionButton.jsx'
 
 // shared shell for migrated problem cards
 export const promptTextSx = { flex: 1 }
@@ -82,19 +82,7 @@ export default function ProblemFrame({
                 </Box>
               )}
               {isInstructorView && onEditQuestion && (
-                <Box sx={{ position: 'absolute', top: { xs: 10, md: 14 }, right: { xs: 10, md: 14 }, zIndex: 1 }}>
-                  <Tooltip title="Edit question">
-                    <Box
-                      component="span"
-                      onClick={onEditQuestion}
-                      role="button"
-                      aria-label="Edit question"
-                      sx={{ display: 'inline-flex', alignItems: 'center', cursor: 'pointer', color: 'text.secondary', '&:hover': { opacity: 0.8 } }}
-                    >
-                      <EditIcon fontSize="small" />
-                    </Box>
-                  </Tooltip>
-                </Box>
+                <EditQuestionButton onClick={onEditQuestion} />
               )}
               {prompt && (
                 <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 0.5 }}>

@@ -1,7 +1,7 @@
-import { Box, Table, TableBody, TableContainer, ToggleButton, ToggleButtonGroup, Tooltip, Typography } from '@mui/material'
-import EditIcon from '@mui/icons-material/Edit'
+import { Box, Table, TableBody, TableContainer, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material'
 import { alpha } from '@mui/material/styles'
 import PromptText from '../../ui/PromptText.jsx'
+import EditQuestionButton from '../mui/frame/EditQuestionButton.jsx'
 import { ProblemCard } from '../mui/frame/ProblemFrame.jsx'
 import { MOBILE_DERIVATION_PLACEHOLDER_MSG } from './derivationUtils.js'
 
@@ -50,19 +50,7 @@ export default function DerivationWorkspace({
   return (
     <Wrapper {...(isFullScreen ? { sx: wrapperSx } : { minHeight: 'auto', cardSx })}>
       {isInstructorView && onEditQuestion && !isFullScreen && (
-        <Box sx={{ position: 'absolute', top: { xs: 10, md: 14 }, right: { xs: 10, md: 14 }, zIndex: 1 }}>
-          <Tooltip title="Edit question">
-            <Box
-              component="span"
-              onClick={onEditQuestion}
-              role="button"
-              aria-label="Edit question"
-              sx={{ display: 'inline-flex', alignItems: 'center', cursor: 'pointer', color: 'text.secondary', '&:hover': { opacity: 0.8 } }}
-            >
-              <EditIcon fontSize="small" />
-            </Box>
-          </Tooltip>
-        </Box>
+        <EditQuestionButton onClick={onEditQuestion} />
       )}
       {problemLabel && !isFullScreen && (
         <Box sx={{ mb: 0.75, color: 'text.secondary', fontSize: '0.875rem', lineHeight: 1.2, pr: 4 }}>
