@@ -187,6 +187,27 @@ export default class DerivationCheck {
             : [];
         // the last real line tells us whether an acp or aip is still open
         if (unresolvedAssumptions.length > 0) {
+            const unresolvedRules = new Set(
+                unresolvedAssumptions.map((assumptionLine) =>
+                    this.resolveRuleName(assumptionLine)
+                )
+            );
+            if (unresolvedRules.has('ACP')) {
+                this.adderror(
+                    lastSubstantiveLine?.n || '1',
+                    "dependency",
+                    "low",
+                    "Conditional Proof sequence not discharged."
+                );
+            }
+            if (unresolvedRules.has('AIP')) {
+                this.adderror(
+                    lastSubstantiveLine?.n || '1',
+                    "dependency",
+                    "low",
+                    "Indirect Proof sequence not discharged."
+                );
+            }
             this.adderror(
                 lastSubstantiveLine?.n || '1',
                 "completion",
