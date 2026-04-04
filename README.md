@@ -15,7 +15,7 @@ LMS for PHILO 275 at Hunter College.
 npm install
 ```
 
-2. Create an `.env` file with your x-api-key.
+2. Start the backend on `http://localhost:3000`, or set `VITE_API_PROXY_TARGET` if your backend is elsewhere.
 
 3. Start the development server:
 ```bash
@@ -25,5 +25,4 @@ npm run dev
 ## License
 
 This project uses code from LogicPenguin, which is licensed under GNU GPL v3.
-
 

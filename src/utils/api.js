@@ -1,4 +1,4 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://backend-logic-production.up.railway.app';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
 const USER_STORAGE_KEY = 'logicapp_current_user';
 let unauthorizedHandler = null;
 
@@ -57,7 +57,6 @@ export function getActiveUserId() {
 }
 
 export async function fetchJson(path, options = {}) {
-  const apiKey = import.meta.env.VITE_API_KEY;
   const fetchOptions = { ...options };
   const timeoutMs = Number(
     fetchOptions.timeoutMs
@@ -76,8 +75,6 @@ export async function fetchJson(path, options = {}) {
     : controller.signal;
   const headers = {
     ...(fetchOptions.headers || {}),
-    // api key is still required for backend requests
-    ...(apiKey ? { "x-api-key": apiKey } : {}),
   };
   let res;
   try {
