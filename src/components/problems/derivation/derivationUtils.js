@@ -250,6 +250,34 @@ export const getRuleFromJustification = (value) => {
   return formatRuleName(citedrules[0])
 }
 
+export const getOpenAssumptionDepths = (linesSnapshot = []) => {
+  let depth = 0
+  return linesSnapshot.map((line) => {
+    const rule = getRuleFromJustification(line?.justification || '').toUpperCase()
+    // cp and ip close before their own line lands
+    if (INDENT_END_RULES.has(rule)) {
+      depth = Math.max(0, depth - 1)
+    }
+    if (INDENT_START_RULES.has(rule)) {
+      depth = Math.min(depth + 1, MAX_INDENT_LEVEL)
+    }
+    return depth
+  })
+}
+
+export const isResolvedConclusionLine = ({
+  line,
+  index,
+  conclusion,
+  normalizeFormula,
+  openAssumptionDepths,
+}) => {
+  if (!line || !String(conclusion || '').trim() || !Number.isInteger(index)) return false
+  if (!formulasEqualNormally(line.formula || '', conclusion, normalizeFormula)) return false
+  // a matching formula inside an open assumption does not end the proof
+  return (openAssumptionDepths?.[index] ?? 0) === 0
+}
+
 export const buildErrorRows = (errors, linesSnapshot = [], { skipCompletion = false } = {}) => {
   if (!errors) return []
   const lines = Object.keys(errors).sort((a, b) => {
