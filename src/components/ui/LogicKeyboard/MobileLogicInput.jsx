@@ -42,6 +42,7 @@ export default function MobileLogicInput({
   onChange,
   onFocus,
   onBlur,
+  inputRef,
   disabled,
   placeholder,
   'aria-label': ariaLabel,
@@ -123,6 +124,17 @@ export default function MobileLogicInput({
   facade.symbols = symbols
   facade.symbolcat = symbolcat
 
+  useEffect(() => {
+    if (!inputRef) return
+    if (typeof inputRef === 'function') {
+      inputRef(facade)
+      return () => inputRef(null)
+    }
+    inputRef.current = facade
+    return () => {
+      inputRef.current = null
+    }
+  }, [facade, inputRef])
   const handleFocus = useCallback(() => {
     setKeyboardFocused(true)
     onFocus?.()

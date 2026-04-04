@@ -1,17 +1,17 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Alert, Box, Stack, Typography, Tooltip } from '@mui/material'
 import EditIcon from '@mui/icons-material/Edit'
-import InstructorQuestionEditor from '../InstructorQuestionEditor.jsx'
-import StatusBanner, { isTerminalStatus } from '../../ui/StatusBanner.jsx'
+import InstructorQuestionEditor from '../../InstructorQuestionEditor.jsx'
+import StatusBanner, { isTerminalStatus } from '../../../ui/StatusBanner.jsx'
 import { useTheme, useMediaQuery } from '@mui/material'
-import ProblemSetButtons from './ProblemSetButtons.jsx'
-import FormulaInput from '../../ui/logicpenguin/formula-input.js'
-import SymbolButtonRow from '../../ui/logicpenguin/SymbolButtonRow.jsx'
-import { MobileLogicInput } from '../../ui/LogicKeyboard/index.js'
-import LogicPenguinProof from '../LogicPenguinProof.jsx'
-import getFormulaClass from '../../../lib/logicpenguin/symbolic/formula.js'
-import { useProblemChecker } from '../../../hooks/useProblemChecker.js'
-import PromptText from '../../ui/PromptText.jsx'
+import ProblemSetButtons from '../frame/ProblemSetButtons.jsx'
+import FormulaInput from '../../../ui/logicpenguin/formula-input.js'
+import SymbolButtonRow from '../../../ui/logicpenguin/SymbolButtonRow.jsx'
+import { MobileLogicInput } from '../../../ui/LogicKeyboard/index.js'
+import DerivationTable from '../../derivation/DerivationTable.jsx'
+import getFormulaClass from '../../../../lib/logicpenguin/symbolic/formula.js'
+import { useProblemChecker } from '../../../../hooks/useProblemChecker.js'
+import PromptText from '../../../ui/PromptText.jsx'
 
 function FormulaInputField({ value, onValueChange, fieldReadOnly, formulaInputRef }) {
   const theme = useTheme()
@@ -150,7 +150,10 @@ export default function ComboTranslationDerivation({
   const [argumentLine, setArgumentLine] = useState(savedState?.argumentLine ?? '')
   const [derivationState, setDerivationState] = useState(savedState?.derivationState ?? null)
   const inputRef = useRef(null)
-  const proofWrapperRef = useRef(null)
+  const [derivationAttemptCount, setDerivationAttemptCount] = useState(proof?.attemptCount ?? 0)
+  const [derivationAttemptLimit, setDerivationAttemptLimit] = useState(proof?.attemptLimit ?? 10)
+  const [derivationChecking, setDerivationChecking] = useState(false)
+  const [, setDerivationStatusBanner] = useState({ status: 'unanswered', message: '' })
 
   useEffect(() => {
     if (savedState?.argumentLine !== undefined) {
@@ -163,6 +166,15 @@ export default function ComboTranslationDerivation({
       setDerivationState(savedState.derivationState)
     }
   }, [savedState?.derivationState])
+
+  useEffect(() => {
+    if (typeof proof?.attemptCount === 'number') {
+      setDerivationAttemptCount(proof.attemptCount)
+    }
+    if (typeof proof?.attemptLimit === 'number') {
+      setDerivationAttemptLimit(proof.attemptLimit)
+    }
+  }, [proof?.attemptCount, proof?.attemptLimit])
 
   const updateState = (updates) => {
     const state = { argumentLine, derivationState, ...updates }
@@ -209,50 +221,14 @@ export default function ComboTranslationDerivation({
     return hasContent(targets)
   }, [derivationState])
 
-  const getDerivationElement = () =>
-    proofWrapperRef.current?.querySelector('derivation-hurley') || null
-
-  useEffect(() => {
-    const derivEl = getDerivationElement()
-    if (!derivEl) return
-    const hideButtons = () => {
-      const btnDiv = derivEl.querySelector('.buttondiv')
-      if (btnDiv) {
-        btnDiv.style.display = 'none'
-      }
-    }
-    hideButtons()
-    derivEl.addEventListener('LP-ready', hideButtons)
-    return () => {
-      derivEl.removeEventListener('LP-ready', hideButtons)
-    }
-  }, [argumentLine, derivationProblem?.conclusion, derivationProblem?.premises?.join(',')])
-
   const getProofAnswer = () => {
-    const derivEl = getDerivationElement()
-    if (derivEl?.getAnswer) {
-      try {
-        return derivEl.getAnswer()
-      } catch {
-        // ignore
-      }
-    }
-    if (derivationState?.ans) return derivationState.ans
-    if (derivationState) return derivationState
-    return null
+    return normalizeProof(derivationState)
   }
 
   const resetInputs = () => {
     setArgumentLine('')
     setDerivationState(null)
-    const derivEl = getDerivationElement()
-    if (derivEl?.startOver) {
-      try {
-        derivEl.startOver()
-      } catch {
-        // ignore
-      }
-    }
+    setDerivationStatusBanner({ status: 'unanswered', message: '' })
     if (inputRef.current) {
       inputRef.current.value = ''
     }
@@ -339,26 +315,30 @@ export default function ComboTranslationDerivation({
             </Box>
 
             {parseStatus.ok && derivationProblem && (
-              <Box
-                ref={proofWrapperRef}
-                sx={{
-                  '& derivation-hurley .buttondiv': { display: 'none' },
-                  '& derivation-hurley': { width: '100%' },
+              <DerivationTable
+                key={argumentLine}
+                proof={{
+                  ...proof,
+                  premises: derivationProblem.premises,
+                  conclusion: derivationProblem.conclusion,
                 }}
-              >
-                <LogicPenguinProof
-                  key={argumentLine}
-                  premises={derivationProblem.premises}
-                  conclusion={derivationProblem.conclusion}
-                  questionId={proof?.questionId}
-                  savedState={derivationState}
-                  onStateChange={(state) => {
-                    setDerivationState(state)
-                    updateState({ derivationState: state })
-                  }}
-                  attemptLimit={attemptLimit}
-                />
-              </Box>
+                savedState={derivationState}
+                onStateChange={(state) => {
+                  setDerivationState(state)
+                  updateState({ derivationState: state })
+                }}
+                onAttempt={() => {}}
+                onProofComplete={() => {}}
+                attemptCount={derivationAttemptCount}
+                attemptLimit={derivationAttemptLimit}
+                isChecking={derivationChecking}
+                setAttemptCount={setDerivationAttemptCount}
+                setAttemptLimit={setDerivationAttemptLimit}
+                setStatusBanner={setDerivationStatusBanner}
+                setIsChecking={setDerivationChecking}
+                isAssignmentLocked={isAssignmentLocked}
+                hideActions
+              />
             )}
           </Stack>
         </Box>

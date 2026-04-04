@@ -1,15 +1,15 @@
 import { useState, useEffect } from 'react'
-import SymbolicTranslation from './mui/SymbolicTranslation.jsx'
-import MultipleChoice from './mui/MultipleChoice.jsx'
-import TrueFalse from './mui/TrueFalse.jsx'
-import EvaluateTruth from './mui/EvaluateTruth.jsx'
-// import ValidCorrectSound from './mui/ValidCorrectSound.jsx'
-import SingleRowTruthTable from './mui/SingleRowTruthTable.jsx'
-import ComboTranslationTruthTable from './mui/ComboTranslationTruthTable.jsx'
-import ComboTranslationDerivation from './mui/ComboTranslationDerivation.jsx'
-import IndirectTruthTable from './mui/IndirectTruthTable.jsx'
-import PartialTruthTable from './mui/PartialTruthTable.jsx'
-import NonClassicalTruthTable from './mui/NonClassicalTruthTable.jsx'
+import SymbolicTranslation from './mui/translation/SymbolicTranslation.jsx'
+import MultipleChoice from './mui/choice/MultipleChoice.jsx'
+import TrueFalse from './mui/choice/TrueFalse.jsx'
+import EvaluateTruth from './mui/choice/EvaluateTruth.jsx'
+import ValidCorrectSound from './mui/choice/ValidCorrectSound.jsx'
+import SingleRowTruthTable from './truth-table/SingleRowTruthTable.jsx'
+import ComboTranslationTruthTable from './mui/translation/ComboTranslationTruthTable.jsx'
+import ComboTranslationDerivation from './mui/translation/ComboTranslationDerivation.jsx'
+import IndirectTruthTable from './truth-table/IndirectTruthTable.jsx'
+import PartialTruthTable from './truth-table/PartialTruthTable.jsx'
+import NonClassicalTruthTable from './truth-table/NonClassicalTruthTable.jsx'
 
 export default function LogicPenguinProblem({ 
   proof, 
@@ -19,6 +19,7 @@ export default function LogicPenguinProblem({
   isAssignmentLocked = false,
   isInstructorView = false,
   onQuestionSaved,
+  problemLabel,
 }) {
   const [localState, setLocalState] = useState(savedState || {})
 
@@ -73,6 +74,7 @@ export default function LogicPenguinProblem({
         isAssignmentLocked={isAssignmentLocked}
         isInstructorView={isInstructorView}
         onQuestionSaved={onQuestionSaved}
+        problemLabel={problemLabel}
       />
     )
   } else if (proof.type === 'multiple-choice') {
@@ -93,6 +95,7 @@ export default function LogicPenguinProblem({
         isAssignmentLocked={isAssignmentLocked}
         isInstructorView={isInstructorView}
         onQuestionSaved={onQuestionSaved}
+        problemLabel={problemLabel}
       />
     )
   } else if (proof.type === 'true-false') {
@@ -112,6 +115,7 @@ export default function LogicPenguinProblem({
         isAssignmentLocked={isAssignmentLocked}
         isInstructorView={isInstructorView}
         onQuestionSaved={onQuestionSaved}
+        problemLabel={problemLabel}
       />
     )
   } else if (proof.type === 'evaluate-truth') {
@@ -129,26 +133,31 @@ export default function LogicPenguinProblem({
         isAssignmentLocked={isAssignmentLocked}
         isInstructorView={isInstructorView}
         onQuestionSaved={onQuestionSaved}
+        problemLabel={problemLabel}
       />
     )
-  /* } else if (proof.type === 'valid-correct-sound') {
-    const prems = Array.isArray(proof.premises) ? proof.premises : (proof.premises ? [proof.premises] : [])
+  } else if (proof.type === 'valid-correct-sound') {
     problemData = {
-      prems: prems,
-      conc: proof.conclusion || ''
+      prompt: proof.description || '',
+      prems: Array.isArray(proof.premises) ? proof.premises : (proof.premises ? [proof.premises] : []),
+      conc: proof.conclusion || '',
     }
     return (
       <ValidCorrectSound
         problem={problemData}
+        proof={proof}
         answer={proof.answer}
         attemptLimit={proof.attemptLimit}
         assignmentQuestionId={proof.questionId}
         onStateChange={handleStateChange}
         onComplete={handleComplete}
         savedState={localState}
+        isAssignmentLocked={isAssignmentLocked}
+        isInstructorView={isInstructorView}
+        onQuestionSaved={onQuestionSaved}
+        problemLabel={problemLabel}
       />
     )
-  } else if (proof.type === 'single-row-truth-table') { */
   } else if (proof.type === 'single-row-truth-table') {
     problemData = proof.singleRowTruthTable || {
       statement: proof.description || '',
@@ -167,6 +176,7 @@ export default function LogicPenguinProblem({
         isAssignmentLocked={isAssignmentLocked}
         isInstructorView={isInstructorView}
         onQuestionSaved={onQuestionSaved}
+        problemLabel={problemLabel}
       />
     )
   } else if (proof.type === 'combo-translation-truth-table') {
@@ -181,6 +191,7 @@ export default function LogicPenguinProblem({
         isAssignmentLocked={isAssignmentLocked}
         isInstructorView={isInstructorView}
         onQuestionSaved={onQuestionSaved}
+        problemLabel={problemLabel}
       />
     )
   } else if (proof.type === 'combo-translation-derivation') {
@@ -195,6 +206,7 @@ export default function LogicPenguinProblem({
         isAssignmentLocked={isAssignmentLocked}
         isInstructorView={isInstructorView}
         onQuestionSaved={onQuestionSaved}
+        problemLabel={problemLabel}
       />
     )
   } else if (proof.type === 'indirect-truth-table') {
@@ -228,6 +240,7 @@ export default function LogicPenguinProblem({
         isAssignmentLocked={isAssignmentLocked}
         isInstructorView={isInstructorView}
         onQuestionSaved={onQuestionSaved}
+        problemLabel={problemLabel}
       />
     )
   } else if (proof.type === 'nonclassical-truth-table') {
@@ -261,6 +274,7 @@ export default function LogicPenguinProblem({
         isAssignmentLocked={isAssignmentLocked}
         isInstructorView={isInstructorView}
         onQuestionSaved={onQuestionSaved}
+        problemLabel={problemLabel}
       />
     )
   } else if (proof.type === 'partial-truth-table') {
@@ -277,6 +291,7 @@ export default function LogicPenguinProblem({
         isAssignmentLocked={isAssignmentLocked}
         isInstructorView={isInstructorView}
         onQuestionSaved={onQuestionSaved}
+        problemLabel={problemLabel}
       />
     )
   }

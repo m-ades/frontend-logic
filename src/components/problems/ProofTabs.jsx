@@ -6,7 +6,7 @@ import WarningAmberIcon from '@mui/icons-material/WarningAmber'
 import AddIcon from '@mui/icons-material/Add'
 import ProofEditor from './ProofEditor.jsx'
 import LogicPenguinProblem from './LogicPenguinProblem.jsx'
-import TruthTableEditor from './TruthTableEditor.jsx'
+import TruthTableEditor from './truth-table/TruthTableEditor.jsx'
 import { ProblemNavigationContext } from './ProblemNavigationContext.jsx'
 import { allowPartialForProof, displayScoreForProof } from '../../utils/problemHelpers.js'
 import InstructorQuestionEditor from './InstructorQuestionEditor.jsx'
@@ -541,10 +541,19 @@ function ProofTabs({
         )}
       </Box>
         {proofs.map((proof, idx) => {
+          const isFirst = idx === 0
           const isLast = idx >= proofs.length - 1
+          const handlePrev = isFirst ? null : () => handleTabChange(null, idx - 1)
           const handleNext = isLast ? null : () => handleTabChange(null, idx + 1)
+          const problemLabel = `Problem ${idx + 1}`
           return (
-            <ProblemNavigationContext.Provider key={proof.id} value={{ onNext: handleNext }}>
+            <ProblemNavigationContext.Provider
+              key={proof.id}
+              value={{
+                onPrev: handlePrev,
+                onNext: handleNext,
+              }}
+            >
               <TabPanel
                 value={currentProofIndex}
                 index={idx}
@@ -566,6 +575,7 @@ function ProofTabs({
                           return (
                             <TruthTableEditor
                               proof={proof}
+                              problemLabel={problemLabel}
                               savedState={savedStateWithAttempts}
                               onStateChange={(state) => handleProofStateChange(proof.id, state, {
                                 assignmentQuestionId: proof.questionId
@@ -585,6 +595,7 @@ function ProofTabs({
                             <ProofEditor
                               key={`proof-${proof.id}`}
                               proof={proof}
+                              problemLabel={problemLabel}
                               onProofComplete={onProofComplete}
                               savedState={savedStateWithAttempts}
                               onStateChange={(state) => handleProofStateChange(proof.id, state, {
@@ -614,6 +625,7 @@ function ProofTabs({
                           <LogicPenguinProblem
                             key={`proof-${proof.id}`}
                             proof={proof}
+                            problemLabel={problemLabel}
                             onProofComplete={onProofComplete}
                             savedState={savedStateWithAttempts}
                             onStateChange={(state) => handleProofStateChange(proof.id, state, {

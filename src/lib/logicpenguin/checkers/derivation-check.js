@@ -479,6 +479,10 @@ export default class DerivationCheck {
             errMsg += ' ' + isare + ' not of the right form for ' +
                 this.rulechecked + ' to apply';
         }
+        const directionalCorrection = this.getDirectionalRuleCorrection(line, rulename);
+        if (directionalCorrection) {
+            errMsg = directionalCorrection;
+        }
         const categ = (line.isshowline &&
             (errMsg.indexOf('what is needed') != -1))
             ? 'completion' : 'rule';
@@ -760,6 +764,58 @@ export default class DerivationCheck {
         }
         line.checkedOK = true;
         return line;
+    }
+
+    getDirectionalRuleCorrection(line, rulename) {
+        const Formula = this.Formula;
+        if (rulename === 'Simp' && line.citedlines.length >= 1) {
+            // catch the wrong side move
+            const source = line.citedlines[0];
+            const sourceFormula = source?.formula ?? (source?.s ? Formula.from(source.s) : null);
+            const andSym = this.syntax?.symbols?.AND ?? '•';
+            if (sourceFormula?.op === andSym && sourceFormula.left && sourceFormula.right) {
+                const resultNormal = line.formulaNormal ??
+                    (line.s ? Formula.from(line.s).normal : '');
+                const leftNormal = sourceFormula.left.normal ?? '';
+                const rightNormal = sourceFormula.right.normal ?? '';
+                if (resultNormal === rightNormal && resultNormal !== leftNormal) {
+                    return 'Simplification derives only the left conjunct';
+                }
+            }
+        }
+
+        if (rulename === 'DS' && line.citedlines.length >= 2) {
+            // same idea for ds on the other side
+            const disjSym = this.syntax?.symbols?.OR ?? '∨';
+            const notSym = this.syntax?.symbols?.NOT ?? '~';
+            const resultNormal = line.formulaNormal ??
+                (line.s ? Formula.from(line.s).normal : '');
+            for (const possibleDisjunction of line.citedlines) {
+                const disjunction = possibleDisjunction?.formula ??
+                    (possibleDisjunction?.s ? Formula.from(possibleDisjunction.s) : null);
+                if (disjunction?.op !== disjSym || !disjunction.left || !disjunction.right) {
+                    continue;
+                }
+                const leftNormal = disjunction.left.normal ?? '';
+                const rightNormal = disjunction.right.normal ?? '';
+                for (const possibleNegation of line.citedlines) {
+                    if (possibleNegation === possibleDisjunction) {
+                        continue;
+                    }
+                    const negation = possibleNegation?.formula ??
+                        (possibleNegation?.s ? Formula.from(possibleNegation.s) : null);
+                    if (negation?.op !== notSym || !negation.right) {
+                        continue;
+                    }
+                    const negatedNormal = negation.right.normal ?? '';
+                    if (negatedNormal === rightNormal && resultNormal === leftNormal) {
+                        return 'DS eliminates only the left disjunct';
+                    }
+                }
+            }
+        }
+
+        return '';
     }
 
     checkDeriv(deriv) {

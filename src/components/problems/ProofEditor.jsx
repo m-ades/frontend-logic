@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom'
 import { Box, IconButton, Stack, useMediaQuery, useTheme } from '@mui/material'
 import StatusBanner from '../ui/StatusBanner.jsx'
 import CloseIcon from '@mui/icons-material/Close'
-import DerivationTable from './mui/DerivationTable.jsx'
+import DerivationTable from './derivation/DerivationTable.jsx'
 import InstructorQuestionEditor from './InstructorQuestionEditor.jsx'
 
 export default function ProofEditor({
@@ -22,6 +22,7 @@ export default function ProofEditor({
   currentQuestionScore,
   isInstructorView = false,
   onQuestionSaved,
+  problemLabel,
 }) {
   const theme = useTheme()
   const editorRef = useRef(null)
@@ -142,6 +143,7 @@ export default function ProofEditor({
         currentQuestionScore={currentQuestionScore}
         isInstructorView={isInstructorView}
         onEditQuestion={openEdit}
+        problemLabel={problemLabel}
       />
     </Box>,
     document.body
@@ -177,6 +179,7 @@ export default function ProofEditor({
             currentQuestionScore={currentQuestionScore}
             isInstructorView={isInstructorView}
             onEditQuestion={openEdit}
+            problemLabel={problemLabel}
           />
         )}
 

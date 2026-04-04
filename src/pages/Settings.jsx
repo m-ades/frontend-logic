@@ -20,11 +20,14 @@ import {
   Dialog,          
   DialogTitle,     
   DialogContent,   
-  DialogActions    
+  DialogActions,
+  Tooltip,
 } from '@mui/material'
 import ThemedCard from '../components/ui/ThemedCard.jsx'
+import { useAuthDispatch, logout } from '../context/AuthContext.jsx'
 import { useThemeState, useThemeDispatch } from '../context/ThemeContext.jsx'
 import { useState, useEffect } from 'react'
+import { fetchJson } from '../utils/api.js'
 import { Visibility, VisibilityOff } from '@mui/icons-material'
 import ComputerIcon from '@mui/icons-material/Computer'
 import SmartphoneIcon from '@mui/icons-material/Smartphone'
@@ -36,6 +39,7 @@ import DeleteIcon from '@mui/icons-material/Delete'
 import WarningIcon from '@mui/icons-material/Warning'
 
 export default function Settings() {
+  const authDispatch = useAuthDispatch()
   const theme = useThemeState()
   const changeTheme = useThemeDispatch()
   const isDark = theme.palette.mode === 'dark'
@@ -63,7 +67,7 @@ export default function Settings() {
     deviceName: ''
   })
 
-  //mock data for devices 
+  // this list is still a stand in until auth sessions are tracked on the backend
   const [devices, setDevices] = useState([
     {
       id: '1',
@@ -113,6 +117,23 @@ export default function Settings() {
 
   const [logoutSuccess, setLogoutSuccess] = useState(false)
   const [logoutError, setLogoutError] = useState('')
+
+  const getErrorMessage = (error, fallback = 'Something went wrong.') => {
+    if (!error) return fallback
+    if (typeof error === 'string') return error
+
+    const message = error.message || String(error)
+    if (!message) return fallback
+
+    try {
+      const parsed = JSON.parse(message)
+      if (parsed?.message) return parsed.message
+    } catch {
+      // ignore parse errors
+    }
+
+    return message
+  }
 
   const calculatePasswordStrength = (password) => {
     if (!password || password.length < 6) return 0
@@ -185,11 +206,6 @@ export default function Settings() {
     setSubmitSuccess(false)
 
     if (validateForm()) {  //need to be implemented with backend
-      console.log('Password change submitted', {
-        currentPassword,
-        newPassword
-      })
-
       setCurrentPassword('')
       setNewPassword('')
       setConfirmPassword('')
@@ -262,8 +278,6 @@ export default function Settings() {
     const { deviceId } = confirmationDialog
     
     //need to be implemented with backend
-    console.log('Logging out device:', deviceId)
-    
     setDevices(prev => prev.filter(device => device.id !== deviceId))
     
     setLogoutSuccess(true)
@@ -274,18 +288,21 @@ export default function Settings() {
     }, 3000)
   }
 
-  const handleConfirmLogoutAllDevices = () => {
-    //need to be implemented with backend
-    console.log('Logging out all devices')
-    
-    setDevices(prev => prev.filter(device => device.currentDevice))
-    
-    setLogoutSuccess(true)
-    closeConfirmationDialog()
-    
-    setTimeout(() => {
-      setLogoutSuccess(false)
-    }, 3000)
+  const handleConfirmLogoutAllDevices = async () => {
+    setLogoutError('')
+
+    try {
+      await fetchJson('/api/auth/logout-all', { method: 'POST' })
+      setLogoutSuccess(true)
+      closeConfirmationDialog()
+      logout(authDispatch)
+
+      setTimeout(() => {
+        setLogoutSuccess(false)
+      }, 3000)
+    } catch (error) {
+      setLogoutError(getErrorMessage(error, 'Failed to log out all devices.'))
+    }
   }
 
   return (
@@ -601,15 +618,18 @@ export default function Settings() {
             </List>
             
             <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-              <Button
-                variant="text"
-                size="small"
-                onClick={() => {
-                  console.log('Refreshing devices list')
-                }}
-              >
-                Refresh list
-              </Button>
+              {/* no live refresh until the device list comes from real session data */}
+              <Tooltip title="Refresh is not available until active devices are backed by real session data.">
+                <span>
+                  <Button
+                    variant="text"
+                    size="small"
+                    disabled
+                  >
+                    Refresh list
+                  </Button>
+                </span>
+              </Tooltip>
             </Box>
           </Stack>
         </CardContent>

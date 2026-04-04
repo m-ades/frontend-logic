@@ -14,6 +14,7 @@ import { Clock } from "lucide-react";
 import { formatEasternDateTime } from "../../../utils/easternTime.js";
 
 export const UpcomingDeadlinesTable = ({ assignments, onAssignmentClick }) => {
+  const isInteractive = typeof onAssignmentClick === "function";
   const upcomingAssignments = assignments
     .map((a) => {
       const dueDate = new Date(a.dueDate);
@@ -65,10 +66,12 @@ export const UpcomingDeadlinesTable = ({ assignments, onAssignmentClick }) => {
                 key={assignment.id}
                 hover
                 sx={{
-                  cursor: "pointer",
-                  "&:hover": { backgroundColor: (theme) => alpha(theme.palette.primary.main, 0.04) },
+                  cursor: isInteractive ? "pointer" : "default",
+                  "&:hover": isInteractive
+                    ? { backgroundColor: (theme) => alpha(theme.palette.primary.main, 0.04) }
+                    : undefined,
                 }}
-                onClick={() => onAssignmentClick(assignment)}
+                onClick={isInteractive ? () => onAssignmentClick(assignment) : undefined}
               >
                 <TableCell>
                   <Typography variant="body2" fontWeight={500}>
