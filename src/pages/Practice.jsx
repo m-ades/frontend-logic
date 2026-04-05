@@ -122,6 +122,7 @@ export default function Practice() {
         courseStructure={courseStructure}
         isLoading={isLoadingPractice}
         emptyText="No practice problems available"
+        defaultSubchapterExpanded
         renderActivity={(activity, { chapter, subchapter }) => (
           (() => {
             const totalQuestions = Number(activity.questionCount) || 0
@@ -137,7 +138,10 @@ export default function Practice() {
               <Box
                 sx={{
                   display: 'grid',
-                  gridTemplateColumns: { xs: '1fr', md: 'minmax(0, 1fr) 440px' },
+                  gridTemplateColumns: {
+                    xs: '1fr',
+                    md: 'minmax(0, 1fr) clamp(240px, 28vw, 360px)',
+                  },
                   columnGap: { xs: 0, md: 4 },
                   rowGap: 2,
                   alignItems: 'start',

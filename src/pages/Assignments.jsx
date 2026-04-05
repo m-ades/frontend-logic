@@ -240,7 +240,10 @@ export default function Assignments() {
         <Box
           sx={{
             display: 'grid',
-            gridTemplateColumns: { xs: '1fr', md: 'minmax(0, 1fr) 440px' },
+            gridTemplateColumns: {
+              xs: '1fr',
+              md: 'minmax(0, 1fr) clamp(240px, 28vw, 360px)',
+            },
             columnGap: { xs: 0, md: 4 },
             rowGap: 2,
             alignItems: 'start',
@@ -354,6 +357,7 @@ export default function Assignments() {
       showExpandAll={showExpandAll}
       showCollapseAll={showCollapseAll}
       showExpandCollapseToggle={showExpandCollapseToggle}
+      defaultSubchapterExpanded
       persistKey={accordionStorageKey}
       renderActivity={(activity, context) =>
         renderActivity(activity, context, datePrefix, showCompletionChip)

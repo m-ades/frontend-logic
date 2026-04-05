@@ -23,6 +23,7 @@ export default function ActivityAccordion({
   showExpandCollapseToggle = false,
   isLoading = false,
   defaultExpanded = true,
+  defaultSubchapterExpanded = defaultExpanded,
   persistKey = null,
 }) {
   const [expandedChapters, setExpandedChapters] = useState({})
@@ -102,7 +103,8 @@ export default function ActivityAccordion({
   }
 
   const isChapterExpandedById = (chapterId) => expandedChapters[chapterId] ?? defaultExpanded
-  const isSubchapterExpandedById = (subchapterId) => expandedSubchapters[subchapterId] ?? defaultExpanded
+  const isSubchapterExpandedById = (subchapterId) =>
+    expandedSubchapters[subchapterId] ?? defaultSubchapterExpanded
   const isAnyCollapsed = courseStructure.some((chapter) => {
     if (!isChapterExpandedById(chapter.id)) return true
     return chapter.subchapters.some((subchapter) => !isSubchapterExpandedById(subchapter.id))
