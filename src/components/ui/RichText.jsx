@@ -1,4 +1,5 @@
 import { Typography } from '@mui/material'
+import { sanitizeRichHtml } from '../../utils/sanitizeRichHtml.js'
 
 const defaultSx = {
   width: '100%',
@@ -35,6 +36,7 @@ const defaultSx = {
 export default function RichText({ content, variant = 'body1', sx, ...props }) {
   if (!content) return null
   const hasHtml = typeof content === 'string' && /<[^>]+>/.test(content)
+  const safeHtml = hasHtml ? sanitizeRichHtml(content) : ''
   const mergedSx = Array.isArray(sx)
     ? [defaultSx, ...sx]
     : (sx ? { ...defaultSx, ...sx } : defaultSx)
@@ -44,7 +46,8 @@ export default function RichText({ content, variant = 'body1', sx, ...props }) {
       <Typography
         variant={variant}
         sx={mergedSx}
-        dangerouslySetInnerHTML={{ __html: content }}
+        // sanitize before render
+        dangerouslySetInnerHTML={{ __html: safeHtml }}
         {...props}
       />
     )
