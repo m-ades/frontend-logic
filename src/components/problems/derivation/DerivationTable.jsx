@@ -403,6 +403,7 @@ export default function DerivationTable({
   currentQuestionScore,
   isInstructorView = false,
   onEditQuestion,
+  hideActions = false,
 }) {
   const formulaRefs = useRef({})
   const justRefs = useRef({})
@@ -1259,10 +1260,12 @@ export default function DerivationTable({
       }
     >
       {(() => {
-        const Wrapper = isFullScreen ? Box : ThemedCard
+        const Wrapper = isFullScreen || hideActions ? Box : ThemedCard
         // fullscreen: no right padding. fill width. scrollable area so button row can stay sticky
         const wrapperSx = isFullScreen
           ? { py: 2, pl: 0, pr: 0, position: 'relative', flex: 1, minHeight: 0, minWidth: 0, width: '100%', maxWidth: '100%', display: 'flex', flexDirection: 'column', boxSizing: 'border-box', overflowY: 'auto', overflowX: 'hidden' }
+          : hideActions
+            ? { p: 0, position: 'relative', width: '100%' }
           : {
               p: { xs: 1.25, md: 2.5 },
               borderRadius: 3,
@@ -1271,7 +1274,7 @@ export default function DerivationTable({
             }
         return (
           <Wrapper sx={wrapperSx}>
-        {isInstructorView && onEditQuestion && !isFullScreen && (
+        {isInstructorView && onEditQuestion && !isFullScreen && !hideActions && (
           <Box sx={{ mb: 2, display: 'flex', justifyContent: 'flex-end' }}>
             <Tooltip title="Edit question">
               <Box
@@ -1286,7 +1289,7 @@ export default function DerivationTable({
             </Tooltip>
           </Box>
         )}
-        {proof.description && !isFullScreen && (
+        {proof.description && !isFullScreen && !hideActions && (
           <Box sx={{ mb: 2, display: 'flex', alignItems: 'flex-start', gap: 0.5 }}>
             <PromptText content={proof.description} sx={{ fontSize: 15, flex: 1 }} />
           </Box>
@@ -1960,49 +1963,51 @@ export default function DerivationTable({
         )
       })()}
       {/* fullscreen: sticky button row at bottom; non-fullscreen: normal flow */}
-      <Box
-        sx={{
-          mt: 1,
-          ...(isFullScreen && {
-            flexShrink: 0,
-            pl: 2,
-            pr: 0,
-            pt: 1.5,
-            pb: 2,
-            bgcolor: 'background.paper',
-            borderTop: 1,
-            borderColor: 'divider',
-          }),
-        }}
-      >
-        <ProblemSetButtons
-          onCheck={handleSubmit}
-          onStartOver={handleStartOver}
-          isChecking={isChecking}
-          isDisabled={submitDisabled}
-          align="flex-start"
-          attemptCount={attemptCount}
-          attemptLimit={attemptLimit}
-          sx={{ mt: 1 }}
-          scoreLabel={isPhone && isFullScreen && Number.isFinite(totalQuestions) && totalQuestions > 0 ? (() => {
-            const pointsPerQuestion = 100 / totalQuestions
-            const maxLabel = pointsPerQuestion % 1 === 0 ? String(Math.round(pointsPerQuestion)) : pointsPerQuestion.toFixed(1)
-            const isLockedOut = Number.isFinite(attemptLimit) && attemptCount >= attemptLimit
-            const score = currentQuestionScore != null && Number.isFinite(Number(currentQuestionScore)) ? Number(currentQuestionScore) : null
-            if (score != null) {
-              const earned = (score / 100) * pointsPerQuestion
-              const earnedLabel = earned % 1 === 0 ? String(Math.round(earned)) : earned.toFixed(1)
-              const color = score >= 100 ? 'success.main' : score > 0 ? 'text.secondary' : 'error.main'
-              return { text: `${earnedLabel}/${maxLabel}`, color }
-            }
-            if (lastSubmitStatus === 'correct') return { text: `${maxLabel}/${maxLabel}`, color: 'success.main' }
-            if (lastSubmitStatus === 'incorrect') return { text: `0/${maxLabel}`, color: 'error.main' }
-            if (isCurrentCorrect) return { text: `${maxLabel}/${maxLabel}`, color: 'success.main' }
-            if (isLockedOut) return { text: `0/${maxLabel}`, color: 'error.main' }
-            return null
-          })() : null}
-        />
-      </Box>
+      {!hideActions && (
+        <Box
+          sx={{
+            mt: 1,
+            ...(isFullScreen && {
+              flexShrink: 0,
+              pl: 2,
+              pr: 0,
+              pt: 1.5,
+              pb: 2,
+              bgcolor: 'background.paper',
+              borderTop: 1,
+              borderColor: 'divider',
+            }),
+          }}
+        >
+          <ProblemSetButtons
+            onCheck={handleSubmit}
+            onStartOver={handleStartOver}
+            isChecking={isChecking}
+            isDisabled={submitDisabled}
+            align="flex-start"
+            attemptCount={attemptCount}
+            attemptLimit={attemptLimit}
+            sx={{ mt: 1 }}
+            scoreLabel={isPhone && isFullScreen && Number.isFinite(totalQuestions) && totalQuestions > 0 ? (() => {
+              const pointsPerQuestion = 100 / totalQuestions
+              const maxLabel = pointsPerQuestion % 1 === 0 ? String(Math.round(pointsPerQuestion)) : pointsPerQuestion.toFixed(1)
+              const isLockedOut = Number.isFinite(attemptLimit) && attemptCount >= attemptLimit
+              const score = currentQuestionScore != null && Number.isFinite(Number(currentQuestionScore)) ? Number(currentQuestionScore) : null
+              if (score != null) {
+                const earned = (score / 100) * pointsPerQuestion
+                const earnedLabel = earned % 1 === 0 ? String(Math.round(earned)) : earned.toFixed(1)
+                const color = score >= 100 ? 'success.main' : score > 0 ? 'text.secondary' : 'error.main'
+                return { text: `${earnedLabel}/${maxLabel}`, color }
+              }
+              if (lastSubmitStatus === 'correct') return { text: `${maxLabel}/${maxLabel}`, color: 'success.main' }
+              if (lastSubmitStatus === 'incorrect') return { text: `0/${maxLabel}`, color: 'error.main' }
+              if (isCurrentCorrect) return { text: `${maxLabel}/${maxLabel}`, color: 'success.main' }
+              if (isLockedOut) return { text: `0/${maxLabel}`, color: 'error.main' }
+              return null
+            })() : null}
+          />
+        </Box>
+      )}
     </Stack>
   )
 }
