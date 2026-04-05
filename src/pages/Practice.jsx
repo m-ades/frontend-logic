@@ -151,9 +151,6 @@ export default function Practice() {
                   <Typography variant="h6" sx={{ mb: 1, wordBreak: 'break-word' }}>
                     {activity.title}
                   </Typography>
-                  <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                    {subchapter.title || chapter.title}
-                  </Typography>
                   {activity.description && (
                     <Typography variant="body2" color="text.secondary" sx={{ wordBreak: 'break-word' }}>
                       {activity.description}

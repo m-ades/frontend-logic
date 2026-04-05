@@ -258,9 +258,6 @@ export default function Assignments() {
                 <LockIcon sx={{ fontSize: '1.25rem', color: 'text.secondary', flexShrink: 0 }} />
               )}
             </Stack>
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-              {subchapter.title || chapter.title}
-            </Typography>
             {activity.description && (
               <Typography variant="body2" color="text.secondary" sx={{ wordBreak: 'break-word' }}>
                 {activity.description}
