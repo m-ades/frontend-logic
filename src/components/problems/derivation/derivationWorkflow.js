@@ -6,8 +6,10 @@ import {
   buildErrorRows,
   buildSubmission,
   formulasEqualNormally,
+  getOpenAssumptionDepths,
   getJustificationMeta,
   getRuleFromJustification,
+  isResolvedConclusionLine,
 } from './derivationUtils.js'
 
 export async function runDerivationAutoCheck({
@@ -47,11 +49,19 @@ export async function runDerivationAutoCheck({
   const lastFilledIndex = filledLineIndices.length ? filledLineIndices[filledLineIndices.length - 1] : -1
   const lastFilled = lastFilledIndex >= 0 ? linesSnapshot[lastFilledIndex] : null
   const allFilledComplete = filledLineIndices.every((index) => isLineComplete(index))
+  const openAssumptionDepths = getOpenAssumptionDepths(linesSnapshot)
+  const lastFilledResolvesConclusion = isResolvedConclusionLine({
+    line: lastFilled,
+    index: lastFilledIndex,
+    conclusion: proof?.conclusion,
+    normalizeFormula: normalizeFormulaForCheck,
+    openAssumptionDepths,
+  })
   const readyForRuleGate = Boolean(
     normalizedConclusion &&
     lastFilled &&
     isLineCompleteForCheck(lastFilled) &&
-    formulasEqualNormally(lastFilled.formula || '', proof?.conclusion || '', normalizeFormulaForCheck) &&
+    lastFilledResolvesConclusion &&
     allFilledComplete
   )
   const filteredErrors = {}
@@ -110,7 +120,13 @@ export async function runDerivationAutoCheck({
     !last.readOnly &&
     isLineCompleteForCheck(last) &&
     perLine[lastIndex] === 'ok' &&
-    !formulasEqualNormally(last.formula || '', proof?.conclusion || '', normalizeFormulaForCheck)
+    !isResolvedConclusionLine({
+      line: last,
+      index: lastIndex,
+      conclusion: proof?.conclusion,
+      normalizeFormula: normalizeFormulaForCheck,
+      openAssumptionDepths,
+    })
   )
   return { perLine, rows, shouldAutoAdd }
 }
@@ -140,12 +156,14 @@ export function deriveDerivationLooksGood({
   if (!lastFilled || lastFilled.readOnly) return { ok: false, index: null }
   if (!isLineCompleteForCheck(lastFilled)) return { ok: false, index: null }
   if (autoCheckPerLine[lastFilledIndex] !== 'ok') return { ok: false, index: null }
-  const matchesConclusion = formulasEqualNormally(
-    lastFilled.formula || '',
+  const openAssumptionDepths = getOpenAssumptionDepths(lines)
+  if (!isResolvedConclusionLine({
+    line: lastFilled,
+    index: lastFilledIndex,
     conclusion,
-    normalizeFormulaForCheck
-  )
-  if (!matchesConclusion) return { ok: false, index: null }
+    normalizeFormula: normalizeFormulaForCheck,
+    openAssumptionDepths,
+  })) return { ok: false, index: null }
   return { ok: true, index: lastFilledIndex }
 }
 

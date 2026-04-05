@@ -165,13 +165,58 @@ export default class DerivationCheck {
 
     checkConc() {
         const Formula = this.Formula;
+        let hasMainScopeConclusion = false;
+        let lastSubstantiveLine = null;
         for (const line of (this.deriv.lines ?? [])) {
             if (!line) { continue; }
+            if ((line.s && line.s.trim()) || (line.j && line.j.trim())) {
+                lastSubstantiveLine = line;
+            }
             const lineNorm = line.formulaNormal ??
                 (line.s ? Formula.from(line.s).normal : '');
-            if (lineNorm == this.conc) {
-                return;
+            const openAssumptions = Array.isArray(line?.openAssumptions)
+                ? line.openAssumptions
+                : [];
+            // only a conclusion in the main proof scope can finish the proof
+            if (lineNorm === this.conc && openAssumptions.length === 0) {
+                hasMainScopeConclusion = true;
             }
+        }
+        const unresolvedAssumptions = Array.isArray(lastSubstantiveLine?.openAssumptions)
+            ? lastSubstantiveLine.openAssumptions
+            : [];
+        // the last real line tells us whether an acp or aip is still open
+        if (unresolvedAssumptions.length > 0) {
+            const unresolvedRules = new Set(
+                unresolvedAssumptions.map((assumptionLine) =>
+                    this.resolveRuleName(assumptionLine)
+                )
+            );
+            if (unresolvedRules.has('ACP')) {
+                this.adderror(
+                    lastSubstantiveLine?.n || '1',
+                    "dependency",
+                    "low",
+                    "Conditional Proof sequence not discharged."
+                );
+            }
+            if (unresolvedRules.has('AIP')) {
+                this.adderror(
+                    lastSubstantiveLine?.n || '1',
+                    "dependency",
+                    "low",
+                    "Indirect Proof sequence not discharged."
+                );
+            }
+            this.adderror(
+                lastSubstantiveLine?.n || '1',
+                "completion",
+                "high",
+                "open ACP/AIP subderivations must be closed with CP/IP before the proof is complete"
+            );
+        }
+        if (hasMainScopeConclusion) {
+            return;
         }
         
         // we attach the error to line one, which we really shouldn't but

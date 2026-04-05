@@ -37,6 +37,7 @@ import getFormulaClass from '../../../lib/logicpenguin/symbolic/formula.js'
 import getSyntax from '../../../lib/logicpenguin/symbolic/libsyntax.js'
 import { justParse } from '../../ui/logicpenguin/justification-parse.js'
 import { getInsertSymbolLabel } from '../../ui/logicpenguin/LogicSymbol.jsx'
+import { getOpenAssumptionDepths, isResolvedConclusionLine } from './derivationUtils.js'
 
 /** Compare formula strings by canonical form so ∃x(~Hx) and ∃x~Hx count equal */
 function formulasEqualNormally(a, b, normalizeForFallback) {
@@ -638,11 +639,19 @@ export default function DerivationTable({
     const lastFilledIndex = filledLineIndices.length ? filledLineIndices[filledLineIndices.length - 1] : -1
     const lastFilled = lastFilledIndex >= 0 ? linesSnapshot[lastFilledIndex] : null
     const allFilledComplete = filledLineIndices.every((idx) => isLineComplete(idx))
+    const openAssumptionDepths = getOpenAssumptionDepths(linesSnapshot)
+    const lastFilledResolvesConclusion = isResolvedConclusionLine({
+      line: lastFilled,
+      index: lastFilledIndex,
+      conclusion: proof?.conclusion,
+      normalizeFormula: normalizeFormulaForCheck,
+      openAssumptionDepths,
+    })
     const readyForRuleGate = Boolean(
       normalizedConclusion &&
       lastFilled &&
       isLineCompleteForCheck(lastFilled) &&
-      formulasEqualNormally(lastFilled.formula || '', proof?.conclusion || '', normalizeFormulaForCheck) &&
+      lastFilledResolvesConclusion &&
       allFilledComplete
     )
     const filteredErrors = {}
@@ -708,7 +717,13 @@ export default function DerivationTable({
       !last.readOnly &&
       isLineCompleteForCheck(last) &&
       perLine[lastIndex] === 'ok' &&
-      !formulasEqualNormally(last.formula || '', proof?.conclusion || '', normalizeFormulaForCheck)
+      !isResolvedConclusionLine({
+        line: last,
+        index: lastIndex,
+        conclusion: proof?.conclusion,
+        normalizeFormula: normalizeFormulaForCheck,
+        openAssumptionDepths,
+      })
     )
     return { perLine, rows, shouldAutoAdd }
   }, [normalizeFormulaForCheck, normalizeJustificationForCheck, premises, proof?.conclusion, proof?.options, proof?.ruleset, isLineCompleteForCheck])
@@ -732,7 +747,14 @@ export default function DerivationTable({
             if (!last || last.readOnly || !isLineCompleteForCheck(last)) return prev
             const conclusionStr = proof?.conclusion || ''
             if (!conclusionStr) return prev
-            if (formulasEqualNormally(last.formula || '', conclusionStr, normalizeFormulaForCheck)) return prev
+            const openAssumptionDepths = getOpenAssumptionDepths(prev)
+            if (isResolvedConclusionLine({
+              line: last,
+              index: prev.length - 1,
+              conclusion: conclusionStr,
+              normalizeFormula: normalizeFormulaForCheck,
+              openAssumptionDepths,
+            })) return prev
             pendingFocusRef.current = prev.length
             return [...prev, { formula: '', justification: '', readOnly: false }]
           })
@@ -770,12 +792,14 @@ export default function DerivationTable({
     if (!lastFilled || lastFilled.readOnly) return { ok: false, index: null }
     if (!isLineCompleteForCheck(lastFilled)) return { ok: false, index: null }
     if (autoCheckState.perLine[lastFilledIndex] !== 'ok') return { ok: false, index: null }
-    const matchesConclusion = formulasEqualNormally(
-      lastFilled.formula || '',
+    const openAssumptionDepths = getOpenAssumptionDepths(lines)
+    if (!isResolvedConclusionLine({
+      line: lastFilled,
+      index: lastFilledIndex,
       conclusion,
-      normalizeFormulaForCheck
-    )
-    if (!matchesConclusion) return { ok: false, index: null }
+      normalizeFormula: normalizeFormulaForCheck,
+      openAssumptionDepths,
+    })) return { ok: false, index: null }
     return { ok: true, index: lastFilledIndex }
   }, [autoCheckEnabled, autoCheckState.perLine, isLineCompleteForCheck, lines, normalizeFormulaForCheck, premises.length, proof?.conclusion])
 
