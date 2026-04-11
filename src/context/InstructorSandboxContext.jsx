@@ -227,6 +227,10 @@ export function InstructorSandboxProvider({ children }) {
       Object.entries(courseState.assignmentsByCourse || {}).map(([courseId, assignments]) => {
         const students = courseState.gradebookByCourse?.[courseId] || []
         const assignmentStats = (assignments || []).map((assignment) => {
+          const grades = students
+            .filter((student) => Boolean(student.submittedAssignments?.[assignment.id]))
+            .map((student) => Number(student.grades?.[assignment.id]))
+            .filter((value) => Number.isFinite(value))
           const attempts = students
             .map((student) => Number(student.attemptCounts?.[assignment.id] || 0))
             .filter((value) => Number.isFinite(value) && value > 0)
@@ -234,6 +238,7 @@ export function InstructorSandboxProvider({ children }) {
           return {
             id: assignment.id,
             students_submitted: students.filter((student) => Boolean(student.submittedAssignments?.[assignment.id])).length,
+            avg_score: grades.length > 0 ? average(grades) : null,
             avg_attempt: average(attempts),
             avg_minutes_per_question: 8 + questionCount * 2,
             median_minutes_per_question: 6 + questionCount * 2,
