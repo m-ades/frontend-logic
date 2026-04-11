@@ -93,7 +93,7 @@ function AppRoutes() {
       </Route>
 
       <Route element={<AppProviders />}>
-        <Route path="/" element={<Navigate to="/login" replace />} />
+        <Route path="/" element={<Landing />} />
         <Route path="/login" element={<Login />} />
         <Route
           path="/student"
