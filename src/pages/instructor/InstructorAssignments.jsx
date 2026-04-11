@@ -50,8 +50,7 @@ export default function InstructorAssignments() {
   const {
     courseState,
     courseActions,
-    assignmentPath,
-    assignmentsPath,
+    assignmentBuilderPath,
   } = useAppRuntime();
   const { activeCourseId, assignmentsByCourse, gradebookByCourse, courses } = courseState;
   const navigate = useNavigate();
@@ -110,8 +109,8 @@ export default function InstructorAssignments() {
     try {
       const created = await courseActions.createAssignment?.(activeCourseId, formData);
       setCreateDialogOpen(false);
-      navigate(assignmentPath(created?.id), {
-        state: { returnTo: assignmentsPath, assignmentId: created?.id },
+      navigate(assignmentBuilderPath, {
+        state: { assignmentId: created?.id },
       });
     } catch (error) {
       console.error("Failed to create assignment", error);
@@ -189,11 +188,11 @@ export default function InstructorAssignments() {
   };
 
   const handleViewAssignment = (assignment) => {
-    navigate(assignmentPath(assignment.id), { state: { returnTo: assignmentsPath, assignmentId: assignment.id } });
+    navigate(assignmentBuilderPath, { state: { assignmentId: assignment.id } });
   };
 
   const handleOpenBuilder = (assignment) => {
-    navigate(assignmentPath(assignment.id), { state: { returnTo: assignmentsPath, assignmentId: assignment.id } });
+    navigate(assignmentBuilderPath, { state: { assignmentId: assignment.id } });
     setMenuAnchor(null);
   };
 
