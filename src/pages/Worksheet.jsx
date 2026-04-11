@@ -414,7 +414,7 @@ function RealWorksheetContent() {
   const [currentDueAt, setCurrentDueAt] = useState(null)
   const [questionScores, setQuestionScores] = useState({})
   const { activeCourseId } = useCoursesState()
-  const { assignmentPath, assignmentsPath } = useAppRuntime()
+  const { assignmentPath, assignmentsPath, isInstructor } = useAppRuntime()
   const courseId = activeCourseId ?? API_CONFIG.courseId
   const courseIdForApi = activeCourseId ?? null
   const sessionId = useRef(null)
@@ -1257,7 +1257,7 @@ function RealWorksheetContent() {
           gradeLabel={gradeLabel}
           policySummary={policySummary}
           isOverdue={isOverdue}
-          isInstructorView={isInstructorView}
+          isInstructorView={isInstructor}
           onQuestionSaved={currentWorksheet?.id ? (qId) => refreshQuestionSolutions(currentWorksheet.id, qId) : undefined}
           onQuestionCreated={handleQuestionCreated}
         />
