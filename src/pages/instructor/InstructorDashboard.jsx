@@ -187,18 +187,10 @@ export default function InstructorDashboard() {
     [nonPracticeAssignments]
   );
 
-  const gradedPastDueAssignments = useMemo(
-    () =>
-      gradedUnlockedAssignments.filter(
-        (assignment) => assignment.dueAt && assignment.dueAt <= new Date()
-      ),
-    [gradedUnlockedAssignments]
-  );
-
-  const totalAverage = gradedPastDueAssignments.length > 0
+  const totalAverage = enrichedAssignments.length > 0
     ? Math.round(
-        gradedPastDueAssignments.reduce((sum, a) => sum + a.average, 0) /
-          gradedPastDueAssignments.length
+        enrichedAssignments.reduce((sum, a) => sum + a.average, 0) /
+          enrichedAssignments.length
       )
     : 0;
 

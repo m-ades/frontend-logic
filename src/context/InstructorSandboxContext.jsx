@@ -205,7 +205,6 @@ export function InstructorSandboxProvider({ children }) {
         const students = courseState.gradebookByCourse?.[courseId] || []
         const summary = (assignments || []).map((assignment) => {
           const grades = students
-            .filter((student) => Boolean(student.submittedAssignments?.[assignment.id]))
             .map((student) => student.grades?.[assignment.id])
             .filter((value) => Number.isFinite(value))
           return {
@@ -228,7 +227,6 @@ export function InstructorSandboxProvider({ children }) {
         const students = courseState.gradebookByCourse?.[courseId] || []
         const assignmentStats = (assignments || []).map((assignment) => {
           const grades = students
-            .filter((student) => Boolean(student.submittedAssignments?.[assignment.id]))
             .map((student) => Number(student.grades?.[assignment.id]))
             .filter((value) => Number.isFinite(value))
           const attempts = students
