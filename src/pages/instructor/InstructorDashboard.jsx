@@ -172,7 +172,8 @@ export default function InstructorDashboard() {
   // Pass the course's grading scale to calculateGradeDistribution
   const gradeDistribution = calculateGradeDistribution(
     studentsForAssignments,
-    course?.gradingScale
+    course?.gradingScale,
+    nonPracticeAssignments
   );
 
   const isGradedAndUnlocked = (assignment) => {
@@ -269,7 +270,7 @@ export default function InstructorDashboard() {
         <MetricCard
           title="Class Average"
           value={`${totalAverage}%`}
-          subtitle="Across all assignments"
+          subtitle="Past-due assignments only"
           icon={TrendingUp}
           gradient={["#10b981", "#059669"]}
         />

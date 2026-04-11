@@ -10,7 +10,7 @@ import {
   Chip,
   alpha,
 } from "@mui/material";
-import { useCoursesState } from "../../../context/CoursesContext";
+import { useCoursesState, getStudentsAtRisk } from "../../../context/CoursesContext";
 import {
   getLetterGrade,
   getGradeColorVariant,
@@ -33,21 +33,12 @@ export const StudentsAtRiskTable = ({ students, assignments }) => {
       ? sortedScale[1].minPercent // Second lowest grade (e.g., D = 60)
       : 70; // Default to 70 if only one grade level
 
-  const atRiskStudents = students
-    .map((student) => {
-      const grades = Object.values(student.grades).filter(
-        (g) => g !== undefined && g !== null
-      );
-      const avg =
-        grades.length > 0
-          ? Math.round(grades.reduce((sum, g) => sum + g, 0) / grades.length)
-          : 0;
-      const missing = assignments.length - grades.length;
-      const letterGrade = getLetterGrade(avg, gradingScale);
-      return { ...student, avg, missing, letterGrade };
+  const atRiskStudents = getStudentsAtRisk(students, assignments, atRiskThreshold).map(
+    (student) => ({
+      ...student,
+      letterGrade: getLetterGrade(student.avg, gradingScale),
     })
-    .filter((s) => s.avg < atRiskThreshold && s.avg > 0)
-    .sort((a, b) => a.avg - b.avg);
+  );
 
   // Get the grade level name for the threshold for display
   const thresholdGrade = gradingScale.find(

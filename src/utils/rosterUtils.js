@@ -1,50 +1,37 @@
 // Utility functions for roster management
-import { parseDueDateAsEastern } from "./easternTime.js";
-
-const getAssignmentDeadline = (assignment) => {
-  if (!assignment?.dueDate) return null;
-  const deadline = parseDueDateAsEastern(assignment.dueDate, assignment.dueTime);
-  return deadline && !Number.isNaN(deadline.getTime()) ? deadline : null;
-};
-
-const getPastDueAssignmentIds = (assignments) => {
-  if (!Array.isArray(assignments) || assignments.length === 0) return null;
-  const now = new Date();
-  const ids = new Set();
-  assignments.forEach((assignment) => {
-    const deadline = getAssignmentDeadline(assignment);
-    if (!deadline || deadline > now) return;
-    const assignmentId = Number(assignment.id);
-    if (Number.isFinite(assignmentId)) {
-      ids.add(assignmentId);
-    }
-  });
-  return ids;
-};
+import {
+  listPastDueGradedAssignments,
+  averagePercentPastDueAssignmentsRounded,
+} from "./studentGradeAverage.js";
 
 export function getStudentStats(student, assignments) {
-  const pastDueAssignmentIds = getPastDueAssignmentIds(assignments);
-  const grades = Object.entries(student.grades || {})
-    .filter(
-      ([assignmentId, grade]) =>
-        grade !== undefined &&
-        grade !== null &&
-        (!pastDueAssignmentIds ||
-          pastDueAssignmentIds.has(Number(assignmentId)))
-    )
-    .map(([, grade]) => grade);
+  const pastDue = listPastDueGradedAssignments(assignments || []);
+  const pastDueIds = new Set(
+    pastDue
+      .map((a) => Number(a.id))
+      .filter((id) => Number.isFinite(id))
+  );
+  const pastDueCount = pastDue.length;
   const average =
-    grades.length > 0
-      ? Math.round(grades.reduce((sum, g) => sum + g, 0) / grades.length)
+    pastDueCount > 0
+      ? averagePercentPastDueAssignmentsRounded(student, assignments || [], undefined, pastDue)
       : 0;
-  const completed = grades.length;
+  const gradesObj = student.grades || {};
+  const completed = pastDue.filter((a) => {
+    const id = Number(a.id);
+    if (!Number.isFinite(id)) return false;
+    const g = gradesObj[id] ?? gradesObj[String(id)];
+    const submitted =
+      student.submittedAssignments?.[id] ||
+      student.submittedAssignments?.[String(id)];
+    return Boolean(submitted) || (typeof g === "number" && g > 0);
+  }).length;
   const lateCount = Object.entries(student.lateSubmissions || {}).filter(
     ([assignmentId, isLate]) =>
-      Boolean(isLate) &&
-      (!pastDueAssignmentIds || pastDueAssignmentIds.has(Number(assignmentId)))
+      Boolean(isLate) && pastDueIds.has(Number(assignmentId))
   ).length;
 
-  return { average, completed, lateCount };
+  return { average, completed, lateCount, pastDueCount };
 }
 
 export function filterStudents(students, searchQuery) {
@@ -54,7 +41,7 @@ export function filterStudents(students, searchQuery) {
   );
 }
 
-/** Students onlyfor analytics */
+/** Students only (excludes TAs) for roster analytics. */
 function studentsOnlyForStats(students) {
   return Array.isArray(students)
     ? students.filter((s) => s.role !== "ta")
@@ -77,7 +64,7 @@ export function calculateClassStats(students, assignments) {
 
   const studentsAtRisk = forStats.filter((s) => {
     const stats = getStudentStats(s, assignments);
-    return stats.average < 70 && stats.average > 0;
+    return (stats.pastDueCount ?? 0) > 0 && stats.average < 70;
   }).length;
 
   return { totalStudents, averageClassGrade, studentsAtRisk };

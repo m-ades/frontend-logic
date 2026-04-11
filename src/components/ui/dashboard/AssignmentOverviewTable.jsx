@@ -104,12 +104,16 @@ export const AssignmentOverviewTable = ({
     assignmentsWithMetrics.reduce((sum, a) => sum + a.submissions, 0);
   const totalPossible =
     totalPossibleProp ?? assignments.length * totalStudents;
+  const now = new Date();
+  const pastDueForAvg = assignmentsWithMetrics.filter(
+    (a) => a.dueAt && a.dueAt <= now
+  );
   const totalAverage =
     totalAverageProp ??
-    (assignmentsWithMetrics.length > 0
+    (pastDueForAvg.length > 0
       ? Math.round(
-          assignmentsWithMetrics.reduce((sum, a) => sum + a.average, 0) /
-            assignmentsWithMetrics.length
+          pastDueForAvg.reduce((sum, a) => sum + a.average, 0) /
+            pastDueForAvg.length
         )
       : 0);
   const completionRate =

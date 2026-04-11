@@ -33,7 +33,7 @@ export default function InstructorGradebook() {
   }
 
   // Apply sorting
-  const sortedStudents = sortStudents(students, sortColumn, sortDirection);
+  const sortedStudents = sortStudents(students, sortColumn, sortDirection, assignments);
 
   // Handle sort column click
   const handleSort = (column) => {
