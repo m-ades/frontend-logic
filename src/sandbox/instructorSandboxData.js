@@ -1,6 +1,7 @@
 import { getSandboxAssignments, getSandboxPractices } from './mockData.js'
 
 const EASTERN = 'America/New_York'
+const INSTRUCTOR_ASSIGNMENT_DAY_OFFSETS = [-21, -14, -7]
 
 const addDays = (date, days) => {
   const next = new Date(date)
@@ -68,7 +69,7 @@ export const INSTRUCTOR_SANDBOX_COURSE = {
 }
 
 export const getInstructorSandboxAssignments = () => getSandboxAssignments().map((assignment, index) => {
-  const dueAt = assignment.due_at
+  const dueAt = addDays(now, INSTRUCTOR_ASSIGNMENT_DAY_OFFSETS[index] ?? -7)
   const publishAt = addDays(new Date(dueAt), -3)
   const publish = splitDateTime(publishAt)
   const due = splitDateTime(dueAt)
@@ -219,8 +220,7 @@ export const INSTRUCTOR_SANDBOX_STUDENTS = STUDENT_SCORES.map((scores, index) =>
       return acc
     }, {}),
     submittedAssignments: assignments.reduce((acc, assignment, assignmentIndex) => {
-      const submissionCutoff = [15, 14, 13][assignmentIndex] ?? 13
-      acc[assignment.id] = studentNumber <= submissionCutoff
+      acc[assignment.id] = Number.isFinite(scores[assignmentIndex])
       return acc
     }, {}),
     lateSubmissions: assignments.reduce((acc, assignment, assignmentIndex) => {
