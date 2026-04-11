@@ -45,6 +45,9 @@ export default function AssignmentTable({
   const isPractice = type === "practice";
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const dueDateLabel = (item) => (
+    formatEasternDateTime(item.dueDate, item.dueTime) ?? "—"
+  );
 
   if (items.length === 0) {
     return (
@@ -154,7 +157,7 @@ export default function AssignmentTable({
                     </Typography>
                     <Stack direction="row" alignItems="center" spacing={0.5}>
                       <Typography variant="body2" color="text.secondary">
-                        {formatEasternDateTime(item.dueDate, item.dueTime) ?? "—"}
+                        {dueDateLabel(item)}
                       </Typography>
                       {onEditDueDate && (
                         <Tooltip title="Edit due date">
@@ -187,28 +190,6 @@ export default function AssignmentTable({
                           Completions
                         </Typography>
                         {completionNode}
-                      </Stack>
-                      <Stack direction="row" justifyContent="space-between" alignItems="center">
-                        <Typography variant="caption" color="text.secondary">
-                          Retakes
-                        </Typography>
-                        <Chip
-                          label={item.allowRetakes ? "Allowed" : "Disabled"}
-                          color={item.allowRetakes ? "success" : "default"}
-                          size="small"
-                          variant="outlined"
-                        />
-                      </Stack>
-                      <Stack direction="row" justifyContent="space-between" alignItems="center">
-                        <Typography variant="caption" color="text.secondary">
-                          Solutions
-                        </Typography>
-                        <Chip
-                          label={item.showSolutions ? "Visible" : "Hidden"}
-                          color={item.showSolutions ? "info" : "default"}
-                          size="small"
-                          variant="outlined"
-                        />
                       </Stack>
                     </Stack>
                   ) : (
@@ -288,12 +269,6 @@ export default function AssignmentTable({
                   <TableCell align="center" sx={{ fontWeight: 600 }}>
                     Completions
                   </TableCell>
-                  <TableCell align="center" sx={{ fontWeight: 600 }}>
-                    Retakes
-                  </TableCell>
-                  <TableCell align="center" sx={{ fontWeight: 600 }}>
-                    Solutions
-                  </TableCell>
                 </>
               ) : (
                 <>
@@ -369,7 +344,7 @@ export default function AssignmentTable({
                     >
                       <Stack direction="row" alignItems="center" spacing={0.5}>
                         <Typography variant="body2" color="text.secondary">
-                          {formatEasternDateTime(item.dueDate, item.dueTime) ?? "—"}
+                          {dueDateLabel(item)}
                         </Typography>
                         {onEditDueDate && (
                           <Tooltip title="Edit due date">
@@ -410,22 +385,6 @@ export default function AssignmentTable({
                             <CheckCircle size={16} color="#4caf50" />
                           )}
                         </Box>
-                      </TableCell>
-                      <TableCell align="center">
-                        <Chip
-                          label={item.allowRetakes ? "Allowed" : "Disabled"}
-                          color={item.allowRetakes ? "success" : "default"}
-                          size="small"
-                          variant="outlined"
-                        />
-                      </TableCell>
-                      <TableCell align="center">
-                        <Chip
-                          label={item.showSolutions ? "Visible" : "Hidden"}
-                          color={item.showSolutions ? "info" : "default"}
-                          size="small"
-                          variant="outlined"
-                        />
                       </TableCell>
                     </>
                   ) : (
