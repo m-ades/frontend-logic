@@ -4,8 +4,7 @@ Shared truth table helpers for truthtable and truthtableeditor
   tokenizes headers and supports grid density 
 */  
 
-import { fetchJson, getActiveUserId } from '../../../utils/api.js'
-import { getSubmissionScore } from '../../../utils/problemHelpers.js'
+import { shouldUseApiValidation, submitApiValidation } from '../../../utils/submissionRuntime.js'
 import {
   argumentTables,
   equivTables,
@@ -310,22 +309,16 @@ export async function submitTruthTableAnswer({
   classificationEnabled,
   selection,
 }) {
-  if (assignmentQuestionId != null) {
-    const resp = await fetchJson('/api/validate/submission', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        assignment_question_id: assignmentQuestionId,
-        user_id: getActiveUserId(),
-        submission_data: submissionData,
-      }),
+  if (shouldUseApiValidation(assignmentQuestionId)) {
+    const { response, validation, successstatus, rawScore } = await submitApiValidation({
+      assignmentQuestionId,
+      submissionData,
     })
-    const validation = resp?.validation || {}
-    const success = validation.successstatus === 'correct'
-    const score = getSubmissionScore(resp)
+    const success = successstatus === 'correct'
+    const score = rawScore
     return {
       mode: 'remote',
-      response: resp,
+      response,
       score,
       isCorrect: success,
       nextStatus: success ? 'correct' : score != null && score > 0 && score < 100 ? 'partial' : 'incorrect',
@@ -343,11 +336,11 @@ export async function submitTruthTableAnswer({
     nextStatus: localIsCorrect ? 'correct' : 'incorrect',
     message: localIsCorrect
       ? 'Correct!'
-      : classificationEnabled && selection.length === 0
-        ? 'Select a classification before submitting.'
+        : classificationEnabled && selection.length === 0
+          ? 'Select a classification before submitting.'
         : 'Incorrect.',
+    }
   }
-}
 
 export function getDisplayedColumnCount(tables = [], combined) {
   if (!Array.isArray(tables) || tables.length === 0) return 0

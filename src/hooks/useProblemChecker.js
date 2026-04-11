@@ -4,8 +4,7 @@
  */
 import { useState, useEffect } from 'react'
 import { localCheck } from '../lib/logicpenguin/common.js'
-import { fetchJson, getActiveUserId } from '../utils/api.js'
-import { getSubmissionScore } from '../utils/problemHelpers.js'
+import { buildPersistedSubmissionState, shouldUseApiValidation, submitApiValidation } from '../utils/submissionRuntime.js'
 
 export function useProblemChecker({
   answer,
@@ -27,6 +26,7 @@ export function useProblemChecker({
   const [attemptCount, setAttemptCount] = useState(initialAttemptCount)
   const [maxAttempts, setMaxAttempts] = useState(attemptLimit)
   const isLocked = attemptCount >= maxAttempts
+  const useApiValidation = shouldUseApiValidation(assignmentQuestionId)
 
   // Sync from parent (e.g. after refreshQuestionSolutions) but never decrease count:
   // a submission response may have already set a higher value before parent state updates.
@@ -45,29 +45,30 @@ export function useProblemChecker({
     if (isChecking || isDisabled() || isLocked) return
     setIsChecking(true)
     try {
-      if (assignmentQuestionId) {
-        const resp = await fetchJson('/api/validate/submission', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            assignment_question_id: assignmentQuestionId,
-            user_id: getActiveUserId(),
-            submission_data: getAnswer(),
-          }),
+      if (useApiValidation) {
+        const submission = await submitApiValidation({
+          assignmentQuestionId,
+          submissionData: getAnswer(),
         })
-        const validation = resp?.validation || {}
-        const successstatus = validation.successstatus || 'incorrect'
-        if (typeof resp?.attempt_limit === 'number') {
-          setMaxAttempts(resp.attempt_limit)
+        const { response, validation, successstatus, rawScore, attempt, attemptLimit: nextAttemptLimit } = submission
+        if (typeof nextAttemptLimit === 'number') {
+          setMaxAttempts(nextAttemptLimit)
         }
-        setAttemptCount((prev) => resp?.submission?.attempt ?? prev + 1)
+        const nextAttempt = attempt ?? attemptCount + 1
+        setAttemptCount((prev) => attempt ?? prev + 1)
+        onStateChange?.(buildPersistedSubmissionState({
+          answerState: getAnswer(),
+          attemptCount: nextAttempt,
+          status: successstatus,
+          rawScore,
+        }))
         if (typeof window !== 'undefined') {
-          const score = getSubmissionScore(resp)
+          const score = rawScore
           window.dispatchEvent(new CustomEvent('assignment-submission', {
             detail: {
               assignmentQuestionId,
-              attempt: resp?.submission?.attempt,
-              attemptLimit: resp?.attempt_limit,
+              attempt,
+              attemptLimit: nextAttemptLimit,
               isCorrect: successstatus === 'correct',
               score,
             },
@@ -99,7 +100,19 @@ export function useProblemChecker({
           setMessage('Error checking answer')
           return
         }
+        const rawScore = result.successstatus === 'correct'
+          ? 100
+          : result.successstatus === 'partial'
+            ? 50
+            : 0
+        const nextAttempt = Math.min(attemptCount + 1, maxAttempts)
         setAttemptCount((prev) => Math.min(prev + 1, maxAttempts))
+        onStateChange?.(buildPersistedSubmissionState({
+          answerState: getAnswer(),
+          attemptCount: nextAttempt,
+          status: result.successstatus,
+          rawScore,
+        }))
         if (result.successstatus === 'correct') {
           setStatus('correct')
           setMessage('Correct!')

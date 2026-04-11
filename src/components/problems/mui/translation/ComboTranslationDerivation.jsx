@@ -1,12 +1,9 @@
-import { createPortal } from 'react-dom'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Alert, Box, IconButton, Stack, Typography, Tooltip } from '@mui/material'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { Alert, Box, Stack, Typography, Tooltip } from '@mui/material'
 import EditIcon from '@mui/icons-material/Edit'
-import CloseIcon from '@mui/icons-material/Close'
 import InstructorQuestionEditor from '../../InstructorQuestionEditor.jsx'
 import StatusBanner, { isTerminalStatus } from '../../../ui/StatusBanner.jsx'
 import { useTheme, useMediaQuery } from '@mui/material'
-import { ProblemCard } from '../frame/ProblemFrame.jsx'
 import ProblemSetButtons from '../frame/ProblemSetButtons.jsx'
 import FormulaInput from '../../../ui/logicpenguin/formula-input.js'
 import SymbolButtonRow from '../../../ui/logicpenguin/SymbolButtonRow.jsx'
@@ -65,7 +62,8 @@ function FormulaInputField({ value, onValueChange, fieldReadOnly, formulaInputRe
     if (!fieldReadOnly && onValueChange) {
       const handleChange = () => {
         if (fieldReadOnly) return
-        onValueChange(formulaInput.value)
+        const nextValue = formulaInput.value
+        onValueChange(nextValue)
       }
       changeHandlerRef.current = handleChange
       formulaInput.addEventListener('input', handleChange)
@@ -93,18 +91,10 @@ function FormulaInputField({ value, onValueChange, fieldReadOnly, formulaInputRe
         width: '100%',
         minHeight: '56px',
         display: 'flex',
-        alignItems: 'center',
+        alignItems: 'center'
       }}
     />
   )
-}
-
-function parseSymbolizationKeyFromPrompt(promptText) {
-  if (!promptText || typeof promptText !== 'string') return []
-  return promptText
-    .split(/\r?\n/)
-    .map((line) => line.trim())
-    .filter((line) => /^[A-Za-z]+\s*[=:]/.test(line))
 }
 
 const parseArgumentLine = (line) => {
@@ -139,21 +129,6 @@ const normalizeProof = (proofLike) => {
   return proofLike
 }
 
-function hasStartedDerivation(derivationState) {
-  const snapshot = derivationState?.ans ?? derivationState
-  if (!snapshot || !Array.isArray(snapshot.parts)) return false
-  const subderivations = snapshot.parts.filter((part) => part && Array.isArray(part.parts))
-  const targets = subderivations.length ? subderivations : snapshot.parts
-  const hasContent = (nodes) => nodes.some((node) => {
-    if (!node) return false
-    if (Array.isArray(node.parts)) return hasContent(node.parts)
-    const formula = typeof node.s === 'string' ? node.s.trim() : ''
-    const justification = typeof node.j === 'string' ? node.j.trim() : ''
-    return formula !== '' || justification !== ''
-  })
-  return hasContent(targets)
-}
-
 export default function ComboTranslationDerivation({
   proof,
   onStateChange,
@@ -166,22 +141,19 @@ export default function ComboTranslationDerivation({
   onQuestionSaved,
 }) {
   const theme = useTheme()
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'))
   const isPhone = useMediaQuery(theme.breakpoints.down('sm'))
   const editorRef = useRef(null)
   const openEdit = () => editorRef.current?.open?.()
   const Formula = useMemo(() => getFormulaClass(), [])
   const snapshot = proof?.comboTranslationDerivation || proof?.snapshot || {}
   const promptText = snapshot?.prompt || proof?.description || ''
-  const symbolizationKey = useMemo(
-    () => parseSymbolizationKeyFromPrompt(promptText),
-    [promptText]
-  )
   const [argumentLine, setArgumentLine] = useState(savedState?.argumentLine ?? '')
   const [derivationState, setDerivationState] = useState(savedState?.derivationState ?? null)
   const inputRef = useRef(null)
-  const [fullScreenOpen, setFullScreenOpen] = useState(false)
-  const [fullScreenFocusTarget, setFullScreenFocusTarget] = useState(null)
+  const [derivationAttemptCount, setDerivationAttemptCount] = useState(proof?.attemptCount ?? 0)
+  const [derivationAttemptLimit, setDerivationAttemptLimit] = useState(proof?.attemptLimit ?? 10)
+  const [derivationChecking, setDerivationChecking] = useState(false)
+  const [, setDerivationStatusBanner] = useState({ status: 'unanswered', message: '' })
 
   useEffect(() => {
     if (savedState?.argumentLine !== undefined) {
@@ -190,8 +162,19 @@ export default function ComboTranslationDerivation({
   }, [savedState?.argumentLine])
 
   useEffect(() => {
-    setDerivationState(savedState?.derivationState ?? null)
+    if (savedState?.derivationState) {
+      setDerivationState(savedState.derivationState)
+    }
   }, [savedState?.derivationState])
+
+  useEffect(() => {
+    if (typeof proof?.attemptCount === 'number') {
+      setDerivationAttemptCount(proof.attemptCount)
+    }
+    if (typeof proof?.attemptLimit === 'number') {
+      setDerivationAttemptLimit(proof.attemptLimit)
+    }
+  }, [proof?.attemptCount, proof?.attemptLimit])
 
   const updateState = (updates) => {
     const state = { argumentLine, derivationState, ...updates }
@@ -215,23 +198,37 @@ export default function ComboTranslationDerivation({
     }
   }, [Formula, argumentLine])
 
-  const derivationProof = useMemo(() => {
+  const derivationProblem = useMemo(() => {
     if (!parseStatus.ok || !parseStatus.parsed) return null
     return {
-      ...proof,
       premises: parseStatus.parsed.premises,
       conclusion: parseStatus.parsed.conclusion,
     }
-  }, [parseStatus.ok, parseStatus.parsed, proof])
+  }, [parseStatus.ok, parseStatus.parsed])
 
-  const hasStartedDerivationLine = useMemo(
-    () => hasStartedDerivation(derivationState),
-    [derivationState]
-  )
+  const hasStartedDerivationLine = useMemo(() => {
+    const snapshot = derivationState?.ans ?? derivationState
+    if (!snapshot || !Array.isArray(snapshot.parts)) return false
+    const subderivations = snapshot.parts.filter((part) => part && Array.isArray(part.parts))
+    const targets = subderivations.length ? subderivations : snapshot.parts
+    const hasContent = (nodes) => nodes.some((node) => {
+      if (!node) return false
+      if (Array.isArray(node.parts)) return hasContent(node.parts)
+      const formula = typeof node.s === 'string' ? node.s.trim() : ''
+      const justification = typeof node.j === 'string' ? node.j.trim() : ''
+      return formula !== '' || justification !== ''
+    })
+    return hasContent(targets)
+  }, [derivationState])
+
+  const getProofAnswer = () => {
+    return normalizeProof(derivationState)
+  }
 
   const resetInputs = () => {
     setArgumentLine('')
     setDerivationState(null)
+    setDerivationStatusBanner({ status: 'unanswered', message: '' })
     if (inputRef.current) {
       inputRef.current.value = ''
     }
@@ -246,7 +243,7 @@ export default function ComboTranslationDerivation({
       options: proof?.options ?? snapshot?.options,
       getAnswer: () => ({
         argumentLine,
-        proof: normalizeProof(derivationState),
+        proof: normalizeProof(getProofAnswer()),
         derivationState: derivationState ?? undefined,
       }),
       onComplete,
@@ -264,89 +261,11 @@ export default function ComboTranslationDerivation({
     updateState({ argumentLine: value, derivationState: null })
   }
 
-  const handleDerivationChange = (state) => {
-    setDerivationState(state)
-    updateState({ derivationState: state })
-  }
-
-  const openFullScreen = useCallback((focusTarget) => {
-    setFullScreenFocusTarget(focusTarget ?? null)
-    setFullScreenOpen(true)
-  }, [])
-
-  const closeFullScreen = useCallback(() => {
-    setFullScreenOpen(false)
-    setFullScreenFocusTarget(null)
-  }, [])
-
-  const derivationProps = derivationProof
-    ? {
-        proof: derivationProof,
-        savedState: derivationState,
-        onStateChange: handleDerivationChange,
-        onAttempt: () => {},
-        onProofComplete: () => {},
-        attemptCount,
-        attemptLimit: maxAttempts,
-        isChecking,
-        setAttemptCount: () => {},
-        setAttemptLimit: () => {},
-        setStatusBanner: () => {},
-        setIsChecking: () => {},
-        isAssignmentLocked,
-        isMobile,
-        isPhone,
-        onOpenFullScreen: openFullScreen,
-        onCloseFullScreen: closeFullScreen,
-        hideActions: true,
-      }
-    : null
-
-  const fullScreenOverlay = isMobile && fullScreenOpen && derivationProps && typeof document !== 'undefined' && createPortal(
-    <Box
-      sx={{
-        position: 'fixed',
-        inset: 0,
-        width: '100%',
-        maxWidth: '100%',
-        boxSizing: 'border-box',
-        margin: 0,
-        padding: 0,
-        zIndex: 1300,
-        bgcolor: 'background.paper',
-        overflowX: 'hidden',
-        overflowY: 'auto',
-        display: 'flex',
-        flexDirection: 'column',
-      }}
-    >
-      <Box sx={{ display: 'flex', justifyContent: 'flex-end', pt: 1, pb: 1, pl: 2, pr: 0, flexShrink: 0 }}>
-        <IconButton
-          onClick={closeFullScreen}
-          aria-label="Close full screen"
-          size="large"
-          sx={{ color: 'text.primary' }}
-        >
-          <CloseIcon />
-        </IconButton>
-      </Box>
-      <DerivationTable
-        key={`fullscreen-${argumentLine}`}
-        {...derivationProps}
-        isFullScreen
-        initialFocusLineIndex={fullScreenFocusTarget?.lineIndex}
-        initialFocusField={fullScreenFocusTarget?.field}
-      />
-    </Box>,
-    document.body
-  )
-
   return (
-    <>
-      {fullScreenOverlay}
-      <Stack spacing={3} sx={{ px: 0, width: '100%' }}>
-        <ProblemCard minHeight="auto" cardSx={{ p: { xs: 2, md: 2 } }}>
-          <Stack spacing={3}>
+    <Stack spacing={3} sx={{ px: 0, width: '100%' }}>
+      <Box className="logicpenguin" sx={{ width: '100%' }}>
+        <Box className="lp-problem-card">
+          <Stack spacing={3} sx={{ p: { xs: 2, md: 2 } }}>
             {isInstructorView && proof && (
               <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
                 <Tooltip title="Edit prompt">
@@ -376,8 +295,6 @@ export default function ComboTranslationDerivation({
                   placeholder="e.g. A ⊃ B / A // B"
                   aria-label="Argument line"
                   includeQuantifiers
-                  symbolizationKey={symbolizationKey}
-                  extraInsertButtons={[{ insert: '/' }, { insert: '//' }]}
                 />
               ) : (
                 <>
@@ -397,42 +314,61 @@ export default function ComboTranslationDerivation({
               )}
             </Box>
 
-            {parseStatus.ok && derivationProps && (!fullScreenOpen || !isPhone) && (
+            {parseStatus.ok && derivationProblem && (
               <DerivationTable
                 key={argumentLine}
-                {...derivationProps}
-                isFullScreen={false}
+                proof={{
+                  ...proof,
+                  premises: derivationProblem.premises,
+                  conclusion: derivationProblem.conclusion,
+                }}
+                savedState={derivationState}
+                onStateChange={(state) => {
+                  setDerivationState(state)
+                  updateState({ derivationState: state })
+                }}
+                onAttempt={() => {}}
+                onProofComplete={() => {}}
+                attemptCount={derivationAttemptCount}
+                attemptLimit={derivationAttemptLimit}
+                isChecking={derivationChecking}
+                setAttemptCount={setDerivationAttemptCount}
+                setAttemptLimit={setDerivationAttemptLimit}
+                setStatusBanner={setDerivationStatusBanner}
+                setIsChecking={setDerivationChecking}
+                isAssignmentLocked={isAssignmentLocked}
+                hideActions
               />
             )}
           </Stack>
-        </ProblemCard>
+        </Box>
+      </Box>
 
-        {!parseStatus.ok && parseStatus.reason && (
-          <Alert severity="info">{parseStatus.reason}</Alert>
-        )}
+      {!parseStatus.ok && parseStatus.reason && (
+        <Alert severity="info">{parseStatus.reason}</Alert>
+      )}
 
-        {isTerminalStatus(status) && (
-          <StatusBanner
-            status={status}
-            message={message}
-            onClose={() => setMessage('')}
-          />
-        )}
-
-        <ProblemSetButtons
-          onCheck={handleCheck}
-          onStartOver={handleStartOver}
-          isChecking={isChecking}
-          isDisabled={!parseStatus.ok || isLocked || isAssignmentLocked || !hasStartedDerivationLine}
-          align="flex-start"
-          attemptCount={attemptCount}
-          attemptLimit={maxAttempts}
-          isInstructorView={isInstructorView}
+      {isTerminalStatus(status) && (
+        <StatusBanner
+          status={status}
+          message={message}
+          onClose={() => setMessage('')}
         />
-        {isInstructorView && proof && (
-          <InstructorQuestionEditor ref={editorRef} proof={proof} isInstructorView onSaved={onQuestionSaved} trigger="none" />
-        )}
-      </Stack>
-    </>
+      )}
+
+      <ProblemSetButtons
+        onCheck={handleCheck}
+        onStartOver={handleStartOver}
+        isChecking={isChecking}
+        isDisabled={!parseStatus.ok || isLocked || isAssignmentLocked || !hasStartedDerivationLine}
+        align="flex-start"
+        attemptCount={attemptCount}
+        attemptLimit={maxAttempts}
+        isInstructorView={isInstructorView}
+      />
+      {isInstructorView && proof && (
+        <InstructorQuestionEditor ref={editorRef} proof={proof} isInstructorView onSaved={onQuestionSaved} trigger="none" />
+      )}
+    </Stack>
   )
 }

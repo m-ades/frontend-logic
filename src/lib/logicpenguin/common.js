@@ -131,9 +131,29 @@ export async function localCheck(prob) {
     if (!question || !problemtype || (typeof givenans === 'undefined')) {
         return false;
     }
-    // Allow null rightans for practice mode (validate without solution comparison)
-    // Only require it to be defined (can be null)
-    if (typeof rightans === 'undefined') {
+    const hasEmbeddedAnswer =
+        Object.prototype.hasOwnProperty.call(question, 'answer')
+        || Object.prototype.hasOwnProperty.call(question, 'answerIndex')
+        || (Array.isArray(question?.answerIndices) && question.answerIndices.length > 0)
+        || (
+            Array.isArray(question?.subquestions)
+            && question.subquestions.some((subq) =>
+                Object.prototype.hasOwnProperty.call(subq ?? {}, 'answer')
+                || Object.prototype.hasOwnProperty.call(subq ?? {}, 'answerIndex')
+                || (Array.isArray(subq?.answerIndices) && subq.answerIndices.length > 0)
+            )
+        )
+        || (
+            Array.isArray(question?.questions)
+            && question.questions.some((subq) =>
+                Object.prototype.hasOwnProperty.call(subq ?? {}, 'answer')
+                || Object.prototype.hasOwnProperty.call(subq ?? {}, 'answerIndex')
+                || (Array.isArray(subq?.answerIndices) && subq.answerIndices.length > 0)
+            )
+        );
+    // Some sandbox question types embed the correct answer directly in the
+    // question payload instead of passing it through myanswer.
+    if ((typeof rightans === 'undefined') && !hasEmbeddedAnswer) {
         return false;
     }
     const savestatus = prob.getIndicatorStatus().savestatus;
