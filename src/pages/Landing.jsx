@@ -1,9 +1,33 @@
+import { useEffect } from 'react'
+import '@fontsource/geist-sans/400.css'
+import '@fontsource/geist-sans/500.css'
+import '@fontsource/geist-sans/600.css'
+import '@fontsource/geist-sans/700.css'
+import '../landing/landing.css'
+import { HeroSection } from '@/components/ui/HeroSection1'
+import HowItWorksSection from './landing/HowItWorksSection'
+import FeaturesSection from './landing/FeaturesSection'
+import GivingDaySection from './landing/GivingDaySection'
+
+const LANDING_HTML_CLASS = 'landing-full-rem'
+
 export default function Landing() {
+  useEffect(() => {
+    document.documentElement.classList.add(LANDING_HTML_CLASS)
+    return () => document.documentElement.classList.remove(LANDING_HTML_CLASS)
+  }, [])
+
   return (
-    <ul>
-      <li><a href="/login">log in</a></li>
-      <li><a href="/sandbox/instructor/dashboard">instructor demo</a></li>
-      <li><a href="/sandbox/student/dashboard">student demo</a></li>
-    </ul>
+    <>
+      <div className="landing-main-flow">
+        <div className="landing-main-flow__bg" aria-hidden />
+        <div className="relative z-[1] flex flex-col">
+          <HeroSection />
+          <HowItWorksSection />
+          <FeaturesSection />
+        </div>
+      </div>
+      <GivingDaySection />
+    </>
   )
 }
