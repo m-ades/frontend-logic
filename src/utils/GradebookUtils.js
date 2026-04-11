@@ -1,8 +1,8 @@
-// Calculate average grade from grades object
-export function calculateAverage(grades) {
-  const values = Object.values(grades);
-  if (values.length === 0) return 0;
-  return Math.round(values.reduce((a, b) => a + b, 0) / values.length);
+import { averagePercentPastDueAssignmentsRounded } from "./studentGradeAverage.js";
+
+/** Row average: mean over officially past-due assignments only (missing = 0). */
+export function calculateOverallGradebookAverage(student, assignments) {
+  return averagePercentPastDueAssignmentsRounded(student, assignments || []);
 }
 
 // Get letter grade from numeric grade
@@ -19,7 +19,8 @@ export function filterStudents(
   students,
   searchTerm,
   selectedAssignment,
-  gradeFilter
+  gradeFilter,
+  assignments = []
 ) {
   return students.filter((student) => {
     // Search filter
@@ -42,7 +43,7 @@ export function filterStudents(
       if (gradeFilter === "f" && grade >= 60) return false;
     } else if (gradeFilter !== "all") {
       // Overall average filter
-      const average = calculateAverage(student.grades);
+      const average = calculateOverallGradebookAverage(student, assignments);
       if (gradeFilter === "a" && average < 90) return false;
       if (gradeFilter === "b" && (average < 80 || average >= 90)) return false;
       if (gradeFilter === "c" && (average < 70 || average >= 80)) return false;
@@ -55,7 +56,7 @@ export function filterStudents(
 }
 
 // Sort students by column
-export function sortStudents(students, sortColumn, sortDirection) {
+export function sortStudents(students, sortColumn, sortDirection, assignments = []) {
   return [...students].sort((a, b) => {
     let aValue, bValue;
 
@@ -66,8 +67,8 @@ export function sortStudents(students, sortColumn, sortDirection) {
         ? aValue.localeCompare(bValue)
         : bValue.localeCompare(aValue);
     } else if (sortColumn === "average") {
-      aValue = calculateAverage(a.grades);
-      bValue = calculateAverage(b.grades);
+      aValue = calculateOverallGradebookAverage(a, assignments);
+      bValue = calculateOverallGradebookAverage(b, assignments);
     } else {
       aValue = a.grades[sortColumn] ?? -1;
       bValue = b.grades[sortColumn] ?? -1;
@@ -117,7 +118,7 @@ export function exportGradebookCSV(students, assignments, courseLabel) {
   const rows = [
     ["Username", "Average", "Letter Grade", ...assignmentHeaders],
     ...students.map((student) => {
-      const average = calculateAverage(student?.grades || {});
+      const average = calculateOverallGradebookAverage(student, assignmentList);
       const letterGrade = getLetterGrade(average);
       const grades = student?.grades || {};
       const assignmentGrades = assignmentList.map((assignment) => {

@@ -140,12 +140,20 @@ export default function Dashboard() {
     const gradeMap = new Map(
       (grades || []).map((g) => [g.assignment_id ?? g.Assignment?.id, g])
     )
+    const nowMs = Date.now()
+    const isSummaryPastDue = (row) => {
+      const raw = row?.due_at ?? row?.due_date
+      if (!raw) return false
+      const d = new Date(raw)
+      return !Number.isNaN(d.getTime()) && d.getTime() <= nowMs
+    }
     const unlockedSummary = gradebookSummary?.length
       ? gradebookSummary.filter((a) => a.is_locked === false)
       : []
+    const unlockedPastDueSummary = unlockedSummary.filter(isSummaryPastDue)
     const timeline =
-      unlockedSummary.length > 0
-        ? unlockedSummary
+      unlockedPastDueSummary.length > 0
+        ? unlockedPastDueSummary
             .slice()
             .sort((a, b) => {
               const aDate = (a.due_at ?? a.due_date) ? new Date(a.due_at ?? a.due_date) : null
@@ -189,8 +197,8 @@ export default function Dashboard() {
             .filter((item) => item.studentPercent != null)
             .sort((a, b) => new Date(a.date) - new Date(b.date))
     const assignmentPercents =
-      unlockedSummary.length > 0
-        ? unlockedSummary.map((assignment) => {
+      unlockedPastDueSummary.length > 0
+        ? unlockedPastDueSummary.map((assignment) => {
             const grade = gradeMap.get(assignment.id)
             const max = grade?.max_score ?? 0
             const score = grade?.final_score ?? grade?.raw_score ?? null
@@ -211,8 +219,8 @@ export default function Dashboard() {
               return list
             }, [])
     const totalAssignments =
-      unlockedSummary.length > 0
-        ? unlockedSummary.length
+      unlockedPastDueSummary.length > 0
+        ? unlockedPastDueSummary.length
         : analyticsData?.assignments?.total ?? gradebookSummary?.length ?? grades?.length ?? 0
     const completedCount = assignmentPercents.filter((a) => a.percent > 0).length
     let overallPercent = null
@@ -228,9 +236,11 @@ export default function Dashboard() {
         ? classAvgWithDrop
         : (() => {
             const forAvg =
-              unlockedSummary.length > 0
-                ? unlockedSummary
-                : (gradebookSummary || []).filter((a) => a.is_locked === false)
+              unlockedPastDueSummary.length > 0
+                ? unlockedPastDueSummary
+                : (gradebookSummary || []).filter(
+                    (a) => a.is_locked === false && isSummaryPastDue(a)
+                  )
             const vals = forAvg
               .map((a) => a.avg_percent)
               .filter((v) => v != null)
@@ -433,11 +443,11 @@ export default function Dashboard() {
                 })}
               >
                 <Typography component="div" variant="body2" sx={{ mb: 1 }}>
-                  Grade = average of published assignments.
+                  Grade = average of published assignments whose due date has passed.
                   <br />
-                  Unattempted work counts as 0%.
+                  Unattempted past-due work counts as 0%. Upcoming assignments are excluded.
                   <br />
-                  Lowest 2 scores dropped after 3+ assignments.
+                  Lowest 2 scores dropped after 3+ past-due assignments.
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
                   {gradeOverview.total

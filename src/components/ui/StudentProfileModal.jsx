@@ -47,17 +47,7 @@ import { formatDate } from "../../utils/formatting.js";
 import { formatEasternFromIso, formatEasternDateTime } from "../../utils/easternTime.js";
 import { MetricCard } from "./MetricCard";
 import { fetchJson } from "../../utils/api.js";
-
-// Helper function to calculate average
-function calculateAverage(grades) {
-  const validGrades = Object.values(grades).filter(
-    (g) => g !== undefined && g !== null && !isNaN(g)
-  );
-  if (validGrades.length === 0) return 0;
-  return Math.round(
-    validGrades.reduce((sum, grade) => sum + grade, 0) / validGrades.length
-  );
-}
+import { averagePercentPastDueAssignmentsRounded } from "../../utils/studentGradeAverage.js";
 
 function calculateTrend(grades, assignments) {
   if (assignments.length < 3) return null;
@@ -332,7 +322,7 @@ export default function StudentProfileModal({
     }
   };
 
-  const average = calculateAverage(student.grades);
+  const average = averagePercentPastDueAssignmentsRounded(student, assignments || []);
   const letterGrade = getLetterGrade(average, gradingScale);
   const gradeColorVariant = getGradeColorVariant(average, gradingScale);
 

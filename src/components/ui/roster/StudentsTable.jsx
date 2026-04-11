@@ -92,6 +92,7 @@ export default function StudentsTable({
           <TableBody>
             {students.map((student) => {
               const stats = getStudentStats(student);
+              const hasPastDueBasis = (stats.pastDueCount ?? 0) > 0;
               const letterGrade =
                 stats.average >= 90
                   ? "A"
@@ -138,12 +139,12 @@ export default function StudentsTable({
                       variant="body2"
                       fontWeight={600}
                       color={
-                        stats.completed > 0 && stats.average < 70
+                        hasPastDueBasis && stats.average < 70
                           ? "error.main"
                           : "text.primary"
                       }
                     >
-                      {stats.completed > 0 ? `${stats.average}%` : "—"}
+                      {hasPastDueBasis ? `${stats.average}%` : "—"}
                     </Typography>
                   </TableCell>
 
@@ -151,7 +152,7 @@ export default function StudentsTable({
                     align="center"
                     onClick={() => onStudentClick(student)}
                   >
-                    {stats.completed > 0 ? (
+                    {hasPastDueBasis ? (
                       <Chip
                         label={letterGrade}
                         color={gradeColor}

@@ -8,6 +8,7 @@ import { formatDateTime } from '../utils/formatting.js'
 import { API_CONFIG, fetchJson, getActiveUserId } from '../utils/api.js'
 import { useCoursesState } from '../context/CoursesContext.jsx'
 import { sortAssignmentsBySubchapter } from '../utils/assignmentSort.js'
+import { getAssignmentDeadlineInstant } from '../utils/studentGradeAverage.js'
 
 function NoRowsOverlay() {
   return (
@@ -55,25 +56,29 @@ export default function Grades() {
     }))
   }, [courseIdForApi, assignments, grades])
 
-  const assignmentPercents = useMemo(() => {
-    return gradeEntries.map((entry) => {
-      const grade = entry.grade
-      const max = grade?.max_score ?? entry.assignment?.total_points ?? 0
-      const score = grade?.final_score ?? grade?.raw_score ?? null
-      const percent =
-        max > 0 && score !== null && score !== undefined ? (score / max) * 100 : 0
-      return percent
-    })
+  const pastDuePercents = useMemo(() => {
+    const nowMs = Date.now()
+    return gradeEntries
+      .filter((entry) => {
+        const d = getAssignmentDeadlineInstant(entry.assignment)
+        return d && d.getTime() <= nowMs
+      })
+      .map((entry) => {
+        const grade = entry.grade
+        const max = grade?.max_score ?? entry.assignment?.total_points ?? 0
+        const score = grade?.final_score ?? grade?.raw_score ?? null
+        return max > 0 && score !== null && score !== undefined ? (score / max) * 100 : 0
+      })
   }, [gradeEntries])
 
   const overallPercentage = useMemo(() => {
-    if (assignmentPercents.length === 0) return 0
+    if (pastDuePercents.length === 0) return 0
     let forAverage =
-      assignmentPercents.length >= 3
-        ? [...assignmentPercents].sort((a, b) => a - b).slice(2)
-        : assignmentPercents
+      pastDuePercents.length >= 3
+        ? [...pastDuePercents].sort((a, b) => a - b).slice(2)
+        : pastDuePercents
     return forAverage.reduce((s, p) => s + p, 0) / forAverage.length
-  }, [assignmentPercents])
+  }, [pastDuePercents])
 
   const rows = useMemo(
     () =>

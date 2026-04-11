@@ -3,19 +3,11 @@ import { fetchJson, getStoredUser } from "../utils/api.js";
 import { sortAssignmentsBySubchapter } from "../utils/assignmentSort.js";
 import { isInstructorRole } from "../utils/auth.js";
 import { parseDueDateAsEastern } from "../utils/easternTime.js";
+import { DEFAULT_GRADING_SCALE } from "../utils/gradingScaleDefaults.js";
 
 // ============================================================================
 // CONSTANTS
 // ============================================================================
-
-// Default grading scale
-const DEFAULT_GRADING_SCALE = [
-  { letter: "A", minPercent: 90, maxPercent: 100, color: "#10b981" },
-  { letter: "B", minPercent: 80, maxPercent: 89, color: "#6366f1" },
-  { letter: "C", minPercent: 70, maxPercent: 79, color: "#f59e0b" },
-  { letter: "D", minPercent: 60, maxPercent: 69, color: "#f97316" },
-  { letter: "F", minPercent: 0, maxPercent: 59, color: "#ef4444" },
-];
 
 // Default late policy
 const DEFAULT_LATE_POLICY = {
@@ -292,62 +284,10 @@ export function calculatePracticeCompletion(practiceId, students) {
   };
 }
 
-// Calculate grade distribution with custom grading scale
-export function calculateGradeDistribution(students, gradingScale) {
-  // Use default grading scale if none provided or if gradingScale is undefined
-  const scale =
-    gradingScale && Array.isArray(gradingScale)
-      ? gradingScale
-      : DEFAULT_GRADING_SCALE;
-
-  const distribution = scale.map((grade) => ({
-    grade: grade.letter,
-    range: `${grade.minPercent}-${grade.maxPercent}`,
-    count: 0,
-    color: grade.color,
-    minPercent: grade.minPercent,
-    maxPercent: grade.maxPercent,
-  }));
-
-  students.forEach((student) => {
-    const grades = Object.values(student.grades).filter(
-      (g) => g !== undefined && g !== null
-    );
-    if (grades.length === 0) return;
-
-    const average = Math.round(
-      grades.reduce((sum, g) => sum + g, 0) / grades.length
-    );
-
-    const gradeIndex = distribution.findIndex(
-      (d) => average >= d.minPercent && average <= d.maxPercent
-    );
-
-    if (gradeIndex !== -1) {
-      distribution[gradeIndex].count++;
-    }
-  });
-
-  return distribution;
-}
-
-// Calculate students at risk (below 70%)
-export function getStudentsAtRisk(students, assignments) {
-  return students
-    .map((student) => {
-      const grades = Object.values(student.grades).filter(
-        (g) => g !== undefined && g !== null
-      );
-      const avg =
-        grades.length > 0
-          ? Math.round(grades.reduce((sum, g) => sum + g, 0) / grades.length)
-          : 0;
-      const missing = assignments.length - grades.length;
-      return { ...student, avg, missing };
-    })
-    .filter((s) => s.avg < 70 && s.avg > 0)
-    .sort((a, b) => a.avg - b.avg);
-}
+export {
+  calculateGradeDistribution,
+  getStudentsAtRisk,
+} from "../utils/pastDueGradeRollups.js";
 
 // Get upcoming deadlines (within 7 days); due dates compared in Eastern
 export function getUpcomingDeadlines(assignments) {
