@@ -1,15 +1,17 @@
 import { ThemeProvider as MuiThemeProvider } from "@mui/material/styles";
 import { CssBaseline } from "@mui/material";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, Outlet } from "react-router-dom";
 import { ThemeProvider } from "./context/ThemeContext.jsx";
 import { useThemeState } from "./context/ThemeContext.jsx";
 import { LayoutProvider } from "./context/LayoutContext.jsx";
 import { AuthProvider } from "./context/AuthContext.jsx";
 import { CoursesProvider } from "./context/CoursesContext.jsx";
+import { SandboxProvider } from "./context/SandboxContext.jsx";
 import ErrorBoundary from "./components/ui/ErrorBoundary.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import ScrollToTop from "./components/layout/ScrollToTop.jsx";
 import AppLayout from "./components/layout/AppLayout.jsx";
+import SandboxLayout from "./components/layout/SandboxLayout.jsx";
 import Dashboard from "./pages/Dashboard.jsx";
 import Worksheet from "./pages/Worksheet.jsx";
 import Assignments from "./pages/Assignments.jsx";
@@ -29,9 +31,69 @@ import InstructorPractice from "./pages/instructor/InstructorPractice.jsx";
 import InstructorRoster from "./pages/instructor/InstructorRoster.jsx";
 import InstructorContact from "./pages/instructor/Contact.jsx";
 
+function SandboxProviders() {
+  return (
+    <SandboxProvider>
+      <Outlet />
+    </SandboxProvider>
+  );
+}
+
 function AppRoutes() {
   return (
     <Routes>
+      <Route element={<SandboxProviders />}>
+        <Route path="/sandbox" element={<Navigate to="/sandbox/dashboard" replace />} />
+        <Route
+          path="/sandbox/courses"
+          element={(
+            <SandboxLayout>
+              <Courses />
+            </SandboxLayout>
+          )}
+        />
+        <Route
+          path="/sandbox/dashboard"
+          element={(
+            <SandboxLayout>
+              <Dashboard />
+            </SandboxLayout>
+          )}
+        />
+        <Route
+          path="/sandbox/assignments"
+          element={(
+            <SandboxLayout>
+              <Assignments />
+            </SandboxLayout>
+          )}
+        />
+        <Route
+          path="/sandbox/practice"
+          element={(
+            <SandboxLayout>
+              <Practice />
+            </SandboxLayout>
+          )}
+        />
+        <Route
+          path="/sandbox/grades"
+          element={(
+            <SandboxLayout>
+              <Grades />
+            </SandboxLayout>
+          )}
+        />
+        <Route
+          path="/sandbox/assignment/:assignmentId"
+          element={(
+            <SandboxLayout>
+              <Worksheet />
+            </SandboxLayout>
+          )}
+        />
+      </Route>
+
       <Route path="/login" element={<Login />} />
 
       <Route path="/" element={<Landing />} />
