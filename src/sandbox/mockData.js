@@ -326,7 +326,7 @@ export const SANDBOX_PRACTICES = [
   {
     id: 'sandbox-practice-1',
     course_id: SANDBOX_COURSE.id,
-    title: 'Practice Assignment 1',
+    title: 'Conceptual Understanding',
     description: '',
     chapter: 1,
     subchapter: '1.1',
@@ -460,7 +460,7 @@ export const SANDBOX_PRACTICES = [
   {
     id: 'sandbox-practice-2',
     course_id: SANDBOX_COURSE.id,
-    title: 'Practice Assignment 2',
+    title: 'Symbolic Translations',
     description: '',
     chapter: 1,
     subchapter: '1.2',
@@ -542,7 +542,7 @@ export const SANDBOX_PRACTICES = [
   {
     id: 'sandbox-practice-3',
     course_id: SANDBOX_COURSE.id,
-    title: 'Practice Assignment 3',
+    title: 'Natural Deductions',
     description: '',
     chapter: 2,
     subchapter: '2.1',
@@ -606,7 +606,7 @@ export const SANDBOX_PRACTICES = [
   {
     id: 'sandbox-practice-4',
     course_id: SANDBOX_COURSE.id,
-    title: 'Practice Assignment 4',
+    title: 'Truth Tables',
     description: '',
     chapter: 2,
     subchapter: '2.2',
