@@ -82,13 +82,14 @@ export default function Practice() {
   return (
     <Box>
       <ActivityAccordion
-        title="Practice Problems"
-        courseStructure={courseStructure}
-        isLoading={isLoadingPractice}
-        emptyText="No practice problems available"
-        renderActivity={(activity, { chapter, subchapter }) => (
-          <ThemedCard
-            key={activity.id}
+      title="Practice Problems"
+      courseStructure={courseStructure}
+      isLoading={isLoadingPractice}
+      emptyText="No practice problems available"
+      defaultSubchapterExpanded
+      renderActivity={(activity, { chapter, subchapter }) => (
+        <ThemedCard
+          key={activity.id}
             sx={{ cursor: 'pointer', '&:hover': { boxShadow: 4 } }}
             onClick={() => handleActivityClick(activity)}
           >

@@ -322,6 +322,7 @@ export default function Assignments() {
       showExpandAll={showExpandAll}
       showCollapseAll={showCollapseAll}
       showExpandCollapseToggle={showExpandCollapseToggle}
+      defaultSubchapterExpanded
       persistKey={accordionStorageKey}
       storage={storageScope}
       renderActivity={(activity, context) =>
