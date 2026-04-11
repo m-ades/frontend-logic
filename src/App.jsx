@@ -22,6 +22,7 @@ import InstructorControls from "./pages/instructor/InstructorControls.jsx";
 import InstructorAssignments from "./pages/instructor/InstructorAssignments.jsx";
 import AssignmentBuilder from "./pages/instructor/InstructorAssignmentBuilder.jsx";
 import Login from "./pages/Login.jsx";
+import Landing from "./pages/Landing.jsx";
 import Courses from "./pages/Courses.jsx";
 import Profile from "./pages/Profile.jsx";
 import InstructorPractice from "./pages/instructor/InstructorPractice.jsx";
@@ -33,7 +34,7 @@ function AppRoutes() {
     <Routes>
       <Route path="/login" element={<Login />} />
 
-      <Route path="/" element={<Navigate to="/login" replace />} />
+      <Route path="/" element={<Landing />} />
 
       <Route
         path="/student"
