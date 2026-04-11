@@ -10,7 +10,7 @@ import {
   remapStudentPath,
 } from "../../runtime/sandboxRuntime.js";
 
-const STUDENT_SANDBOX_PREFIX = "/sandbox";
+const STUDENT_SANDBOX_PREFIX = "/sandbox/student";
 const sandboxSidebarLabels = new Set(["Dashboard", "Assignments", "Practice", "Grades"]);
 
 function SandboxFrame({ children, runtimeValue, sidebarStructure, onExit }) {

@@ -43,9 +43,10 @@ function AppRoutes() {
   return (
     <Routes>
       <Route element={<SandboxProviders />}>
-        <Route path="/sandbox" element={<Navigate to="/sandbox/dashboard" replace />} />
+        <Route path="/sandbox" element={<Navigate to="/sandbox/student/dashboard" replace />} />
+        <Route path="/sandbox/student" element={<Navigate to="/sandbox/student/dashboard" replace />} />
         <Route
-          path="/sandbox/courses"
+          path="/sandbox/student/courses"
           element={(
             <SandboxLayout>
               <Courses />
@@ -53,7 +54,7 @@ function AppRoutes() {
           )}
         />
         <Route
-          path="/sandbox/dashboard"
+          path="/sandbox/student/dashboard"
           element={(
             <SandboxLayout>
               <Dashboard />
@@ -61,7 +62,7 @@ function AppRoutes() {
           )}
         />
         <Route
-          path="/sandbox/assignments"
+          path="/sandbox/student/assignments"
           element={(
             <SandboxLayout>
               <Assignments />
@@ -69,7 +70,7 @@ function AppRoutes() {
           )}
         />
         <Route
-          path="/sandbox/practice"
+          path="/sandbox/student/practice"
           element={(
             <SandboxLayout>
               <Practice />
@@ -77,7 +78,7 @@ function AppRoutes() {
           )}
         />
         <Route
-          path="/sandbox/grades"
+          path="/sandbox/student/grades"
           element={(
             <SandboxLayout>
               <Grades />
@@ -85,7 +86,7 @@ function AppRoutes() {
           )}
         />
         <Route
-          path="/sandbox/assignment/:assignmentId"
+          path="/sandbox/student/assignment/:assignmentId"
           element={(
             <SandboxLayout>
               <Worksheet />
