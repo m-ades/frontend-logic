@@ -13,7 +13,6 @@ import {
   Tooltip,
   alpha,
 } from "@mui/material";
-import { useCoursesState } from "../../../context/CoursesContext";
 import {
   getLetterGrade,
   getGradeColorVariant,
@@ -21,6 +20,7 @@ import {
   getDefaultGradingScale,
 } from "../../../utils/gradingUtils";
 import StudentProfileModal from "../StudentProfileModal";
+import { useAppRuntime } from "../../../hooks/useAppRuntime.js";
 
 // Helper function to calculate average
 function calculateAverage(grades) {
@@ -54,7 +54,8 @@ export default function GradebookTable({
   sortDirection,
   handleSort,
 }) {
-  const { courses, activeCourseId } = useCoursesState();
+  const { courseState } = useAppRuntime();
+  const { courses, activeCourseId } = courseState;
   const activeCourse = courses.find((c) => c.id === activeCourseId);
   const gradingScale = activeCourse?.gradingScale || getDefaultGradingScale();
   const isInstructor = activeCourse?.role === "instructor";

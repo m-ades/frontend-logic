@@ -1,17 +1,17 @@
 import { useState } from "react";
 import { Box, Typography, Button } from "@mui/material";
 import { Download } from "lucide-react";
-import { useCoursesState } from "../../context/CoursesContext";
 import GradebookTable from "../../components/ui/gradebook/GradebookTable";
 import {
   sortStudents,
   exportGradebookCSV,
 } from "../../utils/GradebookUtils";
 import { sortAssignmentsBySubchapter } from "../../utils/assignmentSort.js";
+import { useAppRuntime } from "../../hooks/useAppRuntime.js";
 
 export default function InstructorGradebook() {
-  const { courses, activeCourseId, assignmentsByCourse, gradebookByCourse } =
-    useCoursesState();
+  const { courseState } = useAppRuntime();
+  const { courses, activeCourseId, assignmentsByCourse, gradebookByCourse } = courseState;
 
   // Sort states
   const [sortColumn, setSortColumn] = useState("username");

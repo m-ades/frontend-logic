@@ -36,7 +36,6 @@ import {
   CheckCircle,
   AlertCircle,
 } from "lucide-react";
-import { useCoursesState } from "../../context/CoursesContext";
 import {
   getLetterGrade,
   getGradeColorVariant,
@@ -46,7 +45,7 @@ import {
 import { formatDate } from "../../utils/formatting.js";
 import { formatEasternFromIso, formatEasternDateTime } from "../../utils/easternTime.js";
 import { MetricCard } from "./MetricCard";
-import { fetchJson } from "../../utils/api.js";
+import { useAppRuntime } from "../../hooks/useAppRuntime.js";
 
 // Helper function to calculate average
 function calculateAverage(grades) {
@@ -90,7 +89,8 @@ export default function StudentProfileModal({
   onToggleRole,
 }) {
   const theme = useTheme();
-  const { courses, activeCourseId } = useCoursesState();
+  const { courseState, courseActions } = useAppRuntime();
+  const { courses, activeCourseId } = courseState;
   const activeCourse = courses.find((c) => c.id === activeCourseId);
   const gradingScale = activeCourse?.gradingScale || getDefaultGradingScale();
 
@@ -126,16 +126,13 @@ export default function StudentProfileModal({
 
   // hydrate accommodations when the modal opens
   useEffect(() => {
-    const courseId = Number(activeCourseId);
-    if (!open || !student || !Number.isFinite(courseId) || !canEditAccommodations) return;
+    if (!open || !student || !canEditAccommodations) return;
     let isMounted = true;
     const load = async () => {
       setAccommodationLoading(true);
       setAccommodationError("");
       try {
-        const rows = await fetchJson(
-          `/api/instructor/courses/${courseId}/accommodations`
-        );
+        const rows = await courseActions.getAccommodations?.(activeCourseId, student.id);
         if (!isMounted) return;
         const record = (rows || []).find((r) => r.user_id === student.id);
         const lateDaysValue = Number.isFinite(Number(record?.extra_late_days))
@@ -154,17 +151,14 @@ export default function StudentProfileModal({
     return () => {
       isMounted = false;
     };
-  }, [open, student, activeCourseId, canEditAccommodations]);
+  }, [open, student, activeCourseId, canEditAccommodations, courseActions]);
 
   useEffect(() => {
-    const courseId = Number(activeCourseId);
-    if (!open || !student || !Number.isFinite(courseId) || !canEditAccommodations) return;
+    if (!open || !student || !canEditAccommodations) return;
     let isMounted = true;
     const load = async () => {
       try {
-        const rows = await fetchJson(
-          `/api/instructor/courses/${courseId}/deadlines/${student.id}`
-        );
+        const rows = await courseActions.getDeadlines?.(activeCourseId, student.id);
         if (!isMounted) return;
         const map = {};
         (rows || []).forEach((row) => {
@@ -181,7 +175,7 @@ export default function StudentProfileModal({
     return () => {
       isMounted = false;
     };
-  }, [open, student, activeCourseId, canEditAccommodations]);
+  }, [open, student, activeCourseId, canEditAccommodations, courseActions]);
 
   // default extension picker to the assignment due date
   useEffect(() => {
@@ -203,25 +197,19 @@ export default function StudentProfileModal({
 
   // store course level accommodations for this student
   const handleSaveAccommodation = async () => {
-    const courseId = Number(activeCourseId);
-    if (!Number.isFinite(courseId) || !student) return;
+    if (!student) return;
     setAccommodationSaved(false);
     setAccommodationError("");
     setAccommodationLoading(true);
     try {
-      await fetchJson(`/api/instructor/courses/${courseId}/accommodations`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          user_id: student.id,
-          extra_late_days: Math.max(0, parseInt(extraLateDays || "0", 10) || 0),
-          late_penalty_waived: Boolean(latePenaltyWaived),
-        }),
-      });
+      const payload = {
+        user_id: student.id,
+        extra_late_days: Math.max(0, parseInt(extraLateDays || "0", 10) || 0),
+        late_penalty_waived: Boolean(latePenaltyWaived),
+      };
+      await courseActions.saveAccommodations?.(activeCourseId, student.id, payload);
       try {
-        const rows = await fetchJson(
-          `/api/instructor/courses/${courseId}/deadlines/${student.id}`
-        );
+        const rows = await courseActions.getDeadlines?.(activeCourseId, student.id);
         const map = {};
         (rows || []).forEach((row) => {
           if (!row?.assignment_id) return;
@@ -265,22 +253,9 @@ export default function StudentProfileModal({
     }
     setExtensionSaving(true);
     try {
-      await fetchJson(
-        `/api/instructor/assignments/${assignmentId}/extensions`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            user_id: student.id,
-            extended_due_date: iso,
-          }),
-        }
-      );
+      await courseActions.saveDeadline?.(activeCourseId, assignmentId, student.id, iso);
       try {
-        const courseId = Number(activeCourseId);
-        const rows = await fetchJson(
-          `/api/instructor/courses/${courseId}/deadlines/${student.id}`
-        );
+        const rows = await courseActions.getDeadlines?.(activeCourseId, student.id);
         const map = {};
         (rows || []).forEach((row) => {
           if (!row?.assignment_id) return;

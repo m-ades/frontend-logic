@@ -10,15 +10,16 @@ import {
   Chip,
   alpha,
 } from "@mui/material";
-import { useCoursesState } from "../../../context/CoursesContext";
 import {
   getLetterGrade,
   getGradeColorVariant,
   getDefaultGradingScale,
 } from "../../../utils/gradingUtils";
+import { useAppRuntime } from "../../../hooks/useAppRuntime.js";
 
 export const StudentsAtRiskTable = ({ students, assignments }) => {
-  const { courses, activeCourseId } = useCoursesState();
+  const { courseState } = useAppRuntime();
+  const { courses, activeCourseId } = courseState;
   const activeCourse = courses.find((c) => c.id === activeCourseId);
   const gradingScale = activeCourse?.gradingScale || getDefaultGradingScale();
 

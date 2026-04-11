@@ -1,20 +1,15 @@
 import { useState } from "react";
 import { Box, Typography, Button, Alert } from "@mui/material";
 import { Save } from "lucide-react";
-import {
-  useCoursesState,
-  useCoursesDispatch,
-  saveCourseSettings,
-  toggleArchiveCourse,
-} from "../../context/CoursesContext";
 import CourseInfoSection from "../../components/ui/instructorControls/CourseInfoSection";
 import GradingScaleSection from "../../components/ui/instructorControls/GradingScaleSection";
 import LatePolicySection from "../../components/ui/instructorControls/LatePolicySection";
 import CourseStatusSection from "../../components/ui/instructorControls/CourseStatusSection";
+import { useAppRuntime } from "../../hooks/useAppRuntime.js";
 
 export default function InstructorControls() {
-  const { courses, activeCourseId } = useCoursesState();
-  const dispatch = useCoursesDispatch();
+  const { courseState, courseActions } = useAppRuntime();
+  const { courses, activeCourseId } = courseState;
 
   const activeCourse = courses.find((c) => c.id === activeCourseId);
 
@@ -22,14 +17,14 @@ export default function InstructorControls() {
   const [errors, setErrors] = useState([]);
 
   const handleSave = async (settings) => {
-    await saveCourseSettings(dispatch, activeCourseId, settings);
+    await courseActions.saveCourseSettings?.(activeCourseId, settings);
 
     setShowSuccess(true);
     setTimeout(() => setShowSuccess(false), 3000);
   };
 
   const handleArchiveCourse = async (courseId, archive = true) => {
-    await toggleArchiveCourse(dispatch, courseId, archive);
+    await courseActions.toggleArchiveCourse?.(courseId, archive);
 
     setShowSuccess(true);
     setTimeout(() => setShowSuccess(false), 3000);
