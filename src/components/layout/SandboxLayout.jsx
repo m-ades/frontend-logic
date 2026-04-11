@@ -1,0 +1,118 @@
+import { useLocation, useNavigate } from "react-router-dom";
+import { useMemo } from "react";
+import InstructorSidebarStructure from "./InstructorSidebarStructure.jsx";
+import { AppRuntimeProvider } from "../../context/AppRuntimeContext.jsx";
+import { useInstructorSandbox } from "../../context/InstructorSandboxContext.jsx";
+import ShellFrame from "./ShellFrame.jsx";
+import {
+  buildBreadcrumbInfo,
+  buildRuntimePaths,
+  remapRoutePath,
+} from "../../runtime/sandboxRuntime.js";
+
+const INSTRUCTOR_SANDBOX_PREFIX = "/sandbox/instructor";
+const remapInstructorPath = (path) => remapRoutePath(path, "/instructor", INSTRUCTOR_SANDBOX_PREFIX);
+
+function SandboxFrame({ children, runtimeValue, sidebarStructure, onExit }) {
+  const location = useLocation();
+
+  return (
+    <AppRuntimeProvider value={runtimeValue}>
+      <ShellFrame
+        location={location}
+        sidebarStructure={sidebarStructure}
+        onSignOut={onExit}
+        onOpenSettings={undefined}
+      >
+        {children}
+      </ShellFrame>
+    </AppRuntimeProvider>
+  )
+}
+
+export function InstructorSandboxLayout({ children }) {
+  const navigate = useNavigate();
+  const sandbox = useInstructorSandbox();
+  const runtimePaths = useMemo(
+    () => buildRuntimePaths("instructor", INSTRUCTOR_SANDBOX_PREFIX),
+    []
+  );
+
+  const runtimeValue = useMemo(() => ({
+    mode: "sandbox",
+    ...runtimePaths,
+    isSandbox: true,
+    remapStudentPath: remapInstructorPath,
+    getBreadcrumbInfo: (pathname) => buildBreadcrumbInfo(pathname, {
+      routeKind: "instructor",
+      routePrefix: runtimePaths.routePrefix,
+      stripPrefix: runtimePaths.routePrefix,
+    }),
+    storageScope: "session",
+    user: sandbox.user,
+    courses: sandbox.courseState.courses,
+    activeCourseId: sandbox.courseState.activeCourseId,
+    sandbox: null,
+    instructorSandbox: sandbox,
+    courseState: sandbox.courseState,
+    courseActions: {
+      setActiveCourse: sandbox.setActiveCourseId,
+      addNewCourse: sandbox.addNewCourse,
+      initializeCourses: async () => undefined,
+      resetCourses: async () => undefined,
+      setAssignments: () => undefined,
+      setPractices: () => undefined,
+      setGradebook: () => undefined,
+      createAssignment: sandbox.createAssignment,
+      updateAssignment: sandbox.updateAssignment,
+      toggleAssignmentLock: sandbox.toggleAssignmentLock,
+      toggleAssignmentPublish: sandbox.toggleAssignmentPublish,
+      duplicateAssignment: sandbox.duplicateAssignment,
+      deleteAssignment: sandbox.deleteAssignment,
+      updateAssignmentDueDate: sandbox.updateAssignmentDueDate,
+      createPractice: sandbox.createPractice,
+      updatePractice: sandbox.updatePractice,
+      togglePracticeLock: sandbox.togglePracticeLock,
+      togglePracticePublish: sandbox.togglePracticePublish,
+      duplicatePractice: sandbox.duplicatePractice,
+      deletePractice: sandbox.deletePractice,
+      updateCourseSettings: sandbox.updateCourseSettings,
+      saveCourseSettings: sandbox.updateCourseSettings,
+      toggleArchiveCourse: sandbox.toggleArchiveCourse,
+      addStudentToCourse: sandbox.addStudent,
+      bulkAddStudents: sandbox.bulkAddStudents,
+      removeStudentFromCourse: sandbox.removeStudent,
+      updateStudentRole: sandbox.updateStudentRole,
+      getAccommodations: sandbox.getAccommodations,
+      saveAccommodations: sandbox.saveAccommodations,
+      getDeadlines: sandbox.getDeadlines,
+      saveDeadline: sandbox.saveDeadline,
+      loadInstructorDashboard: async (courseId) => {
+        const snapshot = sandbox.dashboardAnalyticsByCourse?.[courseId];
+        return {
+          analytics: snapshot?.analytics || { gradeSummary: null, assignmentStats: [], timeByCategory: [] },
+          gradebookSummary: snapshot?.gradebookSummary || [],
+        };
+      },
+    },
+  }), [runtimePaths, sandbox]);
+
+  const sidebarStructure = InstructorSidebarStructure
+    .filter((item) => item.label !== "Contact")
+    .map((item) => ({
+      ...item,
+      link: remapInstructorPath(item.link),
+    }));
+
+  return (
+    <SandboxFrame
+      runtimeValue={runtimeValue}
+      sidebarStructure={sidebarStructure}
+      onExit={() => navigate("/")}
+    >
+      {children}
+    </SandboxFrame>
+  );
+}
+
+export default InstructorSandboxLayout;
