@@ -246,13 +246,12 @@ export function createAppRuntime({ coursesDispatch, coursesState, routeKind, use
       return fetchJson(`/api/instructor/courses/${Number(courseId)}/deadlines/${userId}`);
     },
     saveDeadline: async (courseId, assignmentId, userId, extensionDueAt) => {
-      await fetchJson(`/api/instructor/courses/${Number(courseId)}/deadlines`, {
+      await fetchJson(`/api/instructor/assignments/${assignmentId}/extensions`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           user_id: userId,
-          assignment_id: assignmentId,
-          extension_due_at: extensionDueAt,
+          extended_due_date: extensionDueAt,
         }),
       });
     },
