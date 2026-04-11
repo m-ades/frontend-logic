@@ -7,6 +7,7 @@ import { MacWindowDemoFrame } from '@/components/ui/LandingDemoFrames'
 import { YouTubeFacadeEmbed } from '@/components/ui/YouTubeFacadeEmbed'
 import { HERO_DEMO_YOUTUBE_URL_OR_ID } from '@/landing/hero-demo.config'
 import { LANDING_CTA_LIFT_OUTLINE, LANDING_CTA_LIFT_SOLID } from '@/landing/landing-cta-motion'
+import TryDemoSandboxModal from '@/components/ui/TryDemoSandboxModal'
 import { cn } from '@/lib/utils'
 
 const transitionVariants = {
@@ -68,9 +69,14 @@ const DEMO_POSTER_SRC =
   'https://tailark.com//_next/image?url=%2Fmail2.png&w=3840&q=75'
 
 export function HeroSection() {
+  const [tryDemoOpen, setTryDemoOpen] = React.useState(false)
+  const openTryDemo = React.useCallback(() => setTryDemoOpen(true), [])
+  const closeTryDemo = React.useCallback(() => setTryDemoOpen(false), [])
+
   return (
     <>
-      <HeroHeader />
+      <HeroHeader onTryDemoOpen={openTryDemo} />
+      <TryDemoSandboxModal isOpen={tryDemoOpen} onClose={closeTryDemo} />
       <main className="relative overflow-hidden border-0 bg-transparent pb-14 text-foreground shadow-none ring-0 outline-none md:pb-20">
         <div
           aria-hidden
@@ -131,14 +137,13 @@ export function HeroSection() {
                   </Button>
                   <Button
                     key={2}
-                    asChild
+                    type="button"
                     size="lg"
                     variant="outline"
-                    className={cn(navTryDemoButtonClass, 'h-10.5 rounded-xl px-5')}
+                    className={cn(navTryDemoButtonClass, 'h-10.5 cursor-pointer rounded-xl px-5')}
+                    onClick={openTryDemo}
                   >
-                    <RouterLink to="/sandbox" className="no-underline">
-                      <span className="text-nowrap">Try Demo</span>
-                    </RouterLink>
+                    <span className="text-nowrap">Try Demo</span>
                   </Button>
                 </AnimatedGroup>
               </div>
@@ -196,7 +201,7 @@ function getAppScrollTop() {
   return window.scrollY || document.documentElement.scrollTop
 }
 
-function HeroHeader() {
+function HeroHeader({ onTryDemoOpen }) {
   const [menuState, setMenuState] = React.useState(false)
   const [isScrolled, setIsScrolled] = React.useState(false)
   const closeMenu = () => setMenuState(false)
@@ -315,14 +320,16 @@ function HeroHeader() {
                   </div>
                   <div className="flex w-full max-w-md flex-col space-y-3 sm:max-w-none sm:flex-row sm:justify-center sm:gap-3 sm:space-y-0 md:w-fit lg:max-w-none lg:justify-end">
                     <Button
-                      asChild
+                      type="button"
                       variant="outline"
                       size="sm"
-                      className={cn(navTryDemoButtonClass, isScrolled && 'lg:hidden')}
+                      className={cn(navTryDemoButtonClass, 'cursor-pointer', isScrolled && 'lg:hidden')}
+                      onClick={() => {
+                        onTryDemoOpen?.()
+                        closeMenu()
+                      }}
                     >
-                      <RouterLink to="/sandbox" className="no-underline" onClick={closeMenu}>
-                        <span>Try Demo</span>
-                      </RouterLink>
+                      <span>Try Demo</span>
                     </Button>
                     <Button
                       asChild
