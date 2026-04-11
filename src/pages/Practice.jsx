@@ -6,6 +6,7 @@ import ThemedCard from '../components/ui/ThemedCard.jsx'
 import ActivityAccordion from '../components/ui/ActivityAccordion.jsx'
 import { ACTIVITY_TYPES } from '../placeholder/courseActivities.js'
 import { fetchJson } from '../utils/api.js'
+import { compareSubchapterLabels, sortAssignmentsBySubchapter } from '../utils/assignmentSort.js'
 import { useAppRuntime } from '../hooks/useAppRuntime.js'
 
 const buildCourseStructure = (assignments, sectionTitle) => {
@@ -28,11 +29,26 @@ const buildCourseStructure = (assignments, sectionTitle) => {
     chapters.set(chapterLabel, chapterEntry)
   })
 
+  const compareLabels = (a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' })
+  const chapterValue = (label) => {
+    const match = /^Chapter\s+(\d+)/i.exec(label)
+    return match ? Number(match[1]) : null
+  }
+
   return Array.from(chapters.entries())
+    .sort(([labelA], [labelB]) => {
+      const aNum = chapterValue(labelA)
+      const bNum = chapterValue(labelB)
+      if (aNum !== null && bNum !== null) return aNum - bNum
+      if (aNum !== null) return -1
+      if (bNum !== null) return 1
+      return compareLabels(labelA, labelB)
+    })
     .map(([chapterLabel, subMap]) => ({
       id: chapterLabel,
       title: chapterLabel,
       subchapters: Array.from(subMap.entries())
+        .sort(([a], [b]) => compareSubchapterLabels(a, b))
         .map(([subLabel, items]) => ({
           id: `${chapterLabel}-${subLabel}`,
           title: subLabel,
@@ -62,7 +78,10 @@ export default function Practice() {
   })
 
   const practiceAssignments = useMemo(
-    () => (isSandbox ? (sandboxData?.practices ?? []) : (practiceQuery.data ?? [])),
+    () =>
+      sortAssignmentsBySubchapter(
+        isSandbox ? (sandboxData?.practices ?? []) : (practiceQuery.data ?? [])
+      ),
     [isSandbox, practiceQuery.data, sandboxData?.practices]
   )
   const courseStructure = useMemo(
