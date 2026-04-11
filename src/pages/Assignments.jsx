@@ -1,16 +1,15 @@
 import { useEffect, useMemo, useCallback, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
-import { Box, Tabs, Tab, Typography, CardContent, Chip, Stack, LinearProgress } from '@mui/material'
+import { Box, Tabs, Tab, Typography, CardContent, Chip, Stack } from '@mui/material'
 import LockIcon from '@mui/icons-material/Lock'
 import ThemedCard from '../components/ui/ThemedCard.jsx'
 import ActivityAccordion from '../components/ui/ActivityAccordion.jsx'
 import { ACTIVITY_TYPES } from '../placeholder/courseActivities.js'
 import { formatDateTime } from '../utils/formatting.js'
 import { parseDueDateAsEastern } from '../utils/easternTime.js'
-import { compareSubchapterLabels, sortAssignmentsBySubchapter } from '../utils/assignmentSort.js'
 import { API_CONFIG, fetchJson, getActiveUserId } from '../utils/api.js'
-import { useCoursesState } from '../context/CoursesContext.jsx'
+import { useAppRuntime } from '../hooks/useAppRuntime.js'
 
 const buildCourseStructure = (assignments, sectionTitle) => {
   const chapters = new Map()
@@ -30,33 +29,16 @@ const buildCourseStructure = (assignments, sectionTitle) => {
       type: ACTIVITY_TYPES.HOMEWORK,
       worksheet: { id: assignment.id, proofs: [] },
       isLocked: assignment.is_locked ?? assignment.isLocked ?? false,
-      questionCount: Number(assignment.question_count) || 0,
-      answeredCount: Number(assignment.answered_count) || 0,
     })
     chapterEntry.set(subLabel, items)
     chapters.set(chapterLabel, chapterEntry)
   })
 
-  const compareLabels = (a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' })
-  const chapterValue = (label) => {
-    const match = /^Chapter\s+(\d+)/i.exec(label)
-    return match ? Number(match[1]) : null
-  }
-
   return Array.from(chapters.entries())
-    .sort(([labelA], [labelB]) => {
-      const aNum = chapterValue(labelA)
-      const bNum = chapterValue(labelB)
-      if (aNum !== null && bNum !== null) return aNum - bNum
-      if (aNum !== null) return -1
-      if (bNum !== null) return 1
-      return compareLabels(labelA, labelB)
-    })
     .map(([chapterLabel, subMap]) => ({
       id: chapterLabel,
       title: chapterLabel,
       subchapters: Array.from(subMap.entries())
-        .sort(([a], [b]) => compareSubchapterLabels(a, b))
         .map(([subLabel, items]) => ({
           id: `${chapterLabel}-${subLabel}`,
           title: subLabel,
@@ -74,11 +56,19 @@ function TabPanel({ children, value, index }) {
 }
 
 export default function Assignments() {
-  const { activeCourseId } = useCoursesState()
+  const {
+    isSandbox: sandbox,
+    assignmentsPath,
+    assignmentPath,
+    storageScope,
+    sandbox: sandboxData,
+    user,
+    activeCourseId,
+  } = useAppRuntime()
   const courseId = activeCourseId ?? API_CONFIG.courseId
   const navigate = useNavigate()
-  const courseIdForApi = activeCourseId ?? null
-  const userId = getActiveUserId()
+  const courseIdForApi = sandbox ? null : (activeCourseId ?? null)
+  const userId = sandbox ? user.id : getActiveUserId()
   const tabStorageKey = useMemo(() => {
     const suffix = courseIdForApi ? `course-${courseIdForApi}` : 'default'
     return `assignments:last-tab:${suffix}`
@@ -90,14 +80,20 @@ export default function Assignments() {
     return parts.join(':')
   }, [courseIdForApi, userId])
 
-  const readStoredTab = useCallback(() => {
+  const getRouteStorage = useCallback(() => {
     if (typeof window === 'undefined') return null
-    const raw = window.localStorage.getItem(tabStorageKey)
+    return storageScope === 'session' ? window.sessionStorage : window.localStorage
+  }, [storageScope])
+
+  const readStoredTab = useCallback(() => {
+    const storage = getRouteStorage()
+    if (!storage) return null
+    const raw = storage.getItem(tabStorageKey)
     const parsed = raw === null ? null : Number(raw)
     if (!Number.isFinite(parsed)) return null
     if (parsed < 0 || parsed > 2) return null
     return parsed
-  }, [tabStorageKey])
+  }, [getRouteStorage, tabStorageKey])
 
   const [tabValue, setTabValue] = useState(() => readStoredTab() ?? 0)
 
@@ -109,30 +105,27 @@ export default function Assignments() {
   const assignmentsQuery = useQuery({
     queryKey: ['course-assignments', courseIdForApi],
     queryFn: () => fetchJson(`/api/courses/${courseIdForApi}/assignments`),
-    enabled: !!courseIdForApi,
+    enabled: !sandbox && !!courseIdForApi,
   })
 
   const gradesQuery = useQuery({
     queryKey: ['user-grades', userId],
     queryFn: () => fetchJson(`/api/users/${userId}/grades`),
-    enabled: !!userId,
+    enabled: !sandbox && !!userId,
   })
 
-  const assignments = assignmentsQuery.data ?? []
-  const grades = gradesQuery.data ?? []
-  const isLoadingAssignments = assignmentsQuery.isPending || gradesQuery.isPending
+  const assignments = sandbox ? sandboxData.assignments : (assignmentsQuery.data ?? [])
+  const grades = sandbox ? sandboxData.grades : (gradesQuery.data ?? [])
+  const isLoadingAssignments = sandbox ? false : (assignmentsQuery.isPending || gradesQuery.isPending)
 
   const gradedAssignments = useMemo(
-    () =>
-      sortAssignmentsBySubchapter(
-        (assignments || []).filter((a) => a.kind !== 'practice')
-      ),
+    () => (assignments || []).filter((a) => a.kind !== 'practice'),
     [assignments]
   )
 
   const courseStructure = useMemo(
-    () => (courseIdForApi ? buildCourseStructure(gradedAssignments, 'Assignments') : []),
-    [courseIdForApi, gradedAssignments]
+    () => ((sandbox || courseIdForApi) ? buildCourseStructure(gradedAssignments, 'Assignments') : []),
+    [sandbox, courseIdForApi, gradedAssignments]
   )
 
   const completedAssignments = useMemo(() => {
@@ -206,15 +199,16 @@ export default function Assignments() {
 
   const handleTabChange = (e, newValue) => {
     setTabValue(newValue)
-    if (typeof window !== 'undefined') {
-      window.localStorage.setItem(tabStorageKey, String(newValue))
+    const storage = getRouteStorage()
+    if (storage) {
+      storage.setItem(tabStorageKey, String(newValue))
     }
   }
 
   const handleActivityClick = (activity) => {
     if (activity.worksheet) {
-      navigate(`/student/assignment/${activity.worksheet.id}`, {
-        state: { returnTo: '/student/assignments' }
+      navigate(assignmentPath(activity.worksheet.id), {
+        state: { returnTo: assignmentsPath }
       })
     }
   }
@@ -227,27 +221,18 @@ export default function Assignments() {
     const accommodationDueLabel = policy?.accommodation_due_at
       ? formatDateTime(policy.accommodation_due_at)
       : null
-    const totalQuestions = Number(activity.questionCount) || 0
-    const completedQuestions = Math.min(Number(activity.answeredCount) || 0, totalQuestions)
-    const completionValue = totalQuestions > 0 ? (completedQuestions / totalQuestions) * 100 : 0
     return (
     <ThemedCard
       key={activity.id}
       sx={{ cursor: 'pointer', '&:hover': { boxShadow: 4 } }}
       onClick={() => handleActivityClick(activity)}
     >
-      <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
-        <Box
-          sx={{
-            display: 'grid',
-            gridTemplateColumns: {
-              xs: '1fr',
-              md: 'minmax(0, 1fr) clamp(240px, 28vw, 360px)',
-            },
-            columnGap: { xs: 0, md: 4 },
-            rowGap: 2,
-            alignItems: 'start',
-          }}
+      <CardContent sx={{ pl: 0, pr: 2, pt: 2, pb: 2, '&:last-child': { pb: 2 } }}>
+        <Stack
+          direction={{ xs: 'column', sm: 'row' }}
+          justifyContent="space-between"
+          alignItems={{ xs: 'flex-start', sm: 'flex-start' }}
+          spacing={2}
         >
           <Box sx={{ flex: 1, minWidth: 0 }}>
             <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 1 }}>
@@ -258,87 +243,51 @@ export default function Assignments() {
                 <LockIcon sx={{ fontSize: '1.25rem', color: 'text.secondary', flexShrink: 0 }} />
               )}
             </Stack>
-            {activity.description && (
-              <Typography variant="body2" color="text.secondary" sx={{ wordBreak: 'break-word' }}>
-                {activity.description}
+                  {activity.description && (
+                    <Typography variant="body2" color="text.secondary" sx={{ wordBreak: 'break-word' }}>
+                      {activity.description}
               </Typography>
             )}
           </Box>
-          <Stack spacing={0.75} alignItems={{ xs: 'flex-start', md: 'flex-end' }} width="100%">
-            <Stack
-              direction="row"
-              spacing={1}
-              alignItems="center"
-              flexWrap={{ xs: 'wrap', md: 'nowrap' }}
-              justifyContent={{ xs: 'flex-start', md: 'flex-end' }}
-              sx={{ width: '100%' }}
-            >
-              {totalQuestions > 0 && (
-                <Stack
-                  direction="row"
-                  spacing={0.75}
-                  alignItems="center"
-                  sx={{
-                    minWidth: { xs: '100%', md: 'auto' },
-                    flex: { xs: '1 1 100%', md: '0 0 auto' },
-                    flexShrink: 0,
-                  }}
-                >
-                  <Box sx={{ width: { xs: '100%', md: 140 } }}>
-                    <LinearProgress
-                      variant="determinate"
-                      value={completionValue}
-                      aria-label={`Assignment completion: ${completedQuestions} of ${totalQuestions} complete`}
-                      sx={{
-                        height: 8,
-                        borderRadius: 999,
-                        bgcolor: 'action.hover',
-                        '& .MuiLinearProgress-bar': { borderRadius: 999 },
-                      }}
-                    />
-                  </Box>
-                  <Typography variant="body2" sx={{ color: 'text.primary', fontWeight: 600, whiteSpace: 'nowrap' }}>
-                    {completedQuestions}/{totalQuestions}
-                  </Typography>
-                </Stack>
-              )}
+          <Stack spacing={1} alignItems={{ xs: 'flex-start', sm: 'flex-end' }} width={{ xs: '100%', sm: 'auto' }}>
+            <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap">
               <Chip
                 label={activity.type === ACTIVITY_TYPES.HOMEWORK ? 'Homework' : activity.type === ACTIVITY_TYPES.QUIZ ? 'Quiz' : 'Exam'}
                 size="small"
                 color="primary"
                 variant="outlined"
               />
-              {activity.dueDate && !getCompletionStatus(activity.id) && parseDueDateAsEastern(activity.dueDate, activity.dueTime) < new Date() && (
+              {activity.dueDate && parseDueDateAsEastern(activity.dueDate, activity.dueTime) < new Date() && (
                 <Chip label="Past due" size="small" color="error" />
               )}
-              {showCompletionChip && getCompletionStatus(activity.id) && (
-                <Chip label="Completed" size="small" color="success" />
-              )}
             </Stack>
-            <Typography variant="body2" color="text.secondary" sx={{ width: '100%', textAlign: { xs: 'left', md: 'right' } }}>
+            <Typography variant="body2" color="text.secondary">
               {datePrefix}{formatDateTime(activity.dueDate) || 'No due date'}
             </Typography>
             {(extensionDueLabel || accommodationDueLabel) && (
-              <Stack spacing={0.25} alignItems={{ xs: 'flex-start', md: 'flex-end' }} sx={{ width: '100%' }}>
-              {extensionDueLabel && (
-                <Typography variant="caption" color="text.secondary" align="right">
-                  Extension: {extensionDueLabel}
-                </Typography>
-              )}
-              {accommodationDueLabel && (
-                <Typography variant="caption" color="text.secondary" align="right">
-                  Accommodation: {accommodationDueLabel}
-                </Typography>
-              )}
-            </Stack>
-          )}
+              <Stack spacing={0.25} alignItems="flex-end">
+                {extensionDueLabel && (
+                  <Typography variant="caption" color="text.secondary" align="right">
+                    Extension: {extensionDueLabel}
+                  </Typography>
+                )}
+                {accommodationDueLabel && (
+                  <Typography variant="caption" color="text.secondary" align="right">
+                    Accommodation: {accommodationDueLabel}
+                  </Typography>
+                )}
+              </Stack>
+            )}
             {policy?.late_penalty_waived && (
-              <Typography variant="caption" color="text.secondary" align="right" sx={{ width: '100%', textAlign: { xs: 'left', md: 'right' } }}>
+              <Typography variant="caption" color="text.secondary" align="right">
                 Late penalty waived
               </Typography>
             )}
+            {showCompletionChip && getCompletionStatus(activity.id) && (
+              <Chip label="Completed" size="small" color="success" />
+            )}
           </Stack>
-        </Box>
+        </Stack>
       </CardContent>
     </ThemedCard>
     )
@@ -354,8 +303,8 @@ export default function Assignments() {
       showExpandAll={showExpandAll}
       showCollapseAll={showCollapseAll}
       showExpandCollapseToggle={showExpandCollapseToggle}
-      defaultSubchapterExpanded
       persistKey={accordionStorageKey}
+      storage={storageScope}
       renderActivity={(activity, context) =>
         renderActivity(activity, context, datePrefix, showCompletionChip)
       }

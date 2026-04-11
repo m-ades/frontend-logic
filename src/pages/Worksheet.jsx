@@ -13,6 +13,117 @@ import { API_CONFIG, fetchJson, getActiveUserId } from '../utils/api.js'
 import { sortAssignmentsBySubchapter } from '../utils/assignmentSort.js'
 import { displayScoreForProof } from '../utils/problemHelpers.js'
 import { useCoursesState } from '../context/CoursesContext.jsx'
+import { useAppRuntime } from '../hooks/useAppRuntime.js'
+
+function SandboxWorksheetContent() {
+  const { assignmentId } = useParams()
+  const navigate = useNavigate()
+  const location = useLocation()
+  const {
+    assignmentsPath,
+    isInstructor,
+    sandbox,
+    instructorSandbox,
+  } = useAppRuntime()
+  const [currentProofIndex, setCurrentProofIndex] = useState(0)
+
+  const worksheetStore = isInstructor ? instructorSandbox : sandbox
+  const assignment = isInstructor
+    ? worksheetStore?.getActivity?.(assignmentId)
+    : worksheetStore?.getAssignment?.(assignmentId)
+  const getQuestionState = worksheetStore?.getQuestionState ?? (() => null)
+  const isQuestionComplete = worksheetStore?.isQuestionComplete ?? (() => false)
+  const updateQuestionState = worksheetStore?.updateQuestionState ?? (() => undefined)
+  const markQuestionComplete = worksheetStore?.markQuestionComplete ?? (() => undefined)
+
+  const worksheets = useMemo(() => (assignment ? [{ ...assignment, proofs: assignment.proofs || [] }] : []), [assignment])
+  const currentWorksheet = worksheets[0]
+  const total = currentWorksheet?.proofs?.length || 0
+  const backTarget = location?.state?.returnTo || assignmentsPath
+
+  const {
+    completedProofs,
+    score,
+    handleProofComplete,
+    setCompletedProofs,
+  } = useScoring(currentWorksheet)
+
+  useEffect(() => {
+    if (!currentWorksheet?.proofs) return
+    setCompletedProofs(new Set(
+      currentWorksheet.proofs
+        .filter((proof) => isQuestionComplete(proof.id))
+        .map((proof) => proof.id)
+    ))
+  }, [currentWorksheet?.proofs, isQuestionComplete, setCompletedProofs])
+
+  const questionScores = useMemo(() => {
+    const scores = {}
+    for (const proof of currentWorksheet?.proofs || []) {
+      const saved = getQuestionState(proof.id)
+      const rawScore = Number(saved?.rawScore)
+      if (Number.isFinite(rawScore)) {
+        scores[proof.questionId] = rawScore
+      } else if (saved?.lastStatus === 'incorrect') {
+        scores[proof.questionId] = 0
+      } else if (saved?.lastStatus === 'partial') {
+        scores[proof.questionId] = 50
+      } else if (isQuestionComplete(proof.id)) {
+        scores[proof.questionId] = 100
+      }
+    }
+    return scores
+  }, [currentWorksheet?.proofs, getQuestionState, isQuestionComplete])
+
+  const calculatedGradePercent = useMemo(() => {
+    if (!total) return null
+    return (score / total) * 100
+  }, [score, total])
+
+  const { completionPercent, gradeLabel, isOverdue } = useWorksheetMetrics({
+    score,
+    total,
+    calculatedGradePercent,
+    dueAt: currentWorksheet?.dueAt || currentWorksheet?.due_at,
+  })
+
+  if (!currentWorksheet) {
+    return <div>Worksheet not found</div>
+  }
+
+  return (
+    <WorksheetLayout
+      subtitle={currentWorksheet.title || currentWorksheet.name || "Assignment"}
+      onBackToLMS={() => navigate(backTarget)}
+      worksheets={worksheets}
+      currentWorksheetIndex={0}
+      onWorksheetIndexChange={() => {}}
+      completedProofs={completedProofs}
+      isOverdue={isOverdue}
+      isLocked={currentWorksheet.isLocked ?? currentWorksheet.is_locked ?? false}
+      showPolicyInfo
+    >
+      <WorksheetTabs
+        worksheets={worksheets}
+        currentWorksheetIndex={0}
+        onWorksheetIndexChange={() => {}}
+        currentProofIndex={currentProofIndex}
+        onProofIndexChange={setCurrentProofIndex}
+        completedProofs={completedProofs}
+        questionScores={questionScores}
+        onProofComplete={(proofId) => {
+          handleProofComplete(proofId)
+          markQuestionComplete(proofId)
+        }}
+        getSavedProofState={(proofId) => getQuestionState(proofId)}
+        handleProofStateChange={(proofId, state) => updateQuestionState(proofId, state)}
+        total={total}
+        completionPercent={completionPercent}
+        gradeLabel={gradeLabel}
+      />
+    </WorksheetLayout>
+  )
+}
 
 const normalizeType = (snapshot) => (
   snapshot?.type || snapshot?.problemType || snapshot?.logic_problem_type || 'derivation'
@@ -292,7 +403,7 @@ const buildTruthTableState = (lefts, right, data) => {
   return state
 }
 
-export default function Worksheet() {
+function RealWorksheetContent() {
   const { worksheetId, assignmentId } = useParams()
   const navigate = useNavigate()
   const location = useLocation()
@@ -303,6 +414,7 @@ export default function Worksheet() {
   const [currentDueAt, setCurrentDueAt] = useState(null)
   const [questionScores, setQuestionScores] = useState({})
   const { activeCourseId } = useCoursesState()
+  const { assignmentPath, assignmentsPath } = useAppRuntime()
   const courseId = activeCourseId ?? API_CONFIG.courseId
   const courseIdForApi = activeCourseId ?? null
   const sessionId = useRef(null)
@@ -353,9 +465,7 @@ export default function Worksheet() {
   const worksheetDueAt = currentWorksheet?.due_at
     ?? currentWorksheet?.due_date
     ?? currentDueAt
-  const isInstructorView = location.pathname.startsWith('/instructor')
-  const assignmentPathBase = isInstructorView ? '/instructor/assignment' : '/student/assignment'
-  const defaultBackTarget = isInstructorView ? '/instructor/assignments' : '/student/assignments'
+  const defaultBackTarget = assignmentsPath
   const backTarget = location?.state?.returnTo || defaultBackTarget
 
   // total score: sum per-question best (0–100), same as backend
@@ -1045,7 +1155,7 @@ export default function Worksheet() {
   const handleWorksheetChange = (newIndex) => {
     const newWorksheet = worksheets[newIndex]
     if (newWorksheet) {
-      navigate(`${assignmentPathBase}/${newWorksheet.id}`, {
+      navigate(assignmentPath(newWorksheet.id), {
         state: { returnTo: backTarget }
       })
     }
@@ -1154,4 +1264,9 @@ export default function Worksheet() {
       </WorksheetLayout>
     </Box>
   )
+}
+
+export default function Worksheet() {
+  const runtime = useAppRuntime()
+  return runtime.isSandbox ? <SandboxWorksheetContent /> : <RealWorksheetContent />
 }
