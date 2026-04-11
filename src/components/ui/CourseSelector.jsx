@@ -18,35 +18,22 @@ import {
   CheckCircle as CheckCircleIcon,
 } from "@mui/icons-material";
 import { useNavigate, useLocation } from "react-router-dom";
-import { useAuthState } from "../../context/AuthContext";
-import { isInstructorRole } from "../../utils/auth.js";
-import {
-  useCoursesState,
-  useCoursesDispatch,
-  setActiveCourse,
-} from "../../context/CoursesContext";
+import { useAppRuntime } from "../../hooks/useAppRuntime.js";
 
 export default function CourseSelector({ isSidebarOpened }) {
   const [anchorEl, setAnchorEl] = useState(null);
-  const { user } = useAuthState();
-  const { courses, activeCourseId } = useCoursesState();
-  const dispatch = useCoursesDispatch();
+  const {
+    courses: courseList,
+    activeCourseId,
+    coursesPath,
+    dashboardPath,
+    courseActions,
+  } = useAppRuntime();
   const navigate = useNavigate();
   const location = useLocation();
-
-  const isInstructor = location.pathname.startsWith("/instructor")
-    ? true
-    : location.pathname.startsWith("/student")
-    ? false
-    : isInstructorRole(user?.role);
-  const coursesPath = isInstructor ? "/instructor/courses" : "/student/courses";
-  const dashboardPath = isInstructor
-    ? "/instructor/dashboard"
-    : "/student/dashboard";
-
-  const activeCourse = courses.find((c) => c.id === activeCourseId);
-  const currentCourses = courses.filter((c) => c.status === "current");
-  const pastCourses = courses.filter((c) => c.status === "past");
+  const activeCourse = courseList.find((c) => c.id === activeCourseId);
+  const currentCourses = courseList.filter((c) => c.status === "current");
+  const pastCourses = courseList.filter((c) => c.status === "past");
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -67,7 +54,7 @@ export default function CourseSelector({ isSidebarOpened }) {
   }, [isSidebarOpened]);
 
   const handleSelectCourse = (courseId) => {
-    setActiveCourse(dispatch, courseId);
+    courseActions.setActiveCourse?.(courseId);
     handleClose();
 
     // Navigate to dashboard when selecting a course
@@ -267,7 +254,7 @@ export default function CourseSelector({ isSidebarOpened }) {
             </>
           )}
 
-          {courses.length === 0 && (
+          {courseList.length === 0 && (
             <Box sx={{ px: 2, py: 3, textAlign: "center" }}>
               <Typography color="text.secondary" sx={{ fontSize: "1rem" }}>
                 No courses available
@@ -519,10 +506,10 @@ export default function CourseSelector({ isSidebarOpened }) {
           </>
         )}
 
-        {courses.length === 0 && (
-          <Box sx={{ px: 2, py: 3, textAlign: "center" }}>
-            <Typography color="text.secondary" sx={{ fontSize: "1rem" }}>
-              No courses available
+          {courseList.length === 0 && (
+            <Box sx={{ px: 2, py: 3, textAlign: "center" }}>
+              <Typography color="text.secondary" sx={{ fontSize: "1rem" }}>
+                No courses available
             </Typography>
           </Box>
         )}

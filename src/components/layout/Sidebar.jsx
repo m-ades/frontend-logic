@@ -26,9 +26,9 @@ import {
   toggleSidebar,
   setSidebar,
 } from "../../context/LayoutContext.jsx";
-import { useAuthState } from "../../context/AuthContext.jsx";
 import SidebarLink from "./SidebarLink.jsx";
 import CourseSelector from "../ui/CourseSelector.jsx";
+import { useAppRuntime } from "../../hooks/useAppRuntime.js";
 
 const DRAWER_WIDTH = 240;
 
@@ -36,13 +36,12 @@ export default function Sidebar({ structure, location, onSignOut, onOpenSettings
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const { isSidebarOpened, sidebarHoverEnabled } = useLayoutState();
-  const { user } = useAuthState();
+  const { user: activeUser, isSandbox: sandbox } = useAppRuntime();
   const layoutDispatch = useLayoutDispatch();
   const [isPermanent, setPermanent] = useState(true);
   const [profileMenu, setProfileMenu] = useState(null);
   const [isHovering, setIsHovering] = useState(false);
   const [manuallyOpened, setManuallyOpened] = useState(false);
-
   useEffect(() => {
     const handleResize = () => {
       const isSmallScreen = window.innerWidth < theme.breakpoints.values.md;
@@ -86,14 +85,14 @@ export default function Sidebar({ structure, location, onSignOut, onOpenSettings
 
   // Get user's initials for avatar
   const getUserInitials = () => {
-    if (!user?.username) return "U";
-    return user.username.substring(0, 2).toUpperCase();
+    if (!activeUser?.username) return "U";
+    return activeUser.username.substring(0, 2).toUpperCase();
   };
 
   // Get display name
   const getDisplayName = () => {
-    if (!user?.username) return "User";
-    return user.username;
+    if (!activeUser?.username) return "User";
+    return activeUser.username;
   };
 
   return (
@@ -241,21 +240,23 @@ export default function Sidebar({ structure, location, onSignOut, onOpenSettings
             transformOrigin={{ vertical: "bottom", horizontal: "left" }}
             slotProps={{ paper: { sx: { '& .MuiListItemText-primary': { fontSize: '1rem' } } } }}
           >
-          <MenuItem
-            onClick={() => {
-              onOpenSettings?.();
-              setProfileMenu(null);
-            }}
-          >
-            Settings
-          </MenuItem>
+          {onOpenSettings && (
+            <MenuItem
+              onClick={() => {
+                onOpenSettings?.();
+                setProfileMenu(null);
+              }}
+            >
+              Settings
+            </MenuItem>
+          )}
           <MenuItem
             onClick={() => {
               onSignOut?.();
               setProfileMenu(null);
             }}
           >
-            Sign Out
+            {sandbox ? "Exit demo" : "Sign Out"}
           </MenuItem>
           </Menu>
         </Box>
