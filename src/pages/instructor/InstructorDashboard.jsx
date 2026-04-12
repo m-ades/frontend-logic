@@ -72,17 +72,17 @@ export default function InstructorDashboard() {
   );
 
   const nonPracticeIds = useMemo(
-    () => new Set(nonPracticeAssignments.map((assignment) => Number(assignment.id))),
+    () => new Set(nonPracticeAssignments.map((assignment) => String(assignment.id))),
     [nonPracticeAssignments]
   );
 
   const filteredGradebookSummary = useMemo(
-    () => (gradebookSummary || []).filter((item) => nonPracticeIds.has(Number(item.id))),
+    () => (gradebookSummary || []).filter((item) => nonPracticeIds.has(String(item.id))),
     [gradebookSummary, nonPracticeIds]
   );
 
   const filteredAssignmentStats = useMemo(
-    () => (analytics.assignmentStats || []).filter((item) => nonPracticeIds.has(Number(item.id))),
+    () => (analytics.assignmentStats || []).filter((item) => nonPracticeIds.has(String(item.id))),
     [analytics.assignmentStats, nonPracticeIds]
   );
 
@@ -91,8 +91,7 @@ export default function InstructorDashboard() {
       studentsForStats.map((student) => {
         const filteredGrades = Object.entries(student.grades || {}).reduce(
           (acc, [assignmentId, grade]) => {
-            const numericId = Number(assignmentId);
-            if (nonPracticeIds.has(numericId)) {
+            if (nonPracticeIds.has(String(assignmentId))) {
               acc[assignmentId] = grade;
             }
             return acc;
@@ -107,19 +106,21 @@ export default function InstructorDashboard() {
   // Enrich assignments with calculated data
   const enrichedAssignments = useMemo(() => {
     const summaryMap = new Map(
-      (filteredGradebookSummary || []).map((item) => [Number(item.id), item])
+      (filteredGradebookSummary || []).map((item) => [String(item.id), item])
     );
     const statsMap = new Map(
-      (filteredAssignmentStats || []).map((item) => [Number(item.id), item])
+      (filteredAssignmentStats || []).map((item) => [String(item.id), item])
     );
 
     return nonPracticeAssignments.map((assignment) => {
-      const summary = summaryMap.get(Number(assignment.id));
-      const stats = statsMap.get(Number(assignment.id));
+      const summary = summaryMap.get(String(assignment.id));
+      const stats = statsMap.get(String(assignment.id));
       const averagePercent = summary?.avg_percent ?? null;
       const average =
         averagePercent !== null && averagePercent !== undefined
           ? Math.round(averagePercent * 100)
+          : typeof stats?.avg_score === "number"
+          ? Math.round(stats.avg_score)
           : calculateAssignmentAverage(assignment.id, studentsForAssignments);
       const submissionsFallback = studentsForAssignments.filter(
         (student) => Boolean(student.submittedAssignments?.[assignment.id])
@@ -186,18 +187,10 @@ export default function InstructorDashboard() {
     [nonPracticeAssignments]
   );
 
-  const gradedPastDueAssignments = useMemo(
-    () =>
-      gradedUnlockedAssignments.filter(
-        (assignment) => assignment.dueAt && assignment.dueAt <= new Date()
-      ),
-    [gradedUnlockedAssignments]
-  );
-
-  const totalAverage = gradedPastDueAssignments.length > 0
+  const totalAverage = enrichedAssignments.length > 0
     ? Math.round(
-        gradedPastDueAssignments.reduce((sum, a) => sum + a.average, 0) /
-          gradedPastDueAssignments.length
+        enrichedAssignments.reduce((sum, a) => sum + a.average, 0) /
+          enrichedAssignments.length
       )
     : 0;
 

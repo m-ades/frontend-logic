@@ -10,7 +10,7 @@ export function getStatusColor(item, isPractice = false) {
   const publishDate = item.publishDate ? new Date(item.publishDate) : null;
 
   if (item.isLocked) return "default";
-  if (!item.isPublished || (publishDate && publishDate > now)) return "warning";
+  if (!item.isPublished) return "warning";
   if (dueDate && dueDate < now) return isPractice ? "info" : "error";
   return "success";
 }
@@ -26,7 +26,7 @@ export function getStatusText(item, isPractice = false) {
 
   if (item.isLocked) return "Locked";
   if (!item.isPublished) return "Draft";
-  if (publishDate && publishDate > now) return "Scheduled";
+  if (publishDate && publishDate > now) return "Active";
   if (dueDate && dueDate < now) return isPractice ? "Available" : "Past Due";
   return "Active";
 }
@@ -53,7 +53,7 @@ export function enhanceItems(
       totalStudents,
       isPublished: item.isPublished ?? true,
       isLocked: item.isLocked ?? false,
-      publishDate: item.publishDate || item.dueDate,
+      publishDate: item.publishDate || null,
     };
 
     if (isPractice) {
