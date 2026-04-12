@@ -13,12 +13,8 @@ import {
 import { Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import {
-  useCoursesState,
-  useCoursesDispatch,
   calculateAssignmentAverage,
-  fetchCourseAssignments,
 } from "../../context/CoursesContext";
-import { fetchJson } from "../../utils/api.js";
 import AssignmentTable from "../../components/ui/AssignmentTable";
 import AssignmentFormDialog from "../../components/ui/AssignmentFormDialog";
 import AssignmentContextMenu from "../../components/ui/AssignmentContextMenu";
@@ -28,6 +24,7 @@ import {
   getStatusText,
   enhanceItems,
 } from "../../utils/assignmentStatus";
+import { useAppRuntime } from "../../hooks/useAppRuntime.js";
 
 // Helper to get current date
 const getCurrentDate = () => {
@@ -36,27 +33,6 @@ const getCurrentDate = () => {
   const month = String(today.getMonth() + 1).padStart(2, "0");
   const day = String(today.getDate()).padStart(2, "0");
   return `${year}-${month}-${day}`;
-};
-
-const toIsoDateTime = (date, time) => {
-  if (!date) return null;
-  const safeTime = time || "00:00";
-  return new Date(`${date}T${safeTime}:00`).toISOString();
-};
-
-const buildAssignmentPayload = (formData, courseId, overrides = {}) => {
-  const dueDate = toIsoDateTime(formData.dueDate, formData.dueTime || "23:59");
-  return {
-    course_id: courseId,
-    kind: "assignment",
-    title: formData.name,
-    description: formData.description || null,
-    is_locked: formData.isLocked,
-    chapter: Number(formData.chapter) || 1,
-    subchapter: formData.subchapter || "",
-    due_date: dueDate,
-    ...overrides,
-  };
 };
 
 const INITIAL_FORM_DATA = {
@@ -71,9 +47,12 @@ const INITIAL_FORM_DATA = {
 };
 
 export default function InstructorAssignments() {
-  const { activeCourseId, assignmentsByCourse, gradebookByCourse, courses } =
-    useCoursesState();
-  const dispatch = useCoursesDispatch();
+  const {
+    courseState,
+    courseActions,
+    assignmentBuilderPath,
+  } = useAppRuntime();
+  const { activeCourseId, assignmentsByCourse, gradebookByCourse, courses } = courseState;
   const navigate = useNavigate();
 
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
@@ -128,21 +107,10 @@ export default function InstructorAssignments() {
     if (isCreating) return;
     setIsCreating(true);
     try {
-      const payload = buildAssignmentPayload(formData, activeCourseId);
-      const created = await fetchJson("/api/assignments", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      const refreshed = await fetchCourseAssignments(activeCourseId);
-      dispatch({
-        type: "SET_ASSIGNMENTS",
-        courseId: activeCourseId,
-        payload: refreshed,
-      });
+      const created = await courseActions.createAssignment?.(activeCourseId, formData);
       setCreateDialogOpen(false);
-      navigate("/instructor/assignment-builder", {
-        state: { assignmentId: created?.id ?? payload.id },
+      navigate(assignmentBuilderPath, {
+        state: { assignmentId: created?.id },
       });
     } catch (error) {
       console.error("Failed to create assignment", error);
@@ -171,18 +139,7 @@ export default function InstructorAssignments() {
 
   const handleEditSubmit = async () => {
     try {
-      const payload = buildAssignmentPayload(formData, activeCourseId);
-      await fetchJson(`/api/assignments/${selectedAssignment.id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      const refreshed = await fetchCourseAssignments(activeCourseId);
-      dispatch({
-        type: "SET_ASSIGNMENTS",
-        courseId: activeCourseId,
-        payload: refreshed,
-      });
+      await courseActions.updateAssignment?.(activeCourseId, selectedAssignment.id, formData);
       setEditDialogOpen(false);
       setSelectedAssignment(null);
     } catch (error) {
@@ -194,17 +151,7 @@ export default function InstructorAssignments() {
     const assignment = assignments.find((a) => a.id === assignmentId);
     if (!assignment) return;
     try {
-      await fetchJson(`/api/assignments/${assignmentId}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ is_locked: !assignment.isLocked }),
-      });
-      const refreshed = await fetchCourseAssignments(activeCourseId);
-      dispatch({
-        type: "SET_ASSIGNMENTS",
-        courseId: activeCourseId,
-        payload: refreshed,
-      });
+      await courseActions.toggleAssignmentLock?.(activeCourseId, assignmentId, assignment);
     } catch (error) {
       console.error("Failed to toggle lock", error);
     }
@@ -213,19 +160,8 @@ export default function InstructorAssignments() {
   const handleTogglePublish = async (assignmentId) => {
     const assignment = assignments.find((a) => a.id === assignmentId);
     if (!assignment) return;
-    const nextPublished = !assignment.isPublished;
     try {
-      await fetchJson(`/api/assignments/${assignmentId}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ is_locked: assignment.isLocked || !nextPublished }),
-      });
-      const refreshed = await fetchCourseAssignments(activeCourseId);
-      dispatch({
-        type: "SET_ASSIGNMENTS",
-        courseId: activeCourseId,
-        payload: refreshed,
-      });
+      await courseActions.toggleAssignmentPublish?.(activeCourseId, assignmentId, assignment);
     } catch (error) {
       console.error("Failed to toggle publish", error);
     }
@@ -233,31 +169,7 @@ export default function InstructorAssignments() {
 
   const handleDuplicate = async (assignment) => {
     try {
-      const payload = {
-        course_id: activeCourseId,
-        kind: "assignment",
-        title: `${assignment.name} (Copy)`,
-        description: assignment.description || null,
-        is_locked: true,
-        chapter: assignment.chapter || 1,
-        subchapter: assignment.subchapter || "",
-        due_date: assignment.dueDate
-          ? toIsoDateTime(assignment.dueDate, assignment.dueTime || "23:59")
-          : null,
-        late_window_days: assignment.lateWindowDays,
-        late_penalty_percent: assignment.latePenaltyPercent,
-      };
-      await fetchJson("/api/assignments", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      const refreshed = await fetchCourseAssignments(activeCourseId);
-      dispatch({
-        type: "SET_ASSIGNMENTS",
-        courseId: activeCourseId,
-        payload: refreshed,
-      });
+      await courseActions.duplicateAssignment?.(activeCourseId, assignment);
       setMenuAnchor(null);
     } catch (error) {
       console.error("Failed to duplicate assignment", error);
@@ -267,15 +179,7 @@ export default function InstructorAssignments() {
   const handleDelete = async (assignmentId) => {
     if (window.confirm("Are you sure you want to delete this assignment?")) {
       try {
-        await fetchJson(`/api/assignments/${assignmentId}`, {
-          method: "DELETE",
-        });
-        const refreshed = await fetchCourseAssignments(activeCourseId);
-        dispatch({
-          type: "SET_ASSIGNMENTS",
-          courseId: activeCourseId,
-          payload: refreshed,
-        });
+        await courseActions.deleteAssignment?.(activeCourseId, assignmentId);
       } catch (error) {
         console.error("Failed to delete assignment", error);
       }
@@ -284,15 +188,11 @@ export default function InstructorAssignments() {
   };
 
   const handleViewAssignment = (assignment) => {
-    navigate("/instructor/assignment-builder", {
-      state: { assignmentId: assignment.id },
-    });
+    navigate(assignmentBuilderPath, { state: { assignmentId: assignment.id } });
   };
 
   const handleOpenBuilder = (assignment) => {
-    navigate("/instructor/assignment-builder", {
-      state: { assignmentId: assignment.id },
-    });
+    navigate(assignmentBuilderPath, { state: { assignmentId: assignment.id } });
     setMenuAnchor(null);
   };
 
@@ -309,18 +209,12 @@ export default function InstructorAssignments() {
   const handleEditDueDateSubmit = async () => {
     if (!dueDateEditAssignment?.id || !dueDateForm.dueDate) return;
     try {
-      const dueDate = toIsoDateTime(dueDateForm.dueDate, dueDateForm.dueTime || "23:59");
-      await fetchJson(`/api/assignments/${dueDateEditAssignment.id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ due_date: dueDate }),
-      });
-      const refreshed = await fetchCourseAssignments(activeCourseId);
-      dispatch({
-        type: "SET_ASSIGNMENTS",
-        courseId: activeCourseId,
-        payload: refreshed,
-      });
+      await courseActions.updateAssignmentDueDate?.(
+        activeCourseId,
+        dueDateEditAssignment.id,
+        dueDateForm.dueDate,
+        dueDateForm.dueTime || "23:59"
+      );
       setDueDateDialogOpen(false);
       setDueDateEditAssignment(null);
     } catch (error) {

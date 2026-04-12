@@ -1,12 +1,5 @@
 import { useState } from "react";
 import { Box, Alert } from "@mui/material";
-import {
-  useCoursesState,
-  useCoursesDispatch,
-  addStudentToCourse,
-  removeStudentFromCourse,
-  bulkCreateStudents,
-} from "../../context/CoursesContext";
 import AddStudentDialog from "../../components/ui/AddStudentDialog";
 import StudentProfileModal from "../../components/ui/StudentProfileModal";
 import ImportRosterDialog from "../../components/ui/roster/ImportRosterDialog";
@@ -21,12 +14,11 @@ import {
   calculateClassStats,
   exportRosterCSV,
 } from "../../utils/rosterUtils";
-import { updateEnrollmentRole } from "../../context/CoursesContext";
+import { useAppRuntime } from "../../hooks/useAppRuntime.js";
 
 export default function InstructorRoster() {
-  const { activeCourseId, gradebookByCourse, assignmentsByCourse, courses } =
-    useCoursesState();
-  const dispatch = useCoursesDispatch();
+  const { courseState, courseActions } = useAppRuntime();
+  const { activeCourseId, gradebookByCourse, assignmentsByCourse, courses } = courseState;
 
   const [searchQuery, setSearchQuery] = useState("");
   const [addDialogOpen, setAddDialogOpen] = useState(false);
@@ -50,7 +42,7 @@ export default function InstructorRoster() {
 
   // Handlers
   const handleAddStudent = (studentData) =>
-    addStudentToCourse(dispatch, activeCourseId, studentData);
+    courseActions.addStudentToCourse?.(activeCourseId, studentData);
 
   const handleStudentClick = (student) => {
     setSelectedStudent(student);
@@ -63,7 +55,7 @@ export default function InstructorRoster() {
         "Are you sure you want to remove this student from the course? This will delete all their grades."
       )
     ) {
-      await removeStudentFromCourse(dispatch, activeCourseId, studentId);
+      await courseActions.removeStudentFromCourse?.(activeCourseId, studentId);
     }
     setMenuAnchor(null);
   };
@@ -74,30 +66,7 @@ export default function InstructorRoster() {
 
   const handleImportRoster = async (studentsToImport) => {
     try {
-      const response = await bulkCreateStudents(activeCourseId, studentsToImport);
-      const imported = response?.students || [];
-      const newStudents = imported.map((student) => ({
-        id: student.id,
-        username: student.username,
-        grades: {},
-        lateSubmissions: {},
-        submissionDates: {},
-        practices: {},
-      }));
-
-      const updatedGradebook = [...students, ...newStudents];
-
-      dispatch({
-        type: "SET_GRADEBOOK",
-        courseId: activeCourseId,
-        payload: updatedGradebook,
-      });
-
-      dispatch({
-        type: "UPDATE_COURSE_SETTINGS",
-        courseId: activeCourseId,
-        payload: { studentCount: updatedGradebook.length },
-      });
+      await courseActions.bulkAddStudents?.(activeCourseId, studentsToImport, students);
     } catch (error) {
       console.error("Failed to import roster:", error);
     } finally {
@@ -113,11 +82,7 @@ export default function InstructorRoster() {
 
   const handleToggleRole = async (student, newRole) => {
     try {
-      await updateEnrollmentRole(activeCourseId, student.id, newRole);
-      const updated = (gradebookByCourse[activeCourseId] || []).map((s) =>
-        s.id === student.id ? { ...s, role: newRole } : s
-      );
-      dispatch({ type: "SET_GRADEBOOK", courseId: activeCourseId, payload: updated });
+      await courseActions.updateStudentRole?.(activeCourseId, student.id, newRole, gradebookByCourse[activeCourseId] || []);
       setSelectedStudent((prev) =>
         prev?.id === student.id ? { ...prev, role: newRole } : prev
       );

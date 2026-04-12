@@ -2,12 +2,6 @@ import { useState } from "react";
 import { Box, Typography, Button, Alert } from "@mui/material";
 import { Plus, Brain } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import {
-  useCoursesState,
-  useCoursesDispatch,
-  fetchCoursePractices,
-} from "../../context/CoursesContext";
-import { fetchJson } from "../../utils/api.js";
 import AssignmentTable from "../../components/ui/AssignmentTable";
 import AssignmentFormDialog from "../../components/ui/AssignmentFormDialog";
 import AssignmentContextMenu from "../../components/ui/AssignmentContextMenu";
@@ -17,6 +11,7 @@ import {
   getStatusText,
   enhanceItems,
 } from "../../utils/assignmentStatus";
+import { useAppRuntime } from "../../hooks/useAppRuntime.js";
 
 const getCurrentEasternDate = () => new Date().toLocaleDateString('en-CA', { timeZone: 'America/New_York' });
 
@@ -34,8 +29,13 @@ const INITIAL_FORM_DATA = {
 };
 
 export default function InstructorPractice() {
-  const { activeCourseId, practicesByCourse, courses } = useCoursesState();
-  const dispatch = useCoursesDispatch();
+  const {
+    courseState,
+    courseActions,
+    assignmentPath,
+    practicePath,
+  } = useAppRuntime();
+  const { activeCourseId, practicesByCourse, courses } = courseState;
   const navigate = useNavigate();
 
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
@@ -53,8 +53,8 @@ export default function InstructorPractice() {
 
   const navigateToPractice = (practiceId) => {
     if (!practiceId) return;
-    navigate(`/instructor/assignment/${practiceId}`, {
-      state: { returnTo: "/instructor/practice" },
+    navigate(assignmentPath(practiceId), {
+      state: { returnTo: practicePath },
     });
   };
 
@@ -74,31 +74,9 @@ export default function InstructorPractice() {
     if (isCreating) return;
     setIsCreating(true);
     try {
-      const payload = {
-        course_id: activeCourseId,
-        kind: "practice",
-        title: formData.name,
-        description: formData.description || null,
-        is_locked: formData.isLocked,
-        chapter: Number(formData.chapter) || 1,
-        subchapter: formData.subchapter || "A",
-        due_date: null,
-        late_window_days: null,
-        late_penalty_percent: null,
-      };
-      const created = await fetchJson("/api/assignments", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      const refreshed = await fetchCoursePractices(activeCourseId);
-      dispatch({
-        type: "SET_PRACTICES",
-        courseId: activeCourseId,
-        payload: refreshed,
-      });
+      const created = await courseActions.createPractice?.(activeCourseId, formData);
       setCreateDialogOpen(false);
-      navigateToPractice(created?.id ?? payload.id);
+      navigateToPractice(created?.id);
     } catch (error) {
       console.error("Failed to create practice", error);
     } finally {
@@ -126,29 +104,7 @@ export default function InstructorPractice() {
 
   const handleEditSubmit = async () => {
     try {
-      const payload = {
-        course_id: activeCourseId,
-        kind: "practice",
-        title: formData.name,
-        description: formData.description || null,
-        is_locked: formData.isLocked,
-        chapter: Number(formData.chapter) || 1,
-        subchapter: formData.subchapter || "A",
-        due_date: null,
-        late_window_days: null,
-        late_penalty_percent: null,
-      };
-      await fetchJson(`/api/assignments/${selectedPractice.id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      const refreshed = await fetchCoursePractices(activeCourseId);
-      dispatch({
-        type: "SET_PRACTICES",
-        courseId: activeCourseId,
-        payload: refreshed,
-      });
+      await courseActions.updatePractice?.(activeCourseId, selectedPractice.id, formData);
       setEditDialogOpen(false);
       setSelectedPractice(null);
     } catch (error) {
@@ -160,17 +116,7 @@ export default function InstructorPractice() {
     const practice = practices.find((p) => p.id === practiceId);
     if (!practice) return;
     try {
-      await fetchJson(`/api/assignments/${practiceId}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ is_locked: !practice.isLocked }),
-      });
-      const refreshed = await fetchCoursePractices(activeCourseId);
-      dispatch({
-        type: "SET_PRACTICES",
-        courseId: activeCourseId,
-        payload: refreshed,
-      });
+      await courseActions.togglePracticeLock?.(activeCourseId, practiceId, practice);
     } catch (error) {
       console.error("Failed to toggle lock", error);
     }
@@ -179,19 +125,8 @@ export default function InstructorPractice() {
   const handleTogglePublish = async (practiceId) => {
     const practice = practices.find((p) => p.id === practiceId);
     if (!practice) return;
-    const nextPublished = !practice.isPublished;
     try {
-      await fetchJson(`/api/assignments/${practiceId}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ is_locked: practice.isLocked || !nextPublished }),
-      });
-      const refreshed = await fetchCoursePractices(activeCourseId);
-      dispatch({
-        type: "SET_PRACTICES",
-        courseId: activeCourseId,
-        payload: refreshed,
-      });
+      await courseActions.togglePracticePublish?.(activeCourseId, practiceId, practice);
     } catch (error) {
       console.error("Failed to toggle publish", error);
     }
@@ -199,29 +134,7 @@ export default function InstructorPractice() {
 
   const handleDuplicate = async (practice) => {
     try {
-      const payload = {
-        course_id: activeCourseId,
-        kind: "practice",
-        title: `${practice.name} (Copy)`,
-        description: practice.description || null,
-        is_locked: true,
-        chapter: practice.chapter || 1,
-        subchapter: practice.subchapter || "A",
-        due_date: null,
-        late_window_days: null,
-        late_penalty_percent: null,
-      };
-      await fetchJson("/api/assignments", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      const refreshed = await fetchCoursePractices(activeCourseId);
-      dispatch({
-        type: "SET_PRACTICES",
-        courseId: activeCourseId,
-        payload: refreshed,
-      });
+      await courseActions.duplicatePractice?.(activeCourseId, practice);
       setMenuAnchor(null);
     } catch (error) {
       console.error("Failed to duplicate practice", error);
@@ -235,15 +148,7 @@ export default function InstructorPractice() {
       )
     ) {
       try {
-        await fetchJson(`/api/assignments/${practiceId}`, {
-          method: "DELETE",
-        });
-        const refreshed = await fetchCoursePractices(activeCourseId);
-        dispatch({
-          type: "SET_PRACTICES",
-          courseId: activeCourseId,
-          payload: refreshed,
-        });
+        await courseActions.deletePractice?.(activeCourseId, practiceId);
       } catch (error) {
         console.error("Failed to delete practice", error);
       }
@@ -331,6 +236,7 @@ export default function InstructorPractice() {
         open={Boolean(menuAnchor)}
         onClose={() => setMenuAnchor(null)}
         item={menuPractice}
+        onOpenBuilder={handleViewPractice}
         onEdit={handleEditOpen}
         onDuplicate={handleDuplicate}
         onDelete={handleDelete}

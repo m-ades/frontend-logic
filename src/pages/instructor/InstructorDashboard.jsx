@@ -2,11 +2,9 @@ import { Box, Typography, Alert, LinearProgress, useTheme } from "@mui/material"
 import { useEffect, useMemo, useState } from "react";
 import { TrendingUp, Users, CheckCircle, Calendar } from "lucide-react";
 import {
-  useCoursesState,
   calculateAssignmentAverage,
   calculateGradeDistribution,
 } from "../../context/CoursesContext";
-import { fetchJson } from "../../utils/api.js";
 import { MetricCard } from "../../components/ui/MetricCard";
 import { PerformanceTrendsChart } from "../../components/ui/dashboard/PerformanceTrendsChart";
 import { GradeDistributionChart } from "../../components/ui/dashboard/GradeDistributionChart";
@@ -15,11 +13,12 @@ import { UpcomingDeadlinesTable } from "../../components/ui/dashboard/UpcomingDe
 import { AssignmentOverviewTable } from "../../components/ui/dashboard/AssignmentOverviewTable";
 import { sortAssignmentsBySubchapter } from "../../utils/assignmentSort.js";
 import { formatEasternDateTime } from "../../utils/easternTime.js";
+import { useAppRuntime } from "../../hooks/useAppRuntime.js";
 
 export default function InstructorDashboard() {
   const theme = useTheme();
-  const { courses, activeCourseId, assignmentsByCourse, gradebookByCourse } =
-    useCoursesState();
+  const { courseState, courseActions } = useAppRuntime();
+  const { courses, activeCourseId, assignmentsByCourse, gradebookByCourse } = courseState;
   const [isLoadingAnalytics, setIsLoadingAnalytics] = useState(true);
   const [analytics, setAnalytics] = useState({
     gradeSummary: null,
@@ -45,13 +44,10 @@ export default function InstructorDashboard() {
         return;
       }
       try {
-        const [instructorAnalytics, summary] = await Promise.all([
-          fetchJson(`/api/analytics/instructor-dashboard?courseId=${activeCourseId}`),
-          fetchJson(`/api/analytics/gradebook-summary?courseId=${activeCourseId}`),
-        ]);
+        const snapshot = await courseActions.loadInstructorDashboard?.(activeCourseId);
         if (isMounted) {
-          setAnalytics(instructorAnalytics);
-          setGradebookSummary(Array.isArray(summary) ? summary : (summary?.assignments ?? []));
+          setAnalytics(snapshot?.analytics || { gradeSummary: null, assignmentStats: [], timeByCategory: [] });
+          setGradebookSummary(snapshot?.gradebookSummary || []);
         }
       } catch (error) {
         if (isMounted) {
@@ -68,7 +64,7 @@ export default function InstructorDashboard() {
     return () => {
       isMounted = false;
     };
-  }, [activeCourseId]);
+  }, [activeCourseId, courseActions]);
 
   const nonPracticeAssignments = useMemo(
     () => assignments.filter((assignment) => assignment.kind !== "practice"),

@@ -5,57 +5,46 @@ import {
   School as SchoolIcon,
   CheckCircle as CheckCircleIcon,
 } from "@mui/icons-material";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { useAuthState } from "../context/AuthContext";
-import { isInstructorRole } from "../utils/auth.js";
-import {
-  useCoursesState,
-  useCoursesDispatch,
-  setActiveCourse,
-  initializeCourses,
-  addNewCourse,
-} from "../context/CoursesContext";
 import CreateCourseDialog from "../components/ui/courses/CreateCourseDialog";
 import CoursesHeader from "../components/ui/courses/CoursesHeader";
 import CoursesSection from "../components/ui/courses/CoursesSection";
 import CoursesEmptyState from "../components/ui/courses/CoursesEmptyState";
 import CourseCardSkeleton from "../components/ui/courses/CourseCardSkeleton";
+import { useAppRuntime } from "../hooks/useAppRuntime.js";
 
 export default function Courses() {
-  const { user } = useAuthState();
-  const { courses, loading, error, initialized } = useCoursesState();
-  const dispatch = useCoursesDispatch();
+  const {
+    courses: visibleCourses,
+    isSandbox: sandbox,
+    isInstructor,
+    dashboardPath,
+    courseState,
+    courseActions,
+  } = useAppRuntime();
+  const { loading, error, initialized } = courseState;
   const navigate = useNavigate();
-  const location = useLocation();
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
-
-  const isInstructor = location.pathname.startsWith("/instructor")
-    ? true
-    : location.pathname.startsWith("/student")
-    ? false
-    : isInstructorRole(user?.role);
-  const dashboardPath = isInstructor
-    ? "/instructor/dashboard"
-    : "/student/dashboard";
+  const allowCreateCourse = !sandbox || isInstructor;
 
   useEffect(() => {
-    if (!initialized) {
-      initializeCourses(dispatch);
+    if (!sandbox && !initialized) {
+      courseActions.initializeCourses?.();
     }
-  }, [initialized, dispatch]);
+  }, [sandbox, initialized, courseActions]);
 
-  const currentCourses = courses.filter((c) => c.status === "current");
-  const pastCourses = courses.filter((c) => c.status === "past");
+  const currentCourses = visibleCourses.filter((c) => c.status === "current");
+  const pastCourses = visibleCourses.filter((c) => c.status === "past");
 
   const handleSelectCourse = (courseId) => {
-    setActiveCourse(dispatch, courseId);
+    courseActions.setActiveCourse?.(courseId);
     navigate(dashboardPath);
   };
 
   const handleCreateCourse = async (courseData) => {
     try {
-      await addNewCourse(dispatch, courseData);
+      await courseActions.addNewCourse?.(courseData);
       navigate(dashboardPath);
     } catch (error) {
       console.error("Error creating course:", error);
@@ -67,7 +56,7 @@ export default function Courses() {
   };
 
   // Error state
-  if (error) {
+  if (!sandbox && error) {
     return (
       <Box>
         <Typography variant="h4" sx={{ mb: 4, fontWeight: 600 }}>
@@ -80,7 +69,7 @@ export default function Courses() {
             <Typography
               variant="button"
               sx={{ cursor: "pointer", textDecoration: "underline" }}
-              onClick={() => initializeCourses(dispatch)}
+              onClick={() => courseActions.initializeCourses?.()}
             >
               Retry
             </Typography>
@@ -104,10 +93,10 @@ export default function Courses() {
       />
 
       {/* Loading progress bar */}
-      {loading && <LinearProgress sx={{ mb: 3 }} />}
+      {!sandbox && loading && <LinearProgress sx={{ mb: 3 }} />}
 
       {/* Loading state - show skeletons */}
-      {loading && !initialized && (
+      {!sandbox && loading && !initialized && (
         <Grid container spacing={3}>
           {[1, 2, 3].map((i) => (
             <Grid size={{ xs: 12, sm: 6, md: 4 }} key={i}>
@@ -118,7 +107,7 @@ export default function Courses() {
       )}
 
       {/* Loaded state */}
-      {!loading && initialized && (
+      {(sandbox || (!loading && initialized)) && (
         <>
           {/* Current Courses */}
           <CoursesSection
@@ -143,7 +132,7 @@ export default function Courses() {
           />
 
           {/* Empty state */}
-          {courses.length === 0 && (
+          {visibleCourses.length === 0 && (
             <CoursesEmptyState
               isInstructor={isInstructor}
               onCreateCourse={handleOpenCreateDialog}
@@ -153,11 +142,13 @@ export default function Courses() {
       )}
 
       {/* Create Course Dialog */}
-      <CreateCourseDialog
-        open={createDialogOpen}
-        onClose={() => setCreateDialogOpen(false)}
-        onSubmit={handleCreateCourse}
-      />
+      {allowCreateCourse && (
+        <CreateCourseDialog
+          open={createDialogOpen}
+          onClose={() => setCreateDialogOpen(false)}
+          onSubmit={handleCreateCourse}
+        />
+      )}
     </Box>
   );
 }

@@ -15,13 +15,13 @@ import {
 } from "@mui/material";
 import { CheckCircle } from "lucide-react";
 import AssignmentDetailModal from "./AssignmentDetailModal";
-import { useCoursesState } from "../../../context/CoursesContext";
 import {
   getLetterGrade,
   getGradeColorVariant,
   getDefaultGradingScale,
 } from "../../../utils/gradingUtils";
 import { formatEasternDateTime } from "../../../utils/easternTime.js";
+import { useAppRuntime } from "../../../hooks/useAppRuntime.js";
 
 export const AssignmentOverviewTable = ({
   assignments: assignmentsProp,
@@ -30,8 +30,8 @@ export const AssignmentOverviewTable = ({
   totalPossible: totalPossibleProp,
   completionRate: completionRateProp,
 } = {}) => {
-  const { courses, activeCourseId, assignmentsByCourse, gradebookByCourse } =
-    useCoursesState();
+  const { courseState } = useAppRuntime();
+  const { courses, activeCourseId, assignmentsByCourse, gradebookByCourse } = courseState;
   const activeCourse = courses.find((c) => c.id === activeCourseId);
 
   const assignments = assignmentsProp ?? (assignmentsByCourse[activeCourseId] || []);

@@ -33,10 +33,9 @@ import BookIcon from '@mui/icons-material/Book'
 import LeaderboardIcon from '@mui/icons-material/Leaderboard'
 import { formatDateTime } from '../utils/formatting.js'
 import { API_CONFIG, fetchJson, getActiveUserId } from '../utils/api.js'
-import { useCoursesState } from '../context/CoursesContext.jsx'
-import { useAuthState } from '../context/AuthContext.jsx'
 import { isInstructorRole } from '../utils/auth.js'
 import ThemedCard from '../components/ui/ThemedCard.jsx'
+import { useAppRuntime } from '../hooks/useAppRuntime.js'
 
 const formatPercent = (value) => (value === null || value === undefined ? '—' : `${value.toFixed(1)}%`)
 
@@ -90,38 +89,46 @@ const defaultGradeOverview = {
   lowestScores: [],
 }
 const defaultReleaseOverview = { pastDuePercent: 0, remainingPercent: 0 }
+const isSubmittedGrade = (grade) => grade?.graded_at != null || grade?.graded_by != null
 
 export default function Dashboard() {
   const theme = useTheme()
-  const { user } = useAuthState()
-  const { activeCourseId } = useCoursesState()
+  const {
+    isSandbox: sandbox,
+    sandbox: sandboxData,
+    user: runtimeUser,
+    assignmentPath,
+    assignmentsPath,
+    activeCourseId,
+  } = useAppRuntime()
   const courseId = activeCourseId ?? API_CONFIG.courseId
-  const courseIdForApi = activeCourseId ?? null
-  const userId = getActiveUserId()
+  const courseIdForApi = sandbox ? null : (activeCourseId ?? null)
+  const userId = sandbox ? runtimeUser.id : getActiveUserId()
 
   const analyticsQuery = useQuery({
     queryKey: ['analytics-student', userId, courseIdForApi],
     queryFn: () =>
       fetchJson(`/api/analytics/student-dashboard?userId=${userId}&courseId=${courseIdForApi}`),
-    enabled: !!courseIdForApi && !!userId,
+    enabled: !sandbox && !!courseIdForApi && !!userId,
   })
 
   const gradebookQuery = useQuery({
     queryKey: ['gradebook-summary', courseIdForApi],
     queryFn: () =>
       fetchJson(`/api/analytics/gradebook-summary?courseId=${courseIdForApi}`).catch(() => null),
-    enabled: !!courseIdForApi,
+    enabled: !sandbox && !!courseIdForApi,
   })
 
-  const analyticsData = analyticsQuery.data
-  const gradebookResponse = gradebookQuery.data
-  const isLoadingAnalytics =
-    (analyticsQuery.isPending && !!courseIdForApi) || (gradebookQuery.isPending && !!courseIdForApi)
-  const analyticsError = analyticsQuery.isError
-  const gradebookError = gradebookQuery.isError
+  const analyticsData = sandbox ? sandboxData.dashboardAnalytics : analyticsQuery.data
+  const gradebookResponse = sandbox ? sandboxData.dashboardGradebookSummary : gradebookQuery.data
+  const isLoadingAnalytics = sandbox
+    ? false
+    : ((analyticsQuery.isPending && !!courseIdForApi) || (gradebookQuery.isPending && !!courseIdForApi))
+  const analyticsError = sandbox ? false : analyticsQuery.isError
+  const gradebookError = sandbox ? false : gradebookQuery.isError
 
   const { analytics, gradeTimeline, gradeOverview, releaseOverview } = useMemo(() => {
-    if (!courseIdForApi || !analyticsData) {
+    if ((!sandbox && !courseIdForApi) || !analyticsData) {
       return {
         analytics: emptyAnalytics,
         gradeTimeline: [],
@@ -196,7 +203,7 @@ export default function Dashboard() {
             const score = grade?.final_score ?? grade?.raw_score ?? null
             const percent =
               max > 0 && score != null ? (score / max) * 100 : 0
-            return { percent, title: assignment.title || 'Assignment' }
+            return { id: assignment.id, percent, title: assignment.title || 'Assignment' }
           })
         : (grades || [])
             .filter((g) => g?.Assignment?.is_locked === false)
@@ -205,23 +212,41 @@ export default function Dashboard() {
               const score = grade?.final_score ?? grade?.raw_score
               if (!max || score == null) return list
               list.push({
+                id: grade.assignment_id,
                 percent: (score / max) * 100,
                 title: grade?.Assignment?.title || grade?.title || 'Assignment',
               })
               return list
             }, [])
+    const submittedAssignmentPercents = assignmentPercents.filter((entry) => {
+      const grade = entry.id != null
+        ? gradeMap.get(entry.id) ?? grades.find((item) => item?.assignment_id === entry.id)
+        : null
+      return sandbox ? isSubmittedGrade(grade) : true
+    })
     const totalAssignments =
       unlockedSummary.length > 0
         ? unlockedSummary.length
         : analyticsData?.assignments?.total ?? gradebookSummary?.length ?? grades?.length ?? 0
-    const completedCount = assignmentPercents.filter((a) => a.percent > 0).length
+    const completedCount = sandbox
+      ? submittedAssignmentPercents.length
+      : assignmentPercents.filter((a) => a.percent > 0).length
     let overallPercent = null
-    let scoresForAverage = assignmentPercents.map((a) => a.percent)
-    if (scoresForAverage.length > 0) {
-      if (scoresForAverage.length >= 3) {
-        scoresForAverage = [...scoresForAverage].sort((a, b) => a - b).slice(2)
+    if (sandbox) {
+      const totalPossiblePoints = (grades || []).reduce((sum, grade) => sum + (Number(grade?.max_score) || 0), 0)
+      const totalEarnedPoints = (grades || []).reduce(
+        (sum, grade) => sum + (Number(grade?.final_score ?? grade?.raw_score) || 0),
+        0
+      )
+      overallPercent = totalPossiblePoints > 0 ? (totalEarnedPoints / totalPossiblePoints) * 100 : 0
+    } else {
+      let scoresForAverage = assignmentPercents.map((a) => a.percent)
+      if (scoresForAverage.length > 0) {
+        if (scoresForAverage.length >= 3) {
+          scoresForAverage = [...scoresForAverage].sort((a, b) => a - b).slice(2)
+        }
+        overallPercent = scoresForAverage.reduce((s, p) => s + p, 0) / scoresForAverage.length
       }
-      overallPercent = scoresForAverage.reduce((s, p) => s + p, 0) / scoresForAverage.length
     }
     const classAverage =
       classAvgWithDrop != null
@@ -238,7 +263,7 @@ export default function Dashboard() {
               ? (vals.reduce((sum, v) => sum + v, 0) / vals.length) * 100
               : null
           })()
-    const lowestScores = [...assignmentPercents]
+    const lowestScores = [...(sandbox ? assignmentPercents : assignmentPercents)]
       .sort((a, b) => a.percent - b.percent)
       .slice(0, 2)
     const lowestGrade = lowestScores[0] ?? null
@@ -266,7 +291,7 @@ export default function Dashboard() {
         remainingPercent: Number(remainingPercent.toFixed(1)),
       },
     }
-  }, [courseIdForApi, analyticsData, gradebookResponse])
+  }, [sandbox, courseIdForApi, analyticsData, gradebookResponse])
 
   const [instructorAnalytics, setInstructorAnalytics] = useState({
     gradeSummary: null,
@@ -274,7 +299,7 @@ export default function Dashboard() {
     timeByCategory: [],
   })
   const envDashboardMode = import.meta.env.VITE_DASHBOARD_MODE || 'student'
-  const isInstructor = isInstructorRole(user?.role)
+  const isInstructor = isInstructorRole(runtimeUser?.role)
   const dashboardMode = isInstructor && envDashboardMode === 'instructor'
     ? 'instructor'
     : 'student'
@@ -441,7 +466,7 @@ export default function Dashboard() {
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
                   {gradeOverview.total
-                    ? `${gradeOverview.completed}/${gradeOverview.total} assignments attempted`
+                    ? `${gradeOverview.completed}/${gradeOverview.total} assignments completed`
                     : 'No assignments graded yet'}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
@@ -499,12 +524,12 @@ export default function Dashboard() {
                     aria-label="Assignments remaining versus due"
                     sx={{
                       width: '100%',
-                      height: { xs: 160, sm: 200 },
-                      minHeight: { xs: 160, sm: 200 },
+                      height: 200,
+                      minHeight: 200,
                       minWidth: 0,
                     }}
                   >
-                    <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
+                    <ResponsiveContainer width="100%" height={200} minWidth={0} minHeight={0}>
                       <PieChart>
                         <Pie
                           data={[
@@ -606,7 +631,7 @@ export default function Dashboard() {
                       size="small"
                       variant="outlined"
                       component={Link}
-                      to={`/student/assignment/${assignment.id}`}
+                      to={assignmentPath(assignment.id)}
                       aria-label={`Open ${assignment.title}`}
                     >
                       Open
@@ -634,7 +659,9 @@ export default function Dashboard() {
                   Unable to load activity metrics.
                 </Typography>
               ) : null}
-              {!analyticsError && analytics.time?.cohort_median_minutes_per_question != null && (
+              {!analyticsError &&
+              analytics.time?.median_minutes_per_question != null &&
+              analytics.time?.cohort_median_minutes_per_question != null && (
                 <Typography variant="body2" color="text.secondary">
                   Your typical time per question is{' '}
                   {analytics.time.median_minutes_per_question != null &&
@@ -876,72 +903,3 @@ export default function Dashboard() {
     </Box>
   )
 }
-
-
-
-/* old dashboard
-
-import { useNavigate } from 'react-router-dom'
-import { Box, Typography, CardContent, Stack, Button } from '@mui/material'
-import ThemedCard from '../components/ui/ThemedCard.jsx'
-
-export default function Dashboard() {
-  const navigate = useNavigate()
-
-  return (
-    <Box sx={{ maxWidth: 900, mx: 'auto' }}>
-      <Typography variant="h4" sx={{ mb: 1, fontWeight: 600 }}>
-        Welcome back
-      </Typography>
-      <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
-        ............................
-      </Typography>
-
-      <Stack spacing={2}>
-        <ThemedCard>
-          <CardContent sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 2 }}>
-            <Box>
-              <Typography variant="h6">Assignments</Typography>
-              <Typography variant="body2" color="text.secondary">
-                View upcoming and submitted assigments
-              </Typography>
-            </Box>
-            <Button variant="contained" onClick={() => navigate('/student/assignments')}>
-              View assignments
-            </Button>
-          </CardContent>
-        </ThemedCard>
-
-        <ThemedCard>
-          <CardContent sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 2 }}>
-            <Box>
-              <Typography variant="h6">Practice</Typography>
-              <Typography variant="body2" color="text.secondary">
-                Sharpen your skills with supplementary problem sets.
-              </Typography>
-            </Box>
-            <Button variant="contained" onClick={() => navigate('/student/practice')}>
-              Start practice
-            </Button>
-          </CardContent>
-        </ThemedCard>
-
-        <ThemedCard>
-          <CardContent sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 2 }}>
-            <Box>
-              <Typography variant="h6">Grades</Typography>
-              <Typography variant="body2" color="text.secondary">
-                Track your progress.
-              </Typography>
-            </Box>
-            <Button variant="contained" onClick={() => navigate('/student/grades')}>
-              View grades
-            </Button>
-          </CardContent>
-        </ThemedCard>
-      </Stack>
-    </Box>
-  )
-}
-
-*/

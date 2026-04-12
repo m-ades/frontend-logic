@@ -6,8 +6,8 @@ import ThemedCard from '../components/ui/ThemedCard.jsx'
 import LoadingSpinner from '../components/ui/LoadingSpinner.jsx'
 import { formatDateTime } from '../utils/formatting.js'
 import { API_CONFIG, fetchJson, getActiveUserId } from '../utils/api.js'
-import { useCoursesState } from '../context/CoursesContext.jsx'
 import { sortAssignmentsBySubchapter } from '../utils/assignmentSort.js'
+import { useAppRuntime } from '../hooks/useAppRuntime.js'
 
 function NoRowsOverlay() {
   return (
@@ -20,29 +20,29 @@ function NoRowsOverlay() {
 }
 
 export default function Grades() {
-  const { activeCourseId } = useCoursesState()
+  const { isSandbox, sandbox: sandboxData, user, activeCourseId } = useAppRuntime()
   const courseId = activeCourseId ?? API_CONFIG.courseId
-  const courseIdForApi = activeCourseId ?? null
-  const userId = getActiveUserId()
+  const courseIdForApi = isSandbox ? null : (activeCourseId ?? null)
+  const userId = isSandbox ? user.id : getActiveUserId()
 
   const assignmentsQuery = useQuery({
     queryKey: ['course-assignments', courseIdForApi],
     queryFn: () => fetchJson(`/api/courses/${courseIdForApi}/assignments`),
-    enabled: !!courseIdForApi,
+    enabled: !isSandbox && !!courseIdForApi,
   })
 
   const gradesQuery = useQuery({
     queryKey: ['user-grades', userId],
     queryFn: () => fetchJson(`/api/users/${userId}/grades`),
-    enabled: !!userId,
+    enabled: !isSandbox && !!userId,
   })
 
-  const assignments = assignmentsQuery.data ?? []
-  const grades = gradesQuery.data ?? []
-  const isLoadingGrades = assignmentsQuery.isPending || gradesQuery.isPending
+  const assignments = isSandbox ? sandboxData.assignments : (assignmentsQuery.data ?? [])
+  const grades = isSandbox ? sandboxData.grades : (gradesQuery.data ?? [])
+  const isLoadingGrades = isSandbox ? false : (assignmentsQuery.isPending || gradesQuery.isPending)
 
   const gradeEntries = useMemo(() => {
-    if (!courseIdForApi) return []
+    if (!isSandbox && !courseIdForApi) return []
     const gradedAssignments = sortAssignmentsBySubchapter(
       (assignments || []).filter(
         (a) => a.kind !== 'practice' && a.is_locked === false
@@ -53,27 +53,41 @@ export default function Grades() {
       assignment,
       grade: gradeMap.get(assignment.id) || null,
     }))
-  }, [courseIdForApi, assignments, grades])
+  }, [isSandbox, courseIdForApi, assignments, grades])
 
   const assignmentPercents = useMemo(() => {
-    return gradeEntries.map((entry) => {
+    return gradeEntries.flatMap((entry) => {
       const grade = entry.grade
+      if (isSandbox && (!grade || (grade.graded_at == null && grade.graded_by == null))) {
+        return []
+      }
       const max = grade?.max_score ?? entry.assignment?.total_points ?? 0
       const score = grade?.final_score ?? grade?.raw_score ?? null
       const percent =
         max > 0 && score !== null && score !== undefined ? (score / max) * 100 : 0
-      return percent
+      return [percent]
     })
   }, [gradeEntries])
 
   const overallPercentage = useMemo(() => {
+    if (isSandbox) {
+      const totalPossiblePoints = gradeEntries.reduce(
+        (sum, entry) => sum + (Number(entry.grade?.max_score ?? entry.assignment?.total_points) || 0),
+        0
+      )
+      const totalEarnedPoints = gradeEntries.reduce(
+        (sum, entry) => sum + (Number(entry.grade?.final_score ?? entry.grade?.raw_score) || 0),
+        0
+      )
+      return totalPossiblePoints > 0 ? (totalEarnedPoints / totalPossiblePoints) * 100 : 0
+    }
     if (assignmentPercents.length === 0) return 0
-    let forAverage =
+    const forAverage =
       assignmentPercents.length >= 3
         ? [...assignmentPercents].sort((a, b) => a - b).slice(2)
         : assignmentPercents
     return forAverage.reduce((s, p) => s + p, 0) / forAverage.length
-  }, [assignmentPercents])
+  }, [assignmentPercents, gradeEntries, isSandbox])
 
   const rows = useMemo(
     () =>

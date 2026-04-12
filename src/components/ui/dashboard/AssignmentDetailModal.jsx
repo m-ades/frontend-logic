@@ -32,8 +32,6 @@ import {
 
 import { useNavigate, useLocation } from "react-router-dom";
 import {
-  useCoursesState,
-  useCoursesDispatch,
   calculateAssignmentAverage,
 } from "../../../context/CoursesContext";
 import { MetricCard } from "../MetricCard";
@@ -41,6 +39,7 @@ import { GradeDistributionChart } from "./GradeDistributionChart";
 import StudentSubmissionsTable from "./StudentSubmissionsTable";
 import GradeBreakdown from "./GradeBreakdown";
 import { formatEasternDateTime } from "../../../utils/easternTime.js";
+import { useAppRuntime } from "../../../hooks/useAppRuntime.js";
 
 // Helper functions
 function getLetterGrade(grade) {
@@ -64,11 +63,10 @@ export default function AssignmentDetailModal({ open, onClose, assignmentId }) {
   const [activeTab, setActiveTab] = useState(0);
   const navigate = useNavigate();
   const location = useLocation();
-  const dispatch = useCoursesDispatch();
+  const { courseState, courseActions, assignmentPath } = useAppRuntime();
 
   // Pull data from context
-  const { activeCourseId, assignmentsByCourse, gradebookByCourse, courses } =
-    useCoursesState();
+  const { activeCourseId, assignmentsByCourse, gradebookByCourse, courses } = courseState;
 
   // Get current course and assignment data
   const activeCourse = courses.find((c) => c.id === activeCourseId);
@@ -155,29 +153,15 @@ export default function AssignmentDetailModal({ open, onClose, assignmentId }) {
 
   // Action handlers using context dispatch
   const handleToggleLock = () => {
-    const updatedAssignments = assignments.map((a) =>
-      a.id === assignment.id ? { ...a, isLocked: !a.isLocked } : a
-    );
-    dispatch({
-      type: "SET_ASSIGNMENTS",
-      courseId: activeCourseId,
-      payload: updatedAssignments,
-    });
+    courseActions.toggleAssignmentLock?.(activeCourseId, assignment.id, assignment);
   };
 
   const handleTogglePublish = () => {
-    const updatedAssignments = assignments.map((a) =>
-      a.id === assignment.id ? { ...a, isPublished: !a.isPublished } : a
-    );
-    dispatch({
-      type: "SET_ASSIGNMENTS",
-      courseId: activeCourseId,
-      payload: updatedAssignments,
-    });
+    courseActions.toggleAssignmentPublish?.(activeCourseId, assignment.id, assignment);
   };
 
   const handleOpenAssignment = () => {
-    navigate(`/instructor/assignment/${assignment.id}`, {
+    navigate(assignmentPath(assignment.id), {
       state: { returnTo: location.pathname },
     });
     onClose();
