@@ -5,7 +5,10 @@ import { Button } from '@/components/ui/Button'
 import { AnimatedGroup } from '@/components/ui/AnimatedGroup'
 import { MacWindowDemoFrame } from '@/components/ui/LandingDemoFrames'
 import { YouTubeFacadeEmbed } from '@/components/ui/YouTubeFacadeEmbed'
-import { HERO_DEMO_YOUTUBE_URL_OR_ID } from '@/landing/hero-demo.config'
+import {
+  HERO_DEMO_VIDEO_SECTION_ENABLED,
+  HERO_DEMO_YOUTUBE_URL_OR_ID,
+} from '@/landing/hero-demo.config'
 import { LANDING_CTA_LIFT_OUTLINE, LANDING_CTA_LIFT_SOLID } from '@/landing/landing-cta-motion'
 import TryDemoSandboxModal from '@/components/ui/TryDemoSandboxModal'
 import { cn } from '@/lib/utils'
@@ -47,7 +50,7 @@ const demoTransitionVariants = {
 }
 
 const menuItems = [
-  { name: 'Video Demo', href: '#video-demo' },
+  ...(HERO_DEMO_VIDEO_SECTION_ENABLED ? [{ name: 'Video Demo', href: '#video-demo' }] : []),
   { name: 'How It Works', href: '#how-it-works' },
   { name: 'Features', href: '#features' },
   { name: 'Giving Day', href: '#giving-day' },
@@ -87,10 +90,7 @@ export function HeroSection() {
           <div className="h-[80rem] -translate-y-[350px] absolute left-0 top-0 w-56 -rotate-45 bg-[radial-gradient(50%_50%_at_50%_50%,hsla(0,0%,85%,.04)_0,hsla(0,0%,45%,.02)_80%,transparent_100%)]" />
         </div>
 
-        <section
-          id="video-demo"
-          className="relative z-[3] scroll-mt-24 sm:scroll-mt-28 md:scroll-mt-32"
-        >
+        <section className="relative z-[3]">
           <div className="relative isolate pt-20 sm:pt-24 md:pt-32 lg:pt-36">
             {/* Feather into page wash: avoid solid --color-background here — it caused a hard line vs How It Works */}
             <div
@@ -149,42 +149,49 @@ export function HeroSection() {
               </div>
             </div>
 
-            {/* Mac window + poster: same blur + y + spring as headline (`transitionVariants`). */}
-            <AnimatedGroup
-              variants={{
-                container: {
-                  visible: {
-                    transition: {
-                      staggerChildren: 0.05,
-                      delayChildren: 0.75,
+            {HERO_DEMO_VIDEO_SECTION_ENABLED ? (
+              <div
+                id="video-demo"
+                className="scroll-mt-24 sm:scroll-mt-28 md:scroll-mt-32"
+              >
+                {/* Mac window + poster: same blur + y + spring as headline (`transitionVariants`). */}
+                <AnimatedGroup
+                  variants={{
+                    container: {
+                      visible: {
+                        transition: {
+                          staggerChildren: 0.05,
+                          delayChildren: 0.75,
+                        },
+                      },
                     },
-                  },
-                },
-                ...demoTransitionVariants,
-              }}
-            >
-              <div className="relative mt-6 w-full max-w-[100vw] overflow-x-clip px-0 sm:mt-10 sm:px-2 md:mt-14 lg:mt-20">
-                <div className="relative mx-auto w-full max-w-6xl px-3 sm:px-4 md:px-0">
-                  <MacWindowDemoFrame
-                    opaqueShell
-                    className="mx-auto w-full"
-                    title="See HuLA in Action"
-                  >
-                    {/*
-                      YouTube: set `HERO_DEMO_YOUTUBE_URL_OR_ID` in `src/landing/hero-demo.config.js`
-                      (video ID or full URL). Empty = static poster below.
-                    */}
-                    <div className="relative aspect-video w-full bg-black sm:aspect-[15/8]">
-                      <YouTubeFacadeEmbed
-                        urlOrId={HERO_DEMO_YOUTUBE_URL_OR_ID}
-                        fallbackPosterSrc={DEMO_POSTER_SRC}
-                        title="HuLA product demo"
-                      />
+                    ...demoTransitionVariants,
+                  }}
+                >
+                  <div className="relative mt-6 w-full max-w-[100vw] overflow-x-clip px-0 sm:mt-10 sm:px-2 md:mt-14 lg:mt-20">
+                    <div className="relative mx-auto w-full max-w-6xl px-3 sm:px-4 md:px-0">
+                      <MacWindowDemoFrame
+                        opaqueShell
+                        className="mx-auto w-full"
+                        title="See HuLA in Action"
+                      >
+                        {/*
+                          YouTube: `HERO_DEMO_YOUTUBE_URL_OR_ID` in `src/landing/hero-demo.config.js`
+                          (video ID or full URL). Empty = static poster. Section visibility: `HERO_DEMO_VIDEO_SECTION_ENABLED`.
+                        */}
+                        <div className="relative aspect-video w-full bg-black sm:aspect-[15/8]">
+                          <YouTubeFacadeEmbed
+                            urlOrId={HERO_DEMO_YOUTUBE_URL_OR_ID}
+                            fallbackPosterSrc={DEMO_POSTER_SRC}
+                            title="HuLA product demo"
+                          />
+                        </div>
+                      </MacWindowDemoFrame>
                     </div>
-                  </MacWindowDemoFrame>
-                </div>
+                  </div>
+                </AnimatedGroup>
               </div>
-            </AnimatedGroup>
+            ) : null}
           </div>
         </section>
 
