@@ -6,12 +6,13 @@ import { useThemeState } from "./context/ThemeContext.jsx";
 import { LayoutProvider } from "./context/LayoutContext.jsx";
 import { AuthProvider } from "./context/AuthContext.jsx";
 import { CoursesProvider } from "./context/CoursesContext.jsx";
+import { SandboxProvider } from "./context/SandboxContext.jsx";
 import { InstructorSandboxProvider } from "./context/InstructorSandboxContext.jsx";
 import ErrorBoundary from "./components/ui/ErrorBoundary.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import ScrollToTop from "./components/layout/ScrollToTop.jsx";
 import AppLayout from "./components/layout/AppLayout.jsx";
-import { InstructorSandboxLayout } from "./components/layout/SandboxLayout.jsx";
+import SandboxLayout, { InstructorSandboxLayout } from "./components/layout/SandboxLayout.jsx";
 import Dashboard from "./pages/Dashboard.jsx";
 import Worksheet from "./pages/Worksheet.jsx";
 import Assignments from "./pages/Assignments.jsx";
@@ -57,6 +58,14 @@ function AppProviders() {
   );
 }
 
+function SandboxProviders() {
+  return (
+    <SandboxProvider>
+      <Outlet />
+    </SandboxProvider>
+  );
+}
+
 function InstructorSandboxProviders() {
   return (
     <InstructorSandboxProvider>
@@ -80,17 +89,67 @@ function AppRoutes() {
 
   return (
     <Routes>
-      <Route element={<InstructorSandboxProviders />}>
+      <Route element={<SandboxProviders />}>
+        <Route path="/sandbox" element={<Navigate to="/sandbox/student/dashboard" replace />} />
+        <Route path="/sandbox/student" element={<Navigate to="/sandbox/student/dashboard" replace />} />
         <Route
-          path="/sandbox"
-          element={<Navigate to="/sandbox/instructor/dashboard" replace />}
+          path="/sandbox/student/courses"
+          element={(
+            <SandboxLayout>
+              <Courses />
+            </SandboxLayout>
+          )}
         />
+        <Route
+          path="/sandbox/student/dashboard"
+          element={(
+            <SandboxLayout>
+              <Dashboard />
+            </SandboxLayout>
+          )}
+        />
+        <Route
+          path="/sandbox/student/assignments"
+          element={(
+            <SandboxLayout>
+              <Assignments />
+            </SandboxLayout>
+          )}
+        />
+        <Route
+          path="/sandbox/student/practice"
+          element={(
+            <SandboxLayout>
+              <Practice />
+            </SandboxLayout>
+          )}
+        />
+        <Route
+          path="/sandbox/student/grades"
+          element={(
+            <SandboxLayout>
+              <Grades />
+            </SandboxLayout>
+          )}
+        />
+        <Route
+          path="/sandbox/student/assignment/:assignmentId"
+          element={(
+            <SandboxLayout>
+              <Worksheet />
+            </SandboxLayout>
+          )}
+        />
+      </Route>
+
+      <Route element={<InstructorSandboxProviders />}>
         <Route
           path="/sandbox/instructor"
           element={<Navigate to="/sandbox/instructor/dashboard" replace />}
         />
         {renderRouteGroup(instructorSandboxRoutes, InstructorSandboxLayout)}
       </Route>
+
 
       <Route element={<AppProviders />}>
         <Route path="/" element={<Landing />} />

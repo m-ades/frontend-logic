@@ -315,7 +315,15 @@ export default function TruthTableEditor({
         if (typeof resp?.attempt_limit === 'number') {
           setAttemptLimit(resp.attempt_limit)
         }
+        const nextAttempt = resp?.submission?.attempt ?? Math.min(attemptCount + 1, attemptLimit)
         setAttemptCount((prev) => resp?.submission?.attempt ?? Math.min(prev + 1, attemptLimit))
+        onStateChange?.({
+          ...buildTruthTableStatePayload(tableInputs, mcSelection),
+          attemptCount: nextAttempt,
+          lastSubmissionAt: Date.now(),
+          lastStatus: result.nextStatus,
+          rawScore: result.score != null ? result.score : (result.isCorrect ? 100 : 0),
+        })
         if (typeof window !== 'undefined') {
           window.dispatchEvent(new CustomEvent('assignment-submission', {
             detail: {
@@ -339,7 +347,15 @@ export default function TruthTableEditor({
           setMessage(result.message)
         }
       } else {
+        const nextAttempt = Math.min(attemptCount + 1, attemptLimit)
         setAttemptCount((prev) => Math.min(prev + 1, attemptLimit))
+        onStateChange?.({
+          ...buildTruthTableStatePayload(tableInputs, mcSelection),
+          attemptCount: nextAttempt,
+          lastSubmissionAt: Date.now(),
+          lastStatus: result.nextStatus,
+          rawScore: result.isCorrect ? 100 : 0,
+        })
         if (result.isCorrect) {
           setStatus('correct')
           setMessage(result.message)

@@ -23,21 +23,26 @@ export default function ActivityAccordion({
   showExpandCollapseToggle = false,
   isLoading = false,
   defaultExpanded = true,
-  defaultSubchapterExpanded = defaultExpanded,
   persistKey = null,
+  storage = 'local',
 }) {
   const [expandedChapters, setExpandedChapters] = useState({})
   const [expandedSubchapters, setExpandedSubchapters] = useState({})
   const hasHydratedRef = useRef(false)
 
   const storageKey = persistKey ? `activity-accordion:${persistKey}` : null
+  const storageObject = typeof window === 'undefined'
+    ? null
+    : storage === 'session'
+    ? window.sessionStorage
+    : window.localStorage
 
   useEffect(() => {
-    if (!storageKey || typeof window === 'undefined') return
+    if (!storageKey || !storageObject) return
     if (hasHydratedRef.current) return
     if (!courseStructure?.length) return
     try {
-      const raw = window.localStorage.getItem(storageKey)
+      const raw = storageObject.getItem(storageKey)
       if (raw) {
         const parsed = JSON.parse(raw)
         setExpandedChapters(parsed?.expandedChapters || {})
@@ -48,13 +53,13 @@ export default function ActivityAccordion({
       console.warn('Failed to restore accordion state', error)
       hasHydratedRef.current = true
     }
-  }, [courseStructure, storageKey])
+  }, [courseStructure, storageKey, storageObject])
 
   useEffect(() => {
-    if (!storageKey || typeof window === 'undefined') return
+    if (!storageKey || !storageObject) return
     if (!hasHydratedRef.current) return
     try {
-      window.localStorage.setItem(
+      storageObject.setItem(
         storageKey,
         JSON.stringify({
           expandedChapters,
@@ -64,7 +69,7 @@ export default function ActivityAccordion({
     } catch (error) {
       console.warn('Failed to persist accordion state', error)
     }
-  }, [expandedChapters, expandedSubchapters, storageKey])
+  }, [expandedChapters, expandedSubchapters, storageKey, storageObject])
 
   const handleChapterChange = (chapterId) => (event, isExpanded) => {
     setExpandedChapters((prev) => ({
@@ -103,8 +108,7 @@ export default function ActivityAccordion({
   }
 
   const isChapterExpandedById = (chapterId) => expandedChapters[chapterId] ?? defaultExpanded
-  const isSubchapterExpandedById = (subchapterId) =>
-    expandedSubchapters[subchapterId] ?? defaultSubchapterExpanded
+  const isSubchapterExpandedById = (subchapterId) => expandedSubchapters[subchapterId] ?? defaultExpanded
   const isAnyCollapsed = courseStructure.some((chapter) => {
     if (!isChapterExpandedById(chapter.id)) return true
     return chapter.subchapters.some((subchapter) => !isSubchapterExpandedById(subchapter.id))
@@ -284,71 +288,64 @@ export default function ActivityAccordion({
                         sx={{
                           flexDirection: 'column',
                           alignItems: 'stretch',
-                          '&:not(:last-child) .subchapter-shell': {
-                            borderBottom: '1px solid',
-                            borderColor: 'divider',
+                          borderBottom: '1px solid',
+                          borderColor: 'divider',
+                          '&:last-child': {
+                            borderBottom: 'none',
                           },
                         }}
                       >
-                        <Box
-                          className="subchapter-shell"
+                        <Accordion
+                          expanded={isSubchapterExpanded}
+                          onChange={handleSubchapterChange(subchapter.id)}
+                          elevation={0}
                           sx={{
                             width: '100%',
-                            px: { xs: 1.5, md: 2.5 },
+                            boxShadow: 'none',
+                            '&:before': { display: 'none' },
+                            backgroundColor: 'transparent',
                           }}
                         >
-                          <Accordion
-                            expanded={isSubchapterExpanded}
-                            onChange={handleSubchapterChange(subchapter.id)}
-                            elevation={0}
+                          <AccordionSummary
+                            expandIcon={<ExpandMoreIcon sx={{ fontSize: 20 }} />}
                             sx={{
-                              width: '100%',
-                              boxShadow: 'none',
-                              '&:before': { display: 'none' },
-                              backgroundColor: 'transparent',
+                              px: 3,
+                              py: 1.5,
+                              minHeight: 48,
+                              '&.Mui-expanded': {
+                                minHeight: 48,
+                              },
+                              '& .MuiAccordionSummary-content': {
+                                my: 0,
+                                '&.Mui-expanded': {
+                                  my: 0,
+                                },
+                              },
                             }}
                           >
-                            <AccordionSummary
-                              expandIcon={<ExpandMoreIcon sx={{ fontSize: 20 }} />}
+                            <Typography
+                              variant="subtitle1"
                               sx={{
-                                px: 1.5,
-                                py: 1.5,
-                                minHeight: 48,
-                                '&.Mui-expanded': {
-                                  minHeight: 48,
-                                },
-                                '& .MuiAccordionSummary-content': {
-                                  my: 0,
-                                  '&.Mui-expanded': {
-                                    my: 0,
-                                  },
-                                },
+                                fontWeight: 500,
+                                color: 'text.primary',
                               }}
                             >
-                              <Typography
-                                variant="subtitle1"
-                                sx={{
-                                  fontWeight: 500,
-                                  color: 'text.primary',
-                                }}
-                              >
-                                {subchapter.title}
-                              </Typography>
-                            </AccordionSummary>
+                              {subchapter.title}
+                            </Typography>
+                          </AccordionSummary>
 
-                            <AccordionDetails sx={{ px: 1.5, py: 2, pt: 1 }}>
-                              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
-                                {subchapter.activities.map((activity, idx) =>
-                                  renderActivity(activity, {
-                                    chapter,
-                                    subchapter,
-                                    activityIndex: idx,
-                                  })
-                                )}
-                              </Box>
-                            </AccordionDetails>
-                          </Accordion>
-                        </Box>
+                          <AccordionDetails sx={{ px: 3, py: 2, pt: 1 }}>
+                            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+                              {subchapter.activities.map((activity, idx) =>
+                                renderActivity(activity, {
+                                  chapter,
+                                  subchapter,
+                                  activityIndex: idx,
+                                })
+                              )}
+                            </Box>
+                          </AccordionDetails>
+                        </Accordion>
                       </ListItem>
                     )
                   })}
