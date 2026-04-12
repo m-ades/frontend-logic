@@ -7,11 +7,12 @@ import { LayoutProvider } from "./context/LayoutContext.jsx";
 import { AuthProvider } from "./context/AuthContext.jsx";
 import { CoursesProvider } from "./context/CoursesContext.jsx";
 import { SandboxProvider } from "./context/SandboxContext.jsx";
+import { InstructorSandboxProvider } from "./context/InstructorSandboxContext.jsx";
 import ErrorBoundary from "./components/ui/ErrorBoundary.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import ScrollToTop from "./components/layout/ScrollToTop.jsx";
 import AppLayout from "./components/layout/AppLayout.jsx";
-import SandboxLayout from "./components/layout/SandboxLayout.jsx";
+import SandboxLayout, { InstructorSandboxLayout } from "./components/layout/SandboxLayout.jsx";
 import Dashboard from "./pages/Dashboard.jsx";
 import Worksheet from "./pages/Worksheet.jsx";
 import Assignments from "./pages/Assignments.jsx";
@@ -31,6 +32,32 @@ import InstructorPractice from "./pages/instructor/InstructorPractice.jsx";
 import InstructorRoster from "./pages/instructor/InstructorRoster.jsx";
 import InstructorContact from "./pages/instructor/Contact.jsx";
 
+const withLayout = (LayoutComponent, PageComponent) => (
+  <LayoutComponent>
+    <PageComponent />
+  </LayoutComponent>
+);
+
+const renderRouteGroup = (routes, LayoutComponent) => (
+  routes.map(({ path, PageComponent }) => (
+    <Route
+      key={path}
+      path={path}
+      element={withLayout(LayoutComponent, PageComponent)}
+    />
+  ))
+);
+
+function AppProviders() {
+  return (
+    <AuthProvider>
+      <CoursesProvider>
+        <Outlet />
+      </CoursesProvider>
+    </AuthProvider>
+  );
+}
+
 function SandboxProviders() {
   return (
     <SandboxProvider>
@@ -39,7 +66,27 @@ function SandboxProviders() {
   );
 }
 
+function InstructorSandboxProviders() {
+  return (
+    <InstructorSandboxProvider>
+      <Outlet />
+    </InstructorSandboxProvider>
+  );
+}
+
 function AppRoutes() {
+  const instructorSandboxRoutes = [
+    { path: "/sandbox/instructor/courses", PageComponent: Courses },
+    { path: "/sandbox/instructor/dashboard", PageComponent: InstructorDashboard },
+    { path: "/sandbox/instructor/assignments", PageComponent: InstructorAssignments },
+    { path: "/sandbox/instructor/practice", PageComponent: InstructorPractice },
+    { path: "/sandbox/instructor/gradebook", PageComponent: InstructorGradebook },
+    { path: "/sandbox/instructor/roster", PageComponent: InstructorRoster },
+    { path: "/sandbox/instructor/contact", PageComponent: InstructorContact },
+    { path: "/sandbox/instructor/controls", PageComponent: InstructorControls },
+    { path: "/sandbox/instructor/assignment/:assignmentId", PageComponent: Worksheet },
+  ];
+
   return (
     <Routes>
       <Route element={<SandboxProviders />}>
@@ -95,220 +142,229 @@ function AppRoutes() {
         />
       </Route>
 
-      <Route path="/login" element={<Login />} />
+      <Route element={<InstructorSandboxProviders />}>
+        <Route
+          path="/sandbox/instructor"
+          element={<Navigate to="/sandbox/instructor/dashboard" replace />}
+        />
+        {renderRouteGroup(instructorSandboxRoutes, InstructorSandboxLayout)}
+      </Route>
 
-      <Route path="/" element={<Landing />} />
 
-      <Route
-        path="/student"
-        element={
-          <ProtectedRoute allowedRoles={["student"]}>
-            <Navigate to="/student/courses" replace />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/student/courses"
-        element={
-          <ProtectedRoute allowedRoles={["student"]}>
-            <AppLayout>
-              <Courses />
-            </AppLayout>
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/student/dashboard"
-        element={
-          <ProtectedRoute allowedRoles={["student"]}>
-            <AppLayout>
-              <Dashboard />
-            </AppLayout>
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/student/assignments"
-        element={
-          <ProtectedRoute allowedRoles={["student"]}>
-            <AppLayout>
-              <Assignments />
-            </AppLayout>
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/student/practice"
-        element={
-          <ProtectedRoute allowedRoles={["student"]}>
-            <AppLayout>
-              <Practice />
-            </AppLayout>
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/student/profile"
-        element={
-          <ProtectedRoute allowedRoles={["student"]}>
-            <AppLayout>
-              <Profile />
-            </AppLayout>
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/student/grades"
-        element={
-          <ProtectedRoute allowedRoles={["student"]}>
-            <AppLayout>
-              <Grades />
-            </AppLayout>
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/student/contact"
-        element={
-          <ProtectedRoute allowedRoles={["student"]}>
-            <AppLayout>
-              <ContactStudent />
-            </AppLayout>
-          </ProtectedRoute>
-        }
-      />
+      <Route element={<AppProviders />}>
+        <Route path="/" element={<Landing />} />
+        <Route path="/login" element={<Login />} />
+        <Route
+          path="/student"
+          element={
+            <ProtectedRoute allowedRoles={["student"]}>
+              <Navigate to="/student/courses" replace />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/student/courses"
+          element={
+            <ProtectedRoute allowedRoles={["student"]}>
+              <AppLayout>
+                <Courses />
+              </AppLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/student/dashboard"
+          element={
+            <ProtectedRoute allowedRoles={["student"]}>
+              <AppLayout>
+                <Dashboard />
+              </AppLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/student/assignments"
+          element={
+            <ProtectedRoute allowedRoles={["student"]}>
+              <AppLayout>
+                <Assignments />
+              </AppLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/student/practice"
+          element={
+            <ProtectedRoute allowedRoles={["student"]}>
+              <AppLayout>
+                <Practice />
+              </AppLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/student/profile"
+          element={
+            <ProtectedRoute allowedRoles={["student"]}>
+              <AppLayout>
+                <Profile />
+              </AppLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/student/grades"
+          element={
+            <ProtectedRoute allowedRoles={["student"]}>
+              <AppLayout>
+                <Grades />
+              </AppLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/student/contact"
+          element={
+            <ProtectedRoute allowedRoles={["student"]}>
+              <AppLayout>
+                <ContactStudent />
+              </AppLayout>
+            </ProtectedRoute>
+          }
+        />
 
-      <Route
-        path="/student/assignment/:assignmentId"
-        element={
-          <ProtectedRoute allowedRoles={["student"]}>
-            <AppLayout>
-              <Worksheet />
-            </AppLayout>
-          </ProtectedRoute>
-        }
-      />
+        <Route
+          path="/student/assignment/:assignmentId"
+          element={
+            <ProtectedRoute allowedRoles={["student"]}>
+              <AppLayout>
+                <Worksheet />
+              </AppLayout>
+            </ProtectedRoute>
+          }
+        />
 
-      <Route
-        path="/instructor"
-        element={
-          <ProtectedRoute allowedRoles={["instructor"]}>
-            <Navigate to="/instructor/dashboard" replace />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/instructor/assignments"
-        element={
-          <ProtectedRoute allowedRoles={["instructor"]}>
-            <AppLayout>
-              <InstructorAssignments />
-            </AppLayout>
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/instructor/assignment/:assignmentId"
-        element={
-          <ProtectedRoute allowedRoles={["instructor"]}>
-            <AppLayout>
-              <Worksheet />
-            </AppLayout>
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/instructor/dashboard"
-        element={
-          <ProtectedRoute allowedRoles={["instructor"]}>
-            <AppLayout>
-              <InstructorDashboard />
-            </AppLayout>
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/instructor/courses"
-        element={
-          <ProtectedRoute allowedRoles={["instructor"]}>
-            <AppLayout>
-              <Courses />
-            </AppLayout>
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/instructor/profile"
-        element={
-          <ProtectedRoute allowedRoles={["instructor"]}>
-            <AppLayout>
-              <Profile />
-            </AppLayout>
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/instructor/gradebook"
-        element={
-          <ProtectedRoute allowedRoles={["instructor"]}>
-            <AppLayout>
-              <InstructorGradebook />
-            </AppLayout>
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/instructor/controls"
-        element={
-          <ProtectedRoute allowedRoles={["instructor"]}>
-            <AppLayout>
-              <InstructorControls />
-            </AppLayout>
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/instructor/practice"
-        element={
-          <ProtectedRoute allowedRoles={["instructor"]}>
-            <AppLayout>
-              <InstructorPractice />
-            </AppLayout>
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/instructor/roster"
-        element={
-          <ProtectedRoute allowedRoles={["instructor"]}>
-            <AppLayout>
-              <InstructorRoster />
-            </AppLayout>
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/instructor/contact"
-        element={
-          <ProtectedRoute allowedRoles={["instructor"]}>
-            <AppLayout>
-              <InstructorContact />
-            </AppLayout>
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/instructor/assignment-builder"
-        element={
-          <ProtectedRoute allowedRoles={["instructor"]}>
-            <AppLayout>
-              <AssignmentBuilder />
-            </AppLayout>
-          </ProtectedRoute>
-        }
-      />
+        <Route
+          path="/instructor"
+          element={
+            <ProtectedRoute allowedRoles={["instructor"]}>
+              <Navigate to="/instructor/dashboard" replace />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/instructor/assignments"
+          element={
+            <ProtectedRoute allowedRoles={["instructor"]}>
+              <AppLayout>
+                <InstructorAssignments />
+              </AppLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/instructor/assignment/:assignmentId"
+          element={
+            <ProtectedRoute allowedRoles={["instructor"]}>
+              <AppLayout>
+                <Worksheet />
+              </AppLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/instructor/dashboard"
+          element={
+            <ProtectedRoute allowedRoles={["instructor"]}>
+              <AppLayout>
+                <InstructorDashboard />
+              </AppLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/instructor/courses"
+          element={
+            <ProtectedRoute allowedRoles={["instructor"]}>
+              <AppLayout>
+                <Courses />
+              </AppLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/instructor/profile"
+          element={
+            <ProtectedRoute allowedRoles={["instructor"]}>
+              <AppLayout>
+                <Profile />
+              </AppLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/instructor/gradebook"
+          element={
+            <ProtectedRoute allowedRoles={["instructor"]}>
+              <AppLayout>
+                <InstructorGradebook />
+              </AppLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/instructor/controls"
+          element={
+            <ProtectedRoute allowedRoles={["instructor"]}>
+              <AppLayout>
+                <InstructorControls />
+              </AppLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/instructor/practice"
+          element={
+            <ProtectedRoute allowedRoles={["instructor"]}>
+              <AppLayout>
+                <InstructorPractice />
+              </AppLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/instructor/roster"
+          element={
+            <ProtectedRoute allowedRoles={["instructor"]}>
+              <AppLayout>
+                <InstructorRoster />
+              </AppLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/instructor/contact"
+          element={
+            <ProtectedRoute allowedRoles={["instructor"]}>
+              <AppLayout>
+                <InstructorContact />
+              </AppLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/instructor/assignment-builder"
+          element={
+            <ProtectedRoute allowedRoles={["instructor"]}>
+              <AppLayout>
+                <AssignmentBuilder />
+              </AppLayout>
+            </ProtectedRoute>
+          }
+        />
+      </Route>
 
-      <Route path="*" element={<Navigate to="/login" replace />} />
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 }
@@ -320,13 +376,9 @@ function AppContent() {
       <CssBaseline />
       <BrowserRouter>
         <ScrollToTop />
-        <AuthProvider>
-          <CoursesProvider>
-            <LayoutProvider>
-              <AppRoutes />
-            </LayoutProvider>
-          </CoursesProvider>
-        </AuthProvider>
+        <LayoutProvider>
+          <AppRoutes />
+        </LayoutProvider>
       </BrowserRouter>
     </MuiThemeProvider>
   );

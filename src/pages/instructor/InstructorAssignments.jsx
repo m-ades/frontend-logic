@@ -50,7 +50,9 @@ export default function InstructorAssignments() {
   const {
     courseState,
     courseActions,
+    assignmentPath,
     assignmentBuilderPath,
+    isSandbox,
   } = useAppRuntime();
   const { activeCourseId, assignmentsByCourse, gradebookByCourse, courses } = courseState;
   const navigate = useNavigate();
@@ -109,9 +111,11 @@ export default function InstructorAssignments() {
     try {
       const created = await courseActions.createAssignment?.(activeCourseId, formData);
       setCreateDialogOpen(false);
-      navigate(assignmentBuilderPath, {
-        state: { assignmentId: created?.id },
-      });
+      if (!isSandbox && created?.id) {
+        navigate(assignmentBuilderPath, {
+          state: { assignmentId: created.id },
+        });
+      }
     } catch (error) {
       console.error("Failed to create assignment", error);
     } finally {
@@ -188,11 +192,19 @@ export default function InstructorAssignments() {
   };
 
   const handleViewAssignment = (assignment) => {
+    if (isSandbox) {
+      navigate(assignmentPath(assignment.id));
+      return;
+    }
     navigate(assignmentBuilderPath, { state: { assignmentId: assignment.id } });
   };
 
   const handleOpenBuilder = (assignment) => {
-    navigate(assignmentBuilderPath, { state: { assignmentId: assignment.id } });
+    if (isSandbox) {
+      navigate(assignmentPath(assignment.id));
+    } else {
+      navigate(assignmentBuilderPath, { state: { assignmentId: assignment.id } });
+    }
     setMenuAnchor(null);
   };
 
