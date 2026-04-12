@@ -150,7 +150,6 @@ function AppRoutes() {
         {renderRouteGroup(instructorSandboxRoutes, InstructorSandboxLayout)}
       </Route>
 
-
       <Route element={<AppProviders />}>
         <Route path="/" element={<Landing />} />
         <Route path="/login" element={<Login />} />
