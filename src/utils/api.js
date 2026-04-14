@@ -1,4 +1,6 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://backend-logic-production.up.railway.app';
+// default to same origin api so production auth cookies are issued for
+// hunterlogic org via the frontend rewrite proxy instead of railway directly
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
 const USER_STORAGE_KEY = 'logicapp_current_user';
 let unauthorizedHandler = null;
 
@@ -119,7 +121,7 @@ export async function fetchJson(path, options = {}) {
     try {
       message = JSON.parse(text)?.message || text;
     } catch {
-      // text wasn't json; keep raw message
+      // text was not json keep raw message
     }
     throw new Error(message || `Request failed: ${res.status}`);
   }
