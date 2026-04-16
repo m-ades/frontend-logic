@@ -419,6 +419,9 @@ function RealWorksheetContent() {
   const courseIdForApi = activeCourseId ?? null
   const sessionId = useRef(null)
   const questionSessionId = useRef(null)
+  const questionSessionQuestionIdRef = useRef(null)
+  const desiredQuestionSessionQuestionIdRef = useRef(null)
+  const questionSessionSyncRef = useRef(Promise.resolve())
   const lastActivityRef = useRef(null)
   const idleTimeoutIdRef = useRef(null)
   const scheduleIdleTimeoutRef = useRef(() => {})
@@ -528,45 +531,59 @@ function RealWorksheetContent() {
     setLastQuestionIndex(assignmentId, currentProofIndex)
   }, [currentWorksheet?.id, currentProofIndex, setLastQuestionIndex])
 
-  const endQuestionSession = useCallback(async () => {
-    if (!questionSessionId.current) return
-    const id = questionSessionId.current
-    try {
-      await fetchJson(`/api/question-sessions/${id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ended_at: new Date().toISOString() }),
-      })
-    } catch (err) {
-      // ignore for now
-    } finally {
-      if (questionSessionId.current === id) {
-        questionSessionId.current = null
-      }
-    }
-  }, [])
+  const syncQuestionSession = useCallback(() => {
+    questionSessionSyncRef.current = questionSessionSyncRef.current.then(async () => {
+      while (true) {
+        const desiredQuestionId = desiredQuestionSessionQuestionIdRef.current || null
+        const activeSessionId = questionSessionId.current
+        const activeQuestionId = questionSessionQuestionIdRef.current || null
 
-  const startQuestionSession = useCallback(async (questionId) => {
-    if (!questionId || !activeUserId) return
-    // avoid starting a new session if one is already active
-    if (questionSessionId.current) return
-    try {
-      const session = await fetchJson('/api/question-sessions', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          assignment_question_id: questionId,
-          user_id: activeUserId,
-          started_at: new Date().toISOString(),
-        }),
-      })
-      questionSessionId.current = session?.id ?? null
-      if (questionSessionId.current) {
-        scheduleIdleTimeoutRef.current()
+        if (activeSessionId && (!desiredQuestionId || desiredQuestionId !== activeQuestionId)) {
+          const closingSessionId = activeSessionId
+          try {
+            await fetchJson(`/api/question-sessions/${closingSessionId}`, {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ ended_at: new Date().toISOString() }),
+            })
+          } catch (err) {
+            // ignore for now
+          } finally {
+            if (questionSessionId.current === closingSessionId) {
+              questionSessionId.current = null
+              questionSessionQuestionIdRef.current = null
+            }
+          }
+          continue
+        }
+
+        if (!activeSessionId && desiredQuestionId && activeUserId) {
+          try {
+            const session = await fetchJson('/api/question-sessions', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                assignment_question_id: desiredQuestionId,
+                user_id: activeUserId,
+                started_at: new Date().toISOString(),
+              }),
+            })
+            questionSessionId.current = session?.id ?? null
+            questionSessionQuestionIdRef.current = questionSessionId.current ? desiredQuestionId : null
+            if (questionSessionId.current) {
+              scheduleIdleTimeoutRef.current()
+            }
+          } catch (err) {
+            // ignore for now
+          }
+          continue
+        }
+
+        break
       }
-    } catch (err) {
-      // ignore for now
-    }
+    })
+
+    return questionSessionSyncRef.current
   }, [activeUserId])
 
   useEffect(() => {
@@ -625,22 +642,20 @@ function RealWorksheetContent() {
   useEffect(() => {
     let keepGoing = true
 
-    // end any existing question session before starting a new one
     const switchQuestionSession = async () => {
       if (!keepGoing) return
-      await endQuestionSession()
-      if (currentProof?.questionId) {
-        await startQuestionSession(currentProof.questionId)
-      }
+      desiredQuestionSessionQuestionIdRef.current = currentProof?.questionId || null
+      await syncQuestionSession()
     }
 
     switchQuestionSession()
 
     return () => {
       keepGoing = false
-      endQuestionSession()
+      desiredQuestionSessionQuestionIdRef.current = null
+      syncQuestionSession()
     }
-  }, [currentProof?.questionId, endQuestionSession, startQuestionSession])
+  }, [currentProof?.questionId, syncQuestionSession])
 
   useEffect(() => {
     if (typeof window === 'undefined' || typeof document === 'undefined') return undefined
@@ -658,7 +673,8 @@ function RealWorksheetContent() {
       clearIdleTimeout()
       if (!questionSessionId.current) return
       idleTimeoutIdRef.current = setTimeout(() => {
-        endQuestionSession()
+        desiredQuestionSessionQuestionIdRef.current = null
+        syncQuestionSession()
       }, IDLE_TIMEOUT_MS)
     }
     scheduleIdleTimeoutRef.current = scheduleIdleTimeout
@@ -671,24 +687,24 @@ function RealWorksheetContent() {
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'hidden') {
         clearIdleTimeout()
-        endQuestionSession()
+        desiredQuestionSessionQuestionIdRef.current = null
+        syncQuestionSession()
       } else if (document.visibilityState === 'visible') {
-        if (currentProof?.questionId && !questionSessionId.current) {
-          startQuestionSession(currentProof.questionId)
-        }
+        desiredQuestionSessionQuestionIdRef.current = currentProof?.questionId || null
+        syncQuestionSession()
       }
     }
 
     const handleBlur = () => {
       clearIdleTimeout()
-      endQuestionSession()
+      desiredQuestionSessionQuestionIdRef.current = null
+      syncQuestionSession()
     }
 
     const handleFocus = () => {
       handleActivity()
-      if (currentProof?.questionId && !questionSessionId.current) {
-        startQuestionSession(currentProof.questionId)
-      }
+      desiredQuestionSessionQuestionIdRef.current = currentProof?.questionId || null
+      syncQuestionSession()
     }
 
     window.addEventListener('keydown', handleActivity)
@@ -713,7 +729,7 @@ function RealWorksheetContent() {
       window.removeEventListener('focus', handleFocus)
       document.removeEventListener('visibilitychange', handleVisibilityChange)
     }
-  }, [currentProof?.questionId, endQuestionSession, startQuestionSession])
+  }, [currentProof?.questionId, syncQuestionSession])
 
   const refreshQuestionSolutions = useCallback(async (assignmentId, questionId) => {
     if (!assignmentId || !questionId || !activeUserId) return
