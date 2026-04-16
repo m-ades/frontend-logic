@@ -403,6 +403,8 @@ const buildTruthTableState = (lefts, right, data) => {
   return state
 }
 
+const QUESTION_SESSION_TRACKING_ENABLED = false
+
 function RealWorksheetContent() {
   const { worksheetId, assignmentId } = useParams()
   const navigate = useNavigate()
@@ -532,6 +534,12 @@ function RealWorksheetContent() {
   }, [currentWorksheet?.id, currentProofIndex, setLastQuestionIndex])
 
   const syncQuestionSession = useCallback(() => {
+    if (!QUESTION_SESSION_TRACKING_ENABLED) {
+      questionSessionId.current = null
+      questionSessionQuestionIdRef.current = null
+      return Promise.resolve()
+    }
+
     questionSessionSyncRef.current = questionSessionSyncRef.current.then(async () => {
       while (true) {
         const desiredQuestionId = desiredQuestionSessionQuestionIdRef.current || null
