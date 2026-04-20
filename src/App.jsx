@@ -25,7 +25,7 @@ import InstructorControls from "./pages/instructor/InstructorControls.jsx";
 import InstructorAssignments from "./pages/instructor/InstructorAssignments.jsx";
 import AssignmentBuilder from "./pages/instructor/InstructorAssignmentBuilder.jsx";
 import Login from "./pages/Login.jsx";
-import Landing from "./pages/Landing.jsx";
+import PublicLandingRoute from "./pages/PublicLandingRoute.jsx";
 import Courses from "./pages/Courses.jsx";
 import Profile from "./pages/Profile.jsx";
 import InstructorPractice from "./pages/instructor/InstructorPractice.jsx";
@@ -151,7 +151,7 @@ function AppRoutes() {
       </Route>
 
       <Route element={<AppProviders />}>
-        <Route path="/" element={<Landing />} />
+        <Route path="/" element={<PublicLandingRoute />} />
         <Route path="/login" element={<Login />} />
         <Route
           path="/student"
