@@ -8,9 +8,11 @@ import {
   DialogContent,
   DialogTitle,
   Divider,
+  FormControlLabel,
   IconButton,
   InputAdornment,
   Stack,
+  Switch,
   TextField,
   Typography,
 } from "@mui/material";
@@ -22,6 +24,35 @@ import {
   PASSWORD_POLICY_MESSAGE,
   isStrongPassword,
 } from "../../utils/passwords.js";
+
+const DESKTOP_KEYBOARD_ON_MOBILE_KEY = "logicapp_desktop_keyboard_on_mobile";
+const DESKTOP_KEYBOARD_ON_MOBILE_EVENT =
+  "logicapp_desktop_keyboard_on_mobile_change";
+
+const getDesktopKeyboardOnMobile = () => {
+  if (typeof window === "undefined") return false;
+
+  try {
+    return window.localStorage.getItem(DESKTOP_KEYBOARD_ON_MOBILE_KEY) === "true";
+  } catch {
+    return false;
+  }
+};
+
+const setDesktopKeyboardOnMobilePreference = (enabled) => {
+  if (typeof window === "undefined") return;
+
+  try {
+    window.localStorage.setItem(
+      DESKTOP_KEYBOARD_ON_MOBILE_KEY,
+      String(enabled)
+    );
+  } catch {
+    // ignore storage failures
+  }
+
+  window.dispatchEvent(new Event(DESKTOP_KEYBOARD_ON_MOBILE_EVENT));
+};
 
 const getPasswordCriteriaErrors = (password) => {
   const criteriaErrors = [];
@@ -69,6 +100,9 @@ const getErrorMessage = (error) => {
 
 export default function AccountSettingsDialog({ open, onClose }) {
   const { user } = useAuthState();
+  const [mobileKeyboardEnabled, setMobileKeyboardEnabled] = useState(
+    () => !getDesktopKeyboardOnMobile()
+  );
 
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -471,6 +505,28 @@ export default function AccountSettingsDialog({ open, onClose }) {
                   </Box>
                 </Box>
               </Stack>
+            </Box>
+
+            <Divider sx={{ my: 1 }} />
+
+            <Box>
+              <Typography variant="h6" sx={{ mb: 1 }}>
+                Mobile Keyboard
+              </Typography>
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={mobileKeyboardEnabled}
+                    onChange={(event) => {
+                      const enabled = event.target.checked;
+                      setMobileKeyboardEnabled(enabled);
+                      setDesktopKeyboardOnMobilePreference(!enabled);
+                    }}
+                    color="primary"
+                  />
+                }
+                label="Mobile logic keyboard"
+              />
             </Box>
 
             <Divider sx={{ my: 1 }} />

@@ -75,7 +75,7 @@ export default function ShellFrame({
           onOpenSettings={onOpenSettings}
         />
         <Box sx={{ display: "flex", flexDirection: "column", flexGrow: 1, minWidth: 0 }}>
-          <Header onSignOut={onSignOut} />
+          <Header onSignOut={onSignOut} onOpenSettings={onOpenSettings} />
           <Box
             component="main"
             ref={mainContentRef}

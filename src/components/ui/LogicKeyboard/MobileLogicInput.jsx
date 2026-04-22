@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { Box, Button, Stack } from '@mui/material'
+import { Box, Button, Stack, TextField } from '@mui/material'
 import { alpha } from '@mui/material/styles'
 import { useTheme, useMediaQuery } from '@mui/material'
 import LogicInput from './LogicInput.jsx'
@@ -8,6 +8,18 @@ import SymbolButtonRow, { symbolRowButtonSx } from '../logicpenguin/SymbolButton
 import getSyntax from '../../../lib/logicpenguin/symbolic/libsyntax.js'
 
 const DEFAULT_LETTERS = ['P', 'Q', 'R', 'S', 'T']
+const DESKTOP_KEYBOARD_ON_MOBILE_KEY = 'logicapp_desktop_keyboard_on_mobile'
+const DESKTOP_KEYBOARD_ON_MOBILE_EVENT = 'logicapp_desktop_keyboard_on_mobile_change'
+
+function getDesktopKeyboardOnMobile() {
+  if (typeof window === 'undefined') return false
+
+  try {
+    return window.localStorage.getItem(DESKTOP_KEYBOARD_ON_MOBILE_KEY) === 'true'
+  } catch {
+    return false
+  }
+}
 
 /** Binary operators get leading and trailing space (matches formula-input.js insOp / logic parsing). */
 function isBinaryOp(symbolcat, op) {
@@ -58,11 +70,13 @@ export default function MobileLogicInput({
 }) {
   const theme = useTheme()
   const isPhone = useMediaQuery(theme.breakpoints.down('sm'))
+  const [desktopKeyboardOnMobile, setDesktopKeyboardOnMobile] = useState(getDesktopKeyboardOnMobile)
 
   const [cursorPosition, setCursorPosition] = useState(0)
   const [keyboardFocused, setKeyboardFocused] = useState(false)
   const [isClosing, setIsClosing] = useState(false)
   const [slideIn, setSlideIn] = useState(false)
+  const desktopInputRef = useRef(null)
 
   const onChangeRef = useRef(onChange)
   const setCursorRef = useRef(setCursorPosition)
@@ -126,7 +140,7 @@ export default function MobileLogicInput({
   facade.symbolcat = symbolcat
 
   useEffect(() => {
-    if (!inputRef) return
+    if (!inputRef || (isPhone && desktopKeyboardOnMobile)) return
     if (typeof inputRef === 'function') {
       inputRef(facade)
       return () => inputRef(null)
@@ -135,7 +149,21 @@ export default function MobileLogicInput({
     return () => {
       inputRef.current = null
     }
-  }, [facade, inputRef])
+  }, [desktopKeyboardOnMobile, facade, inputRef, isPhone])
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return undefined
+
+    const handlePreferenceChange = () => {
+      setDesktopKeyboardOnMobile(getDesktopKeyboardOnMobile())
+    }
+
+    window.addEventListener(DESKTOP_KEYBOARD_ON_MOBILE_EVENT, handlePreferenceChange)
+    return () => {
+      window.removeEventListener(DESKTOP_KEYBOARD_ON_MOBILE_EVENT, handlePreferenceChange)
+    }
+  }, [])
+
   const handleFocus = useCallback(() => {
     setKeyboardFocused(true)
     onFocus?.()
@@ -215,6 +243,41 @@ export default function MobileLogicInput({
 
   if (!isPhone) {
     return children ?? null
+  }
+
+  if (desktopKeyboardOnMobile) {
+    const setDesktopInputRef = (node) => {
+      desktopInputRef.current = node
+      if (typeof inputRef === 'function') {
+        inputRef(node)
+      } else if (inputRef) {
+        inputRef.current = node
+      }
+    }
+
+    return children ?? (
+      <TextField
+        fullWidth
+        value={value ?? ''}
+        onChange={(event) => onChange?.(event.target.value)}
+        onFocus={onFocus}
+        onBlur={onBlur}
+        disabled={disabled}
+        placeholder={placeholder}
+        inputRef={setDesktopInputRef}
+        inputProps={{
+          autoComplete: 'off',
+          spellCheck: false,
+          'aria-label': ariaLabel,
+        }}
+        sx={{
+          '& .MuiInputBase-input': {
+            fontFamily: 'monospace',
+            fontSize: '1rem',
+          },
+        }}
+      />
+    )
   }
 
   return (

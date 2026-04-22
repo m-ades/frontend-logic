@@ -10,7 +10,12 @@ import {
   useMediaQuery,
   useTheme,
 } from "@mui/material";
-import { Menu as MenuIcon, MenuBook as MenuBookIcon, ArrowBack as ArrowBackIcon } from "@mui/icons-material";
+import {
+  Menu as MenuIcon,
+  MenuBook as MenuBookIcon,
+  ArrowBack as ArrowBackIcon,
+  Settings as SettingsIcon,
+} from "@mui/icons-material";
 import { ChevronRight } from "lucide-react";
 import { Link as RouterLink, useLocation } from "react-router-dom";
 import ThemeToggle from "./ThemeToggle.jsx";
@@ -23,7 +28,7 @@ import {
 } from "../../context/LayoutContext.jsx";
 import { useAppRuntime } from "../../hooks/useAppRuntime.js";
 
-export default function Header({ onSignOut }) {
+export default function Header({ onSignOut, onOpenSettings }) {
   const location = useLocation();
   const { courses, activeCourseId, coursesPath, getBreadcrumbInfo, isSandbox: sandbox } = useAppRuntime();
   const layoutDispatch = useLayoutDispatch();
@@ -138,6 +143,15 @@ export default function Header({ onSignOut }) {
             Rulebook
           </Button>
           <ThemeToggle />
+          {isMobile && onOpenSettings && (
+            <IconButton
+              aria-label="Open settings"
+              onClick={onOpenSettings}
+              color="inherit"
+            >
+              <SettingsIcon />
+            </IconButton>
+          )}
         </Box>
       </Toolbar>
     </AppBar>
