@@ -108,6 +108,32 @@ function getConstantLettersFromPrompt(promptText, count = 3) {
   return result.length > 0 ? result : ['a', 'b', 'c']
 }
 
+function getConstantLettersFromFormulasAndKey(formulaText, symbolizationKey) {
+  const seen = new Set()
+  const result = []
+  const addConstant = (letter) => {
+    if (!seen.has(letter)) {
+      seen.add(letter)
+      result.push(letter)
+    }
+  }
+
+  for (const letter of formulaText.match(/[a-w]/g) || []) {
+    addConstant(letter)
+  }
+
+  for (const line of Array.isArray(symbolizationKey) ? symbolizationKey : []) {
+    const s = typeof line === 'string' ? line : String(line ?? '')
+    const splitAt = s.search(/[=:]/)
+    const left = (splitAt === -1 ? s : s.slice(0, splitAt)).trim()
+    if (/^[a-w]$/.test(left)) {
+      addConstant(left)
+    }
+  }
+
+  return result
+}
+
 const PREDICATE_VARIABLES = ['x', 'y', 'z']
 
 function isPredicateLogicKey(symbolizationKey) {
@@ -116,6 +142,29 @@ function isPredicateLogicKey(symbolizationKey) {
     const s = typeof line === 'string' ? line : String(line ?? '')
     return s.includes(':') && /^[A-Z]/.test(s.split(':')[0].trim())
   })
+}
+
+const DEFAULT_QUANTIFIER_INSERTS = new Set(['(∀x)', '(∃x)'])
+
+function getQuantifierButtonsFromFormulas(premises, conclusion) {
+  const formulas = [...(Array.isArray(premises) ? premises : []), conclusion].filter(Boolean).map(String)
+  const text = formulas.join(' ')
+  const seen = new Set(DEFAULT_QUANTIFIER_INSERTS)
+  const buttons = []
+  const matches = text.match(/\(?[∀∃][x-z]\)?/g)
+
+  if (!matches) return buttons
+
+  for (const rawMatch of matches) {
+    const match = rawMatch.match(/[∀∃][x-z]/)
+    if (!match) continue
+    const insert = `(${match[0]})`
+    if (seen.has(insert)) continue
+    seen.add(insert)
+    buttons.push({ label: insert, insert })
+  }
+
+  return buttons
 }
 
 const SYMBOL_BUTTONS = [
@@ -472,14 +521,19 @@ export default function DerivationTable({
     const premises = Array.isArray(proof?.premises) ? proof.premises : []
     const conclusion = proof?.conclusion ?? proof?.conc ?? ''
     const formulaText = [...premises, conclusion].filter(Boolean).map(String).join(' ')
+    const extraQuantifierButtons = getQuantifierButtonsFromFormulas(premises, conclusion)
 
     const isPredicate = isPredicateLogicKey(key) || /[∀∃]/.test(formulaText)
 
     if (isPredicate) {
-      // For predicate logic, constants should not reuse letters from formulas or symbolization key.
       const keyText = key.map((line) => (typeof line === 'string' ? line : String(line ?? ''))).join(' ')
       const textForConstants = [formulaText, keyText].filter(Boolean).join(' ') || ''
-      const constantLetters = getConstantLettersFromPrompt(textForConstants, 3)
+      const givenConstantLetters = getConstantLettersFromFormulasAndKey(formulaText, key)
+      const fallbackConstantLetters = getConstantLettersFromPrompt(textForConstants, 3)
+      const constantLetters = [
+        ...givenConstantLetters,
+        ...fallbackConstantLetters.filter((letter) => !givenConstantLetters.includes(letter)),
+      ]
       const variableLetters = PREDICATE_VARIABLES
       // Prefer predicate letters from the symbolization key; if missing, fall back to uppercase letters in formulas.
       const fromKey = getPredicateLettersFromKey(key)
@@ -490,6 +544,7 @@ export default function DerivationTable({
         predicateLetters,
         constantLetters,
         variableLetters,
+        extraQuantifierButtons,
       }
     }
 
@@ -498,8 +553,18 @@ export default function DerivationTable({
     return {
       isPredicateMode: false,
       symbolizationKey: predicateLetters,
+      extraQuantifierButtons,
     }
   }, [proof])
+  const symbolButtons = useMemo(() => {
+    const extraQuantifierButtons = derivationKeyboardConfig.extraQuantifierButtons || []
+    if (extraQuantifierButtons.length === 0) return SYMBOL_BUTTONS
+    return [
+      ...SYMBOL_BUTTONS.slice(0, 7),
+      ...extraQuantifierButtons,
+      ...SYMBOL_BUTTONS.slice(7),
+    ]
+  }, [derivationKeyboardConfig.extraQuantifierButtons])
   const isLineCompleteForCheck = useCallback((line) => {
     if (!line) return false
     const formulaFilled = (line.formula || '').trim().length > 0
@@ -1204,9 +1269,11 @@ export default function DerivationTable({
     const inputEl = formulaRefs.current[targetIdx]
     const current = lines[targetIdx]?.formula || ''
     const stored = getStoredSelection(targetIdx, current.length)
+    const activeFacade = targetIdx === activeKeyboardFormulaIndexRef.current && inputEl
     const isFocused = typeof document !== 'undefined' && document.activeElement === inputEl
-    const start = isFocused && typeof inputEl?.selectionStart === 'number' ? inputEl.selectionStart : stored.start
-    const end = isFocused && typeof inputEl?.selectionEnd === 'number' ? inputEl.selectionEnd : stored.end
+    const useInputSelection = activeFacade || isFocused
+    const start = useInputSelection && typeof inputEl?.selectionStart === 'number' ? inputEl.selectionStart : stored.start
+    const end = useInputSelection && typeof inputEl?.selectionEnd === 'number' ? inputEl.selectionEnd : stored.end
     const hasSelection = end > start
     const [open, close] = pair ? pair.split('') : []
     const insertText = pair
@@ -1531,7 +1598,15 @@ export default function DerivationTable({
                       onBlur={() => handleLineCommit(idx, 'formula', normalizeFormulaForCheck(line.formula ?? ''))}
                       placeholder=""
                       aria-label={`Formula line ${idx + 1}`}
+                      inputRef={(el) => { if (el) formulaRefs.current[idx] = el }}
+                      onCursorChange={(position) => {
+                        if (line.readOnly) return
+                        const safePosition = Number.isFinite(position) ? position : 0
+                        const maxPosition = (line.formula ?? '').length
+                        setStoredSelection(idx, Math.max(0, Math.min(safePosition, maxPosition)))
+                      }}
                       includeQuantifiers={derivationKeyboardConfig.isPredicateMode}
+                      extraInsertButtons={derivationKeyboardConfig.extraQuantifierButtons}
                       predicateLetters={derivationKeyboardConfig.isPredicateMode ? derivationKeyboardConfig.predicateLetters : undefined}
                       constantLetters={derivationKeyboardConfig.isPredicateMode ? derivationKeyboardConfig.constantLetters : undefined}
                       variableLetters={derivationKeyboardConfig.isPredicateMode ? derivationKeyboardConfig.variableLetters : undefined}
@@ -1898,7 +1973,7 @@ export default function DerivationTable({
                             <AutoAwesomeIcon />
                           </IconButton>
                         </Tooltip>
-                        {SYMBOL_BUTTONS.map(({ label, insert, pair }) => (
+                        {symbolButtons.map(({ label, insert, pair }) => (
                           <Button
                             key={label}
                             type="button"

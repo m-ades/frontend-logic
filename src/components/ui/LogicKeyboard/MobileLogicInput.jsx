@@ -42,6 +42,7 @@ export default function MobileLogicInput({
   onChange,
   onFocus,
   onBlur,
+  onCursorChange,
   inputRef,
   disabled,
   placeholder,
@@ -224,7 +225,10 @@ export default function MobileLogicInput({
         onFocus={handleFocus}
         onBlur={handleBlur}
         cursorPosition={cursorPosition}
-        onCursorChange={setCursorPosition}
+        onCursorChange={(position) => {
+          setCursorPosition(position)
+          onCursorChange?.(position)
+        }}
         disabled={disabled}
         placeholder={placeholder}
         aria-label={ariaLabel}
