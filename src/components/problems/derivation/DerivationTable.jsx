@@ -1269,9 +1269,11 @@ export default function DerivationTable({
     const inputEl = formulaRefs.current[targetIdx]
     const current = lines[targetIdx]?.formula || ''
     const stored = getStoredSelection(targetIdx, current.length)
+    const activeFacade = targetIdx === activeKeyboardFormulaIndexRef.current && inputEl
     const isFocused = typeof document !== 'undefined' && document.activeElement === inputEl
-    const start = isFocused && typeof inputEl?.selectionStart === 'number' ? inputEl.selectionStart : stored.start
-    const end = isFocused && typeof inputEl?.selectionEnd === 'number' ? inputEl.selectionEnd : stored.end
+    const useInputSelection = activeFacade || isFocused
+    const start = useInputSelection && typeof inputEl?.selectionStart === 'number' ? inputEl.selectionStart : stored.start
+    const end = useInputSelection && typeof inputEl?.selectionEnd === 'number' ? inputEl.selectionEnd : stored.end
     const hasSelection = end > start
     const [open, close] = pair ? pair.split('') : []
     const insertText = pair
@@ -1596,6 +1598,13 @@ export default function DerivationTable({
                       onBlur={() => handleLineCommit(idx, 'formula', normalizeFormulaForCheck(line.formula ?? ''))}
                       placeholder=""
                       aria-label={`Formula line ${idx + 1}`}
+                      inputRef={(el) => { if (el) formulaRefs.current[idx] = el }}
+                      onCursorChange={(position) => {
+                        if (line.readOnly) return
+                        const safePosition = Number.isFinite(position) ? position : 0
+                        const maxPosition = (line.formula ?? '').length
+                        setStoredSelection(idx, Math.max(0, Math.min(safePosition, maxPosition)))
+                      }}
                       includeQuantifiers={derivationKeyboardConfig.isPredicateMode}
                       extraInsertButtons={derivationKeyboardConfig.extraQuantifierButtons}
                       predicateLetters={derivationKeyboardConfig.isPredicateMode ? derivationKeyboardConfig.predicateLetters : undefined}
