@@ -108,6 +108,32 @@ function getConstantLettersFromPrompt(promptText, count = 3) {
   return result.length > 0 ? result : ['a', 'b', 'c']
 }
 
+function getConstantLettersFromFormulasAndKey(formulaText, symbolizationKey) {
+  const seen = new Set()
+  const result = []
+  const addConstant = (letter) => {
+    if (!seen.has(letter)) {
+      seen.add(letter)
+      result.push(letter)
+    }
+  }
+
+  for (const letter of formulaText.match(/[a-w]/g) || []) {
+    addConstant(letter)
+  }
+
+  for (const line of Array.isArray(symbolizationKey) ? symbolizationKey : []) {
+    const s = typeof line === 'string' ? line : String(line ?? '')
+    const splitAt = s.search(/[=:]/)
+    const left = (splitAt === -1 ? s : s.slice(0, splitAt)).trim()
+    if (/^[a-w]$/.test(left)) {
+      addConstant(left)
+    }
+  }
+
+  return result
+}
+
 const PREDICATE_VARIABLES = ['x', 'y', 'z']
 
 function isPredicateLogicKey(symbolizationKey) {
@@ -500,10 +526,14 @@ export default function DerivationTable({
     const isPredicate = isPredicateLogicKey(key) || /[∀∃]/.test(formulaText)
 
     if (isPredicate) {
-      // For predicate logic, constants should not reuse letters from formulas or symbolization key.
       const keyText = key.map((line) => (typeof line === 'string' ? line : String(line ?? ''))).join(' ')
       const textForConstants = [formulaText, keyText].filter(Boolean).join(' ') || ''
-      const constantLetters = getConstantLettersFromPrompt(textForConstants, 3)
+      const givenConstantLetters = getConstantLettersFromFormulasAndKey(formulaText, key)
+      const fallbackConstantLetters = getConstantLettersFromPrompt(textForConstants, 3)
+      const constantLetters = [
+        ...givenConstantLetters,
+        ...fallbackConstantLetters.filter((letter) => !givenConstantLetters.includes(letter)),
+      ]
       const variableLetters = PREDICATE_VARIABLES
       // Prefer predicate letters from the symbolization key; if missing, fall back to uppercase letters in formulas.
       const fromKey = getPredicateLettersFromKey(key)
