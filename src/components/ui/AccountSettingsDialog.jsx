@@ -29,6 +29,12 @@ import {
 const DESKTOP_KEYBOARD_ON_MOBILE_KEY = "logicapp_desktop_keyboard_on_mobile";
 const DESKTOP_KEYBOARD_ON_MOBILE_EVENT =
   "logicapp_desktop_keyboard_on_mobile_change";
+const TEXT_SIZE_CHOICES = [
+  { value: "smaller", label: "smaller" },
+  { value: "default", label: "default" },
+  { value: "larger", label: "larger" },
+  { value: "largest", label: "largest" },
+];
 
 const getDesktopKeyboardOnMobile = () => {
   if (typeof window === "undefined") return false;
@@ -542,11 +548,11 @@ export default function AccountSettingsDialog({
 
             <Box>
               <Typography variant="h6" sx={{ mb: 1 }}>
-                Display and Text Size
+                Accessibility
               </Typography>
-                <Typography variant="body1" sx={{ fontWeight: 500 }}>
-                  Text Size
-                </Typography>
+              <Typography variant="body1" sx={{ fontWeight: 500 }}>
+                Magnify Text
+              </Typography>
               <Typography
                 variant="body2"
                 color="text.secondary"
@@ -563,35 +569,17 @@ export default function AccountSettingsDialog({
                   flexWrap: "wrap",
                 }}
               >
-                <ButtonGroup variant="outlined" aria-label="text size controls">
-                  <Button
-                    onClick={() => onTextSizeChange?.("smaller")}
-                    variant={textSize === "smaller" ? "contained" : "outlined"}
-                    sx={{ textTransform: "none" }}
-                  >
-                    smaller
-                  </Button>
-                  <Button
-                    onClick={() => onTextSizeChange?.("default")}
-                    variant={textSize === "default" ? "contained" : "outlined"}
-                    sx={{ textTransform: "none" }}
-                  >
-                    default
-                  </Button>
-                  <Button
-                    onClick={() => onTextSizeChange?.("larger")}
-                    variant={textSize === "larger" ? "contained" : "outlined"}
-                    sx={{ textTransform: "none" }}
-                  >
-                    larger
-                  </Button>
-                  <Button
-                    onClick={() => onTextSizeChange?.("largest")}
-                    variant={textSize === "largest" ? "contained" : "outlined"}
-                    sx={{ textTransform: "none" }}
-                  >
-                    largest
-                  </Button>
+                <ButtonGroup variant="outlined" aria-label="magnify text controls">
+                  {TEXT_SIZE_CHOICES.map((choice) => (
+                    <Button
+                      key={choice.value}
+                      onClick={() => onTextSizeChange?.(choice.value)}
+                      variant={textSize === choice.value ? "contained" : "outlined"}
+                      sx={{ textTransform: "none" }}
+                    >
+                      {choice.label}
+                    </Button>
+                  ))}
                 </ButtonGroup>
               </Box>
             </Box>
@@ -614,7 +602,7 @@ export default function AccountSettingsDialog({
                     color="primary"
                   />
                 }
-                label="Mobile logic keyboard"
+                label="Show the touch friendly logic keyboard on mobile devices"
               />
             </Box>
 
