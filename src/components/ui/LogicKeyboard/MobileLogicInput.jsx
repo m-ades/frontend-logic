@@ -21,6 +21,25 @@ function getDesktopKeyboardOnMobile() {
   }
 }
 
+export function useMobileLogicKeyboardEnabled() {
+  const [enabled, setEnabled] = useState(() => !getDesktopKeyboardOnMobile())
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return undefined
+
+    const handlePreferenceChange = () => {
+      setEnabled(!getDesktopKeyboardOnMobile())
+    }
+
+    window.addEventListener(DESKTOP_KEYBOARD_ON_MOBILE_EVENT, handlePreferenceChange)
+    return () => {
+      window.removeEventListener(DESKTOP_KEYBOARD_ON_MOBILE_EVENT, handlePreferenceChange)
+    }
+  }, [])
+
+  return enabled
+}
+
 /** Binary operators get leading and trailing space (matches formula-input.js insOp / logic parsing). */
 function isBinaryOp(symbolcat, op) {
   return symbolcat && typeof symbolcat[op] === 'number' && symbolcat[op] >= 2
@@ -70,7 +89,7 @@ export default function MobileLogicInput({
 }) {
   const theme = useTheme()
   const isPhone = useMediaQuery(theme.breakpoints.down('sm'))
-  const [desktopKeyboardOnMobile, setDesktopKeyboardOnMobile] = useState(getDesktopKeyboardOnMobile)
+  const mobileLogicKeyboardEnabled = useMobileLogicKeyboardEnabled()
 
   const [cursorPosition, setCursorPosition] = useState(0)
   const [keyboardFocused, setKeyboardFocused] = useState(false)
@@ -140,7 +159,7 @@ export default function MobileLogicInput({
   facade.symbolcat = symbolcat
 
   useEffect(() => {
-    if (!inputRef || (isPhone && desktopKeyboardOnMobile)) return
+    if (!inputRef) return
     if (typeof inputRef === 'function') {
       inputRef(facade)
       return () => inputRef(null)
@@ -149,20 +168,7 @@ export default function MobileLogicInput({
     return () => {
       inputRef.current = null
     }
-  }, [desktopKeyboardOnMobile, facade, inputRef, isPhone])
-
-  useEffect(() => {
-    if (typeof window === 'undefined') return undefined
-
-    const handlePreferenceChange = () => {
-      setDesktopKeyboardOnMobile(getDesktopKeyboardOnMobile())
-    }
-
-    window.addEventListener(DESKTOP_KEYBOARD_ON_MOBILE_EVENT, handlePreferenceChange)
-    return () => {
-      window.removeEventListener(DESKTOP_KEYBOARD_ON_MOBILE_EVENT, handlePreferenceChange)
-    }
-  }, [])
+  }, [facade, inputRef])
 
   const handleFocus = useCallback(() => {
     setKeyboardFocused(true)
@@ -245,7 +251,7 @@ export default function MobileLogicInput({
     return children ?? null
   }
 
-  if (desktopKeyboardOnMobile) {
+  if (!mobileLogicKeyboardEnabled) {
     const setDesktopInputRef = (node) => {
       desktopInputRef.current = node
       if (typeof inputRef === 'function') {
@@ -255,7 +261,7 @@ export default function MobileLogicInput({
       }
     }
 
-    return children ?? (
+    return (
       <TextField
         fullWidth
         value={value ?? ''}

@@ -28,7 +28,7 @@ import { alpha } from '@mui/material/styles'
 import PromptText from '../../ui/PromptText.jsx'
 import ThemedCard from '../../ui/ThemedCard.jsx'
 import ProblemSetButtons from '../mui/frame/ProblemSetButtons.jsx'
-import { MobileLogicInput } from '../../ui/LogicKeyboard/index.js'
+import { MobileLogicInput, useMobileLogicKeyboardEnabled } from '../../ui/LogicKeyboard/index.js'
 import checkDerivation from '../../../lib/logicpenguin/checkers/derivation-hurley.js'
 import getHurleyRuleset from '../../../lib/logicpenguin/checkers/rules/hurley-rules.js'
 import getFormulaClass from '../../../lib/logicpenguin/symbolic/formula.js'
@@ -437,6 +437,7 @@ export default function DerivationTable({
 }) {
   const formulaRefs = useRef({})
   const justRefs = useRef({})
+  const mobileLogicKeyboardEnabled = useMobileLogicKeyboardEnabled()
   const [activeFormulaIndex, setActiveFormulaIndex] = useState(null)
   const activeKeyboardFormulaIndexRef = useRef(null)
   const lastFormulaIndexRef = useRef(null)
@@ -1590,7 +1591,7 @@ export default function DerivationTable({
                         )
                       })}
                     </Box>
-                  ) : isPhone ? (
+                  ) : isPhone && mobileLogicKeyboardEnabled ? (
                     <MobileLogicInput
                       value={line.formula ?? ''}
                       onChange={(v) => handleLineChange(idx, 'formula', v)}
@@ -1945,40 +1946,41 @@ export default function DerivationTable({
                   <Box
                     sx={{
                       display: 'flex',
-                      alignItems: 'center',
+                      alignItems: mobileLogicKeyboardEnabled ? 'center' : 'flex-start',
                       gap: isFullScreen ? 0.5 : 0.75,
-                      flexWrap: isFullScreen ? 'wrap' : 'nowrap',
                       minWidth: isFullScreen ? 0 : 'max-content',
+                      width: isPhone && isFullScreen ? '100%' : undefined,
                       pr: isFullScreen ? 0 : 1,
-                      ...(isPhone && isFullScreen && { flexDirection: 'column', alignItems: 'flex-start' }), // two rows only in mobile fullscreen
+                      ...(isPhone && isFullScreen && mobileLogicKeyboardEnabled && {
+                        flexDirection: 'column',
+                        alignItems: 'flex-start',
+                      }),
                     }}
                   >
-                    {isPhone && isFullScreen ? (
-                      <Tooltip title={autoCheckEnabled ? 'Turn off autochecker' : 'Turn on autochecker'}>
-                        <IconButton
-                          onClick={() => setAutoCheckEnabled((prev) => !prev)}
-                          size="small"
-                          aria-label="Toggle autochecker"
-                          sx={{ color: autoCheckEnabled ? 'primary.main' : 'text.disabled', position: 'relative' }}
-                        >
-                          <AutoAwesomeIcon />
-                        </IconButton>
-                      </Tooltip>
-                    ) : (
-                      <>
-                        <Tooltip title={autoCheckEnabled ? 'Turn off autochecker' : 'Turn on autochecker'}>
-                          <IconButton
-                            onClick={() => setAutoCheckEnabled((prev) => !prev)}
-                            size="small"
-                            aria-label="Toggle autochecker"
-                            sx={{
-                              color: autoCheckEnabled ? 'primary.main' : 'text.disabled',
-                              position: 'relative',
-                            }}
-                          >
-                            <AutoAwesomeIcon />
-                          </IconButton>
-                        </Tooltip>
+                    <Tooltip title={autoCheckEnabled ? 'Turn off autochecker' : 'Turn on autochecker'}>
+                      <IconButton
+                        onClick={() => setAutoCheckEnabled((prev) => !prev)}
+                        size="small"
+                        aria-label="Toggle autochecker"
+                        sx={{
+                          color: autoCheckEnabled ? 'primary.main' : 'text.disabled',
+                          position: 'relative',
+                        }}
+                      >
+                        <AutoAwesomeIcon />
+                      </IconButton>
+                    </Tooltip>
+                    {!(isPhone && isFullScreen && mobileLogicKeyboardEnabled) && (
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: isFullScreen ? 0.5 : 0.75,
+                          flexWrap: isFullScreen ? 'wrap' : 'nowrap',
+                          minWidth: 0,
+                          flex: 1,
+                        }}
+                      >
                         {SYMBOL_BUTTONS.map(({ label, insert, pair }) => (
                           <Button
                             key={label}
@@ -1994,7 +1996,7 @@ export default function DerivationTable({
                             {label}
                           </Button>
                         ))}
-                      </>
+                      </Box>
                     )}
                   </Box>
                 </Stack>
