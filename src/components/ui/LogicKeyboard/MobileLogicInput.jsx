@@ -33,8 +33,10 @@ export function useMobileLogicKeyboardEnabled() {
     }
 
     window.addEventListener(DESKTOP_KEYBOARD_ON_MOBILE_EVENT, handlePreferenceChange)
+    window.addEventListener('storage', handlePreferenceChange)
     return () => {
       window.removeEventListener(DESKTOP_KEYBOARD_ON_MOBILE_EVENT, handlePreferenceChange)
+      window.removeEventListener('storage', handlePreferenceChange)
     }
   }, [])
 
@@ -82,6 +84,7 @@ export default function MobileLogicInput({
   symbolizationKey,
   includeQuantifiers = true,
   extraInsertButtons,
+  onEnterKey,
   /** Predicate-logic mode: when all three are provided, show predicates / constants / variables rows instead of a single letter row. */
   predicateLetters,
   constantLetters,
@@ -263,6 +266,7 @@ export default function MobileLogicInput({
         node.autoChange = FormulaInput.autoChange
         node.insertHere = FormulaInput.insertHere
         node.insOp = FormulaInput.insOp
+        node.enterHook = onEnterKey
       }
       if (typeof inputRef === 'function') {
         inputRef(node)
@@ -287,7 +291,17 @@ export default function MobileLogicInput({
             }
           }}
           onFocus={onFocus}
-          onBlur={onBlur}
+          onBlur={(event) => {
+            const input = desktopInputRef.current
+            if (input?.inputfix) {
+              const normalizedValue = input.inputfix(input.value ?? '')
+              if (normalizedValue !== input.value) {
+                input.value = normalizedValue
+                onChange?.(normalizedValue)
+              }
+            }
+            onBlur?.(event)
+          }}
           disabled={disabled}
           placeholder={placeholder}
           inputRef={setDesktopInputRef}

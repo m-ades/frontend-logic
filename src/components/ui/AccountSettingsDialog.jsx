@@ -136,8 +136,33 @@ export default function AccountSettingsDialog({ open, onClose }) {
       setLogoutSuccess(false);
       setLogoutError("");
       setLogoutDialogOpen(false);
+      return;
     }
+
+    setMobileKeyboardEnabled(!getDesktopKeyboardOnMobile());
   }, [open]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return undefined;
+
+    const handlePreferenceChange = () => {
+      setMobileKeyboardEnabled(!getDesktopKeyboardOnMobile());
+    };
+
+    window.addEventListener(
+      DESKTOP_KEYBOARD_ON_MOBILE_EVENT,
+      handlePreferenceChange
+    );
+    window.addEventListener("storage", handlePreferenceChange);
+
+    return () => {
+      window.removeEventListener(
+        DESKTOP_KEYBOARD_ON_MOBILE_EVENT,
+        handlePreferenceChange
+      );
+      window.removeEventListener("storage", handlePreferenceChange);
+    };
+  }, []);
 
   const calculatePasswordStrength = (password) => {
     if (!password || password.length < PASSWORD_POLICY.minLength) return 0;

@@ -291,6 +291,7 @@ export default function SymbolicTranslation({
                   aria-label="Formula translation"
                   symbolizationKey={symbolizationKey}
                   includeQuantifiers={isPredicate}
+                  onEnterKey={!readOnly && !hideActions ? handleCheck : undefined}
                   predicateLetters={isPredicate ? predicateLetters : undefined}
                   constantLetters={isPredicate ? constantLetters : undefined}
                   variableLetters={isPredicate ? variableLetters : undefined}
