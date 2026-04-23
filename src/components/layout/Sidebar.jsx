@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   Drawer,
   IconButton,
@@ -37,6 +37,7 @@ export default function Sidebar({ structure, location, onSignOut, onOpenSettings
   const { isSidebarOpened, sidebarHoverEnabled } = useLayoutState();
   const { user: activeUser, isSandbox: sandbox } = useAppRuntime();
   const layoutDispatch = useLayoutDispatch();
+  const drawerPaperRef = useRef(null);
   const [isPermanent, setPermanent] = useState(true);
   const [profileMenu, setProfileMenu] = useState(null);
   const [isHovering, setIsHovering] = useState(false);
@@ -53,6 +54,14 @@ export default function Sidebar({ structure, location, onSignOut, onOpenSettings
   }, [theme.breakpoints.values.md]);
 
   const handleDrawerToggle = () => {
+    if (!isPermanent && isSidebarOpened) {
+      const activeElement = document.activeElement;
+      if (activeElement instanceof HTMLElement && drawerPaperRef.current?.contains(activeElement)) {
+        // let focus leave before the drawer goes dark
+        activeElement.blur();
+      }
+    }
+
     if (sidebarHoverEnabled) {
       setManuallyOpened(!manuallyOpened);
       toggleSidebar(layoutDispatch);
@@ -101,6 +110,11 @@ export default function Sidebar({ structure, location, onSignOut, onOpenSettings
       onClose={handleDrawerToggle}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
+      slotProps={{
+        paper: {
+          ref: drawerPaperRef,
+        },
+      }}
       sx={{
         width: isSidebarOpened ? DRAWER_WIDTH : 85,
         flexShrink: 0,

@@ -3,6 +3,7 @@ import {
   Alert,
   Box,
   Button,
+  ButtonGroup,
   Dialog,
   DialogActions,
   DialogContent,
@@ -98,7 +99,12 @@ const getErrorMessage = (error) => {
   return message;
 };
 
-export default function AccountSettingsDialog({ open, onClose }) {
+export default function AccountSettingsDialog({
+  open,
+  onClose,
+  textSize = "default",
+  onTextSizeChange,
+}) {
   const { user } = useAuthState();
   const [mobileKeyboardEnabled, setMobileKeyboardEnabled] = useState(
     () => !getDesktopKeyboardOnMobile()
@@ -530,6 +536,64 @@ export default function AccountSettingsDialog({ open, onClose }) {
                   </Box>
                 </Box>
               </Stack>
+            </Box>
+
+            <Divider sx={{ my: 1 }} />
+
+            <Box>
+              <Typography variant="h6" sx={{ mb: 1 }}>
+                Display and Text Size
+              </Typography>
+                <Typography variant="body1" sx={{ fontWeight: 500 }}>
+                  Text Size
+                </Typography>
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                sx={{ mt: 0.5, mb: 1.5 }}
+              >
+                Increase or decrease text across the app
+              </Typography>
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "flex-start",
+                  gap: 2,
+                  flexWrap: "wrap",
+                }}
+              >
+                <ButtonGroup variant="outlined" aria-label="text size controls">
+                  <Button
+                    onClick={() => onTextSizeChange?.("smaller")}
+                    variant={textSize === "smaller" ? "contained" : "outlined"}
+                    sx={{ textTransform: "none" }}
+                  >
+                    smaller
+                  </Button>
+                  <Button
+                    onClick={() => onTextSizeChange?.("default")}
+                    variant={textSize === "default" ? "contained" : "outlined"}
+                    sx={{ textTransform: "none" }}
+                  >
+                    default
+                  </Button>
+                  <Button
+                    onClick={() => onTextSizeChange?.("larger")}
+                    variant={textSize === "larger" ? "contained" : "outlined"}
+                    sx={{ textTransform: "none" }}
+                  >
+                    larger
+                  </Button>
+                  <Button
+                    onClick={() => onTextSizeChange?.("largest")}
+                    variant={textSize === "largest" ? "contained" : "outlined"}
+                    sx={{ textTransform: "none" }}
+                  >
+                    largest
+                  </Button>
+                </ButtonGroup>
+              </Box>
             </Box>
 
             <Divider sx={{ my: 1 }} />

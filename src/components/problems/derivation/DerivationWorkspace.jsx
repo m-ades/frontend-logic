@@ -59,7 +59,7 @@ export default function DerivationWorkspace({
       )}
       {prompt && !isFullScreen && (
         <Box sx={{ mb: 0.75, display: 'flex', alignItems: 'flex-start', gap: 0.5 }}>
-          <PromptText content={prompt} sx={{ fontSize: 15, flex: 1 }} />
+          <PromptText content={prompt} sx={{ fontSize: '1.171875rem', flex: 1 }} />
         </Box>
       )}
       {isPhone && !isFullScreen && canOpenFullScreen ? (
@@ -76,7 +76,7 @@ export default function DerivationWorkspace({
             borderRadius: 2,
             bgcolor: (theme) => alpha(theme.palette.primary.main, 0.04),
             color: 'primary.main',
-            fontSize: '15px',
+            fontSize: '1.171875rem',
             lineHeight: 2,
             fontWeight: 400,
             cursor: 'pointer',

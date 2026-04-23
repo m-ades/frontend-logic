@@ -161,11 +161,22 @@ const RULES_ALLOW_NO_LINES = new Set(['ACP', 'AIP'])
 const ASSUMPTION_RULES = new Set(['ACP', 'AIP'])
 const INDENT_START_RULES = new Set(['ACP', 'AIP'])
 const INDENT_END_RULES = new Set(['CP', 'IP'])
-const INDENT_PX = 18
-const ASSUMPTION_INDENT_PX = 12
 const MAX_INDENT_LEVEL = 3
 const AUTO_CHECK_STORAGE_KEY = 'logic-app:autocheck-enabled'
 const RULE_INPUT_MODE_KEY = 'logic-app:derivation-rule-input-mode'
+
+// the line sizes follow the root scale
+const DERIVATION_LINE_FONT_SIZE = '1.25rem'
+const DERIVATION_NUMBER_CELL_WIDTH_MOBILE = '2.8125rem'
+const DERIVATION_NUMBER_CELL_WIDTH_DESKTOP = '3.75rem'
+const DERIVATION_FORMULA_MIN_WIDTH = '15.625rem'
+const DERIVATION_FORMULA_WIDTH = '21.875rem'
+const DERIVATION_RULE_WIDTH_MOBILE = '4.375rem'
+const DERIVATION_RULE_WIDTH_DESKTOP = '5.46875rem'
+const DERIVATION_JUSTIFICATION_WIDTH_XS = 'calc(7ch + 4.375rem)'
+const DERIVATION_JUSTIFICATION_WIDTH_SM = 'calc(7ch + 5.46875rem)'
+const DERIVATION_INDENT_STEP = '1.40625rem'
+const DERIVATION_ASSUMPTION_OFFSET = '0.9375rem'
 
 // Message shown on mobile when derivation is not fullscreen (table not rendered)
 const MOBILE_DERIVATION_PLACEHOLDER_MSG = 'Tap to open proof'
@@ -1369,7 +1380,7 @@ export default function DerivationTable({
         )}
         {proof.description && !isFullScreen && !hideActions && (
           <Box sx={{ mb: 2, display: 'flex', alignItems: 'flex-start', gap: 0.5 }}>
-            <PromptText content={proof.description} sx={{ fontSize: 15, flex: 1 }} />
+            <PromptText content={proof.description} sx={{ fontSize: '1.171875rem', flex: 1 }} />
           </Box>
         )}
         {isPhone && !isFullScreen && canOpenFullScreen ? (
@@ -1386,7 +1397,7 @@ export default function DerivationTable({
               borderRadius: 2,
               bgcolor: (t) => alpha(t.palette.primary.main, 0.04),
               color: 'primary.main',
-              fontSize: '15px',
+              fontSize: '1.171875rem',
               lineHeight: 2,
               fontWeight: 400,
               cursor: 'pointer',
@@ -1450,7 +1461,7 @@ export default function DerivationTable({
                     '& td:last-child': { paddingRight: '0 !important' },
                     '& .MuiTableCell-root:last-child': { paddingRight: '0 !important' },
                   }
-                : { width: 'auto', minWidth: isMobile ? 200 : 280 }
+                : { width: 'auto', minWidth: isMobile ? DERIVATION_FORMULA_MIN_WIDTH : DERIVATION_FORMULA_WIDTH }
             }
           >
             <TableBody>
@@ -1465,7 +1476,7 @@ export default function DerivationTable({
                   },
                 }}
               >
-                <TableCell sx={{ width: isFullScreen || isMobile ? 36 : 48, minWidth: isFullScreen || isMobile ? 36 : undefined, borderBottom: 'none', verticalAlign: 'middle', ...(isFullScreen && { pr: 1 }) }}>
+                <TableCell sx={{ width: isFullScreen || isMobile ? DERIVATION_NUMBER_CELL_WIDTH_MOBILE : DERIVATION_NUMBER_CELL_WIDTH_DESKTOP, minWidth: isFullScreen || isMobile ? DERIVATION_NUMBER_CELL_WIDTH_MOBILE : undefined, borderBottom: 'none', verticalAlign: 'middle', ...(isFullScreen && { pr: 1 }) }}>
                   <Typography sx={{ color: 'transparent' }}>—</Typography>
                 </TableCell>
                 <TableCell sx={{ borderBottom: 'none', pl: isFullScreen ? 1 : undefined, pr: 0.5, verticalAlign: 'middle', ...(isFullScreen ? { width: '50%', minWidth: 0 } : { width: 'auto', whiteSpace: 'nowrap' }) }}>
@@ -1474,7 +1485,7 @@ export default function DerivationTable({
                 <TableCell sx={{ borderBottom: 'none', pl: 0.5, verticalAlign: 'middle', ...(isFullScreen ? { width: '50%', minWidth: 0 } : { width: 'auto', whiteSpace: 'nowrap' }) }}>
                   <Box
                     component="span"
-                    sx={{ fontSize: 16, color: 'text.primary', '& .clickable-char': { cursor: 'pointer', borderRadius: 1, '&:hover': { backgroundColor: (t) => alpha(t.palette.primary.main, t.palette.action.hoverOpacity) } } }}
+                    sx={{ fontSize: DERIVATION_LINE_FONT_SIZE, color: 'text.primary', '& .clickable-char': { cursor: 'pointer', borderRadius: 1, '&:hover': { backgroundColor: (t) => alpha(t.palette.primary.main, t.palette.action.hoverOpacity) } } }}
                   >
                     {(`// ${proof.conclusion || ''}`).split('').map((char, i) => {
                       const isLetter = /^[a-zA-Z]$/.test(char)
@@ -1492,13 +1503,12 @@ export default function DerivationTable({
             )}
             {lines.map((line, idx) => {
               const isActiveLine = activeFormulaIndex === idx
-              const indentPx = (indentLevels[idx] || 0) * INDENT_PX
-                + (indentLevels[idx] ? ASSUMPTION_INDENT_PX : 0)
+              const indentOffset = `calc(${indentLevels[idx] || 0} * ${DERIVATION_INDENT_STEP}${indentLevels[idx] ? ` + ${DERIVATION_ASSUMPTION_OFFSET}` : ''})`
               return (
               <TableRow
                 key={`line-${idx}`}
                 sx={{
-                  transform: indentPx ? `translateX(${indentPx}px)` : 'none',
+                  transform: indentLevels[idx] ? `translateX(${indentOffset})` : 'none',
                   transition: 'transform 120ms ease',
                   '& td': {
                     py: isMobile ? 0.25 : 0.5,
@@ -1523,7 +1533,7 @@ export default function DerivationTable({
                   }),
                 }}
               >
-                <TableCell sx={{ width: isFullScreen || isMobile ? 36 : 48, minWidth: isFullScreen || isMobile ? 36 : undefined, borderBottom: 'none', color: (t) => alpha(t.palette.text.primary, t.palette.mode === 'dark' ? 0.78 : 0.7), fontWeight: 600, verticalAlign: 'middle', ...(isFullScreen && { pr: 1 }) }}>
+                <TableCell sx={{ width: isFullScreen || isMobile ? DERIVATION_NUMBER_CELL_WIDTH_MOBILE : DERIVATION_NUMBER_CELL_WIDTH_DESKTOP, minWidth: isFullScreen || isMobile ? DERIVATION_NUMBER_CELL_WIDTH_MOBILE : undefined, borderBottom: 'none', color: (t) => alpha(t.palette.text.primary, t.palette.mode === 'dark' ? 0.78 : 0.7), fontWeight: 600, verticalAlign: 'middle', ...(isFullScreen && { pr: 1 }) }}>
                   <Box
                     component="button"
                     type="button"
@@ -1563,7 +1573,7 @@ export default function DerivationTable({
                               WebkitOverflowScrolling: 'touch',
                             }
                           : {}),
-                        fontSize: 16,
+                        fontSize: DERIVATION_LINE_FONT_SIZE,
                         py: isMobile ? 0.5 : 1,
                         ...getInputUnderlineSx(theme),
                         '& .clickable-char': {
@@ -1674,11 +1684,11 @@ export default function DerivationTable({
                       updateCursorPosition(idx, e)
                     }}
                     sx={(theme) => ({
-                      width: isFullScreen ? '100%' : { xs: '100%', md: 280 },
+                      width: isFullScreen ? '100%' : { xs: '100%', md: DERIVATION_FORMULA_WIDTH },
                       minWidth: isFullScreen ? 0 : undefined,
                       ...getInputUnderlineSx(theme),
                       '& .MuiInputBase-input': {
-                        fontSize: 16,
+                        fontSize: DERIVATION_LINE_FONT_SIZE,
                         py: isMobile ? 0.5 : 1,
                       },
                     })}
@@ -1704,7 +1714,7 @@ export default function DerivationTable({
                     idx === premises.length - 1 ? (
                       <Box
                         component="span"
-                        sx={{ fontSize: 16, color: 'text.primary', '& .clickable-char': { cursor: 'pointer', borderRadius: 1, '&:hover': { backgroundColor: (t) => alpha(t.palette.primary.main, t.palette.action.hoverOpacity) } } }}
+                        sx={{ fontSize: DERIVATION_LINE_FONT_SIZE, color: 'text.primary', '& .clickable-char': { cursor: 'pointer', borderRadius: 1, '&:hover': { backgroundColor: (t) => alpha(t.palette.primary.main, t.palette.action.hoverOpacity) } } }}
                       >
                         {(proof?.conclusion ? `// ${proof.conclusion}` : '').split('').map((char, i) => {
                           const isLetter = /^[a-zA-Z]$/.test(char)
@@ -1780,14 +1790,14 @@ export default function DerivationTable({
                                 minWidth: '7ch',
                                 ...getInputUnderlineSx(theme),
                                 '& .MuiInputBase-input': {
-                                  fontSize: 16,
+                                  fontSize: DERIVATION_LINE_FONT_SIZE,
                                   py: isMobile ? 0.5 : 1,
                                 },
                               })}
                             />
                           )}
                           {allowedRules.length > 0 && (
-                            <FormControl variant="standard" sx={{ minWidth: isFullScreen || isMobile ? 56 : 70 }}>
+                            <FormControl variant="standard" sx={{ minWidth: isFullScreen || isMobile ? DERIVATION_RULE_WIDTH_MOBILE : DERIVATION_RULE_WIDTH_DESKTOP }}>
                               <Select
                                 value={getRuleFromJustification(line.justification)}
                                 displayEmpty
@@ -1842,13 +1852,13 @@ export default function DerivationTable({
                                 }}
                                 renderValue={(value) => value || 'Rule'}
                                 sx={(theme) => ({
-                                  '& .MuiSelect-select': { fontSize: 16, py: isMobile ? 0.5 : 1 },
-                                  '& .MuiInputBase-input': { fontSize: 16, py: isMobile ? 0.5 : 1 },
+                                  '& .MuiSelect-select': { fontSize: DERIVATION_LINE_FONT_SIZE, py: isMobile ? 0.5 : 1 },
+                                  '& .MuiInputBase-input': { fontSize: DERIVATION_LINE_FONT_SIZE, py: isMobile ? 0.5 : 1 },
                                   '& .MuiSelect-select.MuiInputBase-input': { display: 'flex', alignItems: 'center' },
                                   ...getSelectUnderlineSx(theme),
                                 })}
                                 MenuProps={{
-                                  PaperProps: { sx: { '& .MuiMenuItem-root': { fontSize: 16 } } }
+                                  PaperProps: { sx: { '& .MuiMenuItem-root': { fontSize: DERIVATION_LINE_FONT_SIZE } } }
                                 }}
                               >
                                 <MenuItem value="">
@@ -1896,12 +1906,12 @@ export default function DerivationTable({
                           inputProps={{ autoComplete: 'off' }}
                           inputRef={(el) => { if (el) justRefs.current[idx] = el }}
                           sx={(theme) => ({
-                            width: { xs: 'calc(7ch + 56px)', sm: 'calc(7ch + 70px)' },
-                            maxWidth: { xs: 'calc(7ch + 56px)', sm: 'calc(7ch + 70px)' },
-                            minWidth: { xs: 'calc(7ch + 56px)', sm: 'calc(7ch + 70px)' },
+                            width: { xs: DERIVATION_JUSTIFICATION_WIDTH_XS, sm: DERIVATION_JUSTIFICATION_WIDTH_SM },
+                            maxWidth: { xs: DERIVATION_JUSTIFICATION_WIDTH_XS, sm: DERIVATION_JUSTIFICATION_WIDTH_SM },
+                            minWidth: { xs: DERIVATION_JUSTIFICATION_WIDTH_XS, sm: DERIVATION_JUSTIFICATION_WIDTH_SM },
                             ...getInputUnderlineSx(theme),
                             '& .MuiInputBase-input': {
-                              fontSize: 16,
+                              fontSize: DERIVATION_LINE_FONT_SIZE,
                               py: isMobile ? 0.5 : 1,
                             },
                           })}
@@ -1932,7 +1942,7 @@ export default function DerivationTable({
               )
             })}
             <TableRow sx={{ '& td': { verticalAlign: 'middle', py: isMobile ? 0.25 : 0.5 } }}>
-              <TableCell sx={{ width: isFullScreen || isMobile ? 36 : 48, minWidth: isFullScreen || isMobile ? 36 : undefined, borderBottom: 'none', verticalAlign: 'middle', ...(isFullScreen && { pr: 1 }) }}>
+              <TableCell sx={{ width: isFullScreen || isMobile ? DERIVATION_NUMBER_CELL_WIDTH_MOBILE : DERIVATION_NUMBER_CELL_WIDTH_DESKTOP, minWidth: isFullScreen || isMobile ? DERIVATION_NUMBER_CELL_WIDTH_MOBILE : undefined, borderBottom: 'none', verticalAlign: 'middle', ...(isFullScreen && { pr: 1 }) }}>
                 <Tooltip title="New line">
                   <span style={{ display: 'inline-flex' }}>
                     <IconButton onClick={addLine} size="small" aria-label="Add line" disabled={!canAddLine}>
