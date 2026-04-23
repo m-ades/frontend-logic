@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom'
 import { Box, Button, Stack, TextField } from '@mui/material'
 import { alpha } from '@mui/material/styles'
 import { useTheme, useMediaQuery } from '@mui/material'
+import FormulaInput from '../logicpenguin/formula-input.js'
 import LogicInput from './LogicInput.jsx'
 import SymbolButtonRow, { symbolRowButtonSx } from '../logicpenguin/SymbolButtonRow.jsx'
 import getSyntax from '../../../lib/logicpenguin/symbolic/libsyntax.js'
@@ -254,6 +255,15 @@ export default function MobileLogicInput({
   if (!mobileLogicKeyboardEnabled) {
     const setDesktopInputRef = (node) => {
       desktopInputRef.current = node
+      if (node) {
+        node.syntax = syntax
+        node.symbols = symbols
+        node.symbolcat = symbolcat
+        node.inputfix = syntax?.inputfix
+        node.autoChange = FormulaInput.autoChange
+        node.insertHere = FormulaInput.insertHere
+        node.insOp = FormulaInput.insOp
+      }
       if (typeof inputRef === 'function') {
         inputRef(node)
       } else if (inputRef) {
@@ -262,27 +272,47 @@ export default function MobileLogicInput({
     }
 
     return (
-      <TextField
-        fullWidth
-        value={value ?? ''}
-        onChange={(event) => onChange?.(event.target.value)}
-        onFocus={onFocus}
-        onBlur={onBlur}
-        disabled={disabled}
-        placeholder={placeholder}
-        inputRef={setDesktopInputRef}
-        inputProps={{
-          autoComplete: 'off',
-          spellCheck: false,
-          'aria-label': ariaLabel,
-        }}
-        sx={{
-          '& .MuiInputBase-input': {
-            fontFamily: 'monospace',
-            fontSize: '1rem',
-          },
-        }}
-      />
+      <>
+        <TextField
+          fullWidth
+          value={value ?? ''}
+          onChange={(event) => onChange?.(event.target.value)}
+          onKeyDown={(event) => {
+            const input = desktopInputRef.current
+            if (!input) return
+            const previousValue = input.value
+            FormulaInput.keydown.call(input, event)
+            if (input.value !== previousValue) {
+              onChange?.(input.value)
+            }
+          }}
+          onFocus={onFocus}
+          onBlur={onBlur}
+          disabled={disabled}
+          placeholder={placeholder}
+          inputRef={setDesktopInputRef}
+          inputProps={{
+            autoComplete: 'off',
+            spellCheck: false,
+            'aria-label': ariaLabel,
+          }}
+          sx={{
+            '& .MuiInputBase-input': {
+              fontFamily: 'monospace',
+              fontSize: '1rem',
+            },
+          }}
+        />
+        <Box sx={{ mt: 1 }}>
+          <SymbolButtonRow
+            inputRef={desktopInputRef}
+            onValueChange={onChange}
+            disabled={disabled}
+            includeQuantifiers={includeQuantifiers}
+            extraInsertButtons={extraInsertButtons}
+          />
+        </Box>
+      </>
     )
   }
 
