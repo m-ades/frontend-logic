@@ -496,7 +496,7 @@ export default function DerivationTable({
     const conclusion = proof?.conclusion ?? proof?.conc ?? ''
     const formulaText = [...premises, conclusion].filter(Boolean).map(String).join(' ')
 
-    const isPredicate = isPredicateLogicKey(key) || /[∀∃]/.test(formulaText)
+    const isPredicate = isPredicateLogicKey(key) || /[∀∃]/.test(formulaText) || /[A-Z][a-z]/.test(formulaText)
 
     if (isPredicate) {
       const keyText = key.map((line) => (typeof line === 'string' ? line : String(line ?? ''))).join(' ')

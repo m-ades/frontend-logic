@@ -18,6 +18,7 @@ import PromptText from '../../../ui/PromptText.jsx'
 import {
   ST_PREDICATE_VARIABLES,
   getConstantLettersFromKey,
+  getFormulaKeyboardConfig,
   getPredicateLettersFromKey,
   isPredicateLogicKey,
   parseSymbolizationKeyFromPrompt,
@@ -132,8 +133,6 @@ const parseArgumentLine = (line) => {
   return { premises, conclusion }
 }
 
-const unique = (items) => Array.from(new Set(items.filter(Boolean)))
-
 function getAnswerFormulas(source) {
   if (!source) return []
   if (typeof source === 'string') {
@@ -163,9 +162,14 @@ function firstWithFormulas(...candidates) {
   return null
 }
 
-function getArgumentKeyboardConfig(answer, symbolizationKey, prompt, parseStatus) {
+function getArgumentKeyboardConfig(answer, symbolizationKey, prompt, argumentLine) {
   const answerFormulas = getAnswerFormulas(answer)
-  if (answerFormulas.length === 0 && symbolizationKey.length > 0) {
+  const formulas = answerFormulas.length > 0
+    ? answerFormulas
+    : getAnswerFormulas(argumentLine)
+  const formulaKeyboardConfig = getFormulaKeyboardConfig(formulas)
+  if (formulaKeyboardConfig) return formulaKeyboardConfig
+  if (symbolizationKey.length > 0) {
     const isPredicate = isPredicateLogicKey(symbolizationKey) || promptImpliesPredicateLogic(prompt)
     const predicateLetters = getPredicateLettersFromKey(symbolizationKey)
     const constantsFromKey = getConstantLettersFromKey(symbolizationKey)
@@ -185,40 +189,12 @@ function getArgumentKeyboardConfig(answer, symbolizationKey, prompt, parseStatus
           symbolizationKey,
         }
   }
-  const formulas = answerFormulas.length > 0
-    ? answerFormulas
-    : parseStatus.ok && parseStatus.parsed
-      ? [...parseStatus.parsed.premises, parseStatus.parsed.conclusion]
-      : []
-  const formulaText = formulas.map(String).join(' ')
-  if (!formulaText.trim()) {
-    return {
-      isPredicateMode: true,
-      predicateLetters: [],
-      constantLetters: [],
-      variableLetters: [],
-    }
+  return {
+    isPredicateMode: true,
+    predicateLetters: [],
+    constantLetters: [],
+    variableLetters: [],
   }
-  const predicateLetters = unique(formulaText.match(/[A-Z]/g) || [])
-  const constantLetters = unique(formulaText.match(/[a-w]/g) || [])
-  const variableLetters = unique(formulaText.match(/[x-z]/g) || [])
-  const isPredicate =
-    constantLetters.length > 0 ||
-    variableLetters.length > 0 ||
-    /[∀∃]/.test(formulaText) ||
-    /[A-Z][a-z]/.test(formulaText)
-
-  return isPredicate
-    ? {
-        isPredicateMode: true,
-        predicateLetters,
-        constantLetters,
-        variableLetters,
-      }
-    : {
-        isPredicateMode: false,
-        symbolizationKey: predicateLetters,
-      }
 }
 
 const normalizeProof = (proofLike) => {
@@ -315,9 +291,9 @@ export default function ComboTranslationDerivation({
       answer,
       symbolizationKey,
       promptText,
-      parseStatus
+      argumentLine
     ),
-    [answer, parseStatus, promptText, symbolizationKey]
+    [answer, argumentLine, promptText, symbolizationKey]
   )
 
   const derivationProof = useMemo(() => {
