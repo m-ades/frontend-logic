@@ -44,7 +44,7 @@ function typeKey(existing) {
   return e.logic_problem_type !== undefined ? 'logic_problem_type' : (e.type !== undefined ? 'type' : 'logic_problem_type')
 }
 
-const FORCE_UPPER_RULES = new Set(['UI', 'UG', 'EI', 'EG', 'MP', 'MT', 'HS', 'DS', 'CD', 'DN', 'DM', 'CQ', 'QN', 'CP', 'IP', 'ACP', 'AIP', 'PR'])
+const FORCE_UPPER_RULES = new Set(['UI', 'UG', 'EI', 'EG', 'MP', 'MT', 'HS', 'DS', 'CD', 'DN', 'DM', 'QN', 'CP', 'IP', 'ACP', 'AIP', 'PR'])
 const ALL_DERIVATION_RULES = Object.keys(getHurleyRuleset()).map((rule) => {
   const upper = String(rule || '').toUpperCase()
   if (FORCE_UPPER_RULES.has(upper)) return upper

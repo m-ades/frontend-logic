@@ -180,7 +180,7 @@ const SYMBOL_BUTTONS = [
 ]
 // mobile fullscreen only. second row: (∀x) (∃x) ( ) [ ] under ~ • ∨ ⊃
 const SYMBOL_ROW2 = [SYMBOL_BUTTONS[5], SYMBOL_BUTTONS[6], SYMBOL_BUTTONS[7], SYMBOL_BUTTONS[8]]
-const FORCE_UPPER_RULES = new Set(['UI','UG','EI','EG','MP','MT','HS','DS','CD','DN','DM','CQ','QN','CP','IP','ACP','AIP'])
+const FORCE_UPPER_RULES = new Set(['UI','UG','EI','EG','MP','MT','HS','DS','CD','DN','DM','QN','CP','IP','ACP','AIP'])
 const ALL_DERIVATION_RULES = Object.keys(getHurleyRuleset())
   .filter((r) => r !== 'Pr' && r !== 'Ass')
   .map((r) => (FORCE_UPPER_RULES.has(r.toUpperCase()) ? r.toUpperCase() : r.charAt(0).toUpperCase() + r.slice(1).toLowerCase()))

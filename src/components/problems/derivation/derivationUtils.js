@@ -81,7 +81,7 @@ export const SYMBOL_BUTTONS = [
 ]
 
 export const SYMBOL_ROW2 = [SYMBOL_BUTTONS[5], SYMBOL_BUTTONS[6], SYMBOL_BUTTONS[7], SYMBOL_BUTTONS[8]]
-export const FORCE_UPPER_RULES = new Set(['UI', 'UG', 'EI', 'EG', 'MP', 'MT', 'HS', 'DS', 'CD', 'DN', 'DM', 'CQ', 'QN', 'CP', 'IP', 'ACP', 'AIP'])
+export const FORCE_UPPER_RULES = new Set(['UI', 'UG', 'EI', 'EG', 'MP', 'MT', 'HS', 'DS', 'CD', 'DN', 'DM', 'QN', 'CP', 'IP', 'ACP', 'AIP'])
 export const ALL_DERIVATION_RULES = Object.keys(getHurleyRuleset())
   .filter((rule) => rule !== 'Pr' && rule !== 'Ass')
   .map((rule) => (FORCE_UPPER_RULES.has(rule.toUpperCase()) ? rule.toUpperCase() : rule.charAt(0).toUpperCase() + rule.slice(1).toLowerCase()))

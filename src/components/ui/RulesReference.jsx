@@ -178,13 +178,13 @@ export default function RulesReference() {
           <div><strong>EG:</strong> Fa / (∃x)Fx &nbsp;or&nbsp; Fx / (∃x)Fx</div>
         </Box>
         <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 0.5, color: 'primary.main', fontSize: '0.95rem' }}>
-          Change of Quantifier (CQ) / Quantifier Negation (QN)
+          Quantifier Negation (QN)
         </Typography>
         <Box component="div" sx={{ mb: 1.5, fontSize: '0.85rem' }}>
-          <div><strong>CQ:</strong> ~(x)Fx :: (∃x)~Fx</div>
-          <div><strong>CQ:</strong> ~(∃x)Fx :: (x)~Fx</div>
-          <div><strong>CQ:</strong> (x)Fx :: ~(∃x)~Fx</div>
-          <div><strong>CQ:</strong> (∃x)Fx :: ~(x)~Fx</div>
+          <div><strong>QN:</strong> ~(x)Fx :: (∃x)~Fx</div>
+          <div><strong>QN:</strong> ~(∃x)Fx :: (x)~Fx</div>
+          <div><strong>QN:</strong> (x)Fx :: ~(∃x)~Fx</div>
+          <div><strong>QN:</strong> (∃x)Fx :: ~(x)~Fx</div>
         </Box>
       </RulesCard>
 

@@ -74,16 +74,10 @@ const hurleyRules = {
         { prems: ["Ay"], conc: "∃xAx", subst: {"x":"y"} }
     ]},
     
-    // Change of Quantifier Rules
-    "CQ" : { pred: true, replacementrule: true, forms: [
+    // Quantifier Negation Rules
+    "QN" : { pred: true, replacementrule: true, forms: [
         { a: "∀xAx", b: "~∃x~Ax" },
         { a: "∃xAx", b: "~∀x~Ax" },
-        { a: "~∀xAx", b: "∃x~Ax" },
-        { a: "~∃xAx", b: "∀x~Ax" },
-        { a: "∀x~Ax", b: "~∃xAx" },
-        { a: "∃x~Ax", b: "~∀xAx" }
-    ]},
-    "QN" : { pred: true, replacementrule: true, forms: [
         { a: "~∀xAx", b: "∃x~Ax" },
         { a: "~∃xAx", b: "∀x~Ax" },
         { a: "∀x~Ax", b: "~∃xAx" },

@@ -324,7 +324,7 @@ export default class DerivationExercise extends LogicPenguinProblem {
             'dn': 'DN', 'dm': 'DM', 'com': 'Com', 'comm': 'Com', 'assoc': 'Assoc',
             'dist': 'Dist', 'trans': 'Trans', 'impl': 'Impl', 'equiv': 'Equiv',
             'exp': 'Exp', 'taut': 'Taut', 'ui': 'UI', 'ug': 'UG',
-            'ei': 'EI', 'eg': 'EG', 'cq': 'CQ', 'qn': 'QN',
+            'ei': 'EI', 'eg': 'EG', 'qn': 'QN',
             'ud': 'UG',
             'cp': 'CP', 'ip': 'IP', 'acp': 'ACP', 'aip': 'AIP'
         };
