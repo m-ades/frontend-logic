@@ -25,6 +25,8 @@ import CancelIcon from '@mui/icons-material/Cancel'
 import RemoveIcon from '@mui/icons-material/Remove'
 import EditIcon from '@mui/icons-material/Edit'
 import { alpha } from '@mui/material/styles'
+import { fetchJson, getActiveUserId } from '../../../utils/api.js'
+import { getSubmissionScore } from '../../../utils/problemHelpers.js'
 import PromptText from '../../ui/PromptText.jsx'
 import ThemedCard from '../../ui/ThemedCard.jsx'
 import ProblemSetButtons from '../mui/frame/ProblemSetButtons.jsx'
@@ -35,7 +37,7 @@ import getFormulaClass from '../../../lib/logicpenguin/symbolic/formula.js'
 import getSyntax from '../../../lib/logicpenguin/symbolic/libsyntax.js'
 import { justParse } from '../../ui/logicpenguin/justification-parse.js'
 import { getInsertSymbolLabel } from '../../ui/logicpenguin/LogicSymbol.jsx'
-import { buildPersistedSubmissionState, shouldUseApiValidation, submitApiValidation } from '../../../utils/submissionRuntime.js'
+import { getOpenAssumptionDepths, isResolvedConclusionLine } from './derivationUtils.js'
 
 /** Compare formula strings by canonical form so ∃x(~Hx) and ∃x~Hx count equal */
 function formulasEqualNormally(a, b, normalizeForFallback) {
@@ -111,24 +113,19 @@ function getConstantLettersFromPrompt(promptText, count = 3) {
 function getConstantLettersFromFormulasAndKey(formulaText, symbolizationKey) {
   const seen = new Set()
   const result = []
-  const addConstant = (letter) => {
+  const add = (letter) => {
     if (!seen.has(letter)) {
       seen.add(letter)
       result.push(letter)
     }
   }
 
-  for (const letter of formulaText.match(/[a-w]/g) || []) {
-    addConstant(letter)
-  }
-
+  for (const letter of formulaText.match(/[a-w]/g) || []) add(letter)
   for (const line of Array.isArray(symbolizationKey) ? symbolizationKey : []) {
     const s = typeof line === 'string' ? line : String(line ?? '')
     const splitAt = s.search(/[=:]/)
     const left = (splitAt === -1 ? s : s.slice(0, splitAt)).trim()
-    if (/^[a-w]$/.test(left)) {
-      addConstant(left)
-    }
+    if (/^[a-w]$/.test(left)) add(left)
   }
 
   return result
@@ -142,29 +139,6 @@ function isPredicateLogicKey(symbolizationKey) {
     const s = typeof line === 'string' ? line : String(line ?? '')
     return s.includes(':') && /^[A-Z]/.test(s.split(':')[0].trim())
   })
-}
-
-const DEFAULT_QUANTIFIER_INSERTS = new Set(['(∀x)', '(∃x)'])
-
-function getQuantifierButtonsFromFormulas(premises, conclusion) {
-  const formulas = [...(Array.isArray(premises) ? premises : []), conclusion].filter(Boolean).map(String)
-  const text = formulas.join(' ')
-  const seen = new Set(DEFAULT_QUANTIFIER_INSERTS)
-  const buttons = []
-  const matches = text.match(/\(?[∀∃][x-z]\)?/g)
-
-  if (!matches) return buttons
-
-  for (const rawMatch of matches) {
-    const match = rawMatch.match(/[∀∃][x-z]/)
-    if (!match) continue
-    const insert = `(${match[0]})`
-    if (seen.has(insert)) continue
-    seen.add(insert)
-    buttons.push({ label: insert, insert })
-  }
-
-  return buttons
 }
 
 const SYMBOL_BUTTONS = [
@@ -450,6 +424,7 @@ export default function DerivationTable({
   currentQuestionScore,
   isInstructorView = false,
   onEditQuestion,
+  hideActions = false,
 }) {
   const formulaRefs = useRef({})
   const justRefs = useRef({})
@@ -521,18 +496,16 @@ export default function DerivationTable({
     const premises = Array.isArray(proof?.premises) ? proof.premises : []
     const conclusion = proof?.conclusion ?? proof?.conc ?? ''
     const formulaText = [...premises, conclusion].filter(Boolean).map(String).join(' ')
-    const extraQuantifierButtons = getQuantifierButtonsFromFormulas(premises, conclusion)
 
     const isPredicate = isPredicateLogicKey(key) || /[∀∃]/.test(formulaText)
 
     if (isPredicate) {
       const keyText = key.map((line) => (typeof line === 'string' ? line : String(line ?? ''))).join(' ')
       const textForConstants = [formulaText, keyText].filter(Boolean).join(' ') || ''
-      const givenConstantLetters = getConstantLettersFromFormulasAndKey(formulaText, key)
-      const fallbackConstantLetters = getConstantLettersFromPrompt(textForConstants, 3)
+      const constantsFromAnswer = getConstantLettersFromFormulasAndKey(formulaText, key)
       const constantLetters = [
-        ...givenConstantLetters,
-        ...fallbackConstantLetters.filter((letter) => !givenConstantLetters.includes(letter)),
+        ...constantsFromAnswer,
+        ...getConstantLettersFromPrompt(textForConstants, 3).filter((letter) => !constantsFromAnswer.includes(letter)),
       ]
       const variableLetters = PREDICATE_VARIABLES
       // Prefer predicate letters from the symbolization key; if missing, fall back to uppercase letters in formulas.
@@ -544,7 +517,6 @@ export default function DerivationTable({
         predicateLetters,
         constantLetters,
         variableLetters,
-        extraQuantifierButtons,
       }
     }
 
@@ -553,18 +525,8 @@ export default function DerivationTable({
     return {
       isPredicateMode: false,
       symbolizationKey: predicateLetters,
-      extraQuantifierButtons,
     }
   }, [proof])
-  const symbolButtons = useMemo(() => {
-    const extraQuantifierButtons = derivationKeyboardConfig.extraQuantifierButtons || []
-    if (extraQuantifierButtons.length === 0) return SYMBOL_BUTTONS
-    return [
-      ...SYMBOL_BUTTONS.slice(0, 7),
-      ...extraQuantifierButtons,
-      ...SYMBOL_BUTTONS.slice(7),
-    ]
-  }, [derivationKeyboardConfig.extraQuantifierButtons])
   const isLineCompleteForCheck = useCallback((line) => {
     if (!line) return false
     const formulaFilled = (line.formula || '').trim().length > 0
@@ -702,11 +664,19 @@ export default function DerivationTable({
     const lastFilledIndex = filledLineIndices.length ? filledLineIndices[filledLineIndices.length - 1] : -1
     const lastFilled = lastFilledIndex >= 0 ? linesSnapshot[lastFilledIndex] : null
     const allFilledComplete = filledLineIndices.every((idx) => isLineComplete(idx))
+    const openAssumptionDepths = getOpenAssumptionDepths(linesSnapshot)
+    const lastFilledResolvesConclusion = isResolvedConclusionLine({
+      line: lastFilled,
+      index: lastFilledIndex,
+      conclusion: proof?.conclusion,
+      normalizeFormula: normalizeFormulaForCheck,
+      openAssumptionDepths,
+    })
     const readyForRuleGate = Boolean(
       normalizedConclusion &&
       lastFilled &&
       isLineCompleteForCheck(lastFilled) &&
-      formulasEqualNormally(lastFilled.formula || '', proof?.conclusion || '', normalizeFormulaForCheck) &&
+      lastFilledResolvesConclusion &&
       allFilledComplete
     )
     const filteredErrors = {}
@@ -772,7 +742,13 @@ export default function DerivationTable({
       !last.readOnly &&
       isLineCompleteForCheck(last) &&
       perLine[lastIndex] === 'ok' &&
-      !formulasEqualNormally(last.formula || '', proof?.conclusion || '', normalizeFormulaForCheck)
+      !isResolvedConclusionLine({
+        line: last,
+        index: lastIndex,
+        conclusion: proof?.conclusion,
+        normalizeFormula: normalizeFormulaForCheck,
+        openAssumptionDepths,
+      })
     )
     return { perLine, rows, shouldAutoAdd }
   }, [normalizeFormulaForCheck, normalizeJustificationForCheck, premises, proof?.conclusion, proof?.options, proof?.ruleset, isLineCompleteForCheck])
@@ -796,7 +772,14 @@ export default function DerivationTable({
             if (!last || last.readOnly || !isLineCompleteForCheck(last)) return prev
             const conclusionStr = proof?.conclusion || ''
             if (!conclusionStr) return prev
-            if (formulasEqualNormally(last.formula || '', conclusionStr, normalizeFormulaForCheck)) return prev
+            const openAssumptionDepths = getOpenAssumptionDepths(prev)
+            if (isResolvedConclusionLine({
+              line: last,
+              index: prev.length - 1,
+              conclusion: conclusionStr,
+              normalizeFormula: normalizeFormulaForCheck,
+              openAssumptionDepths,
+            })) return prev
             pendingFocusRef.current = prev.length
             return [...prev, { formula: '', justification: '', readOnly: false }]
           })
@@ -834,12 +817,14 @@ export default function DerivationTable({
     if (!lastFilled || lastFilled.readOnly) return { ok: false, index: null }
     if (!isLineCompleteForCheck(lastFilled)) return { ok: false, index: null }
     if (autoCheckState.perLine[lastFilledIndex] !== 'ok') return { ok: false, index: null }
-    const matchesConclusion = formulasEqualNormally(
-      lastFilled.formula || '',
+    const openAssumptionDepths = getOpenAssumptionDepths(lines)
+    if (!isResolvedConclusionLine({
+      line: lastFilled,
+      index: lastFilledIndex,
       conclusion,
-      normalizeFormulaForCheck
-    )
-    if (!matchesConclusion) return { ok: false, index: null }
+      normalizeFormula: normalizeFormulaForCheck,
+      openAssumptionDepths,
+    })) return { ok: false, index: null }
     return { ok: true, index: lastFilledIndex }
   }, [autoCheckEnabled, autoCheckState.perLine, isLineCompleteForCheck, lines, normalizeFormulaForCheck, premises.length, proof?.conclusion])
 
@@ -1182,75 +1167,44 @@ export default function DerivationTable({
         normalizeFormulaForCheck,
         normalizeJustificationForCheck
       )
-      if (!shouldUseApiValidation(proof?.questionId)) {
-        const validation = await checkDerivation(
-          { prems: premises, conc: proof?.conclusion, ruleset: proof?.ruleset },
-          submission_data.ans,
-          1,
-          proof?.options
-        )
-        const successstatus = validation?.successstatus || 'incorrect'
-        const nextAttempt = attemptCount + 1
-        setLastSubmitStatus(successstatus)
-        setAttemptCount((prev) => prev + 1)
-        onStateChangeRef.current?.(buildPersistedSubmissionState({
-          answerState: submission_data,
-          attemptCount: nextAttempt,
-          status: successstatus,
-          rawScore: successstatus === 'correct' ? 100 : 0,
+      const resp = await fetchJson('/api/validate/submission', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          assignment_question_id: proof?.questionId,
+          user_id: getActiveUserId(),
+          submission_data,
+        }),
+      })
+      const validation = resp?.validation || {}
+      const successstatus = validation.successstatus || 'incorrect'
+      setLastSubmitStatus(successstatus)
+      if (typeof resp?.attempt_limit === 'number') {
+        setAttemptLimit(resp.attempt_limit)
+      }
+      setAttemptCount((prev) => resp?.submission?.attempt ?? prev + 1)
+      if (typeof window !== 'undefined') {
+        const score = getSubmissionScore(resp)
+        window.dispatchEvent(new CustomEvent('assignment-submission', {
+          detail: {
+            assignmentQuestionId: proof?.questionId,
+            attempt: resp?.submission?.attempt,
+            attemptLimit: resp?.attempt_limit,
+            isCorrect: successstatus === 'correct',
+            score,
+          },
         }))
-        setStatusBanner({
-          status: successstatus,
-          message: validation?.message || validation?.transmessage || (successstatus === 'correct' ? 'Correct!' : 'Incorrect.'),
-        })
-        onAttempt?.({
-          attempt: nextAttempt,
-          attemptLimit,
-        })
-        if (successstatus === 'correct') {
-          onProofComplete?.(proof.id)
-        }
-      } else {
-        const submission = await submitApiValidation({
-          assignmentQuestionId: proof?.questionId,
-          submissionData: submission_data,
-        })
-        const { validation, successstatus, rawScore, attempt, attemptLimit: nextAttemptLimit } = submission
-        const score = rawScore
-        setLastSubmitStatus(successstatus)
-        if (typeof nextAttemptLimit === 'number') {
-          setAttemptLimit(nextAttemptLimit)
-        }
-        const nextAttempt = attempt ?? attemptCount + 1
-        setAttemptCount((prev) => attempt ?? prev + 1)
-        onStateChangeRef.current?.(buildPersistedSubmissionState({
-          answerState: submission_data,
-          attemptCount: nextAttempt,
-          status: successstatus,
-          rawScore: score,
-        }))
-        if (typeof window !== 'undefined') {
-          window.dispatchEvent(new CustomEvent('assignment-submission', {
-            detail: {
-              assignmentQuestionId: proof?.questionId,
-              attempt,
-              attemptLimit: nextAttemptLimit,
-              isCorrect: successstatus === 'correct',
-              score,
-            },
-          }))
-        }
-        setStatusBanner({
-          status: successstatus,
-          message: validation.message || validation.transmessage || (successstatus === 'correct' ? 'Correct!' : 'Incorrect.'),
-        })
-        onAttempt?.({
-          attempt: nextAttempt,
-          attemptLimit: nextAttemptLimit,
-        })
-        if (successstatus === 'correct') {
-          onProofComplete?.(proof.id)
-        }
+      }
+      setStatusBanner({
+        status: successstatus,
+        message: validation.message || validation.transmessage || (successstatus === 'correct' ? 'Correct!' : 'Incorrect.'),
+      })
+      onAttempt?.({
+        attempt: resp?.submission?.attempt,
+        attemptLimit: resp?.attempt_limit,
+      })
+      if (successstatus === 'correct') {
+        onProofComplete?.(proof.id)
       }
     } catch (err) {
       setStatusBanner({ status: 'malfunction', message: 'Error submitting answer' })
@@ -1269,11 +1223,9 @@ export default function DerivationTable({
     const inputEl = formulaRefs.current[targetIdx]
     const current = lines[targetIdx]?.formula || ''
     const stored = getStoredSelection(targetIdx, current.length)
-    const activeFacade = targetIdx === activeKeyboardFormulaIndexRef.current && inputEl
     const isFocused = typeof document !== 'undefined' && document.activeElement === inputEl
-    const useInputSelection = activeFacade || isFocused
-    const start = useInputSelection && typeof inputEl?.selectionStart === 'number' ? inputEl.selectionStart : stored.start
-    const end = useInputSelection && typeof inputEl?.selectionEnd === 'number' ? inputEl.selectionEnd : stored.end
+    const start = isFocused && typeof inputEl?.selectionStart === 'number' ? inputEl.selectionStart : stored.start
+    const end = isFocused && typeof inputEl?.selectionEnd === 'number' ? inputEl.selectionEnd : stored.end
     const hasSelection = end > start
     const [open, close] = pair ? pair.split('') : []
     const insertText = pair
@@ -1332,10 +1284,12 @@ export default function DerivationTable({
       }
     >
       {(() => {
-        const Wrapper = isFullScreen ? Box : ThemedCard
+        const Wrapper = isFullScreen || hideActions ? Box : ThemedCard
         // fullscreen: no right padding. fill width. scrollable area so button row can stay sticky
         const wrapperSx = isFullScreen
           ? { py: 2, pl: 0, pr: 0, position: 'relative', flex: 1, minHeight: 0, minWidth: 0, width: '100%', maxWidth: '100%', display: 'flex', flexDirection: 'column', boxSizing: 'border-box', overflowY: 'auto', overflowX: 'hidden' }
+          : hideActions
+            ? { p: 0, position: 'relative', width: '100%' }
           : {
               p: { xs: 1.25, md: 2.5 },
               borderRadius: 3,
@@ -1344,7 +1298,7 @@ export default function DerivationTable({
             }
         return (
           <Wrapper sx={wrapperSx}>
-        {isInstructorView && onEditQuestion && !isFullScreen && (
+        {isInstructorView && onEditQuestion && !isFullScreen && !hideActions && (
           <Box sx={{ mb: 2, display: 'flex', justifyContent: 'flex-end' }}>
             <Tooltip title="Edit question">
               <Box
@@ -1359,7 +1313,7 @@ export default function DerivationTable({
             </Tooltip>
           </Box>
         )}
-        {proof.description && !isFullScreen && (
+        {proof.description && !isFullScreen && !hideActions && (
           <Box sx={{ mb: 2, display: 'flex', alignItems: 'flex-start', gap: 0.5 }}>
             <PromptText content={proof.description} sx={{ fontSize: 15, flex: 1 }} />
           </Box>
@@ -1598,15 +1552,7 @@ export default function DerivationTable({
                       onBlur={() => handleLineCommit(idx, 'formula', normalizeFormulaForCheck(line.formula ?? ''))}
                       placeholder=""
                       aria-label={`Formula line ${idx + 1}`}
-                      inputRef={(el) => { if (el) formulaRefs.current[idx] = el }}
-                      onCursorChange={(position) => {
-                        if (line.readOnly) return
-                        const safePosition = Number.isFinite(position) ? position : 0
-                        const maxPosition = (line.formula ?? '').length
-                        setStoredSelection(idx, Math.max(0, Math.min(safePosition, maxPosition)))
-                      }}
                       includeQuantifiers={derivationKeyboardConfig.isPredicateMode}
-                      extraInsertButtons={derivationKeyboardConfig.extraQuantifierButtons}
                       predicateLetters={derivationKeyboardConfig.isPredicateMode ? derivationKeyboardConfig.predicateLetters : undefined}
                       constantLetters={derivationKeyboardConfig.isPredicateMode ? derivationKeyboardConfig.constantLetters : undefined}
                       variableLetters={derivationKeyboardConfig.isPredicateMode ? derivationKeyboardConfig.variableLetters : undefined}
@@ -1973,7 +1919,7 @@ export default function DerivationTable({
                             <AutoAwesomeIcon />
                           </IconButton>
                         </Tooltip>
-                        {symbolButtons.map(({ label, insert, pair }) => (
+                        {SYMBOL_BUTTONS.map(({ label, insert, pair }) => (
                           <Button
                             key={label}
                             type="button"
@@ -2041,49 +1987,51 @@ export default function DerivationTable({
         )
       })()}
       {/* fullscreen: sticky button row at bottom; non-fullscreen: normal flow */}
-      <Box
-        sx={{
-          mt: 1,
-          ...(isFullScreen && {
-            flexShrink: 0,
-            pl: 2,
-            pr: 0,
-            pt: 1.5,
-            pb: 2,
-            bgcolor: 'background.paper',
-            borderTop: 1,
-            borderColor: 'divider',
-          }),
-        }}
-      >
-        <ProblemSetButtons
-          onCheck={handleSubmit}
-          onStartOver={handleStartOver}
-          isChecking={isChecking}
-          isDisabled={submitDisabled}
-          align="flex-start"
-          attemptCount={attemptCount}
-          attemptLimit={attemptLimit}
-          sx={{ mt: 1 }}
-          scoreLabel={isPhone && isFullScreen && Number.isFinite(totalQuestions) && totalQuestions > 0 ? (() => {
-            const pointsPerQuestion = 100 / totalQuestions
-            const maxLabel = pointsPerQuestion % 1 === 0 ? String(Math.round(pointsPerQuestion)) : pointsPerQuestion.toFixed(1)
-            const isLockedOut = Number.isFinite(attemptLimit) && attemptCount >= attemptLimit
-            const score = currentQuestionScore != null && Number.isFinite(Number(currentQuestionScore)) ? Number(currentQuestionScore) : null
-            if (score != null) {
-              const earned = (score / 100) * pointsPerQuestion
-              const earnedLabel = earned % 1 === 0 ? String(Math.round(earned)) : earned.toFixed(1)
-              const color = score >= 100 ? 'success.main' : score > 0 ? 'text.secondary' : 'error.main'
-              return { text: `${earnedLabel}/${maxLabel}`, color }
-            }
-            if (lastSubmitStatus === 'correct') return { text: `${maxLabel}/${maxLabel}`, color: 'success.main' }
-            if (lastSubmitStatus === 'incorrect') return { text: `0/${maxLabel}`, color: 'error.main' }
-            if (isCurrentCorrect) return { text: `${maxLabel}/${maxLabel}`, color: 'success.main' }
-            if (isLockedOut) return { text: `0/${maxLabel}`, color: 'error.main' }
-            return null
-          })() : null}
-        />
-      </Box>
+      {!hideActions && (
+        <Box
+          sx={{
+            mt: 1,
+            ...(isFullScreen && {
+              flexShrink: 0,
+              pl: 2,
+              pr: 0,
+              pt: 1.5,
+              pb: 2,
+              bgcolor: 'background.paper',
+              borderTop: 1,
+              borderColor: 'divider',
+            }),
+          }}
+        >
+          <ProblemSetButtons
+            onCheck={handleSubmit}
+            onStartOver={handleStartOver}
+            isChecking={isChecking}
+            isDisabled={submitDisabled}
+            align="flex-start"
+            attemptCount={attemptCount}
+            attemptLimit={attemptLimit}
+            sx={{ mt: 1 }}
+            scoreLabel={isPhone && isFullScreen && Number.isFinite(totalQuestions) && totalQuestions > 0 ? (() => {
+              const pointsPerQuestion = 100 / totalQuestions
+              const maxLabel = pointsPerQuestion % 1 === 0 ? String(Math.round(pointsPerQuestion)) : pointsPerQuestion.toFixed(1)
+              const isLockedOut = Number.isFinite(attemptLimit) && attemptCount >= attemptLimit
+              const score = currentQuestionScore != null && Number.isFinite(Number(currentQuestionScore)) ? Number(currentQuestionScore) : null
+              if (score != null) {
+                const earned = (score / 100) * pointsPerQuestion
+                const earnedLabel = earned % 1 === 0 ? String(Math.round(earned)) : earned.toFixed(1)
+                const color = score >= 100 ? 'success.main' : score > 0 ? 'text.secondary' : 'error.main'
+                return { text: `${earnedLabel}/${maxLabel}`, color }
+              }
+              if (lastSubmitStatus === 'correct') return { text: `${maxLabel}/${maxLabel}`, color: 'success.main' }
+              if (lastSubmitStatus === 'incorrect') return { text: `0/${maxLabel}`, color: 'error.main' }
+              if (isCurrentCorrect) return { text: `${maxLabel}/${maxLabel}`, color: 'success.main' }
+              if (isLockedOut) return { text: `0/${maxLabel}`, color: 'error.main' }
+              return null
+            })() : null}
+          />
+        </Box>
+      )}
     </Stack>
   )
 }
