@@ -25,8 +25,6 @@ import CancelIcon from '@mui/icons-material/Cancel'
 import RemoveIcon from '@mui/icons-material/Remove'
 import EditIcon from '@mui/icons-material/Edit'
 import { alpha } from '@mui/material/styles'
-import { fetchJson, getActiveUserId } from '../../../utils/api.js'
-import { getSubmissionScore } from '../../../utils/problemHelpers.js'
 import PromptText from '../../ui/PromptText.jsx'
 import ThemedCard from '../../ui/ThemedCard.jsx'
 import ProblemSetButtons from '../mui/frame/ProblemSetButtons.jsx'
@@ -37,6 +35,7 @@ import getFormulaClass from '../../../lib/logicpenguin/symbolic/formula.js'
 import getSyntax from '../../../lib/logicpenguin/symbolic/libsyntax.js'
 import { justParse } from '../../ui/logicpenguin/justification-parse.js'
 import { getInsertSymbolLabel } from '../../ui/logicpenguin/LogicSymbol.jsx'
+import { buildPersistedSubmissionState, shouldUseApiValidation, submitApiValidation } from '../../../utils/submissionRuntime.js'
 import { getOpenAssumptionDepths, isResolvedConclusionLine } from './derivationUtils.js'
 
 /** Compare formula strings by canonical form so ∃x(~Hx) and ∃x~Hx count equal */
@@ -1167,44 +1166,74 @@ export default function DerivationTable({
         normalizeFormulaForCheck,
         normalizeJustificationForCheck
       )
-      const resp = await fetchJson('/api/validate/submission', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          assignment_question_id: proof?.questionId,
-          user_id: getActiveUserId(),
-          submission_data,
-        }),
-      })
-      const validation = resp?.validation || {}
-      const successstatus = validation.successstatus || 'incorrect'
-      setLastSubmitStatus(successstatus)
-      if (typeof resp?.attempt_limit === 'number') {
-        setAttemptLimit(resp.attempt_limit)
-      }
-      setAttemptCount((prev) => resp?.submission?.attempt ?? prev + 1)
-      if (typeof window !== 'undefined') {
-        const score = getSubmissionScore(resp)
-        window.dispatchEvent(new CustomEvent('assignment-submission', {
-          detail: {
-            assignmentQuestionId: proof?.questionId,
-            attempt: resp?.submission?.attempt,
-            attemptLimit: resp?.attempt_limit,
-            isCorrect: successstatus === 'correct',
-            score,
-          },
+      if (!shouldUseApiValidation(proof?.questionId)) {
+        const validation = await checkDerivation(
+          { prems: premises, conc: proof?.conclusion, ruleset: proof?.ruleset },
+          submission_data.ans,
+          1,
+          proof?.options
+        )
+        const successstatus = validation?.successstatus || 'incorrect'
+        const nextAttempt = attemptCount + 1
+        setLastSubmitStatus(successstatus)
+        setAttemptCount((prev) => prev + 1)
+        onStateChangeRef.current?.(buildPersistedSubmissionState({
+          answerState: submission_data,
+          attemptCount: nextAttempt,
+          status: successstatus,
+          rawScore: successstatus === 'correct' ? 100 : 0,
         }))
-      }
-      setStatusBanner({
-        status: successstatus,
-        message: validation.message || validation.transmessage || (successstatus === 'correct' ? 'Correct!' : 'Incorrect.'),
-      })
-      onAttempt?.({
-        attempt: resp?.submission?.attempt,
-        attemptLimit: resp?.attempt_limit,
-      })
-      if (successstatus === 'correct') {
-        onProofComplete?.(proof.id)
+        setStatusBanner({
+          status: successstatus,
+          message: validation?.message || validation?.transmessage || (successstatus === 'correct' ? 'Correct!' : 'Incorrect.'),
+        })
+        onAttempt?.({
+          attempt: nextAttempt,
+          attemptLimit,
+        })
+        if (successstatus === 'correct') {
+          onProofComplete?.(proof.id)
+        }
+      } else {
+        const submission = await submitApiValidation({
+          assignmentQuestionId: proof?.questionId,
+          submissionData: submission_data,
+        })
+        const { validation, successstatus, rawScore, attempt, attemptLimit: nextAttemptLimit } = submission
+        setLastSubmitStatus(successstatus)
+        if (typeof nextAttemptLimit === 'number') {
+          setAttemptLimit(nextAttemptLimit)
+        }
+        const nextAttempt = attempt ?? attemptCount + 1
+        setAttemptCount((prev) => attempt ?? prev + 1)
+        onStateChangeRef.current?.(buildPersistedSubmissionState({
+          answerState: submission_data,
+          attemptCount: nextAttempt,
+          status: successstatus,
+          rawScore,
+        }))
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('assignment-submission', {
+            detail: {
+              assignmentQuestionId: proof?.questionId,
+              attempt,
+              attemptLimit: nextAttemptLimit,
+              isCorrect: successstatus === 'correct',
+              score: rawScore,
+            },
+          }))
+        }
+        setStatusBanner({
+          status: successstatus,
+          message: validation.message || validation.transmessage || (successstatus === 'correct' ? 'Correct!' : 'Incorrect.'),
+        })
+        onAttempt?.({
+          attempt: nextAttempt,
+          attemptLimit: nextAttemptLimit,
+        })
+        if (successstatus === 'correct') {
+          onProofComplete?.(proof.id)
+        }
       }
     } catch (err) {
       setStatusBanner({ status: 'malfunction', message: 'Error submitting answer' })
@@ -1223,9 +1252,11 @@ export default function DerivationTable({
     const inputEl = formulaRefs.current[targetIdx]
     const current = lines[targetIdx]?.formula || ''
     const stored = getStoredSelection(targetIdx, current.length)
+    const activeFacade = targetIdx === activeKeyboardFormulaIndexRef.current && inputEl
     const isFocused = typeof document !== 'undefined' && document.activeElement === inputEl
-    const start = isFocused && typeof inputEl?.selectionStart === 'number' ? inputEl.selectionStart : stored.start
-    const end = isFocused && typeof inputEl?.selectionEnd === 'number' ? inputEl.selectionEnd : stored.end
+    const useInputSelection = activeFacade || isFocused
+    const start = useInputSelection && typeof inputEl?.selectionStart === 'number' ? inputEl.selectionStart : stored.start
+    const end = useInputSelection && typeof inputEl?.selectionEnd === 'number' ? inputEl.selectionEnd : stored.end
     const hasSelection = end > start
     const [open, close] = pair ? pair.split('') : []
     const insertText = pair
@@ -1552,6 +1583,13 @@ export default function DerivationTable({
                       onBlur={() => handleLineCommit(idx, 'formula', normalizeFormulaForCheck(line.formula ?? ''))}
                       placeholder=""
                       aria-label={`Formula line ${idx + 1}`}
+                      inputRef={(el) => { if (el) formulaRefs.current[idx] = el }}
+                      onCursorChange={(position) => {
+                        if (line.readOnly) return
+                        const safePosition = Number.isFinite(position) ? position : 0
+                        const maxPosition = (line.formula ?? '').length
+                        setStoredSelection(idx, Math.max(0, Math.min(safePosition, maxPosition)))
+                      }}
                       includeQuantifiers={derivationKeyboardConfig.isPredicateMode}
                       predicateLetters={derivationKeyboardConfig.isPredicateMode ? derivationKeyboardConfig.predicateLetters : undefined}
                       constantLetters={derivationKeyboardConfig.isPredicateMode ? derivationKeyboardConfig.constantLetters : undefined}

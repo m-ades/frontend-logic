@@ -15,8 +15,16 @@ import DerivationTable from '../../derivation/DerivationTable.jsx'
 import getFormulaClass from '../../../../lib/logicpenguin/symbolic/formula.js'
 import { useProblemChecker } from '../../../../hooks/useProblemChecker.js'
 import PromptText from '../../../ui/PromptText.jsx'
+import {
+  ST_PREDICATE_VARIABLES,
+  getConstantLettersFromKey,
+  getPredicateLettersFromKey,
+  isPredicateLogicKey,
+  parseSymbolizationKeyFromPrompt,
+  promptImpliesPredicateLogic,
+} from './symbolizationKeyboard.js'
 
-function FormulaInputField({ value, onValueChange, fieldReadOnly, formulaInputRef }) {
+function FormulaInputField({ value, onValueChange, formulaInputRef }) {
   const theme = useTheme()
   const containerRef = useRef(null)
   const changeHandlerRef = useRef(null)
@@ -56,15 +64,14 @@ function FormulaInputField({ value, onValueChange, fieldReadOnly, formulaInputRe
   useEffect(() => {
     const formulaInput = formulaInputRef.current
     if (!formulaInput) return
-    formulaInput.readOnly = fieldReadOnly
+    formulaInput.readOnly = false
     if (changeHandlerRef.current) {
       formulaInput.removeEventListener('input', changeHandlerRef.current)
       formulaInput.removeEventListener('change', changeHandlerRef.current)
       changeHandlerRef.current = null
     }
-    if (!fieldReadOnly && onValueChange) {
+    if (onValueChange) {
       const handleChange = () => {
-        if (fieldReadOnly) return
         onValueChange(formulaInput.value)
       }
       changeHandlerRef.current = handleChange
@@ -78,7 +85,7 @@ function FormulaInputField({ value, onValueChange, fieldReadOnly, formulaInputRe
         changeHandlerRef.current = null
       }
     }
-  }, [fieldReadOnly, onValueChange, formulaInputRef])
+  }, [onValueChange, formulaInputRef])
 
   useEffect(() => {
     if (formulaInputRef.current && value !== undefined && formulaInputRef.current.value !== value) {
@@ -125,12 +132,16 @@ const parseArgumentLine = (line) => {
   return { premises, conclusion }
 }
 
-const PREDICATE_VARIABLES = ['x', 'y', 'z']
-
 const unique = (items) => Array.from(new Set(items.filter(Boolean)))
 
-function getAnswerFormulas(answer) {
-  if (!answer) return []
+function getAnswerFormulas(source) {
+  if (!source) return []
+  if (typeof source === 'string') {
+    const parsed = parseArgumentLine(source)
+    return parsed.error ? [] : [...parsed.premises, parsed.conclusion]
+  }
+  const answer = source.answer || source
+  if (answer !== source) return getAnswerFormulas(answer)
   if (answer.argument || answer.argumentLine) {
     const parsed = parseArgumentLine(answer.argument ?? answer.argumentLine)
     return parsed.error ? [] : [...parsed.premises, parsed.conclusion]
@@ -141,14 +152,53 @@ function getAnswerFormulas(answer) {
   if (Array.isArray(answer.translations)) {
     return answer.translations.filter(Boolean)
   }
+
   return []
 }
 
-function getArgumentKeyboardConfig(answer, parseStatus) {
-  const formulas = parseStatus.ok && parseStatus.parsed
-    ? [...parseStatus.parsed.premises, parseStatus.parsed.conclusion]
-    : getAnswerFormulas(answer)
+function firstWithFormulas(...candidates) {
+  for (const candidate of candidates) {
+    if (getAnswerFormulas(candidate).length > 0) return candidate
+  }
+  return null
+}
+
+function getArgumentKeyboardConfig(answer, symbolizationKey, prompt, parseStatus) {
+  const answerFormulas = getAnswerFormulas(answer)
+  if (answerFormulas.length === 0 && symbolizationKey.length > 0) {
+    const isPredicate = isPredicateLogicKey(symbolizationKey) || promptImpliesPredicateLogic(prompt)
+    const predicateLetters = getPredicateLettersFromKey(symbolizationKey)
+    const constantsFromKey = getConstantLettersFromKey(symbolizationKey)
+    const constantLetters = isPredicate
+      ? (constantsFromKey.length > 0 ? constantsFromKey : [])
+      : []
+    const variableLetters = isPredicate ? ST_PREDICATE_VARIABLES : []
+    return isPredicate
+      ? {
+          isPredicateMode: true,
+          predicateLetters,
+          constantLetters,
+          variableLetters,
+        }
+      : {
+          isPredicateMode: false,
+          symbolizationKey,
+        }
+  }
+  const formulas = answerFormulas.length > 0
+    ? answerFormulas
+    : parseStatus.ok && parseStatus.parsed
+      ? [...parseStatus.parsed.premises, parseStatus.parsed.conclusion]
+      : []
   const formulaText = formulas.map(String).join(' ')
+  if (!formulaText.trim()) {
+    return {
+      isPredicateMode: true,
+      predicateLetters: [],
+      constantLetters: [],
+      variableLetters: [],
+    }
+  }
   const predicateLetters = unique(formulaText.match(/[A-Z]/g) || [])
   const constantLetters = unique(formulaText.match(/[a-w]/g) || [])
   const variableLetters = unique(formulaText.match(/[x-z]/g) || [])
@@ -163,7 +213,7 @@ function getArgumentKeyboardConfig(answer, parseStatus) {
         isPredicateMode: true,
         predicateLetters,
         constantLetters,
-        variableLetters: variableLetters.length ? variableLetters : PREDICATE_VARIABLES,
+        variableLetters,
       }
     : {
         isPredicateMode: false,
@@ -209,9 +259,19 @@ export default function ComboTranslationDerivation({
   const editorRef = useRef(null)
   const openEdit = () => editorRef.current?.open?.()
   const Formula = useMemo(() => getFormulaClass(), [])
-  const snapshot = proof?.comboTranslationDerivation || proof?.snapshot || {}
+  const snapshot = proof?.comboTranslationDerivation || proof?.snapshot || proof?.questionSnapshot || proof?.question_snapshot || proof || {}
   const promptText = snapshot?.prompt || proof?.description || ''
-  const answer = proof?.answer ?? snapshot?.answer
+  const symbolizationKey = useMemo(
+    () => parseSymbolizationKeyFromPrompt(promptText),
+    [promptText]
+  )
+  const answer = firstWithFormulas(
+    proof?.answer,
+    snapshot?.answer,
+    proof?.questionSnapshot?.answer,
+    proof?.question_snapshot?.answer,
+    snapshot
+  ) ?? proof?.answer ?? snapshot?.answer
   const [argumentLine, setArgumentLine] = useState(savedState?.argumentLine ?? '')
   const [derivationState, setDerivationState] = useState(savedState?.derivationState ?? null)
   const inputRef = useRef(null)
@@ -251,8 +311,13 @@ export default function ComboTranslationDerivation({
   }, [Formula, argumentLine])
 
   const argumentKeyboardConfig = useMemo(
-    () => getArgumentKeyboardConfig(answer, parseStatus),
-    [answer, parseStatus]
+    () => getArgumentKeyboardConfig(
+      answer,
+      symbolizationKey,
+      promptText,
+      parseStatus
+    ),
+    [answer, parseStatus, promptText, symbolizationKey]
   )
 
   const derivationProof = useMemo(() => {
@@ -280,7 +345,7 @@ export default function ComboTranslationDerivation({
 
   const { status, message, isChecking, handleCheck, handleStartOver, setMessage, attemptCount, maxAttempts, isLocked } =
     useProblemChecker({
-      answer: proof?.answer ?? snapshot?.answer,
+      answer,
       problemType: 'combo-translation-derivation',
       question: snapshot,
       options: proof?.options ?? snapshot?.options,
@@ -427,7 +492,6 @@ export default function ComboTranslationDerivation({
                   <FormulaInputField
                     value={argumentLine}
                     onValueChange={handleArgumentChange}
-                    fieldReadOnly={false}
                     formulaInputRef={inputRef}
                   />
                   <Box sx={{ mt: 1 }}>
