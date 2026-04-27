@@ -1265,12 +1265,14 @@ export class formFit {
         if (this.rulename != "UI" || !this.possible) { return; }
         const Formula = this.Formula;
         const cited = this.line.citedlines[0];
+        // make sure there is a cited line
         if (!cited || !cited.s) {
             this.possible = false;
             this.message = 'UI requires citing a universal statement.';
             return;
         }
         const universal = Formula.from(cited.s);
+        // make sure the cited line is universal
         if (universal.op != Formula.syntax.symbols.FORALL) {
             this.possible = false;
             this.message = 'UI requires a ∀-statement as the premise.';
@@ -1282,17 +1284,27 @@ export class formFit {
         const conclusionTerms = psi.terms || [];
         const allTerms = [...new Set([...conclusionTerms, x])];
         let ok = false;
+        let instantialTerm = '';
+        // keep track of the term used for instantiation
         for (const t of allTerms) {
             const instStr = phi.instantiate(x, t);
             const inst = Formula.from(instStr);
             if (inst.normal == psi.normal) {
                 ok = true;
+                instantialTerm = t;
                 break;
             }
         }
         if (!ok) {
             this.possible = false;
             this.message = 'conclusion is not a uniform substitution instance.';
+            return;
+        }
+        // make sure ui does not introduce a new constant
+        if (Formula.syntax.cRegEx.test(instantialTerm) &&
+            this.isNewAt(instantialTerm, this.line)) {
+            this.possible = false;
+            this.message = 'UI cannot introduce a new constant. Choose an existing constant or instantiate with a variable.';
         }
     }
 
@@ -1756,6 +1768,7 @@ export class formFit {
                 checkpart = currsubderiv?.parts?.[currindex-1]?? false;
             } else {
                 if (currsubderiv?.showline &&
+                    !currsubderiv.showline.isMainConclusion &&
                     currsubderiv.showline != line) {
                     const f = Formula.from(currsubderiv.showline.s);
                     if (f.terms.indexOf(newname) !== -1) {
@@ -1773,7 +1786,7 @@ export class formFit {
             // if a subderiv, again check its showline,
             // which is available
             if (checkpart.parts) {
-                if (checkpart.showline) {
+                if (checkpart.showline && !checkpart.showline.isMainConclusion) {
                     const f = Formula.from(checkpart.showline.s);
                     if (f.terms.indexOf(newname) !== -1) {
                         return false;
