@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   Drawer,
   IconButton,
@@ -14,7 +14,6 @@ import {
   Avatar,
   Menu,
   MenuItem,
-  Divider,
 } from "@mui/material";
 import {
   ChevronLeft as ChevronLeftIcon,
@@ -38,6 +37,7 @@ export default function Sidebar({ structure, location, onSignOut, onOpenSettings
   const { isSidebarOpened, sidebarHoverEnabled } = useLayoutState();
   const { user: activeUser, isSandbox: sandbox } = useAppRuntime();
   const layoutDispatch = useLayoutDispatch();
+  const drawerPaperRef = useRef(null);
   const [isPermanent, setPermanent] = useState(true);
   const [profileMenu, setProfileMenu] = useState(null);
   const [isHovering, setIsHovering] = useState(false);
@@ -54,6 +54,14 @@ export default function Sidebar({ structure, location, onSignOut, onOpenSettings
   }, [theme.breakpoints.values.md]);
 
   const handleDrawerToggle = () => {
+    if (!isPermanent && isSidebarOpened) {
+      const activeElement = document.activeElement;
+      if (activeElement instanceof HTMLElement && drawerPaperRef.current?.contains(activeElement)) {
+        // let focus leave before the drawer goes dark
+        activeElement.blur();
+      }
+    }
+
     if (sidebarHoverEnabled) {
       setManuallyOpened(!manuallyOpened);
       toggleSidebar(layoutDispatch);
@@ -102,6 +110,11 @@ export default function Sidebar({ structure, location, onSignOut, onOpenSettings
       onClose={handleDrawerToggle}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
+      slotProps={{
+        paper: {
+          ref: drawerPaperRef,
+        },
+      }}
       sx={{
         width: isSidebarOpened ? DRAWER_WIDTH : 85,
         flexShrink: 0,
@@ -118,8 +131,10 @@ export default function Sidebar({ structure, location, onSignOut, onOpenSettings
           willChange: "width, transform",
           display: "flex",
           flexDirection: "column",
-          height: "100vh",
+          height: { xs: "100dvh", md: "100vh" },
+          maxHeight: { xs: "100dvh", md: "100vh" },
           overflowX: "hidden",
+          overflowY: "hidden",
           borderRight: "1px solid",
           borderColor: "divider",
           boxSizing: "border-box",
@@ -155,7 +170,15 @@ export default function Sidebar({ structure, location, onSignOut, onOpenSettings
 
       <CourseSelector isSidebarOpened={isSidebarOpened} />
 
-      <Box sx={{ display: "flex", flexDirection: "column", flexGrow: 1, minHeight: 0 }}>
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          flexGrow: 1,
+          minHeight: 0,
+          overflow: "hidden",
+        }}
+      >
         <List sx={{ mt: 1, px: 1, flexGrow: 1, minHeight: 0, overflowY: "auto" }}>
           {structure.map((link) => (
             <SidebarLink
@@ -169,9 +192,21 @@ export default function Sidebar({ structure, location, onSignOut, onOpenSettings
           ))}
         </List>
 
-        <Box sx={{ px: 1, pb: 2 }}>
-          <Divider sx={{ mb: 1 }} />
-
+        <Box
+          sx={{
+            px: 1,
+            pt: 1,
+            pb: isMobile ? "max(16px, env(safe-area-inset-bottom, 0px))" : 2,
+            mt: "auto",
+            flexShrink: 0,
+            backgroundColor: "background.paper",
+            borderTop: "1px solid",
+            borderColor: "divider",
+            position: "sticky",
+            bottom: 0,
+            zIndex: 1,
+          }}
+        >
           {!sidebarHoverEnabled && (
             <ListItem disablePadding>
               <ListItemButton

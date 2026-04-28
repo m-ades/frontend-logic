@@ -33,6 +33,7 @@ const FormulaField = forwardRef(function FormulaField({
         symbolizationKey={symbolizationKey}
         includeQuantifiers={includeQuantifiers}
         extraInsertButtons={extraInsertButtons}
+        onEnterKey={onEnterKey}
         predicateLetters={predicateLetters}
         constantLetters={constantLetters}
         variableLetters={variableLetters}

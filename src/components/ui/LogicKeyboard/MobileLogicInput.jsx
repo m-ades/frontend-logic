@@ -1,13 +1,47 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { createPortal } from 'react-dom'
-import { Box, Button, Stack } from '@mui/material'
+import { createPortal, flushSync } from 'react-dom'
+import { Box, Button, Stack, TextField } from '@mui/material'
 import { alpha } from '@mui/material/styles'
 import { useTheme, useMediaQuery } from '@mui/material'
+import FormulaInput from '../logicpenguin/formula-input.js'
 import LogicInput from './LogicInput.jsx'
 import SymbolButtonRow, { symbolRowButtonSx } from '../logicpenguin/SymbolButtonRow.jsx'
 import getSyntax from '../../../lib/logicpenguin/symbolic/libsyntax.js'
 
 const DEFAULT_LETTERS = ['P', 'Q', 'R', 'S', 'T']
+const DESKTOP_KEYBOARD_ON_MOBILE_KEY = 'logicapp_desktop_keyboard_on_mobile'
+const DESKTOP_KEYBOARD_ON_MOBILE_EVENT = 'logicapp_desktop_keyboard_on_mobile_change'
+
+function getDesktopKeyboardOnMobile() {
+  if (typeof window === 'undefined') return false
+
+  try {
+    return window.localStorage.getItem(DESKTOP_KEYBOARD_ON_MOBILE_KEY) === 'true'
+  } catch {
+    return false
+  }
+}
+
+export function useMobileLogicKeyboardEnabled() {
+  const [enabled, setEnabled] = useState(() => !getDesktopKeyboardOnMobile())
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return undefined
+
+    const handlePreferenceChange = () => {
+      setEnabled(!getDesktopKeyboardOnMobile())
+    }
+
+    window.addEventListener(DESKTOP_KEYBOARD_ON_MOBILE_EVENT, handlePreferenceChange)
+    window.addEventListener('storage', handlePreferenceChange)
+    return () => {
+      window.removeEventListener(DESKTOP_KEYBOARD_ON_MOBILE_EVENT, handlePreferenceChange)
+      window.removeEventListener('storage', handlePreferenceChange)
+    }
+  }, [])
+
+  return enabled
+}
 
 /** Binary operators get leading and trailing space (matches formula-input.js insOp / logic parsing). */
 function isBinaryOp(symbolcat, op) {
@@ -50,6 +84,7 @@ export default function MobileLogicInput({
   symbolizationKey,
   includeQuantifiers = true,
   extraInsertButtons,
+  onEnterKey,
   /** Predicate-logic mode: when all three are provided, show predicates / constants / variables rows instead of a single letter row. */
   predicateLetters,
   constantLetters,
@@ -58,11 +93,13 @@ export default function MobileLogicInput({
 }) {
   const theme = useTheme()
   const isPhone = useMediaQuery(theme.breakpoints.down('sm'))
+  const mobileLogicKeyboardEnabled = useMobileLogicKeyboardEnabled()
 
   const [cursorPosition, setCursorPosition] = useState(0)
   const [keyboardFocused, setKeyboardFocused] = useState(false)
   const [isClosing, setIsClosing] = useState(false)
   const [slideIn, setSlideIn] = useState(false)
+  const desktopInputRef = useRef(null)
 
   const onChangeRef = useRef(onChange)
   const setCursorRef = useRef(setCursorPosition)
@@ -136,6 +173,7 @@ export default function MobileLogicInput({
       inputRef.current = null
     }
   }, [facade, inputRef])
+
   const handleFocus = useCallback(() => {
     setKeyboardFocused(true)
     onFocus?.()
@@ -215,6 +253,89 @@ export default function MobileLogicInput({
 
   if (!isPhone) {
     return children ?? null
+  }
+
+  if (!mobileLogicKeyboardEnabled) {
+    const syncDesktopValue = (nextValue) => {
+      valueRef.current = nextValue
+      onChangeRef.current?.(nextValue)
+    }
+
+    const setDesktopInputRef = (node) => {
+      desktopInputRef.current = node
+      if (node) {
+        node.syntax = syntax
+        node.symbols = symbols
+        node.symbolcat = symbolcat
+        node.inputfix = syntax?.inputfix
+        node.autoChange = FormulaInput.autoChange
+        node.insertHere = FormulaInput.insertHere
+        node.insOp = FormulaInput.insOp
+        node.enterHook = (event) => {
+          flushSync(() => syncDesktopValue(node.value ?? ''))
+          onEnterKey?.(event)
+        }
+      }
+      if (typeof inputRef === 'function') {
+        inputRef(node)
+      } else if (inputRef) {
+        inputRef.current = node
+      }
+    }
+
+    return (
+      <>
+        <TextField
+          fullWidth
+          value={value ?? ''}
+          onChange={(event) => onChange?.(event.target.value)}
+          onKeyDown={(event) => {
+            const input = desktopInputRef.current
+            if (!input) return
+            FormulaInput.keydown.call(input, event)
+            const nextValue = input.value ?? ''
+            if (nextValue !== valueRef.current) {
+              syncDesktopValue(nextValue)
+            }
+          }}
+          onFocus={onFocus}
+          onBlur={(event) => {
+            const input = desktopInputRef.current
+            if (input?.inputfix) {
+              const normalizedValue = input.inputfix(input.value ?? '')
+              if (normalizedValue !== input.value) {
+                input.value = normalizedValue
+                syncDesktopValue(normalizedValue)
+              }
+            }
+            onBlur?.(event)
+          }}
+          disabled={disabled}
+          placeholder={placeholder}
+          inputRef={setDesktopInputRef}
+          inputProps={{
+            autoComplete: 'off',
+            spellCheck: false,
+            'aria-label': ariaLabel,
+          }}
+          sx={{
+            '& .MuiInputBase-input': {
+              fontFamily: 'monospace',
+              fontSize: '1rem',
+            },
+          }}
+        />
+        <Box sx={{ mt: 1 }}>
+          <SymbolButtonRow
+            inputRef={desktopInputRef}
+            onValueChange={onChange}
+            disabled={disabled}
+            includeQuantifiers={includeQuantifiers}
+            extraInsertButtons={extraInsertButtons}
+          />
+        </Box>
+      </>
+    )
   }
 
   return (

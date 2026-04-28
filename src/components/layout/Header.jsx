@@ -10,7 +10,11 @@ import {
   useMediaQuery,
   useTheme,
 } from "@mui/material";
-import { Menu as MenuIcon, MenuBook as MenuBookIcon, ArrowBack as ArrowBackIcon } from "@mui/icons-material";
+import {
+  Menu as MenuIcon,
+  MenuBook as MenuBookIcon,
+  ArrowBack as ArrowBackIcon,
+} from "@mui/icons-material";
 import { ChevronRight } from "lucide-react";
 import { Link as RouterLink, useLocation } from "react-router-dom";
 import ThemeToggle from "./ThemeToggle.jsx";

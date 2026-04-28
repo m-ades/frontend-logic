@@ -16,7 +16,7 @@
     }
     
     .logicpenguin derivation-hurley .derivationline input.formulainput {
-        font-size: 14px !important;
+        font-size: 1.09375rem !important;
         min-width: 0 !important;
         padding: 0 !important;
         padding-inline: 0.5em !important;
@@ -26,7 +26,7 @@
     }
     
     .logicpenguin derivation-hurley .derivationline input.justification {
-        font-size: 14px !important;
+        font-size: 1.09375rem !important;
         width: 3.5em !important;
         min-width: 3.5em !important;
         max-width: 3.5em !important;
@@ -40,11 +40,11 @@
     .logicpenguin derivation-hurley .derivationcore {
         width: 100% !important;
         max-width: 100% !important;
-        font-size: 14px !important;
+        font-size: 1.09375rem !important;
     }
-    
+
     .logicpenguin derivation-hurley .derivationline .derivationlinenumber {
-        font-size: 14px !important;
+        font-size: 1.09375rem !important;
     }
     
     .logicpenguin derivation-hurley .innersubderiv {
@@ -118,14 +118,14 @@
     display: grid;
     grid-template-columns: 2fr 1fr;
     align-items: center;
-    gap: 12px;
+    gap: 0.9375rem;
 }
 
 .logicpenguin derivation-hurley .derivationline input.formulainput,
 .logicpenguin derivation-hurley .derivationline input.justification {
-    padding: 10px 12px;
+    padding: 0.78125rem 0.9375rem;
     line-height: 1.4;
-    height: 44px;
+    height: 3.4375rem;
 }
 
 .logicpenguin derivation-hurley .derivationline.derivationshowline .bottombar {

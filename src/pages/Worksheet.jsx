@@ -1252,7 +1252,12 @@ function RealWorksheetContent() {
   }
 
   return (
-    <Box sx={{ '& .logicpenguin': { fontSize: '16px' } }}>
+    <Box
+      sx={{
+        // keep the old baseline and let root scaling work
+        '& .logicpenguin': { fontSize: '1.25rem' },
+      }}
+    >
       <WorksheetLayout
         subtitle={currentWorksheet.title || "Predicate Logic: Natural Deduction"}
         onBackToLMS={() => navigate(backTarget)}

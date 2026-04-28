@@ -15,6 +15,8 @@ export default function ShellFrame({
   showAccountSettings = false,
   isAccountSettingsOpen = false,
   onCloseAccountSettings,
+  textSize = "default",
+  onTextSizeChange,
 }) {
   const { isRulesReferenceOpen } = useLayoutState();
   const mainContentRef = useRef(null);
@@ -98,6 +100,8 @@ export default function ShellFrame({
         <AccountSettingsDialog
           open={isAccountSettingsOpen}
           onClose={onCloseAccountSettings}
+          textSize={textSize}
+          onTextSizeChange={onTextSizeChange}
         />
       )}
       <RulesReference />
