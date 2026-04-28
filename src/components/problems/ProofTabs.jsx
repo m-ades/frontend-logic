@@ -591,15 +591,20 @@ function ProofTabs({
                         if (isDerivation) {
                           // only worksheets 14-16 and practice set (17) use derivation
                           // default to derivation if type is not specified (backwards compatibility)
+                          const derivationQuestionKey = JSON.stringify({
+                            premises: proof.premises || [],
+                            conclusion: proof.conclusion || '',
+                          })
                           return (
                             <ProofEditor
-                              key={`proof-${proof.id}`}
+                              key={`proof-${proof.id}-${derivationQuestionKey}`}
                               proof={proof}
                               problemLabel={problemLabel}
                               onProofComplete={onProofComplete}
                               savedState={savedStateWithAttempts}
-                              onStateChange={(state) => handleProofStateChange(proof.id, state, {
-                                assignmentQuestionId: proof.questionId
+                              onStateChange={(state, options = {}) => handleProofStateChange(proof.id, state, {
+                                assignmentQuestionId: proof.questionId,
+                                immediate: Boolean(options.immediate),
                               })}
                               isAssignmentLocked={isAssignmentLocked}
                               fullScreenOpen={fullScreenOpen}

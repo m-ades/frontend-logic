@@ -371,8 +371,18 @@ const extractLines = (savedState, premises = []) => {
   const lines = parts
     .filter((p) => !p.parts) // skip nested subderivations (not supported in simplified UI)
     .map(lineFromLP)
-  if (premises.length && lines.length >= premises.length) {
-    return lines.map((l, idx) => ({ ...l, readOnly: idx < premises.length }))
+  const savedPremiseCount = Array.isArray(ans?.prems) ? ans.prems.length : premises.length
+  if (premises.length || savedPremiseCount) {
+    // use the current question premises
+    const premLines = premises.map((p) => ({ formula: p, justification: '', readOnly: true }))
+    const savedEditableLines = lines.slice(savedPremiseCount)
+    const editableLines = savedEditableLines.length
+      ? savedEditableLines
+      : [{ formula: '', justification: '', readOnly: false }]
+    return [
+      ...premLines,
+      ...editableLines.map((line) => ({ ...line, readOnly: false })),
+    ]
   }
   return lines
 }
@@ -620,7 +630,7 @@ export default function DerivationTable({
     }
   }, [isFullScreen, initialFocusLineIndex, initialFocusField])
 
-  const emitState = useCallback((linesSnapshot) => {
+  const emitState = useCallback((linesSnapshot, options = {}) => {
     const submission = buildSubmission(
       linesSnapshot,
       proof?.conclusion,
@@ -628,8 +638,11 @@ export default function DerivationTable({
       normalizeFormulaForCheck,
       normalizeJustificationForSave
     )
+    if (options.immediate) {
+      return onStateChangeRef.current?.(submission, options)
+    }
     queueMicrotask(() => {
-      onStateChangeRef.current?.(submission)
+      onStateChangeRef.current?.(submission, options)
     })
   }, [premises, proof?.conclusion, normalizeFormulaForCheck, normalizeJustificationForSave])
 
@@ -1136,15 +1149,24 @@ export default function DerivationTable({
     }
   }
 
-  const handleStartOver = () => {
+  const handleStartOver = async () => {
     if (isLocked || isAssignmentLocked) return
+    const previousLines = lines
     const premLines = premises.map((p) => ({ formula: p, justification: '', readOnly: true }))
     const blanks = Array.from({ length: 1 }, () => ({ formula: '', justification: '', readOnly: false }))
     const nextLines = [...premLines, ...blanks]
     setLines(nextLines)
     setLastSubmitStatus(null)
     setStatusBanner({ status: 'unanswered', message: '' })
-    emitState(nextLines)
+    try {
+      await emitState(nextLines, { immediate: true })
+    } catch {
+      setLines(previousLines)
+      setStatusBanner({
+        status: 'malfunction',
+        message: 'Could not clear answer. Check your connection and try again.',
+      })
+    }
   }
 
   const hasStartedLine = lines.some((line) => (

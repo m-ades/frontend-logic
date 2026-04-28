@@ -9,6 +9,23 @@ export function useProofState({ userId = getActiveUserId() } = {}) {
     setSavedProofStates((prev) => ({ ...prev, ...initialStates }))
   }
 
+  const saveDraftNow = async (assignmentQuestionId, draftData) => {
+    if (!assignmentQuestionId) return null
+    if (saveTimersRef.current[assignmentQuestionId]) {
+      clearTimeout(saveTimersRef.current[assignmentQuestionId])
+      delete saveTimersRef.current[assignmentQuestionId]
+    }
+    return fetchJson('/api/assignment-drafts', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        assignment_question_id: assignmentQuestionId,
+        user_id: userId,
+        draft_data: draftData,
+      }),
+    })
+  }
+
   const scheduleDraftSave = (assignmentQuestionId, draftData) => {
     if (!assignmentQuestionId) return
     if (saveTimersRef.current[assignmentQuestionId]) {
@@ -16,22 +33,23 @@ export function useProofState({ userId = getActiveUserId() } = {}) {
     }
     saveTimersRef.current[assignmentQuestionId] = setTimeout(async () => {
       try {
-        await fetchJson('/api/assignment-drafts', {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            assignment_question_id: assignmentQuestionId,
-            user_id: userId,
-            draft_data: draftData,
-          }),
-        })
-      } catch (err) {
-        // ignore draft save errors for now
+        await saveDraftNow(assignmentQuestionId, draftData)
+      } catch {
+        // ignore autosave errors
       }
     }, 500)
   }
 
   const handleProofStateChange = (proofId, state, meta = {}) => {
+    if (meta.assignmentQuestionId && meta.immediate) {
+      return saveDraftNow(meta.assignmentQuestionId, state).then((result) => {
+        setSavedProofStates(prev => ({
+          ...prev,
+          [proofId]: state
+        }))
+        return result
+      })
+    }
     setSavedProofStates(prev => ({
       ...prev,
       [proofId]: state
@@ -39,6 +57,7 @@ export function useProofState({ userId = getActiveUserId() } = {}) {
     if (meta.assignmentQuestionId) {
       scheduleDraftSave(meta.assignmentQuestionId, state)
     }
+    return Promise.resolve(null)
   }
 
   const getSavedProofState = (proofId) => {
