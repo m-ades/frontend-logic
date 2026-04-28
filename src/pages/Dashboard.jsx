@@ -766,7 +766,7 @@ export default function Dashboard() {
               </Typography>
             ) : null}
             <Box role="img" aria-label="Assignment scores over time">
-              <ResponsiveContainer width="100%" height={350} minWidth={0} minHeight={0}>
+              <ResponsiveContainer width="100%" height={270} minWidth={0} minHeight={0}>
                 <LineChart data={mainChartData}>
                   <XAxis
                     dataKey="name"

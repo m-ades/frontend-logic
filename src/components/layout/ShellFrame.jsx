@@ -25,6 +25,7 @@ export default function ShellFrame({
   const hasDesktopPointer = useMediaQuery("(hover: hover) and (pointer: fine)");
   const isDesktopRulebookLayout = isLargeScreen && hasDesktopPointer;
   const shouldShiftShellForRulebook = isDesktopRulebookLayout && isRulesReferenceOpen;
+  const isDashboardRoute = /\/dashboard$/.test(location.pathname);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -84,6 +85,7 @@ export default function ShellFrame({
             sx={{
               flexGrow: 1,
               p: 3,
+              pb: isDashboardRoute ? 0 : 3,
               pt: /\/assignment\/[^/]+$/.test(location.pathname) ? 2 : 3,
               backgroundColor: "background.default",
               minHeight: { xs: "100vh", md: 0 },
