@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { createPortal } from 'react-dom'
+import { createPortal, flushSync } from 'react-dom'
 import { Box, Button, Stack, TextField } from '@mui/material'
 import { alpha } from '@mui/material/styles'
 import { useTheme, useMediaQuery } from '@mui/material'
@@ -256,6 +256,11 @@ export default function MobileLogicInput({
   }
 
   if (!mobileLogicKeyboardEnabled) {
+    const syncDesktopValue = (nextValue) => {
+      valueRef.current = nextValue
+      onChangeRef.current?.(nextValue)
+    }
+
     const setDesktopInputRef = (node) => {
       desktopInputRef.current = node
       if (node) {
@@ -266,7 +271,10 @@ export default function MobileLogicInput({
         node.autoChange = FormulaInput.autoChange
         node.insertHere = FormulaInput.insertHere
         node.insOp = FormulaInput.insOp
-        node.enterHook = onEnterKey
+        node.enterHook = (event) => {
+          flushSync(() => syncDesktopValue(node.value ?? ''))
+          onEnterKey?.(event)
+        }
       }
       if (typeof inputRef === 'function') {
         inputRef(node)
@@ -284,10 +292,10 @@ export default function MobileLogicInput({
           onKeyDown={(event) => {
             const input = desktopInputRef.current
             if (!input) return
-            const previousValue = input.value
             FormulaInput.keydown.call(input, event)
-            if (input.value !== previousValue) {
-              onChange?.(input.value)
+            const nextValue = input.value ?? ''
+            if (nextValue !== valueRef.current) {
+              syncDesktopValue(nextValue)
             }
           }}
           onFocus={onFocus}
@@ -297,7 +305,7 @@ export default function MobileLogicInput({
               const normalizedValue = input.inputfix(input.value ?? '')
               if (normalizedValue !== input.value) {
                 input.value = normalizedValue
-                onChange?.(normalizedValue)
+                syncDesktopValue(normalizedValue)
               }
             }
             onBlur?.(event)

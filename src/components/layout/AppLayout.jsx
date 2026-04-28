@@ -26,8 +26,12 @@ const TEXT_SIZE_OPTIONS = {
 function readTextSize() {
   if (typeof window === "undefined") return "default";
 
-  const savedValue = window.localStorage.getItem(TEXT_SIZE_STORAGE_KEY);
-  return savedValue && TEXT_SIZE_OPTIONS[savedValue] ? savedValue : "default";
+  try {
+    const savedValue = window.localStorage.getItem(TEXT_SIZE_STORAGE_KEY);
+    return savedValue && TEXT_SIZE_OPTIONS[savedValue] ? savedValue : "default";
+  } catch {
+    return "default";
+  }
 }
 
 function applyTextSize(size) {
