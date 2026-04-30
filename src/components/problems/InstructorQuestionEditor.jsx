@@ -24,6 +24,7 @@ import AddIcon from '@mui/icons-material/Add'
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
 import { fetchJson } from '../../utils/api.js'
 import getHurleyRuleset from '../../lib/logicpenguin/checkers/rules/hurley-rules.js'
+import getSyntax from '../../lib/logicpenguin/symbolic/libsyntax.js'
 
 // deep merge. source overwrites. arrays replace.
 function deepMerge(target, source) {
@@ -42,6 +43,21 @@ function deepMerge(target, source) {
 function typeKey(existing) {
   const e = existing && typeof existing === 'object' ? existing : {}
   return e.logic_problem_type !== undefined ? 'logic_problem_type' : (e.type !== undefined ? 'type' : 'logic_problem_type')
+}
+
+function normalizeFormulaInput(value) {
+  return getSyntax().inputfix(String(value ?? '')).trim()
+}
+
+function normalizeFormulaInputs(values) {
+  return (Array.isArray(values) ? values : (values ? [values] : [])).map(normalizeFormulaInput)
+}
+
+function normalizeArgumentInput(argument) {
+  const out = { ...(argument && typeof argument === 'object' ? argument : {}) }
+  if (out.premises !== undefined) out.premises = normalizeFormulaInputs(out.premises)
+  if (out.conclusion !== undefined) out.conclusion = normalizeFormulaInput(out.conclusion)
+  return out
 }
 
 const FORCE_UPPER_RULES = new Set(['UI', 'UG', 'EI', 'EG', 'MP', 'MT', 'HS', 'DS', 'CD', 'DN', 'DM', 'QN', 'CP', 'IP', 'ACP', 'AIP', 'PR'])
@@ -141,9 +157,17 @@ function buildTruthTableSnapshot(proof, edited, existing) {
   const truthTableData = {
     kind,
     options,
-    ...(kind === 'formula' && { statement: edited.statement ?? tt.statement ?? tt.formula ?? '' }),
-    ...(kind === 'equivalence' && { left: edited.left ?? tt.left ?? '', right: edited.right ?? tt.right ?? '' }),
-    ...(kind === 'argument' && { lefts: Array.isArray(edited.lefts) ? edited.lefts : (tt.lefts || []), right: edited.right ?? tt.right ?? '' }),
+    ...(kind === 'formula' && {
+      statement: normalizeFormulaInput(edited.statement ?? tt.statement ?? tt.formula ?? ''),
+    }),
+    ...(kind === 'equivalence' && {
+      left: normalizeFormulaInput(edited.left ?? tt.left ?? ''),
+      right: normalizeFormulaInput(edited.right ?? tt.right ?? ''),
+    }),
+    ...(kind === 'argument' && {
+      lefts: normalizeFormulaInputs(Array.isArray(edited.lefts) ? edited.lefts : (tt.lefts || [])),
+      right: normalizeFormulaInput(edited.right ?? tt.right ?? ''),
+    }),
   }
   const patch = { [typeKey(e)]: 'truth-table', prompt }
   const ttKey = e.truth_table !== undefined ? 'truth_table' : 'truthTable'
@@ -155,9 +179,9 @@ function buildIndirectTruthTableSnapshot(proof, edited, existing) {
   const itt = proof.indirectTruthTable || {}
   const e = existing && typeof existing === 'object' ? existing : {}
   const prompt = edited.prompt ?? itt.prompt ?? proof.description ?? ''
-  const argument = edited.argument ?? itt.argument ?? {}
+  const normalizedArgument = normalizeArgumentInput(edited.argument ?? itt.argument ?? {})
   const questions = Array.isArray(edited.questions) ? edited.questions : (itt.questions || itt.subquestions || [])
-  const patch = { [typeKey(e)]: 'indirect-truth-table', prompt, argument, questions }
+  const patch = { [typeKey(e)]: 'indirect-truth-table', prompt, argument: normalizedArgument, questions }
   if (edited.partialCredit !== undefined) {
     patch.partialCredit = edited.partialCredit
   }
@@ -169,12 +193,14 @@ function buildNonClassicalTruthTableSnapshot(proof, edited, existing) {
   const nctt = proof.nonclassicalTruthTable || {}
   const e = existing && typeof existing === 'object' ? existing : {}
   const prompt = edited.prompt ?? nctt.prompt ?? proof.description ?? ''
-  const argument = (edited.argument && typeof edited.argument === 'object') ? edited.argument : {}
+  const normalizedArgument = normalizeArgumentInput(
+    (edited.argument && typeof edited.argument === 'object') ? edited.argument : {}
+  )
   const questions = Array.isArray(edited.questions) ? edited.questions : (nctt.questions || nctt.subquestions || [])
   const truthValueToggle = Array.isArray(edited.truthValueToggle)
     ? edited.truthValueToggle
     : (Array.isArray(nctt.truthValueToggle) ? nctt.truthValueToggle : undefined)
-  const patch = { [typeKey(e)]: 'nonclassical-truth-table', prompt, argument, questions }
+  const patch = { [typeKey(e)]: 'nonclassical-truth-table', prompt, argument: normalizedArgument, questions }
   if (edited.partialCredit !== undefined) {
     patch.partialCredit = edited.partialCredit
   }
@@ -187,8 +213,8 @@ function buildNonClassicalTruthTableSnapshot(proof, edited, existing) {
 
 function buildDerivationSnapshot(proof, edited, existing) {
   const e = existing && typeof existing === 'object' ? existing : {}
-  const prems = edited.premises ?? proof.premises ?? proof.prems ?? []
-  const conclusion = edited.conclusion ?? proof.conclusion ?? proof.conc ?? ''
+  const prems = normalizeFormulaInputs(edited.premises ?? proof.premises ?? proof.prems ?? [])
+  const conclusion = normalizeFormulaInput(edited.conclusion ?? proof.conclusion ?? proof.conc ?? '')
   const prompt = edited.prompt ?? proof.description ?? ''
   const patch = { [typeKey(e)]: 'derivation', prompt, prems, conc: conclusion }
   const mergedRuleset = normalizeDerivationRuleset(
@@ -457,7 +483,7 @@ function TruthTableEditorForm({ proof, value, onChange }) {
         <TextField
           label="Statement"
           value={statement}
-          onChange={(e) => update({ statement: e.target.value })}
+          onChange={(e) => update({ statement: normalizeFormulaInput(e.target.value) })}
           fullWidth
           variant="outlined"
           placeholder="e.g. (P & Q) → R"
@@ -468,14 +494,14 @@ function TruthTableEditorForm({ proof, value, onChange }) {
           <TextField
             label="Left statement"
             value={left}
-            onChange={(e) => update({ left: e.target.value })}
+            onChange={(e) => update({ left: normalizeFormulaInput(e.target.value) })}
             fullWidth
             variant="outlined"
           />
           <TextField
             label="Right statement"
             value={right}
-            onChange={(e) => update({ right: e.target.value })}
+            onChange={(e) => update({ right: normalizeFormulaInput(e.target.value) })}
             fullWidth
             variant="outlined"
           />
@@ -492,7 +518,7 @@ function TruthTableEditorForm({ proof, value, onChange }) {
                   value={line}
                   onChange={(e) => {
                     const next = [...(lefts.length ? lefts : [''])]
-                    next[idx] = e.target.value
+                    next[idx] = normalizeFormulaInput(e.target.value)
                     update({ lefts: next })
                   }}
                   fullWidth
@@ -521,7 +547,7 @@ function TruthTableEditorForm({ proof, value, onChange }) {
           <TextField
             label="Conclusion"
             value={right}
-            onChange={(e) => update({ right: e.target.value })}
+            onChange={(e) => update({ right: normalizeFormulaInput(e.target.value) })}
             fullWidth
             variant="outlined"
           />
@@ -592,7 +618,7 @@ function IndirectTruthTableEditorForm({ proof, value, onChange }) {
               value={line}
               onChange={(e) => {
                 const next = [...(premises.length ? premises : [''])]
-                next[idx] = e.target.value
+                next[idx] = normalizeFormulaInput(e.target.value)
                 setPremises(next)
               }}
               fullWidth
@@ -610,7 +636,7 @@ function IndirectTruthTableEditorForm({ proof, value, onChange }) {
       <TextField
         label="Conclusion"
         value={conclusion}
-        onChange={(e) => setArgument({ conclusion: e.target.value })}
+        onChange={(e) => setArgument({ conclusion: normalizeFormulaInput(e.target.value) })}
         fullWidth
         variant="outlined"
       />
@@ -742,7 +768,7 @@ function DerivationEditorForm({ proof, value, onChange }) {
               value={line}
               onChange={(e) => {
                 const next = [...(premsList.length ? premsList : [''])]
-                next[idx] = e.target.value
+                next[idx] = normalizeFormulaInput(e.target.value)
                 update({ premises: next })
               }}
               fullWidth
@@ -760,7 +786,7 @@ function DerivationEditorForm({ proof, value, onChange }) {
       <TextField
         label="Conclusion"
         value={conclusion}
-        onChange={(e) => update({ conclusion: e.target.value })}
+        onChange={(e) => update({ conclusion: normalizeFormulaInput(e.target.value) })}
         fullWidth
         variant="outlined"
       />
@@ -810,7 +836,7 @@ function buildTrueFalseSnapshot(proof, edited, existing) {
 
 function buildEvaluateTruthSnapshot(proof, edited, existing) {
   const e = existing && typeof existing === 'object' ? existing : {}
-  const statement = edited.statement ?? proof.evaluateTruth ?? proof.description ?? ''
+  const statement = normalizeFormulaInput(edited.statement ?? proof.evaluateTruth ?? proof.description ?? '')
   const answer = edited.answer !== undefined ? edited.answer : (proof.answer ?? false)
   return { [typeKey(e)]: 'evaluate-truth', prompt: statement, statement, answer: Boolean(answer) }
 }
@@ -821,7 +847,7 @@ function buildSymbolicTranslationSnapshot(proof, edited, existing) {
   const prompt = edited.prompt ?? tr.prompt ?? proof.description ?? ''
   const rawKey = Array.isArray(edited.symbolizationKey) ? edited.symbolizationKey : (tr.symbolizationKey || [])
   const symbolizationKey = rawKey.filter((x) => x != null && String(x).trim() !== '')
-  const answer = edited.answer ?? proof.answer ?? tr.answer ?? ''
+  const answer = normalizeFormulaInput(edited.answer ?? proof.answer ?? tr.answer ?? '')
   const patch = { [typeKey(e)]: 'symbolic-translation', prompt, symbolizationKey, answer }
   if (e.legend !== undefined) patch.legend = edited.legend ?? tr.legend ?? proof.legend ?? ''
   return patch
@@ -829,7 +855,7 @@ function buildSymbolicTranslationSnapshot(proof, edited, existing) {
 
 function buildSingleRowTruthTableSnapshot(proof, edited, existing) {
   const sr = proof.singleRowTruthTable || {}
-  const statement = edited.statement ?? sr.statement ?? sr.formula ?? proof.description ?? ''
+  const statement = normalizeFormulaInput(edited.statement ?? sr.statement ?? sr.formula ?? proof.description ?? '')
   const prompt = edited.prompt ?? sr.prompt ?? proof.description ?? ''
   const editedInterp = edited.interpretation ?? sr.interpretation ?? {}
   const hasEditedInterp = editedInterp && typeof editedInterp === 'object' && Object.keys(editedInterp).length > 0
@@ -845,7 +871,7 @@ function buildSingleRowTruthTableSnapshot(proof, edited, existing) {
 function buildPartialTruthTableSnapshot(proof, edited, existing) {
   const pt = proof.partialTruthTable || {}
   const e = existing && typeof existing === 'object' ? existing : {}
-  const statement = edited.statement ?? pt.statement ?? pt.formula ?? ''
+  const statement = normalizeFormulaInput(edited.statement ?? pt.statement ?? pt.formula ?? '')
   const prompt = edited.prompt ?? pt.prompt ?? proof.description ?? ''
   const row = Array.isArray(edited.row) ? edited.row : (pt.row || [])
   return { [typeKey(e)]: 'partial-truth-table', prompt, statement, row }
@@ -862,7 +888,7 @@ function buildComboSnapshot(proof, edited, existing, comboTypeKey) {
     const answer =
       raw != null && raw !== ''
         ? typeof raw === 'string'
-          ? { argument: raw }
+          ? { argument: normalizeFormulaInput(raw) }
           : raw
         : proof.answer ?? snapshot.answer
     if (answer != null) patch.answer = answer
@@ -893,7 +919,7 @@ function EvaluateTruthEditorForm({ proof, value, onChange }) {
   const answer = value.answer ?? proof?.answer ?? false
   return (
     <Stack spacing={2}>
-      <TextField label="Statement" multiline minRows={1} value={statement} onChange={(e) => onChange({ ...value, statement: e.target.value })} fullWidth variant="outlined" placeholder="e.g. P & Q" />
+      <TextField label="Statement" multiline minRows={1} value={statement} onChange={(e) => onChange({ ...value, statement: normalizeFormulaInput(e.target.value) })} fullWidth variant="outlined" placeholder="e.g. P & Q" />
       <FormControl>
         <Typography variant="subtitle2" sx={{ mb: 1 }}>Correct answer</Typography>
         <RadioGroup row value={answer ? 'true' : 'false'} onChange={(e) => onChange({ ...value, answer: e.target.value === 'true' })}>
@@ -931,7 +957,7 @@ function SymbolicTranslationEditorForm({ proof, value, onChange }) {
         ))}
         <Button size="small" startIcon={<AddIcon />} onClick={() => onChange({ ...value, symbolizationKey: [...keyList, ''] })}>Add line</Button>
       </Box>
-      <TextField label="Correct answer" value={answer} onChange={(e) => onChange({ ...value, answer: e.target.value })} fullWidth variant="outlined" placeholder="e.g. P & Q" />
+      <TextField label="Correct answer" value={answer} onChange={(e) => onChange({ ...value, answer: normalizeFormulaInput(e.target.value) })} fullWidth variant="outlined" placeholder="e.g. P & Q" />
     </Stack>
   )
 }
@@ -942,7 +968,7 @@ function SingleRowTruthTableEditorForm({ proof, value, onChange }) {
   const prompt = value.prompt ?? sr.prompt ?? proof?.description ?? ''
   return (
     <Stack spacing={2}>
-      <TextField label="Statement" value={statement} onChange={(e) => onChange({ ...value, statement: e.target.value })} fullWidth variant="outlined" />
+      <TextField label="Statement" value={statement} onChange={(e) => onChange({ ...value, statement: normalizeFormulaInput(e.target.value) })} fullWidth variant="outlined" />
       <TextField label="Prompt" multiline minRows={1} value={prompt} onChange={(e) => onChange({ ...value, prompt: e.target.value })} fullWidth variant="outlined" />
     </Stack>
   )
@@ -959,7 +985,7 @@ function PartialTruthTableEditorForm({ proof, value, onChange }) {
   }
   return (
     <Stack spacing={2}>
-      <TextField label="Statement" value={statement} onChange={(e) => onChange({ ...value, statement: e.target.value })} fullWidth variant="outlined" />
+      <TextField label="Statement" value={statement} onChange={(e) => onChange({ ...value, statement: normalizeFormulaInput(e.target.value) })} fullWidth variant="outlined" />
       <TextField label="Prompt" value={prompt} onChange={(e) => onChange({ ...value, prompt: e.target.value })} fullWidth variant="outlined" />
       <TextField label="Given row" value={rowStr} onChange={(e) => setRow(e.target.value)} fullWidth variant="outlined" placeholder="T, F, , T" />
     </Stack>
@@ -987,7 +1013,7 @@ function ComboTruthTableEditorForm({ proof, value, onChange }) {
       <TextField
         label="Expected argument"
         value={argumentLine}
-        onChange={(e) => onChange({ ...value, argumentLine: e.target.value })}
+        onChange={(e) => onChange({ ...value, argumentLine: normalizeFormulaInput(e.target.value) })}
         fullWidth
         variant="outlined"
         placeholder="P ⊃ Q / P // Q"
