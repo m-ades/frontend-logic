@@ -297,11 +297,14 @@ export default function StudentProfileModal({
 
   if (!student) return null;
 
-  const roleLabel = student.role === "ta" ? "TA" : "Student";
+  const normalizedRole =
+    String(student.role || "student").toLowerCase() === "ta" ? "ta" : "student";
+  const roleLabel = normalizedRole === "ta" ? "TA" : "Student";
   const handleRoleClick = () => {
     if (!canToggleRole || !onToggleRole) return;
-    const newRole = student.role === "ta" ? "Student" : "TA";
-    const message = `Are you sure you want to change ${student.username}'s role to ${newRole}?`;
+    const newRole = normalizedRole === "ta" ? "student" : "ta";
+    const newRoleLabel = newRole === "ta" ? "TA" : "Student";
+    const message = `Change ${student.username}'s role to ${newRoleLabel}?`;
     if (window.confirm(message)) {
       onToggleRole(student, newRole);
     }
@@ -450,7 +453,7 @@ export default function StudentProfileModal({
                 role={canToggleRole && onToggleRole ? "button" : undefined}
                 aria-label={
                   canToggleRole && onToggleRole
-                    ? `Change role to ${student.role === "ta" ? "Student" : "TA"}`
+                    ? `Change role to ${normalizedRole === "ta" ? "Student" : "TA"}`
                     : undefined
                 }
               >

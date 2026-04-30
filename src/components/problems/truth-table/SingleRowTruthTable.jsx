@@ -18,7 +18,6 @@ const toSymbol = (value) => {
   if (value === false || value === 'F' || value === 'f' || value === 0) return 'F'
   return ''
 }
-const toBoolean = (value) => (value === 'T' ? true : value === 'F' ? false : null)
 
 export default function SingleRowTruthTable({
   problem,
@@ -82,6 +81,10 @@ export default function SingleRowTruthTable({
   }, [statement, syntax])
   const expectedRow = (evaluation?.row || []).map(toSymbol)
   const expectedCompound = toSymbol(evaluation?.tv)
+  const expectedAnswer = useMemo(() => ({
+    row: evaluation?.row || [],
+    tv: evaluation?.tv,
+  }), [evaluation])
 
   const isAtomicToken = useCallback((token) => {
     if (!token) return false
@@ -97,7 +100,7 @@ export default function SingleRowTruthTable({
           return toSymbol(interpretation?.[token])
         }
         if (savedState?.row?.[idx] !== undefined) {
-          return savedState.row[idx]
+          return toSymbol(savedState.row[idx])
         }
         return ''
       }),
@@ -135,8 +138,8 @@ export default function SingleRowTruthTable({
     scheduleDebouncedChange(onStateChangeTimerRef, onStateChange, next)
   }, [onStateChange])
   const buildDraftState = useCallback((nextRow, nextCompound) => ({
-    row: nextRow,
-    compound: nextCompound,
+    row: nextRow.map(toSymbol),
+    compound: toSymbol(nextCompound),
   }), [])
 
   const isDisabled = useCallback(() =>
@@ -146,12 +149,12 @@ export default function SingleRowTruthTable({
   [compoundInput, isAtomicToken, rowInputs, tokens])
 
   const { status, message, isChecking, handleCheck, handleStartOver, setStatus, setMessage, attemptCount, maxAttempts, isLocked } = useProblemChecker({
-    answer: expectedRow,
+    answer: expectedAnswer,
     problemType: 'single-row-truth-table',
     question: problem,
     getAnswer: () => ({
-      row: rowInputs.map(toBoolean),
-      compound: toBoolean(compoundInput),
+      row: rowInputs.map(toSymbol),
+      compound: toSymbol(compoundInput),
     }),
     onComplete,
     isDisabled,
@@ -165,6 +168,11 @@ export default function SingleRowTruthTable({
     attemptLimit,
     initialAttemptCount: savedState?.attemptCount ?? 0,
   })
+
+  const handleCheckCurrent = () => {
+    clearDebounce(onStateChangeTimerRef)
+    handleCheck()
+  }
 
   const handleCellChange = (index, value) => {
     if (readOnly || isLocked) return
@@ -246,7 +254,7 @@ export default function SingleRowTruthTable({
       onCloseStatus={() => setMessage('')}
       actionNode={!hideActions ? (
         <ProblemSetButtons
-          onCheck={handleCheck}
+          onCheck={handleCheckCurrent}
           onStartOver={handleStartOver}
           isChecking={isChecking}
           isDisabled={!tableFilled || isLocked || isAssignmentLocked}

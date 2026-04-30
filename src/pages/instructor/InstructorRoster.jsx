@@ -81,10 +81,11 @@ export default function InstructorRoster() {
   };
 
   const handleToggleRole = async (student, newRole) => {
+    const normalizedRole = String(newRole).toLowerCase() === "ta" ? "ta" : "student";
     try {
-      await courseActions.updateStudentRole?.(activeCourseId, student.id, newRole, gradebookByCourse[activeCourseId] || []);
+      await courseActions.updateStudentRole?.(activeCourseId, student.id, normalizedRole, gradebookByCourse[activeCourseId] || []);
       setSelectedStudent((prev) =>
-        prev?.id === student.id ? { ...prev, role: newRole } : prev
+        prev?.id === student.id ? { ...prev, role: normalizedRole } : prev
       );
     } catch (err) {
       console.error("Failed to update role:", err);

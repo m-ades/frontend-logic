@@ -224,9 +224,10 @@ export function createAppRuntime({ coursesDispatch, coursesState, routeKind, use
       return newStudents;
     },
     updateStudentRole: async (courseId, userId, role, existingStudents = []) => {
-      await updateEnrollmentRole(courseId, userId, role);
+      const normalizedRole = String(role).toLowerCase() === "ta" ? "ta" : "student";
+      await updateEnrollmentRole(courseId, userId, normalizedRole);
       const updated = existingStudents.map((student) =>
-        student.id === userId ? { ...student, role } : student
+        student.id === userId ? { ...student, role: normalizedRole } : student
       );
       coursesDispatch({ type: "SET_GRADEBOOK", courseId, payload: updated });
       return updated;

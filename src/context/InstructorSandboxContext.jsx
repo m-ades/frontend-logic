@@ -564,10 +564,11 @@ export function InstructorSandboxProvider({ children }) {
   }
 
   const updateStudentRole = async (courseId, userId, role) => {
+    const normalizedRole = String(role).toLowerCase() === 'ta' ? 'ta' : 'student'
     setState((prev) => ({
       ...prev,
       gradebookByCourse: mapByCourse(prev.gradebookByCourse, courseId, (student) => (
-        student.id === userId ? { ...student, role } : student
+        student.id === userId ? { ...student, role: normalizedRole } : student
       )),
     }))
   }
