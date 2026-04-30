@@ -95,6 +95,7 @@ function inputfix(s) {
     // convert plaintext shorthands to Hurley's notation
     rv = rv.replace(/-->/g, this.symbols.IFTHEN);
     rv = rv.replace(/->/g, this.symbols.IFTHEN);
+    rv = rv.replace(/>/g, this.symbols.IFTHEN);
     if (this.symbols.AND != '&') {
         rv = rv.replace(/&/g, this.symbols.AND);
     }
