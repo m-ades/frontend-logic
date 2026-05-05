@@ -16,7 +16,6 @@ import {
   TableCell,
   TableBody,
   Popover,
-  Divider,
   alpha,
   useTheme,
   TextField,
@@ -26,6 +25,7 @@ import {
   Alert,
   LinearProgress,
 } from "@mui/material";
+import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import {
   X,
   User,
@@ -34,7 +34,6 @@ import {
   Award,
   Clock,
   CheckCircle,
-  AlertCircle,
 } from "lucide-react";
 import {
   getLetterGrade,
@@ -72,22 +71,48 @@ function calculateTrend(grades, assignments) {
   return diff > 0 ? "improving" : "declining";
 }
 
+const statusColors = {
+  completed: "#10b981",
+  inProgress: "#6366f1",
+  notStarted: "#64748b",
+  incomplete: "#f97316",
+  missing: "#ef4444",
+  notReleased: "#94a3b8",
+  lateMarker: "#f59e0b",
+};
+
+const filledStatusChip = (color) => ({
+  bgcolor: color,
+  color: "common.white",
+});
+
 const statusChip = {
   completed: {
     label: "Completed",
-    color: "success",
     title: "All questions submitted",
+    sx: filledStatusChip(statusColors.completed),
   },
-  inProgress: { label: "In Progress", color: "info" },
-  notStarted: { label: "Not started", color: "default" },
-  late: { label: "Late", sx: { bgcolor: "#f59e0b", color: "common.white" } },
+  inProgress: {
+    label: "In Progress",
+    sx: filledStatusChip(statusColors.inProgress),
+  },
+  notStarted: {
+    label: "Not started",
+    sx: filledStatusChip(statusColors.notStarted),
+  },
   incomplete: {
     label: "Incomplete",
     variant: "outlined",
-    sx: { borderColor: "#f97316", color: "#f97316" },
+    sx: { borderColor: statusColors.incomplete, color: statusColors.incomplete },
   },
-  missing: { label: "Missing", color: "error" },
-  notReleased: { label: "Not released", color: "default" },
+  missing: {
+    label: "Missing",
+    sx: filledStatusChip(statusColors.missing),
+  },
+  notReleased: {
+    label: "Not released",
+    sx: filledStatusChip(statusColors.notReleased),
+  },
 };
 
 const statusByState = {
@@ -97,8 +122,8 @@ const statusByState = {
     none: "notStarted",
   },
   grace: {
-    complete: "late",
-    partial: "late",
+    complete: "completed",
+    partial: "incomplete",
     none: "missing",
   },
   after: {
@@ -107,6 +132,22 @@ const statusByState = {
     none: "missing",
   },
 };
+
+const headerCellSx = {
+  fontWeight: 600,
+  backgroundColor: "background.paper",
+};
+
+const lateIconSx = {
+  position: "absolute",
+  left: "calc(100% + 4px)",
+  top: "50%",
+  transform: "translateY(-50%)",
+  fontSize: 16,
+  color: statusColors.lateMarker,
+};
+
+const lateIconStatuses = new Set(["completed", "incomplete"]);
 
 const exactChipColor = (color) =>
   color && color !== "default"
@@ -118,6 +159,11 @@ const makeDeadlineMap = (rows = []) =>
     if (row?.assignment_id) map[row.assignment_id] = row;
     return map;
   }, {});
+
+const fetchDeadlineMap = async (courseActions, activeCourseId, studentId) =>
+  makeDeadlineMap(
+    await courseActions.getDeadlines?.(activeCourseId, studentId)
+  );
 
 const getGradeMeta = (grade, gradingScale) => {
   const color = getGradeColor(grade, gradingScale);
@@ -163,10 +209,6 @@ export default function StudentProfileModal({
   const [extensionPopoverAssignmentId, setExtensionPopoverAssignmentId] =
     useState(null);
 
-  const nonPracticeAssignments = useMemo(
-    () => assignments.filter((a) => a.kind !== "practice"),
-    [assignments]
-  );
   const extensionPopoverAssignment = useMemo(() => {
     if (!extensionPopoverAssignmentId) return null;
     return assignments.find(
@@ -208,9 +250,9 @@ export default function StudentProfileModal({
     let isMounted = true;
     const load = async () => {
       try {
-        const rows = await courseActions.getDeadlines?.(activeCourseId, student.id);
+        const map = await fetchDeadlineMap(courseActions, activeCourseId, student.id);
         if (!isMounted) return;
-        setDeadlineMap(makeDeadlineMap(rows));
+        setDeadlineMap(map);
       } catch (err) {
         if (!isMounted) return;
         setDeadlineMap({});
@@ -221,17 +263,6 @@ export default function StudentProfileModal({
       isMounted = false;
     };
   }, [open, student, activeCourseId, canEditAccommodations, courseActions]);
-
-  // default extension picker to the assignment due date
-  useEffect(() => {
-    if (!extensionAssignmentId) return;
-    const assignment = nonPracticeAssignments.find(
-      (a) => String(a.id) === String(extensionAssignmentId)
-    );
-    if (!assignment) return;
-    setExtensionDate(assignment.dueDate || "");
-    setExtensionTime(assignment.dueTime || "23:59");
-  }, [extensionAssignmentId, nonPracticeAssignments]);
 
   // compose a single timestamp for the api
   const buildIsoDateTime = (date, time) => {
@@ -254,10 +285,10 @@ export default function StudentProfileModal({
       };
       await courseActions.saveAccommodations?.(activeCourseId, student.id, payload);
       try {
-        const rows = await courseActions.getDeadlines?.(activeCourseId, student.id);
-        setDeadlineMap(makeDeadlineMap(rows));
+        const map = await fetchDeadlineMap(courseActions, activeCourseId, student.id);
+        setDeadlineMap(map);
       } catch (err) {
-        setDeadlineMap((prev) => prev);
+        // keep existing deadlines
       }
       setAccommodationSaved(true);
       setAccommodationAnchorEl(null);
@@ -295,8 +326,8 @@ export default function StudentProfileModal({
     try {
       await courseActions.saveDeadline?.(activeCourseId, assignmentId, student.id, iso);
       try {
-        const rows = await courseActions.getDeadlines?.(activeCourseId, student.id);
-        setDeadlineMap(makeDeadlineMap(rows));
+        const map = await fetchDeadlineMap(courseActions, activeCourseId, student.id);
+        setDeadlineMap(map);
       } catch (err) {
         setDeadlineMap((prev) => ({
           ...prev,
@@ -376,7 +407,6 @@ export default function StudentProfileModal({
     const time =
       !dueAt || now <= dueAt ? "before" : !cutoffAt || now <= cutoffAt ? "grace" : "after";
 
-    if (student.lateSubmissions?.[assignment.id]) return "late";
     return statusByState[time][submission];
   };
 
@@ -384,6 +414,7 @@ export default function StudentProfileModal({
     ...assignment,
     studentGrade: student.grades[assignment.id],
     status: getAssignmentStatus(assignment),
+    submittedLate: Boolean(student.lateSubmissions?.[assignment.id]),
   }));
   const unlockedAssignmentDetails = assignmentDetails.filter(
     (assignment) => assignment.status !== "notReleased"
@@ -400,7 +431,7 @@ export default function StudentProfileModal({
     : 0;
 
   // Grade distribution
-  const gradeValues = Object.values(student.grades);
+  const gradeValues = Object.values(student.grades).filter(Number.isFinite);
   const highestGrade = gradeValues.length > 0 ? Math.max(...gradeValues) : 0;
   const lowestGrade = gradeValues.length > 0 ? Math.min(...gradeValues) : 0;
 
@@ -654,9 +685,7 @@ export default function StudentProfileModal({
           <MetricCard
             title="Missing"
             value={missingAssignments}
-            subtitle={
-              missingAssignments === 0 ? "All done! 🎉" : "Assignments due"
-            }
+            subtitle={missingAssignments === 0 ? "All done" : "Assignments due"}
             icon={Clock}
             gradient={["#ef4444", "#dc2626"]}
           />
@@ -798,47 +827,19 @@ export default function StudentProfileModal({
             <Table stickyHeader size="small">
               <TableHead>
                 <TableRow>
-                  <TableCell
-                    sx={{
-                      fontWeight: 600,
-                      backgroundColor: "background.paper",
-                    }}
-                  >
+                  <TableCell sx={headerCellSx}>
                     Assignment
                   </TableCell>
-                  <TableCell
-                    sx={{
-                      fontWeight: 600,
-                      backgroundColor: "background.paper",
-                    }}
-                  >
+                  <TableCell sx={headerCellSx}>
                     Due Date
                   </TableCell>
-                  <TableCell
-                    align="center"
-                    sx={{
-                      fontWeight: 600,
-                      backgroundColor: "background.paper",
-                    }}
-                  >
+                  <TableCell align="center" sx={headerCellSx}>
                     Grade
                   </TableCell>
-                  <TableCell
-                    align="center"
-                    sx={{
-                      fontWeight: 600,
-                      backgroundColor: "background.paper",
-                    }}
-                  >
+                  <TableCell align="center" sx={headerCellSx}>
                     Letter
                   </TableCell>
-                  <TableCell
-                    align="center"
-                    sx={{
-                      fontWeight: 600,
-                      backgroundColor: "background.paper",
-                    }}
-                  >
+                  <TableCell align="center" sx={headerCellSx}>
                     Submission
                   </TableCell>
                 </TableRow>
@@ -848,6 +849,9 @@ export default function StudentProfileModal({
                   const extensionInfo = getExtensionInfo(assignment);
                   const accommodationInfo = getAccommodationInfo(assignment);
                   const status = statusChip[assignment.status] || statusChip.missing;
+                  const showLateIcon =
+                    assignment.submittedLate &&
+                    lateIconStatuses.has(assignment.status);
                   const gradeMeta =
                     assignment.studentGrade !== undefined
                       ? getGradeMeta(assignment.studentGrade, gradingScale)
@@ -929,14 +933,27 @@ export default function StudentProfileModal({
                         )}
                       </TableCell>
                       <TableCell align="center">
-                        <Chip
-                          label={status.label}
-                          color={status.color}
-                          variant={status.variant}
-                          title={status.title}
-                          size="small"
-                          sx={{ minWidth: 96, ...status.sx }}
-                        />
+                        <Box
+                          sx={{
+                            position: "relative",
+                            display: "inline-flex",
+                            justifyContent: "center",
+                          }}
+                        >
+                          <Chip
+                            label={status.label}
+                            variant={status.variant}
+                            title={status.title}
+                            size="small"
+                            sx={{ minWidth: 96, ...status.sx }}
+                          />
+                          {showLateIcon && (
+                            <AccessTimeIcon
+                              titleAccess="submitted late"
+                              sx={lateIconSx}
+                            />
+                          )}
+                        </Box>
                       </TableCell>
                     </TableRow>
                   );
