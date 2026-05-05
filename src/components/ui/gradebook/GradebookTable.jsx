@@ -19,19 +19,9 @@ import {
   isPassingGrade,
   getDefaultGradingScale,
 } from "../../../utils/gradingUtils";
+import { getStudentAverage } from "../../../utils/GradebookUtils";
 import StudentProfileModal from "../StudentProfileModal";
 import { useAppRuntime } from "../../../hooks/useAppRuntime.js";
-
-// Helper function to calculate average
-function calculateAverage(grades) {
-  const validGrades = Object.values(grades).filter(
-    (g) => g !== undefined && g !== null && !isNaN(g)
-  );
-  if (validGrades.length === 0) return 0;
-  return Math.round(
-    validGrades.reduce((sum, grade) => sum + grade, 0) / validGrades.length
-  );
-}
 
 function splitAssignmentTitle(name = "") {
   const trimmed = String(name || "").trim();
@@ -198,7 +188,7 @@ export default function GradebookTable({
 
             <TableBody>
               {students.map((student) => {
-                const average = calculateAverage(student.grades);
+                const average = getStudentAverage(student);
                 const letterGrade = getLetterGrade(average, gradingScale);
                 const gradeColorVariant = getGradeColorVariant(
                   average,

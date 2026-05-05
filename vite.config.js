@@ -17,6 +17,17 @@ export default defineConfig(({ mode }) => {
         '@': path.resolve(__dirname, 'src'),
       },
     },
+    optimizeDeps: {
+      include: [
+        '@emotion/react',
+        '@emotion/styled',
+        '@mui/icons-material',
+        '@mui/material',
+        '@mui/x-data-grid',
+        'hoist-non-react-statics',
+        'prop-types',
+      ],
+    },
     base: '/',
     server: {
       proxy: {

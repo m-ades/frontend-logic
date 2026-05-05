@@ -201,13 +201,20 @@ export async function fetchCourseAssignmentsAndPractices(courseId) {
 }
 
 export async function fetchCourseGradebook(courseId) {
-  const data = await fetchJson(`/api/analytics/gradebook?courseId=${courseId}`);
+  const data = await fetchJson(`/api/analytics/gradebook?courseId=${courseId}&dropLowestN=2`);
   const students = (data?.students || []).map((student) => {
     const grades = {};
     const submittedAssignments = {};
+    const submittedQuestionCounts = {};
+    const lateSubmissions = {};
     (student.assignments || []).forEach((assignment) => {
+      submittedQuestionCounts[assignment.assignment_id] =
+        Number(assignment.submitted_count) || 0;
       if (assignment.has_submission) {
         submittedAssignments[assignment.assignment_id] = true;
+      }
+      if (assignment.has_late_submission) {
+        lateSubmissions[assignment.assignment_id] = true;
       }
       if (assignment.has_grade && assignment.max_score > 0) {
         grades[assignment.assignment_id] = Math.round(
@@ -222,9 +229,15 @@ export async function fetchCourseGradebook(courseId) {
       id: student.user_id,
       username: student.username,
       role,
+      average:
+        student.dropped?.average_percent !== null &&
+        student.dropped?.average_percent !== undefined
+          ? Math.round(student.dropped.average_percent * 100)
+          : 0,
       grades,
       submittedAssignments,
-      lateSubmissions: {},
+      submittedQuestionCounts,
+      lateSubmissions,
       submissionDates: {},
       practices: {},
     };

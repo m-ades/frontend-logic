@@ -1,5 +1,6 @@
 // Utility functions for roster management
 import { parseDueDateAsEastern } from "./easternTime.js";
+import { getStudentAverage } from "./GradebookUtils.js";
 
 const getAssignmentDeadline = (assignment) => {
   if (!assignment?.dueDate) return null;
@@ -33,10 +34,7 @@ export function getStudentStats(student, assignments) {
           pastDueAssignmentIds.has(Number(assignmentId)))
     )
     .map(([, grade]) => grade);
-  const average =
-    grades.length > 0
-      ? Math.round(grades.reduce((sum, g) => sum + g, 0) / grades.length)
-      : 0;
+  const average = getStudentAverage(student);
   const completed = grades.length;
   const lateCount = Object.entries(student.lateSubmissions || {}).filter(
     ([assignmentId, isLate]) =>
