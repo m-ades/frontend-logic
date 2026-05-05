@@ -136,10 +136,10 @@ function getQuantifierInsertButtonsFromFormulaText(formulaText) {
   const seen = new Set()
   const buttons = []
 
-  for (const [, insert] of String(formulaText ?? '').matchAll(/(\(?[∀∃][y-z]\)?\[?)/g)) {
-    if (seen.has(insert)) continue
-    seen.add(insert)
-    buttons.push({ insert })
+  for (const [, variable] of String(formulaText ?? '').matchAll(/[∀∃]([y-z])/g)) {
+    if (seen.has(variable)) continue
+    seen.add(variable)
+    buttons.push({ insert: `(∀${variable})` }, { insert: `(∃${variable})` })
   }
 
   return buttons
