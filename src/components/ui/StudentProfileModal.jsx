@@ -16,7 +16,6 @@ import {
   TableCell,
   TableBody,
   Popover,
-  Divider,
   alpha,
   useTheme,
   TextField,
@@ -26,6 +25,7 @@ import {
   Alert,
   LinearProgress,
 } from "@mui/material";
+import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import {
   X,
   User,
@@ -34,29 +34,21 @@ import {
   Award,
   Clock,
   CheckCircle,
-  AlertCircle,
 } from "lucide-react";
 import {
   getLetterGrade,
-  getGradeColorVariant,
-  isPassingGrade,
+  getGradeColor,
   getDefaultGradingScale,
 } from "../../utils/gradingUtils";
 import { formatDate } from "../../utils/formatting.js";
-import { formatEasternFromIso, formatEasternDateTime } from "../../utils/easternTime.js";
+import {
+  formatEasternFromIso,
+  formatEasternDateTime,
+  parseDueDateAsEastern,
+} from "../../utils/easternTime.js";
 import { MetricCard } from "./MetricCard";
 import { useAppRuntime } from "../../hooks/useAppRuntime.js";
-
-// Helper function to calculate average
-function calculateAverage(grades) {
-  const validGrades = Object.values(grades).filter(
-    (g) => g !== undefined && g !== null && !isNaN(g)
-  );
-  if (validGrades.length === 0) return 0;
-  return Math.round(
-    validGrades.reduce((sum, grade) => sum + grade, 0) / validGrades.length
-  );
-}
+import { getStudentAverage } from "../../utils/GradebookUtils.js";
 
 function calculateTrend(grades, assignments) {
   if (assignments.length < 3) return null;
@@ -78,6 +70,110 @@ function calculateTrend(grades, assignments) {
   if (Math.abs(diff) < 2) return "stable";
   return diff > 0 ? "improving" : "declining";
 }
+
+const statusColors = {
+  completed: "#10b981",
+  inProgress: "#6366f1",
+  notStarted: "#64748b",
+  incomplete: "#f97316",
+  missing: "#ef4444",
+  notReleased: "#94a3b8",
+  lateMarker: "#f59e0b",
+};
+
+const filledStatusChip = (color) => ({
+  bgcolor: color,
+  color: "common.white",
+});
+
+const statusChip = {
+  completed: {
+    label: "Completed",
+    title: "All questions submitted",
+    sx: filledStatusChip(statusColors.completed),
+  },
+  inProgress: {
+    label: "In Progress",
+    sx: filledStatusChip(statusColors.inProgress),
+  },
+  notStarted: {
+    label: "Not started",
+    sx: filledStatusChip(statusColors.notStarted),
+  },
+  incomplete: {
+    label: "Incomplete",
+    variant: "outlined",
+    sx: { borderColor: statusColors.incomplete, color: statusColors.incomplete },
+  },
+  missing: {
+    label: "Missing",
+    sx: filledStatusChip(statusColors.missing),
+  },
+  notReleased: {
+    label: "Not released",
+    sx: filledStatusChip(statusColors.notReleased),
+  },
+};
+
+const statusByState = {
+  before: {
+    complete: "completed",
+    partial: "inProgress",
+    none: "notStarted",
+  },
+  grace: {
+    complete: "completed",
+    partial: "incomplete",
+    none: "missing",
+  },
+  after: {
+    complete: "completed",
+    partial: "incomplete",
+    none: "missing",
+  },
+};
+
+const headerCellSx = {
+  fontWeight: 600,
+  backgroundColor: "background.paper",
+};
+
+const lateIconSx = {
+  position: "absolute",
+  left: "calc(100% + 4px)",
+  top: "50%",
+  transform: "translateY(-50%)",
+  fontSize: 16,
+  color: statusColors.lateMarker,
+};
+
+const lateIconStatuses = new Set(["completed", "incomplete"]);
+
+const exactChipColor = (color) =>
+  color && color !== "default"
+    ? { bgcolor: color, color: "common.white" }
+    : {};
+
+const makeDeadlineMap = (rows = []) =>
+  rows.reduce((map, row) => {
+    if (row?.assignment_id) map[row.assignment_id] = row;
+    return map;
+  }, {});
+
+const fetchDeadlineMap = async (courseActions, activeCourseId, studentId) =>
+  makeDeadlineMap(
+    await courseActions.getDeadlines?.(activeCourseId, studentId)
+  );
+
+const getGradeMeta = (grade, gradingScale) => {
+  const color = getGradeColor(grade, gradingScale);
+  return {
+    letter: getLetterGrade(grade, gradingScale),
+    chipColor: color === "default" ? "default" : undefined,
+    chipSx: exactChipColor(color),
+    textColor: color === "default" ? "text.primary" : color,
+  };
+};
 
 export default function StudentProfileModal({
   open,
@@ -113,10 +209,6 @@ export default function StudentProfileModal({
   const [extensionPopoverAssignmentId, setExtensionPopoverAssignmentId] =
     useState(null);
 
-  const nonPracticeAssignments = useMemo(
-    () => assignments.filter((a) => a.kind !== "practice"),
-    [assignments]
-  );
   const extensionPopoverAssignment = useMemo(() => {
     if (!extensionPopoverAssignmentId) return null;
     return assignments.find(
@@ -158,13 +250,8 @@ export default function StudentProfileModal({
     let isMounted = true;
     const load = async () => {
       try {
-        const rows = await courseActions.getDeadlines?.(activeCourseId, student.id);
+        const map = await fetchDeadlineMap(courseActions, activeCourseId, student.id);
         if (!isMounted) return;
-        const map = {};
-        (rows || []).forEach((row) => {
-          if (!row?.assignment_id) return;
-          map[row.assignment_id] = row;
-        });
         setDeadlineMap(map);
       } catch (err) {
         if (!isMounted) return;
@@ -176,17 +263,6 @@ export default function StudentProfileModal({
       isMounted = false;
     };
   }, [open, student, activeCourseId, canEditAccommodations, courseActions]);
-
-  // default extension picker to the assignment due date
-  useEffect(() => {
-    if (!extensionAssignmentId) return;
-    const assignment = nonPracticeAssignments.find(
-      (a) => String(a.id) === String(extensionAssignmentId)
-    );
-    if (!assignment) return;
-    setExtensionDate(assignment.dueDate || "");
-    setExtensionTime(assignment.dueTime || "23:59");
-  }, [extensionAssignmentId, nonPracticeAssignments]);
 
   // compose a single timestamp for the api
   const buildIsoDateTime = (date, time) => {
@@ -209,15 +285,10 @@ export default function StudentProfileModal({
       };
       await courseActions.saveAccommodations?.(activeCourseId, student.id, payload);
       try {
-        const rows = await courseActions.getDeadlines?.(activeCourseId, student.id);
-        const map = {};
-        (rows || []).forEach((row) => {
-          if (!row?.assignment_id) return;
-          map[row.assignment_id] = row;
-        });
+        const map = await fetchDeadlineMap(courseActions, activeCourseId, student.id);
         setDeadlineMap(map);
       } catch (err) {
-        setDeadlineMap((prev) => prev);
+        // keep existing deadlines
       }
       setAccommodationSaved(true);
       setAccommodationAnchorEl(null);
@@ -255,12 +326,7 @@ export default function StudentProfileModal({
     try {
       await courseActions.saveDeadline?.(activeCourseId, assignmentId, student.id, iso);
       try {
-        const rows = await courseActions.getDeadlines?.(activeCourseId, student.id);
-        const map = {};
-        (rows || []).forEach((row) => {
-          if (!row?.assignment_id) return;
-          map[row.assignment_id] = row;
-        });
+        const map = await fetchDeadlineMap(courseActions, activeCourseId, student.id);
         setDeadlineMap(map);
       } catch (err) {
         setDeadlineMap((prev) => ({
@@ -310,47 +376,67 @@ export default function StudentProfileModal({
     }
   };
 
-  const average = calculateAverage(student.grades);
-  const letterGrade = getLetterGrade(average, gradingScale);
-  const gradeColorVariant = getGradeColorVariant(average, gradingScale);
+  const average = getStudentAverage(student);
+  const averageGrade = getGradeMeta(average, gradingScale);
 
   const isAssignmentLocked = (assignment) =>
     assignment.is_locked === true || assignment.isLocked === true;
-  const unlockedAssignments = assignments.filter(
-    (assignment) => !isAssignmentLocked(assignment)
-  );
+  const getAssignmentStatus = (assignment) => {
+    if (isAssignmentLocked(assignment)) return "notReleased";
 
-  // Calculate stats (unlocked only)
-  const totalAssignments = unlockedAssignments.length;
-  const completedAssignments = unlockedAssignments.filter((assignment) => {
-    const grade = student.grades[assignment.id];
-    return typeof grade === "number" && grade > 0;
-  }).length;
-  const missingAssignments = totalAssignments - completedAssignments;
+    const submitted = Number(student.submittedQuestionCounts?.[assignment.id] || 0);
+    const total = Number(assignment.questionCount || assignment.question_count || 0);
+    const submission =
+      total > 0 && submitted >= total
+        ? "complete"
+        : submitted > 0
+        ? "partial"
+        : "none";
+    const dueAt = deadlineMap?.[assignment.id]?.due_at
+      ? new Date(deadlineMap[assignment.id].due_at)
+      : assignment.dueAt
+      ? new Date(assignment.dueAt)
+      : parseDueDateAsEastern(assignment.dueDate, assignment.dueTime || "23:59");
+    const lateDays = Number(assignment.lateWindowDays || assignment.late_window_days || 0);
+    const cutoffAt = deadlineMap?.[assignment.id]?.cutoff_at
+      ? new Date(deadlineMap[assignment.id].cutoff_at)
+      : dueAt && lateDays > 0
+      ? new Date(dueAt.getTime() + lateDays * 24 * 60 * 60 * 1000)
+      : dueAt;
+    const now = new Date();
+    const time =
+      !dueAt || now <= dueAt ? "before" : !cutoffAt || now <= cutoffAt ? "grace" : "after";
+
+    return statusByState[time][submission];
+  };
+
+  const assignmentDetails = assignments.map((assignment) => ({
+    ...assignment,
+    studentGrade: student.grades[assignment.id],
+    status: getAssignmentStatus(assignment),
+    submittedLate: Boolean(student.lateSubmissions?.[assignment.id]),
+  }));
+  const unlockedAssignmentDetails = assignmentDetails.filter(
+    (assignment) => assignment.status !== "notReleased"
+  );
+  const totalAssignments = unlockedAssignmentDetails.length;
+  const completedAssignments = unlockedAssignmentDetails.filter(
+    (assignment) => assignment.status === "completed"
+  ).length;
+  const missingAssignments = unlockedAssignmentDetails.filter(
+    (assignment) => assignment.status === "missing"
+  ).length;
   const completionRate = totalAssignments
     ? Math.round((completedAssignments / totalAssignments) * 100)
     : 0;
 
   // Grade distribution
-  const gradeValues = Object.values(student.grades);
+  const gradeValues = Object.values(student.grades).filter(Number.isFinite);
   const highestGrade = gradeValues.length > 0 ? Math.max(...gradeValues) : 0;
   const lowestGrade = gradeValues.length > 0 ? Math.min(...gradeValues) : 0;
 
   // Performance trend
   const trend = calculateTrend(student.grades, assignments);
-
-  // Assignment details with grades
-  const assignmentDetails = assignments.map((assignment) => {
-    const grade = student.grades[assignment.id];
-    const hasGrade = typeof grade === "number" && grade > 0;
-    const isUnlocked = !isAssignmentLocked(assignment);
-    const status = hasGrade ? "completed" : isUnlocked ? "missing" : "locked";
-    return {
-      ...assignment,
-      studentGrade: grade,
-      status,
-    };
-  });
 
   const getBaseDueLabel = (assignment) => {
     if (assignment.dueAt) {
@@ -526,9 +612,14 @@ export default function StudentProfileModal({
                   {average}%
                 </Typography>
                 <Chip
-                  label={letterGrade}
-                  color={gradeColorVariant}
-                  sx={{ fontWeight: 700, fontSize: "1rem", height: 32 }}
+                  label={averageGrade.letter}
+                  color={averageGrade.chipColor}
+                  sx={{
+                    fontWeight: 700,
+                    fontSize: "1rem",
+                    height: 32,
+                    ...averageGrade.chipSx,
+                  }}
                 />
               </Box>
             </Grid>
@@ -594,9 +685,7 @@ export default function StudentProfileModal({
           <MetricCard
             title="Missing"
             value={missingAssignments}
-            subtitle={
-              missingAssignments === 0 ? "All done! 🎉" : "Assignments due"
-            }
+            subtitle={missingAssignments === 0 ? "All done" : "Assignments due"}
             icon={Clock}
             gradient={["#ef4444", "#dc2626"]}
           />
@@ -738,48 +827,20 @@ export default function StudentProfileModal({
             <Table stickyHeader size="small">
               <TableHead>
                 <TableRow>
-                  <TableCell
-                    sx={{
-                      fontWeight: 600,
-                      backgroundColor: "background.paper",
-                    }}
-                  >
+                  <TableCell sx={headerCellSx}>
                     Assignment
                   </TableCell>
-                  <TableCell
-                    sx={{
-                      fontWeight: 600,
-                      backgroundColor: "background.paper",
-                    }}
-                  >
+                  <TableCell sx={headerCellSx}>
                     Due Date
                   </TableCell>
-                  <TableCell
-                    align="center"
-                    sx={{
-                      fontWeight: 600,
-                      backgroundColor: "background.paper",
-                    }}
-                  >
+                  <TableCell align="center" sx={headerCellSx}>
                     Grade
                   </TableCell>
-                  <TableCell
-                    align="center"
-                    sx={{
-                      fontWeight: 600,
-                      backgroundColor: "background.paper",
-                    }}
-                  >
+                  <TableCell align="center" sx={headerCellSx}>
                     Letter
                   </TableCell>
-                  <TableCell
-                    align="center"
-                    sx={{
-                      fontWeight: 600,
-                      backgroundColor: "background.paper",
-                    }}
-                  >
-                    Status
+                  <TableCell align="center" sx={headerCellSx}>
+                    Submission
                   </TableCell>
                 </TableRow>
               </TableHead>
@@ -787,22 +848,14 @@ export default function StudentProfileModal({
                 {assignmentDetails.map((assignment) => {
                   const extensionInfo = getExtensionInfo(assignment);
                   const accommodationInfo = getAccommodationInfo(assignment);
-                  const assignmentLetterGrade =
+                  const status = statusChip[assignment.status] || statusChip.missing;
+                  const showLateIcon =
+                    assignment.submittedLate &&
+                    lateIconStatuses.has(assignment.status);
+                  const gradeMeta =
                     assignment.studentGrade !== undefined
-                      ? getLetterGrade(assignment.studentGrade, gradingScale)
-                      : "—";
-                  const assignmentColorVariant =
-                    assignment.studentGrade !== undefined
-                      ? getGradeColorVariant(
-                          assignment.studentGrade,
-                          gradingScale
-                        )
-                      : "default";
-                  const isPassing =
-                    assignment.studentGrade !== undefined
-                      ? isPassingGrade(assignment.studentGrade, gradingScale)
+                      ? getGradeMeta(assignment.studentGrade, gradingScale)
                       : null;
-
                   return (
                     <TableRow key={assignment.id} hover>
                       <TableCell>
@@ -851,7 +904,7 @@ export default function StudentProfileModal({
                           <Typography
                             variant="body2"
                             fontWeight={600}
-                            color={isPassing ? "success.main" : "error.main"}
+                            color={gradeMeta.textColor}
                           >
                             {assignment.studentGrade}%
                           </Typography>
@@ -864,10 +917,14 @@ export default function StudentProfileModal({
                       <TableCell align="center">
                         {assignment.studentGrade !== undefined ? (
                           <Chip
-                            label={assignmentLetterGrade}
-                            color={assignmentColorVariant}
+                            label={gradeMeta.letter}
+                            color={gradeMeta.chipColor}
                             size="small"
-                            sx={{ fontWeight: 600, minWidth: 40 }}
+                            sx={{
+                              fontWeight: 600,
+                              minWidth: 40,
+                              ...gradeMeta.chipSx,
+                            }}
                           />
                         ) : (
                           <Typography variant="body2" color="text.secondary">
@@ -876,24 +933,27 @@ export default function StudentProfileModal({
                         )}
                       </TableCell>
                       <TableCell align="center">
-                        <Chip
-                          label={
-                            assignment.status === "completed"
-                              ? "Completed"
-                              : assignment.status === "locked"
-                              ? "Not released"
-                              : "Missing"
-                          }
-                          color={
-                            assignment.status === "completed"
-                              ? "success"
-                              : assignment.status === "locked"
-                              ? "default"
-                              : "error"
-                          }
-                          size="small"
-                          sx={{ minWidth: 96 }}
-                        />
+                        <Box
+                          sx={{
+                            position: "relative",
+                            display: "inline-flex",
+                            justifyContent: "center",
+                          }}
+                        >
+                          <Chip
+                            label={status.label}
+                            variant={status.variant}
+                            title={status.title}
+                            size="small"
+                            sx={{ minWidth: 96, ...status.sx }}
+                          />
+                          {showLateIcon && (
+                            <AccessTimeIcon
+                              titleAccess="submitted late"
+                              sx={lateIconSx}
+                            />
+                          )}
+                        </Box>
                       </TableCell>
                     </TableRow>
                   );
