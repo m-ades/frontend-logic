@@ -132,6 +132,19 @@ function getConstantLettersFromFormulasAndKey(formulaText, symbolizationKey) {
 
 const PREDICATE_VARIABLES = ['x', 'y', 'z']
 
+function getQuantifierInsertButtonsFromFormulaText(formulaText) {
+  const seen = new Set()
+  const buttons = []
+
+  for (const [, variable] of String(formulaText ?? '').matchAll(/[∀∃]([y-z])/g)) {
+    if (seen.has(variable)) continue
+    seen.add(variable)
+    buttons.push({ insert: `(∀${variable})` }, { insert: `(∃${variable})` })
+  }
+
+  return buttons
+}
+
 function isPredicateLogicKey(symbolizationKey) {
   if (!Array.isArray(symbolizationKey) || symbolizationKey.length === 0) return false
   return symbolizationKey.some((line) => {
@@ -538,6 +551,7 @@ export default function DerivationTable({
         predicateLetters,
         constantLetters,
         variableLetters,
+        extraInsertButtons: getQuantifierInsertButtonsFromFormulaText(formulaText),
       }
     }
 
@@ -1624,6 +1638,7 @@ export default function DerivationTable({
                         setStoredSelection(idx, Math.max(0, Math.min(safePosition, maxPosition)))
                       }}
                       includeQuantifiers={derivationKeyboardConfig.isPredicateMode}
+                      extraInsertButtons={derivationKeyboardConfig.isPredicateMode ? derivationKeyboardConfig.extraInsertButtons : undefined}
                       predicateLetters={derivationKeyboardConfig.isPredicateMode ? derivationKeyboardConfig.predicateLetters : undefined}
                       constantLetters={derivationKeyboardConfig.isPredicateMode ? derivationKeyboardConfig.constantLetters : undefined}
                       variableLetters={derivationKeyboardConfig.isPredicateMode ? derivationKeyboardConfig.variableLetters : undefined}
