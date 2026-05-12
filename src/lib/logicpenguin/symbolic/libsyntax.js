@@ -124,7 +124,7 @@ function inputfix(s) {
 function stripmatching(s) {
     if (s.length < 2) { return s; }
 
-    const qMatch = s.match(/^\(?[∃∀][x-z]\)?/);
+    const qMatch = s.match(/^(?:[∃∀][x-z]|\([∃∀][x-z]\)|\([x-z]\))/);
     if (qMatch) { return s;}
     
     const openBrackets = { '(': ')', '[': ']', '{': '}' };
