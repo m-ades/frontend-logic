@@ -4,6 +4,7 @@ import Header from "./Header.jsx";
 import Sidebar from "./Sidebar.jsx";
 import RulesReference from "../ui/RulesReference.jsx";
 import AccountSettingsDialog from "../ui/AccountSettingsDialog.jsx";
+import SkipLinks from "../ui/SkipLinks.jsx";
 import { useLayoutState } from "../../context/LayoutContext.jsx";
 
 export default function ShellFrame({
@@ -57,6 +58,11 @@ export default function ShellFrame({
         overflow: { xs: "visible", md: "hidden" },
       }}
     >
+      <SkipLinks
+        items={[
+          { href: "#main-content", label: "Skip to main content" },
+        ]}
+      />
       <Box
         sx={{
           display: "flex",
@@ -81,6 +87,8 @@ export default function ShellFrame({
           <Header onSignOut={onSignOut} />
           <Box
             component="main"
+            id="main-content"
+            tabIndex={-1}
             ref={mainContentRef}
             sx={{
               flexGrow: 1,
