@@ -96,6 +96,7 @@ export default function Login() {
 
   return (
     <Box 
+      component="main"
       sx={{ 
         minHeight: '100vh',
         backgroundColor: isDark ? theme.palette.background.default : '#ffffff',
