@@ -720,10 +720,7 @@ export default class DerivationCheck {
         const assumptionNormal = assumptionFormula
             ? assumptionFormula.wrapifneeded()
             : (assumptionLine.formulaNormal ?? '').trim();
-        const expectedFormula = assumptionNormal
-            ? this.Formula.from(notSym + assumptionNormal)
-            : null;
-        const expected = expectedFormula?.normal ?? (notSym + assumptionNormal);
+        const expected = notSym + assumptionNormal;
         if (line.formulaNormal.trim() !== expected) {
             this.adderror(line.n, "rule", "high",
                 "IP conclusion must be the negation of the AIP assumption.");
