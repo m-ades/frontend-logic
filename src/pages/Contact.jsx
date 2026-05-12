@@ -73,7 +73,7 @@ export default function Contact({ isInstructorView = false }) {
   return (
     <Box>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-        <Typography variant="h4" sx={{ fontWeight: 600 }}>
+        <Typography variant="h4" component="h1" sx={{ fontWeight: 600 }}>
           Contact Staff
         </Typography>
         
@@ -119,10 +119,10 @@ export default function Contact({ isInstructorView = false }) {
 
                   <Box sx={{ flex: 1 }}>
                     <Box sx={{ mb: 2 }}>
-                      <Typography variant="h5" sx={{ fontWeight: 600, mb: 0.5 }}>
+                      <Typography variant="h5" component="h2" sx={{ fontWeight: 600, mb: 0.5 }}>
                         {contact.name}
                       </Typography>
-                      <Typography variant="h6" color="text.secondary">
+                      <Typography variant="h6" component="p" color="text.secondary">
                         {contact.role}
                       </Typography>
                     </Box>
@@ -235,10 +235,10 @@ export default function Contact({ isInstructorView = false }) {
 
                     <Box sx={{ flex: 1 }}>
                       <Box sx={{ mb: 2 }}>
-                        <Typography variant="h5" sx={{ fontWeight: 600, mb: 0.5 }}>
+                        <Typography variant="h5" component="h2" sx={{ fontWeight: 600, mb: 0.5 }}>
                           {contact.name}
                         </Typography>
-                        <Typography variant="h6" color="text.secondary">
+                        <Typography variant="h6" component="p" color="text.secondary">
                           {contact.role}
                         </Typography>
                       </Box>

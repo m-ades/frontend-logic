@@ -157,6 +157,7 @@ export default function Sidebar({ structure, location, onSignOut, onOpenSettings
       >
         <Typography
           variant="h6"
+          component="div"
           sx={{
             fontSize: '1rem',
             fontWeight: 700,

@@ -368,7 +368,7 @@ export default function ComboTranslationTruthTable({
         <Box className="logicpenguin" sx={{ width: '100%' }}>
           <Box className="lp-problem-card" sx={{ borderColor: 'primary.main', borderWidth: 1, borderStyle: 'solid' }}>
             <Stack spacing={2} sx={{ p: 2 }}>
-              <Typography variant="h6" sx={{ fontWeight: 600, color: 'primary.main' }}>
+              <Typography variant="h6" component="h2" sx={{ fontWeight: 600, color: 'primary.main' }}>
                 Correct Answer
               </Typography>
               <Typography variant="body2" sx={{ fontWeight: 600 }}>

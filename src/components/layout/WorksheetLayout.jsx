@@ -18,6 +18,8 @@ export default function Layout({
   latePenaltyWaived = false,
   showPolicyInfo = false,
 }) {
+  const heading = title || subtitle || 'Assignment'
+  const description = title ? subtitle : null
   const dueLabel = dueAt ? formatEasternFromIso(dueAt, { includeTime: true }) : null
   const originalLabel = originalDueAt
     ? formatEasternFromIso(originalDueAt, { includeTime: true })
@@ -78,14 +80,14 @@ export default function Layout({
             </IconButton>
           )}
           <Box sx={{ flex: 1, minWidth: 0 }}>
-            <Typography variant="h4" sx={{ color: 'text.primary', fontWeight: 500, mb: 0.5 }}>
-              {title}
+            <Typography variant="h4" component="h1" sx={{ color: 'text.primary', fontWeight: 500, mb: 0.5 }}>
+              {heading}
             </Typography>
-            {subtitle && (
+            {description && (
               <Stack spacing={0.5}>
                 <Stack direction="row" spacing={1} alignItems="center">
                   <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                    {subtitle}
+                    {description}
                   </Typography>
                   {isLocked && (
                     <LockIcon sx={{ fontSize: '1rem', color: 'text.secondary', flexShrink: 0 }} />

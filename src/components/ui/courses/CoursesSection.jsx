@@ -16,7 +16,7 @@ export default function CoursesSection({
     <Box sx={{ mb: 3 }}>
       <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}>
         <Icon sx={{ color: iconColor, fontSize: 20 }} />
-        <Typography variant="h6" sx={{ fontWeight: 600 }}>
+        <Typography variant="h6" component="h2" sx={{ fontWeight: 600 }}>
           {title}
         </Typography>
         <Chip

@@ -114,7 +114,7 @@ export default function EditStudentDialog({
             justifyContent: "space-between",
           }}
         >
-          <Typography variant="h6" fontWeight={600}>
+          <Typography variant="h6" component="div" fontWeight={600}>
             Edit Student Information
           </Typography>
           <IconButton onClick={handleClose} size="small">

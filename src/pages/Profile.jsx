@@ -64,7 +64,7 @@ export default function Profile() {
 
   return (
     <Box>
-      <Typography variant="h4" sx={{ mb: 3, fontWeight: 600 }}>
+      <Typography variant="h4" component="h1" sx={{ mb: 3, fontWeight: 600 }}>
         Profile & Preferences
       </Typography>
 
@@ -79,7 +79,7 @@ export default function Profile() {
                 alignItems: "center",
               }}
             >
-              <Typography variant="h6">Profile Information</Typography>
+              <Typography variant="h6" component="h2">Profile Information</Typography>
               <Button
                 startIcon={<EditIcon />}
                 onClick={handleProfileEdit}
@@ -102,7 +102,7 @@ export default function Profile() {
                 <PersonIcon sx={{ fontSize: "2.5rem" }} />
               </Avatar>
               <Box>
-                <Typography variant="h6">{profileData.username}</Typography>
+                <Typography variant="h6" component="div">{profileData.username}</Typography>
                 <Typography variant="body2" color="text.secondary">
                   {profileData.role}
                 </Typography>
@@ -150,7 +150,7 @@ export default function Profile() {
       <ThemedCard sx={{ mt: 3 }}>
         <CardContent>
           <Stack spacing={3}>
-            <Typography variant="h6">Appearance</Typography>
+            <Typography variant="h6" component="h2">Appearance</Typography>
             <Divider />
             <FormControlLabel
               control={
@@ -177,7 +177,7 @@ export default function Profile() {
       <ThemedCard sx={{ mt: 3 }}>
         <CardContent>
           <Stack spacing={3}>
-            <Typography variant="h6">Sidebar Preferences</Typography>
+            <Typography variant="h6" component="h2">Sidebar Preferences</Typography>
             <Divider />
             <FormControlLabel
               control={

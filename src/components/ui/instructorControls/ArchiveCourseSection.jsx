@@ -88,7 +88,7 @@ export default function ArchiveCourseSection({ course, onArchive }) {
         <DialogTitle>
           <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
             <AlertTriangle size={24} color="#ed6c02" />
-            <Typography variant="h6" fontWeight={600}>
+            <Typography variant="h6" component="div" fontWeight={600}>
               Archive Course?
             </Typography>
           </Box>

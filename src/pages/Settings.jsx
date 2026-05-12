@@ -307,14 +307,14 @@ export default function Settings() {
 
   return (
     <Box>
-      <Typography variant="h4" sx={{ mb: 3, fontWeight: 600 }}>
+      <Typography variant="h4" component="h1" sx={{ mb: 3, fontWeight: 600 }}>
         Settings
       </Typography>
 
       <ThemedCard sx={{ mb: 3 }}>
         <CardContent>
           <Stack spacing={3}>
-            <Typography variant="h6">Appearance</Typography>
+            <Typography variant="h6" component="h2">Appearance</Typography>
             <Divider />
             <FormControlLabel
               control={
@@ -333,7 +333,7 @@ export default function Settings() {
       <ThemedCard sx={{ mb: 3 }}>
         <CardContent>
           <Stack spacing={3}>
-            <Typography variant="h6">Change Password</Typography>
+            <Typography variant="h6" component="h2">Change Password</Typography>
             <Divider />
             
             {submitSuccess && (
@@ -526,7 +526,7 @@ export default function Settings() {
         <CardContent>
           <Stack spacing={3}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <Typography variant="h6">Active Devices</Typography>
+              <Typography variant="h6" component="h2">Active Devices</Typography>
               <Button
                 variant="outlined"
                 color="error"

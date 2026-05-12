@@ -116,9 +116,9 @@ export default function BasicModal({ isOpen, onClose, title, subtitle, children,
                   {title || subtitle ? (
                     <div className="min-w-0 flex-1 pr-2 text-left">
                       {title ? (
-                        <h3 id="basic-modal-title" className="text-xl font-semibold tracking-tight text-foreground">
+                        <h2 id="basic-modal-title" className="text-xl font-semibold tracking-tight text-foreground">
                           {title}
-                        </h3>
+                        </h2>
                       ) : null}
                       {subtitle ? (
                         <p id="basic-modal-subtitle" className="text-foreground-body mt-1.5 text-sm leading-relaxed">

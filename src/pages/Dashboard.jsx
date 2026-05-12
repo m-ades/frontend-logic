@@ -420,13 +420,16 @@ export default function Dashboard() {
       {isLoadingAnalytics && (
         <LinearProgress sx={{ position: 'sticky', top: 0, zIndex: 10, mb: 0 }} />
       )}
+      <Typography variant="h4" component="h1" sx={{ mb: 3, fontWeight: 600 }}>
+        Dashboard
+      </Typography>
       <Grid container spacing={3} alignItems="stretch" sx={{ minWidth: 0 }}>
       <Grid size={{ xs: 12, sm: 6, lg: 3 }} sx={{ minWidth: 0 }}>
         <ThemedCard sx={statCardSx}>
           <CardContent sx={statCardContentSx}>
             <Box display="flex" alignItems="center" mb={1}>
               <LeaderboardIcon color="primary" sx={{ mr: 1 }} />
-              <Typography variant="h6" component="h3">
+              <Typography variant="h6" component="h2">
                 Your Grade
               </Typography>
             </Box>
@@ -437,7 +440,7 @@ export default function Dashboard() {
                 </Typography>
               ) : null}
               <Box>
-                <Typography variant="h3" fontWeight="medium">
+                <Typography variant="h3" component="div" fontWeight="medium">
                   {formatPercent(gradeOverview.percent)}
                   {gradeOverview.letter ? ` (${gradeOverview.letter})` : ''}
                 </Typography>
@@ -492,7 +495,7 @@ export default function Dashboard() {
           <CardContent sx={statCardContentSx}>
             <Box display="flex" alignItems="center" mb={2}>
               <TrendingUpIcon color="secondary" sx={{ mr: 1 }} />
-              <Typography variant="h6" component="h3">
+              <Typography variant="h6" component="h2">
                 What's Left
               </Typography>
             </Box>
@@ -593,7 +596,7 @@ export default function Dashboard() {
           <CardContent sx={statCardContentSx}>
             <Box display="flex" alignItems="center" mb={2}>
               <CalendarTodayIcon color="warning" sx={{ mr: 1 }} />
-              <Typography variant="h6" component="h3">
+              <Typography variant="h6" component="h2">
                 Upcoming Assignments
               </Typography>
             </Box>
@@ -649,7 +652,7 @@ export default function Dashboard() {
           <CardContent sx={statCardContentSx}>
             <Box display="flex" alignItems="center" mb={2}>
               <BookIcon color="error" sx={{ mr: 1 }} />
-              <Typography variant="h6" component="h3">
+              <Typography variant="h6" component="h2">
                 Activity
               </Typography>
             </Box>
@@ -684,7 +687,7 @@ export default function Dashboard() {
                     {item.label}
                   </Typography>
                   <Box display="flex" alignItems="baseline" gap={1}>
-                    <Typography variant="h6" fontWeight="medium">
+                    <Typography variant="h6" component="div" fontWeight="medium">
                       {item.value}
                     </Typography>
                     <Typography variant="caption" color="text.secondary">
@@ -733,7 +736,7 @@ export default function Dashboard() {
               }}
             >
               <Box>
-                <Typography variant="h6" fontWeight="medium">
+                <Typography variant="h6" component="h2" fontWeight="medium">
                   Assignment Scores Over Time
                 </Typography>
               </Box>
@@ -819,7 +822,7 @@ export default function Dashboard() {
             <CardContent>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
                 <Box>
-                  <Typography variant="h6" fontWeight="medium">
+                  <Typography variant="h6" component="h2" fontWeight="medium">
                     Instructor Insights
                   </Typography>
                   <Typography variant="caption" color="text.secondary">
@@ -832,7 +835,7 @@ export default function Dashboard() {
                   <Typography variant="caption" color="text.secondary">
                     Avg final score
                   </Typography>
-                  <Typography variant="h5" fontWeight="medium">
+                  <Typography variant="h5" component="div" fontWeight="medium">
                     {instructorAnalytics.gradeSummary?.avg_final_score?.toFixed(1) ?? '—'}
                   </Typography>
                 </Grid>
@@ -840,7 +843,7 @@ export default function Dashboard() {
                   <Typography variant="caption" color="text.secondary">
                     Avg raw score
                   </Typography>
-                  <Typography variant="h5" fontWeight="medium">
+                  <Typography variant="h5" component="div" fontWeight="medium">
                     {instructorAnalytics.gradeSummary?.avg_raw_score?.toFixed(1) ?? '—'}
                   </Typography>
                 </Grid>
@@ -848,7 +851,7 @@ export default function Dashboard() {
                   <Typography variant="caption" color="text.secondary">
                     Students graded
                   </Typography>
-                  <Typography variant="h5" fontWeight="medium">
+                  <Typography variant="h5" component="div" fontWeight="medium">
                     {instructorAnalytics.gradeSummary?.students_graded ?? '—'}
                   </Typography>
                 </Grid>

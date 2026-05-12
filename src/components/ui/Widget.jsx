@@ -52,6 +52,7 @@ export default function Widget({
               <Box display="flex" sx={{ width: 'calc(100% - 20px)' }}>
                 <Typography 
                   variant="h4" 
+                  component="div"
                   sx={{ color: 'text.secondary' }}
                   noWrap
                 >

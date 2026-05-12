@@ -320,7 +320,7 @@ export default function AccountSettingsDialog({
         <DialogTitle>Account Settings</DialogTitle>
         <DialogContent>
           <Stack spacing={3} sx={{ mt: 1 }}>
-            <Typography variant="h6">Change Password</Typography>
+            <Typography variant="h6" component="h3">Change Password</Typography>
             <Divider />
 
             {submitSuccess && (
@@ -547,7 +547,7 @@ export default function AccountSettingsDialog({
             <Divider sx={{ my: 1 }} />
 
             <Box>
-              <Typography variant="h6" sx={{ mb: 1 }}>
+              <Typography variant="h6" component="h3" sx={{ mb: 1 }}>
                 Accessibility
               </Typography>
               <Typography variant="body1" sx={{ fontWeight: 500 }}>
@@ -587,7 +587,7 @@ export default function AccountSettingsDialog({
             <Divider sx={{ my: 1 }} />
 
             <Box>
-              <Typography variant="h6" sx={{ mb: 1 }}>
+              <Typography variant="h6" component="h3" sx={{ mb: 1 }}>
                 Mobile Keyboard
               </Typography>
               <FormControlLabel
@@ -609,7 +609,7 @@ export default function AccountSettingsDialog({
             <Divider sx={{ my: 1 }} />
 
             <Box>
-              <Typography variant="h6" sx={{ mb: 1 }}>
+              <Typography variant="h6" component="h3" sx={{ mb: 1 }}>
                 Log out of all devices to end active sessions
               </Typography>
               {logoutSuccess && (

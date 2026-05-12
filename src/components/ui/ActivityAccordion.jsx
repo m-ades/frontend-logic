@@ -113,10 +113,24 @@ export default function ActivityAccordion({
     if (!isChapterExpandedById(chapter.id)) return true
     return chapter.subchapters.some((subchapter) => !isSubchapterExpandedById(subchapter.id))
   })
+  const titleNode = (
+    <Typography
+      variant="h4"
+      component="h1"
+      sx={{
+        fontWeight: 600,
+        color: 'text.primary',
+        letterSpacing: '-0.02em',
+      }}
+    >
+      {title}
+    </Typography>
+  )
 
   if (isLoading) {
     return (
       <Box sx={{ p: 3 }}>
+        <Box sx={{ mb: 4 }}>{titleNode}</Box>
         <LoadingSpinner label="Loading activities..." />
       </Box>
     )
@@ -125,6 +139,7 @@ export default function ActivityAccordion({
   if (!courseStructure?.length) {
     return (
       <Box sx={{ p: 3 }}>
+        <Box sx={{ mb: 4 }}>{titleNode}</Box>
         <Typography color="text.secondary" align="center">
           {emptyText}
         </Typography>
@@ -142,16 +157,7 @@ export default function ActivityAccordion({
           mb: 4,
         }}
       >
-        <Typography
-          variant="h4"
-          sx={{
-            fontWeight: 600,
-            color: 'text.primary',
-            letterSpacing: '-0.02em',
-          }}
-        >
-          {title}
-        </Typography>
+        {titleNode}
         {showExpandCollapseToggle && (
           <Typography
             variant="body2"
@@ -253,6 +259,7 @@ export default function ActivityAccordion({
                   <Box sx={{ flex: 1 }}>
                     <Typography
                       variant="h6"
+                      component="h2"
                       sx={{
                         fontWeight: 600,
                         color: 'text.primary',
@@ -325,6 +332,7 @@ export default function ActivityAccordion({
                           >
                             <Typography
                               variant="subtitle1"
+                              component="h3"
                               sx={{
                                 fontWeight: 500,
                                 color: 'text.primary',

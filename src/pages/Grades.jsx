@@ -137,14 +137,14 @@ export default function Grades() {
 
   return (
     <Box>
-      <Typography variant="h4" sx={{ mb: 3, fontWeight: 600 }}>
+      <Typography variant="h4" component="h1" sx={{ mb: 3, fontWeight: 600 }}>
         Grades
       </Typography>
 
       <ThemedCard>
         <CardContent sx={{ '& .MuiDataGrid-root': { fontSize: '1rem' } }}>
           <Stack direction={{ xs: 'column', sm: 'row' }} justifyContent="space-between" sx={{ mb: 2 }}>
-            <Typography variant="h6" sx={{ fontSize: '1rem' }}>Overall</Typography>
+            <Typography variant="h6" component="h2" sx={{ fontSize: '1rem' }}>Overall</Typography>
             <Typography variant="body2" color="text.secondary" sx={{ fontSize: '1rem' }}>
               {overallPercentage.toFixed(1)}%
             </Typography>

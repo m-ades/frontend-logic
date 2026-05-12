@@ -56,7 +56,7 @@ export default function AssignmentTable({
           {isPractice && (
             <Brain size={48} color="#999" style={{ marginBottom: 16 }} />
           )}
-          <Typography variant="h6" color="text.secondary" gutterBottom>
+          <Typography variant="h6" component="h2" color="text.secondary" gutterBottom>
             {emptyMessage.title}
           </Typography>
           <Typography variant="body2" color="text.secondary" mb={2}>

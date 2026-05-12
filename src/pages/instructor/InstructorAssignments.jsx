@@ -238,6 +238,9 @@ export default function InstructorAssignments() {
   if (!activeCourseId) {
     return (
       <Box sx={{ width: "100%", maxWidth: "100%" }}>
+        <Typography variant="h4" component="h1" fontWeight={600} mb={2}>
+          Assignments
+        </Typography>
         <Alert severity="info">
           Please select a course to view and manage assignments.
         </Alert>
@@ -259,7 +262,7 @@ export default function InstructorAssignments() {
         }}
       >
         <Box>
-          <Typography variant="h4" fontWeight={600}>
+          <Typography variant="h4" component="h1" fontWeight={600}>
             Assignments
           </Typography>
           <Typography variant="body2" color="text.secondary">

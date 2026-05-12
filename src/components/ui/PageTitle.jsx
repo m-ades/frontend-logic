@@ -13,6 +13,7 @@ export default function PageTitle({ title, button, buttonAction }) {
     >
       <Typography
         variant="h1"
+        component="h1"
         sx={{
           fontSize: '1.5rem',
           fontWeight: 500,
@@ -41,4 +42,3 @@ export default function PageTitle({ title, button, buttonAction }) {
     </Box>
   )
 }
-

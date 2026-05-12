@@ -19,7 +19,7 @@ export default function RosterHeader({
       }}
     >
       <Box>
-        <Typography variant="h4" fontWeight={600}>
+        <Typography variant="h4" component="h1" fontWeight={600}>
           Course Roster
         </Typography>
         <Typography variant="body2" color="text.secondary">

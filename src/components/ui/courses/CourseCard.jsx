@@ -97,6 +97,7 @@ export default function CourseCard({ course, isInstructor, onSelect }) {
             <Box sx={{ flexGrow: 1, minWidth: 0 }}>
               <Typography
                 variant="h6"
+                component="h3"
                 sx={{
                   fontWeight: 600,
                   mb: 0.5,

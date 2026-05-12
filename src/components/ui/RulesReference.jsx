@@ -202,7 +202,7 @@ export default function RulesReference() {
   const header = (
     <Box sx={{ p: 2, borderBottom: 1, borderColor: 'divider', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
       <Box>
-        <Typography variant="h6">Rulebook</Typography>
+        <Typography variant="h2" sx={{ fontSize: '1.142rem', fontWeight: 600 }}>Rulebook</Typography>
         <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.75rem' }}>
           Logic Rules & Shortcuts
         </Typography>

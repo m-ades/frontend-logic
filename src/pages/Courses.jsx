@@ -59,7 +59,7 @@ export default function Courses() {
   if (!sandbox && error) {
     return (
       <Box>
-        <Typography variant="h4" sx={{ mb: 4, fontWeight: 600 }}>
+        <Typography variant="h4" component="h1" sx={{ mb: 4, fontWeight: 600 }}>
           My Courses
         </Typography>
         <Alert

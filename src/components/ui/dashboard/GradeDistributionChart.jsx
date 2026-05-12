@@ -62,7 +62,7 @@ export const GradeDistributionChart = ({ data }) => {
     }}
   >
     <Box sx={{ p: 3, pb: 2 }}>
-      <Typography variant="h6" fontWeight={600} mb={0.5}>
+      <Typography variant="h6" component="h2" fontWeight={600} mb={0.5}>
         Grade Distribution
       </Typography>
       <Typography variant="body2" color="text.secondary">
