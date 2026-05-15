@@ -1765,7 +1765,6 @@ export class formFit {
                 checkpart = currsubderiv?.parts?.[currindex-1]?? false;
             } else {
                 if (currsubderiv?.showline &&
-                    !currsubderiv.showline.isMainConclusion &&
                     currsubderiv.showline != line) {
                     const f = Formula.from(currsubderiv.showline.s);
                     if (f.terms.indexOf(newname) !== -1) {
@@ -1783,7 +1782,7 @@ export class formFit {
             // if a subderiv, again check its showline,
             // which is available
             if (checkpart.parts) {
-                if (checkpart.showline && !checkpart.showline.isMainConclusion) {
+                if (checkpart.showline) {
                     const f = Formula.from(checkpart.showline.s);
                     if (f.terms.indexOf(newname) !== -1) {
                         return false;
