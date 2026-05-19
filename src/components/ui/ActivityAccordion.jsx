@@ -222,6 +222,7 @@ export default function ActivityAccordion({
               expanded={isChapterExpanded}
               onChange={handleChapterChange(chapter.id)}
               elevation={0}
+              slots={{ heading: 'h2' }}
               sx={{
                 border: '1px solid',
                 borderColor: 'divider',
@@ -259,7 +260,7 @@ export default function ActivityAccordion({
                   <Box sx={{ flex: 1 }}>
                     <Typography
                       variant="h6"
-                      component="h2"
+                      component="span"
                       sx={{
                         fontWeight: 600,
                         color: 'text.primary',
@@ -306,6 +307,7 @@ export default function ActivityAccordion({
                           expanded={isSubchapterExpanded}
                           onChange={handleSubchapterChange(subchapter.id)}
                           elevation={0}
+                          slots={{ heading: 'h3' }}
                           sx={{
                             width: '100%',
                             boxShadow: 'none',
@@ -332,7 +334,7 @@ export default function ActivityAccordion({
                           >
                             <Typography
                               variant="subtitle1"
-                              component="h3"
+                              component="span"
                               sx={{
                                 fontWeight: 500,
                                 color: 'text.primary',
