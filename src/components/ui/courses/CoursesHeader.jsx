@@ -22,7 +22,7 @@ export default function CoursesHeader({
       }}
     >
       <Box>
-        <Typography variant="h4" sx={{ fontWeight: 600, mb: 1 }}>
+        <Typography variant="h4" component="h1" sx={{ fontWeight: 600, mb: 1 }}>
           My Courses
         </Typography>
         {!loading && (currentCount > 0 || pastCount > 0) && (

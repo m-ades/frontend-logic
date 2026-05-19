@@ -511,7 +511,7 @@ export default function StudentProfileModal({
           }}
         >
           <Box>
-            <Typography variant="h5" fontWeight={700}>
+            <Typography variant="h5" component="div" fontWeight={700}>
               {student.username}
             </Typography>
             <Box
@@ -608,7 +608,7 @@ export default function StudentProfileModal({
               <Box
                 sx={{ display: "flex", alignItems: "baseline", gap: 2, mt: 1 }}
               >
-                <Typography variant="h2" fontWeight={800} color="primary.main">
+                <Typography variant="h2" component="div" fontWeight={800} color="primary.main">
                   {average}%
                 </Typography>
                 <Chip
@@ -811,7 +811,7 @@ export default function StudentProfileModal({
         )}
 
         {/* Assignment Details Table */}
-        <Typography variant="h6" fontWeight={600} mb={2}>
+        <Typography variant="h6" component="h3" fontWeight={600} mb={2}>
           Assignment Details
         </Typography>
         <Paper

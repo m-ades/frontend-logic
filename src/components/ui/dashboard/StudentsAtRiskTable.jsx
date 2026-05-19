@@ -70,7 +70,7 @@ export const StudentsAtRiskTable = ({ students, assignments }) => {
     >
       <Box sx={{ p: 3, pb: 2 }}>
         <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 0.5 }}>
-          <Typography variant="h6" fontWeight={600}>
+          <Typography variant="h6" component="h2" fontWeight={600}>
             Students at Risk
           </Typography>
         </Box>

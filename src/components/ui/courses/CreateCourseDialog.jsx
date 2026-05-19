@@ -113,7 +113,7 @@ export default function CreateCourseDialog({ open, onClose, onSubmit }) {
   return (
     <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
       <DialogTitle>
-        <Typography variant="h6" fontWeight={600}>
+        <Typography variant="h6" component="div" fontWeight={600}>
           Create New Course
         </Typography>
       </DialogTitle>

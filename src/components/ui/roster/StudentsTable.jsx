@@ -35,7 +35,7 @@ export default function StudentsTable({
         }}
       >
         <Box sx={{ textAlign: "center", py: 8 }}>
-          <Typography variant="h6" color="text.secondary" gutterBottom>
+          <Typography variant="h6" component="h2" color="text.secondary" gutterBottom>
             {searchQuery ? "No students found" : "No students enrolled yet"}
           </Typography>
           <Typography variant="body2" color="text.secondary" mb={2}>

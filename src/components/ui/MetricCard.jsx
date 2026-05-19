@@ -40,6 +40,7 @@ export const MetricCard = ({
       <Box>
         <Typography
           variant="h3"
+          component="div"
           fontWeight={700}
           sx={{ color: "#fff", mb: 0.5, lineHeight: 1 }}
         >

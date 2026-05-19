@@ -145,7 +145,7 @@ export default function Practice() {
                 }}
               >
                 <Box sx={{ flex: 1, minWidth: 0 }}>
-                  <Typography variant="h6" sx={{ mb: 1, wordBreak: 'break-word' }}>
+                  <Typography variant="h6" component="h4" sx={{ mb: 1, wordBreak: 'break-word' }}>
                     {activity.title}
                   </Typography>
                   {activity.description && (

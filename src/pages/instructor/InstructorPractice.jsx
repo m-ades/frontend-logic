@@ -164,6 +164,9 @@ export default function InstructorPractice() {
   if (!activeCourseId) {
     return (
       <Box sx={{ width: "100%", maxWidth: "100%" }}>
+        <Typography variant="h4" component="h1" fontWeight={600} mb={2}>
+          Practice
+        </Typography>
         <Alert severity="info">
           Please select a course to view and manage practice assignments.
         </Alert>
@@ -187,6 +190,7 @@ export default function InstructorPractice() {
         <Box>
           <Typography
             variant="h4"
+            component="h1"
             fontWeight={600}
             sx={{ display: "flex", alignItems: "center", gap: 1 }}
           >

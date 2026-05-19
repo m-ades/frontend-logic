@@ -210,7 +210,7 @@ export default function InstructorDashboard() {
     if (!activeCourseId || !course) {
     return (
       <Box sx={{ p: 4 }}>
-        <Typography variant="h4" fontWeight={600} mb={2}>
+        <Typography variant="h4" component="h1" fontWeight={600} mb={2}>
           Dashboard
         </Typography>
         <Alert severity="info">
@@ -235,7 +235,7 @@ export default function InstructorDashboard() {
       >
       {/* Header */}
       <Box>
-        <Typography variant="h4" fontWeight={700} mb={1}>
+        <Typography variant="h4" component="h1" fontWeight={700} mb={1}>
           Dashboard
         </Typography>
         <Typography variant="body1" color="text.secondary">
@@ -301,7 +301,7 @@ export default function InstructorDashboard() {
 
       {/* Time-on-task by category */}
       <Box>
-        <Typography variant="h6" fontWeight={600} mb={1}>
+        <Typography variant="h6" component="h2" fontWeight={600} mb={1}>
           Time-on-task by category
         </Typography>
         <Typography variant="body2" color="text.secondary" mb={2}>

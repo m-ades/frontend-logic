@@ -31,7 +31,7 @@ export default function CoursesEmptyState({ isInstructor, onCreateCourse }) {
           }}
         />
       </Box>
-      <Typography variant="h5" sx={{ fontWeight: 600, mb: 1 }}>
+      <Typography variant="h5" component="h2" sx={{ fontWeight: 600, mb: 1 }}>
         No courses yet
       </Typography>
       <Typography

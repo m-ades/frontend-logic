@@ -22,7 +22,7 @@ class ErrorBoundary extends React.Component {
     if (this.state.hasError) {
       return (
         <Box sx={{ p: 4, textAlign: 'center' }}>
-          <Typography variant="h5" gutterBottom>
+          <Typography variant="h5" component="h1" gutterBottom>
             Something went wrong
           </Typography>
           <Typography variant="body2" color="error" sx={{ mb: 2 }}>
@@ -46,4 +46,3 @@ class ErrorBoundary extends React.Component {
 }
 
 export default ErrorBoundary
-

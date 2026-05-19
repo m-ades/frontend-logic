@@ -173,7 +173,7 @@ export default function ImportRosterDialog({ open, onClose, onImport }) {
         >
           <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
             <Upload size={24} />
-            <Typography variant="h6" fontWeight={600}>
+            <Typography variant="h6" component="div" fontWeight={600}>
               Import Roster from CSV
             </Typography>
           </Box>

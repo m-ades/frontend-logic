@@ -107,7 +107,7 @@ export default function EditGradeModal({
           }}
         >
           <Box>
-            <Typography variant="h6" fontWeight={700}>
+            <Typography variant="h6" component="div" fontWeight={700}>
               Edit Grade
             </Typography>
             <Typography variant="body2" color="text.secondary" mt={0.5}>
@@ -159,6 +159,7 @@ export default function EditGradeModal({
               </Typography>
               <Typography
                 variant="h4"
+                component="div"
                 fontWeight={700}
                 color="primary.main"
                 mt={1}

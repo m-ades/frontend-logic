@@ -216,7 +216,7 @@ export default function AssignmentDetailModal({ open, onClose, assignmentId }) {
         >
           <Box>
             <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 1 }}>
-              <Typography variant="h5" fontWeight={700}>
+              <Typography variant="h5" component="div" fontWeight={700}>
                 {assignment.name}
               </Typography>
               {assignment.isLocked && (

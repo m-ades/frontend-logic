@@ -37,7 +37,7 @@ export const UpcomingDeadlinesTable = ({ assignments, onAssignmentClick }) => {
       }}
     >
       <Box sx={{ p: 3, pb: 2 }}>
-        <Typography variant="h6" fontWeight={600} mb={0.5}>
+        <Typography variant="h6" component="h2" fontWeight={600} mb={0.5}>
           Upcoming Deadlines
         </Typography>
         <Typography variant="body2" color="text.secondary" mb={2}>

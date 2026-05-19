@@ -107,7 +107,7 @@ export default function GradingScaleSection({ course, onSave, onError }) {
       <CardContent>
         <Stack spacing={3}>
           <Box>
-            <Typography variant="h6" fontWeight={600} mb={0.5}>
+            <Typography variant="h6" component="h2" fontWeight={600} mb={0.5}>
               Grading Scale
             </Typography>
             <Typography variant="body2" color="text.secondary">

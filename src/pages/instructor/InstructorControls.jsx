@@ -40,7 +40,7 @@ export default function InstructorControls() {
   if (!activeCourse) {
     return (
       <Box>
-        <Typography variant="h4" sx={{ mb: 3, fontWeight: 600 }}>
+        <Typography variant="h4" component="h1" sx={{ mb: 3, fontWeight: 600 }}>
           Controls
         </Typography>
         <Alert severity="info">No course selected</Alert>
@@ -50,7 +50,7 @@ export default function InstructorControls() {
 
   return (
     <Box>
-      <Typography variant="h4" sx={{ mb: 3, fontWeight: 600 }}>
+      <Typography variant="h4" component="h1" sx={{ mb: 3, fontWeight: 600 }}>
         Course Controls
       </Typography>
 

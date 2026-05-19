@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Box, Alert } from "@mui/material";
+import { Box, Alert, Typography } from "@mui/material";
 import AddStudentDialog from "../../components/ui/AddStudentDialog";
 import StudentProfileModal from "../../components/ui/StudentProfileModal";
 import ImportRosterDialog from "../../components/ui/roster/ImportRosterDialog";
@@ -98,6 +98,9 @@ export default function InstructorRoster() {
   if (!activeCourseId) {
     return (
       <Box sx={{ width: "100%", maxWidth: "100%" }}>
+        <Typography variant="h4" component="h1" fontWeight={600} mb={2}>
+          Course Roster
+        </Typography>
         <Alert severity="info">
           Please select a course to view and manage students.
         </Alert>

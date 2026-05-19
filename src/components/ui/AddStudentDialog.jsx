@@ -113,7 +113,7 @@ export default function AddStudentDialog({ open, onClose, onSubmit }) {
         >
           <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
             <UserPlus size={24} />
-            <Typography variant="h6" fontWeight={600}>
+            <Typography variant="h6" component="div" fontWeight={600}>
               Add Student to Course
             </Typography>
           </Box>

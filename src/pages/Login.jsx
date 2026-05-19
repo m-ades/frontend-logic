@@ -96,6 +96,7 @@ export default function Login() {
 
   return (
     <Box 
+      component="main"
       sx={{ 
         minHeight: '100vh',
         backgroundColor: isDark ? theme.palette.background.default : '#ffffff',
@@ -137,6 +138,7 @@ export default function Login() {
       <Box sx={{ maxWidth: 480, width: '100%', px: 2 }}>
         <Typography 
           variant="h1"
+          component="h1"
           sx={{ 
             mb: 3,
             fontWeight: 900,
@@ -152,6 +154,7 @@ export default function Login() {
         
         <Typography 
           variant="h5"
+          component="p"
           sx={{ 
             mb: 5,
             textAlign: 'center',

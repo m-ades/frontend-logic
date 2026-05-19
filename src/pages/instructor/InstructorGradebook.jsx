@@ -24,7 +24,7 @@ export default function InstructorGradebook() {
   if (!course) {
     return (
       <Box>
-        <Typography variant="h4" fontWeight={600} mb={3}>
+        <Typography variant="h4" component="h1" fontWeight={600} mb={3}>
           Gradebook
         </Typography>
         <Typography color="text.secondary">No course selected</Typography>
@@ -72,7 +72,7 @@ export default function InstructorGradebook() {
         }}
       >
         <Box>
-          <Typography variant="h4" fontWeight={600} mb={1}>
+          <Typography variant="h4" component="h1" fontWeight={600} mb={1}>
             Gradebook
           </Typography>
           <Typography variant="body1" color="text.secondary">

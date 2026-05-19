@@ -113,6 +113,8 @@ export default function Sidebar({ structure, location, onSignOut, onOpenSettings
       slotProps={{
         paper: {
           ref: drawerPaperRef,
+          component: "nav",
+          "aria-label": "Site navigation",
         },
       }}
       sx={{
@@ -157,6 +159,7 @@ export default function Sidebar({ structure, location, onSignOut, onOpenSettings
       >
         <Typography
           variant="h6"
+          component="div"
           sx={{
             fontSize: '1rem',
             fontWeight: 700,

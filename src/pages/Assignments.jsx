@@ -266,7 +266,7 @@ export default function Assignments() {
         >
           <Box sx={{ flex: 1, minWidth: 0 }}>
             <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 1 }}>
-              <Typography variant="h6" sx={{ wordBreak: 'break-word' }}>
+              <Typography variant="h6" component="h4" sx={{ wordBreak: 'break-word' }}>
                 {activity.title}
               </Typography>
               {activity.isLocked && (

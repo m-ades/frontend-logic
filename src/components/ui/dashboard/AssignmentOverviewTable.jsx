@@ -140,7 +140,7 @@ export const AssignmentOverviewTable = ({
         }}
       >
         <Box sx={{ p: 3, pb: 2 }}>
-          <Typography variant="h6" fontWeight={600} mb={0.5}>
+          <Typography variant="h6" component="h2" fontWeight={600} mb={0.5}>
             Assignment Overview
           </Typography>
           <Typography variant="body2" color="text.secondary" mb={2}>
@@ -168,7 +168,7 @@ export const AssignmentOverviewTable = ({
               >
                 Overall Average
               </Typography>
-              <Typography variant="h6" fontWeight={700} color="primary.main">
+              <Typography variant="h6" component="div" fontWeight={700} color="primary.main">
                 {totalAverage}%
               </Typography>
               <Chip
@@ -187,7 +187,7 @@ export const AssignmentOverviewTable = ({
               >
                 Total Submissions
               </Typography>
-              <Typography variant="h6" fontWeight={700}>
+              <Typography variant="h6" component="div" fontWeight={700}>
                 {totalSubmissions}/{totalPossible}
               </Typography>
             </Box>
@@ -200,7 +200,7 @@ export const AssignmentOverviewTable = ({
               >
                 Avg Completion Rate
               </Typography>
-              <Typography variant="h6" fontWeight={700} color="success.main">
+              <Typography variant="h6" component="div" fontWeight={700} color="success.main">
                 {completionRate}%
               </Typography>
             </Box>
