@@ -21,7 +21,7 @@ import {
   promptImpliesPredicateLogic,
 } from './symbolizationKeyboard.js'
 
-function FormulaInputField({ value, onValueChange, fieldReadOnly, formulaInputRef, onEnterKey }) {
+function FormulaInputField({ value, onValueChange, fieldReadOnly, formulaInputRef, onEnterKey, ariaLabel }) {
   const theme = useTheme()
   const containerRef = useRef(null)
   const changeHandlerRef = useRef(null)
@@ -39,6 +39,7 @@ function FormulaInputField({ value, onValueChange, fieldReadOnly, formulaInputRe
       formulaInput.style.fontFamily = 'monospace'
       formulaInput.style.backgroundColor = theme.palette.background.paper
       formulaInput.style.color = theme.palette.text.primary
+      formulaInput.setAttribute('aria-label', ariaLabel || 'Formula input')
       containerRef.current.appendChild(formulaInput)
     } else if (!containerRef.current.contains(formulaInputRef.current)) {
       containerRef.current.appendChild(formulaInputRef.current)
@@ -56,7 +57,12 @@ function FormulaInputField({ value, onValueChange, fieldReadOnly, formulaInputRe
         formulaInputRef.current = null
       }
     }
-  }, [formulaInputRef, theme])
+  }, [ariaLabel, formulaInputRef, theme])
+
+  useEffect(() => {
+    if (!formulaInputRef.current) return
+    formulaInputRef.current.setAttribute('aria-label', ariaLabel || 'Formula input')
+  }, [ariaLabel, formulaInputRef])
 
   useEffect(() => {
     const formulaInput = formulaInputRef.current
@@ -308,6 +314,7 @@ export default function SymbolicTranslation({
                     fieldReadOnly={readOnly}
                     formulaInputRef={formulaInputRef}
                     onEnterKey={!readOnly && !hideActions ? handleCheck : undefined}
+                    ariaLabel="Your translation"
                   />
                   <Box sx={{ mt: 1 }}>
                     <SymbolButtonRow
@@ -332,6 +339,7 @@ export default function SymbolicTranslation({
                   onValueChange={null}
                   fieldReadOnly
                   formulaInputRef={solutionInputRef}
+                  ariaLabel="Correct translation"
                 />
               </SolutionReveal>
             )}
