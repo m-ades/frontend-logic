@@ -1723,7 +1723,10 @@ export default function DerivationTable({
                       handleLineCommit(idx, 'formula', normalizeFormulaForCheck(e.target.value))
                     }}
                     InputProps={{ readOnly: line.readOnly }}
-                    inputProps={{ autoComplete: 'off' }}
+                    inputProps={{
+                      autoComplete: 'off',
+                      'aria-label': `Formula for line ${idx + 1}`,
+                    }}
                     inputRef={(el) => { if (el) formulaRefs.current[idx] = el }}
                     onFocus={(e) => {
                       if (line.readOnly) return
@@ -1832,7 +1835,10 @@ export default function DerivationTable({
                                 })
                               }}
                               InputProps={{ readOnly: line.readOnly }}
-                              inputProps={{ autoComplete: 'off' }}
+                              inputProps={{
+                                autoComplete: 'off',
+                                'aria-label': `Referenced line numbers for line ${idx + 1}`,
+                              }}
                               inputRef={(el) => { if (el) justRefs.current[idx] = el }}
                               sx={(theme) => ({
                                 width: '7ch',
@@ -1851,6 +1857,7 @@ export default function DerivationTable({
                               <Select
                                 value={getRuleFromJustification(line.justification)}
                                 displayEmpty
+                                inputProps={{ 'aria-label': `Rule for line ${idx + 1}` }}
                                 onFocus={() => {
                                   if (!line.readOnly && isPhone && isFullScreen) {
                                     setActiveFormulaIndex(idx)
@@ -1953,7 +1960,10 @@ export default function DerivationTable({
                             handleLineCommit(idx, 'justification', formatted || raw)
                           }}
                           InputProps={{ readOnly: line.readOnly }}
-                          inputProps={{ autoComplete: 'off' }}
+                          inputProps={{
+                            autoComplete: 'off',
+                            'aria-label': `Justification for line ${idx + 1}`,
+                          }}
                           inputRef={(el) => { if (el) justRefs.current[idx] = el }}
                           sx={(theme) => ({
                             width: { xs: DERIVATION_JUSTIFICATION_WIDTH_XS, sm: DERIVATION_JUSTIFICATION_WIDTH_SM },
