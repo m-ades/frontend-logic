@@ -53,7 +53,6 @@ const menuItems = [
   ...(HERO_DEMO_VIDEO_SECTION_ENABLED ? [{ name: 'Video Demo', href: '#video-demo' }] : []),
   { name: 'How It Works', href: '#how-it-works' },
   { name: 'Features', href: '#features' },
-  { name: 'Giving Day', href: '#giving-day' },
 ]
 
 /** Hollow outline vs solid Login: faint hover fill stays clearly “outline”, not a second solid pill */
@@ -371,4 +370,3 @@ function HeroHeader({ onTryDemoOpen }) {
     </header>
   )
 }
-

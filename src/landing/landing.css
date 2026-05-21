@@ -71,7 +71,6 @@ html.landing-full-rem #root {
 
 /*
  * Page wash: neutral charcoal + very soft Vercel-blue atmospheric glow (no purple shift).
- * Giving Day keeps its own Hunter purple strip below this wrapper.
  */
 html.landing-full-rem .landing-main-flow {
   position: relative;
