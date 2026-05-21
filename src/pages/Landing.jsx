@@ -7,7 +7,6 @@ import '../landing/landing.css'
 import { HeroSection } from '@/components/ui/HeroSection1'
 import HowItWorksSection from './landing/HowItWorksSection'
 import FeaturesSection from './landing/FeaturesSection'
-import GivingDaySection from './landing/GivingDaySection'
 
 const LANDING_HTML_CLASS = 'landing-full-rem'
 
@@ -27,7 +26,6 @@ export default function Landing() {
           <FeaturesSection />
         </div>
       </div>
-      <GivingDaySection />
     </>
   )
 }
