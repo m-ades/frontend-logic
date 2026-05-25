@@ -213,10 +213,14 @@ function buildNonClassicalTruthTableSnapshot(proof, edited, existing) {
 
 function buildDerivationSnapshot(proof, edited, existing) {
   const e = existing && typeof existing === 'object' ? existing : {}
+  const key = typeKey(e)
+  const savedType = e[key] === 'derivation-hurley' ? 'derivation-hurley' : 'derivation'
   const prems = normalizeFormulaInputs(edited.premises ?? proof.premises ?? proof.prems ?? [])
   const conclusion = normalizeFormulaInput(edited.conclusion ?? proof.conclusion ?? proof.conc ?? '')
   const prompt = edited.prompt ?? proof.description ?? ''
-  const patch = { [typeKey(e)]: 'derivation', prompt, prems, conc: conclusion }
+  // new derivations stay generic and the course chooses the system
+  // old hurley snapshots keep their mark
+  const patch = { [key]: savedType, prompt, prems, conc: conclusion }
   const mergedRuleset = normalizeDerivationRuleset(
     edited.ruleset ?? proof.ruleset ?? proof.ruleSet ?? e.ruleset
   )

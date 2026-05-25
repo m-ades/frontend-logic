@@ -565,6 +565,8 @@ function ProofTabs({
                     <div ref={el => { if (el) proofRefs.current[proof.id] = el }}>
                       {(() => {
                         const savedState = getSavedProofState(proof.id)
+                        // the proof carries the course system
+                        const logicSystem = proof.logicSystem
                         const shouldAttachAttempts = proof.type !== 'derivation' && proof.type !== 'derivation-hurley' && proof.type
                         const savedStateWithAttempts = shouldAttachAttempts
                           ? { ...(savedState || {}), attemptCount: proof.attemptCount ?? 0 }
@@ -584,6 +586,7 @@ function ProofTabs({
                               isAssignmentLocked={isAssignmentLocked}
                               isInstructorView={isInstructorView}
                               onQuestionSaved={onQuestionSaved}
+                              logicSystem={logicSystem}
                             />
                           )
                         }
@@ -622,6 +625,7 @@ function ProofTabs({
                               currentQuestionScore={displayScoreForProof(proof, questionScores[proof.questionId])}
                               isInstructorView={isInstructorView}
                               onQuestionSaved={onQuestionSaved}
+                              logicSystem={logicSystem}
                             />
                           )
                         }
@@ -639,6 +643,7 @@ function ProofTabs({
                             isAssignmentLocked={isAssignmentLocked}
                             isInstructorView={isInstructorView}
                             onQuestionSaved={onQuestionSaved}
+                            logicSystem={logicSystem}
                           />
                         )
                       })()}

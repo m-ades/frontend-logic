@@ -20,6 +20,7 @@ export default function LogicPenguinProblem({
   isInstructorView = false,
   onQuestionSaved,
   problemLabel,
+  logicSystem,
 }) {
   const [localState, setLocalState] = useState(savedState || {})
 
@@ -75,6 +76,7 @@ export default function LogicPenguinProblem({
         isInstructorView={isInstructorView}
         onQuestionSaved={onQuestionSaved}
         problemLabel={problemLabel}
+        logicSystem={logicSystem}
       />
     )
   } else if (proof.type === 'multiple-choice') {
@@ -96,6 +98,7 @@ export default function LogicPenguinProblem({
         isInstructorView={isInstructorView}
         onQuestionSaved={onQuestionSaved}
         problemLabel={problemLabel}
+        logicSystem={logicSystem}
       />
     )
   } else if (proof.type === 'true-false') {
@@ -116,6 +119,7 @@ export default function LogicPenguinProblem({
         isInstructorView={isInstructorView}
         onQuestionSaved={onQuestionSaved}
         problemLabel={problemLabel}
+        logicSystem={logicSystem}
       />
     )
   } else if (proof.type === 'evaluate-truth') {
@@ -134,6 +138,7 @@ export default function LogicPenguinProblem({
         isInstructorView={isInstructorView}
         onQuestionSaved={onQuestionSaved}
         problemLabel={problemLabel}
+        logicSystem={logicSystem}
       />
     )
   } else if (proof.type === 'valid-correct-sound') {
@@ -156,6 +161,7 @@ export default function LogicPenguinProblem({
         isInstructorView={isInstructorView}
         onQuestionSaved={onQuestionSaved}
         problemLabel={problemLabel}
+        logicSystem={logicSystem}
       />
     )
   } else if (proof.type === 'single-row-truth-table') {
@@ -177,6 +183,7 @@ export default function LogicPenguinProblem({
         isInstructorView={isInstructorView}
         onQuestionSaved={onQuestionSaved}
         problemLabel={problemLabel}
+        logicSystem={logicSystem}
       />
     )
   } else if (proof.type === 'combo-translation-truth-table') {
@@ -192,6 +199,7 @@ export default function LogicPenguinProblem({
         isInstructorView={isInstructorView}
         onQuestionSaved={onQuestionSaved}
         problemLabel={problemLabel}
+        logicSystem={logicSystem}
       />
     )
   } else if (proof.type === 'combo-translation-derivation') {
@@ -207,6 +215,7 @@ export default function LogicPenguinProblem({
         isInstructorView={isInstructorView}
         onQuestionSaved={onQuestionSaved}
         problemLabel={problemLabel}
+        logicSystem={logicSystem}
       />
     )
   } else if (proof.type === 'indirect-truth-table') {
@@ -241,6 +250,7 @@ export default function LogicPenguinProblem({
         isInstructorView={isInstructorView}
         onQuestionSaved={onQuestionSaved}
         problemLabel={problemLabel}
+        logicSystem={logicSystem}
       />
     )
   } else if (proof.type === 'nonclassical-truth-table') {
@@ -275,6 +285,7 @@ export default function LogicPenguinProblem({
         isInstructorView={isInstructorView}
         onQuestionSaved={onQuestionSaved}
         problemLabel={problemLabel}
+        logicSystem={logicSystem}
       />
     )
   } else if (proof.type === 'partial-truth-table') {
@@ -292,6 +303,7 @@ export default function LogicPenguinProblem({
         isInstructorView={isInstructorView}
         onQuestionSaved={onQuestionSaved}
         problemLabel={problemLabel}
+        logicSystem={logicSystem}
       />
     )
   }

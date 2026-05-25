@@ -14,7 +14,7 @@ import { sortAssignmentsBySubchapter } from '../utils/assignmentSort.js'
 import { displayScoreForProof } from '../utils/problemHelpers.js'
 import { useCoursesState } from '../context/CoursesContext.jsx'
 import { useAppRuntime } from '../hooks/useAppRuntime.js'
-import { DEFAULT_LOGIC_SYSTEM, normalizeLogicSystem } from '../lib/logicSystems.js'
+import { DEFAULT_LOGIC_SYSTEM, LEGACY_LOGIC_SYSTEM, normalizeLogicSystem } from '../lib/logicSystems.js'
 
 function SandboxWorksheetContent() {
   const { assignmentId } = useParams()
@@ -133,7 +133,9 @@ const normalizeType = (snapshot) => (
 const mapQuestionToProof = (question, assignment, index, logicSystem = DEFAULT_LOGIC_SYSTEM) => {
   const snapshot = question?.question_snapshot || {}
   const type = normalizeType(snapshot)
-  const courseLogicSystem = normalizeLogicSystem(logicSystem, DEFAULT_LOGIC_SYSTEM)
+  const proofLogicSystem = type === 'derivation-hurley'
+    ? LEGACY_LOGIC_SYSTEM
+    : normalizeLogicSystem(logicSystem, DEFAULT_LOGIC_SYSTEM)
   const description = snapshot.prompt || snapshot.description || snapshot.text || 'Solve.'
   const questionId = question?.id ?? question?.assignment_question_id ?? question?.assignmentQuestionId ?? null
   const orderIndex = question?.order_index ?? question?.orderIndex ?? index
@@ -163,7 +165,7 @@ const mapQuestionToProof = (question, assignment, index, logicSystem = DEFAULT_L
     attemptLimit,
     legend,
     partialCredit: Boolean(snapshotPartial),
-    logicSystem: courseLogicSystem,
+    logicSystem: proofLogicSystem,
     questionSnapshot: question?.question_snapshot ?? snapshot,
     orderIndex,
   }
