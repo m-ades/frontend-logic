@@ -29,10 +29,18 @@ import PromptText from '../../ui/PromptText.jsx'
 import ThemedCard from '../../ui/ThemedCard.jsx'
 import ProblemSetButtons from '../mui/frame/ProblemSetButtons.jsx'
 import { MobileLogicInput, useMobileLogicKeyboardEnabled } from '../../ui/LogicKeyboard/index.js'
-import checkDerivation from '../../../lib/logicpenguin/checkers/derivation-hurley.js'
+import checkDerivationHurley from '../../../lib/logicpenguin/checkers/derivation-hurley.js'
+import checkDerivationCalgary from '../../../lib/logicpenguin/checkers/derivation-calgary.js'
 import getHurleyRuleset from '../../../lib/logicpenguin/checkers/rules/hurley-rules.js'
+import getForallxRuleset from '../../../lib/logicpenguin/checkers/rules/forallx-rules.js'
 import getFormulaClass from '../../../lib/logicpenguin/symbolic/formula.js'
 import getSyntax from '../../../lib/logicpenguin/symbolic/libsyntax.js'
+import {
+  getDerivationProblemType,
+  getNotation,
+  getSymbols,
+  normalizeLogicSystem,
+} from '../../../lib/logicSystems.js'
 import { justParse } from '../../ui/logicpenguin/justification-parse.js'
 import { getInsertSymbolLabel } from '../../ui/logicpenguin/LogicSymbol.jsx'
 import { buildPersistedSubmissionState, shouldUseApiValidation, submitApiValidation } from '../../../utils/submissionRuntime.js'
@@ -176,23 +184,49 @@ function getQuantifierButtonsFromFormulas(premises, conclusion) {
   return buttons
 }
 
-const SYMBOL_BUTTONS = [
-  { label: '~', insert: '~' },
-  { label: '•', insert: '•' },
-  { label: '∨', insert: '∨' },
-  { label: '⊃', insert: '⊃' },
-  { label: '≡', insert: '≡' },
-  { label: '(∀x)', insert: '(∀x)' },
-  { label: '(∃x)', insert: '(∃x)' },
-  { label: '(  )', pair: '()' },
-  { label: '[  ]', pair: '[]' },
-]
-// mobile fullscreen only. second row: (∀x) (∃x) ( ) [ ] under ~ • ∨ ⊃
-const SYMBOL_ROW2 = [SYMBOL_BUTTONS[5], SYMBOL_BUTTONS[6], SYMBOL_BUTTONS[7], SYMBOL_BUTTONS[8]]
+function getSymbolButtons(symbols) {
+  return [
+    { label: symbols.not, insert: symbols.not },
+    { label: symbols.and, insert: symbols.and },
+    { label: symbols.or, insert: symbols.or },
+    { label: symbols.conditional, insert: symbols.conditional },
+    { label: symbols.biconditional, insert: symbols.biconditional },
+    { label: '(∀x)', insert: '(∀x)' },
+    { label: '(∃x)', insert: '(∃x)' },
+    { label: '(  )', pair: '()' },
+    { label: '[  ]', pair: '[]' },
+  ]
+}
+
 const FORCE_UPPER_RULES = new Set(['UI','UG','EI','EG','MP','MT','HS','DS','CD','DN','DM','QN','CP','IP','ACP','AIP'])
-const ALL_DERIVATION_RULES = Object.keys(getHurleyRuleset())
-  .filter((r) => r !== 'Pr' && r !== 'Ass')
-  .map((r) => (FORCE_UPPER_RULES.has(r.toUpperCase()) ? r.toUpperCase() : r.charAt(0).toUpperCase() + r.slice(1).toLowerCase()))
+
+const formatRuleName = (rule) => {
+  if (!rule) return ''
+  if (FORCE_UPPER_RULES.has(rule.toUpperCase())) {
+    return rule.toUpperCase()
+  }
+  return rule.charAt(0).toUpperCase() + rule.slice(1).toLowerCase()
+}
+
+function getRuleNames(ruleset) {
+  return Object.keys(ruleset)
+    .filter((rule) => rule !== 'Pr' && rule !== 'Ass' && rule !== 'Hyp')
+    .filter((rule) => !ruleset[rule]?.hidden)
+    .map((rule) => formatRuleName(rule))
+}
+
+const DERIVATION_RULES_BY_TYPE = {
+  'derivation-hurley': getRuleNames(getHurleyRuleset()),
+  'derivation-calgary': getRuleNames(getForallxRuleset('calgary', 'calgary')),
+}
+
+const DERIVATION_CHECKERS_BY_TYPE = {
+  'derivation-hurley': (question, givenans, points, options) =>
+    checkDerivationHurley(question, givenans, points, options),
+  'derivation-calgary': (question, givenans, points, options) =>
+    checkDerivationCalgary(question, null, givenans, false, points, true, options),
+}
+
 const RULES_ALLOW_NO_LINES = new Set(['ACP', 'AIP'])
 const ASSUMPTION_RULES = new Set(['ACP', 'AIP'])
 const INDENT_START_RULES = new Set(['ACP', 'AIP'])
@@ -285,14 +319,6 @@ const applyInsertion = (value, selectionStart, selectionEnd, insertText, replace
   const nextValue = before + insertText + after
   const nextCursor = before.length + insertText.length
   return { nextValue, nextCursor }
-}
-
-const formatRuleName = (rule) => {
-  if (!rule) return ''
-  if (FORCE_UPPER_RULES.has(rule.toUpperCase())) {
-    return rule.toUpperCase()
-  }
-  return rule.charAt(0).toUpperCase() + rule.slice(1).toLowerCase()
 }
 
 const formatJustificationParts = (nums, ranges, citedrules) => {
@@ -456,6 +482,7 @@ const buildSubmission = (lines, conclusion, premises, normalizeFormula, normaliz
 
 export default function DerivationTable({
   proof,
+  logicSystem,
   savedState,
   onStateChange,
   onAttempt,
@@ -485,12 +512,18 @@ export default function DerivationTable({
   const formulaRefs = useRef({})
   const justRefs = useRef({})
   const mobileLogicKeyboardEnabled = useMobileLogicKeyboardEnabled()
+  const activeLogicSystem = normalizeLogicSystem(logicSystem)
+  const notation = getNotation(activeLogicSystem)
+  const symbols = getSymbols(activeLogicSystem)
+  const derivationProblemType = getDerivationProblemType(activeLogicSystem)
+  const checkDerivation = DERIVATION_CHECKERS_BY_TYPE[derivationProblemType] ?? DERIVATION_CHECKERS_BY_TYPE['derivation-hurley']
+  const allDerivationRules = DERIVATION_RULES_BY_TYPE[derivationProblemType] ?? DERIVATION_RULES_BY_TYPE['derivation-hurley']
   const [activeFormulaIndex, setActiveFormulaIndex] = useState(null)
   const activeKeyboardFormulaIndexRef = useRef(null)
   const lastFormulaIndexRef = useRef(null)
   const lastEditableIndexRef = useRef(null)
   const cursorPositionsRef = useRef({})
-  const syntax = useMemo(() => getSyntax(), [])
+  const syntax = useMemo(() => getSyntax(notation), [notation])
   const premises = useMemo(
     () => (Array.isArray(proof?.premises) ? proof.premises : []),
     [proof?.premises]
@@ -534,8 +567,8 @@ export default function DerivationTable({
       const unique = Array.from(new Set(allow.map((rule) => formatRuleName(String(rule)))))
       return unique.filter((rule) => rule && rule.toLowerCase() !== 'pr')
     }
-    return ALL_DERIVATION_RULES
-  }, [proof?.ruleset, proof?.options?.ruleset])
+    return allDerivationRules
+  }, [proof?.ruleset, proof?.options?.ruleset, allDerivationRules])
 
   /** Keyboard config for derivations.
    * - Predicate mode: three letter rows (predicates, constants, variables).
@@ -589,14 +622,15 @@ export default function DerivationTable({
     }
   }, [proof])
   const symbolButtons = useMemo(() => {
+    const baseSymbolButtons = getSymbolButtons(symbols)
     const extraQuantifierButtons = derivationKeyboardConfig.extraQuantifierButtons || []
-    if (extraQuantifierButtons.length === 0) return SYMBOL_BUTTONS
+    if (extraQuantifierButtons.length === 0) return baseSymbolButtons
     return [
-      ...SYMBOL_BUTTONS.slice(0, 7),
+      ...baseSymbolButtons.slice(0, 7),
       ...extraQuantifierButtons,
-      ...SYMBOL_BUTTONS.slice(7),
+      ...baseSymbolButtons.slice(7),
     ]
-  }, [derivationKeyboardConfig.extraQuantifierButtons])
+  }, [derivationKeyboardConfig.extraQuantifierButtons, symbols])
   const isLineCompleteForCheck = useCallback((line) => {
     if (!line) return false
     const formulaFilled = (line.formula || '').trim().length > 0
@@ -719,7 +753,7 @@ export default function DerivationTable({
       { prems: premises, conc: proof?.conclusion, ruleset: proof?.ruleset },
       submission.ans,
       -1,
-      proof?.options
+      { ...(proof?.options || {}), notation }
     )
     const normalizedConclusion = normalizeFormulaForCheck(proof?.conclusion || '')
     const errors = result?.errors || {}
@@ -824,7 +858,7 @@ export default function DerivationTable({
       })
     )
     return { perLine, rows, shouldAutoAdd }
-  }, [normalizeFormulaForCheck, normalizeJustificationForCheck, premises, proof?.conclusion, proof?.options, proof?.ruleset, isLineCompleteForCheck])
+  }, [checkDerivation, normalizeFormulaForCheck, normalizeJustificationForCheck, notation, premises, proof?.conclusion, proof?.options, proof?.ruleset, isLineCompleteForCheck])
 
   useEffect(() => {
     if (!autoCheckEnabled) {
@@ -1254,7 +1288,7 @@ export default function DerivationTable({
           { prems: premises, conc: proof?.conclusion, ruleset: proof?.ruleset },
           submission_data.ans,
           1,
-          proof?.options
+          { ...(proof?.options || {}), notation }
         )
         const successstatus = validation?.successstatus || 'incorrect'
         const nextAttempt = attemptCount + 1

@@ -10,6 +10,7 @@ import TruthTableEditor from './truth-table/TruthTableEditor.jsx'
 import { ProblemNavigationContext } from './ProblemNavigationContext.jsx'
 import { allowPartialForProof, displayScoreForProof } from '../../utils/problemHelpers.js'
 import InstructorQuestionEditor from './InstructorQuestionEditor.jsx'
+import { getDerivationProblemType, isDerivationProblemType } from '../../lib/logicSystems.js'
 
 function TabPanel(props) {
   const { children, value, index, direction, isMobile, ...other } = props;
@@ -148,7 +149,7 @@ function ProofTabs({
         },
       }
     }
-    if (type === 'derivation' || type === 'derivation-hurley') {
+    if (isDerivationProblemType(type)) {
       return {
         ...base,
         premises: [],
@@ -230,7 +231,10 @@ function ProofTabs({
     if (currentProof) {
       const proofEditorRef = proofRefs.current[currentProof.id]
       if (proofEditorRef) {
-        const derivEl = proofEditorRef.querySelector('derivation-hurley')
+        const derivationProblemType = currentProof.type === 'derivation-hurley'
+          ? 'derivation-hurley'
+          : getDerivationProblemType(currentProof.logicSystem)
+        const derivEl = proofEditorRef.querySelector(derivationProblemType)
         if (derivEl?.getState && !derivEl._isRestoring) {
           try {
             handleProofStateChange(currentProof.id, derivEl.getState(), {
@@ -567,11 +571,11 @@ function ProofTabs({
                         const savedState = getSavedProofState(proof.id)
                         // the proof carries the course system
                         const logicSystem = proof.logicSystem
-                        const shouldAttachAttempts = proof.type !== 'derivation' && proof.type !== 'derivation-hurley' && proof.type
+                        const isDerivation = !proof.type || isDerivationProblemType(proof.type)
+                        const shouldAttachAttempts = !isDerivation && proof.type
                         const savedStateWithAttempts = shouldAttachAttempts
                           ? { ...(savedState || {}), attemptCount: proof.attemptCount ?? 0 }
                           : savedState
-                        const isDerivation = proof.type === 'derivation' || proof.type === 'derivation-hurley' || !proof.type
 
                         if (proof.type === 'truth-table') {
                           return (

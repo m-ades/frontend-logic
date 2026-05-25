@@ -193,6 +193,7 @@ export default function ProofEditor({
           isInstructorView
           onSaved={onQuestionSaved}
           trigger="none"
+          logicSystem={logicSystem}
         />
       )}
 

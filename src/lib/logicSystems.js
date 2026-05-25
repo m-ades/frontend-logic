@@ -5,7 +5,9 @@ export const LOGIC_SYSTEMS = {
   fitch: {
     id: 'fitch',
     label: 'Fitch',
+    notation: 'calgary',
     derivationSystem: 'calgary',
+    derivationProblemType: 'derivation-calgary',
     symbols: {
       not: '¬',
       and: '∧',
@@ -14,12 +16,15 @@ export const LOGIC_SYSTEMS = {
       biconditional: '↔',
       forall: '∀',
       exists: '∃',
+      falsum: '⊥',
     },
   },
   hurley: {
     id: 'hurley',
     label: 'Hurley',
+    notation: 'hurley',
     derivationSystem: 'hurley',
+    derivationProblemType: 'derivation-hurley',
     symbols: {
       not: '~',
       and: '•',
@@ -28,6 +33,7 @@ export const LOGIC_SYSTEMS = {
       biconditional: '≡',
       forall: '∀',
       exists: '∃',
+      falsum: '✖',
     },
   },
 }
@@ -45,7 +51,19 @@ export function getLogicSystem(value, fallback = DEFAULT_LOGIC_SYSTEM) {
 }
 
 export function getDerivationProblemType(value, fallback = DEFAULT_LOGIC_SYSTEM) {
-  return `derivation-${getLogicSystem(value, fallback).derivationSystem}`
+  return getLogicSystem(value, fallback).derivationProblemType
+}
+
+export function getNotation(value, fallback = DEFAULT_LOGIC_SYSTEM) {
+  return getLogicSystem(value, fallback).notation
+}
+
+export function getSymbols(value, fallback = DEFAULT_LOGIC_SYSTEM) {
+  return getLogicSystem(value, fallback).symbols
+}
+
+export function isDerivationProblemType(value) {
+  return value === 'derivation' || value === 'derivation-hurley' || value === 'derivation-calgary'
 }
 
 export function getLogicSystemOptions() {
