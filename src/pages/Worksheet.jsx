@@ -14,6 +14,7 @@ import { sortAssignmentsBySubchapter } from '../utils/assignmentSort.js'
 import { displayScoreForProof } from '../utils/problemHelpers.js'
 import { useCoursesState } from '../context/CoursesContext.jsx'
 import { useAppRuntime } from '../hooks/useAppRuntime.js'
+import { DEFAULT_LOGIC_SYSTEM, normalizeLogicSystem } from '../lib/logicSystems.js'
 
 function SandboxWorksheetContent() {
   const { assignmentId } = useParams()
@@ -129,9 +130,10 @@ const normalizeType = (snapshot) => (
   snapshot?.type || snapshot?.problemType || snapshot?.logic_problem_type || 'derivation'
 )
 
-const mapQuestionToProof = (question, assignment, index) => {
+const mapQuestionToProof = (question, assignment, index, logicSystem = DEFAULT_LOGIC_SYSTEM) => {
   const snapshot = question?.question_snapshot || {}
   const type = normalizeType(snapshot)
+  const courseLogicSystem = normalizeLogicSystem(logicSystem, DEFAULT_LOGIC_SYSTEM)
   const description = snapshot.prompt || snapshot.description || snapshot.text || 'Solve.'
   const questionId = question?.id ?? question?.assignment_question_id ?? question?.assignmentQuestionId ?? null
   const orderIndex = question?.order_index ?? question?.orderIndex ?? index
@@ -161,6 +163,7 @@ const mapQuestionToProof = (question, assignment, index) => {
     attemptLimit,
     legend,
     partialCredit: Boolean(snapshotPartial),
+    logicSystem: courseLogicSystem,
     questionSnapshot: question?.question_snapshot ?? snapshot,
     orderIndex,
   }
@@ -415,10 +418,18 @@ function RealWorksheetContent() {
   const [loadError, setLoadError] = useState('')
   const [currentDueAt, setCurrentDueAt] = useState(null)
   const [questionScores, setQuestionScores] = useState({})
-  const { activeCourseId } = useCoursesState()
+  const { activeCourseId, courses } = useCoursesState()
   const { assignmentPath, assignmentsPath, isInstructor } = useAppRuntime()
   const courseId = activeCourseId ?? API_CONFIG.courseId
   const courseIdForApi = activeCourseId ?? null
+  const activeCourse = useMemo(
+    () => courses.find((course) => Number(course.id) === Number(activeCourseId)),
+    [courses, activeCourseId]
+  )
+  const courseLogicSystem = normalizeLogicSystem(
+    activeCourse?.logicSystem ?? activeCourse?.logic_system,
+    DEFAULT_LOGIC_SYSTEM
+  )
   const sessionId = useRef(null)
   const questionSessionId = useRef(null)
   const questionSessionQuestionIdRef = useRef(null)
@@ -508,6 +519,26 @@ function RealWorksheetContent() {
   useEffect(() => {
     currentWorksheetIdRef.current = currentWorksheet?.id ?? null
   }, [currentWorksheet?.id])
+
+  useEffect(() => {
+    // course data can arrive after proofs are mapped
+    setWorksheets((prev) => {
+      let didChange = false
+      const next = prev.map((worksheet) => {
+        let worksheetChanged = false
+        const proofs = worksheet.proofs || []
+        const nextProofs = proofs.map((proof) => {
+          if (proof.logicSystem === courseLogicSystem) return proof
+          worksheetChanged = true
+          return { ...proof, logicSystem: courseLogicSystem }
+        })
+        if (!worksheetChanged) return worksheet
+        didChange = true
+        return { ...worksheet, proofs: nextProofs }
+      })
+      return didChange ? next : prev
+    })
+  }, [courseLogicSystem])
 
   useEffect(() => {
     // reset to first problem on assignment change (restored from localStorage when worksheet loads)
@@ -772,7 +803,7 @@ function RealWorksheetContent() {
           if (worksheet.id !== assignmentId) return worksheet
           const nextProofs = worksheet.proofs.map((proof, idx) => {
             if (Number(proof.questionId) !== Number(questionId)) return proof
-            const updated = mapQuestionToProof(targetQuestion, assignmentInfo, idx)
+            const updated = mapQuestionToProof(targetQuestion, assignmentInfo, idx, courseLogicSystem)
             return {
               ...proof,
               ...updated,
@@ -788,7 +819,7 @@ function RealWorksheetContent() {
     } finally {
       solutionRefreshRef.current.delete(questionId)
     }
-  }, [activeUserId])
+  }, [activeUserId, courseLogicSystem])
 
   const handleQuestionCreated = useCallback((assignmentId, createdQuestion) => {
     if (!assignmentId || !createdQuestion) return
@@ -799,7 +830,7 @@ function RealWorksheetContent() {
           (proof) => Number(proof.questionId) === Number(createdQuestion.id)
         )
         if (exists) return worksheet
-        const nextProof = mapQuestionToProof(createdQuestion, worksheet, worksheet.proofs.length)
+        const nextProof = mapQuestionToProof(createdQuestion, worksheet, worksheet.proofs.length, courseLogicSystem)
         return {
           ...worksheet,
           proofs: [...worksheet.proofs, nextProof],
@@ -810,7 +841,7 @@ function RealWorksheetContent() {
       const nextIndex = currentWorksheet?.proofs?.length ?? 0
       setCurrentProofIndex(nextIndex)
     }
-  }, [currentWorksheet?.id, currentWorksheet?.proofs?.length, setCurrentProofIndex])
+  }, [courseLogicSystem, currentWorksheet?.id, currentWorksheet?.proofs?.length, setCurrentProofIndex])
 
   useEffect(() => {
     setCurrentDueAt(currentWorksheet?.due_at ?? currentWorksheet?.due_date ?? null)
@@ -1084,7 +1115,7 @@ function RealWorksheetContent() {
       isLocked: assignmentInfo.is_locked ?? false,
       hasLoadedDetails: true,
       proofs: questions.map((question, idx) =>
-        mapQuestionToProof(question, assignmentInfo, idx)
+        mapQuestionToProof(question, assignmentInfo, idx, courseLogicSystem)
       ),
     }
       const { attemptCountMap, completedProofIds, scoreByQuestion } = await loadSavedStates([worksheet])
@@ -1174,7 +1205,7 @@ function RealWorksheetContent() {
     return () => {
       isMounted = false
     }
-  }, [activeUserId, courseId, worksheetIdNum, worksheets])
+  }, [activeUserId, courseId, courseLogicSystem, worksheetIdNum, worksheets])
 
   const handleWorksheetChange = (newIndex) => {
     const newWorksheet = worksheets[newIndex]
