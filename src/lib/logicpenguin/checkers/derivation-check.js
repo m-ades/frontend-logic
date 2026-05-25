@@ -48,7 +48,7 @@ export default class DerivationCheck {
     };
 
     constructor(rules, deriv, prems, conc, options = {}) {
-        const Formula = getFormulaClass();
+        const Formula = getFormulaClass(options.notation);
         this.Formula = Formula;
         this.syntax = Formula.syntax;
         this.rules = rules;

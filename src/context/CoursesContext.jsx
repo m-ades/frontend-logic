@@ -1,5 +1,6 @@
 import { createContext, useContext, useReducer } from "react";
 import { fetchJson, getStoredUser } from "../utils/api.js";
+import { DEFAULT_LOGIC_SYSTEM, normalizeLogicSystem } from "../lib/logicSystems.js";
 import { sortAssignmentsBySubchapter } from "../utils/assignmentSort.js";
 import { isInstructorRole } from "../utils/auth.js";
 import { parseDueDateAsEastern } from "../utils/easternTime.js";
@@ -88,6 +89,8 @@ const mapCourseRecord = (course, index) => ({
   name: course.title,
   code: course.course_code,
   semester: course.semester,
+  logicSystem: normalizeLogicSystem(course.logic_system, DEFAULT_LOGIC_SYSTEM),
+  logic_system: normalizeLogicSystem(course.logic_system, DEFAULT_LOGIC_SYSTEM),
   status: course.is_active ? "current" : "past",
   createdAt: course.created_at,
   studentCount: 0,

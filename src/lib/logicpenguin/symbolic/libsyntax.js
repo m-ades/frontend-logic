@@ -10,7 +10,7 @@
 import notations from './notations.js';
 
 const DEFAULT_NOTATION = 'hurley';
-let cachedSyntax = null;
+const syntaxes = {};
 
 // adicities for operators
 const symbolcat = {
@@ -154,12 +154,12 @@ function stripmatching(s) {
 }
 
 //////////// Main function for generating new syntax
-function generateSyntax() {
+function generateSyntax(notationname = DEFAULT_NOTATION) {
     // initialize return value
     const syntax = {};
 
-    syntax.notation = notations[DEFAULT_NOTATION];
-    syntax.notationname = DEFAULT_NOTATION;
+    syntax.notationname = notationname in notations ? notationname : DEFAULT_NOTATION;
+    syntax.notation = notations[syntax.notationname];
 
     // symbols are those things in notation also in symbolcat
     const symbols = {}
@@ -232,13 +232,11 @@ function generateSyntax() {
 // EXPORTED FUNCTION
 //
 // returns the app's (single) syntax object
-export default function getSyntax() {
-    if (cachedSyntax) {
-        // regenerate if notation has changed (e.g., updated ranges)
-        if (cachedSyntax?.notation?.predicatesRange?.includes('a')) {
-            return cachedSyntax;
-        }
+export default function getSyntax(notationname = DEFAULT_NOTATION) {
+    const selectedNotation = notationname in notations ? notationname : DEFAULT_NOTATION;
+    if (syntaxes[selectedNotation]) {
+        return syntaxes[selectedNotation];
     }
-    cachedSyntax = generateSyntax();
-    return cachedSyntax;
+    syntaxes[selectedNotation] = generateSyntax(selectedNotation);
+    return syntaxes[selectedNotation];
 }
