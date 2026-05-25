@@ -218,8 +218,8 @@ export async function fetchCourseGradebook(courseId) {
       }
       if (assignment.has_grade && assignment.max_score > 0) {
         grades[assignment.assignment_id] = Math.round(
-          (assignment.final_score / assignment.max_score) * 100
-        );
+          (assignment.final_score / assignment.max_score) * 100000
+        ) / 1000;
       }
     });
 
@@ -232,7 +232,7 @@ export async function fetchCourseGradebook(courseId) {
       average:
         student.dropped?.average_percent !== null &&
         student.dropped?.average_percent !== undefined
-          ? Math.round(student.dropped.average_percent * 100)
+          ? Math.round(student.dropped.average_percent * 100000) / 1000
           : 0,
       grades,
       submittedAssignments,
