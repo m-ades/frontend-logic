@@ -40,6 +40,7 @@ export default function ValidCorrectSound({
   isInstructorView = false,
   onQuestionSaved,
   problemLabel,
+  logicSystem,
 }) {
   const editorRef = useRef(null)
   const openEdit = () => editorRef.current?.open?.()
@@ -160,6 +161,7 @@ export default function ValidCorrectSound({
           isInstructorView
           onSaved={onQuestionSaved}
           trigger="none"
+          logicSystem={logicSystem}
         />
       ) : null}
     >

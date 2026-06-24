@@ -16,6 +16,7 @@ const FormulaField = forwardRef(function FormulaField({
   predicateLetters,
   constantLetters,
   variableLetters,
+  logicSystem,
   sx,
 }, ref) {
   const theme = useTheme()
@@ -37,6 +38,7 @@ const FormulaField = forwardRef(function FormulaField({
         predicateLetters={predicateLetters}
         constantLetters={constantLetters}
         variableLetters={variableLetters}
+        logicSystem={logicSystem}
       />
     )
   }

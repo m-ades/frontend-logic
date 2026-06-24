@@ -20,8 +20,9 @@ import {
   isPredicateLogicKey,
   promptImpliesPredicateLogic,
 } from './symbolizationKeyboard.js'
+import { getNotation } from '../../../../lib/logicSystems.js'
 
-function FormulaInputField({ value, onValueChange, fieldReadOnly, formulaInputRef, onEnterKey, ariaLabel }) {
+function FormulaInputField({ value, onValueChange, fieldReadOnly, formulaInputRef, onEnterKey, ariaLabel, notation }) {
   const theme = useTheme()
   const containerRef = useRef(null)
   const changeHandlerRef = useRef(null)
@@ -29,7 +30,7 @@ function FormulaInputField({ value, onValueChange, fieldReadOnly, formulaInputRe
   useEffect(() => {
     if (!containerRef.current) return
     if (!formulaInputRef.current) {
-      const formulaInput = FormulaInput.getnew({})
+      const formulaInput = FormulaInput.getnew({ notation })
       formulaInputRef.current = formulaInput
       formulaInput.style.width = '100%'
       formulaInput.style.padding = theme.spacing(1.5)
@@ -57,7 +58,7 @@ function FormulaInputField({ value, onValueChange, fieldReadOnly, formulaInputRe
         formulaInputRef.current = null
       }
     }
-  }, [ariaLabel, formulaInputRef, theme])
+  }, [ariaLabel, formulaInputRef, notation, theme])
 
   useEffect(() => {
     if (!formulaInputRef.current) return
@@ -139,10 +140,12 @@ export default function SymbolicTranslation({
   isAssignmentLocked = false,
   isInstructorView = false,
   onQuestionSaved,
+  logicSystem,
 }) {
   const theme = useTheme()
   const isPhone = useMediaQuery(theme.breakpoints.down('sm'))
   const editorRef = useRef(null)
+  const notation = getNotation(logicSystem)
   const openEdit = () => editorRef.current?.open?.()
   const [inputValue, setInputValue] = useState(savedState?.ans || '')
   const formulaInputRef = useRef(null)
@@ -301,6 +304,7 @@ export default function SymbolicTranslation({
                   predicateLetters={isPredicate ? predicateLetters : undefined}
                   constantLetters={isPredicate ? constantLetters : undefined}
                   variableLetters={isPredicate ? variableLetters : undefined}
+                  logicSystem={logicSystem}
                 />
               ) : (
                 <>
@@ -315,6 +319,7 @@ export default function SymbolicTranslation({
                     formulaInputRef={formulaInputRef}
                     onEnterKey={!readOnly && !hideActions ? handleCheck : undefined}
                     ariaLabel="Your translation"
+                    notation={notation}
                   />
                   <Box sx={{ mt: 1 }}>
                     <SymbolButtonRow
@@ -326,6 +331,7 @@ export default function SymbolicTranslation({
                         setInputValue(value)
                         scheduleStateSave(value)
                       }}
+                      logicSystem={logicSystem}
                     />
                   </Box>
                 </>
@@ -368,7 +374,7 @@ export default function SymbolicTranslation({
         />
       )}
       {isInstructorView && proof && (
-        <InstructorQuestionEditor ref={editorRef} proof={proof} isInstructorView onSaved={onQuestionSaved} trigger="none" />
+        <InstructorQuestionEditor ref={editorRef} proof={proof} isInstructorView onSaved={onQuestionSaved} trigger="none" logicSystem={logicSystem} />
       )}
     </Stack>
   )

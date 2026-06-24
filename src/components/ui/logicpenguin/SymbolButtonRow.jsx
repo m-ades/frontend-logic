@@ -1,6 +1,7 @@
 import { Box, Button, Stack } from '@mui/material'
 import { alpha } from '@mui/material/styles'
 import getSyntax from '../../../lib/logicpenguin/symbolic/libsyntax.js'
+import { getNotation } from '../../../lib/logicSystems.js'
 import LogicSymbol, { getInsertSymbolLabel } from './LogicSymbol.jsx'
 
 const FALLBACK_SYMBOLS = {
@@ -59,8 +60,9 @@ export default function SymbolButtonRow({
   showBackspace = true,
   extraInsertButtons,
   centerButtons = false,
+  logicSystem,
 }) {
-  const syntax = getSyntax()
+  const syntax = getSyntax(getNotation(logicSystem))
   const inputSymbols = inputRef?.current?.symbols
   const symbols = inputSymbols || syntax?.symbols || {}
 

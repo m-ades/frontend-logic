@@ -81,6 +81,7 @@ function ProofTabs({
   onQuestionSaved,
   onQuestionCreated,
   assignmentId,
+  logicSystem,
 }) {
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
@@ -478,6 +479,7 @@ function ProofTabs({
                     mode="create"
                     assignmentId={assignmentId}
                     orderIndex={nextOrderIndex}
+                    logicSystem={logicSystem}
                     onCreated={(created) => {
                       onQuestionCreated?.(assignmentId, created)
                       setCreateProof(null)

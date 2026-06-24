@@ -33,6 +33,7 @@ import {
 } from './truthTableUi.js'
 import PromptText from '../../ui/PromptText.jsx'
 import { tablesEqual, clearDebounce, scheduleDebouncedChange } from '../../../utils/tablePerf.js'
+import { getNotation } from '../../../lib/logicSystems.js'
 
 export default function TruthTableEditor({
   proof,
@@ -50,12 +51,14 @@ export default function TruthTableEditor({
   isInstructorView = false,
   onQuestionSaved,
   problemLabel,
+  logicSystem,
 }) {
   const editorRef = React.useRef(null)
   const openEdit = () => editorRef.current?.open?.()
   const truthTable = proof.truthTable ?? {}
-  const syntax = React.useMemo(() => getSyntax(), [])
-  const Formula = React.useMemo(() => getFormulaClass(), [])
+  const notation = getNotation(logicSystem)
+  const syntax = React.useMemo(() => getSyntax(notation), [notation])
+  const Formula = React.useMemo(() => getFormulaClass(notation), [notation])
   const kind = truthTable.kind
     ?? (truthTable.left && truthTable.right ? 'equivalence' : 'formula')
   const classificationEnabled = React.useMemo(() => {
@@ -583,6 +586,7 @@ export default function TruthTableEditor({
             isInstructorView
             onSaved={onQuestionSaved}
             trigger="none"
+            logicSystem={logicSystem}
           />
         ) : null}
       >

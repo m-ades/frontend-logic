@@ -31,8 +31,6 @@ import ProblemSetButtons from '../mui/frame/ProblemSetButtons.jsx'
 import { MobileLogicInput, useMobileLogicKeyboardEnabled } from '../../ui/LogicKeyboard/index.js'
 import checkDerivationHurley from '../../../lib/logicpenguin/checkers/derivation-hurley.js'
 import checkDerivationCalgary from '../../../lib/logicpenguin/checkers/derivation-calgary.js'
-import getHurleyRuleset from '../../../lib/logicpenguin/checkers/rules/hurley-rules.js'
-import getForallxRuleset from '../../../lib/logicpenguin/checkers/rules/forallx-rules.js'
 import getFormulaClass from '../../../lib/logicpenguin/symbolic/formula.js'
 import getSyntax from '../../../lib/logicpenguin/symbolic/libsyntax.js'
 import {
@@ -41,6 +39,7 @@ import {
   getSymbols,
   normalizeLogicSystem,
 } from '../../../lib/logicSystems.js'
+import { formatDerivationRuleName as formatRuleName, getDerivationRules } from '../../../lib/derivationRules.js'
 import { justParse } from '../../ui/logicpenguin/justification-parse.js'
 import { getInsertSymbolLabel } from '../../ui/logicpenguin/LogicSymbol.jsx'
 import { buildPersistedSubmissionState, shouldUseApiValidation, submitApiValidation } from '../../../utils/submissionRuntime.js'
@@ -196,28 +195,6 @@ function getSymbolButtons(symbols) {
     { label: '(  )', pair: '()' },
     { label: '[  ]', pair: '[]' },
   ]
-}
-
-const FORCE_UPPER_RULES = new Set(['UI','UG','EI','EG','MP','MT','HS','DS','CD','DN','DM','QN','CP','IP','ACP','AIP'])
-
-const formatRuleName = (rule) => {
-  if (!rule) return ''
-  if (FORCE_UPPER_RULES.has(rule.toUpperCase())) {
-    return rule.toUpperCase()
-  }
-  return rule.charAt(0).toUpperCase() + rule.slice(1).toLowerCase()
-}
-
-function getRuleNames(ruleset) {
-  return Object.keys(ruleset)
-    .filter((rule) => rule !== 'Pr' && rule !== 'Ass' && rule !== 'Hyp')
-    .filter((rule) => !ruleset[rule]?.hidden)
-    .map((rule) => formatRuleName(rule))
-}
-
-const DERIVATION_RULES_BY_TYPE = {
-  'derivation-hurley': getRuleNames(getHurleyRuleset()),
-  'derivation-calgary': getRuleNames(getForallxRuleset('calgary', 'calgary')),
 }
 
 const DERIVATION_CHECKERS_BY_TYPE = {
@@ -517,7 +494,7 @@ export default function DerivationTable({
   const symbols = getSymbols(activeLogicSystem)
   const derivationProblemType = getDerivationProblemType(activeLogicSystem)
   const checkDerivation = DERIVATION_CHECKERS_BY_TYPE[derivationProblemType] ?? DERIVATION_CHECKERS_BY_TYPE['derivation-hurley']
-  const allDerivationRules = DERIVATION_RULES_BY_TYPE[derivationProblemType] ?? DERIVATION_RULES_BY_TYPE['derivation-hurley']
+  const allDerivationRules = getDerivationRules(activeLogicSystem)
   const [activeFormulaIndex, setActiveFormulaIndex] = useState(null)
   const activeKeyboardFormulaIndexRef = useRef(null)
   const lastFormulaIndexRef = useRef(null)
@@ -1712,6 +1689,7 @@ export default function DerivationTable({
                       constantLetters={derivationKeyboardConfig.isPredicateMode ? derivationKeyboardConfig.constantLetters : undefined}
                       variableLetters={derivationKeyboardConfig.isPredicateMode ? derivationKeyboardConfig.variableLetters : undefined}
                       symbolizationKey={derivationKeyboardConfig.symbolizationKey}
+                      logicSystem={activeLogicSystem}
                     />
                   ) : (
                   <TextField

@@ -14,7 +14,7 @@ import { sortAssignmentsBySubchapter } from '../utils/assignmentSort.js'
 import { displayScoreForProof } from '../utils/problemHelpers.js'
 import { useCoursesState } from '../context/CoursesContext.jsx'
 import { useAppRuntime } from '../hooks/useAppRuntime.js'
-import { DEFAULT_LOGIC_SYSTEM, LEGACY_LOGIC_SYSTEM, normalizeLogicSystem } from '../lib/logicSystems.js'
+import { DEFAULT_LOGIC_SYSTEM, LEGACY_LOGIC_SYSTEM, isDerivationProblemType, normalizeLogicSystem } from '../lib/logicSystems.js'
 
 function SandboxWorksheetContent() {
   const { assignmentId } = useParams()
@@ -170,7 +170,7 @@ const mapQuestionToProof = (question, assignment, index, logicSystem = DEFAULT_L
     orderIndex,
   }
 
-  if (type === 'derivation' || type === 'derivation-hurley') {
+  if (isDerivationProblemType(type)) {
     return {
       ...proofBase,
       type: 'derivation',
@@ -1078,7 +1078,7 @@ function RealWorksheetContent() {
           return
         }
 
-        if (proof.type === 'derivation' || proof.type === 'derivation-hurley') {
+        if (isDerivationProblemType(proof.type)) {
           initialStates[proof.id] = data.ans || data.ind ? data : { ans: data }
           return
         }
@@ -1322,6 +1322,7 @@ function RealWorksheetContent() {
           isInstructorView={isInstructor}
           onQuestionSaved={currentWorksheet?.id ? (qId) => refreshQuestionSolutions(currentWorksheet.id, qId) : undefined}
           onQuestionCreated={handleQuestionCreated}
+          logicSystem={courseLogicSystem}
         />
       </WorksheetLayout>
     </Box>

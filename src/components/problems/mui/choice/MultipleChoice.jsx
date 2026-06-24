@@ -96,6 +96,7 @@ export default function MultipleChoice({
   isInstructorView = false,
   onQuestionSaved,
   problemLabel,
+  logicSystem,
 }) {
   const editorRef = useRef(null)
   const openEdit = () => editorRef.current?.open?.()
@@ -269,6 +270,7 @@ export default function MultipleChoice({
           isInstructorView
           onSaved={onQuestionSaved}
           trigger="none"
+          logicSystem={logicSystem}
         />
       ) : null}
     >

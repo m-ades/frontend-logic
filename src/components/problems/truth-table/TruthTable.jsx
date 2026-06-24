@@ -32,6 +32,7 @@ import {
 } from './truthTableUi.js'
 import PromptText from '../../ui/PromptText.jsx'
 import { tablesEqual, clearDebounce, scheduleDebouncedChange } from '../../../utils/tablePerf.js'
+import { getNotation } from '../../../lib/logicSystems.js'
 
 const KIND_BY_PROOF_TYPE = {
   'formula-truth-table': 'formula',
@@ -47,10 +48,12 @@ export default function TruthTable({
   hideActions = false,
   suppressReveal = false,
   embedded = false,
+  logicSystem,
 }) {
   const truthTable = proof.truthTable ?? {}
-  const syntax = React.useMemo(() => getSyntax(), [])
-  const Formula = React.useMemo(() => getFormulaClass(), [])
+  const notation = getNotation(logicSystem)
+  const syntax = React.useMemo(() => getSyntax(notation), [notation])
+  const Formula = React.useMemo(() => getFormulaClass(notation), [notation])
   const kind = truthTable.kind
     ?? KIND_BY_PROOF_TYPE[proof?.type]
     ?? (truthTable.lefts && truthTable.right ? 'argument' : null)
