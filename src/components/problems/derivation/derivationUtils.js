@@ -85,9 +85,9 @@ export const FORCE_UPPER_RULES = new Set(['UI', 'UG', 'EI', 'EG', 'MP', 'MT', 'H
 export const ALL_DERIVATION_RULES = Object.keys(getHurleyRuleset())
   .filter((rule) => rule !== 'Pr' && rule !== 'Ass')
   .map((rule) => (FORCE_UPPER_RULES.has(rule.toUpperCase()) ? rule.toUpperCase() : rule.charAt(0).toUpperCase() + rule.slice(1).toLowerCase()))
-export const RULES_ALLOW_NO_LINES = new Set(['ACP', 'AIP'])
-export const ASSUMPTION_RULES = new Set(['ACP', 'AIP'])
-export const INDENT_START_RULES = new Set(['ACP', 'AIP'])
+export const RULES_ALLOW_NO_LINES = new Set(['ACP', 'AIP', 'HYP'])
+export const ASSUMPTION_RULES = new Set(['ACP', 'AIP', 'HYP'])
+export const INDENT_START_RULES = new Set(['ACP', 'AIP', 'HYP'])
 export const INDENT_END_RULES = new Set(['CP', 'IP'])
 export const INDENT_PX = 18
 export const ASSUMPTION_INDENT_PX = 12
@@ -337,6 +337,19 @@ const lineFromLP = (line) => ({
   readOnly: false,
 })
 
+// flatten saved lp nesting for the table
+const flattenLPParts = (parts = []) => {
+  const lines = []
+  for (const part of parts) {
+    if (Array.isArray(part?.parts)) {
+      lines.push(...flattenLPParts(part.parts))
+    } else {
+      lines.push(lineFromLP(part))
+    }
+  }
+  return lines
+}
+
 export const extractLines = (savedState, premises = []) => {
   if (!savedState) {
     return []
@@ -345,27 +358,80 @@ export const extractLines = (savedState, premises = []) => {
   const first = Array.isArray(ans?.parts) ? ans.parts[0] : null
   if (!first) return []
   const parts = Array.isArray(first.parts) ? first.parts : []
-  const lines = parts
-    .filter((part) => !part.parts)
-    .map(lineFromLP)
-  if (premises.length && lines.length >= premises.length) {
-    return lines.map((line, idx) => ({ ...line, readOnly: idx < premises.length }))
+  const lines = flattenLPParts(parts)
+  const savedPremiseCount = Array.isArray(ans?.prems) ? ans.prems.length : premises.length
+  if (premises.length || savedPremiseCount) {
+    const premLines = premises.map((premise) => ({ formula: premise, justification: '', readOnly: true }))
+    const savedEditableLines = lines.slice(savedPremiseCount)
+    const editableLines = savedEditableLines.length
+      ? savedEditableLines
+      : [{ formula: '', justification: '', readOnly: false }]
+    return [
+      ...premLines,
+      ...editableLines.map((line) => ({ ...line, readOnly: false })),
+    ]
   }
   return lines
 }
 
-export const buildSubmission = (lines, conclusion, premises, normalizeFormula, normalizeJustification) => {
+// rebuild lp nesting from cited ranges
+const buildNestedSubderivationParts = (numbered) => {
+  const byLineNumber = new Map(numbered.map((part) => [Number(part.n), part]))
+  const rangesByStart = new Map()
+
+  // only assumption ranges open subderivations
+  for (const part of numbered) {
+    const lineNumber = Number(part.n)
+    const { ranges } = justParse(String(part.j || ''))
+    for (const [start, end] of ranges) {
+      if (!Number.isFinite(start) || !Number.isFinite(end)) continue
+      if (start >= end || end >= lineNumber) continue
+      const startPart = byLineNumber.get(start)
+      const startRule = getRuleFromJustification(startPart?.j || '').toUpperCase()
+      if (!ASSUMPTION_RULES.has(startRule)) continue
+      const currentEnd = rangesByStart.get(start)
+      if (!currentEnd || end > currentEnd) {
+        rangesByStart.set(start, end)
+      }
+    }
+  }
+
+  const buildRange = (startLine, endLine, wrappedStartLine = null) => {
+    const parts = []
+    let lineNumber = startLine
+    while (lineNumber <= endLine) {
+      const nestedEnd = rangesByStart.get(lineNumber)
+      if (nestedEnd && nestedEnd <= endLine && lineNumber !== wrappedStartLine) {
+        parts.push({ parts: buildRange(lineNumber, nestedEnd, lineNumber) })
+        lineNumber = nestedEnd + 1
+        continue
+      }
+      const part = byLineNumber.get(lineNumber)
+      if (part) parts.push(part)
+      lineNumber += 1
+    }
+    return parts
+  }
+
+  if (numbered.length === 0) return []
+  return buildRange(Number(numbered[0].n), Number(numbered[numbered.length - 1].n))
+}
+
+export const buildSubmission = (lines, conclusion, premises, normalizeFormula, normalizeJustification, options = {}) => {
   const numbered = lines.map((line, idx) => ({
     n: String(idx + 1),
     s: normalizeFormula(line.formula ?? ''),
     j: idx < premises.length ? 'Pr' : normalizeJustification(line.justification ?? ''),
   }))
+  const parts = options.nestedSubderivations
+    ? buildNestedSubderivationParts(numbered)
+    : numbered
   return {
     ans: {
       parts: [
         {
           showline: { s: normalizeFormula(conclusion || ''), j: '', isMainConclusion: true, n: '' },
-          parts: numbered,
+          parts,
         },
       ],
       prems: premises,

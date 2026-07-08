@@ -350,6 +350,12 @@ export default class DerivationCheck {
             }
             return line;
         }
+        // fitch assumptions start subderivations
+        if (rule?.assumptionrule) {
+            line.mysubderiv.assumptions.push(Formula.from(line.s).normal);
+            line.checkedOK = true;
+            return line;
+        }
         // EQUIVALENCE RULE
         if (rule?.replacementrule) {
             const equivcheck = (new replacementRuleCheck(rule, rulename,

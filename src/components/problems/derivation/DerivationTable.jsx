@@ -43,7 +43,17 @@ import { formatDerivationRuleName as formatRuleName, getDerivationRules } from '
 import { justParse } from '../../ui/logicpenguin/justification-parse.js'
 import { getInsertSymbolLabel } from '../../ui/logicpenguin/LogicSymbol.jsx'
 import { buildPersistedSubmissionState, shouldUseApiValidation, submitApiValidation } from '../../../utils/submissionRuntime.js'
-import { getOpenAssumptionDepths, isResolvedConclusionLine } from './derivationUtils.js'
+import {
+  ASSUMPTION_RULES,
+  INDENT_END_RULES,
+  INDENT_START_RULES,
+  MAX_INDENT_LEVEL,
+  RULES_ALLOW_NO_LINES,
+  buildSubmission,
+  extractLines,
+  getOpenAssumptionDepths,
+  isResolvedConclusionLine,
+} from './derivationUtils.js'
 
 /** Compare formula strings by canonical form so ∃x(~Hx) and ∃x~Hx count equal */
 function formulasEqualNormally(a, b, normalizeForFallback) {
@@ -204,11 +214,6 @@ const DERIVATION_CHECKERS_BY_TYPE = {
     checkDerivationCalgary(question, null, givenans, false, points, true, options),
 }
 
-const RULES_ALLOW_NO_LINES = new Set(['ACP', 'AIP'])
-const ASSUMPTION_RULES = new Set(['ACP', 'AIP'])
-const INDENT_START_RULES = new Set(['ACP', 'AIP'])
-const INDENT_END_RULES = new Set(['CP', 'IP'])
-const MAX_INDENT_LEVEL = 3
 const AUTO_CHECK_STORAGE_KEY = 'logic-app:autocheck-enabled'
 const RULE_INPUT_MODE_KEY = 'logic-app:derivation-rule-input-mode'
 
@@ -404,59 +409,6 @@ const buildErrorRows = (errors, linesSnapshot = [], { skipCompletion = false } =
   return rows
 }
 
-const lineFromLP = (line) => ({
-  formula: line?.s ?? '',
-  justification: line?.j ?? '',
-  readOnly: false,
-})
-
-const extractLines = (savedState, premises = []) => {
-  if (!savedState) {
-    return []
-  }
-  const ans = savedState?.ans ?? savedState
-  const first = Array.isArray(ans?.parts) ? ans.parts[0] : null
-  if (!first) return []
-  const parts = Array.isArray(first.parts) ? first.parts : []
-  const lines = parts
-    .filter((p) => !p.parts) // skip nested subderivations (not supported in simplified UI)
-    .map(lineFromLP)
-  const savedPremiseCount = Array.isArray(ans?.prems) ? ans.prems.length : premises.length
-  if (premises.length || savedPremiseCount) {
-    // use the current question premises
-    const premLines = premises.map((p) => ({ formula: p, justification: '', readOnly: true }))
-    const savedEditableLines = lines.slice(savedPremiseCount)
-    const editableLines = savedEditableLines.length
-      ? savedEditableLines
-      : [{ formula: '', justification: '', readOnly: false }]
-    return [
-      ...premLines,
-      ...editableLines.map((line) => ({ ...line, readOnly: false })),
-    ]
-  }
-  return lines
-}
-
-const buildSubmission = (lines, conclusion, premises, normalizeFormula, normalizeJustification) => {
-  const numbered = lines.map((line, idx) => ({
-    n: String(idx + 1),
-    s: normalizeFormula(line.formula ?? ''),
-    j: idx < premises.length ? 'Pr' : normalizeJustification(line.justification ?? ''),
-  }))
-  return {
-    ans: {
-      parts: [
-        {
-          showline: { s: normalizeFormula(conclusion || ''), j: '', isMainConclusion: true, n: '' },
-          parts: numbered,
-        },
-      ],
-      prems: premises,
-      conc: normalizeFormula(conclusion || ''),
-    },
-  }
-}
-
 export default function DerivationTable({
   proof,
   logicSystem,
@@ -493,6 +445,7 @@ export default function DerivationTable({
   const notation = getNotation(activeLogicSystem)
   const symbols = getSymbols(activeLogicSystem)
   const derivationProblemType = getDerivationProblemType(activeLogicSystem)
+  const usesNestedSubderivations = derivationProblemType === 'derivation-calgary'
   const checkDerivation = DERIVATION_CHECKERS_BY_TYPE[derivationProblemType] ?? DERIVATION_CHECKERS_BY_TYPE['derivation-hurley']
   const allDerivationRules = getDerivationRules(activeLogicSystem)
   const [activeFormulaIndex, setActiveFormulaIndex] = useState(null)
@@ -708,7 +661,8 @@ export default function DerivationTable({
       proof?.conclusion,
       premises,
       normalizeFormulaForCheck,
-      normalizeJustificationForSave
+      normalizeJustificationForSave,
+      { nestedSubderivations: usesNestedSubderivations }
     )
     if (options.immediate) {
       return onStateChangeRef.current?.(submission, options)
@@ -716,7 +670,7 @@ export default function DerivationTable({
     queueMicrotask(() => {
       onStateChangeRef.current?.(submission, options)
     })
-  }, [premises, proof?.conclusion, normalizeFormulaForCheck, normalizeJustificationForSave])
+  }, [premises, proof?.conclusion, normalizeFormulaForCheck, normalizeJustificationForSave, usesNestedSubderivations])
 
   const runAutoCheck = useCallback(async (linesSnapshot) => {
     const submission = buildSubmission(
@@ -724,7 +678,8 @@ export default function DerivationTable({
       proof?.conclusion,
       premises,
       normalizeFormulaForCheck,
-      normalizeJustificationForCheck
+      normalizeJustificationForCheck,
+      { nestedSubderivations: usesNestedSubderivations }
     )
     const result = await checkDerivation(
       { prems: premises, conc: proof?.conclusion, ruleset: proof?.ruleset },
@@ -835,7 +790,7 @@ export default function DerivationTable({
       })
     )
     return { perLine, rows, shouldAutoAdd }
-  }, [checkDerivation, normalizeFormulaForCheck, normalizeJustificationForCheck, notation, premises, proof?.conclusion, proof?.options, proof?.ruleset, isLineCompleteForCheck])
+  }, [checkDerivation, normalizeFormulaForCheck, normalizeJustificationForCheck, notation, premises, proof?.conclusion, proof?.options, proof?.ruleset, isLineCompleteForCheck, usesNestedSubderivations])
 
   useEffect(() => {
     if (!autoCheckEnabled) {
@@ -1258,7 +1213,8 @@ export default function DerivationTable({
         proof?.conclusion,
         premises,
         normalizeFormulaForCheck,
-        normalizeJustificationForCheck
+        normalizeJustificationForCheck,
+        { nestedSubderivations: usesNestedSubderivations }
       )
       if (!shouldUseApiValidation(proof?.questionId)) {
         const validation = await checkDerivation(
