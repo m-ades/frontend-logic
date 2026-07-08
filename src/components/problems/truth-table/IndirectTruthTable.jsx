@@ -18,13 +18,13 @@ export default function IndirectTruthTable(props) {
     if (tokens.length) return tokens
     try {
       const wff = Formula.from(statement)
-      tokens = multiTables([wff])?.tables?.[0]?.tokens ?? []
+      tokens = multiTables([wff], notation)?.tables?.[0]?.tokens ?? []
       if (tokens.length) return tokens
     } catch {
       return []
     }
     return []
-  }, [Formula, syntax])
+  }, [Formula, notation, syntax])
 
   return (
     <SandboxTruthTable

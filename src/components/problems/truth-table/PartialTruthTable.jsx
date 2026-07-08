@@ -58,9 +58,9 @@ export default function PartialTruthTable({
   const tokens = useMemo(() => {
     if (!statement) return []
     const wff = Formula.from(statement)
-    const tables = multiTables([wff])
+    const tables = multiTables([wff], notation)
     return tables?.tables?.[0]?.tokens ?? []
-  }, [Formula, statement])
+  }, [Formula, notation, statement])
 
   const editableIndices = useMemo(
     () => tokens.map((_, idx) => toTruth(givenRow[idx]) === null),

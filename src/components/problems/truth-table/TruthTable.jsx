@@ -144,7 +144,7 @@ export default function TruthTable({
   const tables = React.useMemo(() => {
     if (statements.length === 0) return []
     const wffs = statements.map((statement) => Formula.from(statement))
-    const res = multiTables(wffs)
+    const res = multiTables(wffs, notation)
     return statements.map((label, idx) => {
       const statement = statements[idx]
       return {
@@ -422,8 +422,8 @@ export default function TruthTable({
 
   // Correct multiple-choice answer for solution reveal (from proof.solution or derived from problem)
   const solutionMcValues = React.useMemo(
-    () => deriveTruthTableSolutionClassification(kind, proof?.solution, statements, Formula),
-    [Formula, kind, proof?.solution, statements]
+    () => deriveTruthTableSolutionClassification(kind, proof?.solution, statements, Formula, notation),
+    [Formula, kind, notation, proof?.solution, statements]
   )
 
   const promptContent = embedded && (proof.description || tableConfig.prompt)
@@ -544,7 +544,7 @@ export default function TruthTable({
             fontWeight: 400,
           }}
         >
-          {tableCorrect
+          {tableFilledOnly && tableCorrect
             ? 'Truth table looks good.'
             : tableFilledOnly
               ? 'Recheck your rows.'
@@ -580,7 +580,7 @@ export default function TruthTable({
             fontWeight: 400,
           }}
         >
-          {tableCorrect
+          {tableFilledOnly && tableCorrect
             ? 'Truth table looks good.'
             : tableFilledOnly
               ? 'Recheck your rows.'

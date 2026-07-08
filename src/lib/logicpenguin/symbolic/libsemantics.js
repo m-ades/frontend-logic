@@ -49,12 +49,12 @@ libtf.allinterps = function(wffs) {
 
 // evaluates a formula on an interpretation; keeping track of the
 // "full truth table row" and where the main op is in it
-libtf.evaluate = function(wff, interp) {
-    const syntax = getSyntax();
+libtf.evaluate = function(wff, interp, notation = undefined) {
+    const syntax = getSyntax(notation);
     const tfn = (wff.op) ? libtf.tfns[syntax.operators[wff.op]] : false;
     if (syntax.isbinaryop(wff.op)) {
-        const lres = libtf.evaluate(wff.left, interp);
-        const rres = libtf.evaluate(wff.right, interp);
+        const lres = libtf.evaluate(wff.left, interp, notation);
+        const rres = libtf.evaluate(wff.right, interp, notation);
         const tv = tfn(lres.tv, rres.tv);
         return {
             tv: tv,
@@ -63,7 +63,7 @@ libtf.evaluate = function(wff, interp) {
         }
     }
     if (syntax.ismonop(wff.op)) {
-        const rres = libtf.evaluate(wff.right, interp);
+        const rres = libtf.evaluate(wff.right, interp, notation);
         const tv = tfn(rres.tv)
         return { tv: tv, row: [tv, ...rres.row], opspot: 0 }
     }
@@ -74,13 +74,13 @@ libtf.evaluate = function(wff, interp) {
 
 // fills in a truth table for one formula and determines if it
 // is a contradiction or tautology
-export function formulaTable(fml) {
+export function formulaTable(fml, notation = undefined) {
     const interps = libtf.allinterps([fml]);
     let taut = true;
     let contra = true;
     let opspot = 0;
     const rows = interps.map( (interp) => {
-        const e = libtf.evaluate(fml, interp);
+        const e = libtf.evaluate(fml, interp, notation);
         if (e.tv) { contra = false; } else { taut = false; }
         opspot = e.opspot;
         return e.row;
@@ -90,7 +90,7 @@ export function formulaTable(fml) {
 
 // fills in truth table for two formulas and checks their
 // equivalence
-export function equivTables(fmlA, fmlB) {
+export function equivTables(fmlA, fmlB, notation = undefined) {
     const interps = libtf.allinterps([fmlA,fmlB]);
     let equiv = true;
     const A = {};
@@ -100,8 +100,8 @@ export function equivTables(fmlA, fmlB) {
     A.rows = [];
     B.rows = [];
     for (const interp of interps) {
-        const ea = libtf.evaluate(fmlA, interp);
-        const eb = libtf.evaluate(fmlB, interp);
+        const ea = libtf.evaluate(fmlA, interp, notation);
+        const eb = libtf.evaluate(fmlB, interp, notation);
         A.opspot = ea.opspot;
         B.opspot = eb.opspot;
         A.rows.push(ea.row);
@@ -113,7 +113,7 @@ export function equivTables(fmlA, fmlB) {
 
 // fills in the truth tables for the premises and conclusion of
 // an argument and determines its validity
-export function argumentTables(pwffs, cwff) {
+export function argumentTables(pwffs, cwff, notation = undefined) {
 
     const interps = libtf.allinterps([...pwffs,cwff]);
     let valid = true;
@@ -128,12 +128,12 @@ export function argumentTables(pwffs, cwff) {
         let allpremstrue = true;
         for (let i=0; i < pwffs.length; i++) {
             const w = pwffs[i];
-            const e = libtf.evaluate(w, interp);
+            const e = libtf.evaluate(w, interp, notation);
             prems[i].opspot = e.opspot;
             prems[i].rows.push(e.row);
             allpremstrue = (allpremstrue && e.tv);
         }
-        const ce = libtf.evaluate(cwff, interp);
+        const ce = libtf.evaluate(cwff, interp, notation);
         conc.opspot = ce.opspot;
         conc.rows.push(ce.row);
         valid = (valid && (!allpremstrue || ce.tv));
@@ -143,11 +143,11 @@ export function argumentTables(pwffs, cwff) {
 
 // fills in truth tables for multiple formulas using shared interpretations
 // returns rows per subformula column (atoms first, then derived, then main)
-export function multiTables(wffs) {
+export function multiTables(wffs, notation = undefined) {
     const interps = libtf.allinterps(wffs);
     const tables = [];
 
-    const syntax = getSyntax();
+    const syntax = getSyntax(notation);
 
     // evaluation aligned with column order: left subformula(s), operator, right subformula(s)
     function evalWithTokens(wff, interp) {
@@ -197,7 +197,7 @@ export function multiTables(wffs) {
 
 // determines truth tables for a problem in which the student
 // did their own translations and determines validity
-export function comboTables(wffs, index) {
+export function comboTables(wffs, index, notation = undefined) {
     const tables = [];
     const interps = libtf.allinterps(wffs);
     let valid = true;
@@ -209,7 +209,7 @@ export function comboTables(wffs, index) {
         let conctrue = false;
         for (let i=0; i<wffs.length; i++) {
             const wff=wffs[i];
-            const e = libtf.evaluate(wff, interp);
+            const e = libtf.evaluate(wff, interp, notation);
             tables[i].opspot = e.opspot;
             tables[i].rows.push(e.row);
             if (i==index) { // conclusion
