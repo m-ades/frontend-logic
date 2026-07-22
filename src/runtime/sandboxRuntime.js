@@ -4,6 +4,7 @@ const studentSectionLabels = {
   assignments: "Assignments",
   grades: "Grades",
   practice: "Practice",
+  textbook: "Textbook",
   contact: "Contact",
   profile: "Profile & Preferences",
 };
@@ -18,6 +19,7 @@ const instructorSectionLabels = {
   roster: "Roster",
   profile: "Profile & Preferences",
   practice: "Practice",
+  "textbook-links": "Textbook Links",
 };
 
 export function getRoutePrefix(routeKind) {
@@ -49,6 +51,8 @@ export function buildRuntimePaths(routeKind, routePrefix = getRoutePrefix(routeK
     gradesPath,
     gradebookPath: isInstructor ? `${routePrefix}/gradebook` : undefined,
     practicePath: `${routePrefix}/practice`,
+    textbookPath: `${routePrefix}/textbook`,
+    textbookChapterPath: (slug) => `${routePrefix}/textbook/${slug}`,
     contactPath: `${routePrefix}/contact`,
     profilePath: `${routePrefix}/profile`,
     rosterPath: isInstructor ? `${routePrefix}/roster` : undefined,

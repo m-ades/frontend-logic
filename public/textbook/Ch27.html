@@ -1,0 +1,572 @@
+<!DOCTYPE html><html style="--bml-ltx-font-size:10;" class="bml_mathjax4" lang="en">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<title>Chapter 27 Sentences of FOL ‣ Part V First-order logic ‣ forall x: Calgary</title>
+<!--Generated on Tue Jul 21 20:13:15 2026 by LaTeXML (version 0.8.8) http://dlmf.nist.gov/LaTeXML/.-->
+<!--Document created on Fall 2025 (2026‐07‐18 8642250).-->
+
+<link rel="stylesheet" href="LaTeXML.css" type="text/css">
+<link rel="stylesheet" href="ltx-book.css" type="text/css">
+<link rel="stylesheet" href="bookml/gitbook/css/style.css" type="text/css">
+<link rel="stylesheet" href="bookml/gitbook/css/plugin-table.css" type="text/css">
+<link rel="stylesheet" href="bookml/gitbook/css/plugin-search.css" type="text/css">
+<link rel="stylesheet" href="bookml/gitbook/css/plugin-bookdown.css" type="text/css">
+<link rel="stylesheet" href="bookml/gitbook/css/plugin-fontsettings.css" type="text/css">
+<link rel="stylesheet" href="bookml/CSS/style.css" type="text/css">
+<link rel="stylesheet" href="bookml/CSS/style.gitbook,plain.css" type="text/css">
+<link rel="stylesheet" href="bookml/CSS/style.gitbook.css" type="text/css">
+<link rel="stylesheet" href="bmluser/colors.gitbook-forallxyyc-html.css" type="text/css">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<link rel="stylesheet" href="forallxyyc.css" type="text/css">
+<link rel="stylesheet" href="fitchml.css" type="text/css">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script><script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6"></script>
+<link rel="up" href="Pt5.html" title="Part V First-order logic ‣ forall x: Calgary">
+<link rel="up up" href="index.html" title="forall x: Calgary">
+<link rel="start" href="index.html" title="forall x: Calgary">
+<link rel="prev" href="Ch26.html" title="Chapter 26 Identity ‣ Part V First-order logic ‣ forall x: Calgary">
+<link rel="next" href="Ch28.html" title="Chapter 28 Definite descriptions ‣ Part V First-order logic ‣ forall x: Calgary">
+<link rel="chapter" href="Ch23.html" title="Chapter 23 Building blocks of FOL ‣ Part V First-order logic ‣ forall x: Calgary">
+<link rel="chapter" href="Ch24.html" title="Chapter 24 Sentences with one quantifier ‣ Part V First-order logic ‣ forall x: Calgary">
+<link rel="chapter" href="Ch25.html" title="Chapter 25 Multiple generality ‣ Part V First-order logic ‣ forall x: Calgary">
+<link rel="chapter" href="Ch26.html" title="Chapter 26 Identity ‣ Part V First-order logic ‣ forall x: Calgary">
+<link rel="chapter" href="Ch28.html" title="Chapter 28 Definite descriptions ‣ Part V First-order logic ‣ forall x: Calgary">
+<link rel="chapter" href="Ch29.html" title="Chapter 29 Ambiguity ‣ Part V First-order logic ‣ forall x: Calgary">
+<link rel="chapter" href="Chx1.html" title="Preface ‣ forall x: Calgary">
+<link rel="part" href="Pt1.html" title="Part I Key notions of logic ‣ forall x: Calgary">
+<link rel="part" href="Pt2.html" title="Part II Truth-functional logic ‣ forall x: Calgary">
+<link rel="part" href="Pt3.html" title="Part III Truth tables ‣ forall x: Calgary">
+<link rel="part" href="Pt4.html" title="Part IV Natural deduction for TFL ‣ forall x: Calgary">
+<link rel="part" href="Pt5.html" title="Part V First-order logic ‣ forall x: Calgary">
+<link rel="part" href="Pt6.html" title="Part VI Interpretations ‣ forall x: Calgary">
+<link rel="part" href="Pt7.html" title="Part VII Natural deduction for FOL ‣ forall x: Calgary">
+<link rel="part" href="Pt8.html" title="Part VIII Modal logic ‣ forall x: Calgary">
+<link rel="part" href="Pt9.html" title="Part IX Metatheory ‣ forall x: Calgary">
+<link rel="part" href="Ptx1.html" title="Appendices ‣ forall x: Calgary">
+<link rel="part" href="Ptx2.html" title="Solutions to selected exercices ‣ forall x: Calgary">
+<script src="bookml/js/mathjax4.js" defer></script>
+</head>
+<body class="bml_class_book">
+<div class="book without-animation font-size-2 font-family-1" data-basepath=".">
+<a href="#bml-main-content" tabindex="0" class="bml-skip-to-content">Skip to content.</a>
+<div class="book-summary"><nav class="ltx_page_navbar">
+<ul class="ltx_toclist summary">
+<li>
+<a href="index.html" title="" class="ltx_ref" rel="start">forall x: Calgary</a>
+</li>
+<li class="divider" aria-hidden="true"></li>
+<li data-level="" data-path="Chx1.html" class="ltx_tocentry ltx_tocentry_chapter  chapter "><a href="Chx1.html" title="In forall x: Calgary" class="ltx_ref">Preface</a></li>
+<li data-level="I" data-path="Pt1.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt1.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">I </span></b>Key notions of logic</a></li>
+<li data-level="II" data-path="Pt2.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt2.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">II </span></b>Truth-functional logic</a></li>
+<li data-level="III" data-path="Pt3.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt3.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">III </span></b>Truth tables</a></li>
+<li data-level="IV" data-path="Pt4.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt4.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">IV </span></b>Natural deduction for TFL</a></li>
+<li data-level="V" data-path="Pt5.html" class="ltx_tocentry ltx_tocentry_part  chapter ">
+<a href="Pt5.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">V </span></b>First-order logic</a>
+<ol class="ltx_toclist ltx_toclist_part">
+<li data-level="23" data-path="Ch23.html" class="ltx_tocentry ltx_tocentry_chapter  chapter "><a href="Ch23.html" title="In Part V First-order logic ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">23 </span></b>Building blocks of FOL</a></li>
+<li data-level="24" data-path="Ch24.html" class="ltx_tocentry ltx_tocentry_chapter  chapter "><a href="Ch24.html" title="In Part V First-order logic ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">24 </span></b>Sentences with one quantifier</a></li>
+<li data-level="25" data-path="Ch25.html" class="ltx_tocentry ltx_tocentry_chapter  chapter "><a href="Ch25.html" title="In Part V First-order logic ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">25 </span></b>Multiple generality</a></li>
+<li data-level="26" data-path="Ch26.html" class="ltx_tocentry ltx_tocentry_chapter  chapter "><a href="Ch26.html" title="In Part V First-order logic ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">26 </span></b>Identity</a></li>
+<li data-level="27" data-path="" class="ltx_tocentry ltx_tocentry_chapter ltx_ref_self  chapter active">
+<a href="" title="In Part V First-order logic ‣ forall x: Calgary" aria-current="page" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">27 </span></b>Sentences of FOL</a>
+<ol class="ltx_toclist ltx_toclist_chapter">
+<li data-level="27.1" data-path="" class="ltx_tocentry ltx_tocentry_section  chapter "><a href="#S1" title="In Chapter 27 Sentences of FOL ‣ Part V First-order logic ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">27.1 </span></b>Expressions</a></li>
+<li data-level="27.2" data-path="" class="ltx_tocentry ltx_tocentry_section  chapter "><a href="#S2" title="In Chapter 27 Sentences of FOL ‣ Part V First-order logic ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">27.2 </span></b>Terms and formulas</a></li>
+<li data-level="27.3" data-path="" class="ltx_tocentry ltx_tocentry_section  chapter "><a href="#S3" title="In Chapter 27 Sentences of FOL ‣ Part V First-order logic ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">27.3 </span></b>Sentences and free variables</a></li>
+<li data-level="27.4" data-path="" class="ltx_tocentry ltx_tocentry_section  chapter "><a href="#S4" title="In Chapter 27 Sentences of FOL ‣ Part V First-order logic ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">27.4 </span></b>Bracketing conventions</a></li>
+<li data-level="27.5" data-path="" class="ltx_tocentry ltx_tocentry_section  chapter "><a href="#S5" title="In Chapter 27 Sentences of FOL ‣ Part V First-order logic ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">27.5 </span></b>Superscripts on predicates</a></li>
+<li data-level="" data-path="" class="ltx_tocentry ltx_tocentry_section  chapter "><a href="#Sx1" title="In Chapter 27 Sentences of FOL ‣ Part V First-order logic ‣ forall x: Calgary" class="ltx_ref">Practice exercises</a></li>
+</ol>
+</li>
+<li data-level="28" data-path="Ch28.html" class="ltx_tocentry ltx_tocentry_chapter  chapter "><a href="Ch28.html" title="In Part V First-order logic ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">28 </span></b>Definite descriptions</a></li>
+<li data-level="29" data-path="Ch29.html" class="ltx_tocentry ltx_tocentry_chapter  chapter "><a href="Ch29.html" title="In Part V First-order logic ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">29 </span></b>Ambiguity</a></li>
+</ol>
+</li>
+<li data-level="VI" data-path="Pt6.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt6.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">VI </span></b>Interpretations</a></li>
+<li data-level="VII" data-path="Pt7.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt7.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">VII </span></b>Natural deduction for FOL</a></li>
+<li data-level="VIII" data-path="Pt8.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt8.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">VIII </span></b>Modal logic</a></li>
+<li data-level="IX" data-path="Pt9.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt9.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">IX </span></b>Metatheory</a></li>
+<li data-level="" data-path="Ptx1.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Ptx1.html" title="In forall x: Calgary" class="ltx_ref">Appendices</a></li>
+<li data-level="" data-path="Ptx2.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Ptx2.html" title="In forall x: Calgary" class="ltx_ref">Solutions to selected exercices</a></li>
+</ul>
+</nav></div>
+
+<div class="ltx_page_main book-body fixed">
+<div class="body-inner">
+<header class="book-header fixed" aria-label="toolbar"><span class="bml-separator"></span></header>
+<div class="page-wrapper" tabindex="-1" role="main">
+<div class="ltx_page_content page-inner" id="bml-main-content">
+<script src="bookml/gitbook/js/app.min.js"></script>
+<script src="bookml/gitbook/js/jquery.highlight.js"></script>
+<script src="bookml/gitbook/js/plugin-search.js"></script>
+<script src="bookml/gitbook/js/plugin-fontsettings.js"></script>
+<script src="bookml/gitbook/js/plugin-bookdown.js"></script>
+<script type="text/javascript">
+                  gitbook.require(["gitbook"], function(gitbook) {
+                  gitbook.start({
+                    "fontsettings": {
+                      "theme": "white",
+                      "family": "sans",
+                      "size": 2
+                    },
+                    "download": [ [ "forallxyyc.pdf", "PDF" ], [ "forallxyyc-accessible.pdf", "PDF (accessible)" ], ],
+                    "search": {
+                      "engine": "fuse"
+                    },
+                    "toc": {
+                      "collapse": "none"
+                    }
+                  });
+                });
+              </script>
+
+<section class="ltx_chapter ltx_authors_1line normal" lang="en">
+<div class="section level1">
+<h1 class="ltx_title ltx_title_chapter">
+<span class="ltx_tag ltx_tag_chapter header-section-number">Chapter 27</span> Sentences of FOL</h1>
+
+<div id="p1" class="ltx_para">
+<p class="ltx_p">We know how to represent English sentences in FOL. The time has finally come to define the notion of a <span class="ltx_text ltx_font_bold">sentence</span> of FOL.</p>
+</div>
+<section id="S1" class="ltx_section normal">
+<div class="section level2">
+<h2 class="ltx_title ltx_title_section">
+<span class="ltx_tag ltx_tag_section header-section-number">27.1</span> Expressions</h2>
+
+<div id="S1.p1" class="ltx_para">
+<p class="ltx_p">There are six kinds of symbols in FOL:</p>
+</div>
+<div id="S1.p2" class="ltx_para">
+<ol id="S1.I1" class="ltx_enumerate">
+<li id="S1.I1.i1" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">1.</span><div id="S1.I1.i1.p1" class="ltx_para">​<p class="ltx_p"><span class="ltx_text ltx_font_bold">Predicates:</span> <math id="S1.I1.i1.p1.m1" class="ltx_Math" alttext="A" display="inline"><mi>A</mi></math>, <math id="S1.I1.i1.p1.m2" class="ltx_Math" alttext="B" display="inline"><mi>B</mi></math>, <math id="S1.I1.i1.p1.m3" class="ltx_Math" alttext="C" display="inline"><mi>C</mi></math>, …, <math id="S1.I1.i1.p1.m4" class="ltx_Math" alttext="Z" display="inline"><mi>Z</mi></math>, or
+with subscripts, as needed: <math id="S1.I1.i1.p1.m5" class="ltx_Math" alttext="A_{1}" display="inline"><msub><mi>A</mi><mn>1</mn></msub></math>, <math id="S1.I1.i1.p1.m6" class="ltx_Math" alttext="B_{1}" display="inline"><msub><mi>B</mi><mn>1</mn></msub></math>, <math id="S1.I1.i1.p1.m7" class="ltx_Math" alttext="Z_{1}" display="inline"><msub><mi>Z</mi><mn>1</mn></msub></math>, <math id="S1.I1.i1.p1.m8" class="ltx_Math" alttext="A_{2}" display="inline"><msub><mi>A</mi><mn>2</mn></msub></math>, <math id="S1.I1.i1.p1.m9" class="ltx_Math" alttext="A_{25}" display="inline"><msub><mi>A</mi><mn>25</mn></msub></math>,
+<math id="S1.I1.i1.p1.m10" class="ltx_Math" alttext="J_{375}" display="inline"><msub><mi>J</mi><mn>375</mn></msub></math>, …</p>
+</div>
+<div id="S1.I1.i1.p2" class="ltx_para">
+<p class="ltx_p">The identity symbol ‘<math id="S1.I1.i1.p2.m1" class="ltx_Math" alttext="=" display="inline"><mo>=</mo></math>’ counts as a special predicate.</p>
+</div>
+</li>
+<li id="S1.I1.i2" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">2.</span><div id="S1.I1.i2.p1" class="ltx_para">​<p class="ltx_p"><span class="ltx_text ltx_font_bold">Names:</span> <math id="S1.I1.i2.p1.m1" class="ltx_Math" alttext="a" display="inline"><mi>a</mi></math>, <math id="S1.I1.i2.p1.m2" class="ltx_Math" alttext="b" display="inline"><mi>b</mi></math>, <math id="S1.I1.i2.p1.m3" class="ltx_Math" alttext="c" display="inline"><mi>c</mi></math>, …, <math id="S1.I1.i2.p1.m4" class="ltx_Math" alttext="r" display="inline"><mi>r</mi></math>, or
+with subscripts, as needed: <math id="S1.I1.i2.p1.m5" class="ltx_Math" alttext="a_{1}" display="inline"><msub><mi>a</mi><mn>1</mn></msub></math>, <math id="S1.I1.i2.p1.m6" class="ltx_Math" alttext="b_{224}" display="inline"><msub><mi>b</mi><mn>224</mn></msub></math>, <math id="S1.I1.i2.p1.m7" class="ltx_Math" alttext="h_{7}" display="inline"><msub><mi>h</mi><mn>7</mn></msub></math>, <math id="S1.I1.i2.p1.m8" class="ltx_Math" alttext="m_{32}" display="inline"><msub><mi>m</mi><mn>32</mn></msub></math>, …</p>
+</div>
+</li>
+<li id="S1.I1.i3" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">3.</span><div id="S1.I1.i3.p1" class="ltx_para">​<p class="ltx_p"><span class="ltx_text ltx_font_bold">Variables:</span> <math id="S1.I1.i3.p1.m1" class="ltx_Math" alttext="s" display="inline"><mi>s</mi></math>, <math id="S1.I1.i3.p1.m2" class="ltx_Math" alttext="t" display="inline"><mi>t</mi></math>, <math id="S1.I1.i3.p1.m3" class="ltx_Math" alttext="u" display="inline"><mi>u</mi></math>, <math id="S1.I1.i3.p1.m4" class="ltx_Math" alttext="v" display="inline"><mi>v</mi></math>, <math id="S1.I1.i3.p1.m5" class="ltx_Math" alttext="w" display="inline"><mi>w</mi></math>, <math id="S1.I1.i3.p1.m6" class="ltx_Math" alttext="x" display="inline"><mi>x</mi></math>, <math id="S1.I1.i3.p1.m7" class="ltx_Math" alttext="y" display="inline"><mi>y</mi></math>, <math id="S1.I1.i3.p1.m8" class="ltx_Math" alttext="z" display="inline"><mi>z</mi></math>, or
+with subscripts, as needed: <math id="S1.I1.i3.p1.m9" class="ltx_Math" alttext="x_{1}" display="inline"><msub><mi>x</mi><mn>1</mn></msub></math>, <math id="S1.I1.i3.p1.m10" class="ltx_Math" alttext="y_{1}" display="inline"><msub><mi>y</mi><mn>1</mn></msub></math>, <math id="S1.I1.i3.p1.m11" class="ltx_Math" alttext="z_{1}" display="inline"><msub><mi>z</mi><mn>1</mn></msub></math>, <math id="S1.I1.i3.p1.m12" class="ltx_Math" alttext="x_{2}" display="inline"><msub><mi>x</mi><mn>2</mn></msub></math>, …</p>
+</div>
+</li>
+<li id="S1.I1.i4" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">4.</span><div id="S1.I1.i4.p1" class="ltx_para">​<p class="ltx_p"><span class="ltx_text ltx_font_bold">Connectives:</span> <math id="S1.I1.i4.p1.m1" class="ltx_Math" alttext="\neg" display="inline"><mo>¬</mo></math>, <math id="S1.I1.i4.p1.m2" class="ltx_Math" alttext="\wedge" display="inline"><mo>∧</mo></math>, <math id="S1.I1.i4.p1.m3" class="ltx_Math" alttext="\vee" display="inline"><mo>∨</mo></math>, <math id="S1.I1.i4.p1.m4" class="ltx_Math" alttext="\rightarrow" display="inline"><mo stretchy="false">→</mo></math>, <math id="S1.I1.i4.p1.m5" class="ltx_Math" alttext="\leftrightarrow" display="inline"><mo stretchy="false">↔</mo></math></p>
+</div>
+</li>
+<li id="S1.I1.i5" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">5.</span><div id="S1.I1.i5.p1" class="ltx_para">​<p class="ltx_p"><span class="ltx_text ltx_font_bold">Brackets:</span> ( , )</p>
+</div>
+</li>
+<li id="S1.I1.i6" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">6.</span><div id="S1.I1.i6.p1" class="ltx_para">​<p class="ltx_p"><span class="ltx_text ltx_font_bold">Quantifiers:</span> <math id="S1.I1.i6.p1.m1" class="ltx_Math" alttext="\forall" display="inline"><mo>∀</mo></math>, <math id="S1.I1.i6.p1.m2" class="ltx_Math" alttext="\exists" display="inline"><mo>∃</mo></math></p>
+</div>
+</li>
+</ol>
+<p class="ltx_p">We define an <dfn>expression of FOL</dfn>
+ as any string of symbols of FOL. Take any of the symbols of FOL and write them down, in any order, and you have an expression.</p>
+</div>
+</div>
+</section>
+<section id="S2" class="ltx_section normal">
+<div class="section level2">
+<h2 class="ltx_title ltx_title_section">
+<span class="ltx_tag ltx_tag_section header-section-number">27.2</span> Terms and formulas</h2>
+
+<div id="S2.p1" class="ltx_para">
+<p class="ltx_p">In <a href="Ch6.html" title="Chapter 6 Sentences of TFL ‣ Part II Truth-functional logic ‣ forall x: Calgary" class="ltx_ref"><span class="ltx_text ltx_ref_tag">chapter</span> <span class="ltx_text ltx_ref_tag">6</span></a>, we went straight from the statement of the vocabulary of TFL to the definition of a sentence of TFL. In FOL, we will have to go via an intermediary stage: via the notion of a <dfn>formula</dfn>
+. The intuitive idea is that a formula is any sentence, or anything which can be turned into a sentence by adding quantifiers out front. But this intuitive idea will take some time to unpack.</p>
+</div>
+<div id="S2.p2" class="ltx_para">
+<p class="ltx_p">We start by defining the notion of a term.</p>
+<div class="ltx_logical-block bml_background-color_FDF4FA bml_background-color_FDF4FA" style="padding:9pt;">
+            
+<div id="S2.p2.p1" class="ltx_para ltx_noindent">
+<p class="ltx_p">A <dfn>term</dfn>
+ is any name or any variable.</p>
+</div>
+          
+</div>
+<p class="ltx_p">So, here are some terms:</p>
+<div id="Ex1" class="ltx_equation bml_equation bml_equation_container ltx_align_baseline">
+<div class="ltx_Math bml_eqn_cell ltx_align_center"><math id="Ex1.m1" class="ltx_Math" alttext="a,b,x,x_{1},x_{2},y,y_{254},z" display="block"><mrow><mi>a</mi><mo>,</mo><mi>b</mi><mo>,</mo><mi>x</mi><mo>,</mo><msub><mi>x</mi><mn>1</mn></msub><mo>,</mo><msub><mi>x</mi><mn>2</mn></msub><mo>,</mo><mi>y</mi><mo>,</mo><msub><mi>y</mi><mn>254</mn></msub><mo>,</mo><mi>z</mi></mrow></math></div>
+</div>
+<p class="ltx_p">Next we need to define atomic formulas.</p>
+<div class="ltx_logical-block bml_background-color_FDF4FA bml_background-color_FDF4FA" style="padding:9pt;">
+            
+<div id="S2.p2.p2" class="ltx_para ltx_noindent">
+<ol id="S2.I1" class="ltx_enumerate">
+<li id="S2.I1.i1" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">1.</span><div id="S2.I1.i1.p1" class="ltx_para">​<p class="ltx_p">Any sentence letter is an atomic formula.</p>
+</div>
+</li>
+<li id="S2.I1.i2" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">2.</span><div id="S2.I1.i2.p1" class="ltx_para">​<p class="ltx_p">If <math id="S2.I1.i2.p1.m1" class="ltx_Math" alttext="\mathscr{R}" display="inline"><mi class="ltx_font_mathscript">ℛ︁</mi></math> is an <math id="S2.I1.i2.p1.m2" class="ltx_Math" alttext="n" display="inline"><mi>n</mi></math>-place predicate and <math id="S2.I1.i2.p1.m3" class="ltx_Math" alttext="\mathscr{t}_{1},\mathscr{t}_{2},\ldots,\mathscr{t}_{n}" display="inline"><mrow><msub><mi class="ltx_font_mathscript">𝓉</mi><mn>1</mn></msub><mo>,</mo><msub><mi class="ltx_font_mathscript">𝓉</mi><mn>2</mn></msub><mo>,</mo><mi mathvariant="normal">…</mi><mo>,</mo><msub><mi class="ltx_font_mathscript">𝓉</mi><mi>n</mi></msub></mrow></math> are terms, then <math id="S2.I1.i2.p1.m4" class="ltx_Math" alttext="\mathscr{R}(\mathscr{t}_{1},\mathscr{t}_{2},\ldots,\mathscr{t}_{n})" display="inline"><mrow><mi class="ltx_font_mathscript">ℛ︁</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><msub><mi class="ltx_font_mathscript">𝓉</mi><mn>1</mn></msub><mo>,</mo><msub><mi class="ltx_font_mathscript">𝓉</mi><mn>2</mn></msub><mo>,</mo><mi mathvariant="normal">…</mi><mo>,</mo><msub><mi class="ltx_font_mathscript">𝓉</mi><mi>n</mi></msub><mo stretchy="false">)</mo></mrow></mrow></math> is an atomic formula.</p>
+</div>
+</li>
+<li id="S2.I1.i3" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">3.</span><div id="S2.I1.i3.p1" class="ltx_para">​<p class="ltx_p">If <math id="S2.I1.i3.p1.m1" class="ltx_Math" alttext="\mathscr{t}_{1}" display="inline"><msub><mi class="ltx_font_mathscript">𝓉</mi><mn>1</mn></msub></math> and <math id="S2.I1.i3.p1.m2" class="ltx_Math" alttext="\mathscr{t}_{2}" display="inline"><msub><mi class="ltx_font_mathscript">𝓉</mi><mn>2</mn></msub></math> are terms, then <math id="S2.I1.i3.p1.m3" class="ltx_Math" alttext="\mathscr{t}_{1}=\mathscr{t}_{2}" display="inline"><mrow><msub><mi class="ltx_font_mathscript">𝓉</mi><mn>1</mn></msub><mo>=</mo><msub><mi class="ltx_font_mathscript">𝓉</mi><mn>2</mn></msub></mrow></math> is an atomic formula.</p>
+</div>
+</li>
+<li id="S2.I1.i4" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">4.</span><div id="S2.I1.i4.p1" class="ltx_para">​<p class="ltx_p">Nothing else is an atomic formula.</p>
+</div>
+</li>
+</ol>
+</div>
+          
+</div>
+<p class="ltx_p">Note that we consider sentence letters also formulas of FOL, so every
+sentence of TFL is also a formula of FOL. In <a href="Pt7.html" title="Part VII Natural deduction for FOL ‣ forall x: Calgary" class="ltx_ref"><span class="ltx_text ltx_ref_tag">part</span> <span class="ltx_text ltx_ref_tag">VII</span></a>, we will
+again also allow the contradiction ‘<math id="S2.p2.m1" class="ltx_Math" alttext="\bot" display="inline"><mo>⊥</mo></math>’ as an atomic formula.</p>
+</div>
+<div id="S2.p3" class="ltx_para">
+<p class="ltx_p">The use of script letters here follows the conventions laid down in <a href="Ch8.html" title="Chapter 8 Use and mention ‣ Part II Truth-functional logic ‣ forall x: Calgary" class="ltx_ref"><span class="ltx_text ltx_ref_tag">chapter</span> <span class="ltx_text ltx_ref_tag">8</span></a>. So, ‘<math id="S2.p3.m1" class="ltx_Math" alttext="\mathscr{R}" display="inline"><mi class="ltx_font_mathscript">ℛ︁</mi></math>’ is not itself a predicate of FOL. Rather, it is a symbol of our metalanguage (augmented English) that we use to talk about any predicate of FOL. Similarly, ‘<math id="S2.p3.m2" class="ltx_Math" alttext="\mathscr{t}_{1}" display="inline"><msub><mi class="ltx_font_mathscript">𝓉</mi><mn>1</mn></msub></math>’ is not a term of FOL, but a symbol of the metalanguage that we can use to talk about any term of FOL. So, where ‘<math id="S2.p3.m3" class="ltx_Math" alttext="F" display="inline"><mi>F</mi></math>’ is a one-place predicate, ‘<math id="S2.p3.m4" class="ltx_Math" alttext="G" display="inline"><mi>G</mi></math>’ is a three-place predicate, and ‘<math id="S2.p3.m5" class="ltx_Math" alttext="S" display="inline"><mi>S</mi></math>’ is a six-place predicate, here are some atomic formulas:</p>
+<div class="bml-overflow-wrapper">
+<table class="ltx_tabular ltx_centering ltx_align_middle">
+<tr class="ltx_tr">
+<td class="ltx_td ltx_align_left"><math id="S2.p3.m6" class="ltx_Math" alttext="D" display="inline"><mi>D</mi></math></td>
+<td class="ltx_td ltx_nopad_l ltx_align_left"><math id="S2.p3.m7" class="ltx_Math" alttext="F(a)" display="inline"><mrow><mi>F</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mrow></math></td>
+</tr>
+<tr class="ltx_tr">
+<td class="ltx_td ltx_align_left"><math id="S2.p3.m8" class="ltx_Math" alttext="x=a" display="inline"><mrow><mi>x</mi><mo>=</mo><mi>a</mi></mrow></math></td>
+<td class="ltx_td ltx_nopad_l ltx_align_left"><math id="S2.p3.m9" class="ltx_Math" alttext="G(x,a,y)" display="inline"><mrow><mi>G</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo>,</mo><mi>a</mi><mo>,</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow></math></td>
+</tr>
+<tr class="ltx_tr">
+<td class="ltx_td ltx_align_left"><math id="S2.p3.m10" class="ltx_Math" alttext="a=b" display="inline"><mrow><mi>a</mi><mo>=</mo><mi>b</mi></mrow></math></td>
+<td class="ltx_td ltx_nopad_l ltx_align_left"><math id="S2.p3.m11" class="ltx_Math" alttext="G(a,a,a)" display="inline"><mrow><mi>G</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>a</mi><mo>,</mo><mi>a</mi><mo>,</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mrow></math></td>
+</tr>
+<tr class="ltx_tr">
+<td class="ltx_td ltx_align_left"><math id="S2.p3.m12" class="ltx_Math" alttext="F(x)" display="inline"><mrow><mi>F</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></math></td>
+<td class="ltx_td ltx_nopad_l ltx_align_left"><math id="S2.p3.m13" class="ltx_Math" alttext="S(x_{1},x_{2},a,b,y,x_{1})" display="inline"><mrow><mi>S</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><msub><mi>x</mi><mn>1</mn></msub><mo>,</mo><msub><mi>x</mi><mn>2</mn></msub><mo>,</mo><mi>a</mi><mo>,</mo><mi>b</mi><mo>,</mo><mi>y</mi><mo>,</mo><msub><mi>x</mi><mn>1</mn></msub><mo stretchy="false">)</mo></mrow></mrow></math></td>
+</tr>
+</table>
+</div>
+<p class="ltx_p">Once we know what atomic formulas are, we can offer recursion clauses to define arbitrary formulas. The first few clauses are exactly analogous to those in the definition of ‘sentence of TFL’.</p>
+<div class="ltx_logical-block bml_background-color_FDF4FA bml_background-color_FDF4FA" style="padding:9pt;">
+            
+<div id="S2.p3.p1" class="ltx_para ltx_noindent">
+<ol id="S2.I2" class="ltx_enumerate">
+<li id="S2.I2.i1" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">1.</span><div id="S2.I2.i1.p1" class="ltx_para">​<p class="ltx_p">Every atomic formula is a formula.</p>
+</div>
+</li>
+<li id="S2.I2.i2" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">2.</span><div id="S2.I2.i2.p1" class="ltx_para">​<p class="ltx_p">If <math id="S2.I2.i2.p1.m1" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math> is a formula, then <math id="S2.I2.i2.p1.m2" class="ltx_Math" alttext="\neg\mathscr{A}" display="inline"><mrow><mo rspace="0.167em">¬</mo><mi class="ltx_font_mathscript">𝒜︁</mi></mrow></math> is a formula.</p>
+</div>
+</li>
+<li id="S2.I2.i3" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">3.</span><div id="S2.I2.i3.p1" class="ltx_para">​<p class="ltx_p">If <math id="S2.I2.i3.p1.m1" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math> and <math id="S2.I2.i3.p1.m2" class="ltx_Math" alttext="\mathscr{B}" display="inline"><mi class="ltx_font_mathscript">ℬ︁</mi></math> are formulas, then <math id="S2.I2.i3.p1.m3" class="ltx_Math" alttext="(\mathscr{A}\wedge\mathscr{B})" display="inline"><mrow><mo stretchy="false">(</mo><mrow><mi class="ltx_font_mathscript">𝒜︁</mi><mo>∧</mo><mi class="ltx_font_mathscript">ℬ︁</mi></mrow><mo stretchy="false">)</mo></mrow></math> is a formula.</p>
+</div>
+</li>
+<li id="S2.I2.i4" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">4.</span><div id="S2.I2.i4.p1" class="ltx_para">​<p class="ltx_p">If <math id="S2.I2.i4.p1.m1" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math> and <math id="S2.I2.i4.p1.m2" class="ltx_Math" alttext="\mathscr{B}" display="inline"><mi class="ltx_font_mathscript">ℬ︁</mi></math> are formulas, then <math id="S2.I2.i4.p1.m3" class="ltx_Math" alttext="(\mathscr{A}\vee\mathscr{B})" display="inline"><mrow><mo stretchy="false">(</mo><mrow><mi class="ltx_font_mathscript">𝒜︁</mi><mo>∨</mo><mi class="ltx_font_mathscript">ℬ︁</mi></mrow><mo stretchy="false">)</mo></mrow></math> is a formula.</p>
+</div>
+</li>
+<li id="S2.I2.i5" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">5.</span><div id="S2.I2.i5.p1" class="ltx_para">​<p class="ltx_p">If <math id="S2.I2.i5.p1.m1" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math> and <math id="S2.I2.i5.p1.m2" class="ltx_Math" alttext="\mathscr{B}" display="inline"><mi class="ltx_font_mathscript">ℬ︁</mi></math> are formulas, then <math id="S2.I2.i5.p1.m3" class="ltx_Math" alttext="(\mathscr{A}\rightarrow\mathscr{B})" display="inline"><mrow><mo stretchy="false">(</mo><mrow><mi class="ltx_font_mathscript">𝒜︁</mi><mo stretchy="false">→</mo><mi class="ltx_font_mathscript">ℬ︁</mi></mrow><mo stretchy="false">)</mo></mrow></math> is a formula.</p>
+</div>
+</li>
+<li id="S2.I2.i6" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">6.</span><div id="S2.I2.i6.p1" class="ltx_para">​<p class="ltx_p">If <math id="S2.I2.i6.p1.m1" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math> and <math id="S2.I2.i6.p1.m2" class="ltx_Math" alttext="\mathscr{B}" display="inline"><mi class="ltx_font_mathscript">ℬ︁</mi></math> are formulas, then <math id="S2.I2.i6.p1.m3" class="ltx_Math" alttext="(\mathscr{A}\leftrightarrow\mathscr{B})" display="inline"><mrow><mo stretchy="false">(</mo><mrow><mi class="ltx_font_mathscript">𝒜︁</mi><mo stretchy="false">↔</mo><mi class="ltx_font_mathscript">ℬ︁</mi></mrow><mo stretchy="false">)</mo></mrow></math> is a formula.</p>
+</div>
+</li>
+<li id="S2.I2.i7" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">7.</span><div id="S2.I2.i7.p1" class="ltx_para">​<p class="ltx_p">If <math id="S2.I2.i7.p1.m1" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math> is a formula and <math id="S2.I2.i7.p1.m2" class="ltx_Math" alttext="\mathscr{x}" display="inline"><mi class="ltx_font_mathscript">𝓍</mi></math> is a variable,
+then <math id="S2.I2.i7.p1.m3" class="ltx_Math" alttext="\forall\mathscr{x}\,\mathscr{A}" display="inline"><mrow><mo rspace="0.167em">∀</mo><mrow><mi class="ltx_font_mathscript">𝓍</mi><mo lspace="0.170em">⁢</mo><mi class="ltx_font_mathscript">𝒜︁</mi></mrow></mrow></math> is a formula.</p>
+</div>
+</li>
+<li id="S2.I2.i8" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">8.</span><div id="S2.I2.i8.p1" class="ltx_para">​<p class="ltx_p">If <math id="S2.I2.i8.p1.m1" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math> is a formula and <math id="S2.I2.i8.p1.m2" class="ltx_Math" alttext="\mathscr{x}" display="inline"><mi class="ltx_font_mathscript">𝓍</mi></math> is a variable,
+then <math id="S2.I2.i8.p1.m3" class="ltx_Math" alttext="\exists\mathscr{x}\,\mathscr{A}" display="inline"><mrow><mo rspace="0.167em">∃</mo><mrow><mi class="ltx_font_mathscript">𝓍</mi><mo lspace="0.170em">⁢</mo><mi class="ltx_font_mathscript">𝒜︁</mi></mrow></mrow></math> is a formula.</p>
+</div>
+</li>
+<li id="S2.I2.i9" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">9.</span><div id="S2.I2.i9.p1" class="ltx_para">​<p class="ltx_p">Nothing else is a formula.</p>
+</div>
+</li>
+</ol>
+</div>
+          
+</div>
+<p class="ltx_p">So, assuming again that ‘<math id="S2.p3.m14" class="ltx_Math" alttext="F" display="inline"><mi>F</mi></math>’ is a one-place predicate, ‘<math id="S2.p3.m15" class="ltx_Math" alttext="G" display="inline"><mi>G</mi></math>’ is a three-place predicate and ‘<math id="S2.p3.m16" class="ltx_Math" alttext="S" display="inline"><mi>S</mi></math>’ is a six place-predicate, here are some formulas you can build this way:</p>
+<div id="A48.S0.EGx13" class="ltx_equationgroup ltx_eqn_align bml_equationgroup bml_equation_container ltx_align_baseline">
+<div id="Ex2" class="ltx_equation bml_equation ltx_align_baseline" role="group" aria-label="equation">
+<div class="ltx_td bml_eqn_cell"></div>
+<div class="ltx_td ltx_align_left bml_eqn_cell"><math id="Ex2.m1" class="ltx_Math" alttext="\displaystyle{}F(x)" display="inline"><mrow><mi>F</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></math></div>
+</div>
+<div id="Ex3" class="ltx_equation bml_equation ltx_align_baseline" role="group" aria-label="equation">
+<div class="ltx_td bml_eqn_cell"></div>
+<div class="ltx_td ltx_align_left bml_eqn_cell"><math id="Ex3.m1" class="ltx_Math" alttext="\displaystyle{}G(a,y,z)" display="inline"><mrow><mi>G</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>a</mi><mo>,</mo><mi>y</mi><mo>,</mo><mi>z</mi><mo stretchy="false">)</mo></mrow></mrow></math></div>
+</div>
+<div id="Ex4" class="ltx_equation bml_equation ltx_align_baseline" role="group" aria-label="equation">
+<div class="ltx_td bml_eqn_cell"></div>
+<div class="ltx_td ltx_align_left bml_eqn_cell"><math id="Ex4.m1" class="ltx_Math" alttext="\displaystyle{}S(y,z,y,a,y,x)" display="inline"><mrow><mi>S</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>y</mi><mo>,</mo><mi>z</mi><mo>,</mo><mi>y</mi><mo>,</mo><mi>a</mi><mo>,</mo><mi>y</mi><mo>,</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></math></div>
+</div>
+<div id="Ex5" class="ltx_equation bml_equation ltx_align_baseline" role="group" aria-label="equation">
+<div class="ltx_td ltx_align_right bml_eqn_cell"><math id="Ex5.m1" class="ltx_math_unparsed" alttext="\displaystyle(G(a,y,z)\rightarrow\," display="inline"><mrow><mo stretchy="false">(</mo><mi>G</mi><mrow><mo stretchy="false">(</mo><mi>a</mi><mo>,</mo><mi>y</mi><mo>,</mo><mi>z</mi><mo stretchy="false">)</mo></mrow><mo stretchy="false">→</mo></mrow></math></div>
+<div class="ltx_td ltx_align_left bml_eqn_cell"><math id="Ex5.m2" class="ltx_math_unparsed" alttext="\displaystyle{}S(y,z,y,a,y,x))" display="inline"><mrow><mi>S</mi><mrow><mo stretchy="false">(</mo><mi>y</mi><mo>,</mo><mi>z</mi><mo>,</mo><mi>y</mi><mo>,</mo><mi>a</mi><mo>,</mo><mi>y</mi><mo>,</mo><mi>x</mi><mo stretchy="false">)</mo></mrow><mo stretchy="false">)</mo></mrow></math></div>
+</div>
+<div id="Ex6" class="ltx_equation bml_equation ltx_align_baseline" role="group" aria-label="equation">
+<div class="ltx_td ltx_align_right bml_eqn_cell"><math id="Ex6.m1" class="ltx_math_unparsed" alttext="\displaystyle\forall z(G(a,y,z)\rightarrow\," display="inline"><mrow><mo rspace="0.167em">∀</mo><mi>z</mi><mrow><mo stretchy="false">(</mo><mi>G</mi><mrow><mo stretchy="false">(</mo><mi>a</mi><mo>,</mo><mi>y</mi><mo>,</mo><mi>z</mi><mo stretchy="false">)</mo></mrow><mo stretchy="false">→</mo></mrow></mrow></math></div>
+<div class="ltx_td ltx_align_left bml_eqn_cell"><math id="Ex6.m2" class="ltx_math_unparsed" alttext="\displaystyle{}S(y,z,y,a,y,x))" display="inline"><mrow><mi>S</mi><mrow><mo stretchy="false">(</mo><mi>y</mi><mo>,</mo><mi>z</mi><mo>,</mo><mi>y</mi><mo>,</mo><mi>a</mi><mo>,</mo><mi>y</mi><mo>,</mo><mi>x</mi><mo stretchy="false">)</mo></mrow><mo stretchy="false">)</mo></mrow></math></div>
+</div>
+<div id="Ex7" class="ltx_equation bml_equation ltx_align_baseline" role="group" aria-label="equation">
+<div class="ltx_td ltx_align_right bml_eqn_cell"><math id="Ex7.m1" class="ltx_math_unparsed" alttext="\displaystyle F(x)\wedge\forall z(G(a,y,z)\rightarrow\," display="inline"><mrow><mi>F</mi><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow><mo>∧</mo><mo rspace="0.167em">∀</mo><mi>z</mi><mrow><mo stretchy="false">(</mo><mi>G</mi><mrow><mo stretchy="false">(</mo><mi>a</mi><mo>,</mo><mi>y</mi><mo>,</mo><mi>z</mi><mo stretchy="false">)</mo></mrow><mo stretchy="false">→</mo></mrow></mrow></math></div>
+<div class="ltx_td ltx_align_left bml_eqn_cell"><math id="Ex7.m2" class="ltx_math_unparsed" alttext="\displaystyle{}S(y,z,y,a,y,x))" display="inline"><mrow><mi>S</mi><mrow><mo stretchy="false">(</mo><mi>y</mi><mo>,</mo><mi>z</mi><mo>,</mo><mi>y</mi><mo>,</mo><mi>a</mi><mo>,</mo><mi>y</mi><mo>,</mo><mi>x</mi><mo stretchy="false">)</mo></mrow><mo stretchy="false">)</mo></mrow></math></div>
+</div>
+<div id="Ex8" class="ltx_equation bml_equation ltx_align_baseline" role="group" aria-label="equation">
+<div class="ltx_td ltx_align_right bml_eqn_cell"><math id="Ex8.m1" class="ltx_math_unparsed" alttext="\displaystyle\exists y(F(x)\wedge\forall z(G(a,y,z)\rightarrow\," display="inline"><mrow><mo rspace="0.167em">∃</mo><mi>y</mi><mrow><mo stretchy="false">(</mo><mi>F</mi><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow><mo>∧</mo><mo rspace="0.167em">∀</mo><mi>z</mi><mrow><mo stretchy="false">(</mo><mi>G</mi><mrow><mo stretchy="false">(</mo><mi>a</mi><mo>,</mo><mi>y</mi><mo>,</mo><mi>z</mi><mo stretchy="false">)</mo></mrow><mo stretchy="false">→</mo></mrow></mrow></mrow></math></div>
+<div class="ltx_td ltx_align_left bml_eqn_cell"><math id="Ex8.m2" class="ltx_math_unparsed" alttext="\displaystyle{}S(y,z,y,a,y,x)))" display="inline"><mrow><mrow><mi>S</mi><mrow><mo stretchy="false">(</mo><mi>y</mi><mo>,</mo><mi>z</mi><mo>,</mo><mi>y</mi><mo>,</mo><mi>a</mi><mo>,</mo><mi>y</mi><mo>,</mo><mi>x</mi><mo stretchy="false">)</mo></mrow><mo stretchy="false">)</mo></mrow><mo stretchy="false">)</mo></mrow></math></div>
+</div>
+<div id="Ex9" class="ltx_equation bml_equation ltx_align_baseline" role="group" aria-label="equation">
+<div class="ltx_td ltx_align_right bml_eqn_cell"><math id="Ex9.m1" class="ltx_math_unparsed" alttext="\displaystyle\forall x\exists y(F(x)\wedge\forall z(G(a,y,z)\rightarrow\," display="inline"><mrow><mo rspace="0.167em">∀</mo><mi>x</mi><mo lspace="0.167em" rspace="0.167em">∃</mo><mi>y</mi><mrow><mo stretchy="false">(</mo><mi>F</mi><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow><mo>∧</mo><mo rspace="0.167em">∀</mo><mi>z</mi><mrow><mo stretchy="false">(</mo><mi>G</mi><mrow><mo stretchy="false">(</mo><mi>a</mi><mo>,</mo><mi>y</mi><mo>,</mo><mi>z</mi><mo stretchy="false">)</mo></mrow><mo stretchy="false">→</mo></mrow></mrow></mrow></math></div>
+<div class="ltx_td ltx_align_left bml_eqn_cell"><math id="Ex9.m2" class="ltx_math_unparsed" alttext="\displaystyle{}S(y,z,y,a,y,x)))" display="inline"><mrow><mrow><mi>S</mi><mrow><mo stretchy="false">(</mo><mi>y</mi><mo>,</mo><mi>z</mi><mo>,</mo><mi>y</mi><mo>,</mo><mi>a</mi><mo>,</mo><mi>y</mi><mo>,</mo><mi>x</mi><mo stretchy="false">)</mo></mrow><mo stretchy="false">)</mo></mrow><mo stretchy="false">)</mo></mrow></math></div>
+</div>
+</div>
+</div>
+<div id="S2.p4" class="ltx_para">
+<p class="ltx_p">We can now give a formal definition of scope, which incorporates the definition of the scope of a quantifier. Here we follow the case of TFL, though we note that a logical operator can be either a connective or a quantifier:</p>
+<div class="ltx_logical-block bml_background-color_FDF4FA bml_background-color_FDF4FA" style="padding:9pt;">
+            
+<div id="S2.p4.p1" class="ltx_para ltx_noindent">
+<ul id="S2.I3" class="ltx_itemize">
+<li id="S2.I3.i1" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">‣</span><div id="S2.I3.i1.p1" class="ltx_para">​<p class="ltx_p">The <dfn>main logical operator</dfn>
+ in a formula is the
+operator that was introduced most recently, when that formula was
+constructed using the recursion rules.</p>
+</div>
+</li>
+<li id="S2.I3.i2" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">‣</span><div id="S2.I3.i2.p1" class="ltx_para">​<p class="ltx_p">The <dfn>scope</dfn>
+ of a logical operator in a formula is the
+subformula for which that operator is the main logical operator.</p>
+</div>
+</li>
+</ul>
+</div>
+          
+</div>
+<p class="ltx_p">So we can graphically illustrate the scope of the quantifiers in the
+preceding example thus:</p>
+<div id="Ex10" class="ltx_equation bml_equation bml_equation_container ltx_align_baseline">
+<div class="ltx_Math ltx_math_unparsed bml_eqn_cell ltx_align_center"><math id="Ex10.m1" class="ltx_math_unparsed" alttext="\overbrace{\forall x\overbrace{\exists y(F(x)\leftrightarrow\overbrace{\forall
+z%
+(G(a,y,z)\rightarrow S(y,z,y,a,y,x))}^{\text{scope of `}\forall z\text{'}}}^{%
+\text{scope of `}\exists y\text{'}})}^{\text{scope of
+`$\forall x$'}}" display="block"><mover><mover accent="true"><mrow><mo movablelimits="false" rspace="0.167em">∀</mo><mi>x</mi><mover><mover accent="true"><mrow><mo lspace="0.167em" movablelimits="false" rspace="0.167em">∃</mo><mi>y</mi><mrow><mo stretchy="false">(</mo><mi>F</mi><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow><mo stretchy="false">↔</mo><mover><mover accent="true"><mrow><mo movablelimits="false" rspace="0.167em">∀</mo><mrow><mi>z</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>G</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>a</mi><mo>,</mo><mi>y</mi><mo>,</mo><mi>z</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">→</mo><mrow><mi>S</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>y</mi><mo>,</mo><mi>z</mi><mo>,</mo><mi>y</mi><mo>,</mo><mi>a</mi><mo>,</mo><mi>y</mi><mo>,</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow><mo>⏞</mo></mover><mrow><mtext>scope of ‘</mtext><mo lspace="0.167em">⁢</mo><mrow><mo movablelimits="false" rspace="0.167em">∀</mo><mrow><mi>z</mi><mo>⁢</mo><mtext>’</mtext></mrow></mrow></mrow></mover></mrow></mrow><mo>⏞</mo></mover><mrow><mtext>scope of ‘</mtext><mo lspace="0.167em">⁢</mo><mrow><mo movablelimits="false" rspace="0.167em">∃</mo><mrow><mi>y</mi><mo>⁢</mo><mtext>’</mtext></mrow></mrow></mrow></mover><mo stretchy="false">)</mo></mrow><mo>⏞</mo></mover><mrow><mtext>scope of
+‘</mtext><mrow><mo lspace="0.167em" rspace="0.167em">∀</mo><mi>x</mi></mrow><mtext>’</mtext></mrow></mover></math></div>
+</div>
+</div>
+</div>
+</section>
+<section id="S3" class="ltx_section normal">
+<div class="section level2">
+<h2 class="ltx_title ltx_title_section">
+<span class="ltx_tag ltx_tag_section header-section-number">27.3</span> Sentences and free variables</h2>
+
+<div id="S3.p1" class="ltx_para">
+<p class="ltx_p">Recall that we are largely concerned in logic with assertoric
+sentences: sentences that can be either true or false. Many formulas
+are not sentences. Consider the following symbolization key:</p>
+<dl id="S3.I1" class="ltx_description">
+<dt id="S3.I1.ix1" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <span class="ltx_text ltx_markedasmath">domain</span>:</span></dt>
+<dd class="ltx_item">
+<div id="S3.I1.ix1.p1" class="ltx_para">
+<p class="ltx_p">people</p>
+</div>
+</dd>
+<dt id="S3.I1.ix2" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="S3.I1.ix2.m1" class="ltx_Math" alttext="L(x,y)" display="inline"><mrow><mi>L</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo>,</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow></math>:</span></dt>
+<dd class="ltx_item">
+<div id="S3.I1.ix2.p1" class="ltx_para">
+<p class="ltx_p"><span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span><sub class="ltx_sub"><span class="ltx_text ltx_font_italic">x</span></sub> loves <span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span><sub class="ltx_sub"><span class="ltx_text ltx_font_italic">y</span></sub></p>
+</div>
+</dd>
+<dt id="S3.I1.ix3" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="S3.I1.ix3.m1" class="ltx_Math" alttext="b" display="inline"><mi>b</mi></math>:</span></dt>
+<dd class="ltx_item">
+<div id="S3.I1.ix3.p1" class="ltx_para">
+<p class="ltx_p">Boris</p>
+</div>
+</dd>
+</dl>
+<p class="ltx_p">Consider the atomic formula ‘<math id="S3.p1.m1" class="ltx_Math" alttext="L(z,z)" display="inline"><mrow><mi>L</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>z</mi><mo>,</mo><mi>z</mi><mo stretchy="false">)</mo></mrow></mrow></math>’. All atomic formulas are
+formulas, so ‘<math id="S3.p1.m2" class="ltx_Math" alttext="L(z,z)" display="inline"><mrow><mi>L</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>z</mi><mo>,</mo><mi>z</mi><mo stretchy="false">)</mo></mrow></mrow></math>’ is a formula, but can it be true or
+false? You might think that it will be true just in case the person
+named by ‘<math id="S3.p1.m3" class="ltx_Math" alttext="z" display="inline"><mi>z</mi></math>’ loves themself, in the same way that ‘<math id="S3.p1.m4" class="ltx_Math" alttext="L(b,b)" display="inline"><mrow><mi>L</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>b</mi><mo>,</mo><mi>b</mi><mo stretchy="false">)</mo></mrow></mrow></math>’
+is true just in case Boris (the person named by ‘<math id="S3.p1.m5" class="ltx_Math" alttext="b" display="inline"><mi>b</mi></math>’) loves himself.
+<span class="ltx_text ltx_font_bold">However, ‘<math id="S3.p1.m6" class="ltx_Math" alttext="z" display="inline"><mi>z</mi></math>’ is a variable, and does not name anyone or any
+thing.</span></p>
+</div>
+<div id="S3.p2" class="ltx_para">
+<p class="ltx_p">Of course, if we put an existential quantifier out front, obtaining
+‘<math id="S3.p2.m1" class="ltx_Math" alttext="\exists z\,L(z,z)" display="inline"><mrow><mo rspace="0.167em">∃</mo><mrow><mi>z</mi><mo lspace="0.170em">⁢</mo><mrow><mi>L</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>z</mi><mo>,</mo><mi>z</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></math>’, then this would be true if⁠f someone
+loves themselves. Equally, if we wrote ‘<math id="S3.p2.m2" class="ltx_Math" alttext="\forall z\,L(z,z)" display="inline"><mrow><mo rspace="0.167em">∀</mo><mrow><mi>z</mi><mo lspace="0.170em">⁢</mo><mrow><mi>L</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>z</mi><mo>,</mo><mi>z</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></math>’,
+this would be true if⁠f everyone loves themselves. The point is
+that we need a quantifier to tell us how to deal with a variable.</p>
+</div>
+<div id="S3.p3" class="ltx_para">
+<p class="ltx_p">Let’s make this idea precise.</p>
+<div class="ltx_logical-block bml_background-color_FDF4FA bml_background-color_FDF4FA" style="padding:9pt;">
+            
+<div id="S3.p3.p1" class="ltx_para ltx_noindent">
+<p class="ltx_p">An occurrence of a variable <math id="S3.p3.p1.m1" class="ltx_Math" alttext="\mathscr{x}" display="inline"><mi class="ltx_font_mathscript">𝓍</mi></math> is <dfn>bound</dfn>
+ if⁠f it falls within the scope of either <math id="S3.p3.p1.m2" class="ltx_Math" alttext="\forall\mathscr{x}" display="inline"><mrow><mo rspace="0.167em">∀</mo><mi class="ltx_font_mathscript">𝓍</mi></mrow></math> or <math id="S3.p3.p1.m3" class="ltx_Math" alttext="\exists\mathscr{x}" display="inline"><mrow><mo rspace="0.167em">∃</mo><mi class="ltx_font_mathscript">𝓍</mi></mrow></math>. An occurrence of a variable which is not bound is <dfn>free</dfn>
+.</p>
+</div>
+          
+</div>
+</div>
+<div id="S3.p4" class="ltx_para">
+<p class="ltx_p">For example, consider the formula</p>
+<div id="Ex11" class="ltx_equation bml_equation bml_equation_container ltx_align_baseline">
+<div class="ltx_Math bml_eqn_cell ltx_align_center"><math id="Ex11.m1" class="ltx_Math" alttext="(\forall x(E(x)\vee D(y))\rightarrow\exists z(E(x)\rightarrow L(z,x)))" display="block"><mrow><mo stretchy="false">(</mo><mrow><mrow><mo rspace="0.167em">∀</mo><mrow><mi>x</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>E</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo>∨</mo><mrow><mi>D</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">→</mo><mrow><mo rspace="0.167em">∃</mo><mrow><mi>z</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>E</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">→</mo><mrow><mi>L</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>z</mi><mo>,</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></math></div>
+</div>
+<p class="ltx_p">The scope of the universal quantifier ‘<math id="S3.p4.m1" class="ltx_Math" alttext="\forall x" display="inline"><mrow><mo rspace="0.167em">∀</mo><mi>x</mi></mrow></math>’ is ‘<math id="S3.p4.m2" class="ltx_Math" alttext="\forall x(E(x)\vee D(y))" display="inline"><mrow><mo rspace="0.167em">∀</mo><mrow><mi>x</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>E</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo>∨</mo><mrow><mi>D</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>’, so the first ‘<math id="S3.p4.m3" class="ltx_Math" alttext="x" display="inline"><mi>x</mi></math>’ is bound by the universal quantifier. However, the second and third occurrence of ‘<math id="S3.p4.m4" class="ltx_Math" alttext="x" display="inline"><mi>x</mi></math>’ are free. Equally, the ‘<math id="S3.p4.m5" class="ltx_Math" alttext="y" display="inline"><mi>y</mi></math>’ is free. The scope of the existential quantifier ‘<math id="S3.p4.m6" class="ltx_Math" alttext="\exists z" display="inline"><mrow><mo rspace="0.167em">∃</mo><mi>z</mi></mrow></math>’ is ‘<math id="S3.p4.m7" class="ltx_Math" alttext="\exists z(E(x)\rightarrow L(z,x))" display="inline"><mrow><mo rspace="0.167em">∃</mo><mrow><mi>z</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>E</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">→</mo><mrow><mi>L</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>z</mi><mo>,</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>’, so ‘<math id="S3.p4.m8" class="ltx_Math" alttext="z" display="inline"><mi>z</mi></math>’ is bound.</p>
+</div>
+<div id="S3.p5" class="ltx_para">
+<p class="ltx_p">Formulas that do not have free variables, i.e., every variable is
+bound, are called <dfn>sentences</dfn>
+. Only sentences can be true or false.</p>
+<div class="ltx_logical-block bml_background-color_FDF4FA bml_background-color_FDF4FA" style="padding:9pt;">
+            
+<div id="S3.p5.p1" class="ltx_para ltx_noindent">
+<p class="ltx_p">A <dfn>sentence</dfn>
+ of FOL is any formula of FOL that contains no free variables.</p>
+</div>
+          
+</div>
+</div>
+<div id="S3.p6" class="ltx_para">
+<p class="ltx_p">Note that in the formation rules given in <a href="#S2" title="27.2 Terms and formulas ‣ Chapter 27 Sentences of FOL ‣ Part V First-order logic ‣ forall x: Calgary" class="ltx_ref"><span class="ltx_text ltx_ref_tag">section</span> <span class="ltx_text ltx_ref_tag">27.2</span></a>,
+specifically in the clauses for <math id="S3.p6.m1" class="ltx_Math" alttext="\forall" display="inline"><mo>∀</mo></math> and <math id="S3.p6.m2" class="ltx_Math" alttext="\exists" display="inline"><mo>∃</mo></math>, we did not
+require that the variable <math id="S3.p6.m3" class="ltx_Math" alttext="\mathscr{x}" display="inline"><mi class="ltx_font_mathscript">𝓍</mi></math> in <math id="S3.p6.m4" class="ltx_Math" alttext="\forall\mathscr{x}\,\mathscr{A}" display="inline"><mrow><mo rspace="0.167em">∀</mo><mrow><mi class="ltx_font_mathscript">𝓍</mi><mo lspace="0.170em">⁢</mo><mi class="ltx_font_mathscript">𝒜︁</mi></mrow></mrow></math> and <math id="S3.p6.m5" class="ltx_Math" alttext="\exists\mathscr{x}\,\mathscr{A}" display="inline"><mrow><mo rspace="0.167em">∃</mo><mrow><mi class="ltx_font_mathscript">𝓍</mi><mo lspace="0.170em">⁢</mo><mi class="ltx_font_mathscript">𝒜︁</mi></mrow></mrow></math> does not <span class="ltx_text ltx_font_bold">already</span>
+occur as a bound variable in <math id="S3.p6.m6" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math>. So we allow, for instance,
+‘<math id="S3.p6.m7" class="ltx_Math" alttext="\exists x(\forall x\,F(x)\rightarrow G(x))" display="inline"><mrow><mo rspace="0.167em">∃</mo><mrow><mi>x</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mo rspace="0.167em">∀</mo><mrow><mi>x</mi><mo lspace="0.170em">⁢</mo><mrow><mi>F</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow><mo stretchy="false">→</mo><mrow><mi>G</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>’ as a sentence. We
+won’t be meeting such special cases often, since we can always rename
+bound variables to obtain an equivalent sentence that avoids such
+weirdness; in this case, e.g., ‘<math id="S3.p6.m8" class="ltx_Math" alttext="\exists x(\forall y\,F(y)\rightarrow G(x))" display="inline"><mrow><mo rspace="0.167em">∃</mo><mrow><mi>x</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mo rspace="0.167em">∀</mo><mrow><mi>y</mi><mo lspace="0.170em">⁢</mo><mrow><mi>F</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow><mo stretchy="false">→</mo><mrow><mi>G</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>’. But since it is allowed to happen, we should clarify
+which quantifiers bind which variables: An occurrence of a bound
+variable is always bound by the quantifier with the same matching
+variable that is closest to it. By “closest” we mean: it is the main
+logical operator of the smallest subformula into the scope of which
+the occurrence of the variable falls. So in our previous example,
+‘<math id="S3.p6.m9" class="ltx_Math" alttext="\forall x" display="inline"><mrow><mo rspace="0.167em">∀</mo><mi>x</mi></mrow></math>’ binds the occurrence of <math id="S3.p6.m10" class="ltx_Math" alttext="x" display="inline"><mi>x</mi></math> in ‘<math id="S3.p6.m11" class="ltx_Math" alttext="F(x)" display="inline"><mrow><mi>F</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></math>’, since it is
+the main logical operator of ‘<math id="S3.p6.m12" class="ltx_Math" alttext="\forall x\,F(x)" display="inline"><mrow><mo rspace="0.167em">∀</mo><mrow><mi>x</mi><mo lspace="0.170em">⁢</mo><mrow><mi>F</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></math>’. The ‘<math id="S3.p6.m13" class="ltx_Math" alttext="\forall x" display="inline"><mrow><mo rspace="0.167em">∀</mo><mi>x</mi></mrow></math>’
+does not bind the ‘<math id="S3.p6.m14" class="ltx_Math" alttext="x" display="inline"><mi>x</mi></math>’ in ‘<math id="S3.p6.m15" class="ltx_Math" alttext="G(x)" display="inline"><mrow><mi>G</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></math>’, however. The ‘<math id="S3.p6.m16" class="ltx_Math" alttext="\exists x" display="inline"><mrow><mo rspace="0.167em">∃</mo><mi>x</mi></mrow></math>’ does
+not bind the ‘<math id="S3.p6.m17" class="ltx_Math" alttext="x" display="inline"><mi>x</mi></math>’ in ‘<math id="S3.p6.m18" class="ltx_Math" alttext="F(x)" display="inline"><mrow><mi>F</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></math>’, but it does bind the ‘<math id="S3.p6.m19" class="ltx_Math" alttext="x" display="inline"><mi>x</mi></math>’
+in ‘<math id="S3.p6.m20" class="ltx_Math" alttext="G(x)" display="inline"><mrow><mi>G</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></math>’.</p>
+</div>
+<div id="S3.p7" class="ltx_para">
+<p class="ltx_p">The rules also do not require that the bound variable <math id="S3.p7.m1" class="ltx_Math" alttext="\mathscr{x}" display="inline"><mi class="ltx_font_mathscript">𝓍</mi></math>
+<span class="ltx_text ltx_font_bold">actually occurs</span> free in <math id="S3.p7.m2" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math> (or even at all). So our
+rules also allow ‘<math id="S3.p7.m3" class="ltx_Math" alttext="\exists x\,F(a)" display="inline"><mrow><mo rspace="0.167em">∃</mo><mrow><mi>x</mi><mo lspace="0.170em">⁢</mo><mrow><mi>F</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></math>’ and ‘<math id="S3.p7.m4" class="ltx_Math" alttext="\exists x\forall x\,G(x)" display="inline"><mrow><mo rspace="0.167em">∃</mo><mrow><mi>x</mi><mo lspace="0.167em">⁢</mo><mrow><mo rspace="0.167em">∀</mo><mrow><mi>x</mi><mo lspace="0.170em">⁢</mo><mrow><mi>G</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></mrow></mrow></math>’ as formulas. In each case, the ‘<math id="S3.p7.m5" class="ltx_Math" alttext="\exists x" display="inline"><mrow><mo rspace="0.167em">∃</mo><mi>x</mi></mrow></math>’ does not
+bind ‘<math id="S3.p7.m6" class="ltx_Math" alttext="x" display="inline"><mi>x</mi></math>’, because ‘<math id="S3.p7.m7" class="ltx_Math" alttext="x" display="inline"><mi>x</mi></math>’ does not occur free in ‘<math id="S3.p7.m8" class="ltx_Math" alttext="F(a)" display="inline"><mrow><mi>F</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mrow></math>’ or in
+‘<math id="S3.p7.m9" class="ltx_Math" alttext="\forall x\,G(x)" display="inline"><mrow><mo rspace="0.167em">∀</mo><mrow><mi>x</mi><mo lspace="0.170em">⁢</mo><mrow><mi>G</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></math>’. In the former case, ‘<math id="S3.p7.m10" class="ltx_Math" alttext="x" display="inline"><mi>x</mi></math>’ does not occur at
+all; in the latter, it is already bound by ‘<math id="S3.p7.m11" class="ltx_Math" alttext="\forall x" display="inline"><mrow><mo rspace="0.167em">∀</mo><mi>x</mi></mrow></math>’. This is called
+<dfn>vacuous quantification</dfn>
+. It rarely appears in practice, and
+isn’t harmful. The two sentences are equivalent to the sentences
+without the ‘<math id="S3.p7.m12" class="ltx_Math" alttext="\exists x" display="inline"><mrow><mo rspace="0.167em">∃</mo><mi>x</mi></mrow></math>’, i.e., to ‘<math id="S3.p7.m13" class="ltx_Math" alttext="F(a)" display="inline"><mrow><mi>F</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mrow></math>’ and ‘<math id="S3.p7.m14" class="ltx_Math" alttext="\forall x\,G(x)" display="inline"><mrow><mo rspace="0.167em">∀</mo><mrow><mi>x</mi><mo lspace="0.170em">⁢</mo><mrow><mi>G</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></math>’.</p>
+</div>
+</div>
+</section>
+<section id="S4" class="ltx_section normal">
+<div class="section level2">
+<h2 class="ltx_title ltx_title_section">
+<span class="ltx_tag ltx_tag_section header-section-number">27.4</span> Bracketing conventions</h2>
+
+<div id="S4.p1" class="ltx_para">
+<p class="ltx_p">We will adopt the same notational conventions governing brackets that we did for TFL (see <a href="Ch6.html" title="Chapter 6 Sentences of TFL ‣ Part II Truth-functional logic ‣ forall x: Calgary" class="ltx_ref"><span class="ltx_text ltx_ref_tag">chapters</span> <span class="ltx_text ltx_ref_tag">6</span></a> and <a href="Ch11.html#S3" title="11.3 More about brackets ‣ Chapter 11 Complete truth tables ‣ Part III Truth tables ‣ forall x: Calgary" class="ltx_ref"><span class="ltx_text ltx_ref_tag">11.3</span></a>.) First, we may omit the outermost brackets of a formula. Second, we may use square brackets, ‘[’ and ‘]’, in place of brackets to increase the readability of formulas.</p>
+</div>
+<div id="S4.p2" class="ltx_para">
+<p class="ltx_p">Sentences of FOL used in our examples can become quite cumbersome, and so we also introduce a convention to deal with conjunctions and disjunctions of more than two sentences. We stipulate that <math id="S4.p2.m1" class="ltx_Math" alttext="A_{1}\land A_{2}\land\dots\land A_{n}" display="inline"><mrow><msub><mi>A</mi><mn>1</mn></msub><mo>∧</mo><msub><mi>A</mi><mn>2</mn></msub><mo>∧</mo><mi mathvariant="normal">⋯</mi><mo>∧</mo><msub><mi>A</mi><mi>n</mi></msub></mrow></math> and <math id="S4.p2.m2" class="ltx_Math" alttext="A_{1}\lor A_{2}\lor\dots\lor A_{n}" display="inline"><mrow><msub><mi>A</mi><mn>1</mn></msub><mo>∨</mo><msub><mi>A</mi><mn>2</mn></msub><mo>∨</mo><mi mathvariant="normal">⋯</mi><mo>∨</mo><msub><mi>A</mi><mi>n</mi></msub></mrow></math> are to be interpreted as, respectively:</p>
+<ul id="S4.I1" class="ltx_itemize">
+<li id="S4.I1.ix1" class="ltx_item" style="list-style-type:none;"><div id="S4.I1.ix1.p1" class="ltx_para">
+<p class="ltx_p"><math id="S4.I1.ix1.p1.m1" class="ltx_Math" alttext="(\dots(A_{1}\land A_{2})\land\dots\land A_{n})" display="inline"><mrow><mo stretchy="false">(</mo><mrow><mrow><mi mathvariant="normal">…</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><msub><mi>A</mi><mn>1</mn></msub><mo>∧</mo><msub><mi>A</mi><mn>2</mn></msub></mrow><mo stretchy="false">)</mo></mrow></mrow><mo>∧</mo><mi mathvariant="normal">⋯</mi><mo>∧</mo><msub><mi>A</mi><mi>n</mi></msub></mrow><mo stretchy="false">)</mo></mrow></math></p>
+</div></li>
+<li id="S4.I1.ix2" class="ltx_item" style="list-style-type:none;"><div id="S4.I1.ix2.p1" class="ltx_para">
+<p class="ltx_p"><math id="S4.I1.ix2.p1.m1" class="ltx_Math" alttext="(\dots(A_{1}\lor A_{2})\lor\dots\lor A_{n})" display="inline"><mrow><mo stretchy="false">(</mo><mrow><mrow><mi mathvariant="normal">…</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><msub><mi>A</mi><mn>1</mn></msub><mo>∨</mo><msub><mi>A</mi><mn>2</mn></msub></mrow><mo stretchy="false">)</mo></mrow></mrow><mo>∨</mo><mi mathvariant="normal">⋯</mi><mo>∨</mo><msub><mi>A</mi><mi>n</mi></msub></mrow><mo stretchy="false">)</mo></mrow></math></p>
+</div></li>
+</ul>
+<p class="ltx_p">In practice, this just means that you are allowed to leave out parentheses in long conjunctions and disjunctions. But remember that (unless they are the outermost parentheses of the sentence) you must still enclose the entire conjunction or disjunction in parentheses. Also, you cannot mix conjunctions and disjunctions with each other or with other connectives. So the following are still not allowed, and would be ambiguous if they were:</p>
+<ul id="S4.I2" class="ltx_itemize">
+<li id="S4.I2.ix1" class="ltx_item" style="list-style-type:none;"><div id="S4.I2.ix1.p1" class="ltx_para">
+<p class="ltx_p"><math id="S4.I2.ix1.p1.m1" class="ltx_Math" alttext="A\lor B\land C\land D" display="inline"><mrow><mrow><mi>A</mi><mo>∨</mo><mi>B</mi></mrow><mo>∧</mo><mi>C</mi><mo>∧</mo><mi>D</mi></mrow></math></p>
+</div></li>
+<li id="S4.I2.ix2" class="ltx_item" style="list-style-type:none;"><div id="S4.I2.ix2.p1" class="ltx_para">
+<p class="ltx_p"><math id="S4.I2.ix2.p1.m1" class="ltx_Math" alttext="B\lor C\rightarrow D" display="inline"><mrow><mrow><mi>B</mi><mo>∨</mo><mi>C</mi></mrow><mo stretchy="false">→</mo><mi>D</mi></mrow></math></p>
+</div></li>
+</ul>
+</div>
+</div>
+</section>
+<section id="S5" class="ltx_section normal">
+<div class="section level2">
+<h2 class="ltx_title ltx_title_section">
+<span class="ltx_tag ltx_tag_section header-section-number">27.5</span> Superscripts on predicates</h2>
+
+<div id="S5.p1" class="ltx_para">
+<p class="ltx_p">Above, we said that an <math id="S5.p1.m1" class="ltx_Math" alttext="n" display="inline"><mi>n</mi></math>-place predicate followed by <math id="S5.p1.m2" class="ltx_Math" alttext="n" display="inline"><mi>n</mi></math> terms is an atomic formula. But there is a small issue with this definition: the symbols we use for predicates do not, themselves, indicate how many places the predicate has. Indeed, in some places in this book, we have used the letter ‘<math id="S5.p1.m3" class="ltx_Math" alttext="G" display="inline"><mi>G</mi></math>’ as a one-place predicate; in other places we have used it as a three-place predicate. So, unless we state explicitly whether we want to use ‘<math id="S5.p1.m4" class="ltx_Math" alttext="G" display="inline"><mi>G</mi></math>’ as a one-place predicate or as a three place predicate, it is <span class="ltx_text ltx_font_bold">indeterminate</span> whether ‘<math id="S5.p1.m5" class="ltx_Math" alttext="G(a)" display="inline"><mrow><mi>G</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mrow></math>’ is an atomic formula or not.</p>
+</div>
+<div id="S5.p2" class="ltx_para">
+<p class="ltx_p">There is an easy way to avoid this, which many books adopt. Instead of saying that our predicates are just capital letters (with numerical subscripts as necessary), we could say that they are capital letters <span class="ltx_text ltx_font_bold">with numerical superscripts</span> (and with numerical subscripts as necessary). The purpose of the superscript would be to say explicitly how many places the predicate has. On this approach, ‘<math id="S5.p2.m1" class="ltx_Math" alttext="G^{1}" display="inline"><msup><mi>G</mi><mn>1</mn></msup></math>’ would be a one-place predicate, and ‘<math id="S5.p2.m2" class="ltx_Math" alttext="G^{3}" display="inline"><msup><mi>G</mi><mn>3</mn></msup></math>’ would be an (entirely different) three places predicate. They would need to have different entries in any symbolisation key. And ‘<math id="S5.p2.m3" class="ltx_Math" alttext="G^{1}(a)" display="inline"><mrow><msup><mi>G</mi><mn>1</mn></msup><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mrow></math>’ would be an atomic formula, whereas ‘<math id="S5.p2.m4" class="ltx_Math" alttext="G^{3}(a)" display="inline"><mrow><msup><mi>G</mi><mn>3</mn></msup><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mrow></math>’ would not; likewise ‘<math id="S5.p2.m5" class="ltx_Math" alttext="G^{3}(a,b,c)" display="inline"><mrow><msup><mi>G</mi><mn>3</mn></msup><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>a</mi><mo>,</mo><mi>b</mi><mo>,</mo><mi>c</mi><mo stretchy="false">)</mo></mrow></mrow></math>’ would be an atomic formula, and ‘<math id="S5.p2.m6" class="ltx_Math" alttext="G^{1}(a,b,c)" display="inline"><mrow><msup><mi>G</mi><mn>1</mn></msup><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>a</mi><mo>,</mo><mi>b</mi><mo>,</mo><mi>c</mi><mo stretchy="false">)</mo></mrow></mrow></math>’ would not.</p>
+</div>
+<div id="S5.p3" class="ltx_para">
+<p class="ltx_p">So, we <span class="ltx_text ltx_font_bold">could</span> add superscripts to all our predicates. This would have the advantage of making certain things completely explicit. However, it would have the disadvantage of making our formulas much harder to read; the superscripts would distract the eye. So, we will not bother to make this change. Our predicates will remain <span class="ltx_text ltx_font_bold">without</span> superscripts. (And, in practice, any book which includes superscripts almost immediately stops including them!)</p>
+</div>
+<div id="S5.p4" class="ltx_para">
+<p class="ltx_p">However, this leaves open a possibility of ambiguity. So, when any ambiguity could arise—in practice, very rarely—you should say, explicitly, how many places your predicate(s) have.</p>
+</div>
+</div>
+</section>
+<section id="Sx1" class="ltx_section normal">
+<div class="section level2">
+<h2 class="ltx_title ltx_title_section">Practice exercises</h2>
+
+<div id="Sx1.p1" class="ltx_para ltx_noindent">
+<p class="ltx_p"><span class="ltx_text ltx_font_bold">A. </span>
+Identify which variables are bound and which are free.</p>
+<ol id="Sx1.I1" class="ltx_enumerate">
+<li id="Sx1.I1.i1" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">1.</span><div id="Sx1.I1.i1.p1" class="ltx_para">​<p class="ltx_p"><math id="Sx1.I1.i1.p1.m1" class="ltx_Math" alttext="\exists x\,L(x,y)\wedge\forall y\,L(y,x)" display="inline"><mrow><mrow><mo rspace="0.167em">∃</mo><mrow><mi>x</mi><mo lspace="0.170em">⁢</mo><mrow><mi>L</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo>,</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow><mo>∧</mo><mrow><mo rspace="0.167em">∀</mo><mrow><mi>y</mi><mo lspace="0.170em">⁢</mo><mrow><mi>L</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>y</mi><mo>,</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></mrow></math></p>
+</div>
+</li>
+<li id="Sx1.I1.i2" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">2.</span><div id="Sx1.I1.i2.p1" class="ltx_para">​<p class="ltx_p"><math id="Sx1.I1.i2.p1.m1" class="ltx_Math" alttext="\forall x\,A(x)\wedge B(x)" display="inline"><mrow><mrow><mo rspace="0.167em">∀</mo><mrow><mi>x</mi><mo lspace="0.170em">⁢</mo><mrow><mi>A</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow><mo>∧</mo><mrow><mi>B</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math></p>
+</div>
+</li>
+<li id="Sx1.I1.i3" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">3.</span><div id="Sx1.I1.i3.p1" class="ltx_para">​<p class="ltx_p"><math id="Sx1.I1.i3.p1.m1" class="ltx_Math" alttext="\forall x(A(x)\wedge B(x))\wedge\forall y(C(x)\wedge D(y))" display="inline"><mrow><mrow><mo rspace="0.167em">∀</mo><mrow><mi>x</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>A</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo>∧</mo><mrow><mi>B</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow><mo>∧</mo><mrow><mo rspace="0.167em">∀</mo><mrow><mi>y</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>C</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo>∧</mo><mrow><mi>D</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></math></p>
+</div>
+</li>
+<li id="Sx1.I1.i4" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">4.</span><div id="Sx1.I1.i4.p1" class="ltx_para">​<p class="ltx_p"><math id="Sx1.I1.i4.p1.m1" class="ltx_Math" alttext="\forall x\exists y[R(x,y)\rightarrow(J(z)\wedge K(x))]\vee R(y,x)" display="inline"><mrow><mrow><mo rspace="0.167em">∀</mo><mrow><mi>x</mi><mo lspace="0.167em">⁢</mo><mrow><mo rspace="0.167em">∃</mo><mrow><mi>y</mi><mo>⁢</mo><mrow><mo stretchy="false">[</mo><mrow><mrow><mi>R</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo>,</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">→</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>J</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>z</mi><mo stretchy="false">)</mo></mrow></mrow><mo>∧</mo><mrow><mi>K</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">]</mo></mrow></mrow></mrow></mrow></mrow><mo>∨</mo><mrow><mi>R</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>y</mi><mo>,</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math></p>
+</div>
+</li>
+<li id="Sx1.I1.i5" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">5.</span><div id="Sx1.I1.i5.p1" class="ltx_para">​<p class="ltx_p"><math id="Sx1.I1.i5.p1.m1" class="ltx_math_unparsed" alttext="\forall x_{1}(M(x_{2})\leftrightarrow L(x_{2},x_{1}))\wedge\exists x_{2}\,L(x_%
+{3},x_{2})" display="inline"><mrow><mo rspace="0.167em">∀</mo><msub><mi>x</mi><mn>1</mn></msub><mrow><mo stretchy="false">(</mo><mi>M</mi><mrow><mo stretchy="false">(</mo><msub><mi>x</mi><mn>2</mn></msub><mo stretchy="false">)</mo></mrow><mo stretchy="false">↔</mo><mi>L</mi><mrow><mo stretchy="false">(</mo><msub><mi>x</mi><mn>2</mn></msub><mo>,</mo><msub><mi>x</mi><mn>1</mn></msub><mo stretchy="false">)</mo></mrow><mo stretchy="false">)</mo></mrow><mo>∧</mo><mo rspace="0.167em">∃</mo><msub><mi>x</mi><mn>2</mn></msub><mi>L</mi><mrow><mo stretchy="false">(</mo><msub><mi>x</mi><mn>3</mn></msub><mo>,</mo><msub><mi>x</mi><mn>2</mn></msub><mo stretchy="false">)</mo></mrow></mrow></math></p>
+</div>
+</li>
+</ol>
+</div>
+</div>
+</section>
+</div>
+</section>
+</div>
+</div>
+</div>
+<a href="Ch26.html" class="navigation navigation-prev" aria-label="Previous page"><i class="fa fa-angle-left"></i></a><a href="Ch28.html" class="navigation navigation-next" aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+</div>
+</div>
+</body>
+
+</html>

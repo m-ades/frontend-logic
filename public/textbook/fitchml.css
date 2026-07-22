@@ -1,0 +1,88 @@
+/* fitchml.css -- style sheet to format fitch tables produced by fitchml
+must be loaded when running LaTeXML */
+
+.fml-sr-only, thead.fml-sr-only th, thead.fml-sr-only div, .fml-subproof div, .fml-subproof td, .fml-subproof th {
+  height: 0px;
+  width: 0px; 
+  overflow: hidden;
+  padding: 0 !important;
+}
+
+table.fitch td, table.fitch th, table.fitch tr  {
+  padding: 0 !important;
+  border: none !important;
+}
+
+th.fml-pline, td.fml-pline {
+  width: 10%;
+  padding-right: 1ex; 
+  text-align: right;
+}
+
+td.fml-pline, th.fml-pline {
+  width: 10%;
+  text-align: right;
+  font-weight: normal !important;
+}
+
+td.fml-fmla, th.fml-fmla {
+  width: 45%;
+  text-align: left;
+}
+
+table.fitch td.fml-just, table.fitch th.fml-just {
+  width: 45%;
+  text-align: left;
+  padding-left: 1em !important;
+  white-space: nowrap;
+  vertical-align: baseline;
+}
+
+div.fml-fmla {
+  display: inline-block;
+  overflow: visible;
+  padding-left: 1ex;
+  padding-right: 1ex; 
+}
+div.fml-as {
+  display: inline-block;
+  overflow: visible;
+  border-bottom: 1pt solid; 
+  padding-left: 1ex;
+  padding-right: 1ex;
+}
+div.fml-just {
+  display: inline-block;
+  max-width: 100%;
+  overflow: visible;
+}
+div.fml-scope {
+  display: inline;
+  height: 100%;
+  border-right: 1pt solid; 
+  margin-left: 1em;
+  padding-top: 1ex ;
+  padding-right: 0; 
+  padding-bottom: 0;
+  padding-top: 2ex
+}
+div.fml-scope-start {
+  display: inline;
+  height: 100%;
+  border-right: 1pt solid; 
+  margin-left: 1em;
+  padding-right: 0;
+  padding-bottom: 1ex;
+  margin-top: .5ex;
+  padding-top: 0;
+}
+div.fml-scope-end {
+  display: inline;
+  height: 100%;
+  border-right: 1pt solid; 
+  margin-left: 1em;
+  padding-right: 0;
+  padding-top: .5ex;
+  padding-bottom: .5ex;
+  margin-bottom: .5ex;
+}

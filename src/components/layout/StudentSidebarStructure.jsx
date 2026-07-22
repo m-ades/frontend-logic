@@ -2,6 +2,7 @@ import {
   Dashboard as DashboardIcon,
   Assignment as AssignmentIcon,
   Psychology as PracticeIcon,
+  MenuBook as TextbookIcon,
   Grade as GradeIcon,
   ContactSupport as ContactIcon,
 } from "@mui/icons-material";
@@ -27,12 +28,18 @@ export default [
   },
   {
     id: 3,
+    label: "Textbook",
+    link: "/student/textbook",
+    icon: <TextbookIcon />,
+  },
+  {
+    id: 4,
     label: "Grades",
     link: "/student/grades",
     icon: <GradeIcon />,
   },
   {
-    id: 4,
+    id: 5,
     label: "Contact",
     link: "/student/contact",
     icon: <ContactIcon />,

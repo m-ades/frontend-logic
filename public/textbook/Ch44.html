@@ -1,0 +1,956 @@
+<!DOCTYPE html><html style="--bml-ltx-font-size:10;" class="bml_mathjax4" lang="en">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<title>Chapter 44 Semantics for ML ‣ Part VIII Modal logic ‣ forall x: Calgary</title>
+<!--Generated on Tue Jul 21 20:13:15 2026 by LaTeXML (version 0.8.8) http://dlmf.nist.gov/LaTeXML/.-->
+<!--Document created on Fall 2025 (2026‐07‐18 8642250).-->
+
+<link rel="stylesheet" href="LaTeXML.css" type="text/css">
+<link rel="stylesheet" href="ltx-book.css" type="text/css">
+<link rel="stylesheet" href="bookml/gitbook/css/style.css" type="text/css">
+<link rel="stylesheet" href="bookml/gitbook/css/plugin-table.css" type="text/css">
+<link rel="stylesheet" href="bookml/gitbook/css/plugin-search.css" type="text/css">
+<link rel="stylesheet" href="bookml/gitbook/css/plugin-bookdown.css" type="text/css">
+<link rel="stylesheet" href="bookml/gitbook/css/plugin-fontsettings.css" type="text/css">
+<link rel="stylesheet" href="bookml/CSS/style.css" type="text/css">
+<link rel="stylesheet" href="bookml/CSS/style.gitbook,plain.css" type="text/css">
+<link rel="stylesheet" href="bookml/CSS/style.gitbook.css" type="text/css">
+<link rel="stylesheet" href="bmluser/colors.gitbook-forallxyyc-html.css" type="text/css">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<link rel="stylesheet" href="forallxyyc.css" type="text/css">
+<link rel="stylesheet" href="fitchml.css" type="text/css">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script><script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6"></script>
+<link rel="up" href="Pt8.html" title="Part VIII Modal logic ‣ forall x: Calgary">
+<link rel="up up" href="index.html" title="forall x: Calgary">
+<link rel="start" href="index.html" title="forall x: Calgary">
+<link rel="prev" href="Ch43.html" title="Chapter 43 Natural deduction for ML ‣ Part VIII Modal logic ‣ forall x: Calgary">
+<link rel="next" href="Pt9.html" title="Part IX Metatheory ‣ forall x: Calgary">
+<link rel="chapter" href="Ch42.html" title="Chapter 42 Introducing modal logic ‣ Part VIII Modal logic ‣ forall x: Calgary">
+<link rel="chapter" href="Ch43.html" title="Chapter 43 Natural deduction for ML ‣ Part VIII Modal logic ‣ forall x: Calgary">
+<link rel="chapter" href="Chx1.html" title="Preface ‣ forall x: Calgary">
+<link rel="part" href="Pt1.html" title="Part I Key notions of logic ‣ forall x: Calgary">
+<link rel="part" href="Pt2.html" title="Part II Truth-functional logic ‣ forall x: Calgary">
+<link rel="part" href="Pt3.html" title="Part III Truth tables ‣ forall x: Calgary">
+<link rel="part" href="Pt4.html" title="Part IV Natural deduction for TFL ‣ forall x: Calgary">
+<link rel="part" href="Pt5.html" title="Part V First-order logic ‣ forall x: Calgary">
+<link rel="part" href="Pt6.html" title="Part VI Interpretations ‣ forall x: Calgary">
+<link rel="part" href="Pt7.html" title="Part VII Natural deduction for FOL ‣ forall x: Calgary">
+<link rel="part" href="Pt8.html" title="Part VIII Modal logic ‣ forall x: Calgary">
+<link rel="part" href="Pt9.html" title="Part IX Metatheory ‣ forall x: Calgary">
+<link rel="part" href="Ptx1.html" title="Appendices ‣ forall x: Calgary">
+<link rel="part" href="Ptx2.html" title="Solutions to selected exercices ‣ forall x: Calgary">
+<script src="bookml/js/mathjax4.js" defer></script>
+</head>
+<body class="bml_class_book">
+<div class="book without-animation font-size-2 font-family-1" data-basepath=".">
+<a href="#bml-main-content" tabindex="0" class="bml-skip-to-content">Skip to content.</a>
+<div class="book-summary"><nav class="ltx_page_navbar">
+<ul class="ltx_toclist summary">
+<li>
+<a href="index.html" title="" class="ltx_ref" rel="start">forall x: Calgary</a>
+</li>
+<li class="divider" aria-hidden="true"></li>
+<li data-level="" data-path="Chx1.html" class="ltx_tocentry ltx_tocentry_chapter  chapter "><a href="Chx1.html" title="In forall x: Calgary" class="ltx_ref">Preface</a></li>
+<li data-level="I" data-path="Pt1.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt1.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">I </span></b>Key notions of logic</a></li>
+<li data-level="II" data-path="Pt2.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt2.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">II </span></b>Truth-functional logic</a></li>
+<li data-level="III" data-path="Pt3.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt3.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">III </span></b>Truth tables</a></li>
+<li data-level="IV" data-path="Pt4.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt4.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">IV </span></b>Natural deduction for TFL</a></li>
+<li data-level="V" data-path="Pt5.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt5.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">V </span></b>First-order logic</a></li>
+<li data-level="VI" data-path="Pt6.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt6.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">VI </span></b>Interpretations</a></li>
+<li data-level="VII" data-path="Pt7.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt7.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">VII </span></b>Natural deduction for FOL</a></li>
+<li data-level="VIII" data-path="Pt8.html" class="ltx_tocentry ltx_tocentry_part  chapter ">
+<a href="Pt8.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">VIII </span></b>Modal logic</a>
+<ol class="ltx_toclist ltx_toclist_part">
+<li data-level="42" data-path="Ch42.html" class="ltx_tocentry ltx_tocentry_chapter  chapter "><a href="Ch42.html" title="In Part VIII Modal logic ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">42 </span></b>Introducing modal logic</a></li>
+<li data-level="43" data-path="Ch43.html" class="ltx_tocentry ltx_tocentry_chapter  chapter "><a href="Ch43.html" title="In Part VIII Modal logic ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">43 </span></b>Natural deduction for ML</a></li>
+<li data-level="44" data-path="" class="ltx_tocentry ltx_tocentry_chapter ltx_ref_self  chapter active">
+<a href="" title="In Part VIII Modal logic ‣ forall x: Calgary" aria-current="page" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">44 </span></b>Semantics for ML</a>
+<ol class="ltx_toclist ltx_toclist_chapter">
+<li data-level="44.1" data-path="" class="ltx_tocentry ltx_tocentry_section  chapter "><a href="#S1" title="In Chapter 44 Semantics for ML ‣ Part VIII Modal logic ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">44.1 </span></b>Interpretations of ML</a></li>
+<li data-level="44.2" data-path="" class="ltx_tocentry ltx_tocentry_section  chapter "><a href="#S2" title="In Chapter 44 Semantics for ML ‣ Part VIII Modal logic ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">44.2 </span></b>A Semantics for System <math class="ltx_Math" alttext="\mathbf{K}" display="inline"><mi>𝐊</mi></math></a></li>
+<li data-level="44.3" data-path="" class="ltx_tocentry ltx_tocentry_section  chapter "><a href="#S3" title="In Chapter 44 Semantics for ML ‣ Part VIII Modal logic ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">44.3 </span></b>A Semantics for System <math class="ltx_Math" alttext="\mathbf{T}" display="inline"><mi>𝐓</mi></math></a></li>
+<li data-level="44.4" data-path="" class="ltx_tocentry ltx_tocentry_section  chapter "><a href="#S4" title="In Chapter 44 Semantics for ML ‣ Part VIII Modal logic ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">44.4 </span></b>A Semantics for <math class="ltx_Math" alttext="\mathbf{S4}" display="inline"><mi>𝐒𝟒</mi></math></a></li>
+<li data-level="44.5" data-path="" class="ltx_tocentry ltx_tocentry_section  chapter "><a href="#S5" title="In Chapter 44 Semantics for ML ‣ Part VIII Modal logic ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">44.5 </span></b>A Semantics for <math class="ltx_Math" alttext="\mathbf{S5}" display="inline"><mi>𝐒𝟓</mi></math></a></li>
+<li data-level="" data-path="" class="ltx_tocentry ltx_tocentry_section  chapter "><a href="#Sx1" title="In Chapter 44 Semantics for ML ‣ Part VIII Modal logic ‣ forall x: Calgary" class="ltx_ref">Practice exercises</a></li>
+</ol>
+</li>
+</ol>
+</li>
+<li data-level="IX" data-path="Pt9.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt9.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">IX </span></b>Metatheory</a></li>
+<li data-level="" data-path="Ptx1.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Ptx1.html" title="In forall x: Calgary" class="ltx_ref">Appendices</a></li>
+<li data-level="" data-path="Ptx2.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Ptx2.html" title="In forall x: Calgary" class="ltx_ref">Solutions to selected exercices</a></li>
+</ul>
+</nav></div>
+
+<div class="ltx_page_main book-body fixed">
+<div class="body-inner">
+<header class="book-header fixed" aria-label="toolbar"><span class="bml-separator"></span></header>
+<div class="page-wrapper" tabindex="-1" role="main">
+<div class="ltx_page_content page-inner" id="bml-main-content">
+<script src="bookml/gitbook/js/app.min.js"></script>
+<script src="bookml/gitbook/js/jquery.highlight.js"></script>
+<script src="bookml/gitbook/js/plugin-search.js"></script>
+<script src="bookml/gitbook/js/plugin-fontsettings.js"></script>
+<script src="bookml/gitbook/js/plugin-bookdown.js"></script>
+<script type="text/javascript">
+                  gitbook.require(["gitbook"], function(gitbook) {
+                  gitbook.start({
+                    "fontsettings": {
+                      "theme": "white",
+                      "family": "sans",
+                      "size": 2
+                    },
+                    "download": [ [ "forallxyyc.pdf", "PDF" ], [ "forallxyyc-accessible.pdf", "PDF (accessible)" ], ],
+                    "search": {
+                      "engine": "fuse"
+                    },
+                    "toc": {
+                      "collapse": "none"
+                    }
+                  });
+                });
+              </script>
+
+<section class="ltx_chapter ltx_authors_1line normal" lang="en">
+<div class="section level1">
+<h1 class="ltx_title ltx_title_chapter">
+<span class="ltx_tag ltx_tag_chapter header-section-number">Chapter 44</span> Semantics for ML</h1>
+
+<div id="p1" class="ltx_para">
+<p class="ltx_p">So far, we have focussed on laying out various systems of Natural Deduction for ML. Now we will look at the <span class="ltx_text ltx_font_bold">semantics</span> for ML. A semantics for a language is a method for assigning truth-values to the sentences in that language. So a semantics for ML is a method for assigning truth-values to the sentences of ML.</p>
+</div>
+<section id="S1" class="ltx_section normal">
+<div class="section level2">
+<h2 class="ltx_title ltx_title_section">
+<span class="ltx_tag ltx_tag_section header-section-number">44.1</span> Interpretations of ML</h2>
+
+<div id="S1.p1" class="ltx_para">
+<p class="ltx_p">The big idea behind the semantics for ML is this. In ML, sentences are not just true or false, full stop. A sentence is true or false <span class="ltx_text ltx_font_bold">at a given possible world</span>, and a single sentence may well be true at some worlds and false at others. We then say that <math id="S1.p1.m1" class="ltx_Math" alttext="\Box\mathscr{A}" display="inline"><mrow><mi mathvariant="normal">□</mi><mo>⁢</mo><mi class="ltx_font_mathscript">𝒜︁</mi></mrow></math> is true if⁠f <math id="S1.p1.m2" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math> is true at <span class="ltx_text ltx_font_bold">every</span> world, and <math id="S1.p1.m3" class="ltx_Math" alttext="\Diamond\mathscr{A}" display="inline"><mrow><mi mathvariant="normal">◇</mi><mo>⁢</mo><mi class="ltx_font_mathscript">𝒜︁</mi></mrow></math> is true if⁠f <math id="S1.p1.m4" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math> is true at <span class="ltx_text ltx_font_bold">some</span> world.</p>
+</div>
+<div id="S1.p2" class="ltx_para">
+<p class="ltx_p">That’s the big idea, but we need to refine it and make it more precise. To do this, we need to introduce the idea of an <span class="ltx_text ltx_font_bold">interpretation</span> of ML. The first thing you need to include in an interpretation is a collection of <span class="ltx_text ltx_font_bold">possible worlds</span>. Now, at this point you might well want to ask: What exactly is a possible world? The intuitive idea is that a possible world is another way that this world could have been. But what exactly does that mean? This is an excellent philosophical question, and we will look at it in a lot of detail later. But we do not need to worry too much about it right now. As far as the formal logic goes, possible worlds can be anything you like. All that matters is that you supply each interpretation with a non-empty collection of things labelled <dfn>possible worlds</dfn>
+.</p>
+</div>
+<div id="S1.p3" class="ltx_para">
+<p class="ltx_p">Once you have chosen your collection of possible worlds, you need to find some way of determining which sentences of ML are true at which possible worlds. To do that, we need to introduce the notion of a <span class="ltx_text ltx_font_bold">valuation function</span>. Those of you who have studied some maths will already be familiar with the general idea of a function. But for those of you who haven’t, a function is a mathematical entity which maps arguments to values. That might sound a little bit abstract, but some familiar examples will help. Take the function <math id="S1.p3.m1" class="ltx_Math" alttext="x+1" display="inline"><mrow><mi>x</mi><mo>+</mo><mn>1</mn></mrow></math>. This is a function which takes in a number as argument, and then spits out the next number as value. So if you feed in the number <math id="S1.p3.m2" class="ltx_Math" alttext="1" display="inline"><mn>1</mn></math> as an argument, the function <math id="S1.p3.m3" class="ltx_Math" alttext="x+1" display="inline"><mrow><mi>x</mi><mo>+</mo><mn>1</mn></mrow></math> will spit out the number <math id="S1.p3.m4" class="ltx_Math" alttext="2" display="inline"><mn>2</mn></math> as a value; if you feed in <math id="S1.p3.m5" class="ltx_Math" alttext="2" display="inline"><mn>2</mn></math>, it will spit out <math id="S1.p3.m6" class="ltx_Math" alttext="3" display="inline"><mn>3</mn></math>; if you feed in <math id="S1.p3.m7" class="ltx_Math" alttext="3" display="inline"><mn>3</mn></math>, it will spit out <math id="S1.p3.m8" class="ltx_Math" alttext="4" display="inline"><mn>4</mn></math> …Or here is another example: the function <math id="S1.p3.m9" class="ltx_Math" alttext="x+y" display="inline"><mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow></math>. This time, you have to feed two arguments into this function if you want it to return a value: if you feed in <math id="S1.p3.m10" class="ltx_Math" alttext="2" display="inline"><mn>2</mn></math> and <math id="S1.p3.m11" class="ltx_Math" alttext="3" display="inline"><mn>3</mn></math> as your arguments, it spits out <math id="S1.p3.m12" class="ltx_Math" alttext="5" display="inline"><mn>5</mn></math>; if you feed in <math id="S1.p3.m13" class="ltx_Math" alttext="1003" display="inline"><mn>1003</mn></math> and <math id="S1.p3.m14" class="ltx_Math" alttext="2005" display="inline"><mn>2005</mn></math>, it spits out <math id="S1.p3.m15" class="ltx_Math" alttext="3008" display="inline"><mn>3008</mn></math>; and so on.</p>
+</div>
+<div id="S1.p4" class="ltx_para">
+<p class="ltx_p">A valuation function for ML takes in a sentence and a world as its arguments, and then returns a truth-value as its value. So if <math id="S1.p4.m1" class="ltx_Math" alttext="\nu" display="inline"><mi>ν</mi></math> is a valuation function and <math id="S1.p4.m2" class="ltx_Math" alttext="w" display="inline"><mi>w</mi></math> is a possible world, <math id="S1.p4.m3" class="ltx_Math" alttext="\nu_{w}(\mathscr{A})" display="inline"><mrow><msub><mi>ν</mi><mi>w</mi></msub><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mi class="ltx_font_mathscript">𝒜︁</mi><mo stretchy="false">)</mo></mrow></mrow></math> is whatever truth-value <math id="S1.p4.m4" class="ltx_Math" alttext="\nu" display="inline"><mi>ν</mi></math> maps <math id="S1.p4.m5" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math> and <math id="S1.p4.m6" class="ltx_Math" alttext="w" display="inline"><mi>w</mi></math> to: if <math id="S1.p4.m7" class="ltx_Math" alttext="\nu_{w}(\mathscr{A})=F" display="inline"><mrow><mrow><msub><mi>ν</mi><mi>w</mi></msub><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mi class="ltx_font_mathscript">𝒜︁</mi><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mi>F</mi></mrow></math>, then <math id="S1.p4.m8" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math> is false at world <math id="S1.p4.m9" class="ltx_Math" alttext="w" display="inline"><mi>w</mi></math> on valuation <math id="S1.p4.m10" class="ltx_Math" alttext="\nu" display="inline"><mi>ν</mi></math>; if <math id="S1.p4.m11" class="ltx_Math" alttext="\nu_{w}(\mathscr{A})=T" display="inline"><mrow><mrow><msub><mi>ν</mi><mi>w</mi></msub><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mi class="ltx_font_mathscript">𝒜︁</mi><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mi>T</mi></mrow></math>, then <math id="S1.p4.m12" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math> is true at world <math id="S1.p4.m13" class="ltx_Math" alttext="w" display="inline"><mi>w</mi></math> on valuation <math id="S1.p4.m14" class="ltx_Math" alttext="\nu" display="inline"><mi>ν</mi></math>.</p>
+</div>
+<div id="S1.p5" class="ltx_para">
+<p class="ltx_p">These valuation functions are allowed to map any <span class="ltx_text ltx_font_bold">atomic</span> sentence to any truth-value at any world. But there are rules about which truth-values more complex sentences get assigned at a world. Here are the rules for the connectives from TFL:</p>
+<ol id="S1.I1" class="ltx_enumerate">
+<li id="S1.I1.i1" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">1.</span><div id="S1.I1.i1.p1" class="ltx_para">​<p class="ltx_p"><math id="S1.I1.i1.p1.m1" class="ltx_Math" alttext="\nu_{w}(\neg\mathscr{A})=T" display="inline"><mrow><mrow><msub><mi>ν</mi><mi>w</mi></msub><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mo rspace="0.167em">¬</mo><mi class="ltx_font_mathscript">𝒜︁</mi></mrow><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mi>T</mi></mrow></math> if⁠f <math id="S1.I1.i1.p1.m2" class="ltx_Math" alttext="\nu_{w}(\mathscr{A})=F" display="inline"><mrow><mrow><msub><mi>ν</mi><mi>w</mi></msub><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mi class="ltx_font_mathscript">𝒜︁</mi><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mi>F</mi></mrow></math></p>
+</div>
+</li>
+<li id="S1.I1.i2" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">2.</span><div id="S1.I1.i2.p1" class="ltx_para">​<p class="ltx_p"><math id="S1.I1.i2.p1.m1" class="ltx_Math" alttext="\nu_{w}(\mathscr{A}\wedge\mathscr{B})=T" display="inline"><mrow><mrow><msub><mi>ν</mi><mi>w</mi></msub><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mi class="ltx_font_mathscript">𝒜︁</mi><mo>∧</mo><mi class="ltx_font_mathscript">ℬ︁</mi></mrow><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mi>T</mi></mrow></math> if⁠f <math id="S1.I1.i2.p1.m2" class="ltx_Math" alttext="\nu_{w}(\mathscr{A})=T" display="inline"><mrow><mrow><msub><mi>ν</mi><mi>w</mi></msub><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mi class="ltx_font_mathscript">𝒜︁</mi><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mi>T</mi></mrow></math> and <math id="S1.I1.i2.p1.m3" class="ltx_Math" alttext="\nu_{w}(\mathscr{B})=T" display="inline"><mrow><mrow><msub><mi>ν</mi><mi>w</mi></msub><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mi class="ltx_font_mathscript">ℬ︁</mi><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mi>T</mi></mrow></math></p>
+</div>
+</li>
+<li id="S1.I1.i3" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">3.</span><div id="S1.I1.i3.p1" class="ltx_para">​<p class="ltx_p"><math id="S1.I1.i3.p1.m1" class="ltx_Math" alttext="\nu_{w}(\mathscr{A}\vee\mathscr{B})=T" display="inline"><mrow><mrow><msub><mi>ν</mi><mi>w</mi></msub><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mi class="ltx_font_mathscript">𝒜︁</mi><mo>∨</mo><mi class="ltx_font_mathscript">ℬ︁</mi></mrow><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mi>T</mi></mrow></math> if⁠f <math id="S1.I1.i3.p1.m2" class="ltx_Math" alttext="\nu_{w}(\mathscr{A})=T" display="inline"><mrow><mrow><msub><mi>ν</mi><mi>w</mi></msub><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mi class="ltx_font_mathscript">𝒜︁</mi><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mi>T</mi></mrow></math> or <math id="S1.I1.i3.p1.m3" class="ltx_Math" alttext="\nu_{w}(\mathscr{B})=T" display="inline"><mrow><mrow><msub><mi>ν</mi><mi>w</mi></msub><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mi class="ltx_font_mathscript">ℬ︁</mi><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mi>T</mi></mrow></math>, or both</p>
+</div>
+</li>
+<li id="S1.I1.i4" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">4.</span><div id="S1.I1.i4.p1" class="ltx_para">​<p class="ltx_p"><math id="S1.I1.i4.p1.m1" class="ltx_Math" alttext="\nu_{w}(\mathscr{A}\rightarrow\mathscr{B})=T" display="inline"><mrow><mrow><msub><mi>ν</mi><mi>w</mi></msub><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mi class="ltx_font_mathscript">𝒜︁</mi><mo stretchy="false">→</mo><mi class="ltx_font_mathscript">ℬ︁</mi></mrow><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mi>T</mi></mrow></math> if⁠f <math id="S1.I1.i4.p1.m2" class="ltx_Math" alttext="\nu_{w}(\mathscr{A})=F" display="inline"><mrow><mrow><msub><mi>ν</mi><mi>w</mi></msub><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mi class="ltx_font_mathscript">𝒜︁</mi><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mi>F</mi></mrow></math> or <math id="S1.I1.i4.p1.m3" class="ltx_Math" alttext="\nu_{w}(\mathscr{B})=T" display="inline"><mrow><mrow><msub><mi>ν</mi><mi>w</mi></msub><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mi class="ltx_font_mathscript">ℬ︁</mi><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mi>T</mi></mrow></math>, or both</p>
+</div>
+</li>
+<li id="S1.I1.i5" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">5.</span><div id="S1.I1.i5.p1" class="ltx_para">​<p class="ltx_p"><math id="S1.I1.i5.p1.m1" class="ltx_math_unparsed" alttext="\nu_{w}(\mathscr{A}\leftrightarrow\mathscr{B})=T" display="inline"><mrow><msub><mi>ν</mi><mi>w</mi></msub><mrow><mo stretchy="false">(</mo><mi class="ltx_font_mathscript">𝒜︁</mi><mo stretchy="false">↔</mo><mi class="ltx_font_mathscript">ℬ︁</mi><mo stretchy="false">)</mo></mrow><mo>=</mo><mi>T</mi></mrow></math> if⁠f <math id="S1.I1.i5.p1.m2" class="ltx_Math" alttext="\nu_{w}(\mathscr{A})=T" display="inline"><mrow><mrow><msub><mi>ν</mi><mi>w</mi></msub><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mi class="ltx_font_mathscript">𝒜︁</mi><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mi>T</mi></mrow></math> and <math id="S1.I1.i5.p1.m3" class="ltx_Math" alttext="\nu_{w}(\mathscr{B})=T" display="inline"><mrow><mrow><msub><mi>ν</mi><mi>w</mi></msub><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mi class="ltx_font_mathscript">ℬ︁</mi><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mi>T</mi></mrow></math>, or <math id="S1.I1.i5.p1.m4" class="ltx_Math" alttext="\nu_{w}(\mathscr{A})=F" display="inline"><mrow><mrow><msub><mi>ν</mi><mi>w</mi></msub><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mi class="ltx_font_mathscript">𝒜︁</mi><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mi>F</mi></mrow></math> and <math id="S1.I1.i5.p1.m5" class="ltx_Math" alttext="\nu_{w}(\mathscr{B})=F" display="inline"><mrow><mrow><msub><mi>ν</mi><mi>w</mi></msub><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mi class="ltx_font_mathscript">ℬ︁</mi><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mi>F</mi></mrow></math></p>
+</div>
+</li>
+</ol>
+<p class="ltx_p">So far, these rules should all look very familiar. Essentially, they all work exactly like the truth-tables for TFL. The only difference is that these truth-table rules have to be applied over and over again, to one world at a time.</p>
+</div>
+<div id="S1.p6" class="ltx_para">
+<p class="ltx_p">But what are the rules for the new modal operators, <math id="S1.p6.m1" class="ltx_Math" alttext="\Box" display="inline"><mi mathvariant="normal">□</mi></math> and <math id="S1.p6.m2" class="ltx_Math" alttext="\Diamond" display="inline"><mi mathvariant="normal">◇</mi></math>? The most obvious idea would be to give rules like these:</p>
+<ul id="S1.I2" class="ltx_itemize">
+<li id="S1.I2.i1" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">‣</span><div id="S1.I2.i1.p1" class="ltx_para">​<p class="ltx_p"><math id="S1.I2.i1.p1.m1" class="ltx_Math" alttext="\nu_{w}(\Box\mathscr{A})=T" display="inline"><mrow><mrow><msub><mi>ν</mi><mi>w</mi></msub><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mi mathvariant="normal">□</mi><mo>⁢</mo><mi class="ltx_font_mathscript">𝒜︁</mi></mrow><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mi>T</mi></mrow></math> if⁠f <math id="S1.I2.i1.p1.m2" class="ltx_Math" alttext="\forall w^{\prime}(\nu_{w^{\prime}}(\mathscr{A})=T)" display="inline"><mrow><mo rspace="0.167em">∀</mo><mrow><msup><mi>w</mi><mo>′</mo></msup><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><msub><mi>ν</mi><msup><mi>w</mi><mo>′</mo></msup></msub><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mi class="ltx_font_mathscript">𝒜︁</mi><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mi>T</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math></p>
+</div>
+</li>
+<li id="S1.I2.i2" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">‣</span><div id="S1.I2.i2.p1" class="ltx_para">​<p class="ltx_p"><math id="S1.I2.i2.p1.m1" class="ltx_Math" alttext="\nu_{w}(\Diamond\mathscr{A})=T" display="inline"><mrow><mrow><msub><mi>ν</mi><mi>w</mi></msub><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mi mathvariant="normal">◇</mi><mo>⁢</mo><mi class="ltx_font_mathscript">𝒜︁</mi></mrow><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mi>T</mi></mrow></math> if⁠f <math id="S1.I2.i2.p1.m2" class="ltx_Math" alttext="\exists w^{\prime}(\nu_{w^{\prime}}(\mathscr{A})=T)" display="inline"><mrow><mo rspace="0.167em">∃</mo><mrow><msup><mi>w</mi><mo>′</mo></msup><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><msub><mi>ν</mi><msup><mi>w</mi><mo>′</mo></msup></msub><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mi class="ltx_font_mathscript">𝒜︁</mi><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mi>T</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math></p>
+</div>
+</li>
+</ul>
+<p class="ltx_p">This is just the fancy formal way of writing out the idea that <math id="S1.p6.m3" class="ltx_Math" alttext="\Box\mathscr{A}" display="inline"><mrow><mi mathvariant="normal">□</mi><mo>⁢</mo><mi class="ltx_font_mathscript">𝒜︁</mi></mrow></math> is true at <math id="S1.p6.m4" class="ltx_Math" alttext="w" display="inline"><mi>w</mi></math> just in case <math id="S1.p6.m5" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math> is true at <span class="ltx_text ltx_font_bold">every</span> world, and <math id="S1.p6.m6" class="ltx_Math" alttext="\Diamond\mathscr{A}" display="inline"><mrow><mi mathvariant="normal">◇</mi><mo>⁢</mo><mi class="ltx_font_mathscript">𝒜︁</mi></mrow></math> is true at <math id="S1.p6.m7" class="ltx_Math" alttext="w" display="inline"><mi>w</mi></math> just in case <math id="S1.p6.m8" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math> is true at <span class="ltx_text ltx_font_bold">some</span> world.</p>
+</div>
+<div id="S1.p7" class="ltx_para">
+<p class="ltx_p">However, while these rules are nice and simple, they turn out not to be quite as useful as we would like. As we mentioned, ML is meant to be a very flexible tool. It is meant to be a general framework for dealing with lots of different kinds of necessity. As a result, we want our semantic rules for <math id="S1.p7.m1" class="ltx_Math" alttext="\Box" display="inline"><mi mathvariant="normal">□</mi></math> and <math id="S1.p7.m2" class="ltx_Math" alttext="\Diamond" display="inline"><mi mathvariant="normal">◇</mi></math> to be a bit less rigid. We can do this by introducing another new idea: <span class="ltx_text ltx_font_bold">accessibility relations</span>.</p>
+</div>
+<div id="S1.p8" class="ltx_para">
+<p class="ltx_p">An accessibility relation, <math id="S1.p8.m1" class="ltx_Math" alttext="R" display="inline"><mi>R</mi></math>, is a relation between possible worlds. Roughly, to say that <math id="S1.p8.m2" class="ltx_Math" alttext="Rw_{1}w_{2}" display="inline"><mrow><mi>R</mi><mo>⁢</mo><msub><mi>w</mi><mn>1</mn></msub><mo>⁢</mo><msub><mi>w</mi><mn>2</mn></msub></mrow></math> (in English: world <math id="S1.p8.m3" class="ltx_Math" alttext="w_{1}" display="inline"><msub><mi>w</mi><mn>1</mn></msub></math> <span class="ltx_text ltx_font_bold">accesses</span> world <math id="S1.p8.m4" class="ltx_Math" alttext="w_{2}" display="inline"><msub><mi>w</mi><mn>2</mn></msub></math>) is to say that <math id="S1.p8.m5" class="ltx_Math" alttext="w_{2}" display="inline"><msub><mi>w</mi><mn>2</mn></msub></math> is possible <span class="ltx_text ltx_font_bold">relative to</span> <math id="S1.p8.m6" class="ltx_Math" alttext="w_{1}" display="inline"><msub><mi>w</mi><mn>1</mn></msub></math>. In other words, by introducing accessibility relations, we open up the idea that a given world might be possible relative to some worlds but not others. This turns out to be a <span class="ltx_text ltx_font_bold">very</span> fruitful idea when studying modal systems. We can now give the following semantic rules for <math id="S1.p8.m7" class="ltx_Math" alttext="\Box" display="inline"><mi mathvariant="normal">□</mi></math> and <math id="S1.p8.m8" class="ltx_Math" alttext="\Diamond" display="inline"><mi mathvariant="normal">◇</mi></math>:</p>
+<ol id="S1.I3" class="ltx_enumerate">
+<li id="S1.I3.i6" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">6.</span><div id="S1.I3.i6.p1" class="ltx_para">​<p class="ltx_p"><math id="S1.I3.i6.p1.m1" class="ltx_Math" alttext="\nu_{w_{1}}(\Box\mathscr{A})=T" display="inline"><mrow><mrow><msub><mi>ν</mi><msub><mi>w</mi><mn>1</mn></msub></msub><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mi mathvariant="normal">□</mi><mo>⁢</mo><mi class="ltx_font_mathscript">𝒜︁</mi></mrow><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mi>T</mi></mrow></math> if⁠f <math id="S1.I3.i6.p1.m2" class="ltx_Math" alttext="\forall w_{2}(Rw_{1}w_{2}\rightarrow\nu_{w_{2}}(\mathscr{A})=T)" display="inline"><mrow><mo rspace="0.167em">∀</mo><mrow><msub><mi>w</mi><mn>2</mn></msub><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>R</mi><mo>⁢</mo><msub><mi>w</mi><mn>1</mn></msub><mo>⁢</mo><msub><mi>w</mi><mn>2</mn></msub></mrow><mo stretchy="false">→</mo><mrow><msub><mi>ν</mi><msub><mi>w</mi><mn>2</mn></msub></msub><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mi class="ltx_font_mathscript">𝒜︁</mi><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mi>T</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math></p>
+</div>
+</li>
+<li id="S1.I3.i7" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">7.</span><div id="S1.I3.i7.p1" class="ltx_para">​<p class="ltx_p"><math id="S1.I3.i7.p1.m1" class="ltx_Math" alttext="\nu_{w_{1}}(\Diamond\mathscr{A})=T" display="inline"><mrow><mrow><msub><mi>ν</mi><msub><mi>w</mi><mn>1</mn></msub></msub><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mi mathvariant="normal">◇</mi><mo>⁢</mo><mi class="ltx_font_mathscript">𝒜︁</mi></mrow><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mi>T</mi></mrow></math> if⁠f <math id="S1.I3.i7.p1.m2" class="ltx_Math" alttext="\exists w_{2}(Rw_{1}w_{2}\wedge\nu_{w_{2}}(\mathscr{A})=T)" display="inline"><mrow><mo rspace="0.167em">∃</mo><mrow><msub><mi>w</mi><mn>2</mn></msub><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mrow><mi>R</mi><mo>⁢</mo><msub><mi>w</mi><mn>1</mn></msub><mo>⁢</mo><msub><mi>w</mi><mn>2</mn></msub></mrow><mo>∧</mo><mrow><msub><mi>ν</mi><msub><mi>w</mi><mn>2</mn></msub></msub><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mi class="ltx_font_mathscript">𝒜︁</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo>=</mo><mi>T</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math></p>
+</div>
+</li>
+</ol>
+<p class="ltx_p">Or in plain English: <math id="S1.p8.m9" class="ltx_Math" alttext="\Box\mathscr{A}" display="inline"><mrow><mi mathvariant="normal">□</mi><mo>⁢</mo><mi class="ltx_font_mathscript">𝒜︁</mi></mrow></math> is true in world <math id="S1.p8.m10" class="ltx_Math" alttext="w_{1}" display="inline"><msub><mi>w</mi><mn>1</mn></msub></math> if⁠f <math id="S1.p8.m11" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math> is true in every world that is possible relative to <math id="S1.p8.m12" class="ltx_Math" alttext="w_{1}" display="inline"><msub><mi>w</mi><mn>1</mn></msub></math>; and <math id="S1.p8.m13" class="ltx_Math" alttext="\Diamond\mathscr{A}" display="inline"><mrow><mi mathvariant="normal">◇</mi><mo>⁢</mo><mi class="ltx_font_mathscript">𝒜︁</mi></mrow></math> is true in world <math id="S1.p8.m14" class="ltx_Math" alttext="w_{1}" display="inline"><msub><mi>w</mi><mn>1</mn></msub></math> if⁠f <math id="S1.p8.m15" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math> is true in some world that is possible relative to <math id="S1.p8.m16" class="ltx_Math" alttext="w_{1}" display="inline"><msub><mi>w</mi><mn>1</mn></msub></math>.</p>
+</div>
+<div id="S1.p9" class="ltx_para">
+<p class="ltx_p">So, there we have it. An interpretation for ML consists of three things: a collection of possible worlds, <math id="S1.p9.m1" class="ltx_Math" alttext="W" display="inline"><mi>W</mi></math>; an accessibility relation, <math id="S1.p9.m2" class="ltx_Math" alttext="R" display="inline"><mi>R</mi></math>; and a valuation function, <math id="S1.p9.m3" class="ltx_Math" alttext="\nu" display="inline"><mi>ν</mi></math>. The collection of ‘possible worlds’ can really be a collection of anything you like. It really doesn’t matter, so long as <math id="S1.p9.m4" class="ltx_Math" alttext="W" display="inline"><mi>W</mi></math> isn’t empty. (For many purposes, it is helpful just to take a collection of numbers to be your collection of worlds.) And for now, at least, <math id="S1.p9.m5" class="ltx_Math" alttext="R" display="inline"><mi>R</mi></math> can be any relation between the worlds in <math id="S1.p9.m6" class="ltx_Math" alttext="W" display="inline"><mi>W</mi></math> that you like. It could be a relation which every world in <math id="S1.p9.m7" class="ltx_Math" alttext="W" display="inline"><mi>W</mi></math> bears to every world in <math id="S1.p9.m8" class="ltx_Math" alttext="W" display="inline"><mi>W</mi></math>, or one which no world bears to any world, or anything in between. And lastly, <math id="S1.p9.m9" class="ltx_Math" alttext="\nu" display="inline"><mi>ν</mi></math> can map any atomic sentence of ML to any truth-value at any world. All that matters is that it follows the rules (1)–(7) when it comes to the more complex sentences.</p>
+</div>
+<div id="S1.p10" class="ltx_para">
+<p class="ltx_p">Let’s look at an example. It is often helpful to present interpretations of ML as diagrams, like this:</p>
+<div class="bml-overflow-wrapper"><img src="bmlimages/forallxyyc-html-7.svg" alt="The numbers 1 and 2 are connected by arrows. There are arrows from 1 to itself, and from 2 to 1. Node 1 is labelled by A and not-B. Node 2 is labelled by not-A and B." id="S1.p10.g1" class="ltx_graphics ltx_centering ltx_img_landscape" style="vertical-align:-1px" width="168" height="98"></div>
+<p class="ltx_p">Here is how to read the interpretation off from this diagram. It contains just two worlds, 1 and 2. The arrows between the worlds indicate the accessibility relation. So 1 and 2 both access 1, but neither 1 nor 2 accesses 2. The boxes at each world let us know which atomic sentences are true at each world: <math id="S1.p10.m1" class="ltx_Math" alttext="A" display="inline"><mi>A</mi></math> is true at 1 but false at 2; <math id="S1.p10.m2" class="ltx_Math" alttext="B" display="inline"><mi>B</mi></math> is false at 1 but true at 2. You may only write an atomic sentence or the negation of an atomic sentence into one of these boxes. We can figure out what truth-values the more complex sentences get at each world from that. For example, on this interpretation all of the following sentences are true at <math id="S1.p10.m3" class="ltx_Math" alttext="w_{1}" display="inline"><msub><mi>w</mi><mn>1</mn></msub></math>:</p>
+<div id="Ex1" class="ltx_equation bml_equation bml_equation_container ltx_align_baseline">
+<div class="ltx_Math bml_eqn_cell ltx_align_center"><math id="Ex1.m1" class="ltx_Math" alttext="A\wedge\neg B,\qquad B\rightarrow A,\qquad\Diamond A,\qquad\Box\neg B" display="block"><mrow><mrow><mrow><mrow><mi>A</mi><mo>∧</mo><mrow><mo rspace="0.167em">¬</mo><mi>B</mi></mrow></mrow><mo rspace="2.167em">,</mo><mi>B</mi></mrow><mo stretchy="false">→</mo><mi>A</mi></mrow><mo rspace="2.167em">,</mo><mrow><mrow><mi mathvariant="normal">◇</mi><mo>⁢</mo><mi>A</mi></mrow><mo rspace="2.167em">,</mo><mrow><mi mathvariant="normal">□</mi><mo lspace="0.167em">⁢</mo><mrow><mo rspace="0.167em">¬</mo><mi>B</mi></mrow></mrow></mrow></mrow></math></div>
+</div>
+<p class="ltx_p">If you don’t like thinking diagrammatically, then you can also present an interpretation like this:</p>
+<dl id="S1.I4" class="ltx_description">
+<dt id="S1.I4.ix1" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="S1.I4.ix1.m1" class="ltx_Math" alttext="W" display="inline"><mi>W</mi></math>:</span></dt>
+<dd class="ltx_item">
+<div id="S1.I4.ix1.p1" class="ltx_para">
+<p class="ltx_p"><math id="S1.I4.ix1.p1.m1" class="ltx_Math" alttext="1,2" display="inline"><mrow><mn>1</mn><mo>,</mo><mn>2</mn></mrow></math></p>
+</div>
+</dd>
+<dt id="S1.I4.ix2" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="S1.I4.ix2.m1" class="ltx_Math" alttext="R" display="inline"><mi>R</mi></math>:</span></dt>
+<dd class="ltx_item">
+<div id="S1.I4.ix2.p1" class="ltx_para">
+<p class="ltx_p"><math id="S1.I4.ix2.p1.m1" class="ltx_Math" alttext="\langle 1,1\rangle,\langle 2,1\rangle" display="inline"><mrow><mrow><mo stretchy="false">⟨</mo><mn>1</mn><mo>,</mo><mn>1</mn><mo stretchy="false">⟩</mo></mrow><mo>,</mo><mrow><mo stretchy="false">⟨</mo><mn>2</mn><mo>,</mo><mn>1</mn><mo stretchy="false">⟩</mo></mrow></mrow></math></p>
+</div>
+</dd>
+<dt id="S1.I4.ix3" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="S1.I4.ix3.m1" class="ltx_Math" alttext="\nu" display="inline"><mi>ν</mi></math>:</span></dt>
+<dd class="ltx_item">
+<div id="S1.I4.ix3.p1" class="ltx_para">
+<p class="ltx_p"><math id="S1.I4.ix3.p1.m1" class="ltx_Math" alttext="\nu_{1}(A)=T,\nu_{1}(B)=F,\nu_{2}(A)=F,\nu_{2}(B)=T" display="inline"><mrow><mrow><mrow><msub><mi>ν</mi><mn>1</mn></msub><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mi>A</mi><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mi>T</mi></mrow><mo>,</mo><mrow><mrow><mrow><msub><mi>ν</mi><mn>1</mn></msub><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mi>B</mi><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mi>F</mi></mrow><mo>,</mo><mrow><mrow><mrow><msub><mi>ν</mi><mn>2</mn></msub><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mi>A</mi><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mi>F</mi></mrow><mo>,</mo><mrow><mrow><msub><mi>ν</mi><mn>2</mn></msub><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mi>B</mi><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mi>T</mi></mrow></mrow></mrow></mrow></math></p>
+</div>
+</dd>
+</dl>
+<p class="ltx_p">You will get the chance to cook up some interpretations of your own shortly, when we start looking at <span class="ltx_text ltx_font_bold">counter-interpretations</span>.</p>
+</div>
+</div>
+</section>
+<section id="S2" class="ltx_section normal">
+<div class="section level2">
+<h2 class="ltx_title ltx_title_section">
+<span class="ltx_tag ltx_tag_section header-section-number">44.2</span> A Semantics for System <math id="S2.m1" class="ltx_Math" alttext="\mathbf{K}" display="inline"><mi>𝐊</mi></math>
+</h2>
+
+<div id="S2.p1" class="ltx_para">
+<p class="ltx_p">We can now extend all of the semantic concepts of TFL to cover ML:</p>
+<div class="ltx_logical-block bml_background-color_FDF4FA bml_background-color_FDF4FA" style="padding:9pt;">
+            
+<div id="S2.p1.p1" class="ltx_para ltx_noindent">
+<ul id="S2.I1" class="ltx_itemize">
+<li id="S2.I1.i1" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">‣</span><div id="S2.I1.i1.p1" class="ltx_para">​<p class="ltx_p"><math id="S2.I1.i1.p1.m1" class="ltx_Math" alttext="\mathscr{A}_{1},\mathscr{A}_{2},\dots\mathscr{A}_{n}\therefore\mathscr{C}" display="inline"><mrow><mrow><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mn>1</mn></msub><mo>,</mo><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mn>2</mn></msub><mo>,</mo><mrow><mi mathvariant="normal">…</mi><mo>⁢</mo><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mi>n</mi></msub></mrow></mrow><mo>∴</mo><mi class="ltx_font_mathscript">𝒞︁</mi></mrow></math> is <dfn>modally valid</dfn>
+ if⁠f
+there is no world in any interpretation at which
+<math id="S2.I1.i1.p1.m2" class="ltx_Math" alttext="\mathscr{A}_{1},\mathscr{A}_{2},\dots\mathscr{A}_{n}" display="inline"><mrow><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mn>1</mn></msub><mo>,</mo><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mn>2</mn></msub><mo>,</mo><mrow><mi mathvariant="normal">…</mi><mo>⁢</mo><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mi>n</mi></msub></mrow></mrow></math> are all true and
+<math id="S2.I1.i1.p1.m3" class="ltx_Math" alttext="\mathscr{C}" display="inline"><mi class="ltx_font_mathscript">𝒞︁</mi></math> is false.</p>
+</div>
+</li>
+<li id="S2.I1.i2" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">‣</span><div id="S2.I1.i2.p1" class="ltx_para">​<p class="ltx_p"><math id="S2.I1.i2.p1.m1" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math> is a <dfn>modal truth</dfn>
+ if⁠f <math id="S2.I1.i2.p1.m2" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math>
+is true at every world in every interpretation.</p>
+</div>
+</li>
+<li id="S2.I1.i3" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">‣</span><div id="S2.I1.i3.p1" class="ltx_para">​<p class="ltx_p"><math id="S2.I1.i3.p1.m1" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math> is a <dfn>modal contradiction</dfn>
+ if⁠f
+<math id="S2.I1.i3.p1.m2" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math> is false at every world in every interpretation.</p>
+</div>
+</li>
+<li id="S2.I1.i4" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">‣</span><div id="S2.I1.i4.p1" class="ltx_para">​<p class="ltx_p"><math id="S2.I1.i4.p1.m1" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math> is <dfn>modally satisfiable</dfn>
+ if⁠f
+<math id="S2.I1.i4.p1.m2" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math> is true at some world in some interpretation.</p>
+</div>
+</li>
+</ul>
+</div>
+          
+</div>
+<p class="ltx_p">(From now on we will drop the explicit ‘modal’ qualifications, since they can be taken as read.)</p>
+</div>
+<div id="S2.p2" class="ltx_para">
+<p class="ltx_p">We can also extend our use of <math id="S2.p2.m1" class="ltx_Math" alttext="\vDash" display="inline"><mo>⊨</mo></math>. However, we need to add subscripts again, just as we did with <math id="S2.p2.m2" class="ltx_Math" alttext="\vdash" display="inline"><mo>⊢</mo></math>. So, when we want to say that <math id="S2.p2.m3" class="ltx_Math" alttext="\mathscr{A}_{1},\mathscr{A}_{2},\dots\mathscr{A}_{n}\therefore\mathscr{C}" display="inline"><mrow><mrow><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mn>1</mn></msub><mo>,</mo><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mn>2</mn></msub><mo>,</mo><mrow><mi mathvariant="normal">…</mi><mo>⁢</mo><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mi>n</mi></msub></mrow></mrow><mo>∴</mo><mi class="ltx_font_mathscript">𝒞︁</mi></mrow></math> is valid, we will write: <math id="S2.p2.m4" class="ltx_Math" alttext="\mathscr{A}_{1},\mathscr{A}_{2},\dots\mathscr{A}_{n}\vDash_{\mathbf{K}}%
+\mathscr{C}" display="inline"><mrow><mrow><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mn>1</mn></msub><mo>,</mo><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mn>2</mn></msub><mo>,</mo><mrow><mi mathvariant="normal">…</mi><mo>⁢</mo><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mi>n</mi></msub></mrow></mrow><msub><mo>⊨</mo><mi>𝐊</mi></msub><mi class="ltx_font_mathscript">𝒞︁</mi></mrow></math>.</p>
+</div>
+<div id="S2.p3" class="ltx_para">
+<p class="ltx_p">Let’s get more of a feel for this semantics by presenting some counter-interpretations. Consider the following (false) claim:</p>
+<div id="Ex2" class="ltx_equation bml_equation bml_equation_container ltx_align_baseline">
+<div class="ltx_Math bml_eqn_cell ltx_align_center"><math id="Ex2.m1" class="ltx_Math" alttext="\neg A\vDash_{\mathbf{K}}\neg\Diamond A" display="block"><mrow><mrow><mo rspace="0.167em">¬</mo><mi>A</mi></mrow><msub><mo>⊨</mo><mi>𝐊</mi></msub><mrow><mo rspace="0.167em">¬</mo><mrow><mi mathvariant="normal">◇</mi><mo>⁢</mo><mi>A</mi></mrow></mrow></mrow></math></div>
+</div>
+<p class="ltx_p">In order to present a counter-interpretation to this claim, we need to cook up an interpretation which makes <math id="S2.p3.m1" class="ltx_Math" alttext="\neg A" display="inline"><mrow><mo rspace="0.167em">¬</mo><mi>A</mi></mrow></math> true at some world <math id="S2.p3.m2" class="ltx_Math" alttext="w" display="inline"><mi>w</mi></math>, and <math id="S2.p3.m3" class="ltx_Math" alttext="\neg\Diamond A" display="inline"><mrow><mo rspace="0.167em">¬</mo><mrow><mi mathvariant="normal">◇</mi><mo>⁢</mo><mi>A</mi></mrow></mrow></math> false at <math id="S2.p3.m4" class="ltx_Math" alttext="w" display="inline"><mi>w</mi></math>. Here is one such interpretation, presented diagrammatically:</p>
+<div class="bml-overflow-wrapper"><img src="bmlimages/forallxyyc-html-8.svg" alt="The numbers 1 and 2 are connected by an arrow from 1
+to 2. Node 1 is labelled not-A and node 2 is labelled A." id="S2.p3.g1" class="ltx_graphics ltx_centering ltx_img_landscape" style="vertical-align:-1px" width="168" height="71"></div>
+<p class="ltx_p">It is easy to see that this will work as a counter-interpretation for our claim. First, <math id="S2.p3.m5" class="ltx_Math" alttext="\neg A" display="inline"><mrow><mo rspace="0.167em">¬</mo><mi>A</mi></mrow></math> is true at world <math id="S2.p3.m6" class="ltx_Math" alttext="1" display="inline"><mn>1</mn></math>. And second, <math id="S2.p3.m7" class="ltx_Math" alttext="\neg\Diamond A" display="inline"><mrow><mo rspace="0.167em">¬</mo><mrow><mi mathvariant="normal">◇</mi><mo>⁢</mo><mi>A</mi></mrow></mrow></math> is false at <math id="S2.p3.m8" class="ltx_Math" alttext="1" display="inline"><mn>1</mn></math>: <math id="S2.p3.m9" class="ltx_Math" alttext="A" display="inline"><mi>A</mi></math> is true at <math id="S2.p3.m10" class="ltx_Math" alttext="2" display="inline"><mn>2</mn></math>, and <math id="S2.p3.m11" class="ltx_Math" alttext="2" display="inline"><mn>2</mn></math> is accessible from <math id="S2.p3.m12" class="ltx_Math" alttext="1" display="inline"><mn>1</mn></math>. So there is some world in this interpretation where <math id="S2.p3.m13" class="ltx_Math" alttext="\neg A" display="inline"><mrow><mo rspace="0.167em">¬</mo><mi>A</mi></mrow></math> is true and <math id="S2.p3.m14" class="ltx_Math" alttext="\neg\Diamond A" display="inline"><mrow><mo rspace="0.167em">¬</mo><mrow><mi mathvariant="normal">◇</mi><mo>⁢</mo><mi>A</mi></mrow></mrow></math> is false, so it is not the case that <math id="S2.p3.m15" class="ltx_Math" alttext="\neg A\vDash_{\mathbf{K}}\neg\Diamond A" display="inline"><mrow><mrow><mo rspace="0.167em">¬</mo><mi>A</mi></mrow><msub><mo>⊨</mo><mi>𝐊</mi></msub><mrow><mo rspace="0.167em">¬</mo><mrow><mi mathvariant="normal">◇</mi><mo>⁢</mo><mi>A</mi></mrow></mrow></mrow></math>.</p>
+</div>
+<div id="S2.p4" class="ltx_para">
+<p class="ltx_p">Why did we choose the subscript <math id="S2.p4.m1" class="ltx_Math" alttext="\mathbf{K}" display="inline"><mi>𝐊</mi></math>? Well, it turns out that there is an important relationship between system <math id="S2.p4.m2" class="ltx_Math" alttext="\mathbf{K}" display="inline"><mi>𝐊</mi></math> and the definition of validity we have just given. In particular, we have the following two results:</p>
+<ol id="S2.I2" class="ltx_enumerate">
+<li id="S2.I2.i1" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">1.</span><div id="S2.I2.i1.p1" class="ltx_para">​<p class="ltx_p">If <math id="S2.I2.i1.p1.m1" class="ltx_math_unparsed" alttext="\mathscr{A}_{1},\mathscr{A}_{2},\dots\mathscr{A}_{n}\vdash_{\mathbf{K}}%
+\mathscr{C}" display="inline"><mrow><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mn>1</mn></msub><mo>,</mo><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mn>2</mn></msub><mo>,</mo><mi mathvariant="normal">…</mi><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mi>n</mi></msub><msub><mo>⊢</mo><mi>𝐊</mi></msub><mi class="ltx_font_mathscript">𝒞︁</mi></mrow></math>, then <math id="S2.I2.i1.p1.m2" class="ltx_Math" alttext="\mathscr{A}_{1},\mathscr{A}_{2},\dots\mathscr{A}_{n}\vDash_{\mathbf{K}}%
+\mathscr{C}" display="inline"><mrow><mrow><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mn>1</mn></msub><mo>,</mo><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mn>2</mn></msub><mo>,</mo><mrow><mi mathvariant="normal">…</mi><mo>⁢</mo><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mi>n</mi></msub></mrow></mrow><msub><mo>⊨</mo><mi>𝐊</mi></msub><mi class="ltx_font_mathscript">𝒞︁</mi></mrow></math></p>
+</div>
+</li>
+<li id="S2.I2.i2" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">2.</span><div id="S2.I2.i2.p1" class="ltx_para">​<p class="ltx_p">If <math id="S2.I2.i2.p1.m1" class="ltx_Math" alttext="\mathscr{A}_{1},\mathscr{A}_{2},\dots\mathscr{A}_{n}\vDash_{\mathbf{K}}%
+\mathscr{C}" display="inline"><mrow><mrow><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mn>1</mn></msub><mo>,</mo><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mn>2</mn></msub><mo>,</mo><mrow><mi mathvariant="normal">…</mi><mo>⁢</mo><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mi>n</mi></msub></mrow></mrow><msub><mo>⊨</mo><mi>𝐊</mi></msub><mi class="ltx_font_mathscript">𝒞︁</mi></mrow></math>, then <math id="S2.I2.i2.p1.m2" class="ltx_math_unparsed" alttext="\mathscr{A}_{1},\mathscr{A}_{2},\dots\mathscr{A}_{n}\vdash_{\mathbf{K}}%
+\mathscr{C}" display="inline"><mrow><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mn>1</mn></msub><mo>,</mo><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mn>2</mn></msub><mo>,</mo><mi mathvariant="normal">…</mi><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mi>n</mi></msub><msub><mo>⊢</mo><mi>𝐊</mi></msub><mi class="ltx_font_mathscript">𝒞︁</mi></mrow></math></p>
+</div>
+</li>
+</ol>
+<p class="ltx_p">The first result is known as a <span class="ltx_text ltx_font_bold">soundness</span> result, since it tells us that the rules of <math id="S2.p4.m3" class="ltx_Math" alttext="\mathbf{K}" display="inline"><mi>𝐊</mi></math> are good, sound rules: if you can vindicate an argument by giving a proof for it using system <math id="S2.p4.m4" class="ltx_Math" alttext="\mathbf{K}" display="inline"><mi>𝐊</mi></math>, then that argument really is valid. The second result is known as a <span class="ltx_text ltx_font_bold">completeness</span> result, since it tells us that the rules of <math id="S2.p4.m5" class="ltx_Math" alttext="\mathbf{K}" display="inline"><mi>𝐊</mi></math> are broad enough to capture all of the valid arguments: if an argument is valid, then it will be possible to offer a proof in <math id="S2.p4.m6" class="ltx_Math" alttext="\mathbf{K}" display="inline"><mi>𝐊</mi></math> which vindicates it.</p>
+</div>
+<div id="S2.p5" class="ltx_para">
+<p class="ltx_p">Now, it is one thing to state these results, quite another to prove them. However, we will not try to prove them here. But the idea behind the proof of soundness will perhaps make clearer how strict subproofs work.</p>
+</div>
+<div id="S2.p6" class="ltx_para">
+<p class="ltx_p">In a strict subproof, we are not allowed to make use of any information from outside the strict subproof, except what we import into the strict subproof using <math id="S2.p6.m1" class="ltx_Math" alttext="\Box" display="inline"><mi mathvariant="normal">□</mi></math>E. If we’ve assumed or proved <math id="S2.p6.m2" class="ltx_Math" alttext="\Box\mathscr{A}" display="inline"><mrow><mi mathvariant="normal">□</mi><mo>⁢</mo><mi class="ltx_font_mathscript">𝒜︁</mi></mrow></math>, by <math id="S2.p6.m3" class="ltx_Math" alttext="\Box" display="inline"><mi mathvariant="normal">□</mi></math>E, we can used <math id="S2.p6.m4" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math> inside a strict subproof. And in <math id="S2.p6.m5" class="ltx_Math" alttext="\mathbf{K}" display="inline"><mi>𝐊</mi></math>, that is the only way to import a formula into a strict subproof. So everything that can be proved inside a strict subproof must follow from formulas <math id="S2.p6.m6" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math> where outside the strict subproof we have <math id="S2.p6.m7" class="ltx_Math" alttext="\Box\mathscr{A}" display="inline"><mrow><mi mathvariant="normal">□</mi><mo>⁢</mo><mi class="ltx_font_mathscript">𝒜︁</mi></mrow></math>. Let’s imagine that we are reasoning about what’s true in a possible world in some interpretation. If we know that <math id="S2.p6.m8" class="ltx_Math" alttext="\Box\mathscr{A}" display="inline"><mrow><mi mathvariant="normal">□</mi><mo>⁢</mo><mi class="ltx_font_mathscript">𝒜︁</mi></mrow></math> is true in that possible world, we know that <math id="S2.p6.m9" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math> is true in all accessible worlds. So, everything proved inside a strict subproof is true in all accessible possible worlds. That is why <math id="S2.p6.m10" class="ltx_Math" alttext="\Box" display="inline"><mi mathvariant="normal">□</mi></math>I is a sound rule.</p>
+</div>
+</div>
+</section>
+<section id="S3" class="ltx_section normal">
+<div class="section level2">
+<h2 class="ltx_title ltx_title_section">
+<span class="ltx_tag ltx_tag_section header-section-number">44.3</span> A Semantics for System <math id="S3.m1" class="ltx_Math" alttext="\mathbf{T}" display="inline"><mi>𝐓</mi></math>
+</h2>
+
+<div id="S3.p1" class="ltx_para">
+<p class="ltx_p">A few moments ago, we said that system <math id="S3.p1.m1" class="ltx_Math" alttext="\mathbf{K}" display="inline"><mi>𝐊</mi></math> is sound and complete. Where does that leave the other modal systems we looked at, namely <math id="S3.p1.m2" class="ltx_Math" alttext="\mathbf{T}" display="inline"><mi>𝐓</mi></math>, <math id="S3.p1.m3" class="ltx_Math" alttext="\mathbf{S4}" display="inline"><mi>𝐒𝟒</mi></math> and <math id="S3.p1.m4" class="ltx_Math" alttext="\mathbf{S5}" display="inline"><mi>𝐒𝟓</mi></math>? Well, they are all <span class="ltx_text ltx_font_bold">unsound</span>, relative to the definition of validity we gave above. For example, all of these systems allow us to infer <math id="S3.p1.m5" class="ltx_Math" alttext="A" display="inline"><mi>A</mi></math> from <math id="S3.p1.m6" class="ltx_Math" alttext="\Box A" display="inline"><mrow><mi mathvariant="normal">□</mi><mo>⁢</mo><mi>A</mi></mrow></math>, even though <math id="S3.p1.m7" class="ltx_Math" alttext="\Box A\nvDash_{\mathbf{K}}A" display="inline"><mrow><mrow><mi mathvariant="normal">□</mi><mo>⁢</mo><mi>A</mi></mrow><msub><mo>⊭</mo><mi>𝐊</mi></msub><mi>A</mi></mrow></math>.</p>
+</div>
+<div id="S3.p2" class="ltx_para">
+<p class="ltx_p">Does that mean that these systems are a waste of time? Not at all! These systems are only unsound <span class="ltx_text ltx_font_bold">relative to the definition of validity we gave above</span>. (Or to use symbols, they are unsound relative to <math id="S3.p2.m1" class="ltx_Math" alttext="\vDash_{\mathbf{K}}" display="inline"><msub><mo>⊨</mo><mi>𝐊</mi></msub></math>.) So when we are dealing with these stronger modal systems, we just need to modify our definition of validity to fit. This is where accessibility relations come in really handy.</p>
+</div>
+<div id="S3.p3" class="ltx_para">
+<p class="ltx_p">When we introduced the idea of an accessibility relation, we said that it could be any relation between worlds that you like: you could have it relating every world to every world, no world to any world, or anything in between. That is how we were thinking of accessibility relations in our definition of <math id="S3.p3.m1" class="ltx_Math" alttext="\vDash_{\mathbf{K}}" display="inline"><msub><mo>⊨</mo><mi>𝐊</mi></msub></math>. But if we wanted, we could start putting some restrictions on the accessibility relation. In particular, we might insist that it has to be <span class="ltx_text ltx_font_bold">reflexive</span>:</p>
+<div id="Ex3" class="ltx_equation bml_equation bml_equation_container ltx_align_baseline">
+<div class="ltx_Math bml_eqn_cell ltx_align_center"><math id="Ex3.m1" class="ltx_Math" alttext="\forall w\,Rww" display="block"><mrow><mo rspace="0.167em">∀</mo><mrow><mi>w</mi><mo lspace="0.170em">⁢</mo><mi>R</mi><mo>⁢</mo><mi>w</mi><mo>⁢</mo><mi>w</mi></mrow></mrow></math></div>
+</div>
+<p class="ltx_p">In English: every world accesses itself. Or in terms of relative possibility: every world is possible relative to itself. If we imposed this restriction, we could introduce a new consequence relation, <math id="S3.p3.m2" class="ltx_Math" alttext="\vDash_{\mathbf{T}}" display="inline"><msub><mo>⊨</mo><mi>𝐓</mi></msub></math>, as follows:</p>
+<div class="ltx_logical-block bml_background-color_FDF4FA bml_background-color_FDF4FA" style="padding:9pt;">
+            
+<div id="S3.p3.p1" class="ltx_para ltx_noindent">
+<p class="ltx_p"><math id="S3.p3.p1.m1" class="ltx_Math" alttext="\mathscr{A}_{1},\mathscr{A}_{2},\dots\mathscr{A}_{n}\vDash_{\mathbf{T}}%
+\mathscr{C}" display="inline"><mrow><mrow><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mn>1</mn></msub><mo>,</mo><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mn>2</mn></msub><mo>,</mo><mrow><mi mathvariant="normal">…</mi><mo>⁢</mo><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mi>n</mi></msub></mrow></mrow><msub><mo>⊨</mo><mi>𝐓</mi></msub><mi class="ltx_font_mathscript">𝒞︁</mi></mrow></math> if⁠f there is no world in any interpretation <span class="ltx_text ltx_font_bold">which has a reflexive accessibility relation</span>, at which <math id="S3.p3.p1.m2" class="ltx_Math" alttext="\mathscr{A}_{1},\mathscr{A}_{2},\dots\mathscr{A}_{n}" display="inline"><mrow><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mn>1</mn></msub><mo>,</mo><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mn>2</mn></msub><mo>,</mo><mrow><mi mathvariant="normal">…</mi><mo>⁢</mo><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mi>n</mi></msub></mrow></mrow></math> are all true and <math id="S3.p3.p1.m3" class="ltx_Math" alttext="\mathscr{C}" display="inline"><mi class="ltx_font_mathscript">𝒞︁</mi></math> is false</p>
+</div>
+          
+</div>
+<p class="ltx_p">We have attached the <math id="S3.p3.m3" class="ltx_Math" alttext="\mathbf{T}" display="inline"><mi>𝐓</mi></math> subscript to <math id="S3.p3.m4" class="ltx_Math" alttext="\vDash" display="inline"><mo>⊨</mo></math> because it turns out that system <math id="S3.p3.m5" class="ltx_Math" alttext="\mathbf{T}" display="inline"><mi>𝐓</mi></math> is sound and complete relative to this new definition of validity:</p>
+<ol id="S3.I1" class="ltx_enumerate">
+<li id="S3.I1.i1" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">1.</span><div id="S3.I1.i1.p1" class="ltx_para">​<p class="ltx_p">If <math id="S3.I1.i1.p1.m1" class="ltx_math_unparsed" alttext="\mathscr{A}_{1},\mathscr{A}_{2},\dots\mathscr{A}_{n}\vdash_{\mathbf{T}}%
+\mathscr{C}" display="inline"><mrow><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mn>1</mn></msub><mo>,</mo><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mn>2</mn></msub><mo>,</mo><mi mathvariant="normal">…</mi><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mi>n</mi></msub><msub><mo>⊢</mo><mi>𝐓</mi></msub><mi class="ltx_font_mathscript">𝒞︁</mi></mrow></math>, then <math id="S3.I1.i1.p1.m2" class="ltx_Math" alttext="\mathscr{A}_{1},\mathscr{A}_{2},\dots\mathscr{A}_{n}\vDash_{\mathbf{T}}%
+\mathscr{C}" display="inline"><mrow><mrow><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mn>1</mn></msub><mo>,</mo><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mn>2</mn></msub><mo>,</mo><mrow><mi mathvariant="normal">…</mi><mo>⁢</mo><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mi>n</mi></msub></mrow></mrow><msub><mo>⊨</mo><mi>𝐓</mi></msub><mi class="ltx_font_mathscript">𝒞︁</mi></mrow></math></p>
+</div>
+</li>
+<li id="S3.I1.i2" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">2.</span><div id="S3.I1.i2.p1" class="ltx_para">​<p class="ltx_p">If <math id="S3.I1.i2.p1.m1" class="ltx_Math" alttext="\mathscr{A}_{1},\mathscr{A}_{2},\dots\mathscr{A}_{n}\vDash_{\mathbf{T}}%
+\mathscr{C}" display="inline"><mrow><mrow><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mn>1</mn></msub><mo>,</mo><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mn>2</mn></msub><mo>,</mo><mrow><mi mathvariant="normal">…</mi><mo>⁢</mo><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mi>n</mi></msub></mrow></mrow><msub><mo>⊨</mo><mi>𝐓</mi></msub><mi class="ltx_font_mathscript">𝒞︁</mi></mrow></math>, then <math id="S3.I1.i2.p1.m2" class="ltx_math_unparsed" alttext="\mathscr{A}_{1},\mathscr{A}_{2},\dots\mathscr{A}_{n}\vdash_{\mathbf{T}}%
+\mathscr{C}" display="inline"><mrow><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mn>1</mn></msub><mo>,</mo><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mn>2</mn></msub><mo>,</mo><mi mathvariant="normal">…</mi><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mi>n</mi></msub><msub><mo>⊢</mo><mi>𝐓</mi></msub><mi class="ltx_font_mathscript">𝒞︁</mi></mrow></math></p>
+</div>
+</li>
+</ol>
+<p class="ltx_p">As before, we will not try to prove these soundness and completeness results. However, it is relatively easy to see how insisting that the accessibility relation must be reflexive will vindicate the R<math id="S3.p3.m6" class="ltx_Math" alttext="\mathbf{T}" display="inline"><mi>𝐓</mi></math> rule:</p>
+<div class="ltx_logical-block bml_background-color_FDF4FA ltx_pruned_first bml_background-color_FDF4FA" style="padding:9pt;">
+            
+<div id="S3.p3.p3" class="ltx_para ltx_noindent">
+<table class="fitch">
+                
+                <thead class="fml-sr-only">
+                  
+                  <tr>
+                    <th class="fml-pline">
+                      
+                      <div>
+                        
+<p class="ltx_p">Line number</p>
+                      </div>
+                    </th>
+                    <th class="fml-subproof">
+                      
+                      <div>
+                        
+<p class="ltx_p">Subproof level</p>
+                      </div>
+                    </th>
+                    <th class="fml-fmla">
+                      
+                      <div>
+                        
+<p class="ltx_p">Formula</p>
+                      </div>
+                    </th>
+                    <th class="fml-just">
+                      
+                      <div>
+                        
+<p class="ltx_p">Justification</p>
+                      </div>
+                    </th>
+                  </tr>
+                </thead>
+                <tr>
+                  <th class="fml-pline">
+                    
+                    
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"><math id="S3.p3.p3.m1.m1" class="ltx_Math" alttext="m" display="inline"><mi>m</mi></math></span></p>
+                  </th>
+                  <td class="fml-subproof">
+                    
+                    <div>
+                      <span>0</span>
+                    </div>
+                  </td>
+                  <td class="fml-fmla">
+                    
+                    <div class="fml-scope-start">
+                      
+                    </div>
+                    <div class="fml-fmla">
+                      
+                      <span><math id="S3.p3.p3.m2" class="ltx_Math" alttext="\Box\mathscr{A}" display="inline"><mrow><mi mathvariant="normal">□</mi><mo>⁢</mo><mi class="ltx_font_mathscript">𝒜︁</mi></mrow></math></span>
+                    </div>
+                  </td>
+                  <td class="fml-just">
+                    
+                    <div class="fml-just">
+                      
+                      <span></span>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <th class="fml-pline">
+                    
+                    
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"></span></p>
+                  </th>
+                  <td class="fml-subproof">
+                    
+                    <div>
+                      <span>0</span>
+                    </div>
+                  </td>
+                  <td class="fml-fmla">
+                    
+                    <div class="fml-scope">
+                      
+                    </div>
+                    <div class="fml-fmla">
+                      
+                      <span><math id="S3.p3.p3.m4" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math></span>
+                    </div>
+                  </td>
+                  <td class="fml-just">
+                    
+                    <div class="fml-just">
+                      
+                      <span>R<math id="S3.p3.p3.m5" class="ltx_Math" alttext="\mathbf{T}" display="inline"><mi>𝐓</mi></math> <math id="S3.p3.p3.m6" class="ltx_Math" alttext="m" display="inline"><mi>m</mi></math></span>
+                    </div>
+                  </td>
+                </tr>
+              </table>
+</div>
+          
+</div>
+<p class="ltx_p">To see this, just imagine trying to cook up a counter-interpretation to this claim:</p>
+<div id="Ex4" class="ltx_equation bml_equation bml_equation_container ltx_align_baseline">
+<div class="ltx_Math bml_eqn_cell ltx_align_center"><math id="Ex4.m1" class="ltx_Math" alttext="\Box\mathscr{A}\vDash_{\mathbf{T}}\mathscr{A}" display="block"><mrow><mrow><mi mathvariant="normal">□</mi><mo>⁢</mo><mi class="ltx_font_mathscript">𝒜︁</mi></mrow><msub><mo>⊨</mo><mi>𝐓</mi></msub><mi class="ltx_font_mathscript">𝒜︁</mi></mrow></math></div>
+</div>
+<p class="ltx_p">We would need to construct a world, <math id="S3.p3.m7" class="ltx_Math" alttext="w" display="inline"><mi>w</mi></math>, at which <math id="S3.p3.m8" class="ltx_Math" alttext="\Box\mathscr{A}" display="inline"><mrow><mi mathvariant="normal">□</mi><mo>⁢</mo><mi class="ltx_font_mathscript">𝒜︁</mi></mrow></math> was true, but <math id="S3.p3.m9" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math> was false. Now, if <math id="S3.p3.m10" class="ltx_Math" alttext="\Box\mathscr{A}" display="inline"><mrow><mi mathvariant="normal">□</mi><mo>⁢</mo><mi class="ltx_font_mathscript">𝒜︁</mi></mrow></math> is true at <math id="S3.p3.m11" class="ltx_Math" alttext="w" display="inline"><mi>w</mi></math>, then <math id="S3.p3.m12" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math> must be true at every world <math id="S3.p3.m13" class="ltx_Math" alttext="w" display="inline"><mi>w</mi></math> accesses. But since the accessibility relation is reflexive, <math id="S3.p3.m14" class="ltx_Math" alttext="w" display="inline"><mi>w</mi></math> accesses <math id="S3.p3.m15" class="ltx_Math" alttext="w" display="inline"><mi>w</mi></math>. So <math id="S3.p3.m16" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math> must be true at <math id="S3.p3.m17" class="ltx_Math" alttext="w" display="inline"><mi>w</mi></math>. But now <math id="S3.p3.m18" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math> must be true <span class="ltx_text ltx_font_bold">and</span> false at <math id="S3.p3.m19" class="ltx_Math" alttext="w" display="inline"><mi>w</mi></math>. Contradiction!</p>
+</div>
+</div>
+</section>
+<section id="S4" class="ltx_section normal">
+<div class="section level2">
+<h2 class="ltx_title ltx_title_section">
+<span class="ltx_tag ltx_tag_section header-section-number">44.4</span> A Semantics for <math id="S4.m1" class="ltx_Math" alttext="\mathbf{S4}" display="inline"><mi>𝐒𝟒</mi></math>
+</h2>
+
+<div id="S4.p1" class="ltx_para">
+<p class="ltx_p">How else might we tweak our definition of validity? Well, we might also stipulate that the accessibility relation has to be <span class="ltx_text ltx_font_bold">transitive</span>:</p>
+<div id="Ex5" class="ltx_equation bml_equation bml_equation_container ltx_align_baseline">
+<div class="ltx_Math bml_eqn_cell ltx_align_center"><math id="Ex5.m1" class="ltx_Math" alttext="\forall w_{1}\forall w_{2}\forall w_{3}((Rw_{1}w_{2}\wedge Rw_{2}w_{3})%
+\rightarrow Rw_{1}w_{3})" display="block"><mrow><mo rspace="0.167em">∀</mo><mrow><msub><mi>w</mi><mn>1</mn></msub><mo lspace="0.167em">⁢</mo><mrow><mo rspace="0.167em">∀</mo><mrow><msub><mi>w</mi><mn>2</mn></msub><mo lspace="0.167em">⁢</mo><mrow><mo rspace="0.167em">∀</mo><mrow><msub><mi>w</mi><mn>3</mn></msub><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>R</mi><mo>⁢</mo><msub><mi>w</mi><mn>1</mn></msub><mo>⁢</mo><msub><mi>w</mi><mn>2</mn></msub></mrow><mo>∧</mo><mrow><mi>R</mi><mo>⁢</mo><msub><mi>w</mi><mn>2</mn></msub><mo>⁢</mo><msub><mi>w</mi><mn>3</mn></msub></mrow></mrow><mo stretchy="false">)</mo></mrow><mo stretchy="false">→</mo><mrow><mi>R</mi><mo>⁢</mo><msub><mi>w</mi><mn>1</mn></msub><mo>⁢</mo><msub><mi>w</mi><mn>3</mn></msub></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></mrow></mrow></mrow></math></div>
+</div>
+<p class="ltx_p">In English: if <math id="S4.p1.m1" class="ltx_Math" alttext="w_{1}" display="inline"><msub><mi>w</mi><mn>1</mn></msub></math> accesses <math id="S4.p1.m2" class="ltx_Math" alttext="w_{2}" display="inline"><msub><mi>w</mi><mn>2</mn></msub></math>, and <math id="S4.p1.m3" class="ltx_Math" alttext="w_{2}" display="inline"><msub><mi>w</mi><mn>2</mn></msub></math> accesses <math id="S4.p1.m4" class="ltx_Math" alttext="w_{3}" display="inline"><msub><mi>w</mi><mn>3</mn></msub></math>, then <math id="S4.p1.m5" class="ltx_Math" alttext="w_{1}" display="inline"><msub><mi>w</mi><mn>1</mn></msub></math> accesses <math id="S4.p1.m6" class="ltx_Math" alttext="w_{3}" display="inline"><msub><mi>w</mi><mn>3</mn></msub></math>. Or in terms of relative possibility: if <math id="S4.p1.m7" class="ltx_Math" alttext="w_{3}" display="inline"><msub><mi>w</mi><mn>3</mn></msub></math> is possible relative to <math id="S4.p1.m8" class="ltx_Math" alttext="w_{2}" display="inline"><msub><mi>w</mi><mn>2</mn></msub></math>, and <math id="S4.p1.m9" class="ltx_Math" alttext="w_{2}" display="inline"><msub><mi>w</mi><mn>2</mn></msub></math> is possible relative to <math id="S4.p1.m10" class="ltx_Math" alttext="w_{1}" display="inline"><msub><mi>w</mi><mn>1</mn></msub></math>, then <math id="S4.p1.m11" class="ltx_Math" alttext="w_{3}" display="inline"><msub><mi>w</mi><mn>3</mn></msub></math> is possible relative to <math id="S4.p1.m12" class="ltx_Math" alttext="w_{1}" display="inline"><msub><mi>w</mi><mn>1</mn></msub></math>. If we added this restriction on our accessibility relation, we could introduce a new consequence relation, <math id="S4.p1.m13" class="ltx_Math" alttext="\vDash_{\mathbf{S4}}" display="inline"><msub><mo>⊨</mo><mi>𝐒𝟒</mi></msub></math>, as follows:</p>
+<div class="ltx_logical-block bml_background-color_FDF4FA bml_background-color_FDF4FA" style="padding:9pt;">
+            
+<div id="S4.p1.p1" class="ltx_para ltx_noindent">
+<p class="ltx_p"><math id="S4.p1.p1.m1" class="ltx_Math" alttext="\mathscr{A}_{1},\mathscr{A}_{2},\dots\mathscr{A}_{n}\vDash_{\mathbf{S4}}%
+\mathscr{C}" display="inline"><mrow><mrow><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mn>1</mn></msub><mo>,</mo><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mn>2</mn></msub><mo>,</mo><mrow><mi mathvariant="normal">…</mi><mo>⁢</mo><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mi>n</mi></msub></mrow></mrow><msub><mo>⊨</mo><mi>𝐒𝟒</mi></msub><mi class="ltx_font_mathscript">𝒞︁</mi></mrow></math> if⁠f there is no world in any interpretation <span class="ltx_text ltx_font_bold">which has a reflexive and transitive accessibility relation</span>, at which <math id="S4.p1.p1.m2" class="ltx_Math" alttext="\mathscr{A}_{1},\mathscr{A}_{2},\dots\mathscr{A}_{n}" display="inline"><mrow><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mn>1</mn></msub><mo>,</mo><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mn>2</mn></msub><mo>,</mo><mrow><mi mathvariant="normal">…</mi><mo>⁢</mo><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mi>n</mi></msub></mrow></mrow></math> are all true and <math id="S4.p1.p1.m3" class="ltx_Math" alttext="\mathscr{C}" display="inline"><mi class="ltx_font_mathscript">𝒞︁</mi></math> is false</p>
+</div>
+          
+</div>
+<p class="ltx_p">We have attached the <math id="S4.p1.m14" class="ltx_Math" alttext="\mathbf{S4}" display="inline"><mi>𝐒𝟒</mi></math> subscript to <math id="S4.p1.m15" class="ltx_Math" alttext="\vDash" display="inline"><mo>⊨</mo></math> because it turns out that system <math id="S4.p1.m16" class="ltx_Math" alttext="\mathbf{S4}" display="inline"><mi>𝐒𝟒</mi></math> is sound and complete relative to this new definition of validity:</p>
+<ol id="S4.I1" class="ltx_enumerate">
+<li id="S4.I1.i1" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">1.</span><div id="S4.I1.i1.p1" class="ltx_para">​<p class="ltx_p">If <math id="S4.I1.i1.p1.m1" class="ltx_math_unparsed" alttext="\mathscr{A}_{1},\mathscr{A}_{2},\dots\mathscr{A}_{n}\vdash_{\mathbf{S4}}%
+\mathscr{C}" display="inline"><mrow><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mn>1</mn></msub><mo>,</mo><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mn>2</mn></msub><mo>,</mo><mi mathvariant="normal">…</mi><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mi>n</mi></msub><msub><mo>⊢</mo><mi>𝐒𝟒</mi></msub><mi class="ltx_font_mathscript">𝒞︁</mi></mrow></math>, then <math id="S4.I1.i1.p1.m2" class="ltx_Math" alttext="\mathscr{A}_{1},\mathscr{A}_{2},\dots\mathscr{A}_{n}\vDash_{\mathbf{S4}}%
+\mathscr{C}" display="inline"><mrow><mrow><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mn>1</mn></msub><mo>,</mo><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mn>2</mn></msub><mo>,</mo><mrow><mi mathvariant="normal">…</mi><mo>⁢</mo><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mi>n</mi></msub></mrow></mrow><msub><mo>⊨</mo><mi>𝐒𝟒</mi></msub><mi class="ltx_font_mathscript">𝒞︁</mi></mrow></math></p>
+</div>
+</li>
+<li id="S4.I1.i2" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">2.</span><div id="S4.I1.i2.p1" class="ltx_para">​<p class="ltx_p">If <math id="S4.I1.i2.p1.m1" class="ltx_Math" alttext="\mathscr{A}_{1},\mathscr{A}_{2},\dots\mathscr{A}_{n}\vDash_{\mathbf{S4}}%
+\mathscr{C}" display="inline"><mrow><mrow><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mn>1</mn></msub><mo>,</mo><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mn>2</mn></msub><mo>,</mo><mrow><mi mathvariant="normal">…</mi><mo>⁢</mo><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mi>n</mi></msub></mrow></mrow><msub><mo>⊨</mo><mi>𝐒𝟒</mi></msub><mi class="ltx_font_mathscript">𝒞︁</mi></mrow></math>, then <math id="S4.I1.i2.p1.m2" class="ltx_math_unparsed" alttext="\mathscr{A}_{1},\mathscr{A}_{2},\dots\mathscr{A}_{n}\vdash_{\mathbf{S4}}%
+\mathscr{C}" display="inline"><mrow><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mn>1</mn></msub><mo>,</mo><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mn>2</mn></msub><mo>,</mo><mi mathvariant="normal">…</mi><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mi>n</mi></msub><msub><mo>⊢</mo><mi>𝐒𝟒</mi></msub><mi class="ltx_font_mathscript">𝒞︁</mi></mrow></math></p>
+</div>
+</li>
+</ol>
+<p class="ltx_p">As before, we will not try to prove these soundness and completeness results. However, it is relatively easy to see how insisting that the accessibility relation must be transitive will vindicate the <math id="S4.p1.m17" class="ltx_Math" alttext="\mathbf{S4}" display="inline"><mi>𝐒𝟒</mi></math> rule:</p>
+<div class="ltx_logical-block bml_background-color_FDF4FA ltx_pruned_first bml_background-color_FDF4FA" style="padding:9pt;">
+            
+<div id="S4.p1.p3" class="ltx_para ltx_noindent">
+<table class="fitch">
+                
+                <thead class="fml-sr-only">
+                  
+                  <tr>
+                    <th class="fml-pline">
+                      
+                      <div>
+                        
+<p class="ltx_p">Line number</p>
+                      </div>
+                    </th>
+                    <th class="fml-subproof">
+                      
+                      <div>
+                        
+<p class="ltx_p">Subproof level</p>
+                      </div>
+                    </th>
+                    <th class="fml-fmla">
+                      
+                      <div>
+                        
+<p class="ltx_p">Formula</p>
+                      </div>
+                    </th>
+                    <th class="fml-just">
+                      
+                      <div>
+                        
+<p class="ltx_p">Justification</p>
+                      </div>
+                    </th>
+                  </tr>
+                </thead>
+                <tr>
+                  <th class="fml-pline">
+                    
+                    
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"><math id="S4.p1.p3.m1.m1" class="ltx_Math" alttext="m" display="inline"><mi>m</mi></math></span></p>
+                  </th>
+                  <td class="fml-subproof">
+                    
+                    <div>
+                      <span>0</span>
+                    </div>
+                  </td>
+                  <td class="fml-fmla">
+                    
+                    <div class="fml-scope-start">
+                      
+                    </div>
+                    <div class="fml-fmla">
+                      
+                      <span><math id="S4.p1.p3.m2" class="ltx_Math" alttext="\Box\mathscr{A}" display="inline"><mrow><mi mathvariant="normal">□</mi><mo>⁢</mo><mi class="ltx_font_mathscript">𝒜︁</mi></mrow></math></span>
+                    </div>
+                  </td>
+                  <td class="fml-just">
+                    
+                    <div class="fml-just">
+                      
+                      <span></span>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <th class="fml-pline">
+                    
+                    
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"></span></p>
+                  </th>
+                  <td class="fml-subproof">
+                    
+                    <div>
+                      <span>open subproof,
+1</span>
+                    </div>
+                  </td>
+                  <td class="fml-fmla">
+                    
+                    <div class="fml-scope">
+                      
+                    </div>
+                    <div class="fml-scope-start">
+                      
+                    </div>
+                    <div class="fml-as">
+                      
+                      <span><math id="S4.p1.p3.m4" class="ltx_Math" alttext="\Box" display="inline"><mi mathvariant="normal">□</mi></math></span>
+                    </div>
+                  </td>
+                  <td class="fml-just">
+                    
+                    <div class="fml-just">
+                      
+                      <span><abbr title="Assumption">
+AS</abbr>
+</span>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <th class="fml-pline">
+                    
+                    
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"></span></p>
+                  </th>
+                  <td class="fml-subproof">
+                    
+                    <div>
+                      <span>1</span>
+                    </div>
+                  </td>
+                  <td class="fml-fmla">
+                    
+                    <div class="fml-scope">
+                      
+                    </div>
+                    <div class="fml-scope">
+                      
+                    </div>
+                    <div class="fml-fmla">
+                      
+                      <span><math id="S4.p1.p3.m6" class="ltx_Math" alttext="\Box\mathscr{A}" display="inline"><mrow><mi mathvariant="normal">□</mi><mo>⁢</mo><mi class="ltx_font_mathscript">𝒜︁</mi></mrow></math></span>
+                    </div>
+                  </td>
+                  <td class="fml-just">
+                    
+                    <div class="fml-just">
+                      
+                      <span>R<math id="S4.p1.p3.m7" class="ltx_Math" alttext="\mathbf{4}" display="inline"><mn>𝟒</mn></math> <math id="S4.p1.p3.m8" class="ltx_Math" alttext="m" display="inline"><mi>m</mi></math></span>
+                    </div>
+                  </td>
+                </tr>
+              </table>
+</div>
+          
+</div>
+<p class="ltx_p">The idea behind strict subproofs, remember, is that they are ways to prove things that must be true in all accessible worlds. So the R<math id="S4.p1.m18" class="ltx_Math" alttext="\mathbf{4}" display="inline"><mn>𝟒</mn></math> rule means that whenever <math id="S4.p1.m19" class="ltx_Math" alttext="\Box\mathscr{A}" display="inline"><mrow><mi mathvariant="normal">□</mi><mo>⁢</mo><mi class="ltx_font_mathscript">𝒜︁</mi></mrow></math> is true, <math id="S4.p1.m20" class="ltx_Math" alttext="\Box\mathscr{A}" display="inline"><mrow><mi mathvariant="normal">□</mi><mo>⁢</mo><mi class="ltx_font_mathscript">𝒜︁</mi></mrow></math> must also be true in every accessible world. In other words, we must have <math id="S4.p1.m21" class="ltx_Math" alttext="\Box\mathscr{A}\vDash_{\mathbf{S4}}\Box\Box\mathscr{A}" display="inline"><mrow><mrow><mi mathvariant="normal">□</mi><mo>⁢</mo><mi class="ltx_font_mathscript">𝒜︁</mi></mrow><msub><mo>⊨</mo><mi>𝐒𝟒</mi></msub><mrow><mi mathvariant="normal">□</mi><mo>⁢</mo><mi mathvariant="normal">□</mi><mo>⁢</mo><mi class="ltx_font_mathscript">𝒜︁</mi></mrow></mrow></math>.</p>
+</div>
+<div id="S4.p2" class="ltx_para">
+<p class="ltx_p">To see this, just imagine trying to cook up a counter-interpretation to this claim:</p>
+<div id="Ex6" class="ltx_equation bml_equation bml_equation_container ltx_align_baseline">
+<div class="ltx_Math bml_eqn_cell ltx_align_center"><math id="Ex6.m1" class="ltx_Math" alttext="\Box\mathscr{A}\vDash_{\mathbf{S4}}\Box\Box\mathscr{A}" display="block"><mrow><mrow><mi mathvariant="normal">□</mi><mo>⁢</mo><mi class="ltx_font_mathscript">𝒜︁</mi></mrow><msub><mo>⊨</mo><mi>𝐒𝟒</mi></msub><mrow><mi mathvariant="normal">□</mi><mo>⁢</mo><mi mathvariant="normal">□</mi><mo>⁢</mo><mi class="ltx_font_mathscript">𝒜︁</mi></mrow></mrow></math></div>
+</div>
+<p class="ltx_p">We would need to construct a world, <math id="S4.p2.m1" class="ltx_Math" alttext="w_{1}" display="inline"><msub><mi>w</mi><mn>1</mn></msub></math>, at which <math id="S4.p2.m2" class="ltx_Math" alttext="\Box\mathscr{A}" display="inline"><mrow><mi mathvariant="normal">□</mi><mo>⁢</mo><mi class="ltx_font_mathscript">𝒜︁</mi></mrow></math> was true, but <math id="S4.p2.m3" class="ltx_Math" alttext="\Box\Box\mathscr{A}" display="inline"><mrow><mi mathvariant="normal">□</mi><mo>⁢</mo><mi mathvariant="normal">□</mi><mo>⁢</mo><mi class="ltx_font_mathscript">𝒜︁</mi></mrow></math> was false. Now, if <math id="S4.p2.m4" class="ltx_Math" alttext="\Box\Box\mathscr{A}" display="inline"><mrow><mi mathvariant="normal">□</mi><mo>⁢</mo><mi mathvariant="normal">□</mi><mo>⁢</mo><mi class="ltx_font_mathscript">𝒜︁</mi></mrow></math> is false at <math id="S4.p2.m5" class="ltx_Math" alttext="w_{1}" display="inline"><msub><mi>w</mi><mn>1</mn></msub></math>, then <math id="S4.p2.m6" class="ltx_Math" alttext="w_{1}" display="inline"><msub><mi>w</mi><mn>1</mn></msub></math> must access some world, <math id="S4.p2.m7" class="ltx_Math" alttext="w_{2}" display="inline"><msub><mi>w</mi><mn>2</mn></msub></math>, at which <math id="S4.p2.m8" class="ltx_Math" alttext="\Box\mathscr{A}" display="inline"><mrow><mi mathvariant="normal">□</mi><mo>⁢</mo><mi class="ltx_font_mathscript">𝒜︁</mi></mrow></math> is false. Equally, if <math id="S4.p2.m9" class="ltx_Math" alttext="\Box\mathscr{A}" display="inline"><mrow><mi mathvariant="normal">□</mi><mo>⁢</mo><mi class="ltx_font_mathscript">𝒜︁</mi></mrow></math> is false at <math id="S4.p2.m10" class="ltx_Math" alttext="w_{2}" display="inline"><msub><mi>w</mi><mn>2</mn></msub></math>, then <math id="S4.p2.m11" class="ltx_Math" alttext="w_{2}" display="inline"><msub><mi>w</mi><mn>2</mn></msub></math> must access some world, <math id="S4.p2.m12" class="ltx_Math" alttext="w_{3}" display="inline"><msub><mi>w</mi><mn>3</mn></msub></math>, at which <math id="S4.p2.m13" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math> is false. We just said that <math id="S4.p2.m14" class="ltx_Math" alttext="w_{1}" display="inline"><msub><mi>w</mi><mn>1</mn></msub></math> accesses <math id="S4.p2.m15" class="ltx_Math" alttext="w_{2}" display="inline"><msub><mi>w</mi><mn>2</mn></msub></math>, and <math id="S4.p2.m16" class="ltx_Math" alttext="w_{2}" display="inline"><msub><mi>w</mi><mn>2</mn></msub></math> accesses <math id="S4.p2.m17" class="ltx_Math" alttext="w_{3}" display="inline"><msub><mi>w</mi><mn>3</mn></msub></math>. So since we are now insisting that the accessibility relation be transitive, <math id="S4.p2.m18" class="ltx_Math" alttext="w_{1}" display="inline"><msub><mi>w</mi><mn>1</mn></msub></math> must access <math id="S4.p2.m19" class="ltx_Math" alttext="w_{3}" display="inline"><msub><mi>w</mi><mn>3</mn></msub></math>. And as <math id="S4.p2.m20" class="ltx_Math" alttext="\Box\mathscr{A}" display="inline"><mrow><mi mathvariant="normal">□</mi><mo>⁢</mo><mi class="ltx_font_mathscript">𝒜︁</mi></mrow></math> is true at <math id="S4.p2.m21" class="ltx_Math" alttext="w_{1}" display="inline"><msub><mi>w</mi><mn>1</mn></msub></math>, and <math id="S4.p2.m22" class="ltx_Math" alttext="w_{3}" display="inline"><msub><mi>w</mi><mn>3</mn></msub></math> is accessible from <math id="S4.p2.m23" class="ltx_Math" alttext="w_{1}" display="inline"><msub><mi>w</mi><mn>1</mn></msub></math>, it follows that <math id="S4.p2.m24" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math> must be true at <math id="S4.p2.m25" class="ltx_Math" alttext="w_{3}" display="inline"><msub><mi>w</mi><mn>3</mn></msub></math>. So <math id="S4.p2.m26" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math> is true <span class="ltx_text ltx_font_bold">and</span> false at <math id="S4.p2.m27" class="ltx_Math" alttext="w_{3}" display="inline"><msub><mi>w</mi><mn>3</mn></msub></math>. Contradiction!</p>
+</div>
+</div>
+</section>
+<section id="S5" class="ltx_section normal">
+<div class="section level2">
+<h2 class="ltx_title ltx_title_section">
+<span class="ltx_tag ltx_tag_section header-section-number">44.5</span> A Semantics for <math id="S5.m1" class="ltx_Math" alttext="\mathbf{S5}" display="inline"><mi>𝐒𝟓</mi></math>
+</h2>
+
+<div id="S5.p1" class="ltx_para">
+<p class="ltx_p">Let’s put one more restriction on the accessibility relation. This time, let’s insist that it must also be <span class="ltx_text ltx_font_bold">symmetric</span>:</p>
+<div id="Ex7" class="ltx_equation bml_equation bml_equation_container ltx_align_baseline">
+<div class="ltx_Math bml_eqn_cell ltx_align_center"><math id="Ex7.m1" class="ltx_Math" alttext="\forall w_{1}\forall w_{2}(Rw_{1}w_{2}\rightarrow Rw_{2}w_{1})" display="block"><mrow><mo rspace="0.167em">∀</mo><mrow><msub><mi>w</mi><mn>1</mn></msub><mo lspace="0.167em">⁢</mo><mrow><mo rspace="0.167em">∀</mo><mrow><msub><mi>w</mi><mn>2</mn></msub><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>R</mi><mo>⁢</mo><msub><mi>w</mi><mn>1</mn></msub><mo>⁢</mo><msub><mi>w</mi><mn>2</mn></msub></mrow><mo stretchy="false">→</mo><mrow><mi>R</mi><mo>⁢</mo><msub><mi>w</mi><mn>2</mn></msub><mo>⁢</mo><msub><mi>w</mi><mn>1</mn></msub></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></mrow></math></div>
+</div>
+<p class="ltx_p">In English: if <math id="S5.p1.m1" class="ltx_Math" alttext="w_{1}" display="inline"><msub><mi>w</mi><mn>1</mn></msub></math> accesses <math id="S5.p1.m2" class="ltx_Math" alttext="w_{2}" display="inline"><msub><mi>w</mi><mn>2</mn></msub></math>, then <math id="S5.p1.m3" class="ltx_Math" alttext="w_{2}" display="inline"><msub><mi>w</mi><mn>2</mn></msub></math> accesses <math id="S5.p1.m4" class="ltx_Math" alttext="w_{1}" display="inline"><msub><mi>w</mi><mn>1</mn></msub></math>. Or in terms of relative possibility: if <math id="S5.p1.m5" class="ltx_Math" alttext="w_{2}" display="inline"><msub><mi>w</mi><mn>2</mn></msub></math> is possible relative to <math id="S5.p1.m6" class="ltx_Math" alttext="w_{1}" display="inline"><msub><mi>w</mi><mn>1</mn></msub></math>, then <math id="S5.p1.m7" class="ltx_Math" alttext="w_{1}" display="inline"><msub><mi>w</mi><mn>1</mn></msub></math> is possible relative to <math id="S5.p1.m8" class="ltx_Math" alttext="w_{2}" display="inline"><msub><mi>w</mi><mn>2</mn></msub></math>. Logicians call a relation that is reflexive, symmetric, and transitive an <span class="ltx_text ltx_font_bold">equivalence</span> relation. We can now define a new consequence relation, <math id="S5.p1.m9" class="ltx_Math" alttext="\vDash_{\mathbf{S5}}" display="inline"><msub><mo>⊨</mo><mi>𝐒𝟓</mi></msub></math>, as follows:</p>
+<div class="ltx_logical-block bml_background-color_FDF4FA bml_background-color_FDF4FA" style="padding:9pt;">
+            
+<div id="S5.p1.p1" class="ltx_para ltx_noindent">
+<p class="ltx_p"><math id="S5.p1.p1.m1" class="ltx_Math" alttext="\mathscr{A}_{1},\mathscr{A}_{2},\dots\mathscr{A}_{n}\vDash_{\mathbf{S5}}%
+\mathscr{C}" display="inline"><mrow><mrow><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mn>1</mn></msub><mo>,</mo><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mn>2</mn></msub><mo>,</mo><mrow><mi mathvariant="normal">…</mi><mo>⁢</mo><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mi>n</mi></msub></mrow></mrow><msub><mo>⊨</mo><mi>𝐒𝟓</mi></msub><mi class="ltx_font_mathscript">𝒞︁</mi></mrow></math> if⁠f there is no world in any interpretation <span class="ltx_text ltx_font_bold">whose accessibility relation is an equivalence relation</span>, at which <math id="S5.p1.p1.m2" class="ltx_Math" alttext="\mathscr{A}_{1},\mathscr{A}_{2},\dots\mathscr{A}_{n}" display="inline"><mrow><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mn>1</mn></msub><mo>,</mo><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mn>2</mn></msub><mo>,</mo><mrow><mi mathvariant="normal">…</mi><mo>⁢</mo><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mi>n</mi></msub></mrow></mrow></math> are all true and <math id="S5.p1.p1.m3" class="ltx_Math" alttext="\mathscr{C}" display="inline"><mi class="ltx_font_mathscript">𝒞︁</mi></math> is false</p>
+</div>
+          
+</div>
+<p class="ltx_p">We have attached the <math id="S5.p1.m10" class="ltx_Math" alttext="\mathbf{S5}" display="inline"><mi>𝐒𝟓</mi></math> subscript to <math id="S5.p1.m11" class="ltx_Math" alttext="\vDash" display="inline"><mo>⊨</mo></math> because it turns out that system <math id="S5.p1.m12" class="ltx_Math" alttext="\mathbf{S5}" display="inline"><mi>𝐒𝟓</mi></math> is sound and complete relative to this new definition of validity:</p>
+<ol id="S5.I1" class="ltx_enumerate">
+<li id="S5.I1.i1" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">1.</span><div id="S5.I1.i1.p1" class="ltx_para">​<p class="ltx_p">If <math id="S5.I1.i1.p1.m1" class="ltx_math_unparsed" alttext="\mathscr{A}_{1},\mathscr{A}_{2},\dots\mathscr{A}_{n}\vdash_{\mathbf{S5}}%
+\mathscr{C}" display="inline"><mrow><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mn>1</mn></msub><mo>,</mo><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mn>2</mn></msub><mo>,</mo><mi mathvariant="normal">…</mi><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mi>n</mi></msub><msub><mo>⊢</mo><mi>𝐒𝟓</mi></msub><mi class="ltx_font_mathscript">𝒞︁</mi></mrow></math>, then <math id="S5.I1.i1.p1.m2" class="ltx_Math" alttext="\mathscr{A}_{1},\mathscr{A}_{2},\dots\mathscr{A}_{n}\vDash_{\mathbf{S5}}%
+\mathscr{C}" display="inline"><mrow><mrow><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mn>1</mn></msub><mo>,</mo><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mn>2</mn></msub><mo>,</mo><mrow><mi mathvariant="normal">…</mi><mo>⁢</mo><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mi>n</mi></msub></mrow></mrow><msub><mo>⊨</mo><mi>𝐒𝟓</mi></msub><mi class="ltx_font_mathscript">𝒞︁</mi></mrow></math></p>
+</div>
+</li>
+<li id="S5.I1.i2" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">2.</span><div id="S5.I1.i2.p1" class="ltx_para">​<p class="ltx_p">If <math id="S5.I1.i2.p1.m1" class="ltx_Math" alttext="\mathscr{A}_{1},\mathscr{A}_{2},\dots\mathscr{A}_{n}\vDash_{\mathbf{S5}}%
+\mathscr{C}" display="inline"><mrow><mrow><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mn>1</mn></msub><mo>,</mo><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mn>2</mn></msub><mo>,</mo><mrow><mi mathvariant="normal">…</mi><mo>⁢</mo><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mi>n</mi></msub></mrow></mrow><msub><mo>⊨</mo><mi>𝐒𝟓</mi></msub><mi class="ltx_font_mathscript">𝒞︁</mi></mrow></math>, then <math id="S5.I1.i2.p1.m2" class="ltx_math_unparsed" alttext="\mathscr{A}_{1},\mathscr{A}_{2},\dots\mathscr{A}_{n}\vdash_{\mathbf{S5}}%
+\mathscr{C}" display="inline"><mrow><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mn>1</mn></msub><mo>,</mo><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mn>2</mn></msub><mo>,</mo><mi mathvariant="normal">…</mi><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mi>n</mi></msub><msub><mo>⊢</mo><mi>𝐒𝟓</mi></msub><mi class="ltx_font_mathscript">𝒞︁</mi></mrow></math></p>
+</div>
+</li>
+</ol>
+<p class="ltx_p">As before, we will not try to prove these soundness and completeness results here. However, it is relatively easy to see how insisting that the accessibility relation must be an equivalence relation will vindicate the R<math id="S5.p1.m13" class="ltx_Math" alttext="\mathbf{5}" display="inline"><mn>𝟓</mn></math> rule:</p>
+<div class="ltx_logical-block bml_background-color_FDF4FA ltx_pruned_first bml_background-color_FDF4FA" style="padding:9pt;">
+            
+<div id="S5.p1.p3" class="ltx_para ltx_noindent">
+<table class="fitch">
+                
+                <thead class="fml-sr-only">
+                  
+                  <tr>
+                    <th class="fml-pline">
+                      
+                      <div>
+                        
+<p class="ltx_p">Line number</p>
+                      </div>
+                    </th>
+                    <th class="fml-subproof">
+                      
+                      <div>
+                        
+<p class="ltx_p">Subproof level</p>
+                      </div>
+                    </th>
+                    <th class="fml-fmla">
+                      
+                      <div>
+                        
+<p class="ltx_p">Formula</p>
+                      </div>
+                    </th>
+                    <th class="fml-just">
+                      
+                      <div>
+                        
+<p class="ltx_p">Justification</p>
+                      </div>
+                    </th>
+                  </tr>
+                </thead>
+                <tr>
+                  <th class="fml-pline">
+                    
+                    
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"><math id="S5.p1.p3.m1.m1" class="ltx_Math" alttext="m" display="inline"><mi>m</mi></math></span></p>
+                  </th>
+                  <td class="fml-subproof">
+                    
+                    <div>
+                      <span>0</span>
+                    </div>
+                  </td>
+                  <td class="fml-fmla">
+                    
+                    <div class="fml-scope-start">
+                      
+                    </div>
+                    <div class="fml-fmla">
+                      
+                      <span><math id="S5.p1.p3.m2" class="ltx_Math" alttext="\neg\Box\mathscr{A}" display="inline"><mrow><mo rspace="0.167em">¬</mo><mrow><mi mathvariant="normal">□</mi><mo>⁢</mo><mi class="ltx_font_mathscript">𝒜︁</mi></mrow></mrow></math></span>
+                    </div>
+                  </td>
+                  <td class="fml-just">
+                    
+                    <div class="fml-just">
+                      
+                      <span></span>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <th class="fml-pline">
+                    
+                    
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"></span></p>
+                  </th>
+                  <td class="fml-subproof">
+                    
+                    <div>
+                      <span>open subproof,
+1</span>
+                    </div>
+                  </td>
+                  <td class="fml-fmla">
+                    
+                    <div class="fml-scope">
+                      
+                    </div>
+                    <div class="fml-scope-start">
+                      
+                    </div>
+                    <div class="fml-as">
+                      
+                      <span><math id="S5.p1.p3.m4" class="ltx_Math" alttext="\Box" display="inline"><mi mathvariant="normal">□</mi></math></span>
+                    </div>
+                  </td>
+                  <td class="fml-just">
+                    
+                    <div class="fml-just">
+                      
+                      <span><abbr title="Assumption">
+AS</abbr>
+</span>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <th class="fml-pline">
+                    
+                    
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"></span></p>
+                  </th>
+                  <td class="fml-subproof">
+                    
+                    <div>
+                      <span>1</span>
+                    </div>
+                  </td>
+                  <td class="fml-fmla">
+                    
+                    <div class="fml-scope">
+                      
+                    </div>
+                    <div class="fml-scope">
+                      
+                    </div>
+                    <div class="fml-fmla">
+                      
+                      <span><math id="S5.p1.p3.m6" class="ltx_Math" alttext="\neg\Box\mathscr{A}" display="inline"><mrow><mo rspace="0.167em">¬</mo><mrow><mi mathvariant="normal">□</mi><mo>⁢</mo><mi class="ltx_font_mathscript">𝒜︁</mi></mrow></mrow></math></span>
+                    </div>
+                  </td>
+                  <td class="fml-just">
+                    
+                    <div class="fml-just">
+                      
+                      <span>R<math id="S5.p1.p3.m7" class="ltx_Math" alttext="\mathbf{5}" display="inline"><mn>𝟓</mn></math> <math id="S5.p1.p3.m8" class="ltx_Math" alttext="m" display="inline"><mi>m</mi></math></span>
+                    </div>
+                  </td>
+                </tr>
+              </table>
+</div>
+          
+</div>
+<p class="ltx_p">The rule says that if <math id="S5.p1.m14" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math> is not necessary, i.e., false in some accessible world, it is also not necessary in any accessible possible world, i.e., we have <math id="S5.p1.m15" class="ltx_math_unparsed" alttext="\neg\Box\mathscr{A}\vdash_{\mathbf{S5}}\Box\neg\Box\mathscr{A}" display="inline"><mrow><mo rspace="0.167em">¬</mo><mi mathvariant="normal">□</mi><mi class="ltx_font_mathscript">𝒜︁</mi><msub><mo>⊢</mo><mi>𝐒𝟓</mi></msub><mi mathvariant="normal">□</mi><mo lspace="0.167em" rspace="0.167em">¬</mo><mi mathvariant="normal">□</mi><mi class="ltx_font_mathscript">𝒜︁</mi></mrow></math>.</p>
+</div>
+<div id="S5.p2" class="ltx_para">
+<p class="ltx_p">To see this, just imagine trying to cook up a counter-interpretation to this claim:</p>
+<div id="Ex8" class="ltx_equation bml_equation bml_equation_container ltx_align_baseline">
+<div class="ltx_Math bml_eqn_cell ltx_align_center"><math id="Ex8.m1" class="ltx_Math" alttext="\neg\Box\mathscr{A}\vDash_{\mathbf{S5}}\Box\neg\Box\mathscr{A}" display="block"><mrow><mrow><mo rspace="0.167em">¬</mo><mrow><mi mathvariant="normal">□</mi><mo>⁢</mo><mi class="ltx_font_mathscript">𝒜︁</mi></mrow></mrow><msub><mo>⊨</mo><mi>𝐒𝟓</mi></msub><mrow><mi mathvariant="normal">□</mi><mo lspace="0.167em">⁢</mo><mrow><mo rspace="0.167em">¬</mo><mrow><mi mathvariant="normal">□</mi><mo>⁢</mo><mi class="ltx_font_mathscript">𝒜︁</mi></mrow></mrow></mrow></mrow></math></div>
+</div>
+<p class="ltx_p">We would need to construct a world, <math id="S5.p2.m1" class="ltx_Math" alttext="w_{1}" display="inline"><msub><mi>w</mi><mn>1</mn></msub></math>, at which <math id="S5.p2.m2" class="ltx_Math" alttext="\neg\Box\mathscr{A}" display="inline"><mrow><mo rspace="0.167em">¬</mo><mrow><mi mathvariant="normal">□</mi><mo>⁢</mo><mi class="ltx_font_mathscript">𝒜︁</mi></mrow></mrow></math> was true, but <math id="S5.p2.m3" class="ltx_Math" alttext="\Box\neg\Box\mathscr{A}" display="inline"><mrow><mi mathvariant="normal">□</mi><mo lspace="0.167em">⁢</mo><mrow><mo rspace="0.167em">¬</mo><mrow><mi mathvariant="normal">□</mi><mo>⁢</mo><mi class="ltx_font_mathscript">𝒜︁</mi></mrow></mrow></mrow></math> was false.
+Now, if <math id="S5.p2.m4" class="ltx_Math" alttext="\neg\Box\mathscr{A}" display="inline"><mrow><mo rspace="0.167em">¬</mo><mrow><mi mathvariant="normal">□</mi><mo>⁢</mo><mi class="ltx_font_mathscript">𝒜︁</mi></mrow></mrow></math> is true at <math id="S5.p2.m5" class="ltx_Math" alttext="w_{1}" display="inline"><msub><mi>w</mi><mn>1</mn></msub></math>, then <math id="S5.p2.m6" class="ltx_Math" alttext="w_{1}" display="inline"><msub><mi>w</mi><mn>1</mn></msub></math> must access some world, <math id="S5.p2.m7" class="ltx_Math" alttext="w_{2}" display="inline"><msub><mi>w</mi><mn>2</mn></msub></math>, at which <math id="S5.p2.m8" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math> is false. Equally, if <math id="S5.p2.m9" class="ltx_Math" alttext="\Box\neg\Box\mathscr{A}" display="inline"><mrow><mi mathvariant="normal">□</mi><mo lspace="0.167em">⁢</mo><mrow><mo rspace="0.167em">¬</mo><mrow><mi mathvariant="normal">□</mi><mo>⁢</mo><mi class="ltx_font_mathscript">𝒜︁</mi></mrow></mrow></mrow></math> is false at <math id="S5.p2.m10" class="ltx_Math" alttext="w_{1}" display="inline"><msub><mi>w</mi><mn>1</mn></msub></math>, then <math id="S5.p2.m11" class="ltx_Math" alttext="w_{1}" display="inline"><msub><mi>w</mi><mn>1</mn></msub></math> must access some world, <math id="S5.p2.m12" class="ltx_Math" alttext="w_{3}" display="inline"><msub><mi>w</mi><mn>3</mn></msub></math>, at which <math id="S5.p2.m13" class="ltx_Math" alttext="\neg\Box\mathscr{A}" display="inline"><mrow><mo rspace="0.167em">¬</mo><mrow><mi mathvariant="normal">□</mi><mo>⁢</mo><mi class="ltx_font_mathscript">𝒜︁</mi></mrow></mrow></math> is false. Since we are now insisting that the accessibility relation is an equivalence relation, and hence symmetric, we can infer that <math id="S5.p2.m14" class="ltx_Math" alttext="w_{3}" display="inline"><msub><mi>w</mi><mn>3</mn></msub></math> accesses <math id="S5.p2.m15" class="ltx_Math" alttext="w_{1}" display="inline"><msub><mi>w</mi><mn>1</mn></msub></math>. Thus, <math id="S5.p2.m16" class="ltx_Math" alttext="w_{3}" display="inline"><msub><mi>w</mi><mn>3</mn></msub></math> accesses <math id="S5.p2.m17" class="ltx_Math" alttext="w_{1}" display="inline"><msub><mi>w</mi><mn>1</mn></msub></math>, and <math id="S5.p2.m18" class="ltx_Math" alttext="w_{1}" display="inline"><msub><mi>w</mi><mn>1</mn></msub></math> accesses <math id="S5.p2.m19" class="ltx_Math" alttext="w_{2}" display="inline"><msub><mi>w</mi><mn>2</mn></msub></math>. Again, since we are now insisting that the accessibility relation is an equivalence relation, and hence transitive, we can infer that <math id="S5.p2.m20" class="ltx_Math" alttext="w_{3}" display="inline"><msub><mi>w</mi><mn>3</mn></msub></math> accesses <math id="S5.p2.m21" class="ltx_Math" alttext="w_{2}" display="inline"><msub><mi>w</mi><mn>2</mn></msub></math>. But earlier we said that <math id="S5.p2.m22" class="ltx_Math" alttext="\neg\Box\mathscr{A}" display="inline"><mrow><mo rspace="0.167em">¬</mo><mrow><mi mathvariant="normal">□</mi><mo>⁢</mo><mi class="ltx_font_mathscript">𝒜︁</mi></mrow></mrow></math> is false at <math id="S5.p2.m23" class="ltx_Math" alttext="w_{3}" display="inline"><msub><mi>w</mi><mn>3</mn></msub></math>, which implies that <math id="S5.p2.m24" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math> is true at every world which <math id="S5.p2.m25" class="ltx_Math" alttext="w_{3}" display="inline"><msub><mi>w</mi><mn>3</mn></msub></math> accesses. So <math id="S5.p2.m26" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math> is true <span class="ltx_text ltx_font_bold">and</span> false at <math id="S5.p2.m27" class="ltx_Math" alttext="w_{2}" display="inline"><msub><mi>w</mi><mn>2</mn></msub></math>. Contradiction!</p>
+</div>
+<div id="S5.p3" class="ltx_para">
+<p class="ltx_p">In the definition of <math id="S5.p3.m1" class="ltx_Math" alttext="\vDash_{\mathbf{S5}}" display="inline"><msub><mo>⊨</mo><mi>𝐒𝟓</mi></msub></math>, we stipulated that the accessibility relation must be an equivalence relation. But it turns out that there is another way of getting a notion of validity fit for <math id="S5.p3.m2" class="ltx_Math" alttext="\mathbf{S5}" display="inline"><mi>𝐒𝟓</mi></math>. Rather than stipulating that the accessibility relation be an equivalence relation, we can instead stipulate that it be a <span class="ltx_text ltx_font_bold">universal</span> relation:</p>
+<div id="Ex9" class="ltx_equation bml_equation bml_equation_container ltx_align_baseline">
+<div class="ltx_Math bml_eqn_cell ltx_align_center"><math id="Ex9.m1" class="ltx_Math" alttext="\forall w_{1}\forall w_{2}\,Rw_{1}w_{2}" display="block"><mrow><mo rspace="0.167em">∀</mo><mrow><msub><mi>w</mi><mn>1</mn></msub><mo lspace="0.167em">⁢</mo><mrow><mo rspace="0.167em">∀</mo><mrow><msub><mi>w</mi><mn>2</mn></msub><mo>⁢</mo><mi>R</mi><mo>⁢</mo><msub><mi>w</mi><mn>1</mn></msub><mo>⁢</mo><msub><mi>w</mi><mn>2</mn></msub></mrow></mrow></mrow></mrow></math></div>
+</div>
+<p class="ltx_p">In English: every world accesses every world. Or in terms of relative possibility: every world is possible relative to every world. Using this restriction on the accessibility relation, we could have defined <math id="S5.p3.m3" class="ltx_Math" alttext="\vDash_{\mathbf{S5}}" display="inline"><msub><mo>⊨</mo><mi>𝐒𝟓</mi></msub></math> like this:</p>
+<div class="ltx_logical-block bml_background-color_FDF4FA bml_background-color_FDF4FA" style="padding:9pt;">
+            
+<div id="S5.p3.p1" class="ltx_para ltx_noindent">
+<p class="ltx_p"><math id="S5.p3.p1.m1" class="ltx_Math" alttext="\mathscr{A}_{1},\mathscr{A}_{2},\dots\mathscr{A}_{n}\vDash_{\mathbf{S5}}%
+\mathscr{C}" display="inline"><mrow><mrow><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mn>1</mn></msub><mo>,</mo><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mn>2</mn></msub><mo>,</mo><mrow><mi mathvariant="normal">…</mi><mo>⁢</mo><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mi>n</mi></msub></mrow></mrow><msub><mo>⊨</mo><mi>𝐒𝟓</mi></msub><mi class="ltx_font_mathscript">𝒞︁</mi></mrow></math> if⁠f there is no world in any interpretation <span class="ltx_text ltx_font_bold">which has a universal accessibility relation</span>, at which <math id="S5.p3.p1.m2" class="ltx_Math" alttext="\mathscr{A}_{1},\mathscr{A}_{2},\dots\mathscr{A}_{n}" display="inline"><mrow><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mn>1</mn></msub><mo>,</mo><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mn>2</mn></msub><mo>,</mo><mrow><mi mathvariant="normal">…</mi><mo>⁢</mo><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mi>n</mi></msub></mrow></mrow></math> are all true and <math id="S5.p3.p1.m3" class="ltx_Math" alttext="\mathscr{C}" display="inline"><mi class="ltx_font_mathscript">𝒞︁</mi></math> is false.</p>
+</div>
+          
+</div>
+<p class="ltx_p">If we defined <math id="S5.p3.m4" class="ltx_Math" alttext="\vDash_{\mathbf{S5}}" display="inline"><msub><mo>⊨</mo><mi>𝐒𝟓</mi></msub></math> like this, we would still get the same soundness and completeness results for <math id="S5.p3.m5" class="ltx_Math" alttext="\mathbf{S5}" display="inline"><mi>𝐒𝟓</mi></math>. What does this tell us? Well, it means that if we are dealing with a notion of necessity according to which <span class="ltx_text ltx_font_bold">every</span> world is possible relative to <span class="ltx_text ltx_font_bold">every</span> world, then we should use <math id="S5.p3.m6" class="ltx_Math" alttext="\mathbf{S5}" display="inline"><mi>𝐒𝟓</mi></math>. What is more, most philosophers assume that the notions of necessity that they are most concerned with, like <span class="ltx_text ltx_font_bold">logical necessity</span> and <span class="ltx_text ltx_font_bold">metaphysical necessity</span>, are of exactly this kind. So <math id="S5.p3.m7" class="ltx_Math" alttext="\mathbf{S5}" display="inline"><mi>𝐒𝟓</mi></math> is the modal system that most philosophers use most of the time.</p>
+</div>
+</div>
+</section>
+<section id="Sx1" class="ltx_section normal">
+<div class="section level2">
+<h2 class="ltx_title ltx_title_section">Practice exercises</h2>
+
+<div id="Sx1.p1" class="ltx_para ltx_noindent">
+<p class="ltx_p"><span class="ltx_text ltx_font_bold">A. </span>Present counter-interpretations to the following false claims:</p>
+<ol id="Sx1.I2" class="ltx_enumerate">
+<li id="Sx1.I2.i1" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">1.</span><div id="Sx1.I2.i1.p1" class="ltx_para">​<p class="ltx_p"><math id="Sx1.I2.i1.p1.m1" class="ltx_Math" alttext="\neg P\vDash_{\mathbf{K}}\neg\Diamond P" display="inline"><mrow><mrow><mo rspace="0.167em">¬</mo><mi>P</mi></mrow><msub><mo>⊨</mo><mi>𝐊</mi></msub><mrow><mo rspace="0.167em">¬</mo><mrow><mi mathvariant="normal">◇</mi><mo>⁢</mo><mi>P</mi></mrow></mrow></mrow></math></p>
+</div>
+</li>
+<li id="Sx1.I2.i2" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">2.</span><div id="Sx1.I2.i2.p1" class="ltx_para">​<p class="ltx_p"><math id="Sx1.I2.i2.p1.m1" class="ltx_Math" alttext="\Box(P\vee Q)\vDash_{\mathbf{K}}\Box P\vee\Box Q" display="inline"><mrow><mrow><mi mathvariant="normal">□</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mi>P</mi><mo>∨</mo><mi>Q</mi></mrow><mo stretchy="false">)</mo></mrow></mrow><msub><mo>⊨</mo><mi>𝐊</mi></msub><mrow><mrow><mi mathvariant="normal">□</mi><mo>⁢</mo><mi>P</mi></mrow><mo>∨</mo><mrow><mi mathvariant="normal">□</mi><mo>⁢</mo><mi>Q</mi></mrow></mrow></mrow></math></p>
+</div>
+</li>
+<li id="Sx1.I2.i3" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">3.</span><div id="Sx1.I2.i3.p1" class="ltx_para">​<p class="ltx_p"><math id="Sx1.I2.i3.p1.m1" class="ltx_Math" alttext="\vDash_{\mathbf{K}}\neg\Box(A\wedge\neg A)" display="inline"><mrow><mi></mi><msub><mo>⊨</mo><mi>𝐊</mi></msub><mrow><mo rspace="0.167em">¬</mo><mrow><mi mathvariant="normal">□</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mi>A</mi><mo>∧</mo><mrow><mo rspace="0.167em">¬</mo><mi>A</mi></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></math></p>
+</div>
+</li>
+<li id="Sx1.I2.i4" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">4.</span><div id="Sx1.I2.i4.p1" class="ltx_para">​<p class="ltx_p"><math id="Sx1.I2.i4.p1.m1" class="ltx_Math" alttext="\Box A\vDash_{\mathbf{K}}A" display="inline"><mrow><mrow><mi mathvariant="normal">□</mi><mo>⁢</mo><mi>A</mi></mrow><msub><mo>⊨</mo><mi>𝐊</mi></msub><mi>A</mi></mrow></math></p>
+</div>
+</li>
+</ol>
+</div>
+<div id="Sx1.p2" class="ltx_para ltx_noindent">
+<p class="ltx_p"><span class="ltx_text ltx_font_bold">B. </span>Present counter-interpretations to the following false claims:</p>
+<ol id="Sx1.I3" class="ltx_enumerate">
+<li id="Sx1.I3.i1" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">1.</span><div id="Sx1.I3.i1.p1" class="ltx_para">​<p class="ltx_p"><math id="Sx1.I3.i1.p1.m1" class="ltx_Math" alttext="\Diamond A\vDash_{\mathbf{S4}}\Box\Diamond A" display="inline"><mrow><mrow><mi mathvariant="normal">◇</mi><mo>⁢</mo><mi>A</mi></mrow><msub><mo>⊨</mo><mi>𝐒𝟒</mi></msub><mrow><mi mathvariant="normal">□</mi><mo>⁢</mo><mi mathvariant="normal">◇</mi><mo>⁢</mo><mi>A</mi></mrow></mrow></math></p>
+</div>
+</li>
+<li id="Sx1.I3.i2" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">2.</span><div id="Sx1.I3.i2.p1" class="ltx_para">​<p class="ltx_p"><math id="Sx1.I3.i2.p1.m1" class="ltx_Math" alttext="\Diamond A,\Box(\Diamond A\rightarrow B)\vDash_{\mathbf{S4}}\Box B" display="inline"><mrow><mrow><mrow><mi mathvariant="normal">◇</mi><mo>⁢</mo><mi>A</mi></mrow><mo>,</mo><mrow><mi mathvariant="normal">□</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi mathvariant="normal">◇</mi><mo>⁢</mo><mi>A</mi></mrow><mo stretchy="false">→</mo><mi>B</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow><msub><mo>⊨</mo><mi>𝐒𝟒</mi></msub><mrow><mi mathvariant="normal">□</mi><mo>⁢</mo><mi>B</mi></mrow></mrow></math></p>
+</div>
+</li>
+</ol>
+</div>
+<div id="Sx1.p3" class="ltx_para ltx_noindent">
+<p class="ltx_p"><span class="ltx_text ltx_font_bold">C. </span>Present counter-interpretations to the following false claims:</p>
+<ol id="Sx1.I4" class="ltx_enumerate">
+<li id="Sx1.I4.i1" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">1.</span><div id="Sx1.I4.i1.p1" class="ltx_para">​<p class="ltx_p"><math id="Sx1.I4.i1.p1.m1" class="ltx_Math" alttext="\Box(M\rightarrow O),\Diamond M\vDash_{\mathbf{T}}O" display="inline"><mrow><mrow><mrow><mi mathvariant="normal">□</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mi>M</mi><mo stretchy="false">→</mo><mi>O</mi></mrow><mo stretchy="false">)</mo></mrow></mrow><mo>,</mo><mrow><mi mathvariant="normal">◇</mi><mo>⁢</mo><mi>M</mi></mrow></mrow><msub><mo>⊨</mo><mi>𝐓</mi></msub><mi>O</mi></mrow></math></p>
+</div>
+</li>
+<li id="Sx1.I4.i2" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">2.</span><div id="Sx1.I4.i2.p1" class="ltx_para">​<p class="ltx_p"><math id="Sx1.I4.i2.p1.m1" class="ltx_Math" alttext="\Box A\vDash_{\mathbf{T}}\Box\Box A" display="inline"><mrow><mrow><mi mathvariant="normal">□</mi><mo>⁢</mo><mi>A</mi></mrow><msub><mo>⊨</mo><mi>𝐓</mi></msub><mrow><mi mathvariant="normal">□</mi><mo>⁢</mo><mi mathvariant="normal">□</mi><mo>⁢</mo><mi>A</mi></mrow></mrow></math></p>
+</div>
+</li>
+</ol>
+</div>
+</div>
+</section>
+<section id="Sx2" class="ltx_section normal">
+<div class="section level2">
+<h2 class="ltx_title ltx_title_section">Further reading</h2>
+
+<div id="Sx2.p1" class="ltx_para">
+<p class="ltx_p">Modal logic is a large subfield of logic. We have only scratched the surface. If you want to learn more about modal logic, here are some textbooks you might consult.</p>
+</div>
+<div id="Sx2.p2" class="ltx_para">
+<ul id="Sx2.I5" class="ltx_itemize">
+<li id="Sx2.I5.i1" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">‣</span><div id="Sx2.I5.i1.p1" class="ltx_para">​<p class="ltx_p">George E. Hughes and Max J. Cresswell, <span class="ltx_text ltx_font_italic">A New Introduction
+to Modal Logic</span>, Oxford: Routledge, 1996.</p>
+</div>
+</li>
+<li id="Sx2.I5.i2" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">‣</span><div id="Sx2.I5.i2.p1" class="ltx_para">​<p class="ltx_p">Graham Priest, <span class="ltx_text ltx_font_italic">An Introduction to Non-Classical Logic</span>,
+2nd ed., Cambridge: Cambridge University Press, 2008.</p>
+</div>
+</li>
+<li id="Sx2.I5.i3" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">‣</span><div id="Sx2.I5.i3.p1" class="ltx_para">​<p class="ltx_p">James W. Garson, <span class="ltx_text ltx_font_italic">Modal Logic for Philosophers</span>, 2nd
+ed., Cambridge: Cambridge University Press, 2013.</p>
+</div>
+</li>
+</ul>
+</div>
+<div id="Sx2.p3" class="ltx_para">
+<p class="ltx_p">None of these authors formulate their modal proof systems in quite the way we did, but the closest formulation is given by Garson.</p>
+</div>
+</div>
+</section>
+</div>
+</section>
+</div>
+</div>
+</div>
+<a href="Ch43.html" class="navigation navigation-prev" aria-label="Previous page"><i class="fa fa-angle-left"></i></a><a href="Pt9.html" class="navigation navigation-next" aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+</div>
+</div>
+</body>
+
+</html>

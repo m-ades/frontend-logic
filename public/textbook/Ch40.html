@@ -1,0 +1,708 @@
+<!DOCTYPE html><html style="--bml-ltx-font-size:10;" class="bml_mathjax4" lang="en">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<title>Chapter 40 Derived rules ‣ Part VII Natural deduction for FOL ‣ forall x: Calgary</title>
+<!--Generated on Tue Jul 21 20:13:15 2026 by LaTeXML (version 0.8.8) http://dlmf.nist.gov/LaTeXML/.-->
+<!--Document created on Fall 2025 (2026‐07‐18 8642250).-->
+
+<link rel="stylesheet" href="LaTeXML.css" type="text/css">
+<link rel="stylesheet" href="ltx-book.css" type="text/css">
+<link rel="stylesheet" href="bookml/gitbook/css/style.css" type="text/css">
+<link rel="stylesheet" href="bookml/gitbook/css/plugin-table.css" type="text/css">
+<link rel="stylesheet" href="bookml/gitbook/css/plugin-search.css" type="text/css">
+<link rel="stylesheet" href="bookml/gitbook/css/plugin-bookdown.css" type="text/css">
+<link rel="stylesheet" href="bookml/gitbook/css/plugin-fontsettings.css" type="text/css">
+<link rel="stylesheet" href="bookml/CSS/style.css" type="text/css">
+<link rel="stylesheet" href="bookml/CSS/style.gitbook,plain.css" type="text/css">
+<link rel="stylesheet" href="bookml/CSS/style.gitbook.css" type="text/css">
+<link rel="stylesheet" href="bmluser/colors.gitbook-forallxyyc-html.css" type="text/css">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<link rel="stylesheet" href="forallxyyc.css" type="text/css">
+<link rel="stylesheet" href="fitchml.css" type="text/css">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script><script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6"></script>
+<link rel="up" href="Pt7.html" title="Part VII Natural deduction for FOL ‣ forall x: Calgary">
+<link rel="up up" href="index.html" title="forall x: Calgary">
+<link rel="start" href="index.html" title="forall x: Calgary">
+<link rel="prev" href="Ch39.html" title="Chapter 39 Rules for identity ‣ Part VII Natural deduction for FOL ‣ forall x: Calgary">
+<link rel="next" href="Ch41.html" title="Chapter 41 Proofs and semantics ‣ Part VII Natural deduction for FOL ‣ forall x: Calgary">
+<link rel="chapter" href="Ch36.html" title="Chapter 36 Basic rules for FOL ‣ Part VII Natural deduction for FOL ‣ forall x: Calgary">
+<link rel="chapter" href="Ch37.html" title="Chapter 37 Proofs with quantifiers ‣ Part VII Natural deduction for FOL ‣ forall x: Calgary">
+<link rel="chapter" href="Ch38.html" title="Chapter 38 Conversion of quantifiers ‣ Part VII Natural deduction for FOL ‣ forall x: Calgary">
+<link rel="chapter" href="Ch39.html" title="Chapter 39 Rules for identity ‣ Part VII Natural deduction for FOL ‣ forall x: Calgary">
+<link rel="chapter" href="Ch41.html" title="Chapter 41 Proofs and semantics ‣ Part VII Natural deduction for FOL ‣ forall x: Calgary">
+<link rel="chapter" href="Chx1.html" title="Preface ‣ forall x: Calgary">
+<link rel="part" href="Pt1.html" title="Part I Key notions of logic ‣ forall x: Calgary">
+<link rel="part" href="Pt2.html" title="Part II Truth-functional logic ‣ forall x: Calgary">
+<link rel="part" href="Pt3.html" title="Part III Truth tables ‣ forall x: Calgary">
+<link rel="part" href="Pt4.html" title="Part IV Natural deduction for TFL ‣ forall x: Calgary">
+<link rel="part" href="Pt5.html" title="Part V First-order logic ‣ forall x: Calgary">
+<link rel="part" href="Pt6.html" title="Part VI Interpretations ‣ forall x: Calgary">
+<link rel="part" href="Pt7.html" title="Part VII Natural deduction for FOL ‣ forall x: Calgary">
+<link rel="part" href="Pt8.html" title="Part VIII Modal logic ‣ forall x: Calgary">
+<link rel="part" href="Pt9.html" title="Part IX Metatheory ‣ forall x: Calgary">
+<link rel="part" href="Ptx1.html" title="Appendices ‣ forall x: Calgary">
+<link rel="part" href="Ptx2.html" title="Solutions to selected exercices ‣ forall x: Calgary">
+<script src="bookml/js/mathjax4.js" defer></script>
+</head>
+<body class="bml_class_book">
+<div class="book without-animation font-size-2 font-family-1" data-basepath=".">
+<a href="#bml-main-content" tabindex="0" class="bml-skip-to-content">Skip to content.</a>
+<div class="book-summary"><nav class="ltx_page_navbar">
+<ul class="ltx_toclist summary">
+<li>
+<a href="index.html" title="" class="ltx_ref" rel="start">forall x: Calgary</a>
+</li>
+<li class="divider" aria-hidden="true"></li>
+<li data-level="" data-path="Chx1.html" class="ltx_tocentry ltx_tocentry_chapter  chapter "><a href="Chx1.html" title="In forall x: Calgary" class="ltx_ref">Preface</a></li>
+<li data-level="I" data-path="Pt1.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt1.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">I </span></b>Key notions of logic</a></li>
+<li data-level="II" data-path="Pt2.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt2.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">II </span></b>Truth-functional logic</a></li>
+<li data-level="III" data-path="Pt3.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt3.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">III </span></b>Truth tables</a></li>
+<li data-level="IV" data-path="Pt4.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt4.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">IV </span></b>Natural deduction for TFL</a></li>
+<li data-level="V" data-path="Pt5.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt5.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">V </span></b>First-order logic</a></li>
+<li data-level="VI" data-path="Pt6.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt6.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">VI </span></b>Interpretations</a></li>
+<li data-level="VII" data-path="Pt7.html" class="ltx_tocentry ltx_tocentry_part  chapter ">
+<a href="Pt7.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">VII </span></b>Natural deduction for FOL</a>
+<ol class="ltx_toclist ltx_toclist_part">
+<li data-level="36" data-path="Ch36.html" class="ltx_tocentry ltx_tocentry_chapter  chapter "><a href="Ch36.html" title="In Part VII Natural deduction for FOL ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">36 </span></b>Basic rules for FOL</a></li>
+<li data-level="37" data-path="Ch37.html" class="ltx_tocentry ltx_tocentry_chapter  chapter "><a href="Ch37.html" title="In Part VII Natural deduction for FOL ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">37 </span></b>Proofs with quantifiers</a></li>
+<li data-level="38" data-path="Ch38.html" class="ltx_tocentry ltx_tocentry_chapter  chapter "><a href="Ch38.html" title="In Part VII Natural deduction for FOL ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">38 </span></b>Conversion of quantifiers</a></li>
+<li data-level="39" data-path="Ch39.html" class="ltx_tocentry ltx_tocentry_chapter  chapter "><a href="Ch39.html" title="In Part VII Natural deduction for FOL ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">39 </span></b>Rules for identity</a></li>
+<li data-level="40" data-path="" class="ltx_tocentry ltx_tocentry_chapter ltx_ref_self  chapter active">
+<a href="" title="In Part VII Natural deduction for FOL ‣ forall x: Calgary" aria-current="page" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">40 </span></b>Derived rules</a>
+<ol class="ltx_toclist ltx_toclist_chapter">
+<li data-level="" data-path="" class="ltx_tocentry ltx_tocentry_section  chapter "><a href="#Sx1" title="In Chapter 40 Derived rules ‣ Part VII Natural deduction for FOL ‣ forall x: Calgary" class="ltx_ref">Practice exercises</a></li>
+</ol>
+</li>
+<li data-level="41" data-path="Ch41.html" class="ltx_tocentry ltx_tocentry_chapter  chapter "><a href="Ch41.html" title="In Part VII Natural deduction for FOL ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">41 </span></b>Proofs and semantics</a></li>
+</ol>
+</li>
+<li data-level="VIII" data-path="Pt8.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt8.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">VIII </span></b>Modal logic</a></li>
+<li data-level="IX" data-path="Pt9.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt9.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">IX </span></b>Metatheory</a></li>
+<li data-level="" data-path="Ptx1.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Ptx1.html" title="In forall x: Calgary" class="ltx_ref">Appendices</a></li>
+<li data-level="" data-path="Ptx2.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Ptx2.html" title="In forall x: Calgary" class="ltx_ref">Solutions to selected exercices</a></li>
+</ul>
+</nav></div>
+
+<div class="ltx_page_main book-body fixed">
+<div class="body-inner">
+<header class="book-header fixed" aria-label="toolbar"><span class="bml-separator"></span></header>
+<div class="page-wrapper" tabindex="-1" role="main">
+<div class="ltx_page_content page-inner" id="bml-main-content">
+<script src="bookml/gitbook/js/app.min.js"></script>
+<script src="bookml/gitbook/js/jquery.highlight.js"></script>
+<script src="bookml/gitbook/js/plugin-search.js"></script>
+<script src="bookml/gitbook/js/plugin-fontsettings.js"></script>
+<script src="bookml/gitbook/js/plugin-bookdown.js"></script>
+<script type="text/javascript">
+                  gitbook.require(["gitbook"], function(gitbook) {
+                  gitbook.start({
+                    "fontsettings": {
+                      "theme": "white",
+                      "family": "sans",
+                      "size": 2
+                    },
+                    "download": [ [ "forallxyyc.pdf", "PDF" ], [ "forallxyyc-accessible.pdf", "PDF (accessible)" ], ],
+                    "search": {
+                      "engine": "fuse"
+                    },
+                    "toc": {
+                      "collapse": "none"
+                    }
+                  });
+                });
+              </script>
+
+<section class="ltx_chapter ltx_authors_1line normal" lang="en">
+<div class="section level1">
+<h1 class="ltx_title ltx_title_chapter">
+<span class="ltx_tag ltx_tag_chapter header-section-number">Chapter 40</span> Derived rules</h1>
+
+<div id="p1" class="ltx_para">
+<p class="ltx_p">As in the case of TFL, we first introduced some rules for FOL as basic (in <a href="Ch36.html" title="Chapter 36 Basic rules for FOL ‣ Part VII Natural deduction for FOL ‣ forall x: Calgary" class="ltx_ref"><span class="ltx_text ltx_ref_tag">chapter</span> <span class="ltx_text ltx_ref_tag">36</span></a>), and then added some further rules for conversion of quantifiers (in <a href="Ch38.html" title="Chapter 38 Conversion of quantifiers ‣ Part VII Natural deduction for FOL ‣ forall x: Calgary" class="ltx_ref"><span class="ltx_text ltx_ref_tag">chapter</span> <span class="ltx_text ltx_ref_tag">38</span></a>). In fact, the CQ rules should be regarded as <span class="ltx_text ltx_font_bold">derived</span> rules, for they can be derived from the <span class="ltx_text ltx_font_bold">basic</span> rules of <a href="Ch36.html" title="Chapter 36 Basic rules for FOL ‣ Part VII Natural deduction for FOL ‣ forall x: Calgary" class="ltx_ref"><span class="ltx_text ltx_ref_tag">chapter</span> <span class="ltx_text ltx_ref_tag">36</span></a>. (The point here is as in <a href="Ch21.html" title="Chapter 21 Derived rules ‣ Part IV Natural deduction for TFL ‣ forall x: Calgary" class="ltx_ref"><span class="ltx_text ltx_ref_tag">chapter</span> <span class="ltx_text ltx_ref_tag">21</span></a>.) Here is a justification for the first CQ rule:</p>
+</div>
+<div id="p2" class="ltx_para ltx_noindent">
+<table class="fitch">
+          
+          <thead class="fml-sr-only">
+            
+            <tr>
+              <th class="fml-pline">
+                
+                <div>
+                  
+<p class="ltx_p">Line number</p>
+                </div>
+              </th>
+              <th class="fml-subproof">
+                
+                <div>
+                  
+<p class="ltx_p">Subproof level</p>
+                </div>
+              </th>
+              <th class="fml-fmla">
+                
+                <div>
+                  
+<p class="ltx_p">Formula</p>
+                </div>
+              </th>
+              <th class="fml-just">
+                
+                <div>
+                  
+<p class="ltx_p">Justification</p>
+                </div>
+              </th>
+            </tr>
+          </thead>
+          <tr>
+            <th class="fml-pline">
+              
+              
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"><math id="p2.m1.m1" class="ltx_Math" alttext="m" display="inline"><mi>m</mi></math></span></p>
+            </th>
+            <td class="fml-subproof">
+              
+              <div>
+                <span>0</span>
+              </div>
+            </td>
+            <td class="fml-fmla">
+              
+              <div class="fml-scope-start">
+                
+              </div>
+              <div class="fml-fmla">
+                
+                <span><math id="p2.m2" class="ltx_Math" alttext="\forall x\,\neg A(x)" display="inline"><mrow><mo rspace="0.167em">∀</mo><mrow><mi>x</mi><mo lspace="0.337em">⁢</mo><mrow><mo rspace="0.167em">¬</mo><mrow><mi>A</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></mrow></math></span>
+              </div>
+            </td>
+            <td class="fml-just">
+              
+              <div class="fml-just">
+                
+                <span></span>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <th class="fml-pline">
+              
+              
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"><math id="p2.m3.m1" class="ltx_Math" alttext="m+1" display="inline"><mrow><mi>m</mi><mo>+</mo><mn>1</mn></mrow></math></span></p>
+            </th>
+            <td class="fml-subproof">
+              
+              <div>
+                <span>open subproof,
+1</span>
+              </div>
+            </td>
+            <td class="fml-fmla">
+              
+              <div class="fml-scope">
+                
+              </div>
+              <div class="fml-scope-start">
+                
+              </div>
+              <div class="fml-as">
+                
+                <span><math id="p2.m4" class="ltx_Math" alttext="\exists x\,A(x)" display="inline"><mrow><mo rspace="0.167em">∃</mo><mrow><mi>x</mi><mo lspace="0.170em">⁢</mo><mrow><mi>A</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></math></span>
+              </div>
+            </td>
+            <td class="fml-just">
+              
+              <div class="fml-just">
+                
+                <span><abbr title="Assumption">
+AS</abbr>
+</span>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <th class="fml-pline">
+              
+              
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"><math id="p2.m5.m1" class="ltx_Math" alttext="m+2" display="inline"><mrow><mi>m</mi><mo>+</mo><mn>2</mn></mrow></math></span></p>
+            </th>
+            <td class="fml-subproof">
+              
+              <div>
+                <span>open subproof,
+2</span>
+              </div>
+            </td>
+            <td class="fml-fmla">
+              
+              <div class="fml-scope">
+                
+              </div>
+              <div class="fml-scope">
+                
+              </div>
+              <div class="fml-scope-start">
+                
+              </div>
+              <div class="fml-as">
+                
+                <span><math id="p2.m6" class="ltx_Math" alttext="A(c)" display="inline"><mrow><mi>A</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>c</mi><mo stretchy="false">)</mo></mrow></mrow></math></span>
+              </div>
+            </td>
+            <td class="fml-just">
+              
+              <div class="fml-just">
+                
+                <span><abbr title="Assumption">
+AS</abbr>
+</span>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <th class="fml-pline">
+              
+              
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"><math id="p2.m7.m1" class="ltx_Math" alttext="m+3" display="inline"><mrow><mi>m</mi><mo>+</mo><mn>3</mn></mrow></math></span></p>
+            </th>
+            <td class="fml-subproof">
+              
+              <div>
+                <span>2</span>
+              </div>
+            </td>
+            <td class="fml-fmla">
+              
+              <div class="fml-scope">
+                
+              </div>
+              <div class="fml-scope">
+                
+              </div>
+              <div class="fml-scope">
+                
+              </div>
+              <div class="fml-fmla">
+                
+                <span><math id="p2.m8" class="ltx_Math" alttext="\neg A(c)" display="inline"><mrow><mo rspace="0.167em">¬</mo><mrow><mi>A</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>c</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math></span>
+              </div>
+            </td>
+            <td class="fml-just">
+              
+              <div class="fml-just">
+                
+                <span><math id="p2.m9" class="ltx_Math" alttext="\forall" display="inline"><mo>∀</mo></math>E <math id="p2.m10" class="ltx_Math" alttext="m" display="inline"><mi>m</mi></math></span>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <th class="fml-pline">
+              
+              
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"><math id="p2.m11.m1" class="ltx_Math" alttext="m+4" display="inline"><mrow><mi>m</mi><mo>+</mo><mn>4</mn></mrow></math></span></p>
+            </th>
+            <td class="fml-subproof">
+              
+              <div>
+                <span>2</span>
+              </div>
+            </td>
+            <td class="fml-fmla">
+              
+              <div class="fml-scope">
+                
+              </div>
+              <div class="fml-scope">
+                
+              </div>
+              <div class="fml-scope">
+                
+              </div>
+              <div class="fml-fmla">
+                
+                <span><math id="p2.m12" class="ltx_Math" alttext="\bot" display="inline"><mo>⊥</mo></math></span>
+              </div>
+            </td>
+            <td class="fml-just">
+              
+              <div class="fml-just">
+                
+                <span><math id="p2.m13" class="ltx_Math" alttext="\neg" display="inline"><mo>¬</mo></math>E <math id="p2.m14" class="ltx_Math" alttext="m+3" display="inline"><mrow><mi>m</mi><mo>+</mo><mn>3</mn></mrow></math>, <math id="p2.m15" class="ltx_Math" alttext="m+2" display="inline"><mrow><mi>m</mi><mo>+</mo><mn>2</mn></mrow></math></span>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <th class="fml-pline">
+              
+              
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"><math id="p2.m16.m1" class="ltx_Math" alttext="m+5" display="inline"><mrow><mi>m</mi><mo>+</mo><mn>5</mn></mrow></math></span></p>
+            </th>
+            <td class="fml-subproof">
+              
+              <div>
+                <span>close subproof,
+1</span>
+              </div>
+            </td>
+            <td class="fml-fmla">
+              
+              <div class="fml-scope">
+                
+              </div>
+              <div class="fml-scope">
+                
+              </div>
+              <div class="fml-fmla">
+                
+                <span><math id="p2.m17" class="ltx_Math" alttext="\bot" display="inline"><mo>⊥</mo></math></span>
+              </div>
+            </td>
+            <td class="fml-just">
+              
+              <div class="fml-just">
+                
+                <span><math id="p2.m18" class="ltx_Math" alttext="\exists" display="inline"><mo>∃</mo></math>E <math id="p2.m19" class="ltx_Math" alttext="m+1" display="inline"><mrow><mi>m</mi><mo>+</mo><mn>1</mn></mrow></math>, (<math id="p2.m21" class="ltx_Math" alttext="m+2" display="inline"><mrow><mi>m</mi><mo>+</mo><mn>2</mn></mrow></math>)–(<math id="p2.m24" class="ltx_Math" alttext="m+4" display="inline"><mrow><mi>m</mi><mo>+</mo><mn>4</mn></mrow></math>)</span>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <th class="fml-pline">
+              
+              
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"><math id="p2.m26.m1" class="ltx_Math" alttext="m+6" display="inline"><mrow><mi>m</mi><mo>+</mo><mn>6</mn></mrow></math></span></p>
+            </th>
+            <td class="fml-subproof">
+              
+              <div>
+                <span>close subproof,
+0</span>
+              </div>
+            </td>
+            <td class="fml-fmla">
+              
+              <div class="fml-scope">
+                
+              </div>
+              <div class="fml-fmla">
+                
+                <span><math id="p2.m27" class="ltx_Math" alttext="\neg\exists x\,A(x)" display="inline"><mrow><mo rspace="0.167em">¬</mo><mrow><mo rspace="0.167em">∃</mo><mrow><mi>x</mi><mo lspace="0.170em">⁢</mo><mrow><mi>A</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></mrow></math></span>
+              </div>
+            </td>
+            <td class="fml-just">
+              
+              <div class="fml-just">
+                
+                <span><math id="p2.m28" class="ltx_Math" alttext="\neg" display="inline"><mo>¬</mo></math>I (<math id="p2.m30" class="ltx_Math" alttext="m+1" display="inline"><mrow><mi>m</mi><mo>+</mo><mn>1</mn></mrow></math>)–(<math id="p2.m33" class="ltx_Math" alttext="m+5" display="inline"><mrow><mi>m</mi><mo>+</mo><mn>5</mn></mrow></math>)</span>
+              </div>
+            </td>
+          </tr>
+        </table>
+</div>
+<div id="p3" class="ltx_para ltx_noindent">
+<p class="ltx_p">Here is a justification of the third CQ rule:</p>
+</div>
+<div id="p4" class="ltx_para ltx_noindent">
+<table class="fitch">
+          
+          <thead class="fml-sr-only">
+            
+            <tr>
+              <th class="fml-pline">
+                
+                <div>
+                  
+<p class="ltx_p">Line number</p>
+                </div>
+              </th>
+              <th class="fml-subproof">
+                
+                <div>
+                  
+<p class="ltx_p">Subproof level</p>
+                </div>
+              </th>
+              <th class="fml-fmla">
+                
+                <div>
+                  
+<p class="ltx_p">Formula</p>
+                </div>
+              </th>
+              <th class="fml-just">
+                
+                <div>
+                  
+<p class="ltx_p">Justification</p>
+                </div>
+              </th>
+            </tr>
+          </thead>
+          <tr>
+            <th class="fml-pline">
+              
+              
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"><math id="p4.m1.m1" class="ltx_Math" alttext="m" display="inline"><mi>m</mi></math></span></p>
+            </th>
+            <td class="fml-subproof">
+              
+              <div>
+                <span>0</span>
+              </div>
+            </td>
+            <td class="fml-fmla">
+              
+              <div class="fml-scope-start">
+                
+              </div>
+              <div class="fml-fmla">
+                
+                <span><math id="p4.m2" class="ltx_Math" alttext="\exists x\,\neg A(x)" display="inline"><mrow><mo rspace="0.167em">∃</mo><mrow><mi>x</mi><mo lspace="0.337em">⁢</mo><mrow><mo rspace="0.167em">¬</mo><mrow><mi>A</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></mrow></math></span>
+              </div>
+            </td>
+            <td class="fml-just">
+              
+              <div class="fml-just">
+                
+                <span></span>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <th class="fml-pline">
+              
+              
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"><math id="p4.m3.m1" class="ltx_Math" alttext="m+1" display="inline"><mrow><mi>m</mi><mo>+</mo><mn>1</mn></mrow></math></span></p>
+            </th>
+            <td class="fml-subproof">
+              
+              <div>
+                <span>open subproof,
+1</span>
+              </div>
+            </td>
+            <td class="fml-fmla">
+              
+              <div class="fml-scope">
+                
+              </div>
+              <div class="fml-scope-start">
+                
+              </div>
+              <div class="fml-as">
+                
+                <span><math id="p4.m4" class="ltx_Math" alttext="\forall x\,A(x)" display="inline"><mrow><mo rspace="0.167em">∀</mo><mrow><mi>x</mi><mo lspace="0.170em">⁢</mo><mrow><mi>A</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></math></span>
+              </div>
+            </td>
+            <td class="fml-just">
+              
+              <div class="fml-just">
+                
+                <span><abbr title="Assumption">
+AS</abbr>
+</span>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <th class="fml-pline">
+              
+              
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"><math id="p4.m5.m1" class="ltx_Math" alttext="m+2" display="inline"><mrow><mi>m</mi><mo>+</mo><mn>2</mn></mrow></math></span></p>
+            </th>
+            <td class="fml-subproof">
+              
+              <div>
+                <span>open subproof,
+2</span>
+              </div>
+            </td>
+            <td class="fml-fmla">
+              
+              <div class="fml-scope">
+                
+              </div>
+              <div class="fml-scope">
+                
+              </div>
+              <div class="fml-scope-start">
+                
+              </div>
+              <div class="fml-as">
+                
+                <span><math id="p4.m6" class="ltx_Math" alttext="\neg A(c)" display="inline"><mrow><mo rspace="0.167em">¬</mo><mrow><mi>A</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>c</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math></span>
+              </div>
+            </td>
+            <td class="fml-just">
+              
+              <div class="fml-just">
+                
+                <span><abbr title="Assumption">
+AS</abbr>
+</span>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <th class="fml-pline">
+              
+              
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"><math id="p4.m7.m1" class="ltx_Math" alttext="m+3" display="inline"><mrow><mi>m</mi><mo>+</mo><mn>3</mn></mrow></math></span></p>
+            </th>
+            <td class="fml-subproof">
+              
+              <div>
+                <span>2</span>
+              </div>
+            </td>
+            <td class="fml-fmla">
+              
+              <div class="fml-scope">
+                
+              </div>
+              <div class="fml-scope">
+                
+              </div>
+              <div class="fml-scope">
+                
+              </div>
+              <div class="fml-fmla">
+                
+                <span><math id="p4.m8" class="ltx_Math" alttext="A(c)" display="inline"><mrow><mi>A</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>c</mi><mo stretchy="false">)</mo></mrow></mrow></math></span>
+              </div>
+            </td>
+            <td class="fml-just">
+              
+              <div class="fml-just">
+                
+                <span><math id="p4.m9" class="ltx_Math" alttext="\forall" display="inline"><mo>∀</mo></math>E <math id="p4.m10" class="ltx_Math" alttext="m+1" display="inline"><mrow><mi>m</mi><mo>+</mo><mn>1</mn></mrow></math></span>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <th class="fml-pline">
+              
+              
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"><math id="p4.m11.m1" class="ltx_Math" alttext="m+4" display="inline"><mrow><mi>m</mi><mo>+</mo><mn>4</mn></mrow></math></span></p>
+            </th>
+            <td class="fml-subproof">
+              
+              <div>
+                <span>2</span>
+              </div>
+            </td>
+            <td class="fml-fmla">
+              
+              <div class="fml-scope">
+                
+              </div>
+              <div class="fml-scope">
+                
+              </div>
+              <div class="fml-scope">
+                
+              </div>
+              <div class="fml-fmla">
+                
+                <span><math id="p4.m12" class="ltx_Math" alttext="\bot" display="inline"><mo>⊥</mo></math></span>
+              </div>
+            </td>
+            <td class="fml-just">
+              
+              <div class="fml-just">
+                
+                <span><math id="p4.m13" class="ltx_Math" alttext="\neg" display="inline"><mo>¬</mo></math>E <math id="p4.m14" class="ltx_Math" alttext="m+2" display="inline"><mrow><mi>m</mi><mo>+</mo><mn>2</mn></mrow></math>, <math id="p4.m15" class="ltx_Math" alttext="m+3" display="inline"><mrow><mi>m</mi><mo>+</mo><mn>3</mn></mrow></math></span>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <th class="fml-pline">
+              
+              
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"><math id="p4.m16.m1" class="ltx_Math" alttext="m+5" display="inline"><mrow><mi>m</mi><mo>+</mo><mn>5</mn></mrow></math></span></p>
+            </th>
+            <td class="fml-subproof">
+              
+              <div>
+                <span>close subproof,
+1</span>
+              </div>
+            </td>
+            <td class="fml-fmla">
+              
+              <div class="fml-scope">
+                
+              </div>
+              <div class="fml-scope">
+                
+              </div>
+              <div class="fml-fmla">
+                
+                <span><math id="p4.m17" class="ltx_Math" alttext="\bot" display="inline"><mo>⊥</mo></math></span>
+              </div>
+            </td>
+            <td class="fml-just">
+              
+              <div class="fml-just">
+                
+                <span><math id="p4.m18" class="ltx_Math" alttext="\exists" display="inline"><mo>∃</mo></math>E <math id="p4.m19" class="ltx_Math" alttext="m" display="inline"><mi>m</mi></math>, (<math id="p4.m21" class="ltx_Math" alttext="m+2" display="inline"><mrow><mi>m</mi><mo>+</mo><mn>2</mn></mrow></math>)–(<math id="p4.m24" class="ltx_Math" alttext="m+4" display="inline"><mrow><mi>m</mi><mo>+</mo><mn>4</mn></mrow></math>)</span>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <th class="fml-pline">
+              
+              
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"><math id="p4.m26.m1" class="ltx_Math" alttext="m+6" display="inline"><mrow><mi>m</mi><mo>+</mo><mn>6</mn></mrow></math></span></p>
+            </th>
+            <td class="fml-subproof">
+              
+              <div>
+                <span>close subproof,
+0</span>
+              </div>
+            </td>
+            <td class="fml-fmla">
+              
+              <div class="fml-scope">
+                
+              </div>
+              <div class="fml-fmla">
+                
+                <span><math id="p4.m27" class="ltx_Math" alttext="\neg\forall x\,A(x)" display="inline"><mrow><mo rspace="0.167em">¬</mo><mrow><mo rspace="0.167em">∀</mo><mrow><mi>x</mi><mo lspace="0.170em">⁢</mo><mrow><mi>A</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></mrow></math></span>
+              </div>
+            </td>
+            <td class="fml-just">
+              
+              <div class="fml-just">
+                
+                <span><math id="p4.m28" class="ltx_Math" alttext="\neg" display="inline"><mo>¬</mo></math>I (<math id="p4.m30" class="ltx_Math" alttext="m+1" display="inline"><mrow><mi>m</mi><mo>+</mo><mn>1</mn></mrow></math>)–(<math id="p4.m33" class="ltx_Math" alttext="m+5" display="inline"><mrow><mi>m</mi><mo>+</mo><mn>5</mn></mrow></math>)</span>
+              </div>
+            </td>
+          </tr>
+        </table>
+</div>
+<div id="p5" class="ltx_para ltx_noindent">
+<p class="ltx_p">This explains why the CQ rules can be treated as derived. Similar justifications can be offered for the other two CQ rules.</p>
+</div>
+<section id="Sx1" class="ltx_section normal">
+<div class="section level2">
+<h2 class="ltx_title ltx_title_section">Practice exercises</h2>
+
+<div id="Sx1.p1" class="ltx_para ltx_noindent">
+<p class="ltx_p"><span class="ltx_text ltx_font_bold">A. </span>Offer proofs which justify the addition of the second and fourth CQ rules as derived rules.</p>
+</div>
+</div>
+</section>
+</div>
+</section>
+</div>
+</div>
+</div>
+<a href="Ch39.html" class="navigation navigation-prev" aria-label="Previous page"><i class="fa fa-angle-left"></i></a><a href="Ch41.html" class="navigation navigation-next" aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+</div>
+</div>
+</body>
+
+</html>

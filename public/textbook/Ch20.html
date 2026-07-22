@@ -1,0 +1,528 @@
+<!DOCTYPE html><html style="--bml-ltx-font-size:10;" class="bml_mathjax4" lang="en">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<title>Chapter 20 Proof-theoretic concepts ‣ Part IV Natural deduction for TFL ‣ forall x: Calgary</title>
+<!--Generated on Tue Jul 21 20:13:15 2026 by LaTeXML (version 0.8.8) http://dlmf.nist.gov/LaTeXML/.-->
+<!--Document created on Fall 2025 (2026‐07‐18 8642250).-->
+
+<link rel="stylesheet" href="LaTeXML.css" type="text/css">
+<link rel="stylesheet" href="ltx-book.css" type="text/css">
+<link rel="stylesheet" href="bookml/gitbook/css/style.css" type="text/css">
+<link rel="stylesheet" href="bookml/gitbook/css/plugin-table.css" type="text/css">
+<link rel="stylesheet" href="bookml/gitbook/css/plugin-search.css" type="text/css">
+<link rel="stylesheet" href="bookml/gitbook/css/plugin-bookdown.css" type="text/css">
+<link rel="stylesheet" href="bookml/gitbook/css/plugin-fontsettings.css" type="text/css">
+<link rel="stylesheet" href="bookml/CSS/style.css" type="text/css">
+<link rel="stylesheet" href="bookml/CSS/style.gitbook,plain.css" type="text/css">
+<link rel="stylesheet" href="bookml/CSS/style.gitbook.css" type="text/css">
+<link rel="stylesheet" href="bmluser/colors.gitbook-forallxyyc-html.css" type="text/css">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<link rel="stylesheet" href="forallxyyc.css" type="text/css">
+<link rel="stylesheet" href="fitchml.css" type="text/css">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script><script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6"></script>
+<link rel="up" href="Pt4.html" title="Part IV Natural deduction for TFL ‣ forall x: Calgary">
+<link rel="up up" href="index.html" title="forall x: Calgary">
+<link rel="start" href="index.html" title="forall x: Calgary">
+<link rel="prev" href="Ch19.html" title="Chapter 19 Additional rules for TFL ‣ Part IV Natural deduction for TFL ‣ forall x: Calgary">
+<link rel="next" href="Ch21.html" title="Chapter 21 Derived rules ‣ Part IV Natural deduction for TFL ‣ forall x: Calgary">
+<link rel="chapter" href="Ch16.html" title="Chapter 16 The very idea of natural deduction ‣ Part IV Natural deduction for TFL ‣ forall x: Calgary">
+<link rel="chapter" href="Ch17.html" title="Chapter 17 Basic rules for TFL ‣ Part IV Natural deduction for TFL ‣ forall x: Calgary">
+<link rel="chapter" href="Ch18.html" title="Chapter 18 Constructing proofs ‣ Part IV Natural deduction for TFL ‣ forall x: Calgary">
+<link rel="chapter" href="Ch19.html" title="Chapter 19 Additional rules for TFL ‣ Part IV Natural deduction for TFL ‣ forall x: Calgary">
+<link rel="chapter" href="Ch21.html" title="Chapter 21 Derived rules ‣ Part IV Natural deduction for TFL ‣ forall x: Calgary">
+<link rel="chapter" href="Ch22.html" title="Chapter 22 Soundness and completeness ‣ Part IV Natural deduction for TFL ‣ forall x: Calgary">
+<link rel="chapter" href="Chx1.html" title="Preface ‣ forall x: Calgary">
+<link rel="part" href="Pt1.html" title="Part I Key notions of logic ‣ forall x: Calgary">
+<link rel="part" href="Pt2.html" title="Part II Truth-functional logic ‣ forall x: Calgary">
+<link rel="part" href="Pt3.html" title="Part III Truth tables ‣ forall x: Calgary">
+<link rel="part" href="Pt4.html" title="Part IV Natural deduction for TFL ‣ forall x: Calgary">
+<link rel="part" href="Pt5.html" title="Part V First-order logic ‣ forall x: Calgary">
+<link rel="part" href="Pt6.html" title="Part VI Interpretations ‣ forall x: Calgary">
+<link rel="part" href="Pt7.html" title="Part VII Natural deduction for FOL ‣ forall x: Calgary">
+<link rel="part" href="Pt8.html" title="Part VIII Modal logic ‣ forall x: Calgary">
+<link rel="part" href="Pt9.html" title="Part IX Metatheory ‣ forall x: Calgary">
+<link rel="part" href="Ptx1.html" title="Appendices ‣ forall x: Calgary">
+<link rel="part" href="Ptx2.html" title="Solutions to selected exercices ‣ forall x: Calgary">
+<script src="bookml/js/mathjax4.js" defer></script>
+</head>
+<body class="bml_class_book">
+<div class="book without-animation font-size-2 font-family-1" data-basepath=".">
+<a href="#bml-main-content" tabindex="0" class="bml-skip-to-content">Skip to content.</a>
+<div class="book-summary"><nav class="ltx_page_navbar">
+<ul class="ltx_toclist summary">
+<li>
+<a href="index.html" title="" class="ltx_ref" rel="start">forall x: Calgary</a>
+</li>
+<li class="divider" aria-hidden="true"></li>
+<li data-level="" data-path="Chx1.html" class="ltx_tocentry ltx_tocentry_chapter  chapter "><a href="Chx1.html" title="In forall x: Calgary" class="ltx_ref">Preface</a></li>
+<li data-level="I" data-path="Pt1.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt1.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">I </span></b>Key notions of logic</a></li>
+<li data-level="II" data-path="Pt2.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt2.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">II </span></b>Truth-functional logic</a></li>
+<li data-level="III" data-path="Pt3.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt3.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">III </span></b>Truth tables</a></li>
+<li data-level="IV" data-path="Pt4.html" class="ltx_tocentry ltx_tocentry_part  chapter ">
+<a href="Pt4.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">IV </span></b>Natural deduction for TFL</a>
+<ol class="ltx_toclist ltx_toclist_part">
+<li data-level="16" data-path="Ch16.html" class="ltx_tocentry ltx_tocentry_chapter  chapter "><a href="Ch16.html" title="In Part IV Natural deduction for TFL ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">16 </span></b>The very idea of natural deduction</a></li>
+<li data-level="17" data-path="Ch17.html" class="ltx_tocentry ltx_tocentry_chapter  chapter "><a href="Ch17.html" title="In Part IV Natural deduction for TFL ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">17 </span></b>Basic rules for TFL</a></li>
+<li data-level="18" data-path="Ch18.html" class="ltx_tocentry ltx_tocentry_chapter  chapter "><a href="Ch18.html" title="In Part IV Natural deduction for TFL ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">18 </span></b>Constructing proofs</a></li>
+<li data-level="19" data-path="Ch19.html" class="ltx_tocentry ltx_tocentry_chapter  chapter "><a href="Ch19.html" title="In Part IV Natural deduction for TFL ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">19 </span></b>Additional rules for TFL</a></li>
+<li data-level="20" data-path="" class="ltx_tocentry ltx_tocentry_chapter ltx_ref_self  chapter active">
+<a href="" title="In Part IV Natural deduction for TFL ‣ forall x: Calgary" aria-current="page" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">20 </span></b>Proof-theoretic concepts</a>
+<ol class="ltx_toclist ltx_toclist_chapter">
+<li data-level="" data-path="" class="ltx_tocentry ltx_tocentry_section  chapter "><a href="#Sx1" title="In Chapter 20 Proof-theoretic concepts ‣ Part IV Natural deduction for TFL ‣ forall x: Calgary" class="ltx_ref">Practice exercises</a></li>
+</ol>
+</li>
+<li data-level="21" data-path="Ch21.html" class="ltx_tocentry ltx_tocentry_chapter  chapter "><a href="Ch21.html" title="In Part IV Natural deduction for TFL ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">21 </span></b>Derived rules</a></li>
+<li data-level="22" data-path="Ch22.html" class="ltx_tocentry ltx_tocentry_chapter  chapter "><a href="Ch22.html" title="In Part IV Natural deduction for TFL ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">22 </span></b>Soundness and completeness</a></li>
+</ol>
+</li>
+<li data-level="V" data-path="Pt5.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt5.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">V </span></b>First-order logic</a></li>
+<li data-level="VI" data-path="Pt6.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt6.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">VI </span></b>Interpretations</a></li>
+<li data-level="VII" data-path="Pt7.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt7.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">VII </span></b>Natural deduction for FOL</a></li>
+<li data-level="VIII" data-path="Pt8.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt8.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">VIII </span></b>Modal logic</a></li>
+<li data-level="IX" data-path="Pt9.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt9.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">IX </span></b>Metatheory</a></li>
+<li data-level="" data-path="Ptx1.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Ptx1.html" title="In forall x: Calgary" class="ltx_ref">Appendices</a></li>
+<li data-level="" data-path="Ptx2.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Ptx2.html" title="In forall x: Calgary" class="ltx_ref">Solutions to selected exercices</a></li>
+</ul>
+</nav></div>
+
+<div class="ltx_page_main book-body fixed">
+<div class="body-inner">
+<header class="book-header fixed" aria-label="toolbar"><span class="bml-separator"></span></header>
+<div class="page-wrapper" tabindex="-1" role="main">
+<div class="ltx_page_content page-inner" id="bml-main-content">
+<script src="bookml/gitbook/js/app.min.js"></script>
+<script src="bookml/gitbook/js/jquery.highlight.js"></script>
+<script src="bookml/gitbook/js/plugin-search.js"></script>
+<script src="bookml/gitbook/js/plugin-fontsettings.js"></script>
+<script src="bookml/gitbook/js/plugin-bookdown.js"></script>
+<script type="text/javascript">
+                  gitbook.require(["gitbook"], function(gitbook) {
+                  gitbook.start({
+                    "fontsettings": {
+                      "theme": "white",
+                      "family": "sans",
+                      "size": 2
+                    },
+                    "download": [ [ "forallxyyc.pdf", "PDF" ], [ "forallxyyc-accessible.pdf", "PDF (accessible)" ], ],
+                    "search": {
+                      "engine": "fuse"
+                    },
+                    "toc": {
+                      "collapse": "none"
+                    }
+                  });
+                });
+              </script>
+
+<section class="ltx_chapter ltx_authors_1line normal" lang="en">
+<div class="section level1">
+<h1 class="ltx_title ltx_title_chapter">
+<span class="ltx_tag ltx_tag_chapter header-section-number">Chapter 20</span> Proof-theoretic concepts</h1>
+
+<div id="p1" class="ltx_para">
+<p class="ltx_p">In this chapter we will introduce some new vocabulary. The following expression:</p>
+<div id="Ex1" class="ltx_equation bml_equation bml_equation_container ltx_align_baseline">
+<div class="ltx_Math bml_eqn_cell ltx_align_center"><math id="Ex1.m1" class="ltx_Math" alttext="\mathscr{A}_{1},\mathscr{A}_{2},\ldots,\mathscr{A}_{n}\vdash\mathscr{C}" display="block"><mrow><mrow><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mn>1</mn></msub><mo>,</mo><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mn>2</mn></msub><mo>,</mo><mi mathvariant="normal">…</mi><mo>,</mo><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mi>n</mi></msub></mrow><mo>⊢</mo><mi class="ltx_font_mathscript">𝒞︁</mi></mrow></math></div>
+</div>
+<p class="ltx_p">means that there is some proof which ends with <math id="p1.m1" class="ltx_Math" alttext="\mathscr{C}" display="inline"><mi class="ltx_font_mathscript">𝒞︁</mi></math> whose undischarged assumptions are among <math id="p1.m2" class="ltx_Math" alttext="\mathscr{A}_{1},\mathscr{A}_{2},\ldots,\mathscr{A}_{n}" display="inline"><mrow><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mn>1</mn></msub><mo>,</mo><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mn>2</mn></msub><mo>,</mo><mi mathvariant="normal">…</mi><mo>,</mo><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mi>n</mi></msub></mrow></math>. When we want to say that it is <span class="ltx_text ltx_font_bold">not</span> the case that there is some proof which ends with <math id="p1.m3" class="ltx_Math" alttext="\mathscr{C}" display="inline"><mi class="ltx_font_mathscript">𝒞︁</mi></math> from <math id="p1.m4" class="ltx_Math" alttext="\mathscr{A}_{1}" display="inline"><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mn>1</mn></msub></math>, <math id="p1.m5" class="ltx_Math" alttext="\mathscr{A}_{2}" display="inline"><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mn>2</mn></msub></math>, …, <math id="p1.m6" class="ltx_Math" alttext="\mathscr{A}_{n}" display="inline"><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mi>n</mi></msub></math>, we write:</p>
+<div id="Ex2" class="ltx_equation bml_equation bml_equation_container ltx_align_baseline">
+<div class="ltx_Math bml_eqn_cell ltx_align_center"><math id="Ex2.m1" class="ltx_Math" alttext="\mathscr{A}_{1},\mathscr{A}_{2},\ldots,\mathscr{A}_{n}\nvdash\mathscr{C}" display="block"><mrow><mrow><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mn>1</mn></msub><mo>,</mo><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mn>2</mn></msub><mo>,</mo><mi mathvariant="normal">…</mi><mo>,</mo><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mi>n</mi></msub></mrow><mo>⊬</mo><mi class="ltx_font_mathscript">𝒞︁</mi></mrow></math></div>
+</div>
+</div>
+<div id="p2" class="ltx_para">
+<p class="ltx_p">The symbol ‘<math id="p2.m1" class="ltx_Math" alttext="\vdash" display="inline"><mo>⊢</mo></math>’ is called the <span class="ltx_text ltx_font_bold">single turnstile</span>. We want to emphasize that this is not the double turnstile symbol (‘<math id="p2.m2" class="ltx_Math" alttext="\vDash" display="inline"><mo>⊨</mo></math>’) that we introduced in <a href="Ch12.html" title="Chapter 12 Semantic concepts ‣ Part III Truth tables ‣ forall x: Calgary" class="ltx_ref"><span class="ltx_text ltx_ref_tag">chapter</span> <span class="ltx_text ltx_ref_tag">12</span></a> to symbolize entailment. The single turnstile, ‘<math id="p2.m3" class="ltx_Math" alttext="\vdash" display="inline"><mo>⊢</mo></math>’, concerns the existence of proofs; the double turnstile, ‘<math id="p2.m4" class="ltx_Math" alttext="\vDash" display="inline"><mo>⊨</mo></math>’, concerns the existence of valuations (or interpretations, when used for FOL). <span class="ltx_text ltx_font_bold">They are very different notions.</span></p>
+</div>
+<div id="p3" class="ltx_para">
+<p class="ltx_p">Armed with our ‘<math id="p3.m1" class="ltx_Math" alttext="\vdash" display="inline"><mo>⊢</mo></math>’ symbol, we can introduce some more terminology. To say that there is a proof of <math id="p3.m2" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math> with no undischarged assumptions, we write: <math id="p3.m3" class="ltx_Math" alttext="{}\vdash\mathscr{A}" display="inline"><mrow><mi></mi><mo>⊢</mo><mi class="ltx_font_mathscript">𝒜︁</mi></mrow></math>. In this case, we say that <math id="p3.m4" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math> is a <dfn>theorem</dfn>
+.</p>
+<div class="ltx_logical-block bml_background-color_FDF4FA bml_background-color_FDF4FA" style="padding:9pt;">
+          
+<div id="p3.p1" class="ltx_para ltx_noindent">
+<p class="ltx_p"><math id="p3.p1.m1" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math> is a <dfn>theorem</dfn>
+ if⁠f <math id="p3.p1.m2" class="ltx_Math" alttext="\vdash\mathscr{A}" display="inline"><mrow><mi></mi><mo>⊢</mo><mi class="ltx_font_mathscript">𝒜︁</mi></mrow></math></p>
+</div>
+        
+</div>
+</div>
+<div id="p4" class="ltx_para">
+<p class="ltx_p">To illustrate this, suppose we want to show that ‘<math id="p4.m1" class="ltx_Math" alttext="\neg(A\wedge\neg A)" display="inline"><mrow><mo>¬</mo><mrow><mo stretchy="false">(</mo><mrow><mi>A</mi><mo>∧</mo><mrow><mo rspace="0.167em">¬</mo><mi>A</mi></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></math>’ is a theorem. So we need a proof of ‘<math id="p4.m2" class="ltx_Math" alttext="\neg(A\wedge\neg A)" display="inline"><mrow><mo>¬</mo><mrow><mo stretchy="false">(</mo><mrow><mi>A</mi><mo>∧</mo><mrow><mo rspace="0.167em">¬</mo><mi>A</mi></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></math>’ which has <span class="ltx_text ltx_font_bold">no</span> undischarged assumptions. However, since we want to prove a sentence whose main logical operator is a negation, we will want to start with a <span class="ltx_text ltx_font_bold">subproof</span> within which we assume ‘<math id="p4.m3" class="ltx_Math" alttext="A\wedge\neg A" display="inline"><mrow><mi>A</mi><mo>∧</mo><mrow><mo rspace="0.167em">¬</mo><mi>A</mi></mrow></mrow></math>’, and show that this assumption leads to contradiction. All told, then, the proof looks like this:</p>
+</div>
+<div id="p5" class="ltx_para ltx_noindent">
+<table class="fitch">
+          
+          <thead class="fml-sr-only">
+            
+            <tr>
+              <th class="fml-pline">
+                
+                <div>
+                  
+<p class="ltx_p">Line number</p>
+                </div>
+              </th>
+              <th class="fml-subproof">
+                
+                <div>
+                  
+<p class="ltx_p">Subproof level</p>
+                </div>
+              </th>
+              <th class="fml-fmla">
+                
+                <div>
+                  
+<p class="ltx_p">Formula</p>
+                </div>
+              </th>
+              <th class="fml-just">
+                
+                <div>
+                  
+<p class="ltx_p">Justification</p>
+                </div>
+              </th>
+            </tr>
+          </thead>
+          <tr>
+            <th class="fml-pline">
+              
+              
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"><math id="p5.m1.m1" class="ltx_Math" alttext="1" display="inline"><mn>1</mn></math></span></p>
+            </th>
+            <td class="fml-subproof">
+              
+              <div>
+                <span>open subproof,
+1</span>
+              </div>
+            </td>
+            <td class="fml-fmla">
+              
+              <div class="fml-scope-start">
+                
+              </div>
+              <div class="fml-scope-start">
+                
+              </div>
+              <div class="fml-as">
+                
+                <span><math id="p5.m2" class="ltx_Math" alttext="A\wedge\neg A" display="inline"><mrow><mi>A</mi><mo>∧</mo><mrow><mo rspace="0.167em">¬</mo><mi>A</mi></mrow></mrow></math></span>
+              </div>
+            </td>
+            <td class="fml-just">
+              
+              <div class="fml-just">
+                
+                <span><abbr title="Assumption">
+AS</abbr>
+</span>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <th class="fml-pline">
+              
+              
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"><math id="p5.m3.m1" class="ltx_Math" alttext="2" display="inline"><mn>2</mn></math></span></p>
+            </th>
+            <td class="fml-subproof">
+              
+              <div>
+                <span>1</span>
+              </div>
+            </td>
+            <td class="fml-fmla">
+              
+              <div class="fml-scope">
+                
+              </div>
+              <div class="fml-scope">
+                
+              </div>
+              <div class="fml-fmla">
+                
+                <span><math id="p5.m4" class="ltx_Math" alttext="A" display="inline"><mi>A</mi></math></span>
+              </div>
+            </td>
+            <td class="fml-just">
+              
+              <div class="fml-just">
+                
+                <span><math id="p5.m5" class="ltx_Math" alttext="\wedge" display="inline"><mo>∧</mo></math>E <math id="p5.m6" class="ltx_Math" alttext="1" display="inline"><mn>1</mn></math></span>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <th class="fml-pline">
+              
+              
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"><math id="p5.m7.m1" class="ltx_Math" alttext="3" display="inline"><mn>3</mn></math></span></p>
+            </th>
+            <td class="fml-subproof">
+              
+              <div>
+                <span>1</span>
+              </div>
+            </td>
+            <td class="fml-fmla">
+              
+              <div class="fml-scope">
+                
+              </div>
+              <div class="fml-scope">
+                
+              </div>
+              <div class="fml-fmla">
+                
+                <span><math id="p5.m8" class="ltx_Math" alttext="\neg A" display="inline"><mrow><mo rspace="0.167em">¬</mo><mi>A</mi></mrow></math></span>
+              </div>
+            </td>
+            <td class="fml-just">
+              
+              <div class="fml-just">
+                
+                <span><math id="p5.m9" class="ltx_Math" alttext="\wedge" display="inline"><mo>∧</mo></math>E <math id="p5.m10" class="ltx_Math" alttext="1" display="inline"><mn>1</mn></math></span>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <th class="fml-pline">
+              
+              
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"><math id="p5.m11.m1" class="ltx_Math" alttext="4" display="inline"><mn>4</mn></math></span></p>
+            </th>
+            <td class="fml-subproof">
+              
+              <div>
+                <span>1</span>
+              </div>
+            </td>
+            <td class="fml-fmla">
+              
+              <div class="fml-scope">
+                
+              </div>
+              <div class="fml-scope">
+                
+              </div>
+              <div class="fml-fmla">
+                
+                <span><math id="p5.m12" class="ltx_Math" alttext="\bot" display="inline"><mo>⊥</mo></math></span>
+              </div>
+            </td>
+            <td class="fml-just">
+              
+              <div class="fml-just">
+                
+                <span><math id="p5.m13" class="ltx_Math" alttext="\neg" display="inline"><mo>¬</mo></math>E <math id="p5.m14" class="ltx_Math" alttext="3" display="inline"><mn>3</mn></math>, <math id="p5.m15" class="ltx_Math" alttext="2" display="inline"><mn>2</mn></math></span>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <th class="fml-pline">
+              
+              
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"><math id="p5.m16.m1" class="ltx_Math" alttext="5" display="inline"><mn>5</mn></math></span></p>
+            </th>
+            <td class="fml-subproof">
+              
+              <div>
+                <span>close subproof,
+0</span>
+              </div>
+            </td>
+            <td class="fml-fmla">
+              
+              <div class="fml-scope">
+                
+              </div>
+              <div class="fml-fmla">
+                
+                <span><math id="p5.m17" class="ltx_Math" alttext="\neg(A\wedge\neg A)" display="inline"><mrow><mo>¬</mo><mrow><mo stretchy="false">(</mo><mrow><mi>A</mi><mo>∧</mo><mrow><mo rspace="0.167em">¬</mo><mi>A</mi></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></math></span>
+              </div>
+            </td>
+            <td class="fml-just">
+              
+              <div class="fml-just">
+                
+                <span><math id="p5.m18" class="ltx_Math" alttext="\neg" display="inline"><mo>¬</mo></math>I <math id="p5.m19" class="ltx_Math" alttext="1" display="inline"><mn>1</mn></math>–<math id="p5.m20" class="ltx_Math" alttext="4" display="inline"><mn>4</mn></math></span>
+              </div>
+            </td>
+          </tr>
+        </table>
+</div>
+<div id="p6" class="ltx_para ltx_noindent">
+<p class="ltx_p">We have therefore proved ‘<math id="p6.m1" class="ltx_Math" alttext="\neg(A\wedge\neg A)" display="inline"><mrow><mo>¬</mo><mrow><mo stretchy="false">(</mo><mrow><mi>A</mi><mo>∧</mo><mrow><mo rspace="0.167em">¬</mo><mi>A</mi></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></math>’ on no
+(undischarged) assumptions. This particular theorem is an instance of
+what is sometimes called the <span class="ltx_text ltx_font_bold">law of non-contradiction</span>.</p>
+</div>
+<div id="p7" class="ltx_para">
+<p class="ltx_p">To show that something is a theorem, you just have to find a suitable proof. It is typically much harder to show that something is <span class="ltx_text ltx_font_bold">not</span> a theorem. To do this, you would have to demonstrate, not just that certain proof strategies fail, but that <span class="ltx_text ltx_font_bold">no</span> proof is possible. Even if you fail in trying to prove a sentence in a thousand different ways, perhaps the proof is just too long and complex for you to make out. Perhaps you just didn’t try hard enough.</p>
+</div>
+<div id="p8" class="ltx_para">
+<p class="ltx_p">Here is another new bit of terminology:</p>
+<div class="ltx_logical-block bml_background-color_FDF4FA bml_background-color_FDF4FA" style="padding:9pt;">
+          
+<div id="p8.p1" class="ltx_para ltx_noindent">
+<p class="ltx_p">Two sentences <math id="p8.p1.m1" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math> and <math id="p8.p1.m2" class="ltx_Math" alttext="\mathscr{B}" display="inline"><mi class="ltx_font_mathscript">ℬ︁</mi></math> are <dfn>interderivable</dfn>
+ if⁠f each can be proved from the other; i.e., both <math id="p8.p1.m3" class="ltx_Math" alttext="\mathscr{A}\vdash\mathscr{B}" display="inline"><mrow><mi class="ltx_font_mathscript">𝒜︁</mi><mo>⊢</mo><mi class="ltx_font_mathscript">ℬ︁</mi></mrow></math> and <math id="p8.p1.m4" class="ltx_Math" alttext="\mathscr{B}\vdash\mathscr{A}" display="inline"><mrow><mi class="ltx_font_mathscript">ℬ︁</mi><mo>⊢</mo><mi class="ltx_font_mathscript">𝒜︁</mi></mrow></math>.</p>
+</div>
+        
+</div>
+</div>
+<div id="p9" class="ltx_para">
+<p class="ltx_p">As in the case of showing that a sentence is a theorem, it is relatively easy to show that two sentences are interderivable: it just requires a pair of proofs. Showing that sentences are <span class="ltx_text ltx_font_bold">not</span> interderivable would be much harder: it is just as hard as showing that a sentence is not a theorem.</p>
+</div>
+<div id="p10" class="ltx_para">
+<p class="ltx_p">Here is a third, related, bit of terminology:</p>
+<div class="ltx_logical-block bml_background-color_FDF4FA bml_background-color_FDF4FA" style="padding:9pt;">
+          
+<div id="p10.p1" class="ltx_para ltx_noindent">
+<p class="ltx_p">The sentences <math id="p10.p1.m1" class="ltx_Math" alttext="\mathscr{A}_{1},\mathscr{A}_{2},\ldots,\mathscr{A}_{n}" display="inline"><mrow><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mn>1</mn></msub><mo>,</mo><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mn>2</mn></msub><mo>,</mo><mi mathvariant="normal">…</mi><mo>,</mo><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mi>n</mi></msub></mrow></math> are
+<dfn>jointly inconsistent</dfn>
+ if⁠f the contradiction <math id="p10.p1.m2" class="ltx_Math" alttext="\bot" display="inline"><mo>⊥</mo></math> can be proved from
+them, i.e., <math id="p10.p1.m3" class="ltx_Math" alttext="\mathscr{A}_{1},\mathscr{A}_{2},\ldots,\mathscr{A}_{n}\vdash\bot" display="inline"><mrow><mrow><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mn>1</mn></msub><mo>,</mo><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mn>2</mn></msub><mo>,</mo><mi mathvariant="normal">…</mi><mo>,</mo><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mi>n</mi></msub></mrow><mo rspace="0em">⊢</mo><mo lspace="0em">⊥</mo></mrow></math>. If they are not <dfn>inconsistent</dfn>
+, we call them
+<dfn>jointly consistent</dfn>
+.</p>
+</div>
+        
+</div>
+</div>
+<div id="p11" class="ltx_para">
+<p class="ltx_p">It is easy to show that some sentences are inconsistent: you just need
+to prove the contradiction <math id="p11.m1" class="ltx_Math" alttext="\bot" display="inline"><mo>⊥</mo></math>, assuming all the sentences as
+premises. Showing that some sentences are <span class="ltx_text ltx_font_bold">not</span> inconsistent is much
+harder. It would require more than just providing a proof or two; it
+would require showing that no proof of a certain kind is
+<span class="ltx_text ltx_font_bold">possible</span>.</p>
+</div>
+<div id="p12" class="ltx_para">
+<p class="ltx_p">This table summarizes whether one or two proofs suffice, or whether we must reason about all possible proofs.</p>
+</div>
+<div id="p13" class="ltx_para">
+<div class="bml-overflow-wrapper">
+<table class="ltx_tabular ltx_centering ltx_align_middle">
+<tr class="ltx_tr">
+<td class="ltx_td"></td>
+<td class="ltx_td ltx_align_left"><span class="ltx_text ltx_font_bold">Yes</span></td>
+<td class="ltx_td ltx_align_left"><span class="ltx_text ltx_font_bold">No</span></td>
+</tr>
+<tr class="ltx_tr">
+<td class="ltx_td ltx_align_left ltx_border_t">theorem?</td>
+<td class="ltx_td ltx_align_left ltx_border_t">one proof</td>
+<td class="ltx_td ltx_align_left ltx_border_t">all possible proofs</td>
+</tr>
+<tr class="ltx_tr">
+<td class="ltx_td ltx_align_left">inconsistent?</td>
+<td class="ltx_td ltx_align_left">one proof</td>
+<td class="ltx_td ltx_align_left">all possible proofs</td>
+</tr>
+<tr class="ltx_tr">
+<td class="ltx_td ltx_align_left">equivalent?</td>
+<td class="ltx_td ltx_align_left">two proofs</td>
+<td class="ltx_td ltx_align_left">all possible proofs</td>
+</tr>
+<tr class="ltx_tr">
+<td class="ltx_td ltx_align_left">consistent?</td>
+<td class="ltx_td ltx_align_left">all possible proofs</td>
+<td class="ltx_td ltx_align_left">one proof</td>
+</tr>
+</table>
+</div>
+</div>
+<section id="Sx1" class="ltx_section normal">
+<div class="section level2">
+<h2 class="ltx_title ltx_title_section">Practice exercises</h2>
+
+<div id="Sx1.p1" class="ltx_para ltx_noindent">
+<p class="ltx_p"><span class="ltx_text ltx_font_bold">A. </span>Show that each of the following sentences is a theorem:</p>
+<ol id="Sx1.I1" class="ltx_enumerate">
+<li id="Sx1.I1.i1" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">1.</span><div id="Sx1.I1.i1.p1" class="ltx_para">​<p class="ltx_p"><math id="Sx1.I1.i1.p1.m1" class="ltx_Math" alttext="O\rightarrow O" display="inline"><mrow><mi>O</mi><mo stretchy="false">→</mo><mi>O</mi></mrow></math></p>
+</div>
+</li>
+<li id="Sx1.I1.i2" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">2.</span><div id="Sx1.I1.i2.p1" class="ltx_para">​<p class="ltx_p"><math id="Sx1.I1.i2.p1.m1" class="ltx_Math" alttext="N\vee\neg N" display="inline"><mrow><mi>N</mi><mo>∨</mo><mrow><mo rspace="0.167em">¬</mo><mi>N</mi></mrow></mrow></math></p>
+</div>
+</li>
+<li id="Sx1.I1.i3" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">3.</span><div id="Sx1.I1.i3.p1" class="ltx_para">​<p class="ltx_p"><math id="Sx1.I1.i3.p1.m1" class="ltx_Math" alttext="J\leftrightarrow[J\vee(L\wedge\neg L)]" display="inline"><mrow><mi>J</mi><mo stretchy="false">↔</mo><mrow><mo stretchy="false">[</mo><mrow><mi>J</mi><mo>∨</mo><mrow><mo stretchy="false">(</mo><mrow><mi>L</mi><mo>∧</mo><mrow><mo rspace="0.167em">¬</mo><mi>L</mi></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">]</mo></mrow></mrow></math></p>
+</div>
+</li>
+<li id="Sx1.I1.i4" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">4.</span><div id="Sx1.I1.i4.p1" class="ltx_para">​<p class="ltx_p"><math id="Sx1.I1.i4.p1.m1" class="ltx_Math" alttext="((A\rightarrow B)\rightarrow A)\rightarrow A" display="inline"><mrow><mrow><mo stretchy="false">(</mo><mrow><mrow><mo stretchy="false">(</mo><mrow><mi>A</mi><mo stretchy="false">→</mo><mi>B</mi></mrow><mo stretchy="false">)</mo></mrow><mo stretchy="false">→</mo><mi>A</mi></mrow><mo stretchy="false">)</mo></mrow><mo stretchy="false">→</mo><mi>A</mi></mrow></math></p>
+</div>
+</li>
+</ol>
+</div>
+<div id="Sx1.p2" class="ltx_para ltx_noindent">
+<p class="ltx_p"><span class="ltx_text ltx_font_bold">B. </span>Provide proofs to show each of the following:</p>
+<ol id="Sx1.I2" class="ltx_enumerate">
+<li id="Sx1.I2.i1" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">1.</span><div id="Sx1.I2.i1.p1" class="ltx_para">​<p class="ltx_p"><math id="Sx1.I2.i1.p1.m1" class="ltx_Math" alttext="C\rightarrow(E\wedge G),\neg C\rightarrow G\vdash G" display="inline"><mrow><mrow><mrow><mi>C</mi><mo stretchy="false">→</mo><mrow><mo stretchy="false">(</mo><mrow><mi>E</mi><mo>∧</mo><mi>G</mi></mrow><mo stretchy="false">)</mo></mrow></mrow><mo>,</mo><mrow><mrow><mo rspace="0.167em">¬</mo><mi>C</mi></mrow><mo stretchy="false">→</mo><mi>G</mi></mrow></mrow><mo>⊢</mo><mi>G</mi></mrow></math></p>
+</div>
+</li>
+<li id="Sx1.I2.i2" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">2.</span><div id="Sx1.I2.i2.p1" class="ltx_para">​<p class="ltx_p"><math id="Sx1.I2.i2.p1.m1" class="ltx_Math" alttext="M\wedge(\neg N\rightarrow\neg M)\vdash(N\wedge M)\vee\neg M" display="inline"><mrow><mrow><mi>M</mi><mo>∧</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mo rspace="0.167em">¬</mo><mi>N</mi></mrow><mo stretchy="false">→</mo><mrow><mo rspace="0.167em">¬</mo><mi>M</mi></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow><mo>⊢</mo><mrow><mrow><mo stretchy="false">(</mo><mrow><mi>N</mi><mo>∧</mo><mi>M</mi></mrow><mo stretchy="false">)</mo></mrow><mo>∨</mo><mrow><mo rspace="0.167em">¬</mo><mi>M</mi></mrow></mrow></mrow></math></p>
+</div>
+</li>
+<li id="Sx1.I2.i3" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">3.</span><div id="Sx1.I2.i3.p1" class="ltx_para">​<p class="ltx_p"><math id="Sx1.I2.i3.p1.m1" class="ltx_Math" alttext="(Z\wedge K)\leftrightarrow(Y\wedge M),D\wedge(D\rightarrow M)\vdash Y\rightarrow
+Z" display="inline"><mrow><mrow><mo stretchy="false">(</mo><mrow><mi>Z</mi><mo>∧</mo><mi>K</mi></mrow><mo stretchy="false">)</mo></mrow><mo stretchy="false">↔</mo><mrow><mrow><mo stretchy="false">(</mo><mrow><mi>Y</mi><mo>∧</mo><mi>M</mi></mrow><mo stretchy="false">)</mo></mrow><mo>,</mo><mrow><mi>D</mi><mo>∧</mo><mrow><mo stretchy="false">(</mo><mrow><mi>D</mi><mo stretchy="false">→</mo><mi>M</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow><mo>⊢</mo><mrow><mi>Y</mi><mo stretchy="false">→</mo><mi>Z</mi></mrow></mrow></math></p>
+</div>
+</li>
+<li id="Sx1.I2.i4" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">4.</span><div id="Sx1.I2.i4.p1" class="ltx_para">​<p class="ltx_p"><math id="Sx1.I2.i4.p1.m1" class="ltx_math_unparsed" alttext="(W\vee X)\vee(Y\vee Z),X\rightarrow Y,\neg Z\vdash W\vee Y" display="inline"><mrow><mrow><mo stretchy="false">(</mo><mi>W</mi><mo>∨</mo><mi>X</mi><mo stretchy="false">)</mo></mrow><mo>∨</mo><mrow><mo stretchy="false">(</mo><mi>Y</mi><mo>∨</mo><mi>Z</mi><mo stretchy="false">)</mo></mrow><mo>,</mo><mi>X</mi><mo stretchy="false">→</mo><mi>Y</mi><mo>,</mo><mo rspace="0.167em">¬</mo><mi>Z</mi><mo>⊢</mo><mi>W</mi><mo>∨</mo><mi>Y</mi></mrow></math></p>
+</div>
+</li>
+</ol>
+</div>
+<div id="Sx1.p3" class="ltx_para ltx_noindent">
+<p class="ltx_p"><span class="ltx_text ltx_font_bold">C. </span>Show that each of the following pairs of sentences are interderivable:</p>
+<ol id="Sx1.I3" class="ltx_enumerate">
+<li id="Sx1.I3.i1" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">1.</span><div id="Sx1.I3.i1.p1" class="ltx_para">​<p class="ltx_p"><math id="Sx1.I3.i1.p1.m1" class="ltx_Math" alttext="R\leftrightarrow E" display="inline"><mrow><mi>R</mi><mo stretchy="false">↔</mo><mi>E</mi></mrow></math>, <math id="Sx1.I3.i1.p1.m2" class="ltx_Math" alttext="E\leftrightarrow R" display="inline"><mrow><mi>E</mi><mo stretchy="false">↔</mo><mi>R</mi></mrow></math></p>
+</div>
+</li>
+<li id="Sx1.I3.i2" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">2.</span><div id="Sx1.I3.i2.p1" class="ltx_para">​<p class="ltx_p"><math id="Sx1.I3.i2.p1.m1" class="ltx_Math" alttext="G" display="inline"><mi>G</mi></math>, <math id="Sx1.I3.i2.p1.m2" class="ltx_Math" alttext="\neg\neg\neg\neg G" display="inline"><mrow><mo rspace="0.167em">¬</mo><mrow><mo rspace="0.167em">¬</mo><mrow><mo rspace="0.167em">¬</mo><mrow><mo rspace="0.167em">¬</mo><mi>G</mi></mrow></mrow></mrow></mrow></math></p>
+</div>
+</li>
+<li id="Sx1.I3.i3" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">3.</span><div id="Sx1.I3.i3.p1" class="ltx_para">​<p class="ltx_p"><math id="Sx1.I3.i3.p1.m1" class="ltx_Math" alttext="T\rightarrow S" display="inline"><mrow><mi>T</mi><mo stretchy="false">→</mo><mi>S</mi></mrow></math>, <math id="Sx1.I3.i3.p1.m2" class="ltx_Math" alttext="\neg S\rightarrow\neg T" display="inline"><mrow><mrow><mo rspace="0.167em">¬</mo><mi>S</mi></mrow><mo stretchy="false">→</mo><mrow><mo rspace="0.167em">¬</mo><mi>T</mi></mrow></mrow></math></p>
+</div>
+</li>
+<li id="Sx1.I3.i4" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">4.</span><div id="Sx1.I3.i4.p1" class="ltx_para">​<p class="ltx_p"><math id="Sx1.I3.i4.p1.m1" class="ltx_Math" alttext="U\rightarrow I" display="inline"><mrow><mi>U</mi><mo stretchy="false">→</mo><mi>I</mi></mrow></math>, <math id="Sx1.I3.i4.p1.m2" class="ltx_Math" alttext="\neg(U\wedge\neg I)" display="inline"><mrow><mo>¬</mo><mrow><mo stretchy="false">(</mo><mrow><mi>U</mi><mo>∧</mo><mrow><mo rspace="0.167em">¬</mo><mi>I</mi></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></math></p>
+</div>
+</li>
+<li id="Sx1.I3.i5" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">5.</span><div id="Sx1.I3.i5.p1" class="ltx_para">​<p class="ltx_p"><math id="Sx1.I3.i5.p1.m1" class="ltx_Math" alttext="\neg(C\rightarrow D),C\wedge\neg D" display="inline"><mrow><mrow><mo>¬</mo><mrow><mo stretchy="false">(</mo><mrow><mi>C</mi><mo stretchy="false">→</mo><mi>D</mi></mrow><mo stretchy="false">)</mo></mrow></mrow><mo>,</mo><mrow><mi>C</mi><mo>∧</mo><mrow><mo rspace="0.167em">¬</mo><mi>D</mi></mrow></mrow></mrow></math></p>
+</div>
+</li>
+<li id="Sx1.I3.i6" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">6.</span><div id="Sx1.I3.i6.p1" class="ltx_para">​<p class="ltx_p"><math id="Sx1.I3.i6.p1.m1" class="ltx_Math" alttext="\neg G\leftrightarrow H" display="inline"><mrow><mrow><mo rspace="0.167em">¬</mo><mi>G</mi></mrow><mo stretchy="false">↔</mo><mi>H</mi></mrow></math>, <math id="Sx1.I3.i6.p1.m2" class="ltx_math_unparsed" alttext="\neg(G\leftrightarrow H)" display="inline"><mrow><mo>¬</mo><mrow><mo stretchy="false">(</mo><mi>G</mi><mo stretchy="false">↔</mo><mi>H</mi><mo stretchy="false">)</mo></mrow></mrow></math></p>
+</div>
+</li>
+</ol>
+</div>
+<div id="Sx1.p4" class="ltx_para ltx_noindent">
+<p class="ltx_p"><span class="ltx_text ltx_font_bold">D. </span>If you know that <math id="Sx1.p4.m1" class="ltx_Math" alttext="\mathscr{A}\vdash\mathscr{B}" display="inline"><mrow><mi class="ltx_font_mathscript">𝒜︁</mi><mo>⊢</mo><mi class="ltx_font_mathscript">ℬ︁</mi></mrow></math>, what can you say about <math id="Sx1.p4.m2" class="ltx_Math" alttext="(\mathscr{A}\wedge\mathscr{C})\vdash\mathscr{B}" display="inline"><mrow><mrow><mo stretchy="false">(</mo><mrow><mi class="ltx_font_mathscript">𝒜︁</mi><mo>∧</mo><mi class="ltx_font_mathscript">𝒞︁</mi></mrow><mo stretchy="false">)</mo></mrow><mo>⊢</mo><mi class="ltx_font_mathscript">ℬ︁</mi></mrow></math>? What about <math id="Sx1.p4.m3" class="ltx_Math" alttext="(\mathscr{A}\vee\mathscr{C})\vdash\mathscr{B}" display="inline"><mrow><mrow><mo stretchy="false">(</mo><mrow><mi class="ltx_font_mathscript">𝒜︁</mi><mo>∨</mo><mi class="ltx_font_mathscript">𝒞︁</mi></mrow><mo stretchy="false">)</mo></mrow><mo>⊢</mo><mi class="ltx_font_mathscript">ℬ︁</mi></mrow></math>? Explain your answers.</p>
+</div>
+<div id="Sx1.p5" class="ltx_para ltx_noindent">
+<p class="ltx_p"><span class="ltx_text ltx_font_bold">E. </span>In this chapter, we claimed that it is just as hard to show that two sentences are not interderivable, as it is to show that a sentence is not a theorem. Why did we claim this? (<span class="ltx_text ltx_font_bold">Hint</span>: think of a sentence that would be a theorem if⁠f <math id="Sx1.p5.m1" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math> and <math id="Sx1.p5.m2" class="ltx_Math" alttext="\mathscr{B}" display="inline"><mi class="ltx_font_mathscript">ℬ︁</mi></math> were interderivable.)</p>
+</div>
+</div>
+</section>
+</div>
+</section>
+</div>
+</div>
+</div>
+<a href="Ch19.html" class="navigation navigation-prev" aria-label="Previous page"><i class="fa fa-angle-left"></i></a><a href="Ch21.html" class="navigation navigation-next" aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+</div>
+</div>
+</body>
+
+</html>

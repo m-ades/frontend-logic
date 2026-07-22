@@ -1,0 +1,301 @@
+<!DOCTYPE html><html style="--bml-ltx-font-size:10;" class="bml_mathjax4" lang="en">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<title>Chapter 41 Proofs and semantics ‣ Part VII Natural deduction for FOL ‣ forall x: Calgary</title>
+<!--Generated on Tue Jul 21 20:13:15 2026 by LaTeXML (version 0.8.8) http://dlmf.nist.gov/LaTeXML/.-->
+<!--Document created on Fall 2025 (2026‐07‐18 8642250).-->
+
+<link rel="stylesheet" href="LaTeXML.css" type="text/css">
+<link rel="stylesheet" href="ltx-book.css" type="text/css">
+<link rel="stylesheet" href="bookml/gitbook/css/style.css" type="text/css">
+<link rel="stylesheet" href="bookml/gitbook/css/plugin-table.css" type="text/css">
+<link rel="stylesheet" href="bookml/gitbook/css/plugin-search.css" type="text/css">
+<link rel="stylesheet" href="bookml/gitbook/css/plugin-bookdown.css" type="text/css">
+<link rel="stylesheet" href="bookml/gitbook/css/plugin-fontsettings.css" type="text/css">
+<link rel="stylesheet" href="bookml/CSS/style.css" type="text/css">
+<link rel="stylesheet" href="bookml/CSS/style.gitbook,plain.css" type="text/css">
+<link rel="stylesheet" href="bookml/CSS/style.gitbook.css" type="text/css">
+<link rel="stylesheet" href="bmluser/colors.gitbook-forallxyyc-html.css" type="text/css">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<link rel="stylesheet" href="forallxyyc.css" type="text/css">
+<link rel="stylesheet" href="fitchml.css" type="text/css">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script><script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6"></script>
+<link rel="up" href="Pt7.html" title="Part VII Natural deduction for FOL ‣ forall x: Calgary">
+<link rel="up up" href="index.html" title="forall x: Calgary">
+<link rel="start" href="index.html" title="forall x: Calgary">
+<link rel="prev" href="Ch40.html" title="Chapter 40 Derived rules ‣ Part VII Natural deduction for FOL ‣ forall x: Calgary">
+<link rel="next" href="Pt8.html" title="Part VIII Modal logic ‣ forall x: Calgary">
+<link rel="chapter" href="Ch36.html" title="Chapter 36 Basic rules for FOL ‣ Part VII Natural deduction for FOL ‣ forall x: Calgary">
+<link rel="chapter" href="Ch37.html" title="Chapter 37 Proofs with quantifiers ‣ Part VII Natural deduction for FOL ‣ forall x: Calgary">
+<link rel="chapter" href="Ch38.html" title="Chapter 38 Conversion of quantifiers ‣ Part VII Natural deduction for FOL ‣ forall x: Calgary">
+<link rel="chapter" href="Ch39.html" title="Chapter 39 Rules for identity ‣ Part VII Natural deduction for FOL ‣ forall x: Calgary">
+<link rel="chapter" href="Ch40.html" title="Chapter 40 Derived rules ‣ Part VII Natural deduction for FOL ‣ forall x: Calgary">
+<link rel="chapter" href="Chx1.html" title="Preface ‣ forall x: Calgary">
+<link rel="part" href="Pt1.html" title="Part I Key notions of logic ‣ forall x: Calgary">
+<link rel="part" href="Pt2.html" title="Part II Truth-functional logic ‣ forall x: Calgary">
+<link rel="part" href="Pt3.html" title="Part III Truth tables ‣ forall x: Calgary">
+<link rel="part" href="Pt4.html" title="Part IV Natural deduction for TFL ‣ forall x: Calgary">
+<link rel="part" href="Pt5.html" title="Part V First-order logic ‣ forall x: Calgary">
+<link rel="part" href="Pt6.html" title="Part VI Interpretations ‣ forall x: Calgary">
+<link rel="part" href="Pt7.html" title="Part VII Natural deduction for FOL ‣ forall x: Calgary">
+<link rel="part" href="Pt8.html" title="Part VIII Modal logic ‣ forall x: Calgary">
+<link rel="part" href="Pt9.html" title="Part IX Metatheory ‣ forall x: Calgary">
+<link rel="part" href="Ptx1.html" title="Appendices ‣ forall x: Calgary">
+<link rel="part" href="Ptx2.html" title="Solutions to selected exercices ‣ forall x: Calgary">
+<script src="bookml/js/mathjax4.js" defer></script>
+</head>
+<body class="bml_class_book">
+<div class="book without-animation font-size-2 font-family-1" data-basepath=".">
+<a href="#bml-main-content" tabindex="0" class="bml-skip-to-content">Skip to content.</a>
+<div class="book-summary"><nav class="ltx_page_navbar">
+<ul class="ltx_toclist summary">
+<li>
+<a href="index.html" title="" class="ltx_ref" rel="start">forall x: Calgary</a>
+</li>
+<li class="divider" aria-hidden="true"></li>
+<li data-level="" data-path="Chx1.html" class="ltx_tocentry ltx_tocentry_chapter  chapter "><a href="Chx1.html" title="In forall x: Calgary" class="ltx_ref">Preface</a></li>
+<li data-level="I" data-path="Pt1.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt1.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">I </span></b>Key notions of logic</a></li>
+<li data-level="II" data-path="Pt2.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt2.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">II </span></b>Truth-functional logic</a></li>
+<li data-level="III" data-path="Pt3.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt3.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">III </span></b>Truth tables</a></li>
+<li data-level="IV" data-path="Pt4.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt4.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">IV </span></b>Natural deduction for TFL</a></li>
+<li data-level="V" data-path="Pt5.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt5.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">V </span></b>First-order logic</a></li>
+<li data-level="VI" data-path="Pt6.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt6.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">VI </span></b>Interpretations</a></li>
+<li data-level="VII" data-path="Pt7.html" class="ltx_tocentry ltx_tocentry_part  chapter ">
+<a href="Pt7.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">VII </span></b>Natural deduction for FOL</a>
+<ol class="ltx_toclist ltx_toclist_part">
+<li data-level="36" data-path="Ch36.html" class="ltx_tocentry ltx_tocentry_chapter  chapter "><a href="Ch36.html" title="In Part VII Natural deduction for FOL ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">36 </span></b>Basic rules for FOL</a></li>
+<li data-level="37" data-path="Ch37.html" class="ltx_tocentry ltx_tocentry_chapter  chapter "><a href="Ch37.html" title="In Part VII Natural deduction for FOL ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">37 </span></b>Proofs with quantifiers</a></li>
+<li data-level="38" data-path="Ch38.html" class="ltx_tocentry ltx_tocentry_chapter  chapter "><a href="Ch38.html" title="In Part VII Natural deduction for FOL ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">38 </span></b>Conversion of quantifiers</a></li>
+<li data-level="39" data-path="Ch39.html" class="ltx_tocentry ltx_tocentry_chapter  chapter "><a href="Ch39.html" title="In Part VII Natural deduction for FOL ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">39 </span></b>Rules for identity</a></li>
+<li data-level="40" data-path="Ch40.html" class="ltx_tocentry ltx_tocentry_chapter  chapter "><a href="Ch40.html" title="In Part VII Natural deduction for FOL ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">40 </span></b>Derived rules</a></li>
+<li data-level="41" data-path="" class="ltx_tocentry ltx_tocentry_chapter ltx_ref_self  chapter active"><a href="" title="In Part VII Natural deduction for FOL ‣ forall x: Calgary" aria-current="page" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">41 </span></b>Proofs and semantics</a></li>
+</ol>
+</li>
+<li data-level="VIII" data-path="Pt8.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt8.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">VIII </span></b>Modal logic</a></li>
+<li data-level="IX" data-path="Pt9.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt9.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">IX </span></b>Metatheory</a></li>
+<li data-level="" data-path="Ptx1.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Ptx1.html" title="In forall x: Calgary" class="ltx_ref">Appendices</a></li>
+<li data-level="" data-path="Ptx2.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Ptx2.html" title="In forall x: Calgary" class="ltx_ref">Solutions to selected exercices</a></li>
+</ul>
+</nav></div>
+
+<div class="ltx_page_main book-body fixed">
+<div class="body-inner">
+<header class="book-header fixed" aria-label="toolbar"><span class="bml-separator"></span></header>
+<div class="page-wrapper" tabindex="-1" role="main">
+<div class="ltx_page_content page-inner" id="bml-main-content">
+<script src="bookml/gitbook/js/app.min.js"></script>
+<script src="bookml/gitbook/js/jquery.highlight.js"></script>
+<script src="bookml/gitbook/js/plugin-search.js"></script>
+<script src="bookml/gitbook/js/plugin-fontsettings.js"></script>
+<script src="bookml/gitbook/js/plugin-bookdown.js"></script>
+<script type="text/javascript">
+                  gitbook.require(["gitbook"], function(gitbook) {
+                  gitbook.start({
+                    "fontsettings": {
+                      "theme": "white",
+                      "family": "sans",
+                      "size": 2
+                    },
+                    "download": [ [ "forallxyyc.pdf", "PDF" ], [ "forallxyyc-accessible.pdf", "PDF (accessible)" ], ],
+                    "search": {
+                      "engine": "fuse"
+                    },
+                    "toc": {
+                      "collapse": "none"
+                    }
+                  });
+                });
+              </script>
+
+<section class="ltx_chapter ltx_authors_1line normal" lang="en">
+<div class="section level1">
+<h1 class="ltx_title ltx_title_chapter">
+<span class="ltx_tag ltx_tag_chapter header-section-number">Chapter 41</span> Proofs and semantics</h1>
+
+<div id="p1" class="ltx_para">
+<p class="ltx_p">We have used two different turnstiles in this book. This:</p>
+<div id="Ex1" class="ltx_equation bml_equation bml_equation_container ltx_align_baseline">
+<div class="ltx_Math bml_eqn_cell ltx_align_center"><math id="Ex1.m1" class="ltx_Math" alttext="\mathscr{A}_{1},\mathscr{A}_{2},\ldots,\mathscr{A}_{n}\vdash\mathscr{C}" display="block"><mrow><mrow><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mn>1</mn></msub><mo>,</mo><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mn>2</mn></msub><mo>,</mo><mi mathvariant="normal">…</mi><mo>,</mo><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mi>n</mi></msub></mrow><mo>⊢</mo><mi class="ltx_font_mathscript">𝒞︁</mi></mrow></math></div>
+</div>
+<p class="ltx_p">means that there is some proof which ends with <math id="p1.m1" class="ltx_Math" alttext="\mathscr{C}" display="inline"><mi class="ltx_font_mathscript">𝒞︁</mi></math> and whose only undischarged assumptions are among <math id="p1.m2" class="ltx_Math" alttext="\mathscr{A}_{1},\mathscr{A}_{2},\ldots,\mathscr{A}_{n}" display="inline"><mrow><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mn>1</mn></msub><mo>,</mo><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mn>2</mn></msub><mo>,</mo><mi mathvariant="normal">…</mi><mo>,</mo><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mi>n</mi></msub></mrow></math>. This is a <span class="ltx_text ltx_font_bold">proof-theoretic notion</span>. By contrast, this:</p>
+<div id="Ex2" class="ltx_equation bml_equation bml_equation_container ltx_align_baseline">
+<div class="ltx_Math bml_eqn_cell ltx_align_center"><math id="Ex2.m1" class="ltx_Math" alttext="\mathscr{A}_{1},\mathscr{A}_{2},\ldots,\mathscr{A}_{n}\vDash\mathscr{C}" display="block"><mrow><mrow><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mn>1</mn></msub><mo>,</mo><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mn>2</mn></msub><mo>,</mo><mi mathvariant="normal">…</mi><mo>,</mo><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mi>n</mi></msub></mrow><mo>⊨</mo><mi class="ltx_font_mathscript">𝒞︁</mi></mrow></math></div>
+</div>
+<p class="ltx_p">means that no valuation (or interpretation) makes all of <math id="p1.m3" class="ltx_Math" alttext="\mathscr{A}_{1},\mathscr{A}_{2},\ldots,\mathscr{A}_{n}" display="inline"><mrow><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mn>1</mn></msub><mo>,</mo><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mn>2</mn></msub><mo>,</mo><mi mathvariant="normal">…</mi><mo>,</mo><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mi>n</mi></msub></mrow></math> true and <math id="p1.m4" class="ltx_Math" alttext="\mathscr{C}" display="inline"><mi class="ltx_font_mathscript">𝒞︁</mi></math> false. This concerns assignments of truth and falsity to sentences. It is a <span class="ltx_text ltx_font_bold">semantic notion</span>.</p>
+</div>
+<div id="p2" class="ltx_para">
+<p class="ltx_p">It cannot be emphasized enough that these are different notions. But we can emphasize it a bit more: <span class="ltx_text ltx_font_bold">They are different notions.</span></p>
+</div>
+<div id="p3" class="ltx_para">
+<p class="ltx_p">Once you have internalised this point, continue reading.</p>
+</div>
+<div id="p4" class="ltx_para">
+<p class="ltx_p">Although our semantic and proof-theoretic notions are different, there is a deep connection between them. To explain this connection,we will start by considering the relationship between validities and theorems.</p>
+</div>
+<div id="p5" class="ltx_para">
+<p class="ltx_p">To show that a sentence is a theorem, you need only produce a proof. Granted, it may be hard to produce a twenty line proof, but it is not so hard to check each line of the proof and confirm that it is legitimate; and if each line of the proof individually is legitimate, then the whole proof is legitimate. Showing that a sentence is a validity, though, requires reasoning about all possible interpretations. Given a choice between showing that a sentence is a theorem and showing that it is a validity, it would be easier to show that it is a theorem.</p>
+</div>
+<div id="p6" class="ltx_para">
+<p class="ltx_p">Contrawise, to show that a sentence is <span class="ltx_text ltx_font_bold">not</span> a theorem is hard. We would need to reason about all (possible) proofs. That is very difficult. However, to show that a sentence is not a validity, you need only construct an interpretation in which the sentence is false. Granted, it may be hard to come up with the interpretation; but once you have done so, it is relatively straightforward to check what truth value it assigns to a sentence. Given a choice between showing that a sentence is not a theorem and showing that it is not a validity, it would be easier to show that it is not a validity.</p>
+</div>
+<div id="p7" class="ltx_para">
+<p class="ltx_p">Fortunately, <span class="ltx_text ltx_font_bold">a sentence is a theorem if and only if it is a validity</span>. As a result, if we provide a proof of <math id="p7.m1" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math> on no assumptions, and thus show that <math id="p7.m2" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math> is a theorem, i.e., <math id="p7.m3" class="ltx_Math" alttext="{}\vdash\mathscr{A}" display="inline"><mrow><mi></mi><mo>⊢</mo><mi class="ltx_font_mathscript">𝒜︁</mi></mrow></math>, we can legitimately infer that <math id="p7.m4" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math> is a validity, i.e., <math id="p7.m5" class="ltx_Math" alttext="\vDash\mathscr{A}" display="inline"><mrow><mi></mi><mo>⊨</mo><mi class="ltx_font_mathscript">𝒜︁</mi></mrow></math>. Similarly, if we construct an interpretation in which <math id="p7.m6" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math> is false and thus show that it is not a validity, i.e., <math id="p7.m7" class="ltx_Math" alttext="\nvDash\mathscr{A}" display="inline"><mrow><mi></mi><mo>⊭</mo><mi class="ltx_font_mathscript">𝒜︁</mi></mrow></math>, it follows that <math id="p7.m8" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math> is not a theorem, i.e., <math id="p7.m9" class="ltx_Math" alttext="\nvdash\mathscr{A}" display="inline"><mrow><mi></mi><mo>⊬</mo><mi class="ltx_font_mathscript">𝒜︁</mi></mrow></math>.</p>
+</div>
+<div id="p8" class="ltx_para">
+<p class="ltx_p">More generally, we have the following powerful result:</p>
+<div class="ltx_logical-block bml_background-color_FDF4FA bml_background-color_FDF4FA" style="padding:9pt;">
+          
+<div id="p8.p1" class="ltx_para ltx_noindent">
+<p class="ltx_p"><math id="p8.p1.m1" class="ltx_Math" alttext="\mathscr{A}_{1},\mathscr{A}_{2},\ldots,\mathscr{A}_{n}\vdash\mathscr{B}" display="inline"><mrow><mrow><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mn>1</mn></msub><mo>,</mo><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mn>2</mn></msub><mo>,</mo><mi mathvariant="normal">…</mi><mo>,</mo><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mi>n</mi></msub></mrow><mo>⊢</mo><mi class="ltx_font_mathscript">ℬ︁</mi></mrow></math> <span class="ltx_text ltx_font_bold">if⁠f</span> <math id="p8.p1.m2" class="ltx_Math" alttext="\mathscr{A}_{1},\mathscr{A}_{2},\ldots,\mathscr{A}_{n}\vDash\mathscr{B}" display="inline"><mrow><mrow><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mn>1</mn></msub><mo>,</mo><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mn>2</mn></msub><mo>,</mo><mi mathvariant="normal">…</mi><mo>,</mo><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mi>n</mi></msub></mrow><mo>⊨</mo><mi class="ltx_font_mathscript">ℬ︁</mi></mrow></math></p>
+</div>
+        
+</div>
+<p class="ltx_p">This shows that, whilst provability and entailment are <span class="ltx_text ltx_font_bold">different</span> notions, they are extensionally equivalent. As such:</p>
+<div class="ltx_logical-block bml_background-color_FDF4FA bml_background-color_FDF4FA" style="padding:9pt;">
+          
+<div id="p8.p2" class="ltx_para ltx_noindent">
+<ul id="S0.I1" class="ltx_itemize">
+<li id="S0.I1.i1" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">‣</span><div id="S0.I1.i1.p1" class="ltx_para">​<p class="ltx_p">An argument is <span class="ltx_text ltx_font_bold">valid</span> if⁠f <span class="ltx_text ltx_font_bold">the conclusion can be proved from the premises</span>.</p>
+</div>
+</li>
+<li id="S0.I1.i2" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">‣</span><div id="S0.I1.i2.p1" class="ltx_para">​<p class="ltx_p">A sentence is a <span class="ltx_text ltx_font_bold">validity</span> if⁠f it is a <span class="ltx_text ltx_font_bold">theorem</span>.</p>
+</div>
+</li>
+<li id="S0.I1.i3" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">‣</span><div id="S0.I1.i3.p1" class="ltx_para">​<p class="ltx_p">Two sentences are <span class="ltx_text ltx_font_bold">equivalent</span> if⁠f they are
+<span class="ltx_text ltx_font_bold">interderivable</span>.</p>
+</div>
+</li>
+<li id="S0.I1.i4" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">‣</span><div id="S0.I1.i4.p1" class="ltx_para">​<p class="ltx_p">Sentences are <span class="ltx_text ltx_font_bold">jointly satisfiable</span> if⁠f they are
+<span class="ltx_text ltx_font_bold">jointly consistent</span>.</p>
+</div>
+</li>
+</ul>
+</div>
+        
+</div>
+<p class="ltx_p">For this reason, you can pick and choose when to think in terms of proofs and when to think in terms of valuations/interpretations, doing whichever is easier for a given task. The table on the next page summarizes which is (usually) easier.</p>
+</div>
+<div id="p9" class="ltx_para">
+<p class="ltx_p">It is intuitive that provability and semantic entailment should agree. But—let us repeat this—do not be fooled by the similarity of the symbols ‘<math id="p9.m1" class="ltx_Math" alttext="\vDash" display="inline"><mo>⊨</mo></math>’ and ‘<math id="p9.m2" class="ltx_Math" alttext="\vdash" display="inline"><mo>⊢</mo></math>’. These two symbols have very different meanings. The fact that provability and semantic entailment agree is not an easy result to come by.</p>
+</div>
+<div id="p10" class="ltx_para">
+<p class="ltx_p">In fact, demonstrating that provability and semantic entailment agree is, very decisively, the point at which introductory logic becomes intermediate logic.</p>
+</div>
+<figure id="tab1" class="ltx_table"><div class="bml-overflow-wrapper">
+<table class="ltx_tabular ltx_centering ltx_align_middle">
+<tr class="ltx_tr">
+<td class="ltx_td ltx_align_top"></td>
+<td class="ltx_td ltx_align_justify ltx_align_top">
+<span class="ltx_inline-block ltx_align_top">
+<span class="ltx_p" style="width:164.4pt;"><span class="ltx_text ltx_font_bold">Yes</span></span>
+</span>
+</td>
+<td class="ltx_td ltx_align_justify ltx_align_top">
+<span class="ltx_inline-block ltx_align_top">
+<span class="ltx_p" style="width:164.4pt;"><span class="ltx_text ltx_font_bold">No</span></span>
+</span>
+</td>
+</tr>
+<tr class="ltx_tr">
+<td class="ltx_td ltx_align_justify ltx_align_top">
+<span class="ltx_inline-block ltx_align_top">
+<span class="ltx_p" style="width:126.5pt;">Is <math id="m1" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math> a <span class="ltx_text ltx_font_bold">validity</span>?</span>
+</span>
+</td>
+<td class="ltx_td ltx_align_justify ltx_align_top">
+<span class="ltx_inline-block ltx_align_top">
+<span class="ltx_p" style="width:164.4pt;">give a proof which shows <math id="m2" class="ltx_Math" alttext="\vdash\mathscr{A}" display="inline"><mrow><mi></mi><mo>⊢</mo><mi class="ltx_font_mathscript">𝒜︁</mi></mrow></math></span>
+</span>
+</td>
+<td class="ltx_td ltx_align_justify ltx_align_top">
+<span class="ltx_inline-block ltx_align_top">
+<span class="ltx_p" style="width:164.4pt;">give an interpretation in which <math id="m3" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math> is false</span>
+</span>
+</td>
+</tr>
+<tr class="ltx_tr">
+<td class="ltx_td ltx_align_justify ltx_align_top">
+<span class="ltx_inline-block ltx_align_top">
+<span class="ltx_p" style="width:126.5pt;">Is <math id="m4" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math> a <span class="ltx_text ltx_font_bold">contradiction</span>?</span>
+</span>
+</td>
+<td class="ltx_td ltx_align_justify ltx_align_top">
+<span class="ltx_inline-block ltx_align_top">
+<span class="ltx_p" style="width:164.4pt;">give a proof which shows <math id="m5" class="ltx_Math" alttext="\mathscr{A}\vdash\bot" display="inline"><mrow><mi class="ltx_font_mathscript">𝒜︁</mi><mo rspace="0em">⊢</mo><mo lspace="0em">⊥</mo></mrow></math></span>
+</span>
+</td>
+<td class="ltx_td ltx_align_justify ltx_align_top">
+<span class="ltx_inline-block ltx_align_top">
+<span class="ltx_p" style="width:164.4pt;">give an interpretation in which <math id="m6" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math> is true</span>
+</span>
+</td>
+</tr>
+<tr class="ltx_tr">
+<td class="ltx_td ltx_align_justify ltx_align_top">
+<span class="ltx_inline-block ltx_align_top">
+<span class="ltx_p" style="width:126.5pt;">Are <math id="m7" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math> and <math id="m8" class="ltx_Math" alttext="\mathscr{B}" display="inline"><mi class="ltx_font_mathscript">ℬ︁</mi></math> <span class="ltx_text ltx_font_bold">equivalent</span>?</span>
+</span>
+</td>
+<td class="ltx_td ltx_align_justify ltx_align_top">
+<span class="ltx_inline-block ltx_align_top">
+<span class="ltx_p" style="width:164.4pt;">give two proofs, one for <math id="m9" class="ltx_Math" alttext="\mathscr{A}\vdash\mathscr{B}" display="inline"><mrow><mi class="ltx_font_mathscript">𝒜︁</mi><mo>⊢</mo><mi class="ltx_font_mathscript">ℬ︁</mi></mrow></math> and one for <math id="m10" class="ltx_Math" alttext="\mathscr{B}\vdash\mathscr{A}" display="inline"><mrow><mi class="ltx_font_mathscript">ℬ︁</mi><mo>⊢</mo><mi class="ltx_font_mathscript">𝒜︁</mi></mrow></math></span>
+</span>
+</td>
+<td class="ltx_td ltx_align_justify ltx_align_top">
+<span class="ltx_inline-block ltx_align_top">
+<span class="ltx_p" style="width:164.4pt;">give an interpretation in which <math id="m11" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math> and <math id="m12" class="ltx_Math" alttext="\mathscr{B}" display="inline"><mi class="ltx_font_mathscript">ℬ︁</mi></math> have different truth values</span>
+</span>
+</td>
+</tr>
+<tr class="ltx_tr">
+<td class="ltx_td ltx_align_justify ltx_align_top">
+<span class="ltx_inline-block ltx_align_top">
+<span class="ltx_p" style="width:126.5pt;">Are <math id="m13" class="ltx_Math" alttext="\mathscr{A}_{1},\mathscr{A}_{2},\ldots,\mathscr{A}_{n}" display="inline"><mrow><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mn>1</mn></msub><mo>,</mo><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mn>2</mn></msub><mo>,</mo><mi mathvariant="normal">…</mi><mo>,</mo><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mi>n</mi></msub></mrow></math> <span class="ltx_text ltx_font_bold">jointly satisfiable</span>?</span>
+</span>
+</td>
+<td class="ltx_td ltx_align_justify ltx_align_top">
+<span class="ltx_inline-block ltx_align_top">
+<span class="ltx_p" style="width:164.4pt;">give an interpretation in which all of <math id="m14" class="ltx_Math" alttext="\mathscr{A}_{1},\mathscr{A}_{2},\ldots,\mathscr{A}_{n}" display="inline"><mrow><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mn>1</mn></msub><mo>,</mo><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mn>2</mn></msub><mo>,</mo><mi mathvariant="normal">…</mi><mo>,</mo><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mi>n</mi></msub></mrow></math> are true</span>
+</span>
+</td>
+<td class="ltx_td ltx_align_justify ltx_align_top">
+<span class="ltx_inline-block ltx_align_top">
+<span class="ltx_p" style="width:164.4pt;">prove a contradiction from assumptions <math id="m15" class="ltx_Math" alttext="\mathscr{A}_{1},\mathscr{A}_{2},\ldots,\mathscr{A}_{n}" display="inline"><mrow><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mn>1</mn></msub><mo>,</mo><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mn>2</mn></msub><mo>,</mo><mi mathvariant="normal">…</mi><mo>,</mo><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mi>n</mi></msub></mrow></math></span>
+</span>
+</td>
+</tr>
+<tr class="ltx_tr">
+<td class="ltx_td ltx_align_justify ltx_align_top">
+<span class="ltx_inline-block ltx_align_top">
+<span class="ltx_p" style="width:126.5pt;">Is <math id="m16" class="ltx_Math" alttext="\mathscr{A}_{1},\mathscr{A}_{2},\ldots,\mathscr{A}_{n}\therefore\mathscr{C}" display="inline"><mrow><mrow><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mn>1</mn></msub><mo>,</mo><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mn>2</mn></msub><mo>,</mo><mi mathvariant="normal">…</mi><mo>,</mo><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mi>n</mi></msub></mrow><mo>∴</mo><mi class="ltx_font_mathscript">𝒞︁</mi></mrow></math> <span class="ltx_text ltx_font_bold">valid</span>?</span>
+</span>
+</td>
+<td class="ltx_td ltx_align_justify ltx_align_top">
+<span class="ltx_inline-block ltx_align_top">
+<span class="ltx_p" style="width:164.4pt;">give a proof with assumptions <math id="m17" class="ltx_Math" alttext="\mathscr{A}_{1},\mathscr{A}_{2},\ldots,\mathscr{A}_{n}" display="inline"><mrow><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mn>1</mn></msub><mo>,</mo><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mn>2</mn></msub><mo>,</mo><mi mathvariant="normal">…</mi><mo>,</mo><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mi>n</mi></msub></mrow></math> and concluding with <math id="m18" class="ltx_Math" alttext="\mathscr{C}" display="inline"><mi class="ltx_font_mathscript">𝒞︁</mi></math></span>
+</span>
+</td>
+<td class="ltx_td ltx_align_justify ltx_align_top">
+<span class="ltx_inline-block ltx_align_top">
+<span class="ltx_p" style="width:164.4pt;">give an interpretation in which each of <math id="m19" class="ltx_Math" alttext="\mathscr{A}_{1},\mathscr{A}_{2},\ldots,\mathscr{A}_{n}" display="inline"><mrow><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mn>1</mn></msub><mo>,</mo><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mn>2</mn></msub><mo>,</mo><mi mathvariant="normal">…</mi><mo>,</mo><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mi>n</mi></msub></mrow></math> is true and <math id="m20" class="ltx_Math" alttext="\mathscr{C}" display="inline"><mi class="ltx_font_mathscript">𝒞︁</mi></math> is false</span>
+</span>
+</td>
+</tr>
+</table>
+</div>
+</figure>
+</div>
+</section>
+</div>
+</div>
+</div>
+<a href="Ch40.html" class="navigation navigation-prev" aria-label="Previous page"><i class="fa fa-angle-left"></i></a><a href="Pt8.html" class="navigation navigation-next" aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+</div>
+</div>
+</body>
+
+</html>

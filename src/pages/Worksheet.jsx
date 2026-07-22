@@ -15,6 +15,7 @@ import { displayScoreForProof } from '../utils/problemHelpers.js'
 import { useCoursesState } from '../context/CoursesContext.jsx'
 import { useAppRuntime } from '../hooks/useAppRuntime.js'
 import { DEFAULT_LOGIC_SYSTEM, LEGACY_LOGIC_SYSTEM, isDerivationProblemType, normalizeLogicSystem } from '../lib/logicSystems.js'
+import WorksheetTextbookSplit from '../components/textbook/WorksheetTextbookSplit.jsx'
 
 function SandboxWorksheetContent() {
   const { assignmentId } = useParams()
@@ -1395,40 +1396,45 @@ function RealWorksheetContent() {
         '& .logicpenguin': { fontSize: '1.25rem' },
       }}
     >
-      <WorksheetLayout
-        subtitle={currentWorksheet.title || "Predicate Logic: Natural Deduction"}
-        onBackToLMS={() => navigate(backTarget)}
-        worksheets={worksheets}
-        currentWorksheetIndex={currentWorksheetIndex}
-        onWorksheetIndexChange={handleWorksheetChange}
-        completedProofs={completedProofs}
-        isOverdue={isOverdue}
-        isLocked={currentWorksheet.isLocked ?? false}
-        showPolicyInfo={false}
+      <WorksheetTextbookSplit
+        practiceId={currentWorksheet.id}
+        activityKind={currentWorksheet.kind}
       >
-        <WorksheetTabs
-          key={`worksheet-${currentWorksheet?.id ?? worksheetIdNum}`}
+        <WorksheetLayout
+          subtitle={currentWorksheet.title || "Predicate Logic: Natural Deduction"}
+          onBackToLMS={() => navigate(backTarget)}
           worksheets={worksheets}
           currentWorksheetIndex={currentWorksheetIndex}
           onWorksheetIndexChange={handleWorksheetChange}
-          currentProofIndex={currentProofIndex}
-          onProofIndexChange={setCurrentProofIndex}
           completedProofs={completedProofs}
-          questionScores={questionScores}
-          onProofComplete={handleProofComplete}
-          getSavedProofState={getSavedProofState}
-          handleProofStateChange={handleProofStateChange}
-          total={total}
-          completionPercent={completionPercent}
-          gradeLabel={gradeLabel}
-          policySummary={policySummary}
           isOverdue={isOverdue}
-          isInstructorView={isInstructor}
-          onQuestionSaved={currentWorksheet?.id ? (qId) => refreshQuestionSolutions(currentWorksheet.id, qId) : undefined}
-          onQuestionCreated={handleQuestionCreated}
-          logicSystem={courseLogicSystem}
-        />
-      </WorksheetLayout>
+          isLocked={currentWorksheet.isLocked ?? false}
+          showPolicyInfo={false}
+        >
+          <WorksheetTabs
+            key={`worksheet-${currentWorksheet?.id ?? worksheetIdNum}`}
+            worksheets={worksheets}
+            currentWorksheetIndex={currentWorksheetIndex}
+            onWorksheetIndexChange={handleWorksheetChange}
+            currentProofIndex={currentProofIndex}
+            onProofIndexChange={setCurrentProofIndex}
+            completedProofs={completedProofs}
+            questionScores={questionScores}
+            onProofComplete={handleProofComplete}
+            getSavedProofState={getSavedProofState}
+            handleProofStateChange={handleProofStateChange}
+            total={total}
+            completionPercent={completionPercent}
+            gradeLabel={gradeLabel}
+            policySummary={policySummary}
+            isOverdue={isOverdue}
+            isInstructorView={isInstructor}
+            onQuestionSaved={currentWorksheet?.id ? (qId) => refreshQuestionSolutions(currentWorksheet.id, qId) : undefined}
+            onQuestionCreated={handleQuestionCreated}
+            logicSystem={courseLogicSystem}
+          />
+        </WorksheetLayout>
+      </WorksheetTextbookSplit>
     </Box>
   )
 }

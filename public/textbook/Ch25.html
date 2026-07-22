@@ -1,0 +1,1206 @@
+<!DOCTYPE html><html style="--bml-ltx-font-size:10;" class="bml_mathjax4" lang="en">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<title>Chapter 25 Multiple generality ‣ Part V First-order logic ‣ forall x: Calgary</title>
+<!--Generated on Tue Jul 21 20:13:15 2026 by LaTeXML (version 0.8.8) http://dlmf.nist.gov/LaTeXML/.-->
+<!--Document created on Fall 2025 (2026‐07‐18 8642250).-->
+
+<link rel="stylesheet" href="LaTeXML.css" type="text/css">
+<link rel="stylesheet" href="ltx-book.css" type="text/css">
+<link rel="stylesheet" href="bookml/gitbook/css/style.css" type="text/css">
+<link rel="stylesheet" href="bookml/gitbook/css/plugin-table.css" type="text/css">
+<link rel="stylesheet" href="bookml/gitbook/css/plugin-search.css" type="text/css">
+<link rel="stylesheet" href="bookml/gitbook/css/plugin-bookdown.css" type="text/css">
+<link rel="stylesheet" href="bookml/gitbook/css/plugin-fontsettings.css" type="text/css">
+<link rel="stylesheet" href="bookml/CSS/style.css" type="text/css">
+<link rel="stylesheet" href="bookml/CSS/style.gitbook,plain.css" type="text/css">
+<link rel="stylesheet" href="bookml/CSS/style.gitbook.css" type="text/css">
+<link rel="stylesheet" href="bmluser/colors.gitbook-forallxyyc-html.css" type="text/css">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<link rel="stylesheet" href="forallxyyc.css" type="text/css">
+<link rel="stylesheet" href="fitchml.css" type="text/css">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script><script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6"></script>
+<link rel="up" href="Pt5.html" title="Part V First-order logic ‣ forall x: Calgary">
+<link rel="up up" href="index.html" title="forall x: Calgary">
+<link rel="start" href="index.html" title="forall x: Calgary">
+<link rel="prev" href="Ch24.html" title="Chapter 24 Sentences with one quantifier ‣ Part V First-order logic ‣ forall x: Calgary">
+<link rel="next" href="Ch26.html" title="Chapter 26 Identity ‣ Part V First-order logic ‣ forall x: Calgary">
+<link rel="chapter" href="Ch23.html" title="Chapter 23 Building blocks of FOL ‣ Part V First-order logic ‣ forall x: Calgary">
+<link rel="chapter" href="Ch24.html" title="Chapter 24 Sentences with one quantifier ‣ Part V First-order logic ‣ forall x: Calgary">
+<link rel="chapter" href="Ch26.html" title="Chapter 26 Identity ‣ Part V First-order logic ‣ forall x: Calgary">
+<link rel="chapter" href="Ch27.html" title="Chapter 27 Sentences of FOL ‣ Part V First-order logic ‣ forall x: Calgary">
+<link rel="chapter" href="Ch28.html" title="Chapter 28 Definite descriptions ‣ Part V First-order logic ‣ forall x: Calgary">
+<link rel="chapter" href="Ch29.html" title="Chapter 29 Ambiguity ‣ Part V First-order logic ‣ forall x: Calgary">
+<link rel="chapter" href="Chx1.html" title="Preface ‣ forall x: Calgary">
+<link rel="part" href="Pt1.html" title="Part I Key notions of logic ‣ forall x: Calgary">
+<link rel="part" href="Pt2.html" title="Part II Truth-functional logic ‣ forall x: Calgary">
+<link rel="part" href="Pt3.html" title="Part III Truth tables ‣ forall x: Calgary">
+<link rel="part" href="Pt4.html" title="Part IV Natural deduction for TFL ‣ forall x: Calgary">
+<link rel="part" href="Pt5.html" title="Part V First-order logic ‣ forall x: Calgary">
+<link rel="part" href="Pt6.html" title="Part VI Interpretations ‣ forall x: Calgary">
+<link rel="part" href="Pt7.html" title="Part VII Natural deduction for FOL ‣ forall x: Calgary">
+<link rel="part" href="Pt8.html" title="Part VIII Modal logic ‣ forall x: Calgary">
+<link rel="part" href="Pt9.html" title="Part IX Metatheory ‣ forall x: Calgary">
+<link rel="part" href="Ptx1.html" title="Appendices ‣ forall x: Calgary">
+<link rel="part" href="Ptx2.html" title="Solutions to selected exercices ‣ forall x: Calgary">
+<script src="bookml/js/mathjax4.js" defer></script>
+</head>
+<body class="bml_class_book">
+<div class="book without-animation font-size-2 font-family-1" data-basepath=".">
+<a href="#bml-main-content" tabindex="0" class="bml-skip-to-content">Skip to content.</a>
+<div class="book-summary"><nav class="ltx_page_navbar">
+<ul class="ltx_toclist summary">
+<li>
+<a href="index.html" title="" class="ltx_ref" rel="start">forall x: Calgary</a>
+</li>
+<li class="divider" aria-hidden="true"></li>
+<li data-level="" data-path="Chx1.html" class="ltx_tocentry ltx_tocentry_chapter  chapter "><a href="Chx1.html" title="In forall x: Calgary" class="ltx_ref">Preface</a></li>
+<li data-level="I" data-path="Pt1.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt1.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">I </span></b>Key notions of logic</a></li>
+<li data-level="II" data-path="Pt2.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt2.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">II </span></b>Truth-functional logic</a></li>
+<li data-level="III" data-path="Pt3.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt3.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">III </span></b>Truth tables</a></li>
+<li data-level="IV" data-path="Pt4.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt4.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">IV </span></b>Natural deduction for TFL</a></li>
+<li data-level="V" data-path="Pt5.html" class="ltx_tocentry ltx_tocentry_part  chapter ">
+<a href="Pt5.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">V </span></b>First-order logic</a>
+<ol class="ltx_toclist ltx_toclist_part">
+<li data-level="23" data-path="Ch23.html" class="ltx_tocentry ltx_tocentry_chapter  chapter "><a href="Ch23.html" title="In Part V First-order logic ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">23 </span></b>Building blocks of FOL</a></li>
+<li data-level="24" data-path="Ch24.html" class="ltx_tocentry ltx_tocentry_chapter  chapter "><a href="Ch24.html" title="In Part V First-order logic ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">24 </span></b>Sentences with one quantifier</a></li>
+<li data-level="25" data-path="" class="ltx_tocentry ltx_tocentry_chapter ltx_ref_self  chapter active">
+<a href="" title="In Part V First-order logic ‣ forall x: Calgary" aria-current="page" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">25 </span></b>Multiple generality</a>
+<ol class="ltx_toclist ltx_toclist_chapter">
+<li data-level="25.1" data-path="" class="ltx_tocentry ltx_tocentry_section  chapter "><a href="#S1" title="In Chapter 25 Multiple generality ‣ Part V First-order logic ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">25.1 </span></b>Many-placed predicates</a></li>
+<li data-level="25.2" data-path="" class="ltx_tocentry ltx_tocentry_section  chapter "><a href="#S2" title="In Chapter 25 Multiple generality ‣ Part V First-order logic ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">25.2 </span></b>Mind the gap(s)!</a></li>
+<li data-level="25.3" data-path="" class="ltx_tocentry ltx_tocentry_section  chapter "><a href="#S3" title="In Chapter 25 Multiple generality ‣ Part V First-order logic ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">25.3 </span></b>The order of quantifiers</a></li>
+<li data-level="25.4" data-path="" class="ltx_tocentry ltx_tocentry_section  chapter "><a href="#S4" title="In Chapter 25 Multiple generality ‣ Part V First-order logic ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">25.4 </span></b>Stepping-stones to symbolization</a></li>
+<li data-level="25.5" data-path="" class="ltx_tocentry ltx_tocentry_section  chapter "><a href="#S5" title="In Chapter 25 Multiple generality ‣ Part V First-order logic ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">25.5 </span></b>Supressed quantifiers</a></li>
+<li data-level="" data-path="" class="ltx_tocentry ltx_tocentry_section  chapter "><a href="#Sx1" title="In Chapter 25 Multiple generality ‣ Part V First-order logic ‣ forall x: Calgary" class="ltx_ref">Practice exercises</a></li>
+</ol>
+</li>
+<li data-level="26" data-path="Ch26.html" class="ltx_tocentry ltx_tocentry_chapter  chapter "><a href="Ch26.html" title="In Part V First-order logic ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">26 </span></b>Identity</a></li>
+<li data-level="27" data-path="Ch27.html" class="ltx_tocentry ltx_tocentry_chapter  chapter "><a href="Ch27.html" title="In Part V First-order logic ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">27 </span></b>Sentences of FOL</a></li>
+<li data-level="28" data-path="Ch28.html" class="ltx_tocentry ltx_tocentry_chapter  chapter "><a href="Ch28.html" title="In Part V First-order logic ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">28 </span></b>Definite descriptions</a></li>
+<li data-level="29" data-path="Ch29.html" class="ltx_tocentry ltx_tocentry_chapter  chapter "><a href="Ch29.html" title="In Part V First-order logic ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">29 </span></b>Ambiguity</a></li>
+</ol>
+</li>
+<li data-level="VI" data-path="Pt6.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt6.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">VI </span></b>Interpretations</a></li>
+<li data-level="VII" data-path="Pt7.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt7.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">VII </span></b>Natural deduction for FOL</a></li>
+<li data-level="VIII" data-path="Pt8.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt8.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">VIII </span></b>Modal logic</a></li>
+<li data-level="IX" data-path="Pt9.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt9.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">IX </span></b>Metatheory</a></li>
+<li data-level="" data-path="Ptx1.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Ptx1.html" title="In forall x: Calgary" class="ltx_ref">Appendices</a></li>
+<li data-level="" data-path="Ptx2.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Ptx2.html" title="In forall x: Calgary" class="ltx_ref">Solutions to selected exercices</a></li>
+</ul>
+</nav></div>
+
+<div class="ltx_page_main book-body fixed">
+<div class="body-inner">
+<header class="book-header fixed" aria-label="toolbar"><span class="bml-separator"></span></header>
+<div class="page-wrapper" tabindex="-1" role="main">
+<div class="ltx_page_content page-inner" id="bml-main-content">
+<script src="bookml/gitbook/js/app.min.js"></script>
+<script src="bookml/gitbook/js/jquery.highlight.js"></script>
+<script src="bookml/gitbook/js/plugin-search.js"></script>
+<script src="bookml/gitbook/js/plugin-fontsettings.js"></script>
+<script src="bookml/gitbook/js/plugin-bookdown.js"></script>
+<script type="text/javascript">
+                  gitbook.require(["gitbook"], function(gitbook) {
+                  gitbook.start({
+                    "fontsettings": {
+                      "theme": "white",
+                      "family": "sans",
+                      "size": 2
+                    },
+                    "download": [ [ "forallxyyc.pdf", "PDF" ], [ "forallxyyc-accessible.pdf", "PDF (accessible)" ], ],
+                    "search": {
+                      "engine": "fuse"
+                    },
+                    "toc": {
+                      "collapse": "none"
+                    }
+                  });
+                });
+              </script>
+
+<section class="ltx_chapter ltx_authors_1line normal" lang="en">
+<div class="section level1">
+<h1 class="ltx_title ltx_title_chapter">
+<span class="ltx_tag ltx_tag_chapter header-section-number">Chapter 25</span> Multiple generality</h1>
+
+<div id="p1" class="ltx_para">
+<p class="ltx_p">So far, we have only considered sentences that require one-place predicates and one quantifier. The full power of FOL really comes out when we start to use many-place predicates and multiple quantifiers. For this insight, we largely have <span class="ltx_text" lang="de">Gottlob Frege</span> (1879) to thank, but also C. S. Peirce.</p>
+</div>
+<section id="S1" class="ltx_section normal">
+<div class="section level2">
+<h2 class="ltx_title ltx_title_section">
+<span class="ltx_tag ltx_tag_section header-section-number">25.1</span> Many-placed predicates</h2>
+
+<div id="S1.p1" class="ltx_para">
+<p class="ltx_p">All of the predicates that we have considered so far concern properties that objects might have. Those predicates have one gap in them, and to make a sentence, we simply need to slot in one term. They are <dfn>one-place</dfn>
+ predicates.</p>
+</div>
+<div id="S1.p2" class="ltx_para">
+<p class="ltx_p">However, other predicates concern the <span class="ltx_text ltx_font_bold">relation</span> between two things. Here are some examples of relational predicates in English:</p>
+<ul id="S1.I1" class="ltx_itemize">
+<li id="S1.I1.i1" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">‣</span><div id="S1.I1.i1.p1" class="ltx_para">​<p class="ltx_p"><span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span> loves <span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank</span></p>
+</div>
+</li>
+<li id="S1.I1.i2" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">‣</span><div id="S1.I1.i2.p1" class="ltx_para">​<p class="ltx_p"><span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span> is to the left of <span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank</span></p>
+</div>
+</li>
+<li id="S1.I1.i3" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">‣</span><div id="S1.I1.i3.p1" class="ltx_para">​<p class="ltx_p"><span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span> is in debt to <span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank</span></p>
+</div>
+</li>
+</ul>
+<p class="ltx_p">These are <dfn>two-place</dfn>
+ predicates. They need to be filled in with two terms in order to make a sentence. Conversely, if we start with an English sentence containing many singular terms, we can remove two singular terms, to obtain different two-place predicates. Consider the sentence ‘Vinnie borrowed the family car from Nunzio’. By deleting two singular terms, we can obtain any of three different two-place predicates</p>
+<ul id="S1.I2" class="ltx_itemize">
+<li id="S1.I2.i1" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">‣</span><div id="S1.I2.i1.p1" class="ltx_para">​<p class="ltx_p">Vinnie borrowed <span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span> from <span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank</span></p>
+</div>
+</li>
+<li id="S1.I2.i2" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">‣</span><div id="S1.I2.i2.p1" class="ltx_para">​<p class="ltx_p"><span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span> borrowed the family car from <span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank</span></p>
+</div>
+</li>
+<li id="S1.I2.i3" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">‣</span><div id="S1.I2.i3.p1" class="ltx_para">​<p class="ltx_p"><span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span> borrowed <span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span> from Nunzio</p>
+</div>
+</li>
+</ul>
+<p class="ltx_p">and by removing all three singular terms, we obtain a <dfn>three-place</dfn>
+ predicate:</p>
+<ul id="S1.I3" class="ltx_itemize">
+<li id="S1.I3.i1" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">‣</span><div id="S1.I3.i1.p1" class="ltx_para">​<p class="ltx_p"><span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span> borrowed <span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span> from <span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank</span></p>
+</div>
+</li>
+</ul>
+<p class="ltx_p">Indeed, there is no in principle upper limit on the number of places that our predicates may contain.</p>
+</div>
+</div>
+</section>
+<section id="S2" class="ltx_section normal">
+<div class="section level2">
+<h2 class="ltx_title ltx_title_section">
+<span class="ltx_tag ltx_tag_section header-section-number">25.2</span> Mind the gap(s)!</h2>
+
+<div id="S2.p1" class="ltx_para">
+<p class="ltx_p">We have used the same symbol, ‘<span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span>’, to indicate a gap formed by deleting a term from a sentence. However, as <span class="ltx_text" lang="de">Frege</span> emphasized, these are <span class="ltx_text ltx_font_bold">different</span> gaps. To obtain a sentence, we can fill them in with the same term, but we can equally fill them in with different terms, and in various different orders. The following are three perfectly good sentences, obtained by filling in the gaps in ‘<span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span> loves <span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span>’ in different ways; but they all have distinctively different meanings:</p>
+<ol id="S2.I1" class="ltx_enumerate">
+<li id="S2.I1.i1" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">1.</span><div id="S2.I1.i1.p1" class="ltx_para">​<p class="ltx_p">Karl loves Imre.</p>
+</div>
+</li>
+<li id="S2.I1.i2" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">2.</span><div id="S2.I1.i2.p1" class="ltx_para">​<p class="ltx_p">Imre loves Karl.</p>
+</div>
+</li>
+<li id="S2.I1.i3" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">3.</span><div id="S2.I1.i3.p1" class="ltx_para">​<p class="ltx_p">Karl loves Karl.</p>
+</div>
+</li>
+</ol>
+<p class="ltx_p">The point is that we need to keep track of the gaps in predicates, so that we can keep track of how we are filling them in. To keep track of the gaps, we assign them variables. Suppose we want to symbolize the preceding sentences. Then I might start with the following symbolization key:</p>
+<dl id="S2.I2" class="ltx_description">
+<dt id="S2.I2.ix1" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <span class="ltx_text ltx_markedasmath">domain</span>:</span></dt>
+<dd class="ltx_item">
+<div id="S2.I2.ix1.p1" class="ltx_para">
+<p class="ltx_p">people</p>
+</div>
+</dd>
+<dt id="S2.I2.ix2" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="S2.I2.ix2.m1" class="ltx_Math" alttext="i" display="inline"><mi>i</mi></math>:</span></dt>
+<dd class="ltx_item">
+<div id="S2.I2.ix2.p1" class="ltx_para">
+<p class="ltx_p">Imre</p>
+</div>
+</dd>
+<dt id="S2.I2.ix3" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="S2.I2.ix3.m1" class="ltx_Math" alttext="k" display="inline"><mi>k</mi></math>:</span></dt>
+<dd class="ltx_item">
+<div id="S2.I2.ix3.p1" class="ltx_para">
+<p class="ltx_p">Karl</p>
+</div>
+</dd>
+<dt id="S2.I2.ix4" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="S2.I2.ix4.m1" class="ltx_Math" alttext="L(x,y)" display="inline"><mrow><mi>L</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo>,</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow></math>:</span></dt>
+<dd class="ltx_item">
+<div id="S2.I2.ix4.p1" class="ltx_para">
+<p class="ltx_p"><span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span><sub class="ltx_sub"><span class="ltx_text ltx_font_italic">x</span></sub> loves <span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span><sub class="ltx_sub"><span class="ltx_text ltx_font_italic">y</span></sub></p>
+</div>
+</dd>
+</dl>
+<p class="ltx_p"><span class="ltx_ref ltx_nolink ltx_ref_self"><span class="ltx_text ltx_ref_tag">Sentence</span> <span class="ltx_text ltx_ref_tag">1</span></span> will be symbolized by ‘<math id="S2.p1.m1" class="ltx_Math" alttext="L(k,i)" display="inline"><mrow><mi>L</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>k</mi><mo>,</mo><mi>i</mi><mo stretchy="false">)</mo></mrow></mrow></math>’, <span class="ltx_ref ltx_nolink ltx_ref_self"><span class="ltx_text ltx_ref_tag">sentence</span> <span class="ltx_text ltx_ref_tag">2</span></span> will be symbolized by ‘<math id="S2.p1.m2" class="ltx_Math" alttext="L(i,k)" display="inline"><mrow><mi>L</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>i</mi><mo>,</mo><mi>k</mi><mo stretchy="false">)</mo></mrow></mrow></math>’, and <span class="ltx_ref ltx_nolink ltx_ref_self"><span class="ltx_text ltx_ref_tag">sentence</span> <span class="ltx_text ltx_ref_tag">3</span></span> will be symbolized by ‘<math id="S2.p1.m3" class="ltx_Math" alttext="L(k,k)" display="inline"><mrow><mi>L</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>k</mi><mo>,</mo><mi>k</mi><mo stretchy="false">)</mo></mrow></mrow></math>’. Here are a few more sentences that we can symbolize with the same key:</p>
+<ol id="S2.I3" class="ltx_enumerate">
+<li id="S2.I3.i4" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">4.</span><div id="S2.I3.i4.p1" class="ltx_para">​<p class="ltx_p">Imre loves himself.</p>
+</div>
+</li>
+<li id="S2.I3.i5" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">5.</span><div id="S2.I3.i5.p1" class="ltx_para">​<p class="ltx_p">Karl loves Imre, but not vice versa.</p>
+</div>
+</li>
+<li id="S2.I3.i6" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">6.</span><div id="S2.I3.i6.p1" class="ltx_para">​<p class="ltx_p">Karl is loved by Imre.</p>
+</div>
+</li>
+</ol>
+<p class="ltx_p"><span class="ltx_ref ltx_nolink ltx_ref_self"><span class="ltx_text ltx_ref_tag">Sentence</span> <span class="ltx_text ltx_ref_tag">4</span></span> can be paraphrased as ‘Imre loves Imre’, and so
+symbolized by ‘<math id="S2.p1.m4" class="ltx_Math" alttext="L(i,i)" display="inline"><mrow><mi>L</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>i</mi><mo>,</mo><mi>i</mi><mo stretchy="false">)</mo></mrow></mrow></math>’. <span class="ltx_ref ltx_nolink ltx_ref_self"><span class="ltx_text ltx_ref_tag">Sentence</span> <span class="ltx_text ltx_ref_tag">5</span></span> is a conjunction. We
+can paraphrase it as ‘Karl loves Imre, and Imre does not love Karl’,
+and so symbolize it as ‘<math id="S2.p1.m5" class="ltx_Math" alttext="L(k,i)\wedge\neg L(i,k)" display="inline"><mrow><mrow><mi>L</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>k</mi><mo>,</mo><mi>i</mi><mo stretchy="false">)</mo></mrow></mrow><mo>∧</mo><mrow><mo rspace="0.167em">¬</mo><mrow><mi>L</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>i</mi><mo>,</mo><mi>k</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></math>’.
+<span class="ltx_ref ltx_nolink ltx_ref_self"><span class="ltx_text ltx_ref_tag">Sentence</span> <span class="ltx_text ltx_ref_tag">6</span></span> can be paraphrased by ‘Imre loves Karl’, and so
+symbolized as ‘<math id="S2.p1.m6" class="ltx_Math" alttext="L(i,k)" display="inline"><mrow><mi>L</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>i</mi><mo>,</mo><mi>k</mi><mo stretchy="false">)</mo></mrow></mrow></math>’. In this last case, of course, we have
+lost the difference in <span class="ltx_text ltx_font_bold">tone</span> between the active and passive
+voice; but we have at least preserved the truth conditions.</p>
+</div>
+<div id="S2.p2" class="ltx_para">
+<p class="ltx_p">But the relationship between ‘Imre loves Karl’ and ‘Karl is loved by Imre’ highlights something important. To see what, suppose we add another entry to our symbolization key:</p>
+<dl id="S2.I4" class="ltx_description">
+<dt id="S2.I4.ix1" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="S2.I4.ix1.m1" class="ltx_Math" alttext="M(x,y)" display="inline"><mrow><mi>M</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo>,</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow></math>:</span></dt>
+<dd class="ltx_item">
+<div id="S2.I4.ix1.p1" class="ltx_para">
+<p class="ltx_p"><span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span><sub class="ltx_sub"><span class="ltx_text ltx_font_italic">y</span></sub> loves <span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span><sub class="ltx_sub"><span class="ltx_text ltx_font_italic">x</span></sub></p>
+</div>
+</dd>
+</dl>
+<p class="ltx_p">The entry for ‘<math id="S2.p2.m1" class="ltx_Math" alttext="M" display="inline"><mi>M</mi></math>’ uses exactly the same English word—‘loves’—as the entry for ‘<math id="S2.p2.m2" class="ltx_Math" alttext="L" display="inline"><mi>L</mi></math>’. <span class="ltx_text ltx_font_bold">But the gaps have been swapped around!</span> (Just look closely at the subscripts.) And this <span class="ltx_text ltx_font_bold">matters</span>.</p>
+</div>
+<div id="S2.p3" class="ltx_para">
+<p class="ltx_p">To explain: when we see a sentence like ‘<math id="S2.p3.m1" class="ltx_Math" alttext="L(k,i)" display="inline"><mrow><mi>L</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>k</mi><mo>,</mo><mi>i</mi><mo stretchy="false">)</mo></mrow></mrow></math>’, we are
+being told to take the <span class="ltx_text ltx_font_bold">first</span> name (i.e., ‘<math id="S2.p3.m2" class="ltx_Math" alttext="k" display="inline"><mi>k</mi></math>’) and associate
+its value (i.e., Karl) with the gap labelled ‘<math id="S2.p3.m3" class="ltx_Math" alttext="x" display="inline"><mi>x</mi></math>’, then take the
+<span class="ltx_text ltx_font_bold">second</span> name (i.e., ‘<math id="S2.p3.m4" class="ltx_Math" alttext="i" display="inline"><mi>i</mi></math>’) and associate its value (i.e., Imre)
+with the gap labelled ‘<math id="S2.p3.m5" class="ltx_Math" alttext="y" display="inline"><mi>y</mi></math>’, and so come up with: <span class="ltx_text ltx_font_bold">Karl loves
+Imre</span>. The sentence ‘<math id="S2.p3.m6" class="ltx_Math" alttext="M(i,k)" display="inline"><mrow><mi>M</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>i</mi><mo>,</mo><mi>k</mi><mo stretchy="false">)</mo></mrow></mrow></math>’ also tells us to take the
+<span class="ltx_text ltx_font_bold">first</span> name (i.e., ‘<math id="S2.p3.m7" class="ltx_Math" alttext="i" display="inline"><mi>i</mi></math>’) and plug its value into the gap
+labelled ‘<math id="S2.p3.m8" class="ltx_Math" alttext="x" display="inline"><mi>x</mi></math>’, and take the <span class="ltx_text ltx_font_bold">second</span> name (i.e., ‘<math id="S2.p3.m9" class="ltx_Math" alttext="k" display="inline"><mi>k</mi></math>’) and plug
+its value into the gap labelled ‘<math id="S2.p3.m10" class="ltx_Math" alttext="y" display="inline"><mi>y</mi></math>’, and so also come up with:
+<span class="ltx_text ltx_font_bold">Karl loves Imre</span>.</p>
+</div>
+<div id="S2.p4" class="ltx_para">
+<p class="ltx_p">So, ‘<math id="S2.p4.m1" class="ltx_Math" alttext="L(i,k)" display="inline"><mrow><mi>L</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>i</mi><mo>,</mo><mi>k</mi><mo stretchy="false">)</mo></mrow></mrow></math>’ and ‘<math id="S2.p4.m2" class="ltx_Math" alttext="M(k,i)" display="inline"><mrow><mi>M</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>k</mi><mo>,</mo><mi>i</mi><mo stretchy="false">)</mo></mrow></mrow></math>’ both symbolize ‘Imre loves Karl’, whereas ‘<math id="S2.p4.m3" class="ltx_Math" alttext="L(k,i)" display="inline"><mrow><mi>L</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>k</mi><mo>,</mo><mi>i</mi><mo stretchy="false">)</mo></mrow></mrow></math>’ and ‘<math id="S2.p4.m4" class="ltx_Math" alttext="M(i,k)" display="inline"><mrow><mi>M</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>i</mi><mo>,</mo><mi>k</mi><mo stretchy="false">)</mo></mrow></mrow></math>’ both symbolize ‘Karl loves Imre’. Since love can be unrequited, these are different claims.</p>
+</div>
+<div id="S2.p5" class="ltx_para">
+<p class="ltx_p">One last example might be helpful. Suppose we add this to our symbolisation key:</p>
+<dl id="S2.I5" class="ltx_description">
+<dt id="S2.I5.ix1" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="S2.I5.ix1.m1" class="ltx_Math" alttext="P(x,y)" display="inline"><mrow><mi>P</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo>,</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow></math>:</span></dt>
+<dd class="ltx_item">
+<div id="S2.I5.ix1.p1" class="ltx_para">
+<p class="ltx_p"><span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span><sub class="ltx_sub"><span class="ltx_text ltx_font_italic">x</span></sub> prefers <span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span><sub class="ltx_sub"><span class="ltx_text ltx_font_italic">x</span></sub> to <span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span><sub class="ltx_sub"><span class="ltx_text ltx_font_italic">y</span></sub></p>
+</div>
+</dd>
+</dl>
+<p class="ltx_p">Now the sentence ‘<math id="S2.p5.m1" class="ltx_Math" alttext="P(i,k)" display="inline"><mrow><mi>P</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>i</mi><mo>,</mo><mi>k</mi><mo stretchy="false">)</mo></mrow></mrow></math>’ symbolizes ‘Imre prefers Imre to Karl’, and ‘<math id="S2.p5.m2" class="ltx_Math" alttext="P(k,i)" display="inline"><mrow><mi>P</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>k</mi><mo>,</mo><mi>i</mi><mo stretchy="false">)</mo></mrow></mrow></math>’ symbolizes ‘Karl prefers Karl to Imre’. And note that we could have achieved the same effect, if we had instead specified:</p>
+<dl id="S2.I6" class="ltx_description">
+<dt id="S2.I6.ix1" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="S2.I6.ix1.m1" class="ltx_Math" alttext="P(x,y)" display="inline"><mrow><mi>P</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo>,</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow></math>:</span></dt>
+<dd class="ltx_item">
+<div id="S2.I6.ix1.p1" class="ltx_para">
+<p class="ltx_p"><span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span><sub class="ltx_sub"><span class="ltx_text ltx_font_italic">x</span></sub> prefers themselves to <span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span><sub class="ltx_sub"><span class="ltx_text ltx_font_italic">y</span></sub></p>
+</div>
+</dd>
+</dl>
+<p class="ltx_p">In any case, the overall moral of this is simple. <span class="ltx_text ltx_font_bold">When dealing with predicates with more than one place, pay careful attention to the order of the gaps!</span></p>
+</div>
+</div>
+</section>
+<section id="S3" class="ltx_section normal">
+<div class="section level2">
+<h2 class="ltx_title ltx_title_section">
+<span class="ltx_tag ltx_tag_section header-section-number">25.3</span> The order of quantifiers</h2>
+
+<div id="S3.p1" class="ltx_para">
+<p class="ltx_p">Consider the sentence ‘everyone loves someone’. This is potentially ambiguous. It might mean either of the following:</p>
+<ol id="S3.I1" class="ltx_enumerate">
+<li id="S3.I1.i7" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">7.</span><div id="S3.I1.i7.p1" class="ltx_para">​<p class="ltx_p">For every person x, there is some person that x loves.</p>
+</div>
+</li>
+<li id="S3.I1.i8" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">8.</span><div id="S3.I1.i8.p1" class="ltx_para">​<p class="ltx_p">There is some particular person whom every person loves.</p>
+</div>
+</li>
+</ol>
+<p class="ltx_p"><span class="ltx_ref ltx_nolink ltx_ref_self"><span class="ltx_text ltx_ref_tag">Sentence</span> <span class="ltx_text ltx_ref_tag">7</span></span> can be symbolized by ‘<math id="S3.p1.m1" class="ltx_Math" alttext="\forall x\exists y\,L(x,y)" display="inline"><mrow><mo rspace="0.167em">∀</mo><mrow><mi>x</mi><mo lspace="0.167em">⁢</mo><mrow><mo rspace="0.167em">∃</mo><mrow><mi>y</mi><mo lspace="0.170em">⁢</mo><mrow><mi>L</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo>,</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></mrow></mrow></math>’. Suppose that our domain of discourse is restricted to Imre, Juan and Karl. Suppose also that Karl loves Imre but not Juan, that Imre loves Juan but not Karl, and that Juan loves Karl but not Imre. Then <span class="ltx_ref ltx_nolink ltx_ref_self"><span class="ltx_text ltx_ref_tag">sentence</span> <span class="ltx_text ltx_ref_tag">7</span></span> is true.</p>
+</div>
+<div id="S3.p2" class="ltx_para">
+<p class="ltx_p"><span class="ltx_ref ltx_nolink ltx_ref_self"><span class="ltx_text ltx_ref_tag">Sentence</span> <span class="ltx_text ltx_ref_tag">8</span></span> is symbolized by ‘<math id="S3.p2.m1" class="ltx_Math" alttext="\exists y\forall x\,L(x,y)" display="inline"><mrow><mo rspace="0.167em">∃</mo><mrow><mi>y</mi><mo lspace="0.167em">⁢</mo><mrow><mo rspace="0.167em">∀</mo><mrow><mi>x</mi><mo lspace="0.170em">⁢</mo><mrow><mi>L</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo>,</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></mrow></mrow></math>’. <a href="#S3.I1.i8" title="In 25.3 The order of quantifiers ‣ Chapter 25 Multiple generality ‣ Part V First-order logic ‣ forall x: Calgary" class="ltx_ref"><span class="ltx_text ltx_ref_tag">Sentence</span> <span class="ltx_text ltx_ref_tag">8</span></a> is <span class="ltx_text ltx_font_bold">not</span> true in the
+situation just described, since no single person is loved by everyone.
+All three of Juan, Imre and Karl would have to converge on (at least)
+one object of love.</p>
+</div>
+<div id="S3.p3" class="ltx_para">
+<p class="ltx_p">The point of the example is to illustrate that the order of the quantifiers matters a great deal. Indeed, to switch them around is called a <span class="ltx_text ltx_font_bold">quantifier shift fallacy</span>. Here is an example, which comes up in various forms throughout the philosophical literature:</p>
+<ul id="S3.I2" class="ltx_itemize">
+<li id="S3.I2.ix1" class="ltx_item" style="list-style-type:none;"><div id="S3.I2.ix1.p1" class="ltx_para">
+<p class="ltx_p">For every person, there is some truth they cannot know.  (<math id="S3.I2.ix1.p1.m1" class="ltx_Math" alttext="\forall\exists" display="inline"><mrow><mo rspace="0.167em">∀</mo><mo>∃</mo></mrow></math>)</p>
+</div></li>
+<li id="S3.I2.ix2" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">∴</span><div id="S3.I2.ix2.p1" class="ltx_para">​<p class="ltx_p">There is some particular truth that no person can know.  (<math id="S3.I2.ix2.p1.m1" class="ltx_Math" alttext="\exists\forall" display="inline"><mrow><mo rspace="0.167em">∃</mo><mo>∀</mo></mrow></math>)</p>
+</div>
+</li>
+</ul>
+<p class="ltx_p">This argument form is obviously invalid. It’s just as bad as:<span id="footnote1" class="ltx_note ltx_role_footnote"><sup class="ltx_note_mark">1</sup><span class="ltx_note_outer"><span class="ltx_note_content"><sup class="ltx_note_mark">1</sup>
+                <span class="ltx_tag ltx_tag_note">1</span>
+                
+                
+                
+                
+                
+                
+                
+              Thanks to Rob Trueman for the example.</span></span></span></p>
+<ul id="S3.I3" class="ltx_itemize">
+<li id="S3.I3.ix1" class="ltx_item" style="list-style-type:none;"><div id="S3.I3.ix1.p1" class="ltx_para">
+<p class="ltx_p">Every dog has its day.  (<math id="S3.I3.ix1.p1.m1" class="ltx_Math" alttext="\forall\exists" display="inline"><mrow><mo rspace="0.167em">∀</mo><mo>∃</mo></mrow></math>)</p>
+</div></li>
+<li id="S3.I3.ix2" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">∴</span><div id="S3.I3.ix2.p1" class="ltx_para">​<p class="ltx_p">There is a day for all the dogs.  (<math id="S3.I3.ix2.p1.m1" class="ltx_Math" alttext="\exists\forall" display="inline"><mrow><mo rspace="0.167em">∃</mo><mo>∀</mo></mrow></math>)</p>
+</div>
+</li>
+</ul>
+</div>
+<div id="S3.p4" class="ltx_para">
+<p class="ltx_p">The order of quantifiers is also important in definitions in mathematics. For instance, there is a big difference between pointwise and uniform continuity of functions:</p>
+<ul id="S3.I4" class="ltx_itemize">
+<li id="S3.I4.i1" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">‣</span><div id="S3.I4.i1.p1" class="ltx_para">​<p class="ltx_p">A function <math id="S3.I4.i1.p1.m1" class="ltx_Math" alttext="f" display="inline"><mi>f</mi></math> is <span class="ltx_text ltx_font_bold">pointwise continuous</span> if</p>
+<div id="Ex1" class="ltx_equation bml_equation bml_equation_container ltx_align_baseline">
+<div class="ltx_Math bml_eqn_cell ltx_align_center"><math id="Ex1.m1" class="ltx_Math" alttext="\forall\epsilon\forall x\exists\delta\forall y(\left|x-y\right|&lt;\delta\to\left%
+|f(x)-f(y)\right|&lt;\epsilon)" display="block"><mrow><mo rspace="0.167em">∀</mo><mrow><mi>ϵ</mi><mo lspace="0.167em">⁢</mo><mrow><mo rspace="0.167em">∀</mo><mrow><mi>x</mi><mo lspace="0.167em">⁢</mo><mrow><mo rspace="0.167em">∃</mo><mrow><mi>δ</mi><mo lspace="0.167em">⁢</mo><mrow><mo rspace="0.167em">∀</mo><mrow><mi>y</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mo>|</mo><mrow><mi>x</mi><mo>−</mo><mi>y</mi></mrow><mo>|</mo></mrow><mo>&lt;</mo><mi>δ</mi><mo stretchy="false">→</mo><mrow><mo>|</mo><mrow><mrow><mi>f</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo>−</mo><mrow><mi>f</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo>|</mo></mrow><mo>&lt;</mo><mi>ϵ</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></mrow></mrow></mrow></mrow></mrow></math></div>
+</div>
+</div>
+</li>
+<li id="S3.I4.i2" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">‣</span><div id="S3.I4.i2.p1" class="ltx_para">​<p class="ltx_p">A function <math id="S3.I4.i2.p1.m1" class="ltx_Math" alttext="f" display="inline"><mi>f</mi></math> is <span class="ltx_text ltx_font_bold">uniformly continuous</span> if</p>
+<div id="Ex2" class="ltx_equation bml_equation bml_equation_container ltx_align_baseline">
+<div class="ltx_Math bml_eqn_cell ltx_align_center"><math id="Ex2.m1" class="ltx_Math" alttext="\forall\epsilon\exists\delta\forall x\forall y(\left|x-y\right|&lt;\delta\to\left%
+|f(x)-f(y)\right|&lt;\epsilon)" display="block"><mrow><mo rspace="0.167em">∀</mo><mrow><mi>ϵ</mi><mo lspace="0.167em">⁢</mo><mrow><mo rspace="0.167em">∃</mo><mrow><mi>δ</mi><mo lspace="0.167em">⁢</mo><mrow><mo rspace="0.167em">∀</mo><mrow><mi>x</mi><mo lspace="0.167em">⁢</mo><mrow><mo rspace="0.167em">∀</mo><mrow><mi>y</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mo>|</mo><mrow><mi>x</mi><mo>−</mo><mi>y</mi></mrow><mo>|</mo></mrow><mo>&lt;</mo><mi>δ</mi><mo stretchy="false">→</mo><mrow><mo>|</mo><mrow><mrow><mi>f</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo>−</mo><mrow><mi>f</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo>|</mo></mrow><mo>&lt;</mo><mi>ϵ</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></mrow></mrow></mrow></mrow></mrow></math></div>
+</div>
+</div>
+</li>
+</ul>
+</div>
+<div id="S3.p5" class="ltx_para">
+<p class="ltx_p">The moral is simple: <span class="ltx_text ltx_font_bold">take great care with the order of your quantifiers!</span></p>
+</div>
+</div>
+</section>
+<section id="S4" class="ltx_section normal">
+<div class="section level2">
+<h2 class="ltx_title ltx_title_section">
+<span class="ltx_tag ltx_tag_section header-section-number">25.4</span> Stepping-stones to symbolization</h2>
+
+<div id="S4.p1" class="ltx_para">
+<p class="ltx_p">As we are starting to see, symbolization in FOL can become a bit tricky. So, when symbolizing a complex sentence, you should lay down several stepping-stones. As usual, the idea is best illustrated by example. Consider this symbolisation key:</p>
+<dl id="S4.I1" class="ltx_description">
+<dt id="S4.I1.ix1" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <span class="ltx_text ltx_markedasmath">domain</span>:</span></dt>
+<dd class="ltx_item">
+<div id="S4.I1.ix1.p1" class="ltx_para">
+<p class="ltx_p">people and dogs</p>
+</div>
+</dd>
+<dt id="S4.I1.ix2" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="S4.I1.ix2.m1" class="ltx_Math" alttext="D(x)" display="inline"><mrow><mi>D</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></math>:</span></dt>
+<dd class="ltx_item">
+<div id="S4.I1.ix2.p1" class="ltx_para">
+<p class="ltx_p"><span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span><sub class="ltx_sub"><span class="ltx_text ltx_font_italic">x</span></sub> is a dog</p>
+</div>
+</dd>
+<dt id="S4.I1.ix3" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="S4.I1.ix3.m1" class="ltx_Math" alttext="F(x,y)" display="inline"><mrow><mi>F</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo>,</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow></math>:</span></dt>
+<dd class="ltx_item">
+<div id="S4.I1.ix3.p1" class="ltx_para">
+<p class="ltx_p"><span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span><sub class="ltx_sub"><span class="ltx_text ltx_font_italic">x</span></sub> is a friend of <span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span><sub class="ltx_sub"><span class="ltx_text ltx_font_italic">y</span></sub></p>
+</div>
+</dd>
+<dt id="S4.I1.ix4" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="S4.I1.ix4.m1" class="ltx_Math" alttext="O(x,y)" display="inline"><mrow><mi>O</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo>,</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow></math>:</span></dt>
+<dd class="ltx_item">
+<div id="S4.I1.ix4.p1" class="ltx_para">
+<p class="ltx_p"><span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span><sub class="ltx_sub"><span class="ltx_text ltx_font_italic">x</span></sub> owns <span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span><sub class="ltx_sub"><span class="ltx_text ltx_font_italic">y</span></sub></p>
+</div>
+</dd>
+<dt id="S4.I1.ix5" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="S4.I1.ix5.m1" class="ltx_Math" alttext="g" display="inline"><mi>g</mi></math>:</span></dt>
+<dd class="ltx_item">
+<div id="S4.I1.ix5.p1" class="ltx_para">
+<p class="ltx_p">Geraldo</p>
+</div>
+</dd>
+</dl>
+<p class="ltx_p">Now let’s try to symbolize these sentences:</p>
+<ol id="S4.I2" class="ltx_enumerate">
+<li id="S4.I2.i9" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">9.</span><div id="S4.I2.i9.p1" class="ltx_para">​<p class="ltx_p">Geraldo is a dog owner.</p>
+</div>
+</li>
+<li id="S4.I2.i10" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">10.</span><div id="S4.I2.i10.p1" class="ltx_para">​<p class="ltx_p">Someone is a dog owner.</p>
+</div>
+</li>
+<li id="S4.I2.i11" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">11.</span><div id="S4.I2.i11.p1" class="ltx_para">​<p class="ltx_p">All of Geraldo’s friends are dog owners.</p>
+</div>
+</li>
+<li id="S4.I2.i12" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">12.</span><div id="S4.I2.i12.p1" class="ltx_para">​<p class="ltx_p">Every dog owner is a friend of a dog owner.</p>
+</div>
+</li>
+<li id="S4.I2.i13" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">13.</span><div id="S4.I2.i13.p1" class="ltx_para">​<p class="ltx_p">Every dog owner’s friend owns a dog of a friend.</p>
+</div>
+</li>
+</ol>
+<p class="ltx_p"><span class="ltx_ref ltx_nolink ltx_ref_self"><span class="ltx_text ltx_ref_tag">Sentence</span> <span class="ltx_text ltx_ref_tag">9</span></span> can be paraphrased as, ‘There is a dog that Geraldo owns’. This can be symbolized by ‘<math id="S4.p1.m1" class="ltx_Math" alttext="\exists x(D(x)\wedge O(g,x))" display="inline"><mrow><mo rspace="0.167em">∃</mo><mrow><mi>x</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>D</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo>∧</mo><mrow><mi>O</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>g</mi><mo>,</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>’.</p>
+</div>
+<div id="S4.p2" class="ltx_para">
+<p class="ltx_p"><span class="ltx_ref ltx_nolink ltx_ref_self"><span class="ltx_text ltx_ref_tag">Sentence</span> <span class="ltx_text ltx_ref_tag">10</span></span> can be paraphrased as, ‘There is some <math id="S4.p2.m1" class="ltx_Math" alttext="y" display="inline"><mi>y</mi></math> such that <math id="S4.p2.m2" class="ltx_Math" alttext="y" display="inline"><mi>y</mi></math> is a dog owner’. Dealing with part of this, we might write ‘<math id="S4.p2.m3" class="ltx_Math" alttext="\exists y(y\text{ is a dog owner})" display="inline"><mrow><mo rspace="0.167em">∃</mo><mrow><mi>y</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mi>y</mi><mo>⁢</mo><mtext> is a dog owner</mtext></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>’. Now the fragment we have left as ‘<math id="S4.p2.m4" class="ltx_Math" alttext="y" display="inline"><mi>y</mi></math> is a dog owner’ is much like <span class="ltx_ref ltx_nolink ltx_ref_self"><span class="ltx_text ltx_ref_tag">sentence</span> <span class="ltx_text ltx_ref_tag">9</span></span>, except that it is not specifically about Geraldo. So we can symbolize <span class="ltx_ref ltx_nolink ltx_ref_self"><span class="ltx_text ltx_ref_tag">sentence</span> <span class="ltx_text ltx_ref_tag">10</span></span> by:</p>
+<div id="Ex3" class="ltx_equation bml_equation bml_equation_container ltx_align_baseline">
+<div class="ltx_Math bml_eqn_cell ltx_align_center"><math id="Ex3.m1" class="ltx_Math" alttext="\exists y\exists x(D(x)\wedge O(y,x))" display="block"><mrow><mo rspace="0.167em">∃</mo><mrow><mi>y</mi><mo lspace="0.167em">⁢</mo><mrow><mo rspace="0.167em">∃</mo><mrow><mi>x</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>D</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo>∧</mo><mrow><mi>O</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>y</mi><mo>,</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></mrow></math></div>
+</div>
+<p class="ltx_p">We should pause to clarify something here. In working out how to
+symbolize the last sentence, we wrote down ‘<math id="S4.p2.m5" class="ltx_Math" alttext="\exists y(y\text{ is a
+dog owner})" display="inline"><mrow><mo rspace="0.167em">∃</mo><mrow><mi>y</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mi>y</mi><mo>⁢</mo><mtext> is a
+dog owner</mtext></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>’. To be very clear: this is <span class="ltx_text ltx_font_bold">neither</span> an FOL
+sentence <span class="ltx_text ltx_font_bold">nor</span> an English sentence: it uses bits of FOL
+(‘<math id="S4.p2.m6" class="ltx_Math" alttext="\exists" display="inline"><mo>∃</mo></math>’, ‘<math id="S4.p2.m7" class="ltx_Math" alttext="y" display="inline"><mi>y</mi></math>’) and bits of English (‘dog owner’). It is really
+<span class="ltx_text ltx_font_bold">just a stepping-stone</span> on the way to symbolizing the entire
+English sentence with a sentence of FOL. You should regard it as a bit of
+rough-working-out, on a par with the doodles that you might
+absent-mindedly draw in the margin of this book, whilst you are
+concentrating fiercely on some problem.</p>
+</div>
+<div id="S4.p3" class="ltx_para">
+<p class="ltx_p"><span class="ltx_ref ltx_nolink ltx_ref_self"><span class="ltx_text ltx_ref_tag">Sentence</span> <span class="ltx_text ltx_ref_tag">11</span></span> can be paraphrased as, ‘Every <math id="S4.p3.m1" class="ltx_Math" alttext="x" display="inline"><mi>x</mi></math> who is a friend of Geraldo is a dog owner’. Using our stepping-stone tactic, we might write</p>
+<div id="Ex4" class="ltx_equation bml_equation bml_equation_container ltx_align_baseline">
+<div class="ltx_Math bml_eqn_cell ltx_align_center"><math id="Ex4.m1" class="ltx_Math" alttext="\forall x\bigl{[}F(x,g)\rightarrow x\text{ is a dog owner}\bigr{]}" display="block"><mrow><mo rspace="0.167em">∀</mo><mrow><mi>x</mi><mo>⁢</mo><mrow><mo maxsize="120%" minsize="120%">[</mo><mrow><mrow><mi>F</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo>,</mo><mi>g</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">→</mo><mrow><mi>x</mi><mo>⁢</mo><mtext> is a dog owner</mtext></mrow></mrow><mo maxsize="120%" minsize="120%">]</mo></mrow></mrow></mrow></math></div>
+</div>
+<p class="ltx_p">Now the fragment that we have left to deal with, ‘<math id="S4.p3.m2" class="ltx_Math" alttext="x" display="inline"><mi>x</mi></math> is a dog owner’, is structurally just like <span class="ltx_ref ltx_nolink ltx_ref_self"><span class="ltx_text ltx_ref_tag">sentence</span> <span class="ltx_text ltx_ref_tag">9</span></span>. However, it would be a mistake for us simply to write</p>
+<div id="Ex5" class="ltx_equation bml_equation bml_equation_container ltx_align_baseline">
+<div class="ltx_Math bml_eqn_cell ltx_align_center"><math id="Ex5.m1" class="ltx_Math" alttext="\forall x\bigl{[}F(x,g)\rightarrow\exists x(D(x)\wedge O(x,x))\bigr{]}" display="block"><mrow><mo rspace="0.167em">∀</mo><mrow><mi>x</mi><mo>⁢</mo><mrow><mo maxsize="120%" minsize="120%">[</mo><mrow><mrow><mi>F</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo>,</mo><mi>g</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">→</mo><mrow><mo rspace="0.167em">∃</mo><mrow><mi>x</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>D</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo>∧</mo><mrow><mi>O</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo>,</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow><mo maxsize="120%" minsize="120%">]</mo></mrow></mrow></mrow></math></div>
+</div>
+<p class="ltx_p">for we would here have a <span class="ltx_text ltx_font_bold">clash of variables</span>. The scope of the universal quantifier, ‘<math id="S4.p3.m3" class="ltx_Math" alttext="\forall x" display="inline"><mrow><mo rspace="0.167em">∀</mo><mi>x</mi></mrow></math>’, is the entire conditional, so the ‘<math id="S4.p3.m4" class="ltx_Math" alttext="x" display="inline"><mi>x</mi></math>’ in ‘<math id="S4.p3.m5" class="ltx_Math" alttext="D(x)" display="inline"><mrow><mi>D</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></math>’ should be governed by that, but ‘<math id="S4.p3.m6" class="ltx_Math" alttext="D(x)" display="inline"><mrow><mi>D</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></math>’ also falls under the scope of the existential quantifier ‘<math id="S4.p3.m7" class="ltx_Math" alttext="\exists x" display="inline"><mrow><mo rspace="0.167em">∃</mo><mi>x</mi></mrow></math>’, so the ‘<math id="S4.p3.m8" class="ltx_Math" alttext="x" display="inline"><mi>x</mi></math>’ in ‘<math id="S4.p3.m9" class="ltx_Math" alttext="D(x)" display="inline"><mrow><mi>D</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></math>’ should be governed by that. Now confusion reigns: which ‘<math id="S4.p3.m10" class="ltx_Math" alttext="x" display="inline"><mi>x</mi></math>’ are we talking about? Suddenly the sentence becomes ambiguous (if it is even meaningful at all), and logicians hate ambiguity. The broad moral is that a single variable cannot serve two quantifier-masters simultaneously.</p>
+</div>
+<div id="S4.p4" class="ltx_para">
+<p class="ltx_p">To continue our symbolization, then, we must choose some different variable for our existential quantifier. What we want is something like:</p>
+<div id="Ex6" class="ltx_equation bml_equation bml_equation_container ltx_align_baseline">
+<div class="ltx_Math bml_eqn_cell ltx_align_center"><math id="Ex6.m1" class="ltx_Math" alttext="\forall x\bigl{[}F(x,g)\rightarrow\exists z(D(z)\wedge O(x,z))\bigr{]}" display="block"><mrow><mo rspace="0.167em">∀</mo><mrow><mi>x</mi><mo>⁢</mo><mrow><mo maxsize="120%" minsize="120%">[</mo><mrow><mrow><mi>F</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo>,</mo><mi>g</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">→</mo><mrow><mo rspace="0.167em">∃</mo><mrow><mi>z</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>D</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>z</mi><mo stretchy="false">)</mo></mrow></mrow><mo>∧</mo><mrow><mi>O</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo>,</mo><mi>z</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow><mo maxsize="120%" minsize="120%">]</mo></mrow></mrow></mrow></math></div>
+</div>
+<p class="ltx_p">This adequately symbolizes <span class="ltx_ref ltx_nolink ltx_ref_self"><span class="ltx_text ltx_ref_tag">sentence</span> <span class="ltx_text ltx_ref_tag">11</span></span>.</p>
+</div>
+<div id="S4.p5" class="ltx_para">
+<p class="ltx_p"><a href="#S4.I2.i12" title="In 25.4 Stepping-stones to symbolization ‣ Chapter 25 Multiple generality ‣ Part V First-order logic ‣ forall x: Calgary" class="ltx_ref"><span class="ltx_text ltx_ref_tag">Sentence</span> <span class="ltx_text ltx_ref_tag">12</span></a> can be paraphrased as ‘For any <math id="S4.p5.m1" class="ltx_Math" alttext="x" display="inline"><mi>x</mi></math> that is a dog owner, there is a dog owner who <math id="S4.p5.m2" class="ltx_Math" alttext="x" display="inline"><mi>x</mi></math> is a friend of’. Using our stepping-stone tactic, this becomes</p>
+<div id="Ex7" class="ltx_equation bml_equation bml_equation_container ltx_align_baseline">
+<div class="ltx_Math bml_eqn_cell ltx_align_center"><math id="Ex7.m1" class="ltx_Math" alttext="\forall x\bigl{[}\mbox{$x$ is a dog owner}\rightarrow\exists y(\mbox{$y$ is a %
+dog owner}\wedge F(x,y))\bigr{]}" display="block"><mrow><mo rspace="0.167em">∀</mo><mrow><mi>x</mi><mo>⁢</mo><mrow><mo maxsize="120%" minsize="120%">[</mo><mrow><mrow><mi>x</mi><mtext> is a dog owner</mtext></mrow><mo stretchy="false">→</mo><mrow><mo rspace="0.167em">∃</mo><mrow><mi>y</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>y</mi><mtext> is a dog owner</mtext></mrow><mo>∧</mo><mrow><mi>F</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo>,</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow><mo maxsize="120%" minsize="120%">]</mo></mrow></mrow></mrow></math></div>
+</div>
+<p class="ltx_p">Completing the symbolization, we end up with</p>
+<div id="Ex8" class="ltx_equation bml_equation bml_equation_container ltx_align_baseline">
+<div class="ltx_Math bml_eqn_cell ltx_align_center"><math id="Ex8.m1" class="ltx_Math" alttext="\forall x\bigl{[}\exists z(D(z)\wedge O(x,z))\rightarrow\exists y\bigl{(}%
+\exists z(D(z)\wedge O(y,z))\wedge F(x,y)\bigr{)}\bigr{]}" display="block"><mrow><mo rspace="0.167em">∀</mo><mrow><mi>x</mi><mo>⁢</mo><mrow><mo maxsize="120%" minsize="120%">[</mo><mrow><mrow><mo rspace="0.167em">∃</mo><mrow><mi>z</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>D</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>z</mi><mo stretchy="false">)</mo></mrow></mrow><mo>∧</mo><mrow><mi>O</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo>,</mo><mi>z</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">→</mo><mrow><mo rspace="0.167em">∃</mo><mrow><mi>y</mi><mo>⁢</mo><mrow><mo maxsize="120%" minsize="120%">(</mo><mrow><mrow><mo rspace="0.167em">∃</mo><mrow><mi>z</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>D</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>z</mi><mo stretchy="false">)</mo></mrow></mrow><mo>∧</mo><mrow><mi>O</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>y</mi><mo>,</mo><mi>z</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow><mo>∧</mo><mrow><mi>F</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo>,</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo maxsize="120%" minsize="120%">)</mo></mrow></mrow></mrow></mrow><mo maxsize="120%" minsize="120%">]</mo></mrow></mrow></mrow></math></div>
+</div>
+<p class="ltx_p">Note that we have used the same letter, ‘<math id="S4.p5.m3" class="ltx_Math" alttext="z" display="inline"><mi>z</mi></math>’, in both the antecedent and the consequent of the conditional, but that these are governed by two different quantifiers. This is ok: there is no clash here, because it is clear which quantifier that variable falls under. We might graphically represent the scope of the quantifiers thus:</p>
+<div id="Ex9" class="ltx_equation bml_equation bml_equation_container ltx_align_baseline">
+<div class="ltx_Math ltx_math_unparsed bml_eqn_cell ltx_align_center"><math id="Ex9.m1" class="ltx_math_unparsed" alttext="\overbrace{\forall x\bigl{[}\overbrace{\exists z(D(z)\wedge O(x,z))}^{\text{%
+scope of 1st `}\exists z\text{'}}\rightarrow\overbrace{\exists y(\overbrace{%
+\exists z(D(z)\wedge O(y,z))}^{\text{scope of 2nd `}\exists z\text{'}}\wedge F%
+(x,y))\bigr{]}}^{\text{scope of `}\exists y\text{'}}}^{\text{scope of `}%
+\forall x\text{'}}" display="block"><mover><mover accent="true"><mrow><mo movablelimits="false" rspace="0.167em">∀</mo><mi>x</mi><mrow><mo maxsize="120%" minsize="120%">[</mo><mover><mover accent="true"><mrow><mo movablelimits="false" rspace="0.167em">∃</mo><mrow><mi>z</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>D</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>z</mi><mo stretchy="false">)</mo></mrow></mrow><mo>∧</mo><mrow><mi>O</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo>,</mo><mi>z</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow><mo>⏞</mo></mover><mrow><mtext>scope of 1st ‘</mtext><mo lspace="0.167em">⁢</mo><mrow><mo movablelimits="false" rspace="0.167em">∃</mo><mrow><mi>z</mi><mo>⁢</mo><mtext>’</mtext></mrow></mrow></mrow></mover><mo stretchy="false">→</mo><mover><mover accent="true"><mrow><mo movablelimits="false" rspace="0.167em">∃</mo><mi>y</mi><mrow><mo stretchy="false">(</mo><mover><mover accent="true"><mrow><mo movablelimits="false" rspace="0.167em">∃</mo><mrow><mi>z</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>D</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>z</mi><mo stretchy="false">)</mo></mrow></mrow><mo>∧</mo><mrow><mi>O</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>y</mi><mo>,</mo><mi>z</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow><mo>⏞</mo></mover><mrow><mtext>scope of 2nd ‘</mtext><mo lspace="0.167em">⁢</mo><mrow><mo movablelimits="false" rspace="0.167em">∃</mo><mrow><mi>z</mi><mo>⁢</mo><mtext>’</mtext></mrow></mrow></mrow></mover><mo>∧</mo><mi>F</mi><mrow><mo stretchy="false">(</mo><mi>x</mi><mo>,</mo><mi>y</mi><mo stretchy="false">)</mo></mrow><mo stretchy="false">)</mo></mrow><mo maxsize="120%" minsize="120%">]</mo></mrow><mo>⏞</mo></mover><mrow><mtext>scope of ‘</mtext><mo lspace="0.167em">⁢</mo><mrow><mo movablelimits="false" rspace="0.167em">∃</mo><mrow><mi>y</mi><mo>⁢</mo><mtext>’</mtext></mrow></mrow></mrow></mover></mrow></mrow><mo>⏞</mo></mover><mrow><mtext>scope of ‘</mtext><mo lspace="0.167em">⁢</mo><mrow><mo rspace="0.167em">∀</mo><mrow><mi>x</mi><mo>⁢</mo><mtext>’</mtext></mrow></mrow></mrow></mover></math></div>
+</div>
+<p class="ltx_p">This shows that no variable is being forced to serve two masters simultaneously.</p>
+</div>
+<div id="S4.p6" class="ltx_para">
+<p class="ltx_p"><a href="#S4.I2.i13" title="In 25.4 Stepping-stones to symbolization ‣ Chapter 25 Multiple generality ‣ Part V First-order logic ‣ forall x: Calgary" class="ltx_ref"><span class="ltx_text ltx_ref_tag">Sentence</span> <span class="ltx_text ltx_ref_tag">13</span></a> is the trickiest yet. First we paraphrase it as
+‘For any <math id="S4.p6.m1" class="ltx_Math" alttext="x" display="inline"><mi>x</mi></math> that is a friend of a dog owner, <math id="S4.p6.m2" class="ltx_Math" alttext="x" display="inline"><mi>x</mi></math> owns a dog which is
+also owned by a friend of <math id="S4.p6.m3" class="ltx_Math" alttext="x" display="inline"><mi>x</mi></math>’. Using our stepping-stone tactic, this
+becomes:</p>
+<div id="Ex10" class="ltx_equation bml_equation bml_equation_container ltx_align_baseline">
+<div class="ltx_Math bml_eqn_cell ltx_align_center"><math id="Ex10.m1" class="ltx_Math" alttext="\forall x\bigl{[}x\text{ is a friend of a dog owner}\rightarrow x\text{ owns a%
+ dog which is owned by a friend of }x\bigr{]}" display="block"><mrow><mo rspace="0.167em">∀</mo><mrow><mi>x</mi><mo>⁢</mo><mrow><mo maxsize="120%" minsize="120%">[</mo><mrow><mrow><mi>x</mi><mo>⁢</mo><mtext> is a friend of a dog owner</mtext></mrow><mo stretchy="false">→</mo><mrow><mi>x</mi><mo>⁢</mo><mtext> owns a dog which is owned by a friend of </mtext><mo>⁢</mo><mi>x</mi></mrow></mrow><mo maxsize="120%" minsize="120%">]</mo></mrow></mrow></mrow></math></div>
+</div>
+<p class="ltx_p">Breaking this down a bit more:</p>
+<div id="Ex11" class="ltx_equation bml_equation bml_equation_container ltx_align_baseline">
+<div class="ltx_Math bml_eqn_cell ltx_align_center"><math id="Ex11.m1" class="ltx_Math" alttext="\forall x\bigl{[}\exists y(F(x,y)\wedge y\text{ is a dog owner})\rightarrow%
+\exists y((D(y)\wedge O(x,y))\wedge y\text{ is owned by
+a friend of }x)\bigr{]}" display="block"><mrow><mo rspace="0.167em">∀</mo><mrow><mi>x</mi><mo>⁢</mo><mrow><mo maxsize="120%" minsize="120%">[</mo><mrow><mrow><mo rspace="0.167em">∃</mo><mrow><mi>y</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>F</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo>,</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow><mo>∧</mo><mrow><mi>y</mi><mo>⁢</mo><mtext> is a dog owner</mtext></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">→</mo><mrow><mo rspace="0.167em">∃</mo><mrow><mi>y</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>D</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow><mo>∧</mo><mrow><mi>O</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo>,</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow><mo>∧</mo><mrow><mi>y</mi><mo>⁢</mo><mtext> is owned by
+a friend of </mtext><mo>⁢</mo><mi>x</mi></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow><mo maxsize="120%" minsize="120%">]</mo></mrow></mrow></mrow></math></div>
+</div>
+<p class="ltx_p">And a bit more:</p>
+<div id="Ex12" class="ltx_equation bml_equation bml_equation_container ltx_align_baseline">
+<div class="ltx_Math bml_eqn_cell ltx_align_center"><math id="Ex12.m1" class="ltx_Math" alttext="\forall x\bigl{[}\exists y(F(x,y)\wedge\exists z(D(z)\wedge O(y,z)))%
+\rightarrow\exists y((D(y)\wedge O(x,y))\wedge\exists z(F(z,x)\wedge O(z,y)))%
+\bigr{]}" display="block"><mrow><mo rspace="0.167em">∀</mo><mrow><mi>x</mi><mo>⁢</mo><mrow><mo maxsize="120%" minsize="120%">[</mo><mrow><mrow><mo rspace="0.167em">∃</mo><mrow><mi>y</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>F</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo>,</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow><mo>∧</mo><mrow><mo rspace="0.167em">∃</mo><mrow><mi>z</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>D</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>z</mi><mo stretchy="false">)</mo></mrow></mrow><mo>∧</mo><mrow><mi>O</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>y</mi><mo>,</mo><mi>z</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">→</mo><mrow><mo rspace="0.167em">∃</mo><mrow><mi>y</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>D</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow><mo>∧</mo><mrow><mi>O</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo>,</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow><mo>∧</mo><mrow><mo rspace="0.167em">∃</mo><mrow><mi>z</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>F</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>z</mi><mo>,</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo>∧</mo><mrow><mi>O</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>z</mi><mo>,</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow><mo maxsize="120%" minsize="120%">]</mo></mrow></mrow></mrow></math></div>
+</div>
+<p class="ltx_p">And we are done!</p>
+</div>
+<div id="S4.p7" class="ltx_para">
+<p class="ltx_p">There is one subtle issue we should briefly address. We paraphrased
+<a href="#S4.I2.i10" title="In 25.4 Stepping-stones to symbolization ‣ Chapter 25 Multiple generality ‣ Part V First-order logic ‣ forall x: Calgary" class="ltx_ref"><span class="ltx_text ltx_ref_tag">sentence</span> <span class="ltx_text ltx_ref_tag">10</span></a> as ‘There is some <math id="S4.p7.m1" class="ltx_Math" alttext="y" display="inline"><mi>y</mi></math> such that <math id="S4.p7.m2" class="ltx_Math" alttext="y" display="inline"><mi>y</mi></math> is a dog owner’.
+Now our domain includes people and dogs, and ‘someone’ includes
+people, but (at least arguably) does not include dogs. To be more
+correct, we should have paraphrased <span class="ltx_ref ltx_nolink ltx_ref_self"><span class="ltx_text ltx_ref_tag">sentence</span> <span class="ltx_text ltx_ref_tag">10</span></span> as ‘There is
+some <math id="S4.p7.m3" class="ltx_Math" alttext="y" display="inline"><mi>y</mi></math> such that <math id="S4.p7.m4" class="ltx_Math" alttext="y" display="inline"><mi>y</mi></math> is a person and a dog owner’. A more accurate
+symbolization of ‘Someone is a dog owner’ would require that we add a
+predicate for ‘<span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span> is a person’ to our symbolization key:</p>
+<dl id="S4.I3" class="ltx_description">
+<dt id="S4.I3.ix1" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="S4.I3.ix1.m1" class="ltx_Math" alttext="P(x)" display="inline"><mrow><mi>P</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></math>:</span></dt>
+<dd class="ltx_item">
+<div id="S4.I3.ix1.p1" class="ltx_para">
+<p class="ltx_p"><span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span><sub class="ltx_sub"><span class="ltx_text ltx_font_italic">x</span></sub> is a person</p>
+</div>
+</dd>
+</dl>
+<p class="ltx_p">Then we can give a better symbolization of <a href="#S4.I2.i10" title="In 25.4 Stepping-stones to symbolization ‣ Chapter 25 Multiple generality ‣ Part V First-order logic ‣ forall x: Calgary" class="ltx_ref"><span class="ltx_text ltx_ref_tag">sentence</span> <span class="ltx_text ltx_ref_tag">10</span></a>:</p>
+<div id="Ex13" class="ltx_equation bml_equation bml_equation_container ltx_align_baseline">
+<div class="ltx_Math bml_eqn_cell ltx_align_center"><math id="Ex13.m1" class="ltx_Math" alttext="\exists y(P(y)\wedge\exists x(D(x)\wedge O(y,x)))" display="block"><mrow><mo rspace="0.167em">∃</mo><mrow><mi>y</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>P</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow><mo>∧</mo><mrow><mo rspace="0.167em">∃</mo><mrow><mi>x</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>D</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo>∧</mo><mrow><mi>O</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>y</mi><mo>,</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math></div>
+</div>
+<p class="ltx_p">‘Everyone’ and ‘no one’ have to be treated similarly: ‘Everyone
+is a friend of Geraldo’ and ‘No one is a friend of Geraldo’ would be
+symbolized, respectively, as</p>
+<div id="A48.S0.EGx10" class="ltx_equationgroup ltx_eqn_align bml_equationgroup bml_equation_container ltx_align_baseline">
+<div id="Ex14" class="ltx_equation bml_equation ltx_align_baseline" role="group" aria-label="equation">
+<div class="ltx_td ltx_align_left bml_eqn_cell"><math id="Ex14.m1" class="ltx_Math" alttext="\displaystyle{}\forall x(P(x)\rightarrow F(x,g))" display="inline"><mrow><mo rspace="0.167em">∀</mo><mrow><mi>x</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>P</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">→</mo><mrow><mi>F</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo>,</mo><mi>g</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math></div>
+</div>
+<div id="Ex15" class="ltx_equation bml_equation ltx_align_baseline" role="group" aria-label="equation">
+<div class="ltx_td ltx_align_left bml_eqn_cell"><math id="Ex15.m1" class="ltx_Math" alttext="\displaystyle{}\forall x(P(x)\rightarrow\neg F(x,g))." display="inline"><mrow><mrow><mo rspace="0.167em">∀</mo><mrow><mi>x</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>P</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">→</mo><mrow><mo rspace="0.167em">¬</mo><mrow><mi>F</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo>,</mo><mi>g</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow><mo lspace="0em">.</mo></mrow></math></div>
+</div>
+</div>
+<p class="ltx_p">Only ‘someone’, ‘everyone’, and ‘no one’ require this treatment. In
+particular, we do not need to explicitly state in the symbolization of
+<a href="#S4.I2.i9" title="In 25.4 Stepping-stones to symbolization ‣ Chapter 25 Multiple generality ‣ Part V First-order logic ‣ forall x: Calgary" class="ltx_ref"><span class="ltx_text ltx_ref_tag">sentence</span> <span class="ltx_text ltx_ref_tag">9</span></a> that Geraldo is a person. Neither do we have to
+ensure in <a href="#S4.I2.i11" title="In 25.4 Stepping-stones to symbolization ‣ Chapter 25 Multiple generality ‣ Part V First-order logic ‣ forall x: Calgary" class="ltx_ref"><span class="ltx_text ltx_ref_tag">sentence</span> <span class="ltx_text ltx_ref_tag">11</span></a> that Geraldo’s friend <math id="S4.p7.m5" class="ltx_Math" alttext="x" display="inline"><mi>x</mi></math> is a person.
+Although it may be true that only people can own dogs or be friends
+with Geraldo, it is not part of what the sentences <span class="ltx_text ltx_font_bold">say</span>, and so
+does not need to be taken into account when we symbolize
+them.<span id="footnote2" class="ltx_note ltx_role_footnote"><sup class="ltx_note_mark">2</sup><span class="ltx_note_outer"><span class="ltx_note_content"><sup class="ltx_note_mark">2</sup>
+                <span class="ltx_tag ltx_tag_note">2</span>
+                
+                
+                
+                
+                
+                
+                
+              You might object: but the sentences also don’t say that
+dogs aren’t people. E.g., if we’re talking about the fictional world
+of Mickey Mouse, Goofy should be included in ‘everyone’, but Pluto
+should not be. That’s why we picked the predicate ‘<span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span> is a
+person’ and not ‘<span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span> is a human’: in that domain, Goofy would
+fall under both ‘<span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span> is a person’ and ‘<span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span> is a dog’, but
+Pluto would only fall under ‘<span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span> is a dog’.</span></span></span></p>
+</div>
+</div>
+</section>
+<section id="S5" class="ltx_section normal">
+<div class="section level2">
+<h2 class="ltx_title ltx_title_section">
+<span class="ltx_tag ltx_tag_section header-section-number">25.5</span> Supressed quantifiers</h2>
+
+<div id="S5.p1" class="ltx_para">
+<p class="ltx_p">Logic can often help to get clear on the meanings of English claims,
+especially where the quantifiers are left implicit or their order is
+ambiguous or unclear. The clarity of expression and thinking afforded
+by FOL can give you a significant advantage in argument, as can be
+seen in the following takedown by British political philosopher Mary
+Astell (1666–1731) of her contemporary, the theologian William
+Nicholls. In Discourse IV: The Duty of Wives to their Husbands of his
+<span class="ltx_text ltx_font_italic">The Duty of Inferiors towards their Superiors, in Five
+Practical Discourses</span> (London 1701), Nicholls argued that women are
+naturally inferior to men. In the preface to the 3rd edition of her
+treatise <span class="ltx_text ltx_font_italic">Some Reflections upon Marriage, Occasion’d by the Duke
+and Duchess of Mazarine’s Case; which is also considered,</span> Astell
+responded as follows:</p>
+<blockquote class="ltx_quote">
+<p class="ltx_p">’Tis true, thro’ Want of Learning, and of that Superior Genius which
+Men as Men lay claim to, she [Astell] was ignorant of the
+<span class="ltx_text ltx_font_italic">Natural Inferiority</span> of our Sex, which our Masters lay down as
+a Self-Evident and Fundamental Truth. She saw nothing in the Reason of
+Things, to make this either a Principle or a Conclusion, but much to
+the contrary; it being Sedition at least, if not Treason to assert it
+in this Reign.</p>
+<p class="ltx_p">For if by the Natural Superiority of their Sex, they mean that
+<span class="ltx_text ltx_font_italic">every</span> Man is by Nature superior to <span class="ltx_text ltx_font_italic">every</span> Woman,
+which is the obvious meaning, and that which must be stuck to if they
+would speak Sense, it wou’d be a Sin in <span class="ltx_text ltx_font_italic">any</span> Woman to have
+Dominion over <span class="ltx_text ltx_font_italic">any</span> Man, and the greatest Queen ought not to
+command but to obey her Footman, because no Municipal Laws can
+supersede or change the Law of Nature; so that if the Dominion of the
+Men be such, the <span class="ltx_text ltx_font_italic">Salique Law,<span id="footnote3" class="ltx_note ltx_role_footnote"><sup class="ltx_note_mark">3</sup><span class="ltx_note_outer"><span class="ltx_note_content"><sup class="ltx_note_mark">3</sup>
+                    <span class="ltx_tag ltx_tag_note"><span class="ltx_text ltx_font_upright">3</span></span>
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                  <span class="ltx_text ltx_font_upright">The Salique law was
+the common law of France which prohibited the crown be passed on to
+female heirs.</span></span></span></span></span> as unjust as <span class="ltx_text ltx_font_italic">English Men</span> have ever thought
+it, ought to take place over all the Earth, and the most glorious
+Reigns in the <span class="ltx_text ltx_font_italic">English, Danish, Castilian</span>, and other Annals,
+were wicked Violations of the Law of Nature!</p>
+<p class="ltx_p">If they mean that <span class="ltx_text ltx_font_italic">some</span> Men are superior to <span class="ltx_text ltx_font_italic">some</span>
+Women this is no great Discovery; had they turn’d the Tables they
+might have seen that <span class="ltx_text ltx_font_italic">some</span> Women are Superior to <span class="ltx_text ltx_font_italic">some</span>
+Men. Or had they been pleased to remember their Oaths of Allegiance
+and Supremacy, they might have known that <span class="ltx_text ltx_font_italic">One</span> Woman is
+superior to <span class="ltx_text ltx_font_italic">All</span> the Men in these Nations, or else they have
+sworn to very little purpose.<span id="footnote4" class="ltx_note ltx_role_footnote"><sup class="ltx_note_mark">4</sup><span class="ltx_note_outer"><span class="ltx_note_content"><sup class="ltx_note_mark">4</sup>
+                  <span class="ltx_tag ltx_tag_note">4</span>
+                  
+                  
+                  
+                  
+                  
+                  
+                  
+                In 1706, England was ruled by
+Queen Anne.</span></span></span> And it must not be suppos’d, that their Reason and
+Religion wou’d suffer them to take Oaths, contrary to the Laws of
+Nature and Reason of things.<span id="footnote5" class="ltx_note ltx_role_footnote"><sup class="ltx_note_mark">5</sup><span class="ltx_note_outer"><span class="ltx_note_content"><sup class="ltx_note_mark">5</sup>
+                  <span class="ltx_tag ltx_tag_note">5</span>
+                  
+                  
+                  
+                  
+                  
+                  
+                  
+                Mary Astell, <span class="ltx_text ltx_font_italic">Reflections
+upon Marriage</span>, 1706 Preface, iii–iv, and Mary Astell,
+<span class="ltx_text ltx_font_italic">Political Writings</span>, Patricia Springborg (ed.), Cambridge
+University Press, 1996, pp. 9–10.</span></span></span></p>
+</blockquote>
+<p class="ltx_p">We can symbolize the different interpretations Astell offers of
+Nicholls’ claim that men are superior to women:
+He either meant that every man is superior to every woman, i.e.,</p>
+<div id="Ex16" class="ltx_equation bml_equation bml_equation_container ltx_align_baseline">
+<div class="ltx_Math bml_eqn_cell ltx_align_center"><math id="Ex16.m1" class="ltx_Math" alttext="\forall x(M(x)\rightarrow\forall y(W(y)\rightarrow S(x,y)))" display="block"><mrow><mo rspace="0.167em">∀</mo><mrow><mi>x</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>M</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">→</mo><mrow><mo rspace="0.167em">∀</mo><mrow><mi>y</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>W</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">→</mo><mrow><mi>S</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo>,</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math></div>
+</div>
+<p class="ltx_p">or that some men are superior to some women,</p>
+<div id="Ex17" class="ltx_equation bml_equation bml_equation_container ltx_align_baseline">
+<div class="ltx_Math bml_eqn_cell ltx_align_center"><math id="Ex17.m1" class="ltx_Math" alttext="\exists x(M(x)\wedge\exists y(W(y)\wedge S(x,y)))." display="block"><mrow><mrow><mo rspace="0.167em">∃</mo><mrow><mi>x</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>M</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo>∧</mo><mrow><mo rspace="0.167em">∃</mo><mrow><mi>y</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>W</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow><mo>∧</mo><mrow><mi>S</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo>,</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow><mo lspace="0em">.</mo></mrow></math></div>
+</div>
+<p class="ltx_p">The latter is true, but so is</p>
+<div id="Ex18" class="ltx_equation bml_equation bml_equation_container ltx_align_baseline">
+<div class="ltx_Math bml_eqn_cell ltx_align_center"><math id="Ex18.m1" class="ltx_Math" alttext="\exists y(W(y)\wedge\exists x(M(x)\wedge S(y,x)))" display="block"><mrow><mo rspace="0.167em">∃</mo><mrow><mi>y</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>W</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow><mo>∧</mo><mrow><mo rspace="0.167em">∃</mo><mrow><mi>x</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>M</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo>∧</mo><mrow><mi>S</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>y</mi><mo>,</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math></div>
+</div>
+<p class="ltx_p">(some women are superior to some men), so that would be “no great
+discovery.” In fact, since the Queen is superior to all her
+subjects, it’s even true that some woman is superior to every man,
+i.e.,</p>
+<div id="Ex19" class="ltx_equation bml_equation bml_equation_container ltx_align_baseline">
+<div class="ltx_Math bml_eqn_cell ltx_align_center"><math id="Ex19.m1" class="ltx_Math" alttext="\exists y(W(y)\land\forall x(M(x)\rightarrow S(y,x)))." display="block"><mrow><mrow><mo rspace="0.167em">∃</mo><mrow><mi>y</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>W</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow><mo>∧</mo><mrow><mo rspace="0.167em">∀</mo><mrow><mi>x</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>M</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">→</mo><mrow><mi>S</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>y</mi><mo>,</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow><mo lspace="0em">.</mo></mrow></math></div>
+</div>
+<p class="ltx_p">But this is incompatible with the “obvious meaning” of Nicholls’
+claim, i.e., the first reading. So what Nicholls claims amounts to
+treason against the Queen!</p>
+</div>
+</div>
+</section>
+<section id="Sx1" class="ltx_section normal">
+<div class="section level2">
+<h2 class="ltx_title ltx_title_section">Practice exercises</h2>
+
+<div id="Sx1.p1" class="ltx_para ltx_noindent">
+<p class="ltx_p"><span class="ltx_text ltx_font_bold">A. </span>Using this symbolization key:</p>
+<dl id="Sx1.I1" class="ltx_description">
+<dt id="Sx1.I1.ix1" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <span class="ltx_text ltx_markedasmath">domain</span>:</span></dt>
+<dd class="ltx_item">
+<div id="Sx1.I1.ix1.p1" class="ltx_para">
+<p class="ltx_p">all animals</p>
+</div>
+</dd>
+<dt id="Sx1.I1.ix2" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="Sx1.I1.ix2.m1" class="ltx_Math" alttext="A(x)" display="inline"><mrow><mi>A</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></math>:</span></dt>
+<dd class="ltx_item">
+<div id="Sx1.I1.ix2.p1" class="ltx_para">
+<p class="ltx_p"><span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span><sub class="ltx_sub"><span class="ltx_text ltx_font_italic">x</span></sub> is an alligator</p>
+</div>
+</dd>
+<dt id="Sx1.I1.ix3" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="Sx1.I1.ix3.m1" class="ltx_Math" alttext="M(x)" display="inline"><mrow><mi>M</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></math>:</span></dt>
+<dd class="ltx_item">
+<div id="Sx1.I1.ix3.p1" class="ltx_para">
+<p class="ltx_p"><span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span><sub class="ltx_sub"><span class="ltx_text ltx_font_italic">x</span></sub> is a monkey</p>
+</div>
+</dd>
+<dt id="Sx1.I1.ix4" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="Sx1.I1.ix4.m1" class="ltx_Math" alttext="R(x)" display="inline"><mrow><mi>R</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></math>:</span></dt>
+<dd class="ltx_item">
+<div id="Sx1.I1.ix4.p1" class="ltx_para">
+<p class="ltx_p"><span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span><sub class="ltx_sub"><span class="ltx_text ltx_font_italic">x</span></sub> is a reptile</p>
+</div>
+</dd>
+<dt id="Sx1.I1.ix5" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="Sx1.I1.ix5.m1" class="ltx_Math" alttext="Z(x)" display="inline"><mrow><mi>Z</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></math>:</span></dt>
+<dd class="ltx_item">
+<div id="Sx1.I1.ix5.p1" class="ltx_para">
+<p class="ltx_p"><span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span><sub class="ltx_sub"><span class="ltx_text ltx_font_italic">x</span></sub> lives at the zoo</p>
+</div>
+</dd>
+<dt id="Sx1.I1.ix6" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="Sx1.I1.ix6.m1" class="ltx_Math" alttext="L(x,y)" display="inline"><mrow><mi>L</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo>,</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow></math>:</span></dt>
+<dd class="ltx_item">
+<div id="Sx1.I1.ix6.p1" class="ltx_para">
+<p class="ltx_p"><span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span><sub class="ltx_sub"><span class="ltx_text ltx_font_italic">x</span></sub> loves <span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span><sub class="ltx_sub"><span class="ltx_text ltx_font_italic">y</span></sub></p>
+</div>
+</dd>
+<dt id="Sx1.I1.ix7" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="Sx1.I1.ix7.m1" class="ltx_Math" alttext="a" display="inline"><mi>a</mi></math>:</span></dt>
+<dd class="ltx_item">
+<div id="Sx1.I1.ix7.p1" class="ltx_para">
+<p class="ltx_p">Amos</p>
+</div>
+</dd>
+<dt id="Sx1.I1.ix8" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="Sx1.I1.ix8.m1" class="ltx_Math" alttext="b" display="inline"><mi>b</mi></math>:</span></dt>
+<dd class="ltx_item">
+<div id="Sx1.I1.ix8.p1" class="ltx_para">
+<p class="ltx_p">Bouncer</p>
+</div>
+</dd>
+<dt id="Sx1.I1.ix9" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="Sx1.I1.ix9.m1" class="ltx_Math" alttext="c" display="inline"><mi>c</mi></math>:</span></dt>
+<dd class="ltx_item">
+<div id="Sx1.I1.ix9.p1" class="ltx_para">
+<p class="ltx_p">Cleo</p>
+</div>
+</dd>
+</dl>
+<p class="ltx_p">symbolize each of the following sentences in FOL:</p>
+<ol id="Sx1.I2" class="ltx_enumerate">
+<li id="Sx1.I2.i1" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">1.</span><div id="Sx1.I2.i1.p1" class="ltx_para">​<p class="ltx_p">If Cleo loves Bouncer, then Bouncer is a monkey.</p>
+</div>
+</li>
+<li id="Sx1.I2.i2" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">2.</span><div id="Sx1.I2.i2.p1" class="ltx_para">​<p class="ltx_p">If both Bouncer and Cleo are alligators, then Amos loves them both.</p>
+</div>
+</li>
+<li id="Sx1.I2.i3" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">3.</span><div id="Sx1.I2.i3.p1" class="ltx_para">​<p class="ltx_p">Cleo loves a reptile.</p>
+</div>
+</li>
+<li id="Sx1.I2.i4" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">4.</span><div id="Sx1.I2.i4.p1" class="ltx_para">​<p class="ltx_p">Bouncer loves all the monkeys that live at the zoo.</p>
+</div>
+</li>
+<li id="Sx1.I2.i5" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">5.</span><div id="Sx1.I2.i5.p1" class="ltx_para">​<p class="ltx_p">All the monkeys that Amos loves love him back.</p>
+</div>
+</li>
+<li id="Sx1.I2.i6" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">6.</span><div id="Sx1.I2.i6.p1" class="ltx_para">​<p class="ltx_p">Every monkey that Cleo loves is also loved by Amos.</p>
+</div>
+</li>
+<li id="Sx1.I2.i7" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">7.</span><div id="Sx1.I2.i7.p1" class="ltx_para">​<p class="ltx_p">There is a monkey that loves Bouncer, but sadly Bouncer does not reciprocate this love.</p>
+</div>
+</li>
+</ol>
+</div>
+<div id="Sx1.p2" class="ltx_para ltx_noindent">
+<p class="ltx_p"><span class="ltx_text ltx_font_bold">B. </span>Using the following symbolization key:</p>
+<dl id="Sx1.I3" class="ltx_description">
+<dt id="Sx1.I3.ix1" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <span class="ltx_text ltx_markedasmath">domain</span>:</span></dt>
+<dd class="ltx_item">
+<div id="Sx1.I3.ix1.p1" class="ltx_para">
+<p class="ltx_p">all animals</p>
+</div>
+</dd>
+<dt id="Sx1.I3.ix2" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="Sx1.I3.ix2.m1" class="ltx_Math" alttext="D(x)" display="inline"><mrow><mi>D</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></math>:</span></dt>
+<dd class="ltx_item">
+<div id="Sx1.I3.ix2.p1" class="ltx_para">
+<p class="ltx_p"><span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span><sub class="ltx_sub"><span class="ltx_text ltx_font_italic">x</span></sub> is a dog</p>
+</div>
+</dd>
+<dt id="Sx1.I3.ix3" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="Sx1.I3.ix3.m1" class="ltx_Math" alttext="S(x)" display="inline"><mrow><mi>S</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></math>:</span></dt>
+<dd class="ltx_item">
+<div id="Sx1.I3.ix3.p1" class="ltx_para">
+<p class="ltx_p"><span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span><sub class="ltx_sub"><span class="ltx_text ltx_font_italic">x</span></sub> likes samurai movies</p>
+</div>
+</dd>
+<dt id="Sx1.I3.ix4" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="Sx1.I3.ix4.m1" class="ltx_Math" alttext="L(x,y)" display="inline"><mrow><mi>L</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo>,</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow></math>:</span></dt>
+<dd class="ltx_item">
+<div id="Sx1.I3.ix4.p1" class="ltx_para">
+<p class="ltx_p"><span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span><sub class="ltx_sub"><span class="ltx_text ltx_font_italic">x</span></sub> is larger than <span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span><sub class="ltx_sub"><span class="ltx_text ltx_font_italic">y</span></sub></p>
+</div>
+</dd>
+<dt id="Sx1.I3.ix5" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="Sx1.I3.ix5.m1" class="ltx_Math" alttext="r" display="inline"><mi>r</mi></math>:</span></dt>
+<dd class="ltx_item">
+<div id="Sx1.I3.ix5.p1" class="ltx_para">
+<p class="ltx_p">Rave</p>
+</div>
+</dd>
+<dt id="Sx1.I3.ix6" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="Sx1.I3.ix6.m1" class="ltx_Math" alttext="h" display="inline"><mi>h</mi></math>:</span></dt>
+<dd class="ltx_item">
+<div id="Sx1.I3.ix6.p1" class="ltx_para">
+<p class="ltx_p">Shane</p>
+</div>
+</dd>
+<dt id="Sx1.I3.ix7" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="Sx1.I3.ix7.m1" class="ltx_Math" alttext="d" display="inline"><mi>d</mi></math>:</span></dt>
+<dd class="ltx_item">
+<div id="Sx1.I3.ix7.p1" class="ltx_para">
+<p class="ltx_p">Daisy</p>
+</div>
+</dd>
+</dl>
+<p class="ltx_p">symbolize the following sentences in FOL:</p>
+<ol id="Sx1.I4" class="ltx_enumerate">
+<li id="Sx1.I4.i1" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">1.</span><div id="Sx1.I4.i1.p1" class="ltx_para">​<p class="ltx_p">Rave is a dog who likes samurai movies.</p>
+</div>
+</li>
+<li id="Sx1.I4.i2" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">2.</span><div id="Sx1.I4.i2.p1" class="ltx_para">​<p class="ltx_p">Rave, Shane, and Daisy are all dogs.</p>
+</div>
+</li>
+<li id="Sx1.I4.i3" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">3.</span><div id="Sx1.I4.i3.p1" class="ltx_para">​<p class="ltx_p">Shane is larger than Rave, and Daisy is larger than Shane.</p>
+</div>
+</li>
+<li id="Sx1.I4.i4" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">4.</span><div id="Sx1.I4.i4.p1" class="ltx_para">​<p class="ltx_p">All dogs like samurai movies.</p>
+</div>
+</li>
+<li id="Sx1.I4.i5" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">5.</span><div id="Sx1.I4.i5.p1" class="ltx_para">​<p class="ltx_p">Only dogs like samurai movies.</p>
+</div>
+</li>
+<li id="Sx1.I4.i6" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">6.</span><div id="Sx1.I4.i6.p1" class="ltx_para">​<p class="ltx_p">There is a dog that is larger than Shane.</p>
+</div>
+</li>
+<li id="Sx1.I4.i7" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">7.</span><div id="Sx1.I4.i7.p1" class="ltx_para">​<p class="ltx_p">If there is a dog larger than Daisy, then there is a dog larger than Shane.</p>
+</div>
+</li>
+<li id="Sx1.I4.i8" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">8.</span><div id="Sx1.I4.i8.p1" class="ltx_para">​<p class="ltx_p">No animal that likes samurai movies is larger than Shane.</p>
+</div>
+</li>
+<li id="Sx1.I4.i9" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">9.</span><div id="Sx1.I4.i9.p1" class="ltx_para">​<p class="ltx_p">No dog is larger than Daisy.</p>
+</div>
+</li>
+<li id="Sx1.I4.i10" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">10.</span><div id="Sx1.I4.i10.p1" class="ltx_para">​<p class="ltx_p">Any animal that dislikes samurai movies is larger than Rave.</p>
+</div>
+</li>
+<li id="Sx1.I4.i11" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">11.</span><div id="Sx1.I4.i11.p1" class="ltx_para">​<p class="ltx_p">There is an animal that is between Rave and Shane in size.</p>
+</div>
+</li>
+<li id="Sx1.I4.i12" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">12.</span><div id="Sx1.I4.i12.p1" class="ltx_para">​<p class="ltx_p">There is no dog that is between Rave and Shane in size.</p>
+</div>
+</li>
+<li id="Sx1.I4.i13" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">13.</span><div id="Sx1.I4.i13.p1" class="ltx_para">​<p class="ltx_p">No dog is larger than itself.</p>
+</div>
+</li>
+<li id="Sx1.I4.i14" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">14.</span><div id="Sx1.I4.i14.p1" class="ltx_para">​<p class="ltx_p">Every dog is larger than some dog.</p>
+</div>
+</li>
+<li id="Sx1.I4.i15" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">15.</span><div id="Sx1.I4.i15.p1" class="ltx_para">​<p class="ltx_p">There is an animal that is smaller than every dog.</p>
+</div>
+</li>
+<li id="Sx1.I4.i16" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">16.</span><div id="Sx1.I4.i16.p1" class="ltx_para">​<p class="ltx_p">If there is an animal that is larger than any dog, then that animal does not like samurai movies.</p>
+</div>
+</li>
+</ol>
+</div>
+<div id="Sx1.p3" class="ltx_para ltx_noindent">
+<p class="ltx_p"><span class="ltx_text ltx_font_bold">C. </span>
+Using the symbolization key given, symbolize each English-language sentence into FOL.</p>
+<dl id="Sx1.I5" class="ltx_description">
+<dt id="Sx1.I5.ix1" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <span class="ltx_text ltx_markedasmath">domain</span>:</span></dt>
+<dd class="ltx_item">
+<div id="Sx1.I5.ix1.p1" class="ltx_para">
+<p class="ltx_p">candies</p>
+</div>
+</dd>
+<dt id="Sx1.I5.ix2" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="Sx1.I5.ix2.m1" class="ltx_Math" alttext="C(x)" display="inline"><mrow><mi>C</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></math>:</span></dt>
+<dd class="ltx_item">
+<div id="Sx1.I5.ix2.p1" class="ltx_para">
+<p class="ltx_p"><span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span><sub class="ltx_sub"><span class="ltx_text ltx_font_italic">x</span></sub> has chocolate in it</p>
+</div>
+</dd>
+<dt id="Sx1.I5.ix3" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="Sx1.I5.ix3.m1" class="ltx_Math" alttext="M(x)" display="inline"><mrow><mi>M</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></math>:</span></dt>
+<dd class="ltx_item">
+<div id="Sx1.I5.ix3.p1" class="ltx_para">
+<p class="ltx_p"><span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span><sub class="ltx_sub"><span class="ltx_text ltx_font_italic">x</span></sub> has marzipan in it</p>
+</div>
+</dd>
+<dt id="Sx1.I5.ix4" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="Sx1.I5.ix4.m1" class="ltx_Math" alttext="S(x)" display="inline"><mrow><mi>S</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></math>:</span></dt>
+<dd class="ltx_item">
+<div id="Sx1.I5.ix4.p1" class="ltx_para">
+<p class="ltx_p"><span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span><sub class="ltx_sub"><span class="ltx_text ltx_font_italic">x</span></sub> has sugar in it</p>
+</div>
+</dd>
+<dt id="Sx1.I5.ix5" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="Sx1.I5.ix5.m1" class="ltx_Math" alttext="T(x)" display="inline"><mrow><mi>T</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></math>:</span></dt>
+<dd class="ltx_item">
+<div id="Sx1.I5.ix5.p1" class="ltx_para">
+<p class="ltx_p">Boris has tried <span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span><sub class="ltx_sub"><span class="ltx_text ltx_font_italic">x</span></sub></p>
+</div>
+</dd>
+<dt id="Sx1.I5.ix6" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="Sx1.I5.ix6.m1" class="ltx_Math" alttext="B(x,y)" display="inline"><mrow><mi>B</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo>,</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow></math>:</span></dt>
+<dd class="ltx_item">
+<div id="Sx1.I5.ix6.p1" class="ltx_para">
+<p class="ltx_p"><span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span><sub class="ltx_sub"><span class="ltx_text ltx_font_italic">x</span></sub> is better than <span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span><sub class="ltx_sub"><span class="ltx_text ltx_font_italic">y</span></sub></p>
+</div>
+</dd>
+</dl>
+<ol id="Sx1.I6" class="ltx_enumerate">
+<li id="Sx1.I6.i1" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">1.</span><div id="Sx1.I6.i1.p1" class="ltx_para">​<p class="ltx_p">Boris has never tried any candy.</p>
+</div>
+</li>
+<li id="Sx1.I6.i2" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">2.</span><div id="Sx1.I6.i2.p1" class="ltx_para">​<p class="ltx_p">Marzipan is always made with sugar.</p>
+</div>
+</li>
+<li id="Sx1.I6.i3" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">3.</span><div id="Sx1.I6.i3.p1" class="ltx_para">​<p class="ltx_p">Some candy is sugar-free.</p>
+</div>
+</li>
+<li id="Sx1.I6.i4" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">4.</span><div id="Sx1.I6.i4.p1" class="ltx_para">​<p class="ltx_p">The very best candy is chocolate.</p>
+</div>
+</li>
+<li id="Sx1.I6.i5" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">5.</span><div id="Sx1.I6.i5.p1" class="ltx_para">​<p class="ltx_p">No candy is better than itself.</p>
+</div>
+</li>
+<li id="Sx1.I6.i6" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">6.</span><div id="Sx1.I6.i6.p1" class="ltx_para">​<p class="ltx_p">Boris has never tried sugar-free chocolate.</p>
+</div>
+</li>
+<li id="Sx1.I6.i7" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">7.</span><div id="Sx1.I6.i7.p1" class="ltx_para">​<p class="ltx_p">Boris has tried marzipan and chocolate, but never together.</p>
+</div>
+</li>
+<li id="Sx1.I6.i8" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">8.</span><div id="Sx1.I6.i8.p1" class="ltx_para">​<p class="ltx_p">Any candy with chocolate is better than any candy without it.</p>
+</div>
+</li>
+<li id="Sx1.I6.i9" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">9.</span><div id="Sx1.I6.i9.p1" class="ltx_para">​<p class="ltx_p">Any candy with chocolate and marzipan is better than any candy that lacks both.</p>
+</div>
+</li>
+</ol>
+</div>
+<div id="Sx1.p4" class="ltx_para ltx_noindent">
+<p class="ltx_p"><span class="ltx_text ltx_font_bold">D. </span>Using the following symbolization key:</p>
+<dl id="Sx1.I7" class="ltx_description">
+<dt id="Sx1.I7.ix1" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <span class="ltx_text ltx_markedasmath">domain</span>:</span></dt>
+<dd class="ltx_item">
+<div id="Sx1.I7.ix1.p1" class="ltx_para">
+<p class="ltx_p">people and dishes at a potluck</p>
+</div>
+</dd>
+<dt id="Sx1.I7.ix2" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="Sx1.I7.ix2.m1" class="ltx_Math" alttext="R(x)" display="inline"><mrow><mi>R</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></math>:</span></dt>
+<dd class="ltx_item">
+<div id="Sx1.I7.ix2.p1" class="ltx_para">
+<p class="ltx_p"><span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span><sub class="ltx_sub"><span class="ltx_text ltx_font_italic">x</span></sub> has run out</p>
+</div>
+</dd>
+<dt id="Sx1.I7.ix3" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="Sx1.I7.ix3.m1" class="ltx_Math" alttext="T(x)" display="inline"><mrow><mi>T</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></math>:</span></dt>
+<dd class="ltx_item">
+<div id="Sx1.I7.ix3.p1" class="ltx_para">
+<p class="ltx_p"><span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span><sub class="ltx_sub"><span class="ltx_text ltx_font_italic">x</span></sub> is on the table</p>
+</div>
+</dd>
+<dt id="Sx1.I7.ix4" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="Sx1.I7.ix4.m1" class="ltx_Math" alttext="F(x)" display="inline"><mrow><mi>F</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></math>:</span></dt>
+<dd class="ltx_item">
+<div id="Sx1.I7.ix4.p1" class="ltx_para">
+<p class="ltx_p"><span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span><sub class="ltx_sub"><span class="ltx_text ltx_font_italic">x</span></sub> is food</p>
+</div>
+</dd>
+<dt id="Sx1.I7.ix5" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="Sx1.I7.ix5.m1" class="ltx_Math" alttext="P(x)" display="inline"><mrow><mi>P</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></math>:</span></dt>
+<dd class="ltx_item">
+<div id="Sx1.I7.ix5.p1" class="ltx_para">
+<p class="ltx_p"><span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span><sub class="ltx_sub"><span class="ltx_text ltx_font_italic">x</span></sub> is a person</p>
+</div>
+</dd>
+<dt id="Sx1.I7.ix6" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="Sx1.I7.ix6.m1" class="ltx_Math" alttext="L(x,y)" display="inline"><mrow><mi>L</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo>,</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow></math>:</span></dt>
+<dd class="ltx_item">
+<div id="Sx1.I7.ix6.p1" class="ltx_para">
+<p class="ltx_p"><span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span><sub class="ltx_sub"><span class="ltx_text ltx_font_italic">x</span></sub> likes <span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span><sub class="ltx_sub"><span class="ltx_text ltx_font_italic">y</span></sub></p>
+</div>
+</dd>
+<dt id="Sx1.I7.ix7" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="Sx1.I7.ix7.m1" class="ltx_Math" alttext="e" display="inline"><mi>e</mi></math>:</span></dt>
+<dd class="ltx_item">
+<div id="Sx1.I7.ix7.p1" class="ltx_para">
+<p class="ltx_p">Eli</p>
+</div>
+</dd>
+<dt id="Sx1.I7.ix8" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="Sx1.I7.ix8.m1" class="ltx_Math" alttext="f" display="inline"><mi>f</mi></math>:</span></dt>
+<dd class="ltx_item">
+<div id="Sx1.I7.ix8.p1" class="ltx_para">
+<p class="ltx_p">Francesca</p>
+</div>
+</dd>
+<dt id="Sx1.I7.ix9" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="Sx1.I7.ix9.m1" class="ltx_Math" alttext="g" display="inline"><mi>g</mi></math>:</span></dt>
+<dd class="ltx_item">
+<div id="Sx1.I7.ix9.p1" class="ltx_para">
+<p class="ltx_p">the guacamole</p>
+</div>
+</dd>
+</dl>
+<p class="ltx_p">symbolize the following English sentences in FOL:</p>
+<ol id="Sx1.I8" class="ltx_enumerate">
+<li id="Sx1.I8.i1" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">1.</span><div id="Sx1.I8.i1.p1" class="ltx_para">​<p class="ltx_p">All the food is on the table.</p>
+</div>
+</li>
+<li id="Sx1.I8.i2" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">2.</span><div id="Sx1.I8.i2.p1" class="ltx_para">​<p class="ltx_p">If the guacamole has not run out, then it is on the table.</p>
+</div>
+</li>
+<li id="Sx1.I8.i3" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">3.</span><div id="Sx1.I8.i3.p1" class="ltx_para">​<p class="ltx_p">Everyone likes the guacamole.</p>
+</div>
+</li>
+<li id="Sx1.I8.i4" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">4.</span><div id="Sx1.I8.i4.p1" class="ltx_para">​<p class="ltx_p">If anyone likes the guacamole, then Eli does.</p>
+</div>
+</li>
+<li id="Sx1.I8.i5" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">5.</span><div id="Sx1.I8.i5.p1" class="ltx_para">​<p class="ltx_p">Francesca only likes the dishes that have run out.</p>
+</div>
+</li>
+<li id="Sx1.I8.i6" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">6.</span><div id="Sx1.I8.i6.p1" class="ltx_para">​<p class="ltx_p">Francesca likes no one, and no one likes Francesca.</p>
+</div>
+</li>
+<li id="Sx1.I8.i7" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">7.</span><div id="Sx1.I8.i7.p1" class="ltx_para">​<p class="ltx_p">Eli likes anyone who likes the guacamole.</p>
+</div>
+</li>
+<li id="Sx1.I8.i8" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">8.</span><div id="Sx1.I8.i8.p1" class="ltx_para">​<p class="ltx_p">Eli likes anyone who likes the people that he likes.</p>
+</div>
+</li>
+<li id="Sx1.I8.i9" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">9.</span><div id="Sx1.I8.i9.p1" class="ltx_para">​<p class="ltx_p">If there is a person on the table already, then all of the food must have run out.</p>
+</div>
+</li>
+</ol>
+</div>
+<div id="Sx1.p5" class="ltx_para ltx_noindent">
+<p class="ltx_p"><span class="ltx_text ltx_font_bold">E. </span>
+Using the following symbolization key:</p>
+<dl id="Sx1.I9" class="ltx_description">
+<dt id="Sx1.I9.ix1" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <span class="ltx_text ltx_markedasmath">domain</span>:</span></dt>
+<dd class="ltx_item">
+<div id="Sx1.I9.ix1.p1" class="ltx_para">
+<p class="ltx_p">people</p>
+</div>
+</dd>
+<dt id="Sx1.I9.ix2" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="Sx1.I9.ix2.m1" class="ltx_Math" alttext="D(x)" display="inline"><mrow><mi>D</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></math>:</span></dt>
+<dd class="ltx_item">
+<div id="Sx1.I9.ix2.p1" class="ltx_para">
+<p class="ltx_p"><span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span><sub class="ltx_sub"><span class="ltx_text ltx_font_italic">x</span></sub> dances ballet</p>
+</div>
+</dd>
+<dt id="Sx1.I9.ix3" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="Sx1.I9.ix3.m1" class="ltx_Math" alttext="F(x)" display="inline"><mrow><mi>F</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></math>:</span></dt>
+<dd class="ltx_item">
+<div id="Sx1.I9.ix3.p1" class="ltx_para">
+<p class="ltx_p"><span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span><sub class="ltx_sub"><span class="ltx_text ltx_font_italic">x</span></sub> is female</p>
+</div>
+</dd>
+<dt id="Sx1.I9.ix4" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="Sx1.I9.ix4.m1" class="ltx_Math" alttext="M(x)" display="inline"><mrow><mi>M</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></math>:</span></dt>
+<dd class="ltx_item">
+<div id="Sx1.I9.ix4.p1" class="ltx_para">
+<p class="ltx_p"><span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span><sub class="ltx_sub"><span class="ltx_text ltx_font_italic">x</span></sub> is male</p>
+</div>
+</dd>
+<dt id="Sx1.I9.ix5" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="Sx1.I9.ix5.m1" class="ltx_Math" alttext="C(x,y)" display="inline"><mrow><mi>C</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo>,</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow></math>:</span></dt>
+<dd class="ltx_item">
+<div id="Sx1.I9.ix5.p1" class="ltx_para">
+<p class="ltx_p"><span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span><sub class="ltx_sub"><span class="ltx_text ltx_font_italic">x</span></sub> is a child of <span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span><sub class="ltx_sub"><span class="ltx_text ltx_font_italic">y</span></sub></p>
+</div>
+</dd>
+<dt id="Sx1.I9.ix6" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="Sx1.I9.ix6.m1" class="ltx_Math" alttext="S(x,y)" display="inline"><mrow><mi>S</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo>,</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow></math>:</span></dt>
+<dd class="ltx_item">
+<div id="Sx1.I9.ix6.p1" class="ltx_para">
+<p class="ltx_p"><span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span><sub class="ltx_sub"><span class="ltx_text ltx_font_italic">x</span></sub> is a sibling of <span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span><sub class="ltx_sub"><span class="ltx_text ltx_font_italic">y</span></sub></p>
+</div>
+</dd>
+<dt id="Sx1.I9.ix7" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="Sx1.I9.ix7.m1" class="ltx_Math" alttext="e" display="inline"><mi>e</mi></math>:</span></dt>
+<dd class="ltx_item">
+<div id="Sx1.I9.ix7.p1" class="ltx_para">
+<p class="ltx_p">Elmer</p>
+</div>
+</dd>
+<dt id="Sx1.I9.ix8" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="Sx1.I9.ix8.m1" class="ltx_Math" alttext="j" display="inline"><mi>j</mi></math>:</span></dt>
+<dd class="ltx_item">
+<div id="Sx1.I9.ix8.p1" class="ltx_para">
+<p class="ltx_p">Jane</p>
+</div>
+</dd>
+<dt id="Sx1.I9.ix9" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="Sx1.I9.ix9.m1" class="ltx_Math" alttext="p" display="inline"><mi>p</mi></math>:</span></dt>
+<dd class="ltx_item">
+<div id="Sx1.I9.ix9.p1" class="ltx_para">
+<p class="ltx_p">Patrick</p>
+</div>
+</dd>
+</dl>
+<p class="ltx_p">symbolize the following sentences in FOL:</p>
+<ol id="Sx1.I10" class="ltx_enumerate">
+<li id="Sx1.I10.i1" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">1.</span><div id="Sx1.I10.i1.p1" class="ltx_para">​<p class="ltx_p">All of Patrick’s children are ballet dancers.</p>
+</div>
+</li>
+<li id="Sx1.I10.i2" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">2.</span><div id="Sx1.I10.i2.p1" class="ltx_para">​<p class="ltx_p">Jane is Patrick’s daughter.</p>
+</div>
+</li>
+<li id="Sx1.I10.i3" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">3.</span><div id="Sx1.I10.i3.p1" class="ltx_para">​<p class="ltx_p">Patrick has a daughter.</p>
+</div>
+</li>
+<li id="Sx1.I10.i4" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">4.</span><div id="Sx1.I10.i4.p1" class="ltx_para">​<p class="ltx_p">Jane is an only child.</p>
+</div>
+</li>
+<li id="Sx1.I10.i5" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">5.</span><div id="Sx1.I10.i5.p1" class="ltx_para">​<p class="ltx_p">All of Patrick’s sons dance ballet.</p>
+</div>
+</li>
+<li id="Sx1.I10.i6" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">6.</span><div id="Sx1.I10.i6.p1" class="ltx_para">​<p class="ltx_p">Patrick has no sons.</p>
+</div>
+</li>
+<li id="Sx1.I10.i7" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">7.</span><div id="Sx1.I10.i7.p1" class="ltx_para">​<p class="ltx_p">Jane is Elmer’s niece.</p>
+</div>
+</li>
+<li id="Sx1.I10.i8" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">8.</span><div id="Sx1.I10.i8.p1" class="ltx_para">​<p class="ltx_p">Patrick is Elmer’s brother.</p>
+</div>
+</li>
+<li id="Sx1.I10.i9" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">9.</span><div id="Sx1.I10.i9.p1" class="ltx_para">​<p class="ltx_p">Patrick’s brothers have no children.</p>
+</div>
+</li>
+<li id="Sx1.I10.i10" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">10.</span><div id="Sx1.I10.i10.p1" class="ltx_para">​<p class="ltx_p">Jane is an aunt.</p>
+</div>
+</li>
+<li id="Sx1.I10.i11" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">11.</span><div id="Sx1.I10.i11.p1" class="ltx_para">​<p class="ltx_p">Everyone who dances ballet has a brother who also dances ballet.</p>
+</div>
+</li>
+<li id="Sx1.I10.i12" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">12.</span><div id="Sx1.I10.i12.p1" class="ltx_para">​<p class="ltx_p">Every woman who dances ballet is the child of someone who dances ballet.</p>
+</div>
+</li>
+</ol>
+</div>
+</div>
+</section>
+</div>
+</section>
+</div>
+</div>
+</div>
+<a href="Ch24.html" class="navigation navigation-prev" aria-label="Previous page"><i class="fa fa-angle-left"></i></a><a href="Ch26.html" class="navigation navigation-next" aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+</div>
+</div>
+</body>
+
+</html>

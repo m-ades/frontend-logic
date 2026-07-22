@@ -1,0 +1,3219 @@
+<!DOCTYPE html><html style="--bml-ltx-font-size:10;" class="bml_mathjax4" lang="en">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<title>Chapter 21 Derived rules ‣ Part IV Natural deduction for TFL ‣ forall x: Calgary</title>
+<!--Generated on Tue Jul 21 20:13:15 2026 by LaTeXML (version 0.8.8) http://dlmf.nist.gov/LaTeXML/.-->
+<!--Document created on Fall 2025 (2026‐07‐18 8642250).-->
+
+<link rel="stylesheet" href="LaTeXML.css" type="text/css">
+<link rel="stylesheet" href="ltx-book.css" type="text/css">
+<link rel="stylesheet" href="bookml/gitbook/css/style.css" type="text/css">
+<link rel="stylesheet" href="bookml/gitbook/css/plugin-table.css" type="text/css">
+<link rel="stylesheet" href="bookml/gitbook/css/plugin-search.css" type="text/css">
+<link rel="stylesheet" href="bookml/gitbook/css/plugin-bookdown.css" type="text/css">
+<link rel="stylesheet" href="bookml/gitbook/css/plugin-fontsettings.css" type="text/css">
+<link rel="stylesheet" href="bookml/CSS/style.css" type="text/css">
+<link rel="stylesheet" href="bookml/CSS/style.gitbook,plain.css" type="text/css">
+<link rel="stylesheet" href="bookml/CSS/style.gitbook.css" type="text/css">
+<link rel="stylesheet" href="bmluser/colors.gitbook-forallxyyc-html.css" type="text/css">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<link rel="stylesheet" href="forallxyyc.css" type="text/css">
+<link rel="stylesheet" href="fitchml.css" type="text/css">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script><script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6"></script>
+<link rel="up" href="Pt4.html" title="Part IV Natural deduction for TFL ‣ forall x: Calgary">
+<link rel="up up" href="index.html" title="forall x: Calgary">
+<link rel="start" href="index.html" title="forall x: Calgary">
+<link rel="prev" href="Ch20.html" title="Chapter 20 Proof-theoretic concepts ‣ Part IV Natural deduction for TFL ‣ forall x: Calgary">
+<link rel="next" href="Ch22.html" title="Chapter 22 Soundness and completeness ‣ Part IV Natural deduction for TFL ‣ forall x: Calgary">
+<link rel="chapter" href="Ch16.html" title="Chapter 16 The very idea of natural deduction ‣ Part IV Natural deduction for TFL ‣ forall x: Calgary">
+<link rel="chapter" href="Ch17.html" title="Chapter 17 Basic rules for TFL ‣ Part IV Natural deduction for TFL ‣ forall x: Calgary">
+<link rel="chapter" href="Ch18.html" title="Chapter 18 Constructing proofs ‣ Part IV Natural deduction for TFL ‣ forall x: Calgary">
+<link rel="chapter" href="Ch19.html" title="Chapter 19 Additional rules for TFL ‣ Part IV Natural deduction for TFL ‣ forall x: Calgary">
+<link rel="chapter" href="Ch20.html" title="Chapter 20 Proof-theoretic concepts ‣ Part IV Natural deduction for TFL ‣ forall x: Calgary">
+<link rel="chapter" href="Ch22.html" title="Chapter 22 Soundness and completeness ‣ Part IV Natural deduction for TFL ‣ forall x: Calgary">
+<link rel="chapter" href="Chx1.html" title="Preface ‣ forall x: Calgary">
+<link rel="part" href="Pt1.html" title="Part I Key notions of logic ‣ forall x: Calgary">
+<link rel="part" href="Pt2.html" title="Part II Truth-functional logic ‣ forall x: Calgary">
+<link rel="part" href="Pt3.html" title="Part III Truth tables ‣ forall x: Calgary">
+<link rel="part" href="Pt4.html" title="Part IV Natural deduction for TFL ‣ forall x: Calgary">
+<link rel="part" href="Pt5.html" title="Part V First-order logic ‣ forall x: Calgary">
+<link rel="part" href="Pt6.html" title="Part VI Interpretations ‣ forall x: Calgary">
+<link rel="part" href="Pt7.html" title="Part VII Natural deduction for FOL ‣ forall x: Calgary">
+<link rel="part" href="Pt8.html" title="Part VIII Modal logic ‣ forall x: Calgary">
+<link rel="part" href="Pt9.html" title="Part IX Metatheory ‣ forall x: Calgary">
+<link rel="part" href="Ptx1.html" title="Appendices ‣ forall x: Calgary">
+<link rel="part" href="Ptx2.html" title="Solutions to selected exercices ‣ forall x: Calgary">
+<script src="bookml/js/mathjax4.js" defer></script>
+</head>
+<body class="bml_class_book">
+<div class="book without-animation font-size-2 font-family-1" data-basepath=".">
+<a href="#bml-main-content" tabindex="0" class="bml-skip-to-content">Skip to content.</a>
+<div class="book-summary"><nav class="ltx_page_navbar">
+<ul class="ltx_toclist summary">
+<li>
+<a href="index.html" title="" class="ltx_ref" rel="start">forall x: Calgary</a>
+</li>
+<li class="divider" aria-hidden="true"></li>
+<li data-level="" data-path="Chx1.html" class="ltx_tocentry ltx_tocentry_chapter  chapter "><a href="Chx1.html" title="In forall x: Calgary" class="ltx_ref">Preface</a></li>
+<li data-level="I" data-path="Pt1.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt1.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">I </span></b>Key notions of logic</a></li>
+<li data-level="II" data-path="Pt2.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt2.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">II </span></b>Truth-functional logic</a></li>
+<li data-level="III" data-path="Pt3.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt3.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">III </span></b>Truth tables</a></li>
+<li data-level="IV" data-path="Pt4.html" class="ltx_tocentry ltx_tocentry_part  chapter ">
+<a href="Pt4.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">IV </span></b>Natural deduction for TFL</a>
+<ol class="ltx_toclist ltx_toclist_part">
+<li data-level="16" data-path="Ch16.html" class="ltx_tocentry ltx_tocentry_chapter  chapter "><a href="Ch16.html" title="In Part IV Natural deduction for TFL ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">16 </span></b>The very idea of natural deduction</a></li>
+<li data-level="17" data-path="Ch17.html" class="ltx_tocentry ltx_tocentry_chapter  chapter "><a href="Ch17.html" title="In Part IV Natural deduction for TFL ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">17 </span></b>Basic rules for TFL</a></li>
+<li data-level="18" data-path="Ch18.html" class="ltx_tocentry ltx_tocentry_chapter  chapter "><a href="Ch18.html" title="In Part IV Natural deduction for TFL ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">18 </span></b>Constructing proofs</a></li>
+<li data-level="19" data-path="Ch19.html" class="ltx_tocentry ltx_tocentry_chapter  chapter "><a href="Ch19.html" title="In Part IV Natural deduction for TFL ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">19 </span></b>Additional rules for TFL</a></li>
+<li data-level="20" data-path="Ch20.html" class="ltx_tocentry ltx_tocentry_chapter  chapter "><a href="Ch20.html" title="In Part IV Natural deduction for TFL ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">20 </span></b>Proof-theoretic concepts</a></li>
+<li data-level="21" data-path="" class="ltx_tocentry ltx_tocentry_chapter ltx_ref_self  chapter active">
+<a href="" title="In Part IV Natural deduction for TFL ‣ forall x: Calgary" aria-current="page" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">21 </span></b>Derived rules</a>
+<ol class="ltx_toclist ltx_toclist_chapter">
+<li data-level="21.1" data-path="" class="ltx_tocentry ltx_tocentry_section  chapter "><a href="#S1" title="In Chapter 21 Derived rules ‣ Part IV Natural deduction for TFL ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">21.1 </span></b>Derivation of Reiteration</a></li>
+<li data-level="21.2" data-path="" class="ltx_tocentry ltx_tocentry_section  chapter "><a href="#S2" title="In Chapter 21 Derived rules ‣ Part IV Natural deduction for TFL ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">21.2 </span></b>Derivation of Disjunctive Syllogism</a></li>
+<li data-level="21.3" data-path="" class="ltx_tocentry ltx_tocentry_section  chapter "><a href="#S3" title="In Chapter 21 Derived rules ‣ Part IV Natural deduction for TFL ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">21.3 </span></b>Derivation of Modus Tollens</a></li>
+<li data-level="21.4" data-path="" class="ltx_tocentry ltx_tocentry_section  chapter "><a href="#S4" title="In Chapter 21 Derived rules ‣ Part IV Natural deduction for TFL ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">21.4 </span></b>Derivation of Double-Negation Elimination</a></li>
+<li data-level="21.5" data-path="" class="ltx_tocentry ltx_tocentry_section  chapter "><a href="#S5" title="In Chapter 21 Derived rules ‣ Part IV Natural deduction for TFL ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">21.5 </span></b>Derivation of Excluded Middle</a></li>
+<li data-level="21.6" data-path="" class="ltx_tocentry ltx_tocentry_section  chapter "><a href="#S6" title="In Chapter 21 Derived rules ‣ Part IV Natural deduction for TFL ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">21.6 </span></b>Derivation of De Morgan rules</a></li>
+<li data-level="" data-path="" class="ltx_tocentry ltx_tocentry_section  chapter "><a href="#Sx1" title="In Chapter 21 Derived rules ‣ Part IV Natural deduction for TFL ‣ forall x: Calgary" class="ltx_ref">Practice exercises</a></li>
+</ol>
+</li>
+<li data-level="22" data-path="Ch22.html" class="ltx_tocentry ltx_tocentry_chapter  chapter "><a href="Ch22.html" title="In Part IV Natural deduction for TFL ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">22 </span></b>Soundness and completeness</a></li>
+</ol>
+</li>
+<li data-level="V" data-path="Pt5.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt5.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">V </span></b>First-order logic</a></li>
+<li data-level="VI" data-path="Pt6.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt6.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">VI </span></b>Interpretations</a></li>
+<li data-level="VII" data-path="Pt7.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt7.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">VII </span></b>Natural deduction for FOL</a></li>
+<li data-level="VIII" data-path="Pt8.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt8.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">VIII </span></b>Modal logic</a></li>
+<li data-level="IX" data-path="Pt9.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt9.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">IX </span></b>Metatheory</a></li>
+<li data-level="" data-path="Ptx1.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Ptx1.html" title="In forall x: Calgary" class="ltx_ref">Appendices</a></li>
+<li data-level="" data-path="Ptx2.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Ptx2.html" title="In forall x: Calgary" class="ltx_ref">Solutions to selected exercices</a></li>
+</ul>
+</nav></div>
+
+<div class="ltx_page_main book-body fixed">
+<div class="body-inner">
+<header class="book-header fixed" aria-label="toolbar"><span class="bml-separator"></span></header>
+<div class="page-wrapper" tabindex="-1" role="main">
+<div class="ltx_page_content page-inner" id="bml-main-content">
+<script src="bookml/gitbook/js/app.min.js"></script>
+<script src="bookml/gitbook/js/jquery.highlight.js"></script>
+<script src="bookml/gitbook/js/plugin-search.js"></script>
+<script src="bookml/gitbook/js/plugin-fontsettings.js"></script>
+<script src="bookml/gitbook/js/plugin-bookdown.js"></script>
+<script type="text/javascript">
+                  gitbook.require(["gitbook"], function(gitbook) {
+                  gitbook.start({
+                    "fontsettings": {
+                      "theme": "white",
+                      "family": "sans",
+                      "size": 2
+                    },
+                    "download": [ [ "forallxyyc.pdf", "PDF" ], [ "forallxyyc-accessible.pdf", "PDF (accessible)" ], ],
+                    "search": {
+                      "engine": "fuse"
+                    },
+                    "toc": {
+                      "collapse": "none"
+                    }
+                  });
+                });
+              </script>
+
+<section class="ltx_chapter ltx_authors_1line normal" lang="en">
+<div class="section level1">
+<h1 class="ltx_title ltx_title_chapter">
+<span class="ltx_tag ltx_tag_chapter header-section-number">Chapter 21</span> Derived rules</h1>
+
+<div id="p1" class="ltx_para">
+<p class="ltx_p">In this section, we will see why we introduced the rules of our proof system in two separate batches. In particular, we want to show that the additional rules of <a href="A19.html" title="Solutions to Chapter 19 Additional rules for TFL ‣ Solutions to selected exercices ‣ forall x: Calgary" class="ltx_ref"><span class="ltx_text ltx_ref_tag">appendix</span> <span class="ltx_text ltx_ref_tag">19</span></a> are not strictly speaking necessary, but can be derived from the basic rules of <a href="Ch17.html" title="Chapter 17 Basic rules for TFL ‣ Part IV Natural deduction for TFL ‣ forall x: Calgary" class="ltx_ref"><span class="ltx_text ltx_ref_tag">chapter</span> <span class="ltx_text ltx_ref_tag">17</span></a>.</p>
+</div>
+<section id="S1" class="ltx_section normal">
+<div class="section level2">
+<h2 class="ltx_title ltx_title_section">
+<span class="ltx_tag ltx_tag_section header-section-number">21.1</span> Derivation of Reiteration</h2>
+
+<div id="S1.p1" class="ltx_para">
+<p class="ltx_p">To illustrate what it means to derive a <span class="ltx_text ltx_font_bold">rule</span> from other rules, first consider reiteration. It is a basic rule of our system, but it is also not necessary. Suppose you have some sentence on some line of your deduction:</p>
+</div>
+<div id="S1.p2" class="ltx_para ltx_noindent">
+<table class="fitch">
+            
+            <thead class="fml-sr-only">
+              
+              <tr>
+                <th class="fml-pline">
+                  
+                  <div>
+                    
+<p class="ltx_p">Line number</p>
+                  </div>
+                </th>
+                <th class="fml-subproof">
+                  
+                  <div>
+                    
+<p class="ltx_p">Subproof level</p>
+                  </div>
+                </th>
+                <th class="fml-fmla">
+                  
+                  <div>
+                    
+<p class="ltx_p">Formula</p>
+                  </div>
+                </th>
+                <th class="fml-just">
+                  
+                  <div>
+                    
+<p class="ltx_p">Justification</p>
+                  </div>
+                </th>
+              </tr>
+            </thead>
+            <tr>
+              <th class="fml-pline">
+                
+                
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"><math id="S1.p2.m1.m1" class="ltx_Math" alttext="m" display="inline"><mi>m</mi></math></span></p>
+              </th>
+              <td class="fml-subproof">
+                
+                <div>
+                  <span>0</span>
+                </div>
+              </td>
+              <td class="fml-fmla">
+                
+                <div class="fml-scope-start">
+                  
+                </div>
+                <div class="fml-fmla">
+                  
+                  <span><math id="S1.p2.m2" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math></span>
+                </div>
+              </td>
+              <td class="fml-just">
+                
+                <div class="fml-just">
+                  
+                  <span></span>
+                </div>
+              </td>
+            </tr>
+          </table>
+</div>
+<div id="S1.p3" class="ltx_para ltx_noindent">
+<p class="ltx_p">You now want to repeat yourself, on some line <math id="S1.p3.m1" class="ltx_Math" alttext="k" display="inline"><mi>k</mi></math>. You could just invoke the rule R. But equally well, you can do this with other basic rules of <a href="Ch17.html" title="Chapter 17 Basic rules for TFL ‣ Part IV Natural deduction for TFL ‣ forall x: Calgary" class="ltx_ref"><span class="ltx_text ltx_ref_tag">chapter</span> <span class="ltx_text ltx_ref_tag">17</span></a>:</p>
+</div>
+<div id="S1.p4" class="ltx_para ltx_noindent">
+<table class="fitch">
+            
+            <thead class="fml-sr-only">
+              
+              <tr>
+                <th class="fml-pline">
+                  
+                  <div>
+                    
+<p class="ltx_p">Line number</p>
+                  </div>
+                </th>
+                <th class="fml-subproof">
+                  
+                  <div>
+                    
+<p class="ltx_p">Subproof level</p>
+                  </div>
+                </th>
+                <th class="fml-fmla">
+                  
+                  <div>
+                    
+<p class="ltx_p">Formula</p>
+                  </div>
+                </th>
+                <th class="fml-just">
+                  
+                  <div>
+                    
+<p class="ltx_p">Justification</p>
+                  </div>
+                </th>
+              </tr>
+            </thead>
+            <tr>
+              <th class="fml-pline">
+                
+                
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"><math id="S1.p4.m1.m1" class="ltx_Math" alttext="m" display="inline"><mi>m</mi></math></span></p>
+              </th>
+              <td class="fml-subproof">
+                
+                <div>
+                  <span>0</span>
+                </div>
+              </td>
+              <td class="fml-fmla">
+                
+                <div class="fml-scope-start">
+                  
+                </div>
+                <div class="fml-fmla">
+                  
+                  <span><math id="S1.p4.m2" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math></span>
+                </div>
+              </td>
+              <td class="fml-just">
+                
+                <div class="fml-just">
+                  
+                  <span></span>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <th class="fml-pline">
+                
+                
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"><math id="S1.p4.m3.m1" class="ltx_Math" alttext="k" display="inline"><mi>k</mi></math></span></p>
+              </th>
+              <td class="fml-subproof">
+                
+                <div>
+                  <span>0</span>
+                </div>
+              </td>
+              <td class="fml-fmla">
+                
+                <div class="fml-scope">
+                  
+                </div>
+                <div class="fml-fmla">
+                  
+                  <span><math id="S1.p4.m4" class="ltx_Math" alttext="\mathscr{A}\wedge\mathscr{A}" display="inline"><mrow><mi class="ltx_font_mathscript">𝒜︁</mi><mo>∧</mo><mi class="ltx_font_mathscript">𝒜︁</mi></mrow></math></span>
+                </div>
+              </td>
+              <td class="fml-just">
+                
+                <div class="fml-just">
+                  
+                  <span><math id="S1.p4.m5" class="ltx_Math" alttext="\wedge" display="inline"><mo>∧</mo></math>I <math id="S1.p4.m6" class="ltx_Math" alttext="m" display="inline"><mi>m</mi></math>, <math id="S1.p4.m7" class="ltx_Math" alttext="m" display="inline"><mi>m</mi></math></span>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <th class="fml-pline">
+                
+                
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"><math id="S1.p4.m8.m1" class="ltx_Math" alttext="k+1" display="inline"><mrow><mi>k</mi><mo>+</mo><mn>1</mn></mrow></math></span></p>
+              </th>
+              <td class="fml-subproof">
+                
+                <div>
+                  <span>0</span>
+                </div>
+              </td>
+              <td class="fml-fmla">
+                
+                <div class="fml-scope">
+                  
+                </div>
+                <div class="fml-fmla">
+                  
+                  <span><math id="S1.p4.m9" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math></span>
+                </div>
+              </td>
+              <td class="fml-just">
+                
+                <div class="fml-just">
+                  
+                  <span><math id="S1.p4.m10" class="ltx_Math" alttext="\wedge" display="inline"><mo>∧</mo></math>E <math id="S1.p4.m11" class="ltx_Math" alttext="k" display="inline"><mi>k</mi></math></span>
+                </div>
+              </td>
+            </tr>
+          </table>
+</div>
+<div id="S1.p5" class="ltx_para ltx_noindent">
+<p class="ltx_p">To be clear: this is not a proof. Rather, it is a proof <span class="ltx_text ltx_font_bold">scheme</span>. After all, it uses a variable, ‘<math id="S1.p5.m1" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math>’, rather than a sentence of TFL, but the point is simple: Whatever sentences of TFL we plugged in for ‘<math id="S1.p5.m2" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math>’, and whatever lines we were working on, we could produce a bona fide proof. So you can think of this as a recipe for producing proofs.</p>
+</div>
+<div id="S1.p6" class="ltx_para">
+<p class="ltx_p">Indeed, it is a recipe which shows us the following: anything we can prove using the rule R, we can prove (with one more line) using just the basic rules of <a href="Ch17.html" title="Chapter 17 Basic rules for TFL ‣ Part IV Natural deduction for TFL ‣ forall x: Calgary" class="ltx_ref"><span class="ltx_text ltx_ref_tag">chapter</span> <span class="ltx_text ltx_ref_tag">17</span></a> without R. That is what it means to say that the rule R can be derived from the other basic rules: anything that can be justified using R can be justified using only the other basic rules.</p>
+</div>
+</div>
+</section>
+<section id="S2" class="ltx_section normal">
+<div class="section level2">
+<h2 class="ltx_title ltx_title_section">
+<span class="ltx_tag ltx_tag_section header-section-number">21.2</span> Derivation of Disjunctive Syllogism</h2>
+
+<div id="S2.p1" class="ltx_para">
+<p class="ltx_p">Suppose that you are in a proof, and you have something of this form:</p>
+</div>
+<div id="S2.p2" class="ltx_para ltx_noindent">
+<table class="fitch">
+            
+            <thead class="fml-sr-only">
+              
+              <tr>
+                <th class="fml-pline">
+                  
+                  <div>
+                    
+<p class="ltx_p">Line number</p>
+                  </div>
+                </th>
+                <th class="fml-subproof">
+                  
+                  <div>
+                    
+<p class="ltx_p">Subproof level</p>
+                  </div>
+                </th>
+                <th class="fml-fmla">
+                  
+                  <div>
+                    
+<p class="ltx_p">Formula</p>
+                  </div>
+                </th>
+                <th class="fml-just">
+                  
+                  <div>
+                    
+<p class="ltx_p">Justification</p>
+                  </div>
+                </th>
+              </tr>
+            </thead>
+            <tr>
+              <th class="fml-pline">
+                
+                
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"><math id="S2.p2.m1.m1" class="ltx_Math" alttext="m" display="inline"><mi>m</mi></math></span></p>
+              </th>
+              <td class="fml-subproof">
+                
+                <div>
+                  <span>0</span>
+                </div>
+              </td>
+              <td class="fml-fmla">
+                
+                <div class="fml-scope-start">
+                  
+                </div>
+                <div class="fml-fmla">
+                  
+                  <span><math id="S2.p2.m2" class="ltx_Math" alttext="\mathscr{A}\vee\mathscr{B}" display="inline"><mrow><mi class="ltx_font_mathscript">𝒜︁</mi><mo>∨</mo><mi class="ltx_font_mathscript">ℬ︁</mi></mrow></math></span>
+                </div>
+              </td>
+              <td class="fml-just">
+                
+                <div class="fml-just">
+                  
+                  <span></span>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <th class="fml-pline">
+                
+                
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"><math id="S2.p2.m3.m1" class="ltx_Math" alttext="n" display="inline"><mi>n</mi></math></span></p>
+              </th>
+              <td class="fml-subproof">
+                
+                <div>
+                  <span>0</span>
+                </div>
+              </td>
+              <td class="fml-fmla">
+                
+                <div class="fml-scope">
+                  
+                </div>
+                <div class="fml-fmla">
+                  
+                  <span><math id="S2.p2.m4" class="ltx_Math" alttext="\neg\mathscr{A}" display="inline"><mrow><mo rspace="0.167em">¬</mo><mi class="ltx_font_mathscript">𝒜︁</mi></mrow></math></span>
+                </div>
+              </td>
+              <td class="fml-just">
+                
+                <div class="fml-just">
+                  
+                  <span></span>
+                </div>
+              </td>
+            </tr>
+          </table>
+</div>
+<div id="S2.p3" class="ltx_para ltx_noindent">
+<p class="ltx_p">You now want, on line <math id="S2.p3.m1" class="ltx_Math" alttext="k" display="inline"><mi>k</mi></math>, to prove <math id="S2.p3.m2" class="ltx_Math" alttext="\mathscr{B}" display="inline"><mi class="ltx_font_mathscript">ℬ︁</mi></math>. You can do this with the rule of DS, introduced in <a href="A19.html" title="Solutions to Chapter 19 Additional rules for TFL ‣ Solutions to selected exercices ‣ forall x: Calgary" class="ltx_ref"><span class="ltx_text ltx_ref_tag">appendix</span> <span class="ltx_text ltx_ref_tag">19</span></a>, but equally well, you can do this with the <span class="ltx_text ltx_font_bold">basic</span> rules of <a href="Ch17.html" title="Chapter 17 Basic rules for TFL ‣ Part IV Natural deduction for TFL ‣ forall x: Calgary" class="ltx_ref"><span class="ltx_text ltx_ref_tag">chapter</span> <span class="ltx_text ltx_ref_tag">17</span></a>:</p>
+</div>
+<div id="S2.p4" class="ltx_para ltx_noindent">
+<table class="fitch">
+            
+            <thead class="fml-sr-only">
+              
+              <tr>
+                <th class="fml-pline">
+                  
+                  <div>
+                    
+<p class="ltx_p">Line number</p>
+                  </div>
+                </th>
+                <th class="fml-subproof">
+                  
+                  <div>
+                    
+<p class="ltx_p">Subproof level</p>
+                  </div>
+                </th>
+                <th class="fml-fmla">
+                  
+                  <div>
+                    
+<p class="ltx_p">Formula</p>
+                  </div>
+                </th>
+                <th class="fml-just">
+                  
+                  <div>
+                    
+<p class="ltx_p">Justification</p>
+                  </div>
+                </th>
+              </tr>
+            </thead>
+            <tr>
+              <th class="fml-pline">
+                
+                
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"><math id="S2.p4.m1.m1" class="ltx_Math" alttext="m" display="inline"><mi>m</mi></math></span></p>
+              </th>
+              <td class="fml-subproof">
+                
+                <div>
+                  <span>0</span>
+                </div>
+              </td>
+              <td class="fml-fmla">
+                
+                <div class="fml-scope-start">
+                  
+                </div>
+                <div class="fml-fmla">
+                  
+                  <span><math id="S2.p4.m2" class="ltx_Math" alttext="\mathscr{A}\vee\mathscr{B}" display="inline"><mrow><mi class="ltx_font_mathscript">𝒜︁</mi><mo>∨</mo><mi class="ltx_font_mathscript">ℬ︁</mi></mrow></math></span>
+                </div>
+              </td>
+              <td class="fml-just">
+                
+                <div class="fml-just">
+                  
+                  <span></span>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <th class="fml-pline">
+                
+                
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"><math id="S2.p4.m3.m1" class="ltx_Math" alttext="n" display="inline"><mi>n</mi></math></span></p>
+              </th>
+              <td class="fml-subproof">
+                
+                <div>
+                  <span>0</span>
+                </div>
+              </td>
+              <td class="fml-fmla">
+                
+                <div class="fml-scope">
+                  
+                </div>
+                <div class="fml-fmla">
+                  
+                  <span><math id="S2.p4.m4" class="ltx_Math" alttext="\neg\mathscr{A}" display="inline"><mrow><mo rspace="0.167em">¬</mo><mi class="ltx_font_mathscript">𝒜︁</mi></mrow></math></span>
+                </div>
+              </td>
+              <td class="fml-just">
+                
+                <div class="fml-just">
+                  
+                  <span></span>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <th class="fml-pline">
+                
+                
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"><math id="S2.p4.m5.m1" class="ltx_Math" alttext="k" display="inline"><mi>k</mi></math></span></p>
+              </th>
+              <td class="fml-subproof">
+                
+                <div>
+                  <span>open subproof,
+1</span>
+                </div>
+              </td>
+              <td class="fml-fmla">
+                
+                <div class="fml-scope">
+                  
+                </div>
+                <div class="fml-scope-start">
+                  
+                </div>
+                <div class="fml-as">
+                  
+                  <span><math id="S2.p4.m6" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math></span>
+                </div>
+              </td>
+              <td class="fml-just">
+                
+                <div class="fml-just">
+                  
+                  <span><abbr title="Assumption">
+AS</abbr>
+</span>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <th class="fml-pline">
+                
+                
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"><math id="S2.p4.m7.m1" class="ltx_Math" alttext="k+1" display="inline"><mrow><mi>k</mi><mo>+</mo><mn>1</mn></mrow></math></span></p>
+              </th>
+              <td class="fml-subproof">
+                
+                <div>
+                  <span>1</span>
+                </div>
+              </td>
+              <td class="fml-fmla">
+                
+                <div class="fml-scope">
+                  
+                </div>
+                <div class="fml-scope">
+                  
+                </div>
+                <div class="fml-fmla">
+                  
+                  <span><math id="S2.p4.m8" class="ltx_Math" alttext="\bot" display="inline"><mo>⊥</mo></math></span>
+                </div>
+              </td>
+              <td class="fml-just">
+                
+                <div class="fml-just">
+                  
+                  <span><math id="S2.p4.m9" class="ltx_Math" alttext="\neg" display="inline"><mo>¬</mo></math>E <math id="S2.p4.m10" class="ltx_Math" alttext="n" display="inline"><mi>n</mi></math>, <math id="S2.p4.m11" class="ltx_Math" alttext="k" display="inline"><mi>k</mi></math></span>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <th class="fml-pline">
+                
+                
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"><math id="S2.p4.m12.m1" class="ltx_Math" alttext="k+2" display="inline"><mrow><mi>k</mi><mo>+</mo><mn>2</mn></mrow></math></span></p>
+              </th>
+              <td class="fml-subproof">
+                
+                <div>
+                  <span>1</span>
+                </div>
+              </td>
+              <td class="fml-fmla">
+                
+                <div class="fml-scope">
+                  
+                </div>
+                <div class="fml-scope">
+                  
+                </div>
+                <div class="fml-fmla">
+                  
+                  <span><math id="S2.p4.m13" class="ltx_Math" alttext="\mathscr{B}" display="inline"><mi class="ltx_font_mathscript">ℬ︁</mi></math></span>
+                </div>
+              </td>
+              <td class="fml-just">
+                
+                <div class="fml-just">
+                  
+                  <span>X <math id="S2.p4.m14" class="ltx_Math" alttext="k+1" display="inline"><mrow><mi>k</mi><mo>+</mo><mn>1</mn></mrow></math></span>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <th class="fml-pline">
+                
+                
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"><math id="S2.p4.m15.m1" class="ltx_Math" alttext="k+3" display="inline"><mrow><mi>k</mi><mo>+</mo><mn>3</mn></mrow></math></span></p>
+              </th>
+              <td class="fml-subproof">
+                
+                <div>
+                  <span>close subproof,
+open subproof,
+1</span>
+                </div>
+              </td>
+              <td class="fml-fmla">
+                
+                <div class="fml-scope">
+                  
+                </div>
+                <div class="fml-scope-start">
+                  
+                </div>
+                <div class="fml-as">
+                  
+                  <span><math id="S2.p4.m16" class="ltx_Math" alttext="\mathscr{B}" display="inline"><mi class="ltx_font_mathscript">ℬ︁</mi></math></span>
+                </div>
+              </td>
+              <td class="fml-just">
+                
+                <div class="fml-just">
+                  
+                  <span><abbr title="Assumption">
+AS</abbr>
+</span>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <th class="fml-pline">
+                
+                
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"><math id="S2.p4.m17.m1" class="ltx_Math" alttext="k+4" display="inline"><mrow><mi>k</mi><mo>+</mo><mn>4</mn></mrow></math></span></p>
+              </th>
+              <td class="fml-subproof">
+                
+                <div>
+                  <span>1</span>
+                </div>
+              </td>
+              <td class="fml-fmla">
+                
+                <div class="fml-scope">
+                  
+                </div>
+                <div class="fml-scope">
+                  
+                </div>
+                <div class="fml-fmla">
+                  
+                  <span><math id="S2.p4.m18" class="ltx_Math" alttext="\mathscr{B}" display="inline"><mi class="ltx_font_mathscript">ℬ︁</mi></math></span>
+                </div>
+              </td>
+              <td class="fml-just">
+                
+                <div class="fml-just">
+                  
+                  <span>R <math id="S2.p4.m19" class="ltx_Math" alttext="k+3" display="inline"><mrow><mi>k</mi><mo>+</mo><mn>3</mn></mrow></math></span>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <th class="fml-pline">
+                
+                
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"><math id="S2.p4.m20.m1" class="ltx_Math" alttext="k+5" display="inline"><mrow><mi>k</mi><mo>+</mo><mn>5</mn></mrow></math></span></p>
+              </th>
+              <td class="fml-subproof">
+                
+                <div>
+                  <span>close subproof,
+0</span>
+                </div>
+              </td>
+              <td class="fml-fmla">
+                
+                <div class="fml-scope">
+                  
+                </div>
+                <div class="fml-fmla">
+                  
+                  <span><math id="S2.p4.m21" class="ltx_Math" alttext="\mathscr{B}" display="inline"><mi class="ltx_font_mathscript">ℬ︁</mi></math></span>
+                </div>
+              </td>
+              <td class="fml-just">
+                
+                <div class="fml-just">
+                  
+                  <span><math id="S2.p4.m22" class="ltx_Math" alttext="\vee" display="inline"><mo>∨</mo></math>E <math id="S2.p4.m23" class="ltx_Math" alttext="m" display="inline"><mi>m</mi></math>, <math id="S2.p4.m24" class="ltx_Math" alttext="k" display="inline"><mi>k</mi></math>–<math id="S2.p4.m25" class="ltx_Math" alttext="k+2" display="inline"><mrow><mi>k</mi><mo>+</mo><mn>2</mn></mrow></math>, <math id="S2.p4.m26" class="ltx_Math" alttext="k+3" display="inline"><mrow><mi>k</mi><mo>+</mo><mn>3</mn></mrow></math>–<math id="S2.p4.m27" class="ltx_Math" alttext="k+4" display="inline"><mrow><mi>k</mi><mo>+</mo><mn>4</mn></mrow></math></span>
+                </div>
+              </td>
+            </tr>
+          </table>
+</div>
+<div id="S2.p5" class="ltx_para ltx_noindent">
+<p class="ltx_p">So the DS rule, again, can be derived from our more basic rules. Adding it to our system did not make any new proofs possible. Anytime you use the DS rule, you could always take a few extra lines and prove the same thing using only our basic rules. It is a <span class="ltx_text ltx_font_bold">derived</span> rule.</p>
+</div>
+</div>
+</section>
+<section id="S3" class="ltx_section normal">
+<div class="section level2">
+<h2 class="ltx_title ltx_title_section">
+<span class="ltx_tag ltx_tag_section header-section-number">21.3</span> Derivation of Modus Tollens</h2>
+
+<div id="S3.p1" class="ltx_para">
+<p class="ltx_p">Suppose you have the following in your proof:</p>
+</div>
+<div id="S3.p2" class="ltx_para ltx_noindent">
+<table class="fitch">
+            
+            <thead class="fml-sr-only">
+              
+              <tr>
+                <th class="fml-pline">
+                  
+                  <div>
+                    
+<p class="ltx_p">Line number</p>
+                  </div>
+                </th>
+                <th class="fml-subproof">
+                  
+                  <div>
+                    
+<p class="ltx_p">Subproof level</p>
+                  </div>
+                </th>
+                <th class="fml-fmla">
+                  
+                  <div>
+                    
+<p class="ltx_p">Formula</p>
+                  </div>
+                </th>
+                <th class="fml-just">
+                  
+                  <div>
+                    
+<p class="ltx_p">Justification</p>
+                  </div>
+                </th>
+              </tr>
+            </thead>
+            <tr>
+              <th class="fml-pline">
+                
+                
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"><math id="S3.p2.m1.m1" class="ltx_Math" alttext="m" display="inline"><mi>m</mi></math></span></p>
+              </th>
+              <td class="fml-subproof">
+                
+                <div>
+                  <span>0</span>
+                </div>
+              </td>
+              <td class="fml-fmla">
+                
+                <div class="fml-scope-start">
+                  
+                </div>
+                <div class="fml-fmla">
+                  
+                  <span><math id="S3.p2.m2" class="ltx_Math" alttext="\mathscr{A}\rightarrow\mathscr{B}" display="inline"><mrow><mi class="ltx_font_mathscript">𝒜︁</mi><mo stretchy="false">→</mo><mi class="ltx_font_mathscript">ℬ︁</mi></mrow></math></span>
+                </div>
+              </td>
+              <td class="fml-just">
+                
+                <div class="fml-just">
+                  
+                  <span></span>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <th class="fml-pline">
+                
+                
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"><math id="S3.p2.m3.m1" class="ltx_Math" alttext="n" display="inline"><mi>n</mi></math></span></p>
+              </th>
+              <td class="fml-subproof">
+                
+                <div>
+                  <span>0</span>
+                </div>
+              </td>
+              <td class="fml-fmla">
+                
+                <div class="fml-scope">
+                  
+                </div>
+                <div class="fml-fmla">
+                  
+                  <span><math id="S3.p2.m4" class="ltx_Math" alttext="\neg\mathscr{B}" display="inline"><mrow><mo rspace="0.167em">¬</mo><mi class="ltx_font_mathscript">ℬ︁</mi></mrow></math></span>
+                </div>
+              </td>
+              <td class="fml-just">
+                
+                <div class="fml-just">
+                  
+                  <span></span>
+                </div>
+              </td>
+            </tr>
+          </table>
+</div>
+<div id="S3.p3" class="ltx_para ltx_noindent">
+<p class="ltx_p">You now want, on line <math id="S3.p3.m1" class="ltx_Math" alttext="k" display="inline"><mi>k</mi></math>, to prove <math id="S3.p3.m2" class="ltx_Math" alttext="\neg\mathscr{A}" display="inline"><mrow><mo rspace="0.167em">¬</mo><mi class="ltx_font_mathscript">𝒜︁</mi></mrow></math>. You can do this with the rule of MT, introduced in <a href="A19.html" title="Solutions to Chapter 19 Additional rules for TFL ‣ Solutions to selected exercices ‣ forall x: Calgary" class="ltx_ref"><span class="ltx_text ltx_ref_tag">appendix</span> <span class="ltx_text ltx_ref_tag">19</span></a>. Equally well, you can do this with the <span class="ltx_text ltx_font_bold">basic</span> rules of <a href="Ch17.html" title="Chapter 17 Basic rules for TFL ‣ Part IV Natural deduction for TFL ‣ forall x: Calgary" class="ltx_ref"><span class="ltx_text ltx_ref_tag">chapter</span> <span class="ltx_text ltx_ref_tag">17</span></a>:</p>
+</div>
+<div id="S3.p4" class="ltx_para ltx_noindent">
+<table class="fitch">
+            
+            <thead class="fml-sr-only">
+              
+              <tr>
+                <th class="fml-pline">
+                  
+                  <div>
+                    
+<p class="ltx_p">Line number</p>
+                  </div>
+                </th>
+                <th class="fml-subproof">
+                  
+                  <div>
+                    
+<p class="ltx_p">Subproof level</p>
+                  </div>
+                </th>
+                <th class="fml-fmla">
+                  
+                  <div>
+                    
+<p class="ltx_p">Formula</p>
+                  </div>
+                </th>
+                <th class="fml-just">
+                  
+                  <div>
+                    
+<p class="ltx_p">Justification</p>
+                  </div>
+                </th>
+              </tr>
+            </thead>
+            <tr>
+              <th class="fml-pline">
+                
+                
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"><math id="S3.p4.m1.m1" class="ltx_Math" alttext="m" display="inline"><mi>m</mi></math></span></p>
+              </th>
+              <td class="fml-subproof">
+                
+                <div>
+                  <span>0</span>
+                </div>
+              </td>
+              <td class="fml-fmla">
+                
+                <div class="fml-scope-start">
+                  
+                </div>
+                <div class="fml-fmla">
+                  
+                  <span><math id="S3.p4.m2" class="ltx_Math" alttext="\mathscr{A}\rightarrow\mathscr{B}" display="inline"><mrow><mi class="ltx_font_mathscript">𝒜︁</mi><mo stretchy="false">→</mo><mi class="ltx_font_mathscript">ℬ︁</mi></mrow></math></span>
+                </div>
+              </td>
+              <td class="fml-just">
+                
+                <div class="fml-just">
+                  
+                  <span></span>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <th class="fml-pline">
+                
+                
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"><math id="S3.p4.m3.m1" class="ltx_Math" alttext="n" display="inline"><mi>n</mi></math></span></p>
+              </th>
+              <td class="fml-subproof">
+                
+                <div>
+                  <span>0</span>
+                </div>
+              </td>
+              <td class="fml-fmla">
+                
+                <div class="fml-scope">
+                  
+                </div>
+                <div class="fml-fmla">
+                  
+                  <span><math id="S3.p4.m4" class="ltx_Math" alttext="\neg\mathscr{B}" display="inline"><mrow><mo rspace="0.167em">¬</mo><mi class="ltx_font_mathscript">ℬ︁</mi></mrow></math></span>
+                </div>
+              </td>
+              <td class="fml-just">
+                
+                <div class="fml-just">
+                  
+                  <span></span>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <th class="fml-pline">
+                
+                
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"><math id="S3.p4.m5.m1" class="ltx_Math" alttext="k" display="inline"><mi>k</mi></math></span></p>
+              </th>
+              <td class="fml-subproof">
+                
+                <div>
+                  <span>open subproof,
+1</span>
+                </div>
+              </td>
+              <td class="fml-fmla">
+                
+                <div class="fml-scope">
+                  
+                </div>
+                <div class="fml-scope-start">
+                  
+                </div>
+                <div class="fml-as">
+                  
+                  <span><math id="S3.p4.m6" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math></span>
+                </div>
+              </td>
+              <td class="fml-just">
+                
+                <div class="fml-just">
+                  
+                  <span><abbr title="Assumption">
+AS</abbr>
+</span>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <th class="fml-pline">
+                
+                
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"><math id="S3.p4.m7.m1" class="ltx_Math" alttext="k+1" display="inline"><mrow><mi>k</mi><mo>+</mo><mn>1</mn></mrow></math></span></p>
+              </th>
+              <td class="fml-subproof">
+                
+                <div>
+                  <span>1</span>
+                </div>
+              </td>
+              <td class="fml-fmla">
+                
+                <div class="fml-scope">
+                  
+                </div>
+                <div class="fml-scope">
+                  
+                </div>
+                <div class="fml-fmla">
+                  
+                  <span><math id="S3.p4.m8" class="ltx_Math" alttext="\mathscr{B}" display="inline"><mi class="ltx_font_mathscript">ℬ︁</mi></math></span>
+                </div>
+              </td>
+              <td class="fml-just">
+                
+                <div class="fml-just">
+                  
+                  <span><math id="S3.p4.m9" class="ltx_Math" alttext="\rightarrow" display="inline"><mo stretchy="false">→</mo></math>E <math id="S3.p4.m10" class="ltx_Math" alttext="m" display="inline"><mi>m</mi></math>, <math id="S3.p4.m11" class="ltx_Math" alttext="k" display="inline"><mi>k</mi></math></span>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <th class="fml-pline">
+                
+                
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"><math id="S3.p4.m12.m1" class="ltx_Math" alttext="k+2" display="inline"><mrow><mi>k</mi><mo>+</mo><mn>2</mn></mrow></math></span></p>
+              </th>
+              <td class="fml-subproof">
+                
+                <div>
+                  <span>1</span>
+                </div>
+              </td>
+              <td class="fml-fmla">
+                
+                <div class="fml-scope">
+                  
+                </div>
+                <div class="fml-scope">
+                  
+                </div>
+                <div class="fml-fmla">
+                  
+                  <span><math id="S3.p4.m13" class="ltx_Math" alttext="\bot" display="inline"><mo>⊥</mo></math></span>
+                </div>
+              </td>
+              <td class="fml-just">
+                
+                <div class="fml-just">
+                  
+                  <span><math id="S3.p4.m14" class="ltx_Math" alttext="\neg" display="inline"><mo>¬</mo></math>E <math id="S3.p4.m15" class="ltx_Math" alttext="n" display="inline"><mi>n</mi></math>, <math id="S3.p4.m16" class="ltx_Math" alttext="k+1" display="inline"><mrow><mi>k</mi><mo>+</mo><mn>1</mn></mrow></math></span>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <th class="fml-pline">
+                
+                
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"><math id="S3.p4.m17.m1" class="ltx_Math" alttext="k+3" display="inline"><mrow><mi>k</mi><mo>+</mo><mn>3</mn></mrow></math></span></p>
+              </th>
+              <td class="fml-subproof">
+                
+                <div>
+                  <span>close subproof,
+0</span>
+                </div>
+              </td>
+              <td class="fml-fmla">
+                
+                <div class="fml-scope">
+                  
+                </div>
+                <div class="fml-fmla">
+                  
+                  <span><math id="S3.p4.m18" class="ltx_Math" alttext="\neg\mathscr{A}" display="inline"><mrow><mo rspace="0.167em">¬</mo><mi class="ltx_font_mathscript">𝒜︁</mi></mrow></math></span>
+                </div>
+              </td>
+              <td class="fml-just">
+                
+                <div class="fml-just">
+                  
+                  <span><math id="S3.p4.m19" class="ltx_Math" alttext="\neg" display="inline"><mo>¬</mo></math>I <math id="S3.p4.m20" class="ltx_Math" alttext="k" display="inline"><mi>k</mi></math>–<math id="S3.p4.m21" class="ltx_Math" alttext="k+2" display="inline"><mrow><mi>k</mi><mo>+</mo><mn>2</mn></mrow></math></span>
+                </div>
+              </td>
+            </tr>
+          </table>
+</div>
+<div id="S3.p5" class="ltx_para ltx_noindent">
+<p class="ltx_p">Again, the rule of MT can be derived from the <span class="ltx_text ltx_font_bold">basic</span> rules of <a href="Ch17.html" title="Chapter 17 Basic rules for TFL ‣ Part IV Natural deduction for TFL ‣ forall x: Calgary" class="ltx_ref"><span class="ltx_text ltx_ref_tag">chapter</span> <span class="ltx_text ltx_ref_tag">17</span></a>.</p>
+</div>
+</div>
+</section>
+<section id="S4" class="ltx_section normal">
+<div class="section level2">
+<h2 class="ltx_title ltx_title_section">
+<span class="ltx_tag ltx_tag_section header-section-number">21.4</span> Derivation of Double-Negation Elimination</h2>
+
+<div id="S4.p1" class="ltx_para">
+<p class="ltx_p">Consider the following deduction scheme:</p>
+</div>
+<div id="S4.p2" class="ltx_para ltx_noindent">
+<table class="fitch">
+            
+            <thead class="fml-sr-only">
+              
+              <tr>
+                <th class="fml-pline">
+                  
+                  <div>
+                    
+<p class="ltx_p">Line number</p>
+                  </div>
+                </th>
+                <th class="fml-subproof">
+                  
+                  <div>
+                    
+<p class="ltx_p">Subproof level</p>
+                  </div>
+                </th>
+                <th class="fml-fmla">
+                  
+                  <div>
+                    
+<p class="ltx_p">Formula</p>
+                  </div>
+                </th>
+                <th class="fml-just">
+                  
+                  <div>
+                    
+<p class="ltx_p">Justification</p>
+                  </div>
+                </th>
+              </tr>
+            </thead>
+            <tr>
+              <th class="fml-pline">
+                
+                
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"><math id="S4.p2.m1.m1" class="ltx_Math" alttext="m" display="inline"><mi>m</mi></math></span></p>
+              </th>
+              <td class="fml-subproof">
+                
+                <div>
+                  <span>0</span>
+                </div>
+              </td>
+              <td class="fml-fmla">
+                
+                <div class="fml-scope-start">
+                  
+                </div>
+                <div class="fml-fmla">
+                  
+                  <span><math id="S4.p2.m2" class="ltx_Math" alttext="\neg\neg\mathscr{A}" display="inline"><mrow><mo rspace="0.167em">¬</mo><mrow><mo rspace="0.167em">¬</mo><mi class="ltx_font_mathscript">𝒜︁</mi></mrow></mrow></math></span>
+                </div>
+              </td>
+              <td class="fml-just">
+                
+                <div class="fml-just">
+                  
+                  <span></span>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <th class="fml-pline">
+                
+                
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"><math id="S4.p2.m3.m1" class="ltx_Math" alttext="k" display="inline"><mi>k</mi></math></span></p>
+              </th>
+              <td class="fml-subproof">
+                
+                <div>
+                  <span>open subproof,
+1</span>
+                </div>
+              </td>
+              <td class="fml-fmla">
+                
+                <div class="fml-scope">
+                  
+                </div>
+                <div class="fml-scope-start">
+                  
+                </div>
+                <div class="fml-as">
+                  
+                  <span><math id="S4.p2.m4" class="ltx_Math" alttext="\neg\mathscr{A}" display="inline"><mrow><mo rspace="0.167em">¬</mo><mi class="ltx_font_mathscript">𝒜︁</mi></mrow></math></span>
+                </div>
+              </td>
+              <td class="fml-just">
+                
+                <div class="fml-just">
+                  
+                  <span><abbr title="Assumption">
+AS</abbr>
+</span>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <th class="fml-pline">
+                
+                
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"><math id="S4.p2.m5.m1" class="ltx_Math" alttext="k+1" display="inline"><mrow><mi>k</mi><mo>+</mo><mn>1</mn></mrow></math></span></p>
+              </th>
+              <td class="fml-subproof">
+                
+                <div>
+                  <span>1</span>
+                </div>
+              </td>
+              <td class="fml-fmla">
+                
+                <div class="fml-scope">
+                  
+                </div>
+                <div class="fml-scope">
+                  
+                </div>
+                <div class="fml-fmla">
+                  
+                  <span><math id="S4.p2.m6" class="ltx_Math" alttext="\bot" display="inline"><mo>⊥</mo></math></span>
+                </div>
+              </td>
+              <td class="fml-just">
+                
+                <div class="fml-just">
+                  
+                  <span><math id="S4.p2.m7" class="ltx_Math" alttext="\neg" display="inline"><mo>¬</mo></math>E <math id="S4.p2.m8" class="ltx_Math" alttext="m" display="inline"><mi>m</mi></math>, <math id="S4.p2.m9" class="ltx_Math" alttext="k" display="inline"><mi>k</mi></math></span>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <th class="fml-pline">
+                
+                
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"><math id="S4.p2.m10.m1" class="ltx_Math" alttext="k+2" display="inline"><mrow><mi>k</mi><mo>+</mo><mn>2</mn></mrow></math></span></p>
+              </th>
+              <td class="fml-subproof">
+                
+                <div>
+                  <span>close subproof,
+0</span>
+                </div>
+              </td>
+              <td class="fml-fmla">
+                
+                <div class="fml-scope">
+                  
+                </div>
+                <div class="fml-fmla">
+                  
+                  <span><math id="S4.p2.m11" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math></span>
+                </div>
+              </td>
+              <td class="fml-just">
+                
+                <div class="fml-just">
+                  
+                  <span>IP <math id="S4.p2.m12" class="ltx_Math" alttext="k" display="inline"><mi>k</mi></math>–<math id="S4.p2.m13" class="ltx_Math" alttext="k+1" display="inline"><mrow><mi>k</mi><mo>+</mo><mn>1</mn></mrow></math></span>
+                </div>
+              </td>
+            </tr>
+          </table>
+</div>
+<div id="S4.p3" class="ltx_para ltx_noindent">
+<p class="ltx_p">Again, we can derive the DNE rule from the <span class="ltx_text ltx_font_bold">basic</span> rules of <a href="Ch17.html" title="Chapter 17 Basic rules for TFL ‣ Part IV Natural deduction for TFL ‣ forall x: Calgary" class="ltx_ref"><span class="ltx_text ltx_ref_tag">chapter</span> <span class="ltx_text ltx_ref_tag">17</span></a>.</p>
+</div>
+</div>
+</section>
+<section id="S5" class="ltx_section normal">
+<div class="section level2">
+<h2 class="ltx_title ltx_title_section">
+<span class="ltx_tag ltx_tag_section header-section-number">21.5</span> Derivation of Excluded Middle</h2>
+
+<div id="S5.p1" class="ltx_para">
+<p class="ltx_p">Suppose you want to prove something using the LEM rule, i.e., you have in your proof</p>
+</div>
+<div id="S5.p2" class="ltx_para ltx_noindent">
+<table class="fitch">
+            
+            <thead class="fml-sr-only">
+              
+              <tr>
+                <th class="fml-pline">
+                  
+                  <div>
+                    
+<p class="ltx_p">Line number</p>
+                  </div>
+                </th>
+                <th class="fml-subproof">
+                  
+                  <div>
+                    
+<p class="ltx_p">Subproof level</p>
+                  </div>
+                </th>
+                <th class="fml-fmla">
+                  
+                  <div>
+                    
+<p class="ltx_p">Formula</p>
+                  </div>
+                </th>
+                <th class="fml-just">
+                  
+                  <div>
+                    
+<p class="ltx_p">Justification</p>
+                  </div>
+                </th>
+              </tr>
+            </thead>
+            <tr>
+              <th class="fml-pline">
+                
+                
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"><math id="S5.p2.m1.m1" class="ltx_Math" alttext="m" display="inline"><mi>m</mi></math></span></p>
+              </th>
+              <td class="fml-subproof">
+                
+                <div>
+                  <span>open subproof,
+1</span>
+                </div>
+              </td>
+              <td class="fml-fmla">
+                
+                <div class="fml-scope-start">
+                  
+                </div>
+                <div class="fml-scope-start">
+                  
+                </div>
+                <div class="fml-as">
+                  
+                  <span><math id="S5.p2.m2" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math></span>
+                </div>
+              </td>
+              <td class="fml-just">
+                
+                <div class="fml-just">
+                  
+                  <span><abbr title="Assumption">
+AS</abbr>
+</span>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <th class="fml-pline">
+                
+                
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"><math id="S5.p2.m3.m1" class="ltx_Math" alttext="n" display="inline"><mi>n</mi></math></span></p>
+              </th>
+              <td class="fml-subproof">
+                
+                <div>
+                  <span>1</span>
+                </div>
+              </td>
+              <td class="fml-fmla">
+                
+                <div class="fml-scope">
+                  
+                </div>
+                <div class="fml-scope">
+                  
+                </div>
+                <div class="fml-fmla">
+                  
+                  <span><math id="S5.p2.m4" class="ltx_Math" alttext="\mathscr{B}" display="inline"><mi class="ltx_font_mathscript">ℬ︁</mi></math></span>
+                </div>
+              </td>
+              <td class="fml-just">
+                
+                <div class="fml-just">
+                  
+                  <span></span>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <th class="fml-pline">
+                
+                
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"><math id="S5.p2.m5.m1" class="ltx_Math" alttext="k" display="inline"><mi>k</mi></math></span></p>
+              </th>
+              <td class="fml-subproof">
+                
+                <div>
+                  <span>close subproof,
+open subproof,
+1</span>
+                </div>
+              </td>
+              <td class="fml-fmla">
+                
+                <div class="fml-scope">
+                  
+                </div>
+                <div class="fml-scope-start">
+                  
+                </div>
+                <div class="fml-as">
+                  
+                  <span><math id="S5.p2.m6" class="ltx_Math" alttext="\neg\mathscr{A}" display="inline"><mrow><mo rspace="0.167em">¬</mo><mi class="ltx_font_mathscript">𝒜︁</mi></mrow></math></span>
+                </div>
+              </td>
+              <td class="fml-just">
+                
+                <div class="fml-just">
+                  
+                  <span><abbr title="Assumption">
+AS</abbr>
+</span>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <th class="fml-pline">
+                
+                
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"><math id="S5.p2.m7.m1" class="ltx_Math" alttext="l" display="inline"><mi>l</mi></math></span></p>
+              </th>
+              <td class="fml-subproof">
+                
+                <div>
+                  <span>1</span>
+                </div>
+              </td>
+              <td class="fml-fmla">
+                
+                <div class="fml-scope">
+                  
+                </div>
+                <div class="fml-scope">
+                  
+                </div>
+                <div class="fml-fmla">
+                  
+                  <span><math id="S5.p2.m8" class="ltx_Math" alttext="\mathscr{B}" display="inline"><mi class="ltx_font_mathscript">ℬ︁</mi></math></span>
+                </div>
+              </td>
+              <td class="fml-just">
+                
+                <div class="fml-just">
+                  
+                  <span></span>
+                </div>
+              </td>
+            </tr>
+          </table>
+</div>
+<div id="S5.p3" class="ltx_para ltx_noindent">
+<p class="ltx_p">You now want, on line <math id="S5.p3.m1" class="ltx_Math" alttext="l+1" display="inline"><mrow><mi>l</mi><mo>+</mo><mn>1</mn></mrow></math>, to prove <math id="S5.p3.m2" class="ltx_Math" alttext="\mathscr{B}" display="inline"><mi class="ltx_font_mathscript">ℬ︁</mi></math>. The rule LEM from
+<a href="A19.html" title="Solutions to Chapter 19 Additional rules for TFL ‣ Solutions to selected exercices ‣ forall x: Calgary" class="ltx_ref"><span class="ltx_text ltx_ref_tag">appendix</span> <span class="ltx_text ltx_ref_tag">19</span></a> would allow you to do it. But can you do this with
+the <span class="ltx_text ltx_font_bold">basic</span> rules of <a href="Ch17.html" title="Chapter 17 Basic rules for TFL ‣ Part IV Natural deduction for TFL ‣ forall x: Calgary" class="ltx_ref"><span class="ltx_text ltx_ref_tag">chapter</span> <span class="ltx_text ltx_ref_tag">17</span></a>?</p>
+</div>
+<div id="S5.p4" class="ltx_para">
+<p class="ltx_p">One option is to first prove <math id="S5.p4.m1" class="ltx_Math" alttext="\mathscr{A}\vee\neg\mathscr{A}" display="inline"><mrow><mi class="ltx_font_mathscript">𝒜︁</mi><mo>∨</mo><mrow><mo rspace="0.167em">¬</mo><mi class="ltx_font_mathscript">𝒜︁</mi></mrow></mrow></math>, and then apply <math id="S5.p4.m2" class="ltx_Math" alttext="\vee" display="inline"><mo>∨</mo></math>E, i.e., proof by cases:</p>
+</div>
+<div id="S5.p5" class="ltx_para ltx_noindent">
+<table class="fitch">
+            
+            <thead class="fml-sr-only">
+              
+              <tr>
+                <th class="fml-pline">
+                  
+                  <div>
+                    
+<p class="ltx_p">Line number</p>
+                  </div>
+                </th>
+                <th class="fml-subproof">
+                  
+                  <div>
+                    
+<p class="ltx_p">Subproof level</p>
+                  </div>
+                </th>
+                <th class="fml-fmla">
+                  
+                  <div>
+                    
+<p class="ltx_p">Formula</p>
+                  </div>
+                </th>
+                <th class="fml-just">
+                  
+                  <div>
+                    
+<p class="ltx_p">Justification</p>
+                  </div>
+                </th>
+              </tr>
+            </thead>
+            <tr>
+              <th class="fml-pline">
+                
+                
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"><math id="S5.p5.m1.m1" class="ltx_Math" alttext="m" display="inline"><mi>m</mi></math></span></p>
+              </th>
+              <td class="fml-subproof">
+                
+                <div>
+                  <span>open subproof,
+1</span>
+                </div>
+              </td>
+              <td class="fml-fmla">
+                
+                <div class="fml-scope-start">
+                  
+                </div>
+                <div class="fml-scope-start">
+                  
+                </div>
+                <div class="fml-as">
+                  
+                  <span><math id="S5.p5.m2" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math></span>
+                </div>
+              </td>
+              <td class="fml-just">
+                
+                <div class="fml-just">
+                  
+                  <span><abbr title="Assumption">
+AS</abbr>
+</span>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <th class="fml-pline">
+                
+                
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"><math id="S5.p5.m3.m1" class="ltx_Math" alttext="n" display="inline"><mi>n</mi></math></span></p>
+              </th>
+              <td class="fml-subproof">
+                
+                <div>
+                  <span>1</span>
+                </div>
+              </td>
+              <td class="fml-fmla">
+                
+                <div class="fml-scope">
+                  
+                </div>
+                <div class="fml-scope">
+                  
+                </div>
+                <div class="fml-fmla">
+                  
+                  <span><math id="S5.p5.m4" class="ltx_Math" alttext="\mathscr{B}" display="inline"><mi class="ltx_font_mathscript">ℬ︁</mi></math></span>
+                </div>
+              </td>
+              <td class="fml-just">
+                
+                <div class="fml-just">
+                  
+                  <span></span>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <th class="fml-pline">
+                
+                
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"><math id="S5.p5.m5.m1" class="ltx_Math" alttext="k" display="inline"><mi>k</mi></math></span></p>
+              </th>
+              <td class="fml-subproof">
+                
+                <div>
+                  <span>close subproof,
+open subproof,
+1</span>
+                </div>
+              </td>
+              <td class="fml-fmla">
+                
+                <div class="fml-scope">
+                  
+                </div>
+                <div class="fml-scope-start">
+                  
+                </div>
+                <div class="fml-as">
+                  
+                  <span><math id="S5.p5.m6" class="ltx_Math" alttext="\neg\mathscr{A}" display="inline"><mrow><mo rspace="0.167em">¬</mo><mi class="ltx_font_mathscript">𝒜︁</mi></mrow></math></span>
+                </div>
+              </td>
+              <td class="fml-just">
+                
+                <div class="fml-just">
+                  
+                  <span><abbr title="Assumption">
+AS</abbr>
+</span>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <th class="fml-pline">
+                
+                
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"><math id="S5.p5.m7.m1" class="ltx_Math" alttext="l" display="inline"><mi>l</mi></math></span></p>
+              </th>
+              <td class="fml-subproof">
+                
+                <div>
+                  <span>1</span>
+                </div>
+              </td>
+              <td class="fml-fmla">
+                
+                <div class="fml-scope">
+                  
+                </div>
+                <div class="fml-scope">
+                  
+                </div>
+                <div class="fml-fmla">
+                  
+                  <span><math id="S5.p5.m8" class="ltx_Math" alttext="\mathscr{B}" display="inline"><mi class="ltx_font_mathscript">ℬ︁</mi></math></span>
+                </div>
+              </td>
+              <td class="fml-just">
+                
+                <div class="fml-just">
+                  
+                  <span></span>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <th class="fml-pline">
+                
+                
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"></span></p>
+              </th>
+              <td class="fml-subproof">
+                
+                <div>
+                  <span>close subproof,
+0</span>
+                </div>
+              </td>
+              <td class="fml-fmla">
+                
+                <div class="fml-scope">
+                  
+                </div>
+                <div class="fml-fmla">
+                  
+                  <span><math id="S5.p5.m10" class="ltx_Math" alttext="\vdots" display="inline"><mi mathvariant="normal">⋮</mi></math></span>
+                </div>
+              </td>
+              <td class="fml-just">
+                
+                <div class="fml-just">
+                  
+                  <span></span>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <th class="fml-pline">
+                
+                
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"><math id="S5.p5.m11.m1" class="ltx_Math" alttext="i" display="inline"><mi>i</mi></math></span></p>
+              </th>
+              <td class="fml-subproof">
+                
+                <div>
+                  <span>0</span>
+                </div>
+              </td>
+              <td class="fml-fmla">
+                
+                <div class="fml-scope">
+                  
+                </div>
+                <div class="fml-fmla">
+                  
+                  <span><math id="S5.p5.m12" class="ltx_Math" alttext="\mathscr{A}\vee\neg\mathscr{A}" display="inline"><mrow><mi class="ltx_font_mathscript">𝒜︁</mi><mo>∨</mo><mrow><mo rspace="0.167em">¬</mo><mi class="ltx_font_mathscript">𝒜︁</mi></mrow></mrow></math></span>
+                </div>
+              </td>
+              <td class="fml-just">
+                
+                <div class="fml-just">
+                  
+                  <span></span>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <th class="fml-pline">
+                
+                
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"><math id="S5.p5.m13.m1" class="ltx_Math" alttext="i+1" display="inline"><mrow><mi>i</mi><mo>+</mo><mn>1</mn></mrow></math></span></p>
+              </th>
+              <td class="fml-subproof">
+                
+                <div>
+                  <span>0</span>
+                </div>
+              </td>
+              <td class="fml-fmla">
+                
+                <div class="fml-scope">
+                  
+                </div>
+                <div class="fml-fmla">
+                  
+                  <span><math id="S5.p5.m14" class="ltx_Math" alttext="\mathscr{B}" display="inline"><mi class="ltx_font_mathscript">ℬ︁</mi></math></span>
+                </div>
+              </td>
+              <td class="fml-just">
+                
+                <div class="fml-just">
+                  
+                  <span><math id="S5.p5.m15" class="ltx_Math" alttext="\vee" display="inline"><mo>∨</mo></math>E <math id="S5.p5.m16" class="ltx_Math" alttext="i" display="inline"><mi>i</mi></math>, <math id="S5.p5.m17" class="ltx_Math" alttext="m" display="inline"><mi>m</mi></math>–<math id="S5.p5.m18" class="ltx_Math" alttext="n" display="inline"><mi>n</mi></math>, <math id="S5.p5.m19" class="ltx_Math" alttext="k" display="inline"><mi>k</mi></math>–<math id="S5.p5.m20" class="ltx_Math" alttext="l" display="inline"><mi>l</mi></math></span>
+                </div>
+              </td>
+            </tr>
+          </table>
+</div>
+<div id="S5.p6" class="ltx_para ltx_noindent">
+<p class="ltx_p">(We gave a proof of <math id="S5.p6.m1" class="ltx_Math" alttext="\mathscr{A}\vee\neg\mathscr{A}" display="inline"><mrow><mi class="ltx_font_mathscript">𝒜︁</mi><mo>∨</mo><mrow><mo rspace="0.167em">¬</mo><mi class="ltx_font_mathscript">𝒜︁</mi></mrow></mrow></math> using only our basic rules in <a href="Ch18.html#S6" title="18.6 Indirect proof of excluded middle ‣ Chapter 18 Constructing proofs ‣ Part IV Natural deduction for TFL ‣ forall x: Calgary" class="ltx_ref"><span class="ltx_text ltx_ref_tag">section</span> <span class="ltx_text ltx_ref_tag">18.6</span></a>.)</p>
+</div>
+<div id="S5.p7" class="ltx_para">
+<p class="ltx_p">Here is another way that is a bit more complicated than the ones before. What you have to do is embed your two subproofs inside another subproof. The assumption of the subproof will be <math id="S5.p7.m1" class="ltx_Math" alttext="\neg\mathscr{B}" display="inline"><mrow><mo rspace="0.167em">¬</mo><mi class="ltx_font_mathscript">ℬ︁</mi></mrow></math>, and the last line will be <math id="S5.p7.m2" class="ltx_Math" alttext="\bot" display="inline"><mo>⊥</mo></math>. Thus, the complete subproof is the kind you need to conclude <math id="S5.p7.m3" class="ltx_Math" alttext="\mathscr{B}" display="inline"><mi class="ltx_font_mathscript">ℬ︁</mi></math> using IP. Inside the proof, you’d have to do a bit more work to get <math id="S5.p7.m4" class="ltx_Math" alttext="\bot" display="inline"><mo>⊥</mo></math>:</p>
+</div>
+<div id="S5.p8" class="ltx_para ltx_noindent">
+<table class="fitch">
+            
+            <thead class="fml-sr-only">
+              
+              <tr>
+                <th class="fml-pline">
+                  
+                  <div>
+                    
+<p class="ltx_p">Line number</p>
+                  </div>
+                </th>
+                <th class="fml-subproof">
+                  
+                  <div>
+                    
+<p class="ltx_p">Subproof level</p>
+                  </div>
+                </th>
+                <th class="fml-fmla">
+                  
+                  <div>
+                    
+<p class="ltx_p">Formula</p>
+                  </div>
+                </th>
+                <th class="fml-just">
+                  
+                  <div>
+                    
+<p class="ltx_p">Justification</p>
+                  </div>
+                </th>
+              </tr>
+            </thead>
+            <tr>
+              <th class="fml-pline">
+                
+                
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"><math id="S5.p8.m1.m1" class="ltx_Math" alttext="m" display="inline"><mi>m</mi></math></span></p>
+              </th>
+              <td class="fml-subproof">
+                
+                <div>
+                  <span>open subproof,
+1</span>
+                </div>
+              </td>
+              <td class="fml-fmla">
+                
+                <div class="fml-scope-start">
+                  
+                </div>
+                <div class="fml-scope-start">
+                  
+                </div>
+                <div class="fml-as">
+                  
+                  <span><math id="S5.p8.m2" class="ltx_Math" alttext="\neg\mathscr{B}" display="inline"><mrow><mo rspace="0.167em">¬</mo><mi class="ltx_font_mathscript">ℬ︁</mi></mrow></math></span>
+                </div>
+              </td>
+              <td class="fml-just">
+                
+                <div class="fml-just">
+                  
+                  <span><abbr title="Assumption">
+AS</abbr>
+</span>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <th class="fml-pline">
+                
+                
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"><math id="S5.p8.m3.m1" class="ltx_Math" alttext="m+1" display="inline"><mrow><mi>m</mi><mo>+</mo><mn>1</mn></mrow></math></span></p>
+              </th>
+              <td class="fml-subproof">
+                
+                <div>
+                  <span>open subproof,
+2</span>
+                </div>
+              </td>
+              <td class="fml-fmla">
+                
+                <div class="fml-scope">
+                  
+                </div>
+                <div class="fml-scope">
+                  
+                </div>
+                <div class="fml-scope-start">
+                  
+                </div>
+                <div class="fml-as">
+                  
+                  <span><math id="S5.p8.m4" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math></span>
+                </div>
+              </td>
+              <td class="fml-just">
+                
+                <div class="fml-just">
+                  
+                  <span><abbr title="Assumption">
+AS</abbr>
+</span>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <th class="fml-pline">
+                
+                
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"></span></p>
+              </th>
+              <td class="fml-subproof">
+                
+                <div>
+                  <span>2</span>
+                </div>
+              </td>
+              <td class="fml-fmla">
+                
+                <div class="fml-scope">
+                  
+                </div>
+                <div class="fml-scope">
+                  
+                </div>
+                <div class="fml-scope">
+                  
+                </div>
+                <div class="fml-fmla">
+                  
+                  <span><math id="S5.p8.m6" class="ltx_Math" alttext="\vdots" display="inline"><mi mathvariant="normal">⋮</mi></math></span>
+                </div>
+              </td>
+              <td class="fml-just">
+                
+                <div class="fml-just">
+                  
+                  <span></span>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <th class="fml-pline">
+                
+                
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"><math id="S5.p8.m7.m1" class="ltx_Math" alttext="n" display="inline"><mi>n</mi></math></span></p>
+              </th>
+              <td class="fml-subproof">
+                
+                <div>
+                  <span>2</span>
+                </div>
+              </td>
+              <td class="fml-fmla">
+                
+                <div class="fml-scope">
+                  
+                </div>
+                <div class="fml-scope">
+                  
+                </div>
+                <div class="fml-scope">
+                  
+                </div>
+                <div class="fml-fmla">
+                  
+                  <span><math id="S5.p8.m8" class="ltx_Math" alttext="\mathscr{B}" display="inline"><mi class="ltx_font_mathscript">ℬ︁</mi></math></span>
+                </div>
+              </td>
+              <td class="fml-just">
+                
+                <div class="fml-just">
+                  
+                  <span></span>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <th class="fml-pline">
+                
+                
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"><math id="S5.p8.m9.m1" class="ltx_Math" alttext="n+1" display="inline"><mrow><mi>n</mi><mo>+</mo><mn>1</mn></mrow></math></span></p>
+              </th>
+              <td class="fml-subproof">
+                
+                <div>
+                  <span>2</span>
+                </div>
+              </td>
+              <td class="fml-fmla">
+                
+                <div class="fml-scope">
+                  
+                </div>
+                <div class="fml-scope">
+                  
+                </div>
+                <div class="fml-scope">
+                  
+                </div>
+                <div class="fml-fmla">
+                  
+                  <span><math id="S5.p8.m10" class="ltx_Math" alttext="\bot" display="inline"><mo>⊥</mo></math></span>
+                </div>
+              </td>
+              <td class="fml-just">
+                
+                <div class="fml-just">
+                  
+                  <span><math id="S5.p8.m11" class="ltx_Math" alttext="\neg" display="inline"><mo>¬</mo></math>E <math id="S5.p8.m12" class="ltx_Math" alttext="m" display="inline"><mi>m</mi></math>, <math id="S5.p8.m13" class="ltx_Math" alttext="n" display="inline"><mi>n</mi></math></span>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <th class="fml-pline">
+                
+                
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"><math id="S5.p8.m14.m1" class="ltx_Math" alttext="n+2" display="inline"><mrow><mi>n</mi><mo>+</mo><mn>2</mn></mrow></math></span></p>
+              </th>
+              <td class="fml-subproof">
+                
+                <div>
+                  <span>close subproof,
+open subproof,
+2</span>
+                </div>
+              </td>
+              <td class="fml-fmla">
+                
+                <div class="fml-scope">
+                  
+                </div>
+                <div class="fml-scope">
+                  
+                </div>
+                <div class="fml-scope-start">
+                  
+                </div>
+                <div class="fml-as">
+                  
+                  <span><math id="S5.p8.m15" class="ltx_Math" alttext="\neg\mathscr{A}" display="inline"><mrow><mo rspace="0.167em">¬</mo><mi class="ltx_font_mathscript">𝒜︁</mi></mrow></math></span>
+                </div>
+              </td>
+              <td class="fml-just">
+                
+                <div class="fml-just">
+                  
+                  <span><abbr title="Assumption">
+AS</abbr>
+</span>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <th class="fml-pline">
+                
+                
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"></span></p>
+              </th>
+              <td class="fml-subproof">
+                
+                <div>
+                  <span>2</span>
+                </div>
+              </td>
+              <td class="fml-fmla">
+                
+                <div class="fml-scope">
+                  
+                </div>
+                <div class="fml-scope">
+                  
+                </div>
+                <div class="fml-scope">
+                  
+                </div>
+                <div class="fml-fmla">
+                  
+                  <span><math id="S5.p8.m17" class="ltx_Math" alttext="\vdots" display="inline"><mi mathvariant="normal">⋮</mi></math></span>
+                </div>
+              </td>
+              <td class="fml-just">
+                
+                <div class="fml-just">
+                  
+                  <span></span>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <th class="fml-pline">
+                
+                
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"><math id="S5.p8.m18.m1" class="ltx_Math" alttext="l" display="inline"><mi>l</mi></math></span></p>
+              </th>
+              <td class="fml-subproof">
+                
+                <div>
+                  <span>2</span>
+                </div>
+              </td>
+              <td class="fml-fmla">
+                
+                <div class="fml-scope">
+                  
+                </div>
+                <div class="fml-scope">
+                  
+                </div>
+                <div class="fml-scope">
+                  
+                </div>
+                <div class="fml-fmla">
+                  
+                  <span><math id="S5.p8.m19" class="ltx_Math" alttext="\mathscr{B}" display="inline"><mi class="ltx_font_mathscript">ℬ︁</mi></math></span>
+                </div>
+              </td>
+              <td class="fml-just">
+                
+                <div class="fml-just">
+                  
+                  <span></span>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <th class="fml-pline">
+                
+                
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"><math id="S5.p8.m20.m1" class="ltx_Math" alttext="l+1" display="inline"><mrow><mi>l</mi><mo>+</mo><mn>1</mn></mrow></math></span></p>
+              </th>
+              <td class="fml-subproof">
+                
+                <div>
+                  <span>2</span>
+                </div>
+              </td>
+              <td class="fml-fmla">
+                
+                <div class="fml-scope">
+                  
+                </div>
+                <div class="fml-scope">
+                  
+                </div>
+                <div class="fml-scope">
+                  
+                </div>
+                <div class="fml-fmla">
+                  
+                  <span><math id="S5.p8.m21" class="ltx_Math" alttext="\bot" display="inline"><mo>⊥</mo></math></span>
+                </div>
+              </td>
+              <td class="fml-just">
+                
+                <div class="fml-just">
+                  
+                  <span><math id="S5.p8.m22" class="ltx_Math" alttext="\neg" display="inline"><mo>¬</mo></math>E <math id="S5.p8.m23" class="ltx_Math" alttext="m" display="inline"><mi>m</mi></math>, <math id="S5.p8.m24" class="ltx_Math" alttext="l" display="inline"><mi>l</mi></math></span>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <th class="fml-pline">
+                
+                
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"><math id="S5.p8.m25.m1" class="ltx_Math" alttext="l+2" display="inline"><mrow><mi>l</mi><mo>+</mo><mn>2</mn></mrow></math></span></p>
+              </th>
+              <td class="fml-subproof">
+                
+                <div>
+                  <span>close subproof,
+1</span>
+                </div>
+              </td>
+              <td class="fml-fmla">
+                
+                <div class="fml-scope">
+                  
+                </div>
+                <div class="fml-scope">
+                  
+                </div>
+                <div class="fml-fmla">
+                  
+                  <span><math id="S5.p8.m26" class="ltx_Math" alttext="\neg\mathscr{A}" display="inline"><mrow><mo rspace="0.167em">¬</mo><mi class="ltx_font_mathscript">𝒜︁</mi></mrow></math></span>
+                </div>
+              </td>
+              <td class="fml-just">
+                
+                <div class="fml-just">
+                  
+                  <span><math id="S5.p8.m27" class="ltx_Math" alttext="\neg" display="inline"><mo>¬</mo></math>I (<math id="S5.p8.m29" class="ltx_Math" alttext="m+1" display="inline"><mrow><mi>m</mi><mo>+</mo><mn>1</mn></mrow></math>)–(<math id="S5.p8.m32" class="ltx_Math" alttext="n+1" display="inline"><mrow><mi>n</mi><mo>+</mo><mn>1</mn></mrow></math>)</span>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <th class="fml-pline">
+                
+                
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"><math id="S5.p8.m34.m1" class="ltx_Math" alttext="l+3" display="inline"><mrow><mi>l</mi><mo>+</mo><mn>3</mn></mrow></math></span></p>
+              </th>
+              <td class="fml-subproof">
+                
+                <div>
+                  <span>1</span>
+                </div>
+              </td>
+              <td class="fml-fmla">
+                
+                <div class="fml-scope">
+                  
+                </div>
+                <div class="fml-scope">
+                  
+                </div>
+                <div class="fml-fmla">
+                  
+                  <span><math id="S5.p8.m35" class="ltx_Math" alttext="\neg\neg\mathscr{A}" display="inline"><mrow><mo rspace="0.167em">¬</mo><mrow><mo rspace="0.167em">¬</mo><mi class="ltx_font_mathscript">𝒜︁</mi></mrow></mrow></math></span>
+                </div>
+              </td>
+              <td class="fml-just">
+                
+                <div class="fml-just">
+                  
+                  <span><math id="S5.p8.m36" class="ltx_Math" alttext="\neg" display="inline"><mo>¬</mo></math>I (<math id="S5.p8.m38" class="ltx_Math" alttext="n+2" display="inline"><mrow><mi>n</mi><mo>+</mo><mn>2</mn></mrow></math>)–(<math id="S5.p8.m41" class="ltx_Math" alttext="l+1" display="inline"><mrow><mi>l</mi><mo>+</mo><mn>1</mn></mrow></math>)</span>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <th class="fml-pline">
+                
+                
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"><math id="S5.p8.m43.m1" class="ltx_Math" alttext="l+4" display="inline"><mrow><mi>l</mi><mo>+</mo><mn>4</mn></mrow></math></span></p>
+              </th>
+              <td class="fml-subproof">
+                
+                <div>
+                  <span>1</span>
+                </div>
+              </td>
+              <td class="fml-fmla">
+                
+                <div class="fml-scope">
+                  
+                </div>
+                <div class="fml-scope">
+                  
+                </div>
+                <div class="fml-fmla">
+                  
+                  <span><math id="S5.p8.m44" class="ltx_Math" alttext="\bot" display="inline"><mo>⊥</mo></math></span>
+                </div>
+              </td>
+              <td class="fml-just">
+                
+                <div class="fml-just">
+                  
+                  <span><math id="S5.p8.m45" class="ltx_Math" alttext="\neg" display="inline"><mo>¬</mo></math>E <math id="S5.p8.m46" class="ltx_Math" alttext="l+3" display="inline"><mrow><mi>l</mi><mo>+</mo><mn>3</mn></mrow></math>, <math id="S5.p8.m47" class="ltx_Math" alttext="l+2" display="inline"><mrow><mi>l</mi><mo>+</mo><mn>2</mn></mrow></math></span>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <th class="fml-pline">
+                
+                
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"><math id="S5.p8.m48.m1" class="ltx_Math" alttext="l+5" display="inline"><mrow><mi>l</mi><mo>+</mo><mn>5</mn></mrow></math></span></p>
+              </th>
+              <td class="fml-subproof">
+                
+                <div>
+                  <span>close subproof,
+0</span>
+                </div>
+              </td>
+              <td class="fml-fmla">
+                
+                <div class="fml-scope">
+                  
+                </div>
+                <div class="fml-fmla">
+                  
+                  <span><math id="S5.p8.m49" class="ltx_Math" alttext="\mathscr{B}" display="inline"><mi class="ltx_font_mathscript">ℬ︁</mi></math></span>
+                </div>
+              </td>
+              <td class="fml-just">
+                
+                <div class="fml-just">
+                  
+                  <span>IP <math id="S5.p8.m50" class="ltx_Math" alttext="m" display="inline"><mi>m</mi></math>–(<math id="S5.p8.m52" class="ltx_Math" alttext="l+4" display="inline"><mrow><mi>l</mi><mo>+</mo><mn>4</mn></mrow></math>)</span>
+                </div>
+              </td>
+            </tr>
+          </table>
+</div>
+<div id="S5.p9" class="ltx_para ltx_noindent">
+<p class="ltx_p">Note that because we add an assumption at the top and additional conclusions inside the subproofs, the line numbers change. You may have to stare at this for a while before you understand what’s going on.</p>
+</div>
+</div>
+</section>
+<section id="S6" class="ltx_section normal">
+<div class="section level2">
+<h2 class="ltx_title ltx_title_section">
+<span class="ltx_tag ltx_tag_section header-section-number">21.6</span> Derivation of De Morgan rules</h2>
+
+<div id="S6.p1" class="ltx_para">
+<p class="ltx_p">Here is a demonstration of how we could derive the first De Morgan rule:</p>
+</div>
+<div id="S6.p2" class="ltx_para ltx_noindent">
+<table class="fitch">
+            
+            <thead class="fml-sr-only">
+              
+              <tr>
+                <th class="fml-pline">
+                  
+                  <div>
+                    
+<p class="ltx_p">Line number</p>
+                  </div>
+                </th>
+                <th class="fml-subproof">
+                  
+                  <div>
+                    
+<p class="ltx_p">Subproof level</p>
+                  </div>
+                </th>
+                <th class="fml-fmla">
+                  
+                  <div>
+                    
+<p class="ltx_p">Formula</p>
+                  </div>
+                </th>
+                <th class="fml-just">
+                  
+                  <div>
+                    
+<p class="ltx_p">Justification</p>
+                  </div>
+                </th>
+              </tr>
+            </thead>
+            <tr>
+              <th class="fml-pline">
+                
+                
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"><math id="S6.p2.m1.m1" class="ltx_Math" alttext="m" display="inline"><mi>m</mi></math></span></p>
+              </th>
+              <td class="fml-subproof">
+                
+                <div>
+                  <span>0</span>
+                </div>
+              </td>
+              <td class="fml-fmla">
+                
+                <div class="fml-scope-start">
+                  
+                </div>
+                <div class="fml-fmla">
+                  
+                  <span><math id="S6.p2.m2" class="ltx_Math" alttext="\neg(\mathscr{A}\wedge\mathscr{B})" display="inline"><mrow><mo>¬</mo><mrow><mo stretchy="false">(</mo><mrow><mi class="ltx_font_mathscript">𝒜︁</mi><mo>∧</mo><mi class="ltx_font_mathscript">ℬ︁</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math></span>
+                </div>
+              </td>
+              <td class="fml-just">
+                
+                <div class="fml-just">
+                  
+                  <span></span>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <th class="fml-pline">
+                
+                
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"><math id="S6.p2.m3.m1" class="ltx_Math" alttext="k" display="inline"><mi>k</mi></math></span></p>
+              </th>
+              <td class="fml-subproof">
+                
+                <div>
+                  <span>open subproof,
+1</span>
+                </div>
+              </td>
+              <td class="fml-fmla">
+                
+                <div class="fml-scope">
+                  
+                </div>
+                <div class="fml-scope-start">
+                  
+                </div>
+                <div class="fml-as">
+                  
+                  <span><math id="S6.p2.m4" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math></span>
+                </div>
+              </td>
+              <td class="fml-just">
+                
+                <div class="fml-just">
+                  
+                  <span><abbr title="Assumption">
+AS</abbr>
+</span>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <th class="fml-pline">
+                
+                
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"><math id="S6.p2.m5.m1" class="ltx_Math" alttext="k+1" display="inline"><mrow><mi>k</mi><mo>+</mo><mn>1</mn></mrow></math></span></p>
+              </th>
+              <td class="fml-subproof">
+                
+                <div>
+                  <span>open subproof,
+2</span>
+                </div>
+              </td>
+              <td class="fml-fmla">
+                
+                <div class="fml-scope">
+                  
+                </div>
+                <div class="fml-scope">
+                  
+                </div>
+                <div class="fml-scope-start">
+                  
+                </div>
+                <div class="fml-as">
+                  
+                  <span><math id="S6.p2.m6" class="ltx_Math" alttext="\mathscr{B}" display="inline"><mi class="ltx_font_mathscript">ℬ︁</mi></math></span>
+                </div>
+              </td>
+              <td class="fml-just">
+                
+                <div class="fml-just">
+                  
+                  <span><abbr title="Assumption">
+AS</abbr>
+</span>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <th class="fml-pline">
+                
+                
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"><math id="S6.p2.m7.m1" class="ltx_Math" alttext="k+2" display="inline"><mrow><mi>k</mi><mo>+</mo><mn>2</mn></mrow></math></span></p>
+              </th>
+              <td class="fml-subproof">
+                
+                <div>
+                  <span>2</span>
+                </div>
+              </td>
+              <td class="fml-fmla">
+                
+                <div class="fml-scope">
+                  
+                </div>
+                <div class="fml-scope">
+                  
+                </div>
+                <div class="fml-scope">
+                  
+                </div>
+                <div class="fml-fmla">
+                  
+                  <span><math id="S6.p2.m8" class="ltx_Math" alttext="\mathscr{A}\wedge\mathscr{B}" display="inline"><mrow><mi class="ltx_font_mathscript">𝒜︁</mi><mo>∧</mo><mi class="ltx_font_mathscript">ℬ︁</mi></mrow></math></span>
+                </div>
+              </td>
+              <td class="fml-just">
+                
+                <div class="fml-just">
+                  
+                  <span><math id="S6.p2.m9" class="ltx_Math" alttext="\wedge" display="inline"><mo>∧</mo></math>I <math id="S6.p2.m10" class="ltx_Math" alttext="k" display="inline"><mi>k</mi></math>, <math id="S6.p2.m11" class="ltx_Math" alttext="k+1" display="inline"><mrow><mi>k</mi><mo>+</mo><mn>1</mn></mrow></math></span>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <th class="fml-pline">
+                
+                
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"><math id="S6.p2.m12.m1" class="ltx_Math" alttext="k+3" display="inline"><mrow><mi>k</mi><mo>+</mo><mn>3</mn></mrow></math></span></p>
+              </th>
+              <td class="fml-subproof">
+                
+                <div>
+                  <span>2</span>
+                </div>
+              </td>
+              <td class="fml-fmla">
+                
+                <div class="fml-scope">
+                  
+                </div>
+                <div class="fml-scope">
+                  
+                </div>
+                <div class="fml-scope">
+                  
+                </div>
+                <div class="fml-fmla">
+                  
+                  <span><math id="S6.p2.m13" class="ltx_Math" alttext="\bot" display="inline"><mo>⊥</mo></math></span>
+                </div>
+              </td>
+              <td class="fml-just">
+                
+                <div class="fml-just">
+                  
+                  <span><math id="S6.p2.m14" class="ltx_Math" alttext="\neg" display="inline"><mo>¬</mo></math>E <math id="S6.p2.m15" class="ltx_Math" alttext="m" display="inline"><mi>m</mi></math>, <math id="S6.p2.m16" class="ltx_Math" alttext="k+2" display="inline"><mrow><mi>k</mi><mo>+</mo><mn>2</mn></mrow></math></span>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <th class="fml-pline">
+                
+                
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"><math id="S6.p2.m17.m1" class="ltx_Math" alttext="k+4" display="inline"><mrow><mi>k</mi><mo>+</mo><mn>4</mn></mrow></math></span></p>
+              </th>
+              <td class="fml-subproof">
+                
+                <div>
+                  <span>close subproof,
+1</span>
+                </div>
+              </td>
+              <td class="fml-fmla">
+                
+                <div class="fml-scope">
+                  
+                </div>
+                <div class="fml-scope">
+                  
+                </div>
+                <div class="fml-fmla">
+                  
+                  <span><math id="S6.p2.m18" class="ltx_Math" alttext="\neg\mathscr{B}" display="inline"><mrow><mo rspace="0.167em">¬</mo><mi class="ltx_font_mathscript">ℬ︁</mi></mrow></math></span>
+                </div>
+              </td>
+              <td class="fml-just">
+                
+                <div class="fml-just">
+                  
+                  <span><math id="S6.p2.m19" class="ltx_Math" alttext="\neg" display="inline"><mo>¬</mo></math>I (<math id="S6.p2.m21" class="ltx_Math" alttext="k+1" display="inline"><mrow><mi>k</mi><mo>+</mo><mn>1</mn></mrow></math>)–(<math id="S6.p2.m24" class="ltx_Math" alttext="k+3" display="inline"><mrow><mi>k</mi><mo>+</mo><mn>3</mn></mrow></math>)</span>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <th class="fml-pline">
+                
+                
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"><math id="S6.p2.m26.m1" class="ltx_Math" alttext="k+5" display="inline"><mrow><mi>k</mi><mo>+</mo><mn>5</mn></mrow></math></span></p>
+              </th>
+              <td class="fml-subproof">
+                
+                <div>
+                  <span>1</span>
+                </div>
+              </td>
+              <td class="fml-fmla">
+                
+                <div class="fml-scope">
+                  
+                </div>
+                <div class="fml-scope">
+                  
+                </div>
+                <div class="fml-fmla">
+                  
+                  <span><math id="S6.p2.m27" class="ltx_Math" alttext="\neg\mathscr{A}\vee\neg\mathscr{B}" display="inline"><mrow><mrow><mo rspace="0.167em">¬</mo><mi class="ltx_font_mathscript">𝒜︁</mi></mrow><mo>∨</mo><mrow><mo rspace="0.167em">¬</mo><mi class="ltx_font_mathscript">ℬ︁</mi></mrow></mrow></math></span>
+                </div>
+              </td>
+              <td class="fml-just">
+                
+                <div class="fml-just">
+                  
+                  <span><math id="S6.p2.m28" class="ltx_Math" alttext="\vee" display="inline"><mo>∨</mo></math>I <math id="S6.p2.m29" class="ltx_Math" alttext="k+4" display="inline"><mrow><mi>k</mi><mo>+</mo><mn>4</mn></mrow></math></span>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <th class="fml-pline">
+                
+                
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"><math id="S6.p2.m30.m1" class="ltx_Math" alttext="k+6" display="inline"><mrow><mi>k</mi><mo>+</mo><mn>6</mn></mrow></math></span></p>
+              </th>
+              <td class="fml-subproof">
+                
+                <div>
+                  <span>close subproof,
+open subproof,
+1</span>
+                </div>
+              </td>
+              <td class="fml-fmla">
+                
+                <div class="fml-scope">
+                  
+                </div>
+                <div class="fml-scope-start">
+                  
+                </div>
+                <div class="fml-as">
+                  
+                  <span><math id="S6.p2.m31" class="ltx_Math" alttext="\neg\mathscr{A}" display="inline"><mrow><mo rspace="0.167em">¬</mo><mi class="ltx_font_mathscript">𝒜︁</mi></mrow></math></span>
+                </div>
+              </td>
+              <td class="fml-just">
+                
+                <div class="fml-just">
+                  
+                  <span><abbr title="Assumption">
+AS</abbr>
+</span>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <th class="fml-pline">
+                
+                
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"><math id="S6.p2.m32.m1" class="ltx_Math" alttext="k+7" display="inline"><mrow><mi>k</mi><mo>+</mo><mn>7</mn></mrow></math></span></p>
+              </th>
+              <td class="fml-subproof">
+                
+                <div>
+                  <span>1</span>
+                </div>
+              </td>
+              <td class="fml-fmla">
+                
+                <div class="fml-scope">
+                  
+                </div>
+                <div class="fml-scope">
+                  
+                </div>
+                <div class="fml-fmla">
+                  
+                  <span><math id="S6.p2.m33" class="ltx_Math" alttext="\neg\mathscr{A}\vee\neg\mathscr{B}" display="inline"><mrow><mrow><mo rspace="0.167em">¬</mo><mi class="ltx_font_mathscript">𝒜︁</mi></mrow><mo>∨</mo><mrow><mo rspace="0.167em">¬</mo><mi class="ltx_font_mathscript">ℬ︁</mi></mrow></mrow></math></span>
+                </div>
+              </td>
+              <td class="fml-just">
+                
+                <div class="fml-just">
+                  
+                  <span><math id="S6.p2.m34" class="ltx_Math" alttext="\vee" display="inline"><mo>∨</mo></math>I <math id="S6.p2.m35" class="ltx_Math" alttext="k+6" display="inline"><mrow><mi>k</mi><mo>+</mo><mn>6</mn></mrow></math></span>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <th class="fml-pline">
+                
+                
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"><math id="S6.p2.m36.m1" class="ltx_Math" alttext="k+8" display="inline"><mrow><mi>k</mi><mo>+</mo><mn>8</mn></mrow></math></span></p>
+              </th>
+              <td class="fml-subproof">
+                
+                <div>
+                  <span>close subproof,
+0</span>
+                </div>
+              </td>
+              <td class="fml-fmla">
+                
+                <div class="fml-scope">
+                  
+                </div>
+                <div class="fml-fmla">
+                  
+                  <span><math id="S6.p2.m37" class="ltx_Math" alttext="\neg\mathscr{A}\vee\neg\mathscr{B}" display="inline"><mrow><mrow><mo rspace="0.167em">¬</mo><mi class="ltx_font_mathscript">𝒜︁</mi></mrow><mo>∨</mo><mrow><mo rspace="0.167em">¬</mo><mi class="ltx_font_mathscript">ℬ︁</mi></mrow></mrow></math></span>
+                </div>
+              </td>
+              <td class="fml-just">
+                
+                <div class="fml-just">
+                  
+                  <span>LEM <math id="S6.p2.m38" class="ltx_Math" alttext="k" display="inline"><mi>k</mi></math>–(<math id="S6.p2.m40" class="ltx_Math" alttext="k+5" display="inline"><mrow><mi>k</mi><mo>+</mo><mn>5</mn></mrow></math>), (<math id="S6.p2.m43" class="ltx_Math" alttext="k+6" display="inline"><mrow><mi>k</mi><mo>+</mo><mn>6</mn></mrow></math>)–(<math id="S6.p2.m46" class="ltx_Math" alttext="k+7" display="inline"><mrow><mi>k</mi><mo>+</mo><mn>7</mn></mrow></math>)</span>
+                </div>
+              </td>
+            </tr>
+          </table>
+</div>
+<div id="S6.p3" class="ltx_para ltx_noindent">
+<p class="ltx_p">Here is a demonstration of how we could derive the second De Morgan rule:</p>
+</div>
+<div id="S6.p4" class="ltx_para ltx_noindent">
+<table class="fitch">
+            
+            <thead class="fml-sr-only">
+              
+              <tr>
+                <th class="fml-pline">
+                  
+                  <div>
+                    
+<p class="ltx_p">Line number</p>
+                  </div>
+                </th>
+                <th class="fml-subproof">
+                  
+                  <div>
+                    
+<p class="ltx_p">Subproof level</p>
+                  </div>
+                </th>
+                <th class="fml-fmla">
+                  
+                  <div>
+                    
+<p class="ltx_p">Formula</p>
+                  </div>
+                </th>
+                <th class="fml-just">
+                  
+                  <div>
+                    
+<p class="ltx_p">Justification</p>
+                  </div>
+                </th>
+              </tr>
+            </thead>
+            <tr>
+              <th class="fml-pline">
+                
+                
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"><math id="S6.p4.m1.m1" class="ltx_Math" alttext="m" display="inline"><mi>m</mi></math></span></p>
+              </th>
+              <td class="fml-subproof">
+                
+                <div>
+                  <span>0</span>
+                </div>
+              </td>
+              <td class="fml-fmla">
+                
+                <div class="fml-scope-start">
+                  
+                </div>
+                <div class="fml-fmla">
+                  
+                  <span><math id="S6.p4.m2" class="ltx_Math" alttext="\neg\mathscr{A}\vee\neg\mathscr{B}" display="inline"><mrow><mrow><mo rspace="0.167em">¬</mo><mi class="ltx_font_mathscript">𝒜︁</mi></mrow><mo>∨</mo><mrow><mo rspace="0.167em">¬</mo><mi class="ltx_font_mathscript">ℬ︁</mi></mrow></mrow></math></span>
+                </div>
+              </td>
+              <td class="fml-just">
+                
+                <div class="fml-just">
+                  
+                  <span></span>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <th class="fml-pline">
+                
+                
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"><math id="S6.p4.m3.m1" class="ltx_Math" alttext="k" display="inline"><mi>k</mi></math></span></p>
+              </th>
+              <td class="fml-subproof">
+                
+                <div>
+                  <span>open subproof,
+1</span>
+                </div>
+              </td>
+              <td class="fml-fmla">
+                
+                <div class="fml-scope">
+                  
+                </div>
+                <div class="fml-scope-start">
+                  
+                </div>
+                <div class="fml-as">
+                  
+                  <span><math id="S6.p4.m4" class="ltx_Math" alttext="\mathscr{A}\wedge\mathscr{B}" display="inline"><mrow><mi class="ltx_font_mathscript">𝒜︁</mi><mo>∧</mo><mi class="ltx_font_mathscript">ℬ︁</mi></mrow></math></span>
+                </div>
+              </td>
+              <td class="fml-just">
+                
+                <div class="fml-just">
+                  
+                  <span><abbr title="Assumption">
+AS</abbr>
+</span>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <th class="fml-pline">
+                
+                
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"><math id="S6.p4.m5.m1" class="ltx_Math" alttext="k+1" display="inline"><mrow><mi>k</mi><mo>+</mo><mn>1</mn></mrow></math></span></p>
+              </th>
+              <td class="fml-subproof">
+                
+                <div>
+                  <span>1</span>
+                </div>
+              </td>
+              <td class="fml-fmla">
+                
+                <div class="fml-scope">
+                  
+                </div>
+                <div class="fml-scope">
+                  
+                </div>
+                <div class="fml-fmla">
+                  
+                  <span><math id="S6.p4.m6" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math></span>
+                </div>
+              </td>
+              <td class="fml-just">
+                
+                <div class="fml-just">
+                  
+                  <span><math id="S6.p4.m7" class="ltx_Math" alttext="\wedge" display="inline"><mo>∧</mo></math>E <math id="S6.p4.m8" class="ltx_Math" alttext="k" display="inline"><mi>k</mi></math></span>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <th class="fml-pline">
+                
+                
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"><math id="S6.p4.m9.m1" class="ltx_Math" alttext="k+2" display="inline"><mrow><mi>k</mi><mo>+</mo><mn>2</mn></mrow></math></span></p>
+              </th>
+              <td class="fml-subproof">
+                
+                <div>
+                  <span>1</span>
+                </div>
+              </td>
+              <td class="fml-fmla">
+                
+                <div class="fml-scope">
+                  
+                </div>
+                <div class="fml-scope">
+                  
+                </div>
+                <div class="fml-fmla">
+                  
+                  <span><math id="S6.p4.m10" class="ltx_Math" alttext="\mathscr{B}" display="inline"><mi class="ltx_font_mathscript">ℬ︁</mi></math></span>
+                </div>
+              </td>
+              <td class="fml-just">
+                
+                <div class="fml-just">
+                  
+                  <span><math id="S6.p4.m11" class="ltx_Math" alttext="\wedge" display="inline"><mo>∧</mo></math>E <math id="S6.p4.m12" class="ltx_Math" alttext="k" display="inline"><mi>k</mi></math></span>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <th class="fml-pline">
+                
+                
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"><math id="S6.p4.m13.m1" class="ltx_Math" alttext="k+3" display="inline"><mrow><mi>k</mi><mo>+</mo><mn>3</mn></mrow></math></span></p>
+              </th>
+              <td class="fml-subproof">
+                
+                <div>
+                  <span>open subproof,
+2</span>
+                </div>
+              </td>
+              <td class="fml-fmla">
+                
+                <div class="fml-scope">
+                  
+                </div>
+                <div class="fml-scope">
+                  
+                </div>
+                <div class="fml-scope-start">
+                  
+                </div>
+                <div class="fml-as">
+                  
+                  <span><math id="S6.p4.m14" class="ltx_Math" alttext="\neg\mathscr{A}" display="inline"><mrow><mo rspace="0.167em">¬</mo><mi class="ltx_font_mathscript">𝒜︁</mi></mrow></math></span>
+                </div>
+              </td>
+              <td class="fml-just">
+                
+                <div class="fml-just">
+                  
+                  <span><abbr title="Assumption">
+AS</abbr>
+</span>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <th class="fml-pline">
+                
+                
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"><math id="S6.p4.m15.m1" class="ltx_Math" alttext="k+4" display="inline"><mrow><mi>k</mi><mo>+</mo><mn>4</mn></mrow></math></span></p>
+              </th>
+              <td class="fml-subproof">
+                
+                <div>
+                  <span>2</span>
+                </div>
+              </td>
+              <td class="fml-fmla">
+                
+                <div class="fml-scope">
+                  
+                </div>
+                <div class="fml-scope">
+                  
+                </div>
+                <div class="fml-scope">
+                  
+                </div>
+                <div class="fml-fmla">
+                  
+                  <span><math id="S6.p4.m16" class="ltx_Math" alttext="\bot" display="inline"><mo>⊥</mo></math></span>
+                </div>
+              </td>
+              <td class="fml-just">
+                
+                <div class="fml-just">
+                  
+                  <span><math id="S6.p4.m17" class="ltx_Math" alttext="\neg" display="inline"><mo>¬</mo></math>E <math id="S6.p4.m18" class="ltx_Math" alttext="k+3" display="inline"><mrow><mi>k</mi><mo>+</mo><mn>3</mn></mrow></math>, <math id="S6.p4.m19" class="ltx_Math" alttext="k+1" display="inline"><mrow><mi>k</mi><mo>+</mo><mn>1</mn></mrow></math></span>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <th class="fml-pline">
+                
+                
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"><math id="S6.p4.m20.m1" class="ltx_Math" alttext="k+5" display="inline"><mrow><mi>k</mi><mo>+</mo><mn>5</mn></mrow></math></span></p>
+              </th>
+              <td class="fml-subproof">
+                
+                <div>
+                  <span>close subproof,
+open subproof,
+2</span>
+                </div>
+              </td>
+              <td class="fml-fmla">
+                
+                <div class="fml-scope">
+                  
+                </div>
+                <div class="fml-scope">
+                  
+                </div>
+                <div class="fml-scope-start">
+                  
+                </div>
+                <div class="fml-as">
+                  
+                  <span><math id="S6.p4.m21" class="ltx_Math" alttext="\neg\mathscr{B}" display="inline"><mrow><mo rspace="0.167em">¬</mo><mi class="ltx_font_mathscript">ℬ︁</mi></mrow></math></span>
+                </div>
+              </td>
+              <td class="fml-just">
+                
+                <div class="fml-just">
+                  
+                  <span><abbr title="Assumption">
+AS</abbr>
+</span>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <th class="fml-pline">
+                
+                
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"><math id="S6.p4.m22.m1" class="ltx_Math" alttext="k+6" display="inline"><mrow><mi>k</mi><mo>+</mo><mn>6</mn></mrow></math></span></p>
+              </th>
+              <td class="fml-subproof">
+                
+                <div>
+                  <span>2</span>
+                </div>
+              </td>
+              <td class="fml-fmla">
+                
+                <div class="fml-scope">
+                  
+                </div>
+                <div class="fml-scope">
+                  
+                </div>
+                <div class="fml-scope">
+                  
+                </div>
+                <div class="fml-fmla">
+                  
+                  <span><math id="S6.p4.m23" class="ltx_Math" alttext="\bot" display="inline"><mo>⊥</mo></math></span>
+                </div>
+              </td>
+              <td class="fml-just">
+                
+                <div class="fml-just">
+                  
+                  <span><math id="S6.p4.m24" class="ltx_Math" alttext="\neg" display="inline"><mo>¬</mo></math>E <math id="S6.p4.m25" class="ltx_Math" alttext="k+5" display="inline"><mrow><mi>k</mi><mo>+</mo><mn>5</mn></mrow></math>, <math id="S6.p4.m26" class="ltx_Math" alttext="k+2" display="inline"><mrow><mi>k</mi><mo>+</mo><mn>2</mn></mrow></math></span>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <th class="fml-pline">
+                
+                
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"><math id="S6.p4.m27.m1" class="ltx_Math" alttext="k+7" display="inline"><mrow><mi>k</mi><mo>+</mo><mn>7</mn></mrow></math></span></p>
+              </th>
+              <td class="fml-subproof">
+                
+                <div>
+                  <span>close subproof,
+1</span>
+                </div>
+              </td>
+              <td class="fml-fmla">
+                
+                <div class="fml-scope">
+                  
+                </div>
+                <div class="fml-scope">
+                  
+                </div>
+                <div class="fml-fmla">
+                  
+                  <span><math id="S6.p4.m28" class="ltx_Math" alttext="\bot" display="inline"><mo>⊥</mo></math></span>
+                </div>
+              </td>
+              <td class="fml-just">
+                
+                <div class="fml-just">
+                  
+                  <span><math id="S6.p4.m29" class="ltx_Math" alttext="\vee" display="inline"><mo>∨</mo></math>E <math id="S6.p4.m30" class="ltx_Math" alttext="m" display="inline"><mi>m</mi></math>, (<math id="S6.p4.m32" class="ltx_Math" alttext="k+3" display="inline"><mrow><mi>k</mi><mo>+</mo><mn>3</mn></mrow></math>)–(<math id="S6.p4.m35" class="ltx_Math" alttext="k+4" display="inline"><mrow><mi>k</mi><mo>+</mo><mn>4</mn></mrow></math>), (<math id="S6.p4.m38" class="ltx_Math" alttext="k+5" display="inline"><mrow><mi>k</mi><mo>+</mo><mn>5</mn></mrow></math>)–(<math id="S6.p4.m41" class="ltx_Math" alttext="k+6" display="inline"><mrow><mi>k</mi><mo>+</mo><mn>6</mn></mrow></math>)</span>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <th class="fml-pline">
+                
+                
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"><math id="S6.p4.m43.m1" class="ltx_Math" alttext="k+8" display="inline"><mrow><mi>k</mi><mo>+</mo><mn>8</mn></mrow></math></span></p>
+              </th>
+              <td class="fml-subproof">
+                
+                <div>
+                  <span>close subproof,
+0</span>
+                </div>
+              </td>
+              <td class="fml-fmla">
+                
+                <div class="fml-scope">
+                  
+                </div>
+                <div class="fml-fmla">
+                  
+                  <span><math id="S6.p4.m44" class="ltx_Math" alttext="\neg(\mathscr{A}\wedge\mathscr{B})" display="inline"><mrow><mo>¬</mo><mrow><mo stretchy="false">(</mo><mrow><mi class="ltx_font_mathscript">𝒜︁</mi><mo>∧</mo><mi class="ltx_font_mathscript">ℬ︁</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math></span>
+                </div>
+              </td>
+              <td class="fml-just">
+                
+                <div class="fml-just">
+                  
+                  <span><math id="S6.p4.m45" class="ltx_Math" alttext="\neg" display="inline"><mo>¬</mo></math>I <math id="S6.p4.m46" class="ltx_Math" alttext="k" display="inline"><mi>k</mi></math>–(<math id="S6.p4.m48" class="ltx_Math" alttext="k+7" display="inline"><mrow><mi>k</mi><mo>+</mo><mn>7</mn></mrow></math>)</span>
+                </div>
+              </td>
+            </tr>
+          </table>
+</div>
+<div id="S6.p5" class="ltx_para ltx_noindent">
+<p class="ltx_p">Similar demonstrations can be offered explaining how we could derive the third and fourth De Morgan rules. These are left as exercises.</p>
+</div>
+</div>
+</section>
+<section id="Sx1" class="ltx_section normal">
+<div class="section level2">
+<h2 class="ltx_title ltx_title_section">Practice exercises</h2>
+
+<div id="Sx1.p1" class="ltx_para ltx_noindent">
+<p class="ltx_p"><span class="ltx_text ltx_font_bold">A. </span>Provide proof schemes that justify the addition of the third and fourth De Morgan rules as derived rules.</p>
+</div>
+<div id="Sx1.p2" class="ltx_para ltx_noindent">
+<p class="ltx_p"><span class="ltx_text ltx_font_bold">B. </span>The proofs you offered in response to the practice exercises of <a href="A19.html" title="Solutions to Chapter 19 Additional rules for TFL ‣ Solutions to selected exercices ‣ forall x: Calgary" class="ltx_ref"><span class="ltx_text ltx_ref_tag">appendices</span> <span class="ltx_text ltx_ref_tag">19</span></a> to <a href="A20.html" title="Solutions to Chapter 20 Proof-theoretic concepts ‣ Solutions to selected exercices ‣ forall x: Calgary" class="ltx_ref"><span class="ltx_text ltx_ref_tag">20</span></a> used derived rules. Replace the use of derived rules, in such proofs, with only basic rules. You will find some ‘repetition’ in the resulting proofs; in such cases, offer a streamlined proof using only basic rules. (This will give you a sense, both of the power of derived rules, and of how all the rules interact.)</p>
+</div>
+<div id="Sx1.p3" class="ltx_para ltx_noindent">
+<p class="ltx_p"><span class="ltx_text ltx_font_bold">C. </span>Give a proof of <math id="Sx1.p3.m1" class="ltx_Math" alttext="\mathscr{A}\vee\neg\mathscr{A}" display="inline"><mrow><mi class="ltx_font_mathscript">𝒜︁</mi><mo>∨</mo><mrow><mo rspace="0.167em">¬</mo><mi class="ltx_font_mathscript">𝒜︁</mi></mrow></mrow></math>. Then
+give a proof that <span class="ltx_text ltx_font_bold">uses only the basic rules</span>.</p>
+</div>
+<div id="Sx1.p4" class="ltx_para ltx_noindent">
+<p class="ltx_p"><span class="ltx_text ltx_font_bold">D. </span>Show that if you had LEM as a basic rule, you could justify IP as a derived rule. That is, suppose you had the proof:</p>
+</div>
+<div id="Sx1.p5" class="ltx_para ltx_noindent">
+<table class="fitch">
+            
+            <thead class="fml-sr-only">
+              
+              <tr>
+                <th class="fml-pline">
+                  
+                  <div>
+                    
+<p class="ltx_p">Line number</p>
+                  </div>
+                </th>
+                <th class="fml-subproof">
+                  
+                  <div>
+                    
+<p class="ltx_p">Subproof level</p>
+                  </div>
+                </th>
+                <th class="fml-fmla">
+                  
+                  <div>
+                    
+<p class="ltx_p">Formula</p>
+                  </div>
+                </th>
+                <th class="fml-just">
+                  
+                  <div>
+                    
+<p class="ltx_p">Justification</p>
+                  </div>
+                </th>
+              </tr>
+            </thead>
+            <tr>
+              <th class="fml-pline">
+                
+                
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"><math id="Sx1.p5.m1.m1" class="ltx_Math" alttext="m" display="inline"><mi>m</mi></math></span></p>
+              </th>
+              <td class="fml-subproof">
+                
+                <div>
+                  <span>open subproof,
+1</span>
+                </div>
+              </td>
+              <td class="fml-fmla">
+                
+                <div class="fml-scope-start">
+                  
+                </div>
+                <div class="fml-scope-start">
+                  
+                </div>
+                <div class="fml-as">
+                  
+                  <span><math id="Sx1.p5.m2" class="ltx_Math" alttext="\neg\mathscr{A}" display="inline"><mrow><mo rspace="0.167em">¬</mo><mi class="ltx_font_mathscript">𝒜︁</mi></mrow></math></span>
+                </div>
+              </td>
+              <td class="fml-just">
+                
+                <div class="fml-just">
+                  
+                  <span><abbr title="Assumption">
+AS</abbr>
+</span>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <th class="fml-pline">
+                
+                
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"></span></p>
+              </th>
+              <td class="fml-subproof">
+                
+                <div>
+                  <span>1</span>
+                </div>
+              </td>
+              <td class="fml-fmla">
+                
+                <div class="fml-scope">
+                  
+                </div>
+                <div class="fml-scope">
+                  
+                </div>
+                <div class="fml-fmla">
+                  
+                  <span><math id="Sx1.p5.m4" class="ltx_Math" alttext="\dots" display="inline"><mi mathvariant="normal">…</mi></math></span>
+                </div>
+              </td>
+              <td class="fml-just">
+                
+                <div class="fml-just">
+                  
+                  <span></span>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <th class="fml-pline">
+                
+                
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"><math id="Sx1.p5.m5.m1" class="ltx_Math" alttext="n" display="inline"><mi>n</mi></math></span></p>
+              </th>
+              <td class="fml-subproof">
+                
+                <div>
+                  <span>1</span>
+                </div>
+              </td>
+              <td class="fml-fmla">
+                
+                <div class="fml-scope">
+                  
+                </div>
+                <div class="fml-scope">
+                  
+                </div>
+                <div class="fml-fmla">
+                  
+                  <span><math id="Sx1.p5.m6" class="ltx_Math" alttext="\bot" display="inline"><mo>⊥</mo></math></span>
+                </div>
+              </td>
+              <td class="fml-just">
+                
+                <div class="fml-just">
+                  
+                  <span></span>
+                </div>
+              </td>
+            </tr>
+          </table>
+</div>
+<div id="Sx1.p6" class="ltx_para ltx_noindent">
+<p class="ltx_p">How could you use it to prove <math id="Sx1.p6.m1" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math> without using IP but with using LEM as well as all the other basic rules?</p>
+</div>
+<div id="Sx1.p7" class="ltx_para ltx_noindent">
+<p class="ltx_p"><span class="ltx_text ltx_font_bold">E. </span>Give a proof of the first De Morgan rule, but using only the basic rules, in particular, <span class="ltx_text ltx_font_bold">without using LEM</span>. (Of course, you can combine the proof using LEM with the proof <span class="ltx_text ltx_font_bold">of</span> LEM. Try to find a proof directly.)</p>
+</div>
+</div>
+</section>
+</div>
+</section>
+</div>
+</div>
+</div>
+<a href="Ch20.html" class="navigation navigation-prev" aria-label="Previous page"><i class="fa fa-angle-left"></i></a><a href="Ch22.html" class="navigation navigation-next" aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+</div>
+</div>
+</body>
+
+</html>
