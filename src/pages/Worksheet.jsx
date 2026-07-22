@@ -14,6 +14,7 @@ import { sortAssignmentsBySubchapter } from '../utils/assignmentSort.js'
 import { displayScoreForProof } from '../utils/problemHelpers.js'
 import { useCoursesState } from '../context/CoursesContext.jsx'
 import { useAppRuntime } from '../hooks/useAppRuntime.js'
+import WorksheetTextbookSplit from '../components/textbook/WorksheetTextbookSplit.jsx'
 
 function SandboxWorksheetContent() {
   const { assignmentId } = useParams()
@@ -92,36 +93,41 @@ function SandboxWorksheetContent() {
   }
 
   return (
-    <WorksheetLayout
-      subtitle={currentWorksheet.title || currentWorksheet.name || "Assignment"}
-      onBackToLMS={() => navigate(backTarget)}
-      worksheets={worksheets}
-      currentWorksheetIndex={0}
-      onWorksheetIndexChange={() => {}}
-      completedProofs={completedProofs}
-      isOverdue={isOverdue}
-      isLocked={currentWorksheet.isLocked ?? currentWorksheet.is_locked ?? false}
-      showPolicyInfo
+    <WorksheetTextbookSplit
+      practiceId={currentWorksheet.id}
+      activityKind={currentWorksheet.kind}
     >
-      <WorksheetTabs
+      <WorksheetLayout
+        subtitle={currentWorksheet.title || currentWorksheet.name || "Assignment"}
+        onBackToLMS={() => navigate(backTarget)}
         worksheets={worksheets}
         currentWorksheetIndex={0}
         onWorksheetIndexChange={() => {}}
-        currentProofIndex={currentProofIndex}
-        onProofIndexChange={setCurrentProofIndex}
         completedProofs={completedProofs}
-        questionScores={questionScores}
-        onProofComplete={(proofId) => {
-          handleProofComplete(proofId)
-          markQuestionComplete(proofId)
-        }}
-        getSavedProofState={(proofId) => getQuestionState(proofId)}
-        handleProofStateChange={(proofId, state) => updateQuestionState(proofId, state)}
-        total={total}
-        completionPercent={completionPercent}
-        gradeLabel={gradeLabel}
-      />
-    </WorksheetLayout>
+        isOverdue={isOverdue}
+        isLocked={currentWorksheet.isLocked ?? currentWorksheet.is_locked ?? false}
+        showPolicyInfo
+      >
+        <WorksheetTabs
+          worksheets={worksheets}
+          currentWorksheetIndex={0}
+          onWorksheetIndexChange={() => {}}
+          currentProofIndex={currentProofIndex}
+          onProofIndexChange={setCurrentProofIndex}
+          completedProofs={completedProofs}
+          questionScores={questionScores}
+          onProofComplete={(proofId) => {
+            handleProofComplete(proofId)
+            markQuestionComplete(proofId)
+          }}
+          getSavedProofState={(proofId) => getQuestionState(proofId)}
+          handleProofStateChange={(proofId, state) => updateQuestionState(proofId, state)}
+          total={total}
+          completionPercent={completionPercent}
+          gradeLabel={gradeLabel}
+        />
+      </WorksheetLayout>
+    </WorksheetTextbookSplit>
   )
 }
 
@@ -1256,41 +1262,50 @@ function RealWorksheetContent() {
       sx={{
         // keep the old baseline and let root scaling work
         '& .logicpenguin': { fontSize: '1.25rem' },
+        height: { xs: 'auto', md: '100%' },
+        minHeight: { xs: 'auto', md: 0 },
+        display: 'flex',
+        flexDirection: 'column',
       }}
     >
-      <WorksheetLayout
-        subtitle={currentWorksheet.title || "Predicate Logic: Natural Deduction"}
-        onBackToLMS={() => navigate(backTarget)}
-        worksheets={worksheets}
-        currentWorksheetIndex={currentWorksheetIndex}
-        onWorksheetIndexChange={handleWorksheetChange}
-        completedProofs={completedProofs}
-        isOverdue={isOverdue}
-        isLocked={currentWorksheet.isLocked ?? false}
-        showPolicyInfo={false}
+      <WorksheetTextbookSplit
+        practiceId={currentWorksheet.id}
+        activityKind={currentWorksheet.kind}
       >
-        <WorksheetTabs
-          key={`worksheet-${currentWorksheet?.id ?? worksheetIdNum}`}
+        <WorksheetLayout
+          subtitle={currentWorksheet.title || "Predicate Logic: Natural Deduction"}
+          onBackToLMS={() => navigate(backTarget)}
           worksheets={worksheets}
           currentWorksheetIndex={currentWorksheetIndex}
           onWorksheetIndexChange={handleWorksheetChange}
-          currentProofIndex={currentProofIndex}
-          onProofIndexChange={setCurrentProofIndex}
           completedProofs={completedProofs}
-          questionScores={questionScores}
-          onProofComplete={handleProofComplete}
-          getSavedProofState={getSavedProofState}
-          handleProofStateChange={handleProofStateChange}
-          total={total}
-          completionPercent={completionPercent}
-          gradeLabel={gradeLabel}
-          policySummary={policySummary}
           isOverdue={isOverdue}
-          isInstructorView={isInstructor}
-          onQuestionSaved={currentWorksheet?.id ? (qId) => refreshQuestionSolutions(currentWorksheet.id, qId) : undefined}
-          onQuestionCreated={handleQuestionCreated}
-        />
-      </WorksheetLayout>
+          isLocked={currentWorksheet.isLocked ?? false}
+          showPolicyInfo={false}
+        >
+          <WorksheetTabs
+            key={`worksheet-${currentWorksheet?.id ?? worksheetIdNum}`}
+            worksheets={worksheets}
+            currentWorksheetIndex={currentWorksheetIndex}
+            onWorksheetIndexChange={handleWorksheetChange}
+            currentProofIndex={currentProofIndex}
+            onProofIndexChange={setCurrentProofIndex}
+            completedProofs={completedProofs}
+            questionScores={questionScores}
+            onProofComplete={handleProofComplete}
+            getSavedProofState={getSavedProofState}
+            handleProofStateChange={handleProofStateChange}
+            total={total}
+            completionPercent={completionPercent}
+            gradeLabel={gradeLabel}
+            policySummary={policySummary}
+            isOverdue={isOverdue}
+            isInstructorView={isInstructor}
+            onQuestionSaved={currentWorksheet?.id ? (qId) => refreshQuestionSolutions(currentWorksheet.id, qId) : undefined}
+            onQuestionCreated={handleQuestionCreated}
+          />
+        </WorksheetLayout>
+      </WorksheetTextbookSplit>
     </Box>
   )
 }

@@ -1,0 +1,504 @@
+<!DOCTYPE html><html style="--bml-ltx-font-size:10;" class="bml_mathjax4" lang="en">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<title>Chapter 47 Proving equivalences ‣ Part IX Metatheory ‣ forall x: Calgary</title>
+<!--Generated on Tue Jul 21 20:13:15 2026 by LaTeXML (version 0.8.8) http://dlmf.nist.gov/LaTeXML/.-->
+<!--Document created on Fall 2025 (2026‐07‐18 8642250).-->
+
+<link rel="stylesheet" href="LaTeXML.css" type="text/css">
+<link rel="stylesheet" href="ltx-book.css" type="text/css">
+<link rel="stylesheet" href="bookml/gitbook/css/style.css" type="text/css">
+<link rel="stylesheet" href="bookml/gitbook/css/plugin-table.css" type="text/css">
+<link rel="stylesheet" href="bookml/gitbook/css/plugin-search.css" type="text/css">
+<link rel="stylesheet" href="bookml/gitbook/css/plugin-bookdown.css" type="text/css">
+<link rel="stylesheet" href="bookml/gitbook/css/plugin-fontsettings.css" type="text/css">
+<link rel="stylesheet" href="bookml/CSS/style.css" type="text/css">
+<link rel="stylesheet" href="bookml/CSS/style.gitbook,plain.css" type="text/css">
+<link rel="stylesheet" href="bookml/CSS/style.gitbook.css" type="text/css">
+<link rel="stylesheet" href="bmluser/colors.gitbook-forallxyyc-html.css" type="text/css">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<link rel="stylesheet" href="forallxyyc.css" type="text/css">
+<link rel="stylesheet" href="fitchml.css" type="text/css">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script><script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6"></script>
+<link rel="up" href="Pt9.html" title="Part IX Metatheory ‣ forall x: Calgary">
+<link rel="up up" href="index.html" title="forall x: Calgary">
+<link rel="start" href="index.html" title="forall x: Calgary">
+<link rel="prev" href="Ch46.html" title="Chapter 46 Functional completeness ‣ Part IX Metatheory ‣ forall x: Calgary">
+<link rel="next" href="Ch48.html" title="Chapter 48 Soundness ‣ Part IX Metatheory ‣ forall x: Calgary">
+<link rel="chapter" href="Ch45.html" title="Chapter 45 Normal forms ‣ Part IX Metatheory ‣ forall x: Calgary">
+<link rel="chapter" href="Ch46.html" title="Chapter 46 Functional completeness ‣ Part IX Metatheory ‣ forall x: Calgary">
+<link rel="chapter" href="Ch48.html" title="Chapter 48 Soundness ‣ Part IX Metatheory ‣ forall x: Calgary">
+<link rel="chapter" href="Chx1.html" title="Preface ‣ forall x: Calgary">
+<link rel="part" href="Pt1.html" title="Part I Key notions of logic ‣ forall x: Calgary">
+<link rel="part" href="Pt2.html" title="Part II Truth-functional logic ‣ forall x: Calgary">
+<link rel="part" href="Pt3.html" title="Part III Truth tables ‣ forall x: Calgary">
+<link rel="part" href="Pt4.html" title="Part IV Natural deduction for TFL ‣ forall x: Calgary">
+<link rel="part" href="Pt5.html" title="Part V First-order logic ‣ forall x: Calgary">
+<link rel="part" href="Pt6.html" title="Part VI Interpretations ‣ forall x: Calgary">
+<link rel="part" href="Pt7.html" title="Part VII Natural deduction for FOL ‣ forall x: Calgary">
+<link rel="part" href="Pt8.html" title="Part VIII Modal logic ‣ forall x: Calgary">
+<link rel="part" href="Pt9.html" title="Part IX Metatheory ‣ forall x: Calgary">
+<link rel="part" href="Ptx1.html" title="Appendices ‣ forall x: Calgary">
+<link rel="part" href="Ptx2.html" title="Solutions to selected exercices ‣ forall x: Calgary">
+<script src="bookml/js/mathjax4.js" defer></script>
+</head>
+<body class="bml_class_book">
+<div class="book without-animation font-size-2 font-family-1" data-basepath=".">
+<a href="#bml-main-content" tabindex="0" class="bml-skip-to-content">Skip to content.</a>
+<div class="book-summary"><nav class="ltx_page_navbar">
+<ul class="ltx_toclist summary">
+<li>
+<a href="index.html" title="" class="ltx_ref" rel="start">forall x: Calgary</a>
+</li>
+<li class="divider" aria-hidden="true"></li>
+<li data-level="" data-path="Chx1.html" class="ltx_tocentry ltx_tocentry_chapter  chapter "><a href="Chx1.html" title="In forall x: Calgary" class="ltx_ref">Preface</a></li>
+<li data-level="I" data-path="Pt1.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt1.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">I </span></b>Key notions of logic</a></li>
+<li data-level="II" data-path="Pt2.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt2.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">II </span></b>Truth-functional logic</a></li>
+<li data-level="III" data-path="Pt3.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt3.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">III </span></b>Truth tables</a></li>
+<li data-level="IV" data-path="Pt4.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt4.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">IV </span></b>Natural deduction for TFL</a></li>
+<li data-level="V" data-path="Pt5.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt5.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">V </span></b>First-order logic</a></li>
+<li data-level="VI" data-path="Pt6.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt6.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">VI </span></b>Interpretations</a></li>
+<li data-level="VII" data-path="Pt7.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt7.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">VII </span></b>Natural deduction for FOL</a></li>
+<li data-level="VIII" data-path="Pt8.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt8.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">VIII </span></b>Modal logic</a></li>
+<li data-level="IX" data-path="Pt9.html" class="ltx_tocentry ltx_tocentry_part  chapter ">
+<a href="Pt9.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">IX </span></b>Metatheory</a>
+<ol class="ltx_toclist ltx_toclist_part">
+<li data-level="45" data-path="Ch45.html" class="ltx_tocentry ltx_tocentry_chapter  chapter "><a href="Ch45.html" title="In Part IX Metatheory ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">45 </span></b>Normal forms</a></li>
+<li data-level="46" data-path="Ch46.html" class="ltx_tocentry ltx_tocentry_chapter  chapter "><a href="Ch46.html" title="In Part IX Metatheory ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">46 </span></b>Functional completeness</a></li>
+<li data-level="47" data-path="" class="ltx_tocentry ltx_tocentry_chapter ltx_ref_self  chapter active">
+<a href="" title="In Part IX Metatheory ‣ forall x: Calgary" aria-current="page" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">47 </span></b>Proving equivalences</a>
+<ol class="ltx_toclist ltx_toclist_chapter">
+<li data-level="47.1" data-path="" class="ltx_tocentry ltx_tocentry_section  chapter "><a href="#S1" title="In Chapter 47 Proving equivalences ‣ Part IX Metatheory ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">47.1 </span></b>Substitutability of equivalents</a></li>
+<li data-level="47.2" data-path="" class="ltx_tocentry ltx_tocentry_section  chapter "><a href="#S2" title="In Chapter 47 Proving equivalences ‣ Part IX Metatheory ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">47.2 </span></b>Chains of equivalences</a></li>
+<li data-level="47.3" data-path="" class="ltx_tocentry ltx_tocentry_section  chapter "><a href="#S3" title="In Chapter 47 Proving equivalences ‣ Part IX Metatheory ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">47.3 </span></b>Finding equivalent normal forms</a></li>
+<li data-level="" data-path="" class="ltx_tocentry ltx_tocentry_section  chapter "><a href="#Sx1" title="In Chapter 47 Proving equivalences ‣ Part IX Metatheory ‣ forall x: Calgary" class="ltx_ref">Practice exercises</a></li>
+</ol>
+</li>
+<li data-level="48" data-path="Ch48.html" class="ltx_tocentry ltx_tocentry_chapter  chapter "><a href="Ch48.html" title="In Part IX Metatheory ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">48 </span></b>Soundness</a></li>
+</ol>
+</li>
+<li data-level="" data-path="Ptx1.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Ptx1.html" title="In forall x: Calgary" class="ltx_ref">Appendices</a></li>
+<li data-level="" data-path="Ptx2.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Ptx2.html" title="In forall x: Calgary" class="ltx_ref">Solutions to selected exercices</a></li>
+</ul>
+</nav></div>
+
+<div class="ltx_page_main book-body fixed">
+<div class="body-inner">
+<header class="book-header fixed" aria-label="toolbar"><span class="bml-separator"></span></header>
+<div class="page-wrapper" tabindex="-1" role="main">
+<div class="ltx_page_content page-inner" id="bml-main-content">
+<script src="bookml/gitbook/js/app.min.js"></script>
+<script src="bookml/gitbook/js/jquery.highlight.js"></script>
+<script src="bookml/gitbook/js/plugin-search.js"></script>
+<script src="bookml/gitbook/js/plugin-fontsettings.js"></script>
+<script src="bookml/gitbook/js/plugin-bookdown.js"></script>
+<script type="text/javascript">
+                  gitbook.require(["gitbook"], function(gitbook) {
+                  gitbook.start({
+                    "fontsettings": {
+                      "theme": "white",
+                      "family": "sans",
+                      "size": 2
+                    },
+                    "download": [ [ "forallxyyc.pdf", "PDF" ], [ "forallxyyc-accessible.pdf", "PDF (accessible)" ], ],
+                    "search": {
+                      "engine": "fuse"
+                    },
+                    "toc": {
+                      "collapse": "none"
+                    }
+                  });
+                });
+              </script>
+
+<section class="ltx_chapter ltx_authors_1line normal" lang="en">
+<div class="section level1">
+<h1 class="ltx_title ltx_title_chapter">
+<span class="ltx_tag ltx_tag_chapter header-section-number">Chapter 47</span> Proving equivalences</h1>
+
+<section id="S1" class="ltx_section normal">
+<div class="section level2">
+<h2 class="ltx_title ltx_title_section">
+<span class="ltx_tag ltx_tag_section header-section-number">47.1</span> Substitutability of equivalents</h2>
+
+<div id="S1.p1" class="ltx_para">
+<p class="ltx_p">Recall from <a href="Ch12.html#S2" title="12.2 Equivalence ‣ Chapter 12 Semantic concepts ‣ Part III Truth tables ‣ forall x: Calgary" class="ltx_ref"><span class="ltx_text ltx_ref_tag">section</span> <span class="ltx_text ltx_ref_tag">12.2</span></a> that <math id="S1.p1.m1" class="ltx_Math" alttext="\mathscr{P}" display="inline"><mi class="ltx_font_mathscript">𝒫︁</mi></math> and <math id="S1.p1.m2" class="ltx_Math" alttext="\mathscr{Q}" display="inline"><mi class="ltx_font_mathscript">𝒬︁</mi></math> are equivalent (in TFL) iff, for every valuation, their truth values agree. We have seen many examples of this and used both truth tables and natural deduction proofs to establish such equivalences. In <a href="Ch45.html" title="Chapter 45 Normal forms ‣ Part IX Metatheory ‣ forall x: Calgary" class="ltx_ref"><span class="ltx_text ltx_ref_tag">chapter</span> <span class="ltx_text ltx_ref_tag">45</span></a> we’ve even proved that every sentence of TFL is equivalent to one in conjunctive and one in disjunctive normal form. If <math id="S1.p1.m3" class="ltx_Math" alttext="\mathscr{P}" display="inline"><mi class="ltx_font_mathscript">𝒫︁</mi></math> and <math id="S1.p1.m4" class="ltx_Math" alttext="\mathscr{Q}" display="inline"><mi class="ltx_font_mathscript">𝒬︁</mi></math> are equivalent, they always have the same truth value, either one entails the other, and from either one you can prove the other.</p>
+</div>
+<div id="S1.p2" class="ltx_para">
+<p class="ltx_p">Equivalent sentences are not the same, of course: the sentences <math id="S1.p2.m1" class="ltx_Math" alttext="\neg\neg A" display="inline"><mrow><mo rspace="0.167em">¬</mo><mrow><mo rspace="0.167em">¬</mo><mi>A</mi></mrow></mrow></math> and <math id="S1.p2.m2" class="ltx_Math" alttext="A" display="inline"><mi>A</mi></math> may always have the same truth value, but the first starts with the ‘<math id="S1.p2.m3" class="ltx_Math" alttext="\neg" display="inline"><mo>¬</mo></math>’ symbol while the second doesn’t. But you may wonder if it’s always true that we can replace one of a pair of equivalent sentences by the other, and the results will be equivalent, too. For instance, consider <math id="S1.p2.m4" class="ltx_Math" alttext="\neg\neg A\rightarrow B" display="inline"><mrow><mrow><mo rspace="0.167em">¬</mo><mrow><mo rspace="0.167em">¬</mo><mi>A</mi></mrow></mrow><mo stretchy="false">→</mo><mi>B</mi></mrow></math> and <math id="S1.p2.m5" class="ltx_Math" alttext="A\rightarrow B" display="inline"><mrow><mi>A</mi><mo stretchy="false">→</mo><mi>B</mi></mrow></math>. The second results from the first by replacing ‘<math id="S1.p2.m6" class="ltx_Math" alttext="\neg\neg A" display="inline"><mrow><mo rspace="0.167em">¬</mo><mrow><mo rspace="0.167em">¬</mo><mi>A</mi></mrow></mrow></math>’ by ‘<math id="S1.p2.m7" class="ltx_Math" alttext="A" display="inline"><mi>A</mi></math>’. And these two sentences are also equivalent.</p>
+</div>
+<div id="S1.p3" class="ltx_para">
+<p class="ltx_p">This is a general fact, and it is not hard to see why it is true. In
+any valuation, we compute the truth value of a sentence “from the
+inside out.” So when it comes to determining the truth value of
+‘<math id="S1.p3.m1" class="ltx_Math" alttext="\neg\neg A\rightarrow B" display="inline"><mrow><mrow><mo rspace="0.167em">¬</mo><mrow><mo rspace="0.167em">¬</mo><mi>A</mi></mrow></mrow><mo stretchy="false">→</mo><mi>B</mi></mrow></math>’, we first compute the truth value of
+‘<math id="S1.p3.m2" class="ltx_Math" alttext="\neg\neg A" display="inline"><mrow><mo rspace="0.167em">¬</mo><mrow><mo rspace="0.167em">¬</mo><mi>A</mi></mrow></mrow></math>’, and the truth value of the overall sentence then
+just depends on that truth value (true or false, as the case may be)
+and the rest of the sentence (the truth value of ‘<math id="S1.p3.m3" class="ltx_Math" alttext="B" display="inline"><mi>B</mi></math>’ and the truth
+table for ‘<math id="S1.p3.m4" class="ltx_Math" alttext="\rightarrow" display="inline"><mo stretchy="false">→</mo></math>’). But since ‘<math id="S1.p3.m5" class="ltx_Math" alttext="\neg\neg A" display="inline"><mrow><mo rspace="0.167em">¬</mo><mrow><mo rspace="0.167em">¬</mo><mi>A</mi></mrow></mrow></math>’ and ‘<math id="S1.p3.m6" class="ltx_Math" alttext="A" display="inline"><mi>A</mi></math>’ are equivalent,
+they always have the same truth value in a given valuation—hence,
+replacing ‘<math id="S1.p3.m7" class="ltx_Math" alttext="\neg\neg A" display="inline"><mrow><mo rspace="0.167em">¬</mo><mrow><mo rspace="0.167em">¬</mo><mi>A</mi></mrow></mrow></math>’ by ‘<math id="S1.p3.m8" class="ltx_Math" alttext="A" display="inline"><mi>A</mi></math>’ cannot change the truth value of
+the overall sentence. The same of course is true for any other
+sentence equivalent to ‘<math id="S1.p3.m9" class="ltx_Math" alttext="\neg\neg A" display="inline"><mrow><mo rspace="0.167em">¬</mo><mrow><mo rspace="0.167em">¬</mo><mi>A</mi></mrow></mrow></math>’, say, ‘<math id="S1.p3.m10" class="ltx_Math" alttext="A\wedge(A\vee A)" display="inline"><mrow><mi>A</mi><mo>∧</mo><mrow><mo stretchy="false">(</mo><mrow><mi>A</mi><mo>∨</mo><mi>A</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math>’.</p>
+</div>
+<div id="S1.p4" class="ltx_para">
+<p class="ltx_p">To state the result in general, let’s use the notation <math id="S1.p4.m1" class="ltx_Math" alttext="\mathscr{R}(\mathscr{P})" display="inline"><mrow><mi class="ltx_font_mathscript">ℛ︁</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mi class="ltx_font_mathscript">𝒫︁</mi><mo stretchy="false">)</mo></mrow></mrow></math> to mean a sentence which contains the sentence <math id="S1.p4.m2" class="ltx_Math" alttext="\mathscr{P}" display="inline"><mi class="ltx_font_mathscript">𝒫︁</mi></math> as a part. Then by <math id="S1.p4.m3" class="ltx_Math" alttext="\mathscr{R}(\mathscr{Q})" display="inline"><mrow><mi class="ltx_font_mathscript">ℛ︁</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mi class="ltx_font_mathscript">𝒬︁</mi><mo stretchy="false">)</mo></mrow></mrow></math> we mean the result of replacing the occurrence of <math id="S1.p4.m4" class="ltx_Math" alttext="\mathscr{P}" display="inline"><mi class="ltx_font_mathscript">𝒫︁</mi></math> by the sentence <math id="S1.p4.m5" class="ltx_Math" alttext="\mathscr{Q}" display="inline"><mi class="ltx_font_mathscript">𝒬︁</mi></math>. For instance, if <math id="S1.p4.m6" class="ltx_Math" alttext="\mathscr{P}" display="inline"><mi class="ltx_font_mathscript">𝒫︁</mi></math> is the sentence letter ‘<math id="S1.p4.m7" class="ltx_Math" alttext="A" display="inline"><mi>A</mi></math>’, <math id="S1.p4.m8" class="ltx_Math" alttext="\mathscr{Q}" display="inline"><mi class="ltx_font_mathscript">𝒬︁</mi></math> is the sentence ‘<math id="S1.p4.m9" class="ltx_Math" alttext="\neg\neg A" display="inline"><mrow><mo rspace="0.167em">¬</mo><mrow><mo rspace="0.167em">¬</mo><mi>A</mi></mrow></mrow></math>’, and <math id="S1.p4.m10" class="ltx_Math" alttext="\mathscr{R}(\mathscr{P})" display="inline"><mrow><mi class="ltx_font_mathscript">ℛ︁</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mi class="ltx_font_mathscript">𝒫︁</mi><mo stretchy="false">)</mo></mrow></mrow></math> is ‘<math id="S1.p4.m11" class="ltx_Math" alttext="A\rightarrow B" display="inline"><mrow><mi>A</mi><mo stretchy="false">→</mo><mi>B</mi></mrow></math>’, then <math id="S1.p4.m12" class="ltx_Math" alttext="\mathscr{R}(\mathscr{Q})" display="inline"><mrow><mi class="ltx_font_mathscript">ℛ︁</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mi class="ltx_font_mathscript">𝒬︁</mi><mo stretchy="false">)</mo></mrow></mrow></math> is ‘<math id="S1.p4.m13" class="ltx_Math" alttext="\neg\neg A\rightarrow B" display="inline"><mrow><mrow><mo rspace="0.167em">¬</mo><mrow><mo rspace="0.167em">¬</mo><mi>A</mi></mrow></mrow><mo stretchy="false">→</mo><mi>B</mi></mrow></math>’.</p>
+</div>
+<div id="S1.p5" class="ltx_para bml_background-color_FDF4FA ltx_noindent bml_background-color_FDF4FA" style="padding:9pt;">
+<p class="ltx_p">If <math id="S1.p5.m1" class="ltx_Math" alttext="\mathscr{P}" display="inline"><mi class="ltx_font_mathscript">𝒫︁</mi></math> and <math id="S1.p5.m2" class="ltx_Math" alttext="\mathscr{Q}" display="inline"><mi class="ltx_font_mathscript">𝒬︁</mi></math> are equivalent, then so are <math id="S1.p5.m3" class="ltx_Math" alttext="\mathscr{R}(\mathscr{P})" display="inline"><mrow><mi class="ltx_font_mathscript">ℛ︁</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mi class="ltx_font_mathscript">𝒫︁</mi><mo stretchy="false">)</mo></mrow></mrow></math> and <math id="S1.p5.m4" class="ltx_Math" alttext="\mathscr{R}(\mathscr{Q})" display="inline"><mrow><mi class="ltx_font_mathscript">ℛ︁</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mi class="ltx_font_mathscript">𝒬︁</mi><mo stretchy="false">)</mo></mrow></mrow></math>.</p>
+</div>
+<div id="S1.p6" class="ltx_para">
+<p class="ltx_p">It follows from this fact that any sentence of the form <math id="S1.p6.m1" class="ltx_Math" alttext="\mathscr{R}(\mathscr{P})\leftrightarrow\mathscr{R}(\mathscr{Q})" display="inline"><mrow><mrow><mi class="ltx_font_mathscript">ℛ︁</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mi class="ltx_font_mathscript">𝒫︁</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">↔</mo><mrow><mi class="ltx_font_mathscript">ℛ︁</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mi class="ltx_font_mathscript">𝒬︁</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math>, where <math id="S1.p6.m2" class="ltx_Math" alttext="\mathscr{P}" display="inline"><mi class="ltx_font_mathscript">𝒫︁</mi></math> and <math id="S1.p6.m3" class="ltx_Math" alttext="\mathscr{Q}" display="inline"><mi class="ltx_font_mathscript">𝒬︁</mi></math> are equivalent, is a tautology. However, the proofs in natural deduction will be wildly different for different <math id="S1.p6.m4" class="ltx_Math" alttext="\mathscr{R}" display="inline"><mi class="ltx_font_mathscript">ℛ︁</mi></math>. (As an exercise, give proofs that show that</p>
+<div id="A48.S0.EGx28" class="ltx_equationgroup ltx_eqn_align bml_equationgroup bml_equation_container ltx_align_baseline">
+<div id="Ex1" class="ltx_equation bml_equation ltx_align_baseline" role="group" aria-label="equation">
+<div class="ltx_td ltx_align_left bml_eqn_cell"><math id="Ex1.m1" class="ltx_Math" alttext="\displaystyle{}\vdash(\neg\neg P\rightarrow Q)\leftrightarrow(P\rightarrow Q)%
+\text{ and}" display="inline"><mrow><mi></mi><mo>⊢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mo rspace="0.167em">¬</mo><mrow><mo rspace="0.167em">¬</mo><mi>P</mi></mrow></mrow><mo stretchy="false">→</mo><mi>Q</mi></mrow><mo stretchy="false">)</mo></mrow><mo stretchy="false">↔</mo><mrow><mrow><mo stretchy="false">(</mo><mrow><mi>P</mi><mo stretchy="false">→</mo><mi>Q</mi></mrow><mo stretchy="false">)</mo></mrow><mo>⁢</mo><mtext> and</mtext></mrow></mrow></math></div>
+</div>
+<div id="Ex2" class="ltx_equation bml_equation ltx_align_baseline" role="group" aria-label="equation">
+<div class="ltx_td ltx_align_left bml_eqn_cell"><math id="Ex2.m1" class="ltx_Math" alttext="\displaystyle{}\vdash(\neg\neg P\wedge Q)\leftrightarrow(P\wedge Q)" display="inline"><mrow><mi></mi><mo>⊢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mo rspace="0.167em">¬</mo><mrow><mo rspace="0.167em">¬</mo><mi>P</mi></mrow></mrow><mo>∧</mo><mi>Q</mi></mrow><mo stretchy="false">)</mo></mrow><mo stretchy="false">↔</mo><mrow><mo stretchy="false">(</mo><mrow><mi>P</mi><mo>∧</mo><mi>Q</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math></div>
+</div>
+</div>
+<p class="ltx_p">and compare the two.)</p>
+</div>
+<div id="S1.p7" class="ltx_para">
+<p class="ltx_p">Here is another fact: if two sentences <math id="S1.p7.m1" class="ltx_Math" alttext="\mathscr{P}" display="inline"><mi class="ltx_font_mathscript">𝒫︁</mi></math> and <math id="S1.p7.m2" class="ltx_Math" alttext="\mathscr{Q}" display="inline"><mi class="ltx_font_mathscript">𝒬︁</mi></math> are equivalent, and you replace some sentence letter in both <math id="S1.p7.m3" class="ltx_Math" alttext="\mathscr{P}" display="inline"><mi class="ltx_font_mathscript">𝒫︁</mi></math> and <math id="S1.p7.m4" class="ltx_Math" alttext="\mathscr{Q}" display="inline"><mi class="ltx_font_mathscript">𝒬︁</mi></math> by the same sentence <math id="S1.p7.m5" class="ltx_Math" alttext="\mathscr{R}" display="inline"><mi class="ltx_font_mathscript">ℛ︁</mi></math>, the results are also equivalent. For instance, if you replace ‘<math id="S1.p7.m6" class="ltx_Math" alttext="A" display="inline"><mi>A</mi></math>’ in both ‘<math id="S1.p7.m7" class="ltx_Math" alttext="A\land B" display="inline"><mrow><mi>A</mi><mo>∧</mo><mi>B</mi></mrow></math>’ and ‘<math id="S1.p7.m8" class="ltx_Math" alttext="B\land A" display="inline"><mrow><mi>B</mi><mo>∧</mo><mi>A</mi></mrow></math>’ by, say, ‘<math id="S1.p7.m9" class="ltx_Math" alttext="\neg C" display="inline"><mrow><mo rspace="0.167em">¬</mo><mi>C</mi></mrow></math>’, you get ‘<math id="S1.p7.m10" class="ltx_Math" alttext="\neg C\land B" display="inline"><mrow><mrow><mo rspace="0.167em">¬</mo><mi>C</mi></mrow><mo>∧</mo><mi>B</mi></mrow></math>’ and ‘<math id="S1.p7.m11" class="ltx_Math" alttext="B\land\neg C" display="inline"><mrow><mi>B</mi><mo>∧</mo><mrow><mo rspace="0.167em">¬</mo><mi>C</mi></mrow></mrow></math>’, and those are equivalent. We can record this, too:</p>
+</div>
+<div id="S1.p8" class="ltx_para bml_background-color_FDF4FA ltx_noindent bml_background-color_FDF4FA" style="padding:9pt;">
+<p class="ltx_p">Equivalence is preserved under replacement of sentence letters, i.e., if <math id="S1.p8.m1" class="ltx_Math" alttext="\mathscr{P}(A)" display="inline"><mrow><mi class="ltx_font_mathscript">𝒫︁</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mi>A</mi><mo stretchy="false">)</mo></mrow></mrow></math> and <math id="S1.p8.m2" class="ltx_Math" alttext="\mathscr{Q}(A)" display="inline"><mrow><mi class="ltx_font_mathscript">𝒬︁</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mi>A</mi><mo stretchy="false">)</mo></mrow></mrow></math> both contain the sentence letter ‘<math id="S1.p8.m3" class="ltx_Math" alttext="A" display="inline"><mi>A</mi></math>’ and are equivalent, then the sentences <math id="S1.p8.m4" class="ltx_Math" alttext="\mathscr{P}(\mathscr{R})" display="inline"><mrow><mi class="ltx_font_mathscript">𝒫︁</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mi class="ltx_font_mathscript">ℛ︁</mi><mo stretchy="false">)</mo></mrow></mrow></math> and <math id="S1.p8.m5" class="ltx_Math" alttext="\mathscr{Q}(\mathscr{R})" display="inline"><mrow><mi class="ltx_font_mathscript">𝒬︁</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mi class="ltx_font_mathscript">ℛ︁</mi><mo stretchy="false">)</mo></mrow></mrow></math> (resulting by replacing ‘<math id="S1.p8.m6" class="ltx_Math" alttext="A" display="inline"><mi>A</mi></math>’ by <math id="S1.p8.m7" class="ltx_Math" alttext="\mathscr{R}" display="inline"><mi class="ltx_font_mathscript">ℛ︁</mi></math> in both) are also equivalent.</p>
+</div>
+<div id="S1.p9" class="ltx_para">
+<p class="ltx_p">This means that once we have shown that two sentence are equivalent (e.g., ‘<math id="S1.p9.m1" class="ltx_Math" alttext="\neg\neg A" display="inline"><mrow><mo rspace="0.167em">¬</mo><mrow><mo rspace="0.167em">¬</mo><mi>A</mi></mrow></mrow></math>’ and ‘<math id="S1.p9.m2" class="ltx_Math" alttext="A" display="inline"><mi>A</mi></math>’, or ‘<math id="S1.p9.m3" class="ltx_Math" alttext="A\land B" display="inline"><mrow><mi>A</mi><mo>∧</mo><mi>B</mi></mrow></math>’ and ‘<math id="S1.p9.m4" class="ltx_Math" alttext="B\land A" display="inline"><mrow><mi>B</mi><mo>∧</mo><mi>A</mi></mrow></math>’) we know that all their common “instances” are also equivalent. Note that we do not immediately get this from a truth table or a natural deduction proof. E.g., a truth table that shows that ‘<math id="S1.p9.m5" class="ltx_Math" alttext="\neg\neg A" display="inline"><mrow><mo rspace="0.167em">¬</mo><mrow><mo rspace="0.167em">¬</mo><mi>A</mi></mrow></mrow></math>’ and ‘<math id="S1.p9.m6" class="ltx_Math" alttext="A" display="inline"><mi>A</mi></math>’ are equivalent does <span class="ltx_text ltx_font_bold">not</span> also show that ‘<math id="S1.p9.m7" class="ltx_Math" alttext="\neg\neg(B\rightarrow C)" display="inline"><mrow><mo rspace="0.167em">¬</mo><mrow><mo>¬</mo><mrow><mo stretchy="false">(</mo><mrow><mi>B</mi><mo stretchy="false">→</mo><mi>C</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>’ and ‘<math id="S1.p9.m8" class="ltx_Math" alttext="B\rightarrow C" display="inline"><mrow><mi>B</mi><mo stretchy="false">→</mo><mi>C</mi></mrow></math>’ are equivalent: the former needs just 2 lines, the latter 4.</p>
+</div>
+</div>
+</section>
+<section id="S2" class="ltx_section normal">
+<div class="section level2">
+<h2 class="ltx_title ltx_title_section">
+<span class="ltx_tag ltx_tag_section header-section-number">47.2</span> Chains of equivalences</h2>
+
+<div id="S2.p1" class="ltx_para">
+<p class="ltx_p">When you want to verify that two sentences are equivalent, you can of course do a truth table, or look for a formal proof. But there is a simpler method, based on the principle of substitutability of equivalents we just discussed: Armed with a small catalog of simple equivalences, replace parts of your first sentence by equivalent parts, and repeat until you reach your second sentence.</p>
+</div>
+<div id="S2.p2" class="ltx_para">
+<p class="ltx_p">This method of showing sentences equivalent is underwritten by the two facts from the previous section. The first fact tells us that <span class="ltx_text ltx_font_bold">if</span>, say, <math id="S2.p2.m1" class="ltx_Math" alttext="\neg\neg\mathscr{P}" display="inline"><mrow><mo rspace="0.167em">¬</mo><mrow><mo rspace="0.167em">¬</mo><mi class="ltx_font_mathscript">𝒫︁</mi></mrow></mrow></math> and <math id="S2.p2.m2" class="ltx_Math" alttext="\mathscr{P}" display="inline"><mi class="ltx_font_mathscript">𝒫︁</mi></math> are equivalent (for any sentence <math id="S2.p2.m3" class="ltx_Math" alttext="\mathscr{P}" display="inline"><mi class="ltx_font_mathscript">𝒫︁</mi></math>), then replacing <math id="S2.p2.m4" class="ltx_Math" alttext="\neg\neg\mathscr{P}" display="inline"><mrow><mo rspace="0.167em">¬</mo><mrow><mo rspace="0.167em">¬</mo><mi class="ltx_font_mathscript">𝒫︁</mi></mrow></mrow></math> in a sentence by <math id="S2.p2.m5" class="ltx_Math" alttext="\mathscr{P}" display="inline"><mi class="ltx_font_mathscript">𝒫︁</mi></math> results in an equivalent sentence. The second fact tells us <span class="ltx_text ltx_font_bold">that</span> <math id="S2.p2.m6" class="ltx_Math" alttext="\neg\neg\mathscr{P}" display="inline"><mrow><mo rspace="0.167em">¬</mo><mrow><mo rspace="0.167em">¬</mo><mi class="ltx_font_mathscript">𝒫︁</mi></mrow></mrow></math> and <math id="S2.p2.m7" class="ltx_Math" alttext="\mathscr{P}" display="inline"><mi class="ltx_font_mathscript">𝒫︁</mi></math> are always equivalent, for any sentence <math id="S2.p2.m8" class="ltx_Math" alttext="\mathscr{P}" display="inline"><mi class="ltx_font_mathscript">𝒫︁</mi></math>. (A simple truth table shows that ‘<math id="S2.p2.m9" class="ltx_Math" alttext="\neg\neg A" display="inline"><mrow><mo rspace="0.167em">¬</mo><mrow><mo rspace="0.167em">¬</mo><mi>A</mi></mrow></mrow></math>’ and ‘<math id="S2.p2.m10" class="ltx_Math" alttext="A" display="inline"><mi>A</mi></math>’ are equivalent.) By the second fact we know that whenever we replace ‘<math id="S2.p2.m11" class="ltx_Math" alttext="A" display="inline"><mi>A</mi></math>’ in both ‘<math id="S2.p2.m12" class="ltx_Math" alttext="\neg\neg A" display="inline"><mrow><mo rspace="0.167em">¬</mo><mrow><mo rspace="0.167em">¬</mo><mi>A</mi></mrow></mrow></math>’ and ‘<math id="S2.p2.m13" class="ltx_Math" alttext="A" display="inline"><mi>A</mi></math>’ by some sentence <math id="S2.p2.m14" class="ltx_Math" alttext="\mathscr{P}" display="inline"><mi class="ltx_font_mathscript">𝒫︁</mi></math>, we get equivalent results. In other words, from the fact that ‘<math id="S2.p2.m15" class="ltx_Math" alttext="\neg\neg A" display="inline"><mrow><mo rspace="0.167em">¬</mo><mrow><mo rspace="0.167em">¬</mo><mi>A</mi></mrow></mrow></math>’ and ‘<math id="S2.p2.m16" class="ltx_Math" alttext="A" display="inline"><mi>A</mi></math>’ are equivalent and the second fact, we can conclude that, for any sentence <math id="S2.p2.m17" class="ltx_Math" alttext="\mathscr{P}" display="inline"><mi class="ltx_font_mathscript">𝒫︁</mi></math>, <math id="S2.p2.m18" class="ltx_Math" alttext="\neg\neg\mathscr{P}" display="inline"><mrow><mo rspace="0.167em">¬</mo><mrow><mo rspace="0.167em">¬</mo><mi class="ltx_font_mathscript">𝒫︁</mi></mrow></mrow></math> and <math id="S2.p2.m19" class="ltx_Math" alttext="\mathscr{P}" display="inline"><mi class="ltx_font_mathscript">𝒫︁</mi></math> are equivalent.</p>
+</div>
+<div id="S2.p3" class="ltx_para">
+<p class="ltx_p">Let’s give an example. By De Morgan’s Laws, the following pairs of sentences are equivalent:</p>
+<div id="A48.S0.EGx29" class="ltx_equationgroup ltx_eqn_align bml_equationgroup bml_equation_container ltx_align_baseline">
+<div id="Ex3" class="ltx_equation bml_equation ltx_align_baseline" role="group" aria-label="equation">
+<div class="ltx_td ltx_align_right bml_eqn_cell"><math id="Ex3.m1" class="ltx_Math" alttext="\displaystyle\neg(A\wedge B)" display="inline"><mrow><mo>¬</mo><mrow><mo stretchy="false">(</mo><mrow><mi>A</mi><mo>∧</mo><mi>B</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math></div>
+<div class="ltx_td ltx_align_left bml_eqn_cell"><math id="Ex3.m2" class="ltx_Math" alttext="\displaystyle{}\Leftrightarrow(\neg A\vee\neg B)" display="inline"><mrow><mi></mi><mo stretchy="false">⇔</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mo rspace="0.167em">¬</mo><mi>A</mi></mrow><mo>∨</mo><mrow><mo rspace="0.167em">¬</mo><mi>B</mi></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></math></div>
+</div>
+<div id="Ex4" class="ltx_equation bml_equation ltx_align_baseline" role="group" aria-label="equation">
+<div class="ltx_td ltx_align_right bml_eqn_cell"><math id="Ex4.m1" class="ltx_Math" alttext="\displaystyle\neg(A\vee B)" display="inline"><mrow><mo>¬</mo><mrow><mo stretchy="false">(</mo><mrow><mi>A</mi><mo>∨</mo><mi>B</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math></div>
+<div class="ltx_td ltx_align_left bml_eqn_cell"><math id="Ex4.m2" class="ltx_Math" alttext="\displaystyle{}\Leftrightarrow(\neg A\wedge\neg B)" display="inline"><mrow><mi></mi><mo stretchy="false">⇔</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mo rspace="0.167em">¬</mo><mi>A</mi></mrow><mo>∧</mo><mrow><mo rspace="0.167em">¬</mo><mi>B</mi></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></math></div>
+</div>
+</div>
+<p class="ltx_p">This can be verified by constructing two truth tables, or four natural deduction proofs that show:</p>
+<div id="A48.S0.EGx30" class="ltx_equationgroup ltx_eqn_align bml_equationgroup bml_equation_container ltx_align_baseline">
+<div id="Ex5" class="ltx_equation bml_equation ltx_align_baseline" role="group" aria-label="equation">
+<div class="ltx_td ltx_align_right bml_eqn_cell"><math id="Ex5.m1" class="ltx_Math" alttext="\displaystyle\neg(A\wedge B)" display="inline"><mrow><mo>¬</mo><mrow><mo stretchy="false">(</mo><mrow><mi>A</mi><mo>∧</mo><mi>B</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math></div>
+<div class="ltx_td ltx_align_left bml_eqn_cell"><math id="Ex5.m2" class="ltx_Math" alttext="\displaystyle{}\vdash(\neg A\vee\neg B)" display="inline"><mrow><mi></mi><mo>⊢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mo rspace="0.167em">¬</mo><mi>A</mi></mrow><mo>∨</mo><mrow><mo rspace="0.167em">¬</mo><mi>B</mi></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></math></div>
+</div>
+<div id="Ex6" class="ltx_equation bml_equation ltx_align_baseline" role="group" aria-label="equation">
+<div class="ltx_td ltx_align_right bml_eqn_cell"><math id="Ex6.m1" class="ltx_Math" alttext="\displaystyle(\neg A\vee\neg B)" display="inline"><mrow><mo stretchy="false">(</mo><mrow><mrow><mo rspace="0.167em">¬</mo><mi>A</mi></mrow><mo>∨</mo><mrow><mo rspace="0.167em">¬</mo><mi>B</mi></mrow></mrow><mo stretchy="false">)</mo></mrow></math></div>
+<div class="ltx_td ltx_align_left bml_eqn_cell"><math id="Ex6.m2" class="ltx_Math" alttext="\displaystyle{}\vdash\neg(A\wedge B)" display="inline"><mrow><mi></mi><mo>⊢</mo><mrow><mo>¬</mo><mrow><mo stretchy="false">(</mo><mrow><mi>A</mi><mo>∧</mo><mi>B</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math></div>
+</div>
+<div id="Ex7" class="ltx_equation bml_equation ltx_align_baseline" role="group" aria-label="equation">
+<div class="ltx_td ltx_align_right bml_eqn_cell"><math id="Ex7.m1" class="ltx_Math" alttext="\displaystyle\neg(A\vee B)" display="inline"><mrow><mo>¬</mo><mrow><mo stretchy="false">(</mo><mrow><mi>A</mi><mo>∨</mo><mi>B</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math></div>
+<div class="ltx_td ltx_align_left bml_eqn_cell"><math id="Ex7.m2" class="ltx_Math" alttext="\displaystyle{}\vdash(\neg A\wedge\neg B)" display="inline"><mrow><mi></mi><mo>⊢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mo rspace="0.167em">¬</mo><mi>A</mi></mrow><mo>∧</mo><mrow><mo rspace="0.167em">¬</mo><mi>B</mi></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></math></div>
+</div>
+<div id="Ex8" class="ltx_equation bml_equation ltx_align_baseline" role="group" aria-label="equation">
+<div class="ltx_td ltx_align_right bml_eqn_cell"><math id="Ex8.m1" class="ltx_Math" alttext="\displaystyle(\neg A\wedge\neg B)" display="inline"><mrow><mo stretchy="false">(</mo><mrow><mrow><mo rspace="0.167em">¬</mo><mi>A</mi></mrow><mo>∧</mo><mrow><mo rspace="0.167em">¬</mo><mi>B</mi></mrow></mrow><mo stretchy="false">)</mo></mrow></math></div>
+<div class="ltx_td ltx_align_left bml_eqn_cell"><math id="Ex8.m2" class="ltx_Math" alttext="\displaystyle{}\vdash\neg(A\vee B)" display="inline"><mrow><mi></mi><mo>⊢</mo><mrow><mo>¬</mo><mrow><mo stretchy="false">(</mo><mrow><mi>A</mi><mo>∨</mo><mi>B</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math></div>
+</div>
+</div>
+</div>
+<div id="S2.p4" class="ltx_para">
+<p class="ltx_p">By the second fact, <span class="ltx_text ltx_font_bold">any</span> pairs of sentences of the following forms are equivalent:</p>
+<div id="A48.S0.EGx31" class="ltx_equationgroup ltx_eqn_align bml_equationgroup bml_equation_container ltx_align_baseline">
+<div id="Ex9" class="ltx_equation bml_equation ltx_align_baseline" role="group" aria-label="equation">
+<div class="ltx_td ltx_align_right bml_eqn_cell"><math id="Ex9.m1" class="ltx_Math" alttext="\displaystyle\neg(\mathscr{P}\wedge\mathscr{Q})" display="inline"><mrow><mo>¬</mo><mrow><mo stretchy="false">(</mo><mrow><mi class="ltx_font_mathscript">𝒫︁</mi><mo>∧</mo><mi class="ltx_font_mathscript">𝒬︁</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math></div>
+<div class="ltx_td ltx_align_left bml_eqn_cell"><math id="Ex9.m2" class="ltx_Math" alttext="\displaystyle{}\Leftrightarrow(\neg\mathscr{P}\vee\neg\mathscr{Q})" display="inline"><mrow><mi></mi><mo stretchy="false">⇔</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mo rspace="0.167em">¬</mo><mi class="ltx_font_mathscript">𝒫︁</mi></mrow><mo>∨</mo><mrow><mo rspace="0.167em">¬</mo><mi class="ltx_font_mathscript">𝒬︁</mi></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></math></div>
+</div>
+<div id="Ex10" class="ltx_equation bml_equation ltx_align_baseline" role="group" aria-label="equation">
+<div class="ltx_td ltx_align_right bml_eqn_cell"><math id="Ex10.m1" class="ltx_Math" alttext="\displaystyle\neg(\mathscr{P}\vee\mathscr{Q})" display="inline"><mrow><mo>¬</mo><mrow><mo stretchy="false">(</mo><mrow><mi class="ltx_font_mathscript">𝒫︁</mi><mo>∨</mo><mi class="ltx_font_mathscript">𝒬︁</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math></div>
+<div class="ltx_td ltx_align_left bml_eqn_cell"><math id="Ex10.m2" class="ltx_Math" alttext="\displaystyle{}\Leftrightarrow(\neg\mathscr{P}\wedge\neg\mathscr{Q})" display="inline"><mrow><mi></mi><mo stretchy="false">⇔</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mo rspace="0.167em">¬</mo><mi class="ltx_font_mathscript">𝒫︁</mi></mrow><mo>∧</mo><mrow><mo rspace="0.167em">¬</mo><mi class="ltx_font_mathscript">𝒬︁</mi></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></math></div>
+</div>
+</div>
+<p class="ltx_p">Now consider the sentence ‘<math id="S2.p4.m1" class="ltx_Math" alttext="\neg(R\vee(S\wedge T))" display="inline"><mrow><mo>¬</mo><mrow><mo stretchy="false">(</mo><mrow><mi>R</mi><mo>∨</mo><mrow><mo stretchy="false">(</mo><mrow><mi>S</mi><mo>∧</mo><mi>T</mi></mrow><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></math>’. We will find an equivalent sentence in which all ‘<math id="S2.p4.m2" class="ltx_Math" alttext="\neg" display="inline"><mo>¬</mo></math>’ signs attach directly to sentence letters. In the first step, we consider this as a sentence of the form <math id="S2.p4.m3" class="ltx_Math" alttext="\neg(\mathscr{P}\vee\mathscr{Q})" display="inline"><mrow><mo>¬</mo><mrow><mo stretchy="false">(</mo><mrow><mi class="ltx_font_mathscript">𝒫︁</mi><mo>∨</mo><mi class="ltx_font_mathscript">𝒬︁</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math>—then <math id="S2.p4.m4" class="ltx_Math" alttext="\mathscr{P}" display="inline"><mi class="ltx_font_mathscript">𝒫︁</mi></math> is the sentence ‘<math id="S2.p4.m5" class="ltx_Math" alttext="R" display="inline"><mi>R</mi></math>’ and <math id="S2.p4.m6" class="ltx_Math" alttext="\mathscr{Q}" display="inline"><mi class="ltx_font_mathscript">𝒬︁</mi></math> is ‘<math id="S2.p4.m7" class="ltx_Math" alttext="(S\wedge T)" display="inline"><mrow><mo stretchy="false">(</mo><mrow><mi>S</mi><mo>∧</mo><mi>T</mi></mrow><mo stretchy="false">)</mo></mrow></math>’. Since <math id="S2.p4.m8" class="ltx_Math" alttext="\neg(\mathscr{P}\vee\mathscr{Q})" display="inline"><mrow><mo>¬</mo><mrow><mo stretchy="false">(</mo><mrow><mi class="ltx_font_mathscript">𝒫︁</mi><mo>∨</mo><mi class="ltx_font_mathscript">𝒬︁</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math> is equivalent to <math id="S2.p4.m9" class="ltx_Math" alttext="(\neg\mathscr{P}\wedge\neg\mathscr{Q})" display="inline"><mrow><mo stretchy="false">(</mo><mrow><mrow><mo rspace="0.167em">¬</mo><mi class="ltx_font_mathscript">𝒫︁</mi></mrow><mo>∧</mo><mrow><mo rspace="0.167em">¬</mo><mi class="ltx_font_mathscript">𝒬︁</mi></mrow></mrow><mo stretchy="false">)</mo></mrow></math> (by the second of De Morgan’s Laws) we can replace the entire sentence by <math id="S2.p4.m10" class="ltx_Math" alttext="(\neg\mathscr{P}\wedge\neg\mathscr{Q})" display="inline"><mrow><mo stretchy="false">(</mo><mrow><mrow><mo rspace="0.167em">¬</mo><mi class="ltx_font_mathscript">𝒫︁</mi></mrow><mo>∧</mo><mrow><mo rspace="0.167em">¬</mo><mi class="ltx_font_mathscript">𝒬︁</mi></mrow></mrow><mo stretchy="false">)</mo></mrow></math>. In this case (where <math id="S2.p4.m11" class="ltx_Math" alttext="\mathscr{P}" display="inline"><mi class="ltx_font_mathscript">𝒫︁</mi></math> is ‘<math id="S2.p4.m12" class="ltx_Math" alttext="R" display="inline"><mi>R</mi></math>’ and <math id="S2.p4.m13" class="ltx_Math" alttext="\mathscr{Q}" display="inline"><mi class="ltx_font_mathscript">𝒬︁</mi></math> is ‘<math id="S2.p4.m14" class="ltx_Math" alttext="(S\wedge T)" display="inline"><mrow><mo stretchy="false">(</mo><mrow><mi>S</mi><mo>∧</mo><mi>T</mi></mrow><mo stretchy="false">)</mo></mrow></math>’) we obtain ‘<math id="S2.p4.m15" class="ltx_Math" alttext="(\neg R\wedge\neg(S\wedge T))" display="inline"><mrow><mo stretchy="false">(</mo><mrow><mrow><mo rspace="0.167em">¬</mo><mi>R</mi></mrow><mo>∧</mo><mrow><mo>¬</mo><mrow><mo stretchy="false">(</mo><mrow><mi>S</mi><mo>∧</mo><mi>T</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></math>’. This new sentence contains as a part the sentence ‘<math id="S2.p4.m16" class="ltx_Math" alttext="\neg(S\wedge T)" display="inline"><mrow><mo>¬</mo><mrow><mo stretchy="false">(</mo><mrow><mi>S</mi><mo>∧</mo><mi>T</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math>’. It is of the form <math id="S2.p4.m17" class="ltx_Math" alttext="\neg(\mathscr{P}\wedge\mathscr{Q})" display="inline"><mrow><mo>¬</mo><mrow><mo stretchy="false">(</mo><mrow><mi class="ltx_font_mathscript">𝒫︁</mi><mo>∧</mo><mi class="ltx_font_mathscript">𝒬︁</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math>, except now <math id="S2.p4.m18" class="ltx_Math" alttext="\mathscr{P}" display="inline"><mi class="ltx_font_mathscript">𝒫︁</mi></math> is the sentence letter ‘<math id="S2.p4.m19" class="ltx_Math" alttext="S" display="inline"><mi>S</mi></math>’ and <math id="S2.p4.m20" class="ltx_Math" alttext="\mathscr{Q}" display="inline"><mi class="ltx_font_mathscript">𝒬︁</mi></math> is ‘<math id="S2.p4.m21" class="ltx_Math" alttext="T" display="inline"><mi>T</mi></math>’. By De Morgan’s Law (the first one this time), this is equivalent to <math id="S2.p4.m22" class="ltx_Math" alttext="(\neg\mathscr{P}\vee\neg\mathscr{Q})" display="inline"><mrow><mo stretchy="false">(</mo><mrow><mrow><mo rspace="0.167em">¬</mo><mi class="ltx_font_mathscript">𝒫︁</mi></mrow><mo>∨</mo><mrow><mo rspace="0.167em">¬</mo><mi class="ltx_font_mathscript">𝒬︁</mi></mrow></mrow><mo stretchy="false">)</mo></mrow></math>, or in this specific case, to ‘<math id="S2.p4.m23" class="ltx_Math" alttext="(\neg S\vee\neg T)" display="inline"><mrow><mo stretchy="false">(</mo><mrow><mrow><mo rspace="0.167em">¬</mo><mi>S</mi></mrow><mo>∨</mo><mrow><mo rspace="0.167em">¬</mo><mi>T</mi></mrow></mrow><mo stretchy="false">)</mo></mrow></math>’. So we can replace the part ‘<math id="S2.p4.m24" class="ltx_Math" alttext="\neg(S\wedge T)" display="inline"><mrow><mo>¬</mo><mrow><mo stretchy="false">(</mo><mrow><mi>S</mi><mo>∧</mo><mi>T</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math>’ by ‘<math id="S2.p4.m25" class="ltx_Math" alttext="(\neg S\vee\neg T)" display="inline"><mrow><mo stretchy="false">(</mo><mrow><mrow><mo rspace="0.167em">¬</mo><mi>S</mi></mrow><mo>∨</mo><mrow><mo rspace="0.167em">¬</mo><mi>T</mi></mrow></mrow><mo stretchy="false">)</mo></mrow></math>’. This now results in the sentence ‘<math id="S2.p4.m26" class="ltx_Math" alttext="(\neg R\wedge(\neg S\vee\neg T))" display="inline"><mrow><mo stretchy="false">(</mo><mrow><mrow><mo rspace="0.167em">¬</mo><mi>R</mi></mrow><mo>∧</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mo rspace="0.167em">¬</mo><mi>S</mi></mrow><mo>∨</mo><mrow><mo rspace="0.167em">¬</mo><mi>T</mi></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">)</mo></mrow></math>’, in which the ‘<math id="S2.p4.m27" class="ltx_Math" alttext="\neg" display="inline"><mo>¬</mo></math>’ symbols all attach directly to sentence letters. We’ve “pushed” the negations inwards as far as possible. We can record such a chain of equivalences by listing the individual steps, and recording, just as we do in natural deduction, which basic equivalence we use in each case:</p>
+<div id="A48.S0.EGx32" class="ltx_equationgroup ltx_eqn_align bml_equationgroup bml_equation_container ltx_align_baseline">
+<div id="Ex11" class="ltx_equation bml_equation ltx_align_baseline" role="group" aria-label="equation">
+<div class="ltx_td ltx_align_left bml_eqn_cell"><span class="ltx_text bml_border-color_000000 bml_framebox ltx_markedasmath ltx_framed ltx_framed_rectangle"><math id="Ex11.m1.m1" class="ltx_Math" alttext="\neg" display="inline"><mo>¬</mo></math>(<math id="Ex11.m1.m2" class="bml_framebox" alttext="R" display="inline"><mi>R</mi></math> <math id="Ex11.m1.m3" class="ltx_Math" alttext="\vee" display="inline"><mo>∨</mo></math><math id="Ex11.m1.m4" class="bml_framebox" alttext="(S\wedge T)" display="inline"><mrow><mo stretchy="false">(</mo><mrow><mi>S</mi><mo>∧</mo><mi>T</mi></mrow><mo stretchy="false">)</mo></mrow></math>)</span></div>
+</div>
+<div id="Ex12" class="ltx_equation bml_equation ltx_align_baseline" role="group" aria-label="equation">
+<div class="ltx_td ltx_align_left bml_eqn_cell"><span class="ltx_text bml_border-color_000000 bml_framebox ltx_markedasmath ltx_framed ltx_framed_rectangle">(<math id="Ex12.m1.m1" class="ltx_Math" alttext="\neg" display="inline"><mo>¬</mo></math>(<math id="Ex12.m1.m2" class="bml_framebox" alttext="R" display="inline"><mi>R</mi></math> <math id="Ex12.m1.m3" class="ltx_Math" alttext="\wedge" display="inline"><mo>∧</mo></math><math id="Ex12.m1.m4" class="ltx_Math" alttext="\neg" display="inline"><mo>¬</mo></math><math id="Ex12.m1.m5" class="bml_framebox" alttext="(S\wedge T)" display="inline"><mrow><mo stretchy="false">(</mo><mrow><mi>S</mi><mo>∧</mo><mi>T</mi></mrow><mo stretchy="false">)</mo></mrow></math>)</span></div>
+<div class="ltx_td ltx_align_left bml_eqn_cell"><span class="ltx_text ltx_markedasmath">DeM</span></div>
+</div>
+<div id="Ex13" class="ltx_equation bml_equation ltx_align_baseline" role="group" aria-label="equation">
+<div class="ltx_td ltx_align_left bml_eqn_cell"><math id="Ex13.m1" class="ltx_math_unparsed" alttext="\displaystyle{}(\neg(R\wedge\framebox{$\neg(\framebox{$S$}\wedge\framebox{$T$}%
+)$})" display="inline"><mrow><mo stretchy="false">(</mo><mo>¬</mo><mrow><mo stretchy="false">(</mo><mi>R</mi><mo>∧</mo><menclose class="bml_framebox" notation="box"><mrow><mo>¬</mo><mrow><mo stretchy="false">(</mo><mrow><mi class="bml_framebox">S</mi><mo>∧</mo><mi class="bml_framebox">T</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></menclose><mo stretchy="false">)</mo></mrow></mrow></math></div>
+</div>
+<div id="Ex14" class="ltx_equation bml_equation ltx_align_baseline" role="group" aria-label="equation">
+<div class="ltx_td ltx_align_left bml_eqn_cell"><math id="Ex14.m1" class="ltx_math_unparsed" alttext="\displaystyle{}(\neg(R\wedge\framebox{$(\neg\framebox{$S$}\vee\neg\framebox{$T%
+$})$})" display="inline"><mrow><mo stretchy="false">(</mo><mo>¬</mo><mrow><mo stretchy="false">(</mo><mi>R</mi><mo>∧</mo><menclose class="bml_framebox" notation="box"><mrow><mo stretchy="false">(</mo><mrow><mrow><mo rspace="0.167em">¬</mo><mi class="bml_framebox">S</mi></mrow><mo>∨</mo><mrow><mo rspace="0.167em">¬</mo><mi class="bml_framebox">T</mi></mrow></mrow><mo stretchy="false">)</mo></mrow></menclose><mo stretchy="false">)</mo></mrow></mrow></math></div>
+<div class="ltx_td ltx_align_left bml_eqn_cell"><span class="ltx_text ltx_markedasmath">DeM</span></div>
+</div>
+</div>
+<p class="ltx_p">We’ve highlighted the sentence replaced, and those matching the <math id="S2.p4.m28" class="ltx_Math" alttext="\mathscr{P}" display="inline"><mi class="ltx_font_mathscript">𝒫︁</mi></math> and <math id="S2.p4.m29" class="ltx_Math" alttext="\mathscr{Q}" display="inline"><mi class="ltx_font_mathscript">𝒬︁</mi></math> in De Morgan’s Laws for clarity, but this is not necessary, and we won’t keep doing it.</p>
+</div>
+<div id="S2.p5" class="ltx_para">
+<p class="ltx_p">In <a href="#T1" title="In 47.2 Chains of equivalences ‣ Chapter 47 Proving equivalences ‣ Part IX Metatheory ‣ forall x: Calgary" class="ltx_ref"><span class="ltx_text ltx_ref_tag">table</span> <span class="ltx_text ltx_ref_tag">47.1</span></a> we’ve given a list of basic equivalences you can use for such chains of equivalences. The labels abbreviate the customary name for the respective logical laws: double negation (DN), De Morgan (DeM), commutativity (Comm), distributivity (Dist), associativity (Assoc), idempotence (Id), and absorption (Abs).</p>
+</div>
+<figure id="T1" class="ltx_table">
+<div id="A48.S0.EGx33" class="ltx_equationgroup ltx_eqn_align bml_equationgroup bml_equation_container ltx_align_baseline">
+<div id="Ex15" class="ltx_equation bml_equation ltx_align_baseline" role="group" aria-label="equation">
+<div class="ltx_td ltx_align_right bml_eqn_cell"><math id="Ex15.m1" class="ltx_Math" alttext="\displaystyle\lnot\lnot\mathscr{P}" display="inline"><mrow><mo rspace="0.167em">¬</mo><mrow><mo rspace="0.167em">¬</mo><mi class="ltx_font_mathscript">𝒫︁</mi></mrow></mrow></math></div>
+<div class="ltx_td ltx_align_left bml_eqn_cell"><math id="Ex15.m2" class="ltx_Math" alttext="\displaystyle{}\Leftrightarrow\mathscr{P}" display="inline"><mrow><mi></mi><mo stretchy="false">⇔</mo><mi class="ltx_font_mathscript">𝒫︁</mi></mrow></math></div>
+<div class="ltx_td ltx_align_left bml_eqn_cell"><span class="ltx_text ltx_markedasmath">(DN)</span></div>
+</div>
+<div id="Ex16" class="ltx_equation bml_equation ltx_align_baseline" role="group" aria-label="equation">
+<div class="ltx_td ltx_align_right bml_eqn_cell"><math id="Ex16.m1" class="ltx_Math" alttext="\displaystyle(\mathscr{P}\rightarrow\mathscr{Q})" display="inline"><mrow><mo stretchy="false">(</mo><mrow><mi class="ltx_font_mathscript">𝒫︁</mi><mo stretchy="false">→</mo><mi class="ltx_font_mathscript">𝒬︁</mi></mrow><mo stretchy="false">)</mo></mrow></math></div>
+<div class="ltx_td ltx_align_left bml_eqn_cell"><math id="Ex16.m2" class="ltx_Math" alttext="\displaystyle{}\Leftrightarrow(\lnot\mathscr{P}\lor\mathscr{Q})" display="inline"><mrow><mi></mi><mo stretchy="false">⇔</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mo rspace="0.167em">¬</mo><mi class="ltx_font_mathscript">𝒫︁</mi></mrow><mo>∨</mo><mi class="ltx_font_mathscript">𝒬︁</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math></div>
+<div class="ltx_td ltx_align_left bml_eqn_cell"><span class="ltx_text ltx_markedasmath">(Cond)</span></div>
+</div>
+<div id="Ex17" class="ltx_equation bml_equation ltx_align_baseline" role="group" aria-label="equation">
+<div class="ltx_td ltx_align_right bml_eqn_cell"><math id="Ex17.m1" class="ltx_Math" alttext="\displaystyle\lnot(\mathscr{P}\rightarrow\mathscr{Q})" display="inline"><mrow><mo>¬</mo><mrow><mo stretchy="false">(</mo><mrow><mi class="ltx_font_mathscript">𝒫︁</mi><mo stretchy="false">→</mo><mi class="ltx_font_mathscript">𝒬︁</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math></div>
+<div class="ltx_td ltx_align_left bml_eqn_cell"><math id="Ex17.m2" class="ltx_Math" alttext="\displaystyle{}\Leftrightarrow(\mathscr{P}\land\lnot\mathscr{Q})" display="inline"><mrow><mi></mi><mo stretchy="false">⇔</mo><mrow><mo stretchy="false">(</mo><mrow><mi class="ltx_font_mathscript">𝒫︁</mi><mo>∧</mo><mrow><mo rspace="0.167em">¬</mo><mi class="ltx_font_mathscript">𝒬︁</mi></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></math></div>
+</div>
+<div id="Ex18" class="ltx_equation bml_equation ltx_align_baseline" role="group" aria-label="equation">
+<div class="ltx_td ltx_align_right bml_eqn_cell"><math id="Ex18.m1" class="ltx_Math" alttext="\displaystyle(\mathscr{P}\leftrightarrow\mathscr{Q})" display="inline"><mrow><mo stretchy="false">(</mo><mrow><mi class="ltx_font_mathscript">𝒫︁</mi><mo stretchy="false">↔</mo><mi class="ltx_font_mathscript">𝒬︁</mi></mrow><mo stretchy="false">)</mo></mrow></math></div>
+<div class="ltx_td ltx_align_left bml_eqn_cell"><math id="Ex18.m2" class="ltx_Math" alttext="\displaystyle{}\Leftrightarrow((\mathscr{P}\rightarrow\mathscr{Q})\land(%
+\mathscr{Q}\rightarrow\mathscr{P}))" display="inline"><mrow><mi></mi><mo stretchy="false">⇔</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mo stretchy="false">(</mo><mrow><mi class="ltx_font_mathscript">𝒫︁</mi><mo stretchy="false">→</mo><mi class="ltx_font_mathscript">𝒬︁</mi></mrow><mo stretchy="false">)</mo></mrow><mo>∧</mo><mrow><mo stretchy="false">(</mo><mrow><mi class="ltx_font_mathscript">𝒬︁</mi><mo stretchy="false">→</mo><mi class="ltx_font_mathscript">𝒫︁</mi></mrow><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></math></div>
+<div class="ltx_td ltx_align_left bml_eqn_cell"><span class="ltx_text ltx_markedasmath">(Bicond)</span></div>
+</div>
+<div id="Ex19" class="ltx_equation bml_equation ltx_align_baseline" role="group" aria-label="equation">
+<div class="ltx_td ltx_align_right bml_eqn_cell"><math id="Ex19.m1" class="ltx_Math" alttext="\displaystyle\lnot(\mathscr{P}\land\mathscr{Q})" display="inline"><mrow><mo>¬</mo><mrow><mo stretchy="false">(</mo><mrow><mi class="ltx_font_mathscript">𝒫︁</mi><mo>∧</mo><mi class="ltx_font_mathscript">𝒬︁</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math></div>
+<div class="ltx_td ltx_align_left bml_eqn_cell"><math id="Ex19.m2" class="ltx_Math" alttext="\displaystyle{}\Leftrightarrow(\lnot\mathscr{P}\lor\lnot\mathscr{Q})" display="inline"><mrow><mi></mi><mo stretchy="false">⇔</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mo rspace="0.167em">¬</mo><mi class="ltx_font_mathscript">𝒫︁</mi></mrow><mo>∨</mo><mrow><mo rspace="0.167em">¬</mo><mi class="ltx_font_mathscript">𝒬︁</mi></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></math></div>
+<div class="ltx_td ltx_align_left bml_eqn_cell"><span class="ltx_text ltx_markedasmath">(DeM)</span></div>
+</div>
+<div id="Ex20" class="ltx_equation bml_equation ltx_align_baseline" role="group" aria-label="equation">
+<div class="ltx_td ltx_align_right bml_eqn_cell"><math id="Ex20.m1" class="ltx_Math" alttext="\displaystyle\lnot(\mathscr{P}\lor\mathscr{Q})" display="inline"><mrow><mo>¬</mo><mrow><mo stretchy="false">(</mo><mrow><mi class="ltx_font_mathscript">𝒫︁</mi><mo>∨</mo><mi class="ltx_font_mathscript">𝒬︁</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math></div>
+<div class="ltx_td ltx_align_left bml_eqn_cell"><math id="Ex20.m2" class="ltx_Math" alttext="\displaystyle{}\Leftrightarrow(\lnot\mathscr{P}\land\lnot\mathscr{Q})" display="inline"><mrow><mi></mi><mo stretchy="false">⇔</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mo rspace="0.167em">¬</mo><mi class="ltx_font_mathscript">𝒫︁</mi></mrow><mo>∧</mo><mrow><mo rspace="0.167em">¬</mo><mi class="ltx_font_mathscript">𝒬︁</mi></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></math></div>
+</div>
+<div id="Ex21" class="ltx_equation bml_equation ltx_align_baseline" role="group" aria-label="equation">
+<div class="ltx_td ltx_align_right bml_eqn_cell"><math id="Ex21.m1" class="ltx_Math" alttext="\displaystyle(\mathscr{P}\lor\mathscr{Q})" display="inline"><mrow><mo stretchy="false">(</mo><mrow><mi class="ltx_font_mathscript">𝒫︁</mi><mo>∨</mo><mi class="ltx_font_mathscript">𝒬︁</mi></mrow><mo stretchy="false">)</mo></mrow></math></div>
+<div class="ltx_td ltx_align_left bml_eqn_cell"><math id="Ex21.m2" class="ltx_Math" alttext="\displaystyle{}\Leftrightarrow(\mathscr{Q}\lor\mathscr{P})" display="inline"><mrow><mi></mi><mo stretchy="false">⇔</mo><mrow><mo stretchy="false">(</mo><mrow><mi class="ltx_font_mathscript">𝒬︁</mi><mo>∨</mo><mi class="ltx_font_mathscript">𝒫︁</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math></div>
+<div class="ltx_td ltx_align_left bml_eqn_cell"><span class="ltx_text ltx_markedasmath">(Comm)</span></div>
+</div>
+<div id="Ex22" class="ltx_equation bml_equation ltx_align_baseline" role="group" aria-label="equation">
+<div class="ltx_td ltx_align_right bml_eqn_cell"><math id="Ex22.m1" class="ltx_Math" alttext="\displaystyle(\mathscr{P}\land\mathscr{Q})" display="inline"><mrow><mo stretchy="false">(</mo><mrow><mi class="ltx_font_mathscript">𝒫︁</mi><mo>∧</mo><mi class="ltx_font_mathscript">𝒬︁</mi></mrow><mo stretchy="false">)</mo></mrow></math></div>
+<div class="ltx_td ltx_align_left bml_eqn_cell"><math id="Ex22.m2" class="ltx_Math" alttext="\displaystyle{}\Leftrightarrow(\mathscr{Q}\land\mathscr{P})" display="inline"><mrow><mi></mi><mo stretchy="false">⇔</mo><mrow><mo stretchy="false">(</mo><mrow><mi class="ltx_font_mathscript">𝒬︁</mi><mo>∧</mo><mi class="ltx_font_mathscript">𝒫︁</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math></div>
+</div>
+<div id="Ex23" class="ltx_equation bml_equation ltx_align_baseline" role="group" aria-label="equation">
+<div class="ltx_td ltx_align_right bml_eqn_cell"><math id="Ex23.m1" class="ltx_Math" alttext="\displaystyle(\mathscr{P}\land(\mathscr{Q}\lor\mathscr{R}))" display="inline"><mrow><mo stretchy="false">(</mo><mrow><mi class="ltx_font_mathscript">𝒫︁</mi><mo>∧</mo><mrow><mo stretchy="false">(</mo><mrow><mi class="ltx_font_mathscript">𝒬︁</mi><mo>∨</mo><mi class="ltx_font_mathscript">ℛ︁</mi></mrow><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">)</mo></mrow></math></div>
+<div class="ltx_td ltx_align_left bml_eqn_cell"><math id="Ex23.m2" class="ltx_Math" alttext="\displaystyle{}\Leftrightarrow((\mathscr{P}\land\mathscr{Q})\lor(\mathscr{P}%
+\land\mathscr{R}))" display="inline"><mrow><mi></mi><mo stretchy="false">⇔</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mo stretchy="false">(</mo><mrow><mi class="ltx_font_mathscript">𝒫︁</mi><mo>∧</mo><mi class="ltx_font_mathscript">𝒬︁</mi></mrow><mo stretchy="false">)</mo></mrow><mo>∨</mo><mrow><mo stretchy="false">(</mo><mrow><mi class="ltx_font_mathscript">𝒫︁</mi><mo>∧</mo><mi class="ltx_font_mathscript">ℛ︁</mi></mrow><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></math></div>
+<div class="ltx_td ltx_align_left bml_eqn_cell"><span class="ltx_text ltx_markedasmath">(Dist)</span></div>
+</div>
+<div id="Ex24" class="ltx_equation bml_equation ltx_align_baseline" role="group" aria-label="equation">
+<div class="ltx_td ltx_align_right bml_eqn_cell"><math id="Ex24.m1" class="ltx_Math" alttext="\displaystyle(\mathscr{P}\lor(\mathscr{Q}\land\mathscr{R}))" display="inline"><mrow><mo stretchy="false">(</mo><mrow><mi class="ltx_font_mathscript">𝒫︁</mi><mo>∨</mo><mrow><mo stretchy="false">(</mo><mrow><mi class="ltx_font_mathscript">𝒬︁</mi><mo>∧</mo><mi class="ltx_font_mathscript">ℛ︁</mi></mrow><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">)</mo></mrow></math></div>
+<div class="ltx_td ltx_align_left bml_eqn_cell"><math id="Ex24.m2" class="ltx_Math" alttext="\displaystyle{}\Leftrightarrow((\mathscr{P}\lor\mathscr{Q})\land(\mathscr{P}%
+\lor\mathscr{R}))" display="inline"><mrow><mi></mi><mo stretchy="false">⇔</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mo stretchy="false">(</mo><mrow><mi class="ltx_font_mathscript">𝒫︁</mi><mo>∨</mo><mi class="ltx_font_mathscript">𝒬︁</mi></mrow><mo stretchy="false">)</mo></mrow><mo>∧</mo><mrow><mo stretchy="false">(</mo><mrow><mi class="ltx_font_mathscript">𝒫︁</mi><mo>∨</mo><mi class="ltx_font_mathscript">ℛ︁</mi></mrow><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></math></div>
+</div>
+<div id="Ex25" class="ltx_equation bml_equation ltx_align_baseline" role="group" aria-label="equation">
+<div class="ltx_td ltx_align_right bml_eqn_cell"><math id="Ex25.m1" class="ltx_Math" alttext="\displaystyle(\mathscr{P}\lor(\mathscr{Q}\lor\mathscr{R}))" display="inline"><mrow><mo stretchy="false">(</mo><mrow><mi class="ltx_font_mathscript">𝒫︁</mi><mo>∨</mo><mrow><mo stretchy="false">(</mo><mrow><mi class="ltx_font_mathscript">𝒬︁</mi><mo>∨</mo><mi class="ltx_font_mathscript">ℛ︁</mi></mrow><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">)</mo></mrow></math></div>
+<div class="ltx_td ltx_align_left bml_eqn_cell"><math id="Ex25.m2" class="ltx_Math" alttext="\displaystyle{}\Leftrightarrow((\mathscr{P}\lor\mathscr{Q})\lor\mathscr{R})" display="inline"><mrow><mi></mi><mo stretchy="false">⇔</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mo stretchy="false">(</mo><mrow><mi class="ltx_font_mathscript">𝒫︁</mi><mo>∨</mo><mi class="ltx_font_mathscript">𝒬︁</mi></mrow><mo stretchy="false">)</mo></mrow><mo>∨</mo><mi class="ltx_font_mathscript">ℛ︁</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math></div>
+<div class="ltx_td ltx_align_left bml_eqn_cell"><span class="ltx_text ltx_markedasmath">(Assoc)</span></div>
+</div>
+<div id="Ex26" class="ltx_equation bml_equation ltx_align_baseline" role="group" aria-label="equation">
+<div class="ltx_td ltx_align_right bml_eqn_cell"><math id="Ex26.m1" class="ltx_Math" alttext="\displaystyle(\mathscr{P}\land(\mathscr{Q}\land\mathscr{R}))" display="inline"><mrow><mo stretchy="false">(</mo><mrow><mi class="ltx_font_mathscript">𝒫︁</mi><mo>∧</mo><mrow><mo stretchy="false">(</mo><mrow><mi class="ltx_font_mathscript">𝒬︁</mi><mo>∧</mo><mi class="ltx_font_mathscript">ℛ︁</mi></mrow><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">)</mo></mrow></math></div>
+<div class="ltx_td ltx_align_left bml_eqn_cell"><math id="Ex26.m2" class="ltx_Math" alttext="\displaystyle{}\Leftrightarrow((\mathscr{P}\land\mathscr{Q})\land\mathscr{R})" display="inline"><mrow><mi></mi><mo stretchy="false">⇔</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mo stretchy="false">(</mo><mrow><mi class="ltx_font_mathscript">𝒫︁</mi><mo>∧</mo><mi class="ltx_font_mathscript">𝒬︁</mi></mrow><mo stretchy="false">)</mo></mrow><mo>∧</mo><mi class="ltx_font_mathscript">ℛ︁</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math></div>
+</div>
+<div id="Ex27" class="ltx_equation bml_equation ltx_align_baseline" role="group" aria-label="equation">
+<div class="ltx_td ltx_align_right bml_eqn_cell"><math id="Ex27.m1" class="ltx_Math" alttext="\displaystyle(\mathscr{P}\lor\mathscr{P})" display="inline"><mrow><mo stretchy="false">(</mo><mrow><mi class="ltx_font_mathscript">𝒫︁</mi><mo>∨</mo><mi class="ltx_font_mathscript">𝒫︁</mi></mrow><mo stretchy="false">)</mo></mrow></math></div>
+<div class="ltx_td ltx_align_left bml_eqn_cell"><math id="Ex27.m2" class="ltx_Math" alttext="\displaystyle{}\Leftrightarrow\mathscr{P}" display="inline"><mrow><mi></mi><mo stretchy="false">⇔</mo><mi class="ltx_font_mathscript">𝒫︁</mi></mrow></math></div>
+<div class="ltx_td ltx_align_left bml_eqn_cell"><span class="ltx_text ltx_markedasmath">(Id)</span></div>
+</div>
+<div id="Ex28" class="ltx_equation bml_equation ltx_align_baseline" role="group" aria-label="equation">
+<div class="ltx_td ltx_align_right bml_eqn_cell"><math id="Ex28.m1" class="ltx_Math" alttext="\displaystyle(\mathscr{P}\land\mathscr{P})" display="inline"><mrow><mo stretchy="false">(</mo><mrow><mi class="ltx_font_mathscript">𝒫︁</mi><mo>∧</mo><mi class="ltx_font_mathscript">𝒫︁</mi></mrow><mo stretchy="false">)</mo></mrow></math></div>
+<div class="ltx_td ltx_align_left bml_eqn_cell"><math id="Ex28.m2" class="ltx_Math" alttext="\displaystyle{}\Leftrightarrow\mathscr{P}" display="inline"><mrow><mi></mi><mo stretchy="false">⇔</mo><mi class="ltx_font_mathscript">𝒫︁</mi></mrow></math></div>
+</div>
+<div id="Ex29" class="ltx_equation bml_equation ltx_align_baseline" role="group" aria-label="equation">
+<div class="ltx_td ltx_align_right bml_eqn_cell"><math id="Ex29.m1" class="ltx_Math" alttext="\displaystyle(\mathscr{P}\land(\mathscr{P}\lor\mathscr{Q}))" display="inline"><mrow><mo stretchy="false">(</mo><mrow><mi class="ltx_font_mathscript">𝒫︁</mi><mo>∧</mo><mrow><mo stretchy="false">(</mo><mrow><mi class="ltx_font_mathscript">𝒫︁</mi><mo>∨</mo><mi class="ltx_font_mathscript">𝒬︁</mi></mrow><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">)</mo></mrow></math></div>
+<div class="ltx_td ltx_align_left bml_eqn_cell"><math id="Ex29.m2" class="ltx_Math" alttext="\displaystyle{}\Leftrightarrow\mathscr{P}" display="inline"><mrow><mi></mi><mo stretchy="false">⇔</mo><mi class="ltx_font_mathscript">𝒫︁</mi></mrow></math></div>
+<div class="ltx_td ltx_align_left bml_eqn_cell"><span class="ltx_text ltx_markedasmath">(Abs)</span></div>
+</div>
+<div id="Ex30" class="ltx_equation bml_equation ltx_align_baseline" role="group" aria-label="equation">
+<div class="ltx_td ltx_align_right bml_eqn_cell"><math id="Ex30.m1" class="ltx_Math" alttext="\displaystyle(\mathscr{P}\lor(\mathscr{P}\land\mathscr{Q}))" display="inline"><mrow><mo stretchy="false">(</mo><mrow><mi class="ltx_font_mathscript">𝒫︁</mi><mo>∨</mo><mrow><mo stretchy="false">(</mo><mrow><mi class="ltx_font_mathscript">𝒫︁</mi><mo>∧</mo><mi class="ltx_font_mathscript">𝒬︁</mi></mrow><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">)</mo></mrow></math></div>
+<div class="ltx_td ltx_align_left bml_eqn_cell"><math id="Ex30.m2" class="ltx_Math" alttext="\displaystyle{}\Leftrightarrow\mathscr{P}" display="inline"><mrow><mi></mi><mo stretchy="false">⇔</mo><mi class="ltx_font_mathscript">𝒫︁</mi></mrow></math></div>
+</div>
+<div id="Ex31" class="ltx_equation bml_equation ltx_align_baseline" role="group" aria-label="equation">
+<div class="ltx_td ltx_align_right bml_eqn_cell"><math id="Ex31.m1" class="ltx_Math" alttext="\displaystyle(\mathscr{P}\land(\mathscr{Q}\lor\lnot\mathscr{Q}))" display="inline"><mrow><mo stretchy="false">(</mo><mrow><mi class="ltx_font_mathscript">𝒫︁</mi><mo>∧</mo><mrow><mo stretchy="false">(</mo><mrow><mi class="ltx_font_mathscript">𝒬︁</mi><mo>∨</mo><mrow><mo rspace="0.167em">¬</mo><mi class="ltx_font_mathscript">𝒬︁</mi></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">)</mo></mrow></math></div>
+<div class="ltx_td ltx_align_left bml_eqn_cell"><math id="Ex31.m2" class="ltx_Math" alttext="\displaystyle{}\Leftrightarrow\mathscr{P}" display="inline"><mrow><mi></mi><mo stretchy="false">⇔</mo><mi class="ltx_font_mathscript">𝒫︁</mi></mrow></math></div>
+<div class="ltx_td ltx_align_left bml_eqn_cell"><span class="ltx_text ltx_markedasmath">(Simp)</span></div>
+</div>
+<div id="Ex32" class="ltx_equation bml_equation ltx_align_baseline" role="group" aria-label="equation">
+<div class="ltx_td ltx_align_right bml_eqn_cell"><math id="Ex32.m1" class="ltx_Math" alttext="\displaystyle(\mathscr{P}\lor(\mathscr{Q}\land\lnot\mathscr{Q}))" display="inline"><mrow><mo stretchy="false">(</mo><mrow><mi class="ltx_font_mathscript">𝒫︁</mi><mo>∨</mo><mrow><mo stretchy="false">(</mo><mrow><mi class="ltx_font_mathscript">𝒬︁</mi><mo>∧</mo><mrow><mo rspace="0.167em">¬</mo><mi class="ltx_font_mathscript">𝒬︁</mi></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">)</mo></mrow></math></div>
+<div class="ltx_td ltx_align_left bml_eqn_cell"><math id="Ex32.m2" class="ltx_Math" alttext="\displaystyle{}\Leftrightarrow\mathscr{P}" display="inline"><mrow><mi></mi><mo stretchy="false">⇔</mo><mi class="ltx_font_mathscript">𝒫︁</mi></mrow></math></div>
+</div>
+<div id="Ex33" class="ltx_equation bml_equation ltx_align_baseline" role="group" aria-label="equation">
+<div class="ltx_td ltx_align_right bml_eqn_cell"><math id="Ex33.m1" class="ltx_Math" alttext="\displaystyle(\mathscr{P}\lor(\mathscr{Q}\lor\lnot\mathscr{Q}))" display="inline"><mrow><mo stretchy="false">(</mo><mrow><mi class="ltx_font_mathscript">𝒫︁</mi><mo>∨</mo><mrow><mo stretchy="false">(</mo><mrow><mi class="ltx_font_mathscript">𝒬︁</mi><mo>∨</mo><mrow><mo rspace="0.167em">¬</mo><mi class="ltx_font_mathscript">𝒬︁</mi></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">)</mo></mrow></math></div>
+<div class="ltx_td ltx_align_left bml_eqn_cell"><math id="Ex33.m2" class="ltx_Math" alttext="\displaystyle{}\Leftrightarrow(\mathscr{Q}\lor\lnot\mathscr{Q})" display="inline"><mrow><mi></mi><mo stretchy="false">⇔</mo><mrow><mo stretchy="false">(</mo><mrow><mi class="ltx_font_mathscript">𝒬︁</mi><mo>∨</mo><mrow><mo rspace="0.167em">¬</mo><mi class="ltx_font_mathscript">𝒬︁</mi></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></math></div>
+</div>
+<div id="Ex34" class="ltx_equation bml_equation ltx_align_baseline" role="group" aria-label="equation">
+<div class="ltx_td ltx_align_right bml_eqn_cell"><math id="Ex34.m1" class="ltx_Math" alttext="\displaystyle(\mathscr{P}\land(\mathscr{Q}\land\lnot\mathscr{Q}))" display="inline"><mrow><mo stretchy="false">(</mo><mrow><mi class="ltx_font_mathscript">𝒫︁</mi><mo>∧</mo><mrow><mo stretchy="false">(</mo><mrow><mi class="ltx_font_mathscript">𝒬︁</mi><mo>∧</mo><mrow><mo rspace="0.167em">¬</mo><mi class="ltx_font_mathscript">𝒬︁</mi></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">)</mo></mrow></math></div>
+<div class="ltx_td ltx_align_left bml_eqn_cell"><math id="Ex34.m2" class="ltx_Math" alttext="\displaystyle{}\Leftrightarrow(\mathscr{Q}\land\lnot\mathscr{Q})" display="inline"><mrow><mi></mi><mo stretchy="false">⇔</mo><mrow><mo stretchy="false">(</mo><mrow><mi class="ltx_font_mathscript">𝒬︁</mi><mo>∧</mo><mrow><mo rspace="0.167em">¬</mo><mi class="ltx_font_mathscript">𝒬︁</mi></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></math></div>
+</div>
+</div>
+<figcaption class="ltx_caption"><span class="ltx_tag ltx_tag_table">Table 47.1: </span>Basic equivalences</figcaption>
+</figure>
+</div>
+</section>
+<section id="S3" class="ltx_section normal">
+<div class="section level2">
+<h2 class="ltx_title ltx_title_section">
+<span class="ltx_tag ltx_tag_section header-section-number">47.3</span> Finding equivalent normal forms</h2>
+
+<div id="S3.p1" class="ltx_para">
+<p class="ltx_p">In <a href="Ch45.html" title="Chapter 45 Normal forms ‣ Part IX Metatheory ‣ forall x: Calgary" class="ltx_ref"><span class="ltx_text ltx_ref_tag">chapter</span> <span class="ltx_text ltx_ref_tag">45</span></a> we showed that every sentence of TFL is equivalent to one in disjunctive normal form (DNF) and to one in conjunctive normal form (CNF). We did this by giving a method to construct a sentences in DNF or CNF equivalent to the original sentence by first constructing a truth table, and then “reading off” a sentence in DNF or CNF from the truth table. This method has two drawbacks. The first one is that the resulting sentences in DNF or CNF are not always the shortest ones. The second one is that the method itself becomes hard to apply when the sentence you start with contains more than a handful of sentence letters (since the truth table for a sentence with <math id="S3.p1.m1" class="ltx_Math" alttext="n" display="inline"><mi>n</mi></math> sentence letters has <math id="S3.p1.m2" class="ltx_Math" alttext="2^{n}" display="inline"><msup><mn>2</mn><mi>n</mi></msup></math> lines).</p>
+</div>
+<div id="S3.p2" class="ltx_para">
+<p class="ltx_p">We can use chains of equivalences as an alternative method: To find a sentence in DNF, we can successively apply basic equivalences until we have found an equivalent sentence that is in DNF. Recall the conditions a sentence in DNF must satisfy:</p>
+<ol id="S3.I1" class="ltx_enumerate">
+<li id="S3.I1.ix1" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">(<span class="ltx_text ltx_font_smallcaps">dnf1</span>)</span><div id="S3.I1.ix1.p1" class="ltx_para">​<p class="ltx_p">No connectives occur in the sentence other than negations, conjunctions and disjunctions;</p>
+</div>
+</li>
+<li id="S3.I1.ix2" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">(<span class="ltx_text ltx_font_smallcaps">dnf2</span>)</span><div id="S3.I1.ix2.p1" class="ltx_para">​<p class="ltx_p">Every occurrence of negation has minimal scope (i.e., any ‘<math id="S3.I1.ix2.p1.m1" class="ltx_Math" alttext="\neg" display="inline"><mo>¬</mo></math>’ is immediately followed by an atomic sentence);</p>
+</div>
+</li>
+<li id="S3.I1.ix3" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">(<span class="ltx_text ltx_font_smallcaps">dnf3</span>)</span><div id="S3.I1.ix3.p1" class="ltx_para">​<p class="ltx_p">No disjunction occurs within the scope of any conjunction.</p>
+</div>
+</li>
+</ol>
+<p class="ltx_p">Condition (<span class="ltx_text ltx_font_smallcaps">dnf1</span>) says that we must remove all ‘<math id="S3.p2.m1" class="ltx_Math" alttext="\rightarrow" display="inline"><mo stretchy="false">→</mo></math>’ and ‘<math id="S3.p2.m2" class="ltx_Math" alttext="\leftrightarrow" display="inline"><mo stretchy="false">↔</mo></math>’ symbols from a sentence. This is what the basic equivalences (Cond) and (Bicond) are good for. For instance, suppose we start with the sentence</p>
+<div id="A48.S0.EGx34" class="ltx_equationgroup ltx_eqn_align bml_equationgroup bml_equation_container ltx_align_baseline">
+<div id="Ex35" class="ltx_equation bml_equation ltx_align_baseline" role="group" aria-label="equation">
+<div class="ltx_td bml_eqn_cell"></div>
+<div class="ltx_td ltx_align_left bml_eqn_cell"><math id="Ex35.m1" class="ltx_Math" alttext="\displaystyle{}\neg(A\wedge\neg C)\land(\neg A\rightarrow\neg B)." display="inline"><mrow><mrow><mrow><mo>¬</mo><mrow><mo stretchy="false">(</mo><mrow><mi>A</mi><mo>∧</mo><mrow><mo rspace="0.167em">¬</mo><mi>C</mi></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow><mo>∧</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mo rspace="0.167em">¬</mo><mi>A</mi></mrow><mo stretchy="false">→</mo><mrow><mo rspace="0.167em">¬</mo><mi>B</mi></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow><mo lspace="0em">.</mo></mrow></math></div>
+</div>
+<span class="bml_intertext ltx_align_baseline">We can get rid of the ‘<math id="A48.S0.EGx34.m1" class="ltx_Math" alttext="\rightarrow" display="inline"><mo stretchy="false">→</mo></math>’ by using (Cond). In this case <math id="A48.S0.EGx34.m2" class="ltx_Math" alttext="\mathscr{P}" display="inline"><mi class="ltx_font_mathscript">𝒫︁</mi></math> is ‘<math id="A48.S0.EGx34.m3" class="ltx_Math" alttext="\neg A" display="inline"><mrow><mo rspace="0.167em">¬</mo><mi>A</mi></mrow></math>’ and <math id="A48.S0.EGx34.m4" class="ltx_Math" alttext="\mathscr{Q}" display="inline"><mi class="ltx_font_mathscript">𝒬︁</mi></math> is ‘<math id="A48.S0.EGx34.m5" class="ltx_Math" alttext="\neg{B}" display="inline"><mrow><mo rspace="0.167em">¬</mo><mi>B</mi></mrow></math>’. We get:</span>
+<div id="Ex36" class="ltx_equation bml_equation ltx_align_baseline" role="group" aria-label="equation">
+<div class="ltx_td bml_eqn_cell"></div>
+<div class="ltx_td ltx_align_left bml_eqn_cell"><math id="Ex36.m1" class="ltx_Math" alttext="\displaystyle{}\neg(A\wedge\neg C)\land(\neg\neg A\vee\neg B)" display="inline"><mrow><mrow><mo>¬</mo><mrow><mo stretchy="false">(</mo><mrow><mi>A</mi><mo>∧</mo><mrow><mo rspace="0.167em">¬</mo><mi>C</mi></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow><mo>∧</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mo rspace="0.167em">¬</mo><mrow><mo rspace="0.167em">¬</mo><mi>A</mi></mrow></mrow><mo>∨</mo><mrow><mo rspace="0.167em">¬</mo><mi>B</mi></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></math></div>
+<div class="ltx_td ltx_align_left bml_eqn_cell"><span class="ltx_text ltx_markedasmath">Cond</span></div>
+</div>
+<span class="bml_intertext ltx_align_baseline">The double negation can be removed, since ‘<math id="A48.S0.EGx34.m6" class="ltx_Math" alttext="\neg\neg A" display="inline"><mrow><mo rspace="0.167em">¬</mo><mrow><mo rspace="0.167em">¬</mo><mi>A</mi></mrow></mrow></math>’ is equivalent to ‘<math id="A48.S0.EGx34.m7" class="ltx_Math" alttext="A" display="inline"><mi>A</mi></math>’:</span>
+<div id="Ex37" class="ltx_equation bml_equation ltx_align_baseline" role="group" aria-label="equation">
+<div class="ltx_td bml_eqn_cell"></div>
+<div class="ltx_td ltx_align_left bml_eqn_cell"><math id="Ex37.m1" class="ltx_Math" alttext="\displaystyle{}\neg(A\wedge\neg C)\land(A\vee\neg B)" display="inline"><mrow><mrow><mo>¬</mo><mrow><mo stretchy="false">(</mo><mrow><mi>A</mi><mo>∧</mo><mrow><mo rspace="0.167em">¬</mo><mi>C</mi></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow><mo>∧</mo><mrow><mo stretchy="false">(</mo><mrow><mi>A</mi><mo>∨</mo><mrow><mo rspace="0.167em">¬</mo><mi>B</mi></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></math></div>
+<div class="ltx_td ltx_align_left bml_eqn_cell"><span class="ltx_text ltx_markedasmath">DN</span></div>
+</div>
+<span class="bml_intertext ltx_align_baseline">Now condition (<span class="ltx_text ltx_font_smallcaps">dnf1</span>) is satisfied: our sentence contains only ‘<math id="A48.S0.EGx34.m8" class="ltx_Math" alttext="\neg" display="inline"><mo>¬</mo></math>’, ‘<math id="A48.S0.EGx34.m9" class="ltx_Math" alttext="\wedge" display="inline"><mo>∧</mo></math>’, and ‘<math id="A48.S0.EGx34.m10" class="ltx_Math" alttext="\vee" display="inline"><mo>∨</mo></math>’. Condition (<span class="ltx_text ltx_font_smallcaps">dnf2</span>) says that we must find a way to have all ‘<math id="A48.S0.EGx34.m11" class="ltx_Math" alttext="\neg" display="inline"><mo>¬</mo></math>’s apply immediately to sentence letters. But in the first conjunct it doesn’t. To ensure (<span class="ltx_text ltx_font_smallcaps">dnf2</span>) is satisfied, we use De Morgan’s Laws and the double negation (DN) law as many times as needed.</span>
+<div id="Ex38" class="ltx_equation bml_equation ltx_align_baseline" role="group" aria-label="equation">
+<div class="ltx_td bml_eqn_cell"></div>
+<div class="ltx_td ltx_align_left bml_eqn_cell"><math id="Ex38.m1" class="ltx_Math" alttext="\displaystyle{}(\neg A\vee\neg\neg C)\land(A\vee\neg B)" display="inline"><mrow><mrow><mo stretchy="false">(</mo><mrow><mrow><mo rspace="0.167em">¬</mo><mi>A</mi></mrow><mo>∨</mo><mrow><mo rspace="0.167em">¬</mo><mrow><mo rspace="0.167em">¬</mo><mi>C</mi></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow><mo>∧</mo><mrow><mo stretchy="false">(</mo><mrow><mi>A</mi><mo>∨</mo><mrow><mo rspace="0.167em">¬</mo><mi>B</mi></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></math></div>
+<div class="ltx_td ltx_align_left bml_eqn_cell"><span class="ltx_text ltx_markedasmath">DeM</span></div>
+</div>
+<div id="Ex39" class="ltx_equation bml_equation ltx_align_baseline" role="group" aria-label="equation">
+<div class="ltx_td bml_eqn_cell"></div>
+<div class="ltx_td ltx_align_left bml_eqn_cell"><math id="Ex39.m1" class="ltx_Math" alttext="\displaystyle{}(\neg A\vee C)\land(A\vee\neg B)" display="inline"><mrow><mrow><mo stretchy="false">(</mo><mrow><mrow><mo rspace="0.167em">¬</mo><mi>A</mi></mrow><mo>∨</mo><mi>C</mi></mrow><mo stretchy="false">)</mo></mrow><mo>∧</mo><mrow><mo stretchy="false">(</mo><mrow><mi>A</mi><mo>∨</mo><mrow><mo rspace="0.167em">¬</mo><mi>B</mi></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></math></div>
+<div class="ltx_td ltx_align_left bml_eqn_cell"><span class="ltx_text ltx_markedasmath">DN</span></div>
+</div>
+<span class="bml_intertext ltx_align_baseline">The resulting sentence is now in CNF—it is a conjunction of disjunctions of sentence letters and negated sentence letters. But we want a sentence in DNF, i.e., a sentence in which (<span class="ltx_text ltx_font_smallcaps">dnf3</span>) is satisfied: no ‘<math id="A48.S0.EGx34.m12" class="ltx_Math" alttext="\vee" display="inline"><mo>∨</mo></math>’ occurs in the scope of an ‘<math id="A48.S0.EGx34.m13" class="ltx_Math" alttext="\wedge" display="inline"><mo>∧</mo></math>’. We use the distributive laws (Dist) to ensure this. The last sentence is of the form <math id="A48.S0.EGx34.m14" class="ltx_Math" alttext="\mathscr{P}\land(\mathscr{Q}\lor\mathscr{R})" display="inline"><mrow><mi class="ltx_font_mathscript">𝒫︁</mi><mo>∧</mo><mrow><mo stretchy="false">(</mo><mrow><mi class="ltx_font_mathscript">𝒬︁</mi><mo>∨</mo><mi class="ltx_font_mathscript">ℛ︁</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math>, where <math id="A48.S0.EGx34.m15" class="ltx_Math" alttext="\mathscr{P}" display="inline"><mi class="ltx_font_mathscript">𝒫︁</mi></math> is ‘<math id="A48.S0.EGx34.m16" class="ltx_Math" alttext="(\neg A\vee C)" display="inline"><mrow><mo stretchy="false">(</mo><mrow><mrow><mo rspace="0.167em">¬</mo><mi>A</mi></mrow><mo>∨</mo><mi>C</mi></mrow><mo stretchy="false">)</mo></mrow></math>’, <math id="A48.S0.EGx34.m17" class="ltx_Math" alttext="\mathscr{Q}" display="inline"><mi class="ltx_font_mathscript">𝒬︁</mi></math> is ‘<math id="A48.S0.EGx34.m18" class="ltx_Math" alttext="A" display="inline"><mi>A</mi></math>’, and <math id="A48.S0.EGx34.m19" class="ltx_Math" alttext="\mathscr{R}" display="inline"><mi class="ltx_font_mathscript">ℛ︁</mi></math> is ‘<math id="A48.S0.EGx34.m20" class="ltx_Math" alttext="\neg B" display="inline"><mrow><mo rspace="0.167em">¬</mo><mi>B</mi></mrow></math>’. By applying (Dist) once we get:</span>
+<div id="Ex40" class="ltx_equation bml_equation ltx_align_baseline" role="group" aria-label="equation">
+<div class="ltx_td bml_eqn_cell"></div>
+<div class="ltx_td ltx_align_left bml_eqn_cell"><math id="Ex40.m1" class="ltx_math_unparsed" alttext="\displaystyle{}((\neg A\vee C)\wedge A))\vee((\neg A\vee C)\wedge\neg B)" display="inline"><mrow><mrow><mo stretchy="false">(</mo><mrow><mo stretchy="false">(</mo><mo rspace="0.167em">¬</mo><mi>A</mi><mo>∨</mo><mi>C</mi><mo stretchy="false">)</mo></mrow><mo>∧</mo><mi>A</mi><mo stretchy="false">)</mo></mrow><mo stretchy="false">)</mo><mo>∨</mo><mo stretchy="false">(</mo><mrow><mo stretchy="false">(</mo><mo rspace="0.167em">¬</mo><mi>A</mi><mo>∨</mo><mi>C</mi><mo stretchy="false">)</mo></mrow><mo>∧</mo><mo rspace="0.167em">¬</mo><mi>B</mi><mo stretchy="false">)</mo></mrow></math></div>
+<div class="ltx_td ltx_align_left bml_eqn_cell"><span class="ltx_text ltx_markedasmath">Dist</span></div>
+</div>
+<span class="bml_intertext ltx_align_baseline">This looks worse, but if we keep going, it’s going to look better! The two disjuncts almost look like we can apply (Dist) again, except the ‘<math id="A48.S0.EGx34.m21" class="ltx_Math" alttext="\vee" display="inline"><mo>∨</mo></math>’ is on the wrong side. This is what commutativity (Comm) is good for. let’s apply it to ‘<math id="A48.S0.EGx34.m22" class="ltx_Math" alttext="(\neg A\vee C)\wedge A" display="inline"><mrow><mrow><mo stretchy="false">(</mo><mrow><mrow><mo rspace="0.167em">¬</mo><mi>A</mi></mrow><mo>∨</mo><mi>C</mi></mrow><mo stretchy="false">)</mo></mrow><mo>∧</mo><mi>A</mi></mrow></math>’:</span>
+<div id="Ex41" class="ltx_equation bml_equation ltx_align_baseline" role="group" aria-label="equation">
+<div class="ltx_td bml_eqn_cell"></div>
+<div class="ltx_td ltx_align_left bml_eqn_cell"><math id="Ex41.m1" class="ltx_Math" alttext="\displaystyle{}(A\wedge(\neg A\vee C))\vee((\neg A\vee C)\wedge\neg B)" display="inline"><mrow><mrow><mo stretchy="false">(</mo><mrow><mi>A</mi><mo>∧</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mo rspace="0.167em">¬</mo><mi>A</mi></mrow><mo>∨</mo><mi>C</mi></mrow><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">)</mo></mrow><mo>∨</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mo stretchy="false">(</mo><mrow><mrow><mo rspace="0.167em">¬</mo><mi>A</mi></mrow><mo>∨</mo><mi>C</mi></mrow><mo stretchy="false">)</mo></mrow><mo>∧</mo><mrow><mo rspace="0.167em">¬</mo><mi>B</mi></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></math></div>
+<div class="ltx_td ltx_align_left bml_eqn_cell"><span class="ltx_text ltx_markedasmath">Comm</span></div>
+</div>
+<span class="bml_intertext ltx_align_baseline">We can apply (Dist) again to the resulting part, ‘<math id="A48.S0.EGx34.m23" class="ltx_Math" alttext="A\wedge(\neg A\vee C)" display="inline"><mrow><mi>A</mi><mo>∧</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mo rspace="0.167em">¬</mo><mi>A</mi></mrow><mo>∨</mo><mi>C</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math>’:</span>
+<div id="Ex42" class="ltx_equation bml_equation ltx_align_baseline" role="group" aria-label="equation">
+<div class="ltx_td bml_eqn_cell"></div>
+<div class="ltx_td ltx_align_left bml_eqn_cell"><math id="Ex42.m1" class="ltx_Math" alttext="\displaystyle{}((A\wedge\neg A)\vee(A\wedge C))\vee((\neg A\vee C)\wedge\neg B)" display="inline"><mrow><mrow><mo stretchy="false">(</mo><mrow><mrow><mo stretchy="false">(</mo><mrow><mi>A</mi><mo>∧</mo><mrow><mo rspace="0.167em">¬</mo><mi>A</mi></mrow></mrow><mo stretchy="false">)</mo></mrow><mo>∨</mo><mrow><mo stretchy="false">(</mo><mrow><mi>A</mi><mo>∧</mo><mi>C</mi></mrow><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">)</mo></mrow><mo>∨</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mo stretchy="false">(</mo><mrow><mrow><mo rspace="0.167em">¬</mo><mi>A</mi></mrow><mo>∨</mo><mi>C</mi></mrow><mo stretchy="false">)</mo></mrow><mo>∧</mo><mrow><mo rspace="0.167em">¬</mo><mi>B</mi></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></math></div>
+<div class="ltx_td ltx_align_left bml_eqn_cell"><span class="ltx_text ltx_markedasmath">Dist</span></div>
+</div>
+<span class="bml_intertext ltx_align_baseline">Now in the left half, no ‘<math id="A48.S0.EGx34.m24" class="ltx_Math" alttext="\vee" display="inline"><mo>∨</mo></math>’ is in the scope of an ‘<math id="A48.S0.EGx34.m25" class="ltx_Math" alttext="\wedge" display="inline"><mo>∧</mo></math>’. Let’s apply the same principles to the right half:</span>
+<div id="Ex43" class="ltx_equation bml_equation ltx_align_baseline" role="group" aria-label="equation">
+<div class="ltx_td bml_eqn_cell"></div>
+<div class="ltx_td ltx_align_left bml_eqn_cell"><math id="Ex43.m1" class="ltx_Math" alttext="\displaystyle{}((A\wedge\neg A)\vee(A\wedge C))\vee(\neg B\wedge(\neg A\vee C))" display="inline"><mrow><mrow><mo stretchy="false">(</mo><mrow><mrow><mo stretchy="false">(</mo><mrow><mi>A</mi><mo>∧</mo><mrow><mo rspace="0.167em">¬</mo><mi>A</mi></mrow></mrow><mo stretchy="false">)</mo></mrow><mo>∨</mo><mrow><mo stretchy="false">(</mo><mrow><mi>A</mi><mo>∧</mo><mi>C</mi></mrow><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">)</mo></mrow><mo>∨</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mo rspace="0.167em">¬</mo><mi>B</mi></mrow><mo>∧</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mo rspace="0.167em">¬</mo><mi>A</mi></mrow><mo>∨</mo><mi>C</mi></mrow><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></math></div>
+<div class="ltx_td ltx_align_left bml_eqn_cell"><span class="ltx_text ltx_markedasmath">Comm</span></div>
+</div>
+<div id="Ex44" class="ltx_equation bml_equation ltx_align_baseline" role="group" aria-label="equation">
+<div class="ltx_td bml_eqn_cell"></div>
+<div class="ltx_td ltx_align_left bml_eqn_cell"><math id="Ex44.m1" class="ltx_Math" alttext="\displaystyle{}((A\wedge\neg A)\vee(A\wedge C))\vee((\neg B\wedge\neg A)\vee(%
+\neg B\wedge C))" display="inline"><mrow><mrow><mo stretchy="false">(</mo><mrow><mrow><mo stretchy="false">(</mo><mrow><mi>A</mi><mo>∧</mo><mrow><mo rspace="0.167em">¬</mo><mi>A</mi></mrow></mrow><mo stretchy="false">)</mo></mrow><mo>∨</mo><mrow><mo stretchy="false">(</mo><mrow><mi>A</mi><mo>∧</mo><mi>C</mi></mrow><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">)</mo></mrow><mo>∨</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mo stretchy="false">(</mo><mrow><mrow><mo rspace="0.167em">¬</mo><mi>B</mi></mrow><mo>∧</mo><mrow><mo rspace="0.167em">¬</mo><mi>A</mi></mrow></mrow><mo stretchy="false">)</mo></mrow><mo>∨</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mo rspace="0.167em">¬</mo><mi>B</mi></mrow><mo>∧</mo><mi>C</mi></mrow><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></math></div>
+<div class="ltx_td ltx_align_left bml_eqn_cell"><span class="ltx_text ltx_markedasmath">Dist</span></div>
+</div>
+<span class="bml_intertext ltx_align_baseline">Our sentence is now in DNF! But we can simplify it a bit: ‘<math id="A48.S0.EGx34.m26" class="ltx_Math" alttext="(A\wedge\neg A)" display="inline"><mrow><mo stretchy="false">(</mo><mrow><mi>A</mi><mo>∧</mo><mrow><mo rspace="0.167em">¬</mo><mi>A</mi></mrow></mrow><mo stretchy="false">)</mo></mrow></math>’ is a contradiction in TFL, i.e., it is always false. And if you combine something that’s always false using ‘<math id="A48.S0.EGx34.m27" class="ltx_Math" alttext="\vee" display="inline"><mo>∨</mo></math>’ with a sentence <math id="A48.S0.EGx34.m28" class="ltx_Math" alttext="\mathscr{P}" display="inline"><mi class="ltx_font_mathscript">𝒫︁</mi></math>, you get something equivalent to just <math id="A48.S0.EGx34.m29" class="ltx_Math" alttext="\mathscr{P}" display="inline"><mi class="ltx_font_mathscript">𝒫︁</mi></math>. This is the second of the simplification (Simp) rules.</span>
+<div id="Ex45" class="ltx_equation bml_equation ltx_align_baseline" role="group" aria-label="equation">
+<div class="ltx_td bml_eqn_cell"></div>
+<div class="ltx_td ltx_align_left bml_eqn_cell"><math id="Ex45.m1" class="ltx_Math" alttext="\displaystyle{}((A\wedge C)\vee(A\wedge\neg A))\vee((\neg B\wedge\neg A)\vee(%
+\neg B\wedge C))" display="inline"><mrow><mrow><mo stretchy="false">(</mo><mrow><mrow><mo stretchy="false">(</mo><mrow><mi>A</mi><mo>∧</mo><mi>C</mi></mrow><mo stretchy="false">)</mo></mrow><mo>∨</mo><mrow><mo stretchy="false">(</mo><mrow><mi>A</mi><mo>∧</mo><mrow><mo rspace="0.167em">¬</mo><mi>A</mi></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">)</mo></mrow><mo>∨</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mo stretchy="false">(</mo><mrow><mrow><mo rspace="0.167em">¬</mo><mi>B</mi></mrow><mo>∧</mo><mrow><mo rspace="0.167em">¬</mo><mi>A</mi></mrow></mrow><mo stretchy="false">)</mo></mrow><mo>∨</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mo rspace="0.167em">¬</mo><mi>B</mi></mrow><mo>∧</mo><mi>C</mi></mrow><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></math></div>
+<div class="ltx_td ltx_align_left bml_eqn_cell"><span class="ltx_text ltx_markedasmath">Comm</span></div>
+</div>
+<div id="Ex46" class="ltx_equation bml_equation ltx_align_baseline" role="group" aria-label="equation">
+<div class="ltx_td bml_eqn_cell"></div>
+<div class="ltx_td ltx_align_left bml_eqn_cell"><math id="Ex46.m1" class="ltx_Math" alttext="\displaystyle{}(A\wedge C)\vee((\neg B\wedge\neg A)\vee(\neg B\wedge C))" display="inline"><mrow><mrow><mo stretchy="false">(</mo><mrow><mi>A</mi><mo>∧</mo><mi>C</mi></mrow><mo stretchy="false">)</mo></mrow><mo>∨</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mo stretchy="false">(</mo><mrow><mrow><mo rspace="0.167em">¬</mo><mi>B</mi></mrow><mo>∧</mo><mrow><mo rspace="0.167em">¬</mo><mi>A</mi></mrow></mrow><mo stretchy="false">)</mo></mrow><mo>∨</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mo rspace="0.167em">¬</mo><mi>B</mi></mrow><mo>∧</mo><mi>C</mi></mrow><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></math></div>
+<div class="ltx_td ltx_align_left bml_eqn_cell"><span class="ltx_text ltx_markedasmath">Simp</span></div>
+</div>
+</div>
+<p class="ltx_p">The final result is still in DNF, but a bit simpler still. It is also much simpler than the DNF we would have obtained by the method of <a href="Ch45.html" title="Chapter 45 Normal forms ‣ Part IX Metatheory ‣ forall x: Calgary" class="ltx_ref"><span class="ltx_text ltx_ref_tag">chapter</span> <span class="ltx_text ltx_ref_tag">45</span></a>. In fact, the sentence we started with could have been the <math id="S3.p2.m3" class="ltx_Math" alttext="\mathscr{S}" display="inline"><mi class="ltx_font_mathscript">𝒮︁</mi></math> of <a href="Ch45.html#S2" title="45.2 Proof of DNF Theorem via truth tables ‣ Chapter 45 Normal forms ‣ Part IX Metatheory ‣ forall x: Calgary" class="ltx_ref"><span class="ltx_text ltx_ref_tag">section</span> <span class="ltx_text ltx_ref_tag">45.2</span></a>—it has exactly the truth table used as an example there. The DNF we found there (in section <a href="Ch45.html#S2" title="45.2 Proof of DNF Theorem via truth tables ‣ Chapter 45 Normal forms ‣ Part IX Metatheory ‣ forall x: Calgary" class="ltx_ref"><span class="ltx_text ltx_ref_tag">section</span> <span class="ltx_text ltx_ref_tag">45.2</span></a>), was (with all necessary brackets):</p>
+<div id="Ex47" class="ltx_equation bml_equation bml_equation_container ltx_align_baseline">
+<div class="ltx_Math bml_eqn_cell ltx_align_center"><math id="Ex47.m1" class="ltx_Math" alttext="((((A\wedge B)\wedge C)\vee((A\wedge\neg B)\wedge C))\vee((\neg A\wedge\neg B)%
+\wedge C))\vee((\neg A\wedge\neg B)\wedge\neg C)" display="block"><mrow><mrow><mo stretchy="false">(</mo><mrow><mrow><mo stretchy="false">(</mo><mrow><mrow><mo stretchy="false">(</mo><mrow><mrow><mo stretchy="false">(</mo><mrow><mi>A</mi><mo>∧</mo><mi>B</mi></mrow><mo stretchy="false">)</mo></mrow><mo>∧</mo><mi>C</mi></mrow><mo stretchy="false">)</mo></mrow><mo>∨</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mo stretchy="false">(</mo><mrow><mi>A</mi><mo>∧</mo><mrow><mo rspace="0.167em">¬</mo><mi>B</mi></mrow></mrow><mo stretchy="false">)</mo></mrow><mo>∧</mo><mi>C</mi></mrow><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">)</mo></mrow><mo>∨</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mo stretchy="false">(</mo><mrow><mrow><mo rspace="0.167em">¬</mo><mi>A</mi></mrow><mo>∧</mo><mrow><mo rspace="0.167em">¬</mo><mi>B</mi></mrow></mrow><mo stretchy="false">)</mo></mrow><mo>∧</mo><mi>C</mi></mrow><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">)</mo></mrow><mo>∨</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mo stretchy="false">(</mo><mrow><mrow><mo rspace="0.167em">¬</mo><mi>A</mi></mrow><mo>∧</mo><mrow><mo rspace="0.167em">¬</mo><mi>B</mi></mrow></mrow><mo stretchy="false">)</mo></mrow><mo>∧</mo><mrow><mo rspace="0.167em">¬</mo><mi>C</mi></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></math></div>
+</div>
+</div>
+</div>
+</section>
+<section id="Sx1" class="ltx_section normal">
+<div class="section level2">
+<h2 class="ltx_title ltx_title_section">Practice exercises</h2>
+
+<div id="Sx1.p1" class="ltx_para ltx_noindent">
+<p class="ltx_p"><span class="ltx_text ltx_font_bold">A. </span>
+Consider the following sentences:</p>
+<ol id="Sx1.I2" class="ltx_enumerate">
+<li id="Sx1.I2.i1" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">1.</span><div id="Sx1.I2.i1.p1" class="ltx_para">​<p class="ltx_p"><math id="Sx1.I2.i1.p1.m1" class="ltx_Math" alttext="(A\rightarrow\neg B)" display="inline"><mrow><mo stretchy="false">(</mo><mrow><mi>A</mi><mo stretchy="false">→</mo><mrow><mo rspace="0.167em">¬</mo><mi>B</mi></mrow></mrow><mo stretchy="false">)</mo></mrow></math></p>
+</div>
+</li>
+<li id="Sx1.I2.i2" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">2.</span><div id="Sx1.I2.i2.p1" class="ltx_para">​<p class="ltx_p"><math id="Sx1.I2.i2.p1.m1" class="ltx_math_unparsed" alttext="\neg(A\leftrightarrow B)" display="inline"><mrow><mo>¬</mo><mrow><mo stretchy="false">(</mo><mi>A</mi><mo stretchy="false">↔</mo><mi>B</mi><mo stretchy="false">)</mo></mrow></mrow></math></p>
+</div>
+</li>
+<li id="Sx1.I2.i3" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">3.</span><div id="Sx1.I2.i3.p1" class="ltx_para">​<p class="ltx_p"><math id="Sx1.I2.i3.p1.m1" class="ltx_Math" alttext="(\neg A\vee\neg(A\wedge B))" display="inline"><mrow><mo stretchy="false">(</mo><mrow><mrow><mo rspace="0.167em">¬</mo><mi>A</mi></mrow><mo>∨</mo><mrow><mo>¬</mo><mrow><mo stretchy="false">(</mo><mrow><mi>A</mi><mo>∧</mo><mi>B</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></math></p>
+</div>
+</li>
+<li id="Sx1.I2.i4" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">4.</span><div id="Sx1.I2.i4.p1" class="ltx_para">​<p class="ltx_p"><math id="Sx1.I2.i4.p1.m1" class="ltx_Math" alttext="(\neg(A\rightarrow B)\wedge(A\rightarrow C))" display="inline"><mrow><mo stretchy="false">(</mo><mrow><mrow><mo>¬</mo><mrow><mo stretchy="false">(</mo><mrow><mi>A</mi><mo stretchy="false">→</mo><mi>B</mi></mrow><mo stretchy="false">)</mo></mrow></mrow><mo>∧</mo><mrow><mo stretchy="false">(</mo><mrow><mi>A</mi><mo stretchy="false">→</mo><mi>C</mi></mrow><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">)</mo></mrow></math></p>
+</div>
+</li>
+<li id="Sx1.I2.i5" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">5.</span><div id="Sx1.I2.i5.p1" class="ltx_para">​<p class="ltx_p"><math id="Sx1.I2.i5.p1.m1" class="ltx_Math" alttext="(\neg(A\vee B)\leftrightarrow((\neg C\wedge\neg A)\rightarrow\neg B))" display="inline"><mrow><mo stretchy="false">(</mo><mrow><mrow><mo>¬</mo><mrow><mo stretchy="false">(</mo><mrow><mi>A</mi><mo>∨</mo><mi>B</mi></mrow><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">↔</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mo stretchy="false">(</mo><mrow><mrow><mo rspace="0.167em">¬</mo><mi>C</mi></mrow><mo>∧</mo><mrow><mo rspace="0.167em">¬</mo><mi>A</mi></mrow></mrow><mo stretchy="false">)</mo></mrow><mo stretchy="false">→</mo><mrow><mo rspace="0.167em">¬</mo><mi>B</mi></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">)</mo></mrow></math></p>
+</div>
+</li>
+<li id="Sx1.I2.i6" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">6.</span><div id="Sx1.I2.i6.p1" class="ltx_para">​<p class="ltx_p"><math id="Sx1.I2.i6.p1.m1" class="ltx_Math" alttext="((\neg(A\wedge\neg B)\rightarrow C)\wedge\neg(A\wedge D))" display="inline"><mrow><mo stretchy="false">(</mo><mrow><mrow><mo stretchy="false">(</mo><mrow><mrow><mo>¬</mo><mrow><mo stretchy="false">(</mo><mrow><mi>A</mi><mo>∧</mo><mrow><mo rspace="0.167em">¬</mo><mi>B</mi></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">→</mo><mi>C</mi></mrow><mo stretchy="false">)</mo></mrow><mo>∧</mo><mrow><mo>¬</mo><mrow><mo stretchy="false">(</mo><mrow><mi>A</mi><mo>∧</mo><mi>D</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></math></p>
+</div>
+</li>
+</ol>
+<p class="ltx_p">For each sentence, find an equivalent sentence in DNF and one in CNF by giving a chain of equivalences. Use (Id), (Abs), and (Simp) to simplify your sentences as much as possible.</p>
+</div>
+</div>
+</section>
+</div>
+</section>
+</div>
+</div>
+</div>
+<a href="Ch46.html" class="navigation navigation-prev" aria-label="Previous page"><i class="fa fa-angle-left"></i></a><a href="Ch48.html" class="navigation navigation-next" aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+</div>
+</div>
+</body>
+
+</html>

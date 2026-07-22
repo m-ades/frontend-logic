@@ -8,6 +8,12 @@ import { ACTIVITY_TYPES } from '../placeholder/courseActivities.js'
 import { fetchJson } from '../utils/api.js'
 import { compareSubchapterLabels, sortAssignmentsBySubchapter } from '../utils/assignmentSort.js'
 import { useAppRuntime } from '../hooks/useAppRuntime.js'
+import { useTextbookPracticeLinks } from '../hooks/useTextbookPracticeLinks.js'
+import {
+  linksForPracticeId,
+  primarySectionIdForPractice,
+  primaryTextbookSlugForPractice,
+} from '../components/textbook/textbookPracticeLinks.js'
 
 const buildCourseStructure = (assignments, sectionTitle) => {
   const chapters = new Map()
@@ -65,9 +71,11 @@ export default function Practice() {
     isSandbox,
     assignmentPath,
     practicePath,
+    textbookChapterPath,
     sandbox: sandboxData,
     activeCourseId,
   } = useAppRuntime()
+  const { resolvedLinks } = useTextbookPracticeLinks()
   const courseIdForApi = isSandbox ? null : (activeCourseId ?? null)
 
   const practiceQuery = useQuery({
@@ -106,8 +114,14 @@ export default function Practice() {
 
   const handleActivityClick = (activity) => {
     if (activity.worksheet) {
-      navigate(assignmentPath(activity.worksheet.id), {
-        state: { returnTo: practicePath }
+      const practiceId = activity.worksheet.id
+      const textbookSlug = primaryTextbookSlugForPractice(resolvedLinks, practiceId)
+      navigate(assignmentPath(practiceId), {
+        state: {
+          returnTo: practicePath,
+          textbookSlug: textbookSlug || undefined,
+          textbookSectionId: primarySectionIdForPractice(resolvedLinks, practiceId) || undefined,
+        },
       })
     }
   }
@@ -196,6 +210,22 @@ export default function Practice() {
                           {completedQuestions}/{totalQuestions}
                         </Typography>
                       </Stack>
+                    )}
+                    {linksForPracticeId(resolvedLinks, activity.id).length > 0 && (
+                      <Chip
+                        label={primaryTextbookSlugForPractice(resolvedLinks, activity.id) || 'Textbook'}
+                        size="small"
+                        variant="outlined"
+                        color="secondary"
+                        onClick={(event) => {
+                          event.stopPropagation()
+                          const slug = primaryTextbookSlugForPractice(resolvedLinks, activity.id)
+                          if (slug && textbookChapterPath) {
+                            navigate(textbookChapterPath(slug))
+                          }
+                        }}
+                        sx={{ alignSelf: { xs: 'flex-start', md: 'flex-end' } }}
+                      />
                     )}
                     <Chip
                       label="Practice"

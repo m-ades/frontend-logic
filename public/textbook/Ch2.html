@@ -1,0 +1,643 @@
+<!DOCTYPE html><html style="--bml-ltx-font-size:10;" class="bml_mathjax4" lang="en">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<title>Chapter 2 The scope of logic ‣ Part I Key notions of logic ‣ forall x: Calgary</title>
+<!--Generated on Tue Jul 21 20:13:15 2026 by LaTeXML (version 0.8.8) http://dlmf.nist.gov/LaTeXML/.-->
+<!--Document created on Fall 2025 (2026‐07‐18 8642250).-->
+
+<link rel="stylesheet" href="LaTeXML.css" type="text/css">
+<link rel="stylesheet" href="ltx-book.css" type="text/css">
+<link rel="stylesheet" href="bookml/gitbook/css/style.css" type="text/css">
+<link rel="stylesheet" href="bookml/gitbook/css/plugin-table.css" type="text/css">
+<link rel="stylesheet" href="bookml/gitbook/css/plugin-search.css" type="text/css">
+<link rel="stylesheet" href="bookml/gitbook/css/plugin-bookdown.css" type="text/css">
+<link rel="stylesheet" href="bookml/gitbook/css/plugin-fontsettings.css" type="text/css">
+<link rel="stylesheet" href="bookml/CSS/style.css" type="text/css">
+<link rel="stylesheet" href="bookml/CSS/style.gitbook,plain.css" type="text/css">
+<link rel="stylesheet" href="bookml/CSS/style.gitbook.css" type="text/css">
+<link rel="stylesheet" href="bmluser/colors.gitbook-forallxyyc-html.css" type="text/css">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<link rel="stylesheet" href="forallxyyc.css" type="text/css">
+<link rel="stylesheet" href="fitchml.css" type="text/css">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script><script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6"></script>
+<link rel="up" href="Pt1.html" title="Part I Key notions of logic ‣ forall x: Calgary">
+<link rel="up up" href="index.html" title="forall x: Calgary">
+<link rel="start" href="index.html" title="forall x: Calgary">
+<link rel="prev" href="Ch1.html" title="Chapter 1 Arguments ‣ Part I Key notions of logic ‣ forall x: Calgary">
+<link rel="next" href="Ch3.html" title="Chapter 3 Other logical notions ‣ Part I Key notions of logic ‣ forall x: Calgary">
+<link rel="chapter" href="Ch1.html" title="Chapter 1 Arguments ‣ Part I Key notions of logic ‣ forall x: Calgary">
+<link rel="chapter" href="Ch3.html" title="Chapter 3 Other logical notions ‣ Part I Key notions of logic ‣ forall x: Calgary">
+<link rel="chapter" href="Chx1.html" title="Preface ‣ forall x: Calgary">
+<link rel="part" href="Pt1.html" title="Part I Key notions of logic ‣ forall x: Calgary">
+<link rel="part" href="Pt2.html" title="Part II Truth-functional logic ‣ forall x: Calgary">
+<link rel="part" href="Pt3.html" title="Part III Truth tables ‣ forall x: Calgary">
+<link rel="part" href="Pt4.html" title="Part IV Natural deduction for TFL ‣ forall x: Calgary">
+<link rel="part" href="Pt5.html" title="Part V First-order logic ‣ forall x: Calgary">
+<link rel="part" href="Pt6.html" title="Part VI Interpretations ‣ forall x: Calgary">
+<link rel="part" href="Pt7.html" title="Part VII Natural deduction for FOL ‣ forall x: Calgary">
+<link rel="part" href="Pt8.html" title="Part VIII Modal logic ‣ forall x: Calgary">
+<link rel="part" href="Pt9.html" title="Part IX Metatheory ‣ forall x: Calgary">
+<link rel="part" href="Ptx1.html" title="Appendices ‣ forall x: Calgary">
+<link rel="part" href="Ptx2.html" title="Solutions to selected exercices ‣ forall x: Calgary">
+<script src="bookml/js/mathjax4.js" defer></script>
+</head>
+<body class="bml_class_book">
+<div class="book without-animation font-size-2 font-family-1" data-basepath=".">
+<a href="#bml-main-content" tabindex="0" class="bml-skip-to-content">Skip to content.</a>
+<div class="book-summary"><nav class="ltx_page_navbar">
+<ul class="ltx_toclist summary">
+<li>
+<a href="index.html" title="" class="ltx_ref" rel="start">forall x: Calgary</a>
+</li>
+<li class="divider" aria-hidden="true"></li>
+<li data-level="" data-path="Chx1.html" class="ltx_tocentry ltx_tocentry_chapter  chapter "><a href="Chx1.html" title="In forall x: Calgary" class="ltx_ref">Preface</a></li>
+<li data-level="I" data-path="Pt1.html" class="ltx_tocentry ltx_tocentry_part  chapter ">
+<a href="Pt1.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">I </span></b>Key notions of logic</a>
+<ol class="ltx_toclist ltx_toclist_part">
+<li data-level="1" data-path="Ch1.html" class="ltx_tocentry ltx_tocentry_chapter  chapter "><a href="Ch1.html" title="In Part I Key notions of logic ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">1 </span></b>Arguments</a></li>
+<li data-level="2" data-path="" class="ltx_tocentry ltx_tocentry_chapter ltx_ref_self  chapter active">
+<a href="" title="In Part I Key notions of logic ‣ forall x: Calgary" aria-current="page" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">2 </span></b>The scope of logic</a>
+<ol class="ltx_toclist ltx_toclist_chapter">
+<li data-level="2.1" data-path="" class="ltx_tocentry ltx_tocentry_section  chapter "><a href="#S1" title="In Chapter 2 The scope of logic ‣ Part I Key notions of logic ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">2.1 </span></b>Consequence and validity</a></li>
+<li data-level="2.2" data-path="" class="ltx_tocentry ltx_tocentry_section  chapter "><a href="#S2" title="In Chapter 2 The scope of logic ‣ Part I Key notions of logic ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">2.2 </span></b>Cases and types of validity</a></li>
+<li data-level="2.3" data-path="" class="ltx_tocentry ltx_tocentry_section  chapter "><a href="#S3" title="In Chapter 2 The scope of logic ‣ Part I Key notions of logic ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">2.3 </span></b>Formal validity</a></li>
+<li data-level="2.4" data-path="" class="ltx_tocentry ltx_tocentry_section  chapter "><a href="#S4" title="In Chapter 2 The scope of logic ‣ Part I Key notions of logic ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">2.4 </span></b>Sound arguments</a></li>
+<li data-level="2.5" data-path="" class="ltx_tocentry ltx_tocentry_section  chapter "><a href="#S5" title="In Chapter 2 The scope of logic ‣ Part I Key notions of logic ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">2.5 </span></b>Inductive arguments</a></li>
+<li data-level="" data-path="" class="ltx_tocentry ltx_tocentry_section  chapter "><a href="#Sx1" title="In Chapter 2 The scope of logic ‣ Part I Key notions of logic ‣ forall x: Calgary" class="ltx_ref">Practice exercises</a></li>
+</ol>
+</li>
+<li data-level="3" data-path="Ch3.html" class="ltx_tocentry ltx_tocentry_chapter  chapter "><a href="Ch3.html" title="In Part I Key notions of logic ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">3 </span></b>Other logical notions</a></li>
+</ol>
+</li>
+<li data-level="II" data-path="Pt2.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt2.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">II </span></b>Truth-functional logic</a></li>
+<li data-level="III" data-path="Pt3.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt3.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">III </span></b>Truth tables</a></li>
+<li data-level="IV" data-path="Pt4.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt4.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">IV </span></b>Natural deduction for TFL</a></li>
+<li data-level="V" data-path="Pt5.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt5.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">V </span></b>First-order logic</a></li>
+<li data-level="VI" data-path="Pt6.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt6.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">VI </span></b>Interpretations</a></li>
+<li data-level="VII" data-path="Pt7.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt7.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">VII </span></b>Natural deduction for FOL</a></li>
+<li data-level="VIII" data-path="Pt8.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt8.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">VIII </span></b>Modal logic</a></li>
+<li data-level="IX" data-path="Pt9.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt9.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">IX </span></b>Metatheory</a></li>
+<li data-level="" data-path="Ptx1.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Ptx1.html" title="In forall x: Calgary" class="ltx_ref">Appendices</a></li>
+<li data-level="" data-path="Ptx2.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Ptx2.html" title="In forall x: Calgary" class="ltx_ref">Solutions to selected exercices</a></li>
+</ul>
+</nav></div>
+
+<div class="ltx_page_main book-body fixed">
+<div class="body-inner">
+<header class="book-header fixed" aria-label="toolbar"><span class="bml-separator"></span></header>
+<div class="page-wrapper" tabindex="-1" role="main">
+<div class="ltx_page_content page-inner" id="bml-main-content">
+<script src="bookml/gitbook/js/app.min.js"></script>
+<script src="bookml/gitbook/js/jquery.highlight.js"></script>
+<script src="bookml/gitbook/js/plugin-search.js"></script>
+<script src="bookml/gitbook/js/plugin-fontsettings.js"></script>
+<script src="bookml/gitbook/js/plugin-bookdown.js"></script>
+<script type="text/javascript">
+                  gitbook.require(["gitbook"], function(gitbook) {
+                  gitbook.start({
+                    "fontsettings": {
+                      "theme": "white",
+                      "family": "sans",
+                      "size": 2
+                    },
+                    "download": [ [ "forallxyyc.pdf", "PDF" ], [ "forallxyyc-accessible.pdf", "PDF (accessible)" ], ],
+                    "search": {
+                      "engine": "fuse"
+                    },
+                    "toc": {
+                      "collapse": "none"
+                    }
+                  });
+                });
+              </script>
+
+<section class="ltx_chapter ltx_authors_1line normal" lang="en">
+<div class="section level1">
+<h1 class="ltx_title ltx_title_chapter">
+<span class="ltx_tag ltx_tag_chapter header-section-number">Chapter 2</span> The scope of logic</h1>
+
+<section id="S1" class="ltx_section normal">
+<div class="section level2">
+<h2 class="ltx_title ltx_title_section">
+<span class="ltx_tag ltx_tag_section header-section-number">2.1</span> Consequence and validity</h2>
+
+<div id="S1.p1" class="ltx_para">
+<p class="ltx_p">In <a href="Ch1.html" title="Chapter 1 Arguments ‣ Part I Key notions of logic ‣ forall x: Calgary" class="ltx_ref"><span class="ltx_text ltx_ref_tag">chapter</span> <span class="ltx_text ltx_ref_tag">1</span></a>, we talked about arguments, i.e., collections of sentences (the premises), followed by a single sentence (the conclusion). We said that some words, such as ‘therefore’, indicate which sentence is supposed to be the conclusion. ‘Therefore’, of course, suggests that there is a connection between the premises and the conclusion, namely that the conclusion <span class="ltx_text ltx_font_bold">follows from</span>, or <span class="ltx_text ltx_font_bold">is a consequence of</span>, the premises.</p>
+</div>
+<div id="S1.p2" class="ltx_para">
+<p class="ltx_p">This notion of consequence is one of the primary things logic is concerned with. One might even say that logic is the science of what follows from what. Logic develops theories and tools that tell us when a sentence follows from some others.</p>
+</div>
+<div id="S1.p3" class="ltx_para">
+<p class="ltx_p">What about the main argument discussed in <a href="Ch1.html" title="Chapter 1 Arguments ‣ Part I Key notions of logic ‣ forall x: Calgary" class="ltx_ref"><span class="ltx_text ltx_ref_tag">chapter</span> <span class="ltx_text ltx_ref_tag">1</span></a>?</p>
+<ul id="S1.I1" class="ltx_itemize">
+<li id="S1.I1.ix1" class="ltx_item" style="list-style-type:none;"><div id="S1.I1.ix1.p1" class="ltx_para">
+<p class="ltx_p">Either the butler or the gardener did it.</p>
+</div></li>
+<li id="S1.I1.ix2" class="ltx_item" style="list-style-type:none;"><div id="S1.I1.ix2.p1" class="ltx_para">
+<p class="ltx_p">The butler didn’t do it.</p>
+</div></li>
+<li id="S1.I1.ix3" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">∴</span><div id="S1.I1.ix3.p1" class="ltx_para">​<p class="ltx_p">The gardener did it.</p>
+</div>
+</li>
+</ul>
+<p class="ltx_p">We don’t have any context for what the sentences in this argument refer to. Perhaps you suspect that “did it” here means “was the perpetrator” of some unspecified crime. You might imagine that the argument occurs in a mystery novel or TV show, perhaps spoken by a detective working through the evidence. But even without having any of this information, you probably agree that the argument is a good one in the sense that whatever the premises refer to, if they are both true, the conclusion cannot but be true as well. If the first premise is true, i.e., it’s true that “the butler did it or the gardener did it”, then at least one of them “did it”, whatever that means. And if the second premise is true, then the butler did not “do it.” That leaves only one option: “the gardener did it” must be true. Here, the conclusion follows from the premises. We call arguments that have this property <dfn>valid</dfn>
+.</p>
+</div>
+<div id="S1.p4" class="ltx_para">
+<p class="ltx_p">By way of contrast, consider the following argument:</p>
+<ul id="S1.I2" class="ltx_itemize">
+<li id="S1.I2.ix1" class="ltx_item" style="list-style-type:none;"><div id="S1.I2.ix1.p1" class="ltx_para">
+<p class="ltx_p">If the driver did it, the maid didn’t do it.</p>
+</div></li>
+<li id="S1.I2.ix2" class="ltx_item" style="list-style-type:none;"><div id="S1.I2.ix2.p1" class="ltx_para">
+<p class="ltx_p">The maid didn’t do it.</p>
+</div></li>
+<li id="S1.I2.ix3" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">∴</span><div id="S1.I2.ix3.p1" class="ltx_para">​<p class="ltx_p">The driver did it.</p>
+</div>
+</li>
+</ul>
+<p class="ltx_p">We still have no idea what is being talked about here. But, again, you probably agree that this argument is different from the previous one in an important respect. If the premises are true, it is <span class="ltx_text ltx_font_bold">not</span> guaranteed that the conclusion is also true. The premises of this argument do not rule out, by themselves, that someone other than the maid or the driver “did it.” So there is a case where both premises are true, and yet the driver didn’t do it, i.e., the conclusion is not true. In this second argument, the conclusion does not follow from the premises. If, like in this argument, the conclusion does not follow from the premises, we say it is <dfn>invalid</dfn>
+.</p>
+</div>
+</div>
+</section>
+<section id="S2" class="ltx_section normal">
+<div class="section level2">
+<h2 class="ltx_title ltx_title_section">
+<span class="ltx_tag ltx_tag_section header-section-number">2.2</span> Cases and types of validity</h2>
+
+<div id="S2.p1" class="ltx_para">
+<p class="ltx_p">How did we determine that the second argument is invalid? We pointed to a case in which the premises are true and in which the conclusion is not. This was the scenario where neither the driver nor the maid did it, but some third person did. Let’s call such a case a <dfn>counterexample</dfn>
+ to the argument. If there is a counterexample to an argument, the conclusion cannot be a consequence of the premises. For the conclusion to be a consequence of the premises, the truth of the premises must guarantee the truth of the conclusion. If there is a counterexample, the truth of the premises does not guarantee the truth of the conclusion.</p>
+</div>
+<div id="S2.p2" class="ltx_para">
+<p class="ltx_p">As logicians, we want to be able to determine when the conclusion of an argument follows from the premises. And the conclusion is a consequence of the premises if there is no counterexample—no case where the premises are all true but the conclusion is not. This motivates a definition:</p>
+</div>
+<div id="S2.p3" class="ltx_para bml_background-color_FDF4FA ltx_noindent bml_background-color_FDF4FA" style="padding:9pt;">
+<p class="ltx_p">A sentence <math id="S2.p3.m1" class="ltx_Math" alttext="A" display="inline"><mi>A</mi></math> is a <dfn>consequence</dfn>
+ of sentences <math id="S2.p3.m2" class="ltx_Math" alttext="B_{1}" display="inline"><msub><mi>B</mi><mn>1</mn></msub></math>, …, <math id="S2.p3.m3" class="ltx_Math" alttext="B_{n}" display="inline"><msub><mi>B</mi><mi>n</mi></msub></math> if and only if there is no case where <math id="S2.p3.m4" class="ltx_Math" alttext="B_{1}" display="inline"><msub><mi>B</mi><mn>1</mn></msub></math>, …, <math id="S2.p3.m5" class="ltx_Math" alttext="B_{n}" display="inline"><msub><mi>B</mi><mi>n</mi></msub></math> are all true and <math id="S2.p3.m6" class="ltx_Math" alttext="A" display="inline"><mi>A</mi></math> is not true. (We then also say that <math id="S2.p3.m7" class="ltx_Math" alttext="A" display="inline"><mi>A</mi></math> <dfn>follows from</dfn>
+ <math id="S2.p3.m8" class="ltx_Math" alttext="B_{1}" display="inline"><msub><mi>B</mi><mn>1</mn></msub></math>, …, <math id="S2.p3.m9" class="ltx_Math" alttext="B_{n}" display="inline"><msub><mi>B</mi><mi>n</mi></msub></math> or that <math id="S2.p3.m10" class="ltx_Math" alttext="B_{1}" display="inline"><msub><mi>B</mi><mn>1</mn></msub></math>, …, <math id="S2.p3.m11" class="ltx_Math" alttext="B_{n}" display="inline"><msub><mi>B</mi><mi>n</mi></msub></math> <dfn>entail</dfn>
+ <math id="S2.p3.m12" class="ltx_Math" alttext="A" display="inline"><mi>A</mi></math>.)</p>
+</div>
+<div id="S2.p4" class="ltx_para">
+<p class="ltx_p">This “definition” is incomplete: it does not tell us what a “case” is or what it means to be “true in a case.” So far we’ve only seen an example: a hypothetical scenario involving three people. Of the three people in the scenario—a driver, a maid, and some third person—the driver and maid didn’t do it, but the third person did. In this scenario, as described, the driver didn’t do it, and so it is a case in which the sentence “the driver did it” is not true. The premises of our second argument are true, but the conclusion is not true: the scenario is a counterexample.</p>
+</div>
+<div id="S2.p5" class="ltx_para">
+<p class="ltx_p">We said that arguments where the conclusion is a consequence of the premises are called valid, and those where the conclusion isn’t a consequence of the premises are invalid. Since we now have at least a first stab at a definition of “consequence”, we’ll record this:</p>
+</div>
+<div id="S2.p6" class="ltx_para bml_background-color_FDF4FA ltx_noindent bml_background-color_FDF4FA" style="padding:9pt;">
+<ul id="S2.I1" class="ltx_itemize">
+<li id="S2.I1.i1" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">‣</span><div id="S2.I1.i1.p1" class="ltx_para">​<p class="ltx_p">An argument is <dfn>valid</dfn>
+ if and only if the
+conclusion is a consequence of the premises.</p>
+</div>
+</li>
+<li id="S2.I1.i2" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">‣</span><div id="S2.I1.i2.p1" class="ltx_para">​<p class="ltx_p">An argument is <dfn>invalid</dfn>
+ if and only if it is not
+valid, i.e., it has a counterexample.</p>
+</div>
+</li>
+</ul>
+</div>
+<div id="S2.p7" class="ltx_para">
+<p class="ltx_p">Logicians are in the business of making the notion of “case” more precise, and investigating which arguments are valid when “case” is made precise in one way or another. If we take “case” to mean “hypothetical scenario” like the counterexample to the second argument, it’s clear that the first argument counts as valid. If we imagine a scenario in which either the butler or the gardener did it, and also the butler didn’t do it, we are automatically imagining a scenario in which the gardener did it. So any hypothetical scenario in which the premises of our first argument are true automatically makes the conclusion of our first argument true. This makes the first argument valid.</p>
+</div>
+<div id="S2.p8" class="ltx_para">
+<p class="ltx_p">Making “case” more specific by interpreting it as “hypothetical scenario” is an advance. But it is not the end of the story. The first problem is that we don’t know what to count as a hypothetical scenario. Are they limited by the laws of physics? By what is conceivable, in a very general sense? What answers we give to these questions determine which arguments we count as valid.</p>
+</div>
+<div id="S2.p9" class="ltx_para">
+<p class="ltx_p">Suppose the answer to the first question is “yes.” Consider the following argument:</p>
+<ul id="S2.I2" class="ltx_itemize">
+<li id="S2.I2.ix1" class="ltx_item" style="list-style-type:none;"><div id="S2.I2.ix1.p1" class="ltx_para">
+<p class="ltx_p">The spaceship <span class="ltx_text ltx_font_italic">Rocinante</span> took six hours to reach Jupiter from Tycho space station.</p>
+</div></li>
+<li id="S2.I2.ix2" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">∴</span><div id="S2.I2.ix2.p1" class="ltx_para">​<p class="ltx_p">The distance between Tycho space station and Jupiter is less than 14 billion kilometers.</p>
+</div>
+</li>
+</ul>
+<p class="ltx_p">A counterexample to this argument would be a scenario in which the <span class="ltx_text ltx_font_italic">Rocinante</span> makes a trip of over 14 billion kilometers in 6 hours, exceeding the speed of light. Since such a scenario is incompatible with the laws of physics, there is no such scenario if hypothetical scenarios have to conform to the laws of physics. If hypothetical scenarios are not limited by the laws of physics, however, there is a counterexample: a scenario where the <span class="ltx_text ltx_font_italic">Rocinante</span> travels faster than the speed of light.</p>
+</div>
+<div id="S2.p10" class="ltx_para">
+<p class="ltx_p">Suppose the answer to the second question is “yes”, and consider another argument:</p>
+<ul id="S2.I3" class="ltx_itemize">
+<li id="S2.I3.ix1" class="ltx_item" style="list-style-type:none;"><div id="S2.I3.ix1.p1" class="ltx_para">
+<p class="ltx_p">Priya is an ophthalmologist.</p>
+</div></li>
+<li id="S2.I3.ix2" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">∴</span><div id="S2.I3.ix2.p1" class="ltx_para">​<p class="ltx_p">Priya is an eye doctor.</p>
+</div>
+</li>
+</ul>
+<p class="ltx_p">If we’re allowing only conceivable scenarios, this is also a valid argument. If you imagine Priya being an ophthalmologist, you thereby imagine Priya being an eye doctor. That’s just what “ophthalmologist” and “eye doctor” mean. A scenario where Priya is an ophthalmologist but not an eye doctor is ruled out by the conceptual connection between these words.</p>
+</div>
+<div id="S2.p11" class="ltx_para">
+<p class="ltx_p">Depending on what kinds of cases we consider as potential
+counterexamples we arrive at different notions of consequence and
+validity. Validity is characterized by the absence of counterexamples.
+But what counts as a counterexample may be different for different
+notions. For instance, we might exclude counterexamples that violate
+the laws of nature, or counterexamples that violate conceptual
+connections between words like “eye doctor” and “ophthalmologist”.
+So, we might call an argument <dfn>nomologically valid</dfn>
+ if there
+are no counterexamples that respect the laws of nature, and an
+argument <dfn>conceptually valid</dfn>
+ if there are no counterexamples
+that respect conceptual connections between words. For both of these
+notions of validity, aspects of the world (e.g., what the laws of
+nature are) and aspects of the meaning of the sentences in the
+argument (e.g., that “ophthalmologist” just means a kind of eye
+doctor) figure into whether an argument counts as valid.</p>
+</div>
+</div>
+</section>
+<section id="S3" class="ltx_section normal">
+<div class="section level2">
+<h2 class="ltx_title ltx_title_section">
+<span class="ltx_tag ltx_tag_section header-section-number">2.3</span> Formal validity</h2>
+
+<div id="S3.p1" class="ltx_para">
+<p class="ltx_p">One distinguishing feature of <span class="ltx_text ltx_font_bold">logical</span> consequence, however, is
+that it should not depend on the content of the premises and
+conclusion, but only on their logical form. In other words, as
+logicians we want to develop a theory that captures yet another way in
+which arguments can be valid. For instance,
+both</p>
+<ul id="S3.I1" class="ltx_itemize">
+<li id="S3.I1.ix1" class="ltx_item" style="list-style-type:none;"><div id="S3.I1.ix1.p1" class="ltx_para">
+<p class="ltx_p">Priya is either an ophthalmologist or a dentist.</p>
+</div></li>
+<li id="S3.I1.ix2" class="ltx_item" style="list-style-type:none;"><div id="S3.I1.ix2.p1" class="ltx_para">
+<p class="ltx_p">Priya isn’t a dentist.</p>
+</div></li>
+<li id="S3.I1.ix3" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">∴</span><div id="S3.I1.ix3.p1" class="ltx_para">​<p class="ltx_p">Priya is an eye doctor.</p>
+</div>
+</li>
+</ul>
+<p class="ltx_p">and</p>
+<ul id="S3.I2" class="ltx_itemize">
+<li id="S3.I2.ix1" class="ltx_item" style="list-style-type:none;"><div id="S3.I2.ix1.p1" class="ltx_para">
+<p class="ltx_p">Priya is either an ophthalmologist or a dentist.</p>
+</div></li>
+<li id="S3.I2.ix2" class="ltx_item" style="list-style-type:none;"><div id="S3.I2.ix2.p1" class="ltx_para">
+<p class="ltx_p">Priya isn’t a dentist.</p>
+</div></li>
+<li id="S3.I2.ix3" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">∴</span><div id="S3.I2.ix3.p1" class="ltx_para">​<p class="ltx_p">Priya is an ophthalmologist.</p>
+</div>
+</li>
+</ul>
+<p class="ltx_p">are valid arguments. But while the validity of the first depends on the content (i.e., the meaning of “ophthalmologist” and “eye doctor”), the second does not. The second argument is <dfn>formally valid</dfn>
+. We can describe the “form” of this argument as a pattern, something like this:</p>
+<ul id="S3.I3" class="ltx_itemize">
+<li id="S3.I3.ix1" class="ltx_item" style="list-style-type:none;"><div id="S3.I3.ix1.p1" class="ltx_para">
+<p class="ltx_p"><math id="S3.I3.ix1.p1.m1" class="ltx_Math" alttext="A" display="inline"><mi>A</mi></math> is either an <math id="S3.I3.ix1.p1.m2" class="ltx_Math" alttext="X" display="inline"><mi>X</mi></math> or a <math id="S3.I3.ix1.p1.m3" class="ltx_Math" alttext="Y" display="inline"><mi>Y</mi></math>.</p>
+</div></li>
+<li id="S3.I3.ix2" class="ltx_item" style="list-style-type:none;"><div id="S3.I3.ix2.p1" class="ltx_para">
+<p class="ltx_p"><math id="S3.I3.ix2.p1.m1" class="ltx_Math" alttext="A" display="inline"><mi>A</mi></math> isn’t a <math id="S3.I3.ix2.p1.m2" class="ltx_Math" alttext="Y" display="inline"><mi>Y</mi></math>.</p>
+</div></li>
+<li id="S3.I3.ix3" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">∴</span><div id="S3.I3.ix3.p1" class="ltx_para">​<p class="ltx_p"><math id="S3.I3.ix3.p1.m1" class="ltx_Math" alttext="A" display="inline"><mi>A</mi></math> is an <math id="S3.I3.ix3.p1.m2" class="ltx_Math" alttext="X" display="inline"><mi>X</mi></math>.</p>
+</div>
+</li>
+</ul>
+<p class="ltx_p">Here, <math id="S3.p1.m1" class="ltx_Math" alttext="A" display="inline"><mi>A</mi></math>, <math id="S3.p1.m2" class="ltx_Math" alttext="X" display="inline"><mi>X</mi></math>, and <math id="S3.p1.m3" class="ltx_Math" alttext="Y" display="inline"><mi>Y</mi></math> are placeholders for appropriate expressions that, when substituted for <math id="S3.p1.m4" class="ltx_Math" alttext="A" display="inline"><mi>A</mi></math>, <math id="S3.p1.m5" class="ltx_Math" alttext="X" display="inline"><mi>X</mi></math>, and <math id="S3.p1.m6" class="ltx_Math" alttext="Y" display="inline"><mi>Y</mi></math>, turn the pattern into an argument consisting of sentences. For instance,</p>
+<ul id="S3.I4" class="ltx_itemize">
+<li id="S3.I4.ix1" class="ltx_item" style="list-style-type:none;"><div id="S3.I4.ix1.p1" class="ltx_para">
+<p class="ltx_p">Mei is either a mathematician or a botanist.</p>
+</div></li>
+<li id="S3.I4.ix2" class="ltx_item" style="list-style-type:none;"><div id="S3.I4.ix2.p1" class="ltx_para">
+<p class="ltx_p">Mei isn’t a botanist.</p>
+</div></li>
+<li id="S3.I4.ix3" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">∴</span><div id="S3.I4.ix3.p1" class="ltx_para">​<p class="ltx_p">Mei is a mathematician.</p>
+</div>
+</li>
+</ul>
+<p class="ltx_p">is an argument of the same form, but the first argument above is not: we would have to replace <math id="S3.p1.m7" class="ltx_Math" alttext="Y" display="inline"><mi>Y</mi></math> by different expressions (once by “ophthalmologist” and once by “eye doctor”) to obtain it from the pattern.</p>
+</div>
+<div id="S3.p2" class="ltx_para">
+<p class="ltx_p">Moreover, the first argument is not formally valid. <span class="ltx_text ltx_font_bold">Its</span> form is this:</p>
+<ul id="S3.I5" class="ltx_itemize">
+<li id="S3.I5.ix1" class="ltx_item" style="list-style-type:none;"><div id="S3.I5.ix1.p1" class="ltx_para">
+<p class="ltx_p"><math id="S3.I5.ix1.p1.m1" class="ltx_Math" alttext="A" display="inline"><mi>A</mi></math> is either an <math id="S3.I5.ix1.p1.m2" class="ltx_Math" alttext="X" display="inline"><mi>X</mi></math> or a <math id="S3.I5.ix1.p1.m3" class="ltx_Math" alttext="Y" display="inline"><mi>Y</mi></math>.</p>
+</div></li>
+<li id="S3.I5.ix2" class="ltx_item" style="list-style-type:none;"><div id="S3.I5.ix2.p1" class="ltx_para">
+<p class="ltx_p"><math id="S3.I5.ix2.p1.m1" class="ltx_Math" alttext="A" display="inline"><mi>A</mi></math> isn’t a <math id="S3.I5.ix2.p1.m2" class="ltx_Math" alttext="Y" display="inline"><mi>Y</mi></math>.</p>
+</div></li>
+<li id="S3.I5.ix3" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">∴</span><div id="S3.I5.ix3.p1" class="ltx_para">​<p class="ltx_p"><math id="S3.I5.ix3.p1.m1" class="ltx_Math" alttext="A" display="inline"><mi>A</mi></math> is a <math id="S3.I5.ix3.p1.m2" class="ltx_Math" alttext="Z" display="inline"><mi>Z</mi></math>.</p>
+</div>
+</li>
+</ul>
+<p class="ltx_p">In this pattern we can replace <math id="S3.p2.m1" class="ltx_Math" alttext="X" display="inline"><mi>X</mi></math> by “ophthalmologist” and <math id="S3.p2.m2" class="ltx_Math" alttext="Z" display="inline"><mi>Z</mi></math> by “eye doctor” to obtain the original argument. But here is another argument of the same form:</p>
+<ul id="S3.I6" class="ltx_itemize">
+<li id="S3.I6.ix1" class="ltx_item" style="list-style-type:none;"><div id="S3.I6.ix1.p1" class="ltx_para">
+<p class="ltx_p">Mei is either a mathematician or a botanist.</p>
+</div></li>
+<li id="S3.I6.ix2" class="ltx_item" style="list-style-type:none;"><div id="S3.I6.ix2.p1" class="ltx_para">
+<p class="ltx_p">Mei isn’t a botanist.</p>
+</div></li>
+<li id="S3.I6.ix3" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">∴</span><div id="S3.I6.ix3.p1" class="ltx_para">​<p class="ltx_p">Mei is an acrobat.</p>
+</div>
+</li>
+</ul>
+<p class="ltx_p">This argument is clearly not valid, since we can imagine a mathematician named Mei who is not an acrobat.</p>
+</div>
+<div id="S3.p3" class="ltx_para">
+<p class="ltx_p">Our strategy as logicians will be to come up with a notion of “case”
+on which an argument turns out to be valid only if it is formally
+valid. Clearly such a notion of “case” will have to violate not just
+some laws of nature but some laws of English. Since the first argument
+is invalid in this sense, we must allow as counterexample a case where
+Priya is an ophthalmologist but not an eye doctor. That case is not a
+conceivable situation: it is ruled out by the meanings of
+“ophthalmologist” and “eye doctor.”</p>
+</div>
+<div id="S3.p4" class="ltx_para">
+<p class="ltx_p">When we consider cases of various kinds in order to evaluate the
+validity of an argument, we will make one important assumption. We
+assume that every case makes every sentence under consideration true
+or not true. That means first of all that any imagined scenario which
+leaves it undetermined if a sentence in our argument is true will not
+be considered as a potential counterexample. For instance, a scenario
+where Priya is a dentist but not an ophthalmologist will count as a
+case to be considered in the first few arguments in this section, but
+not as a case to be considered in the last two: it doesn’t tell us if
+Mei is a mathematician, a botanist, or an acrobat. If a case doesn’t
+make a sentence true, we say it makes it <dfn>false</dfn>
+. We’ll thus
+assume that cases make sentences true or false but never
+both.<span id="footnote1" class="ltx_note ltx_role_footnote"><sup class="ltx_note_mark">1</sup><span class="ltx_note_outer"><span class="ltx_note_content"><sup class="ltx_note_mark">1</sup>
+                <span class="ltx_tag ltx_tag_note">1</span>
+                
+                
+                
+                
+                
+                
+                
+              The assumption that sentences are true or false and not
+both is called “bivalence.” Even if this assumption seems
+common-sensical to you, it is controversial among philosophers of
+logic. First of all, there are logicians who want to consider cases
+where sentences are neither true nor false, but have some kind of
+intermediate level of truth. More controversially, some philosophers
+think we should allow for the possibility of sentences to be both true
+and false at the same time. There are systems of logic in which
+sentences can be neither true nor false, or both, but we will not
+discuss them in this book.</span></span></span></p>
+</div>
+</div>
+</section>
+<section id="S4" class="ltx_section normal">
+<div class="section level2">
+<h2 class="ltx_title ltx_title_section">
+<span class="ltx_tag ltx_tag_section header-section-number">2.4</span> Sound arguments</h2>
+
+<div id="S4.p1" class="ltx_para">
+<p class="ltx_p">Before we go on and execute this strategy, a few clarifications. We
+have defined arguments as collections of sentences in which one (the
+conclusion) is supposed to follow from the others (the premises).
+Arguments in this sense are used all the time in everyday and
+scientific discourse. When they are, arguments are given to support or
+even prove their conclusions. Now, if an argument is valid, it will
+support its conclusion, but <span class="ltx_text ltx_font_bold">only if</span> its premises are all true.
+Validity rules out the possibility that the premises are true and the
+conclusion is not true at the same time. It does not, by itself, rule
+out the possibility that the conclusion is not true, period. In other
+words, it is perfectly possibly for a valid argument to have a
+conclusion that isn’t true!</p>
+</div>
+<div id="S4.p2" class="ltx_para">
+<p class="ltx_p">Consider this example:</p>
+<ul id="S4.I1" class="ltx_itemize">
+<li id="S4.I1.ix1" class="ltx_item" style="list-style-type:none;"><div id="S4.I1.ix1.p1" class="ltx_para">
+<p class="ltx_p">Oranges are either fruit or musical instruments.</p>
+</div></li>
+<li id="S4.I1.ix2" class="ltx_item" style="list-style-type:none;"><div id="S4.I1.ix2.p1" class="ltx_para">
+<p class="ltx_p">Oranges are not fruit.</p>
+</div></li>
+<li id="S4.I1.ix3" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">∴</span><div id="S4.I1.ix3.p1" class="ltx_para">​<p class="ltx_p">Oranges are musical instruments.</p>
+</div>
+</li>
+</ul>
+<p class="ltx_p">The conclusion of this argument is ridiculous. Nevertheless, it follows from the premises. <span class="ltx_text ltx_font_bold">If</span> both premises are true, <span class="ltx_text ltx_font_bold">then</span> the conclusion just has to be true. So the argument is valid.</p>
+</div>
+<div id="S4.p3" class="ltx_para">
+<p class="ltx_p">Conversely, having true premises and a true conclusion is not enough to make an argument valid. Consider this example:</p>
+<ul id="S4.I2" class="ltx_itemize">
+<li id="S4.I2.ix1" class="ltx_item" style="list-style-type:none;"><div id="S4.I2.ix1.p1" class="ltx_para">
+<p class="ltx_p">London is in England.</p>
+</div></li>
+<li id="S4.I2.ix2" class="ltx_item" style="list-style-type:none;"><div id="S4.I2.ix2.p1" class="ltx_para">
+<p class="ltx_p">Beijing is in China.</p>
+</div></li>
+<li id="S4.I2.ix3" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">∴</span><div id="S4.I2.ix3.p1" class="ltx_para">​<p class="ltx_p">Paris is in France.</p>
+</div>
+</li>
+</ul>
+<p class="ltx_p">The premises and conclusion of this argument are, as a matter of fact, all true, but the argument is invalid. If Paris were to declare independence from the rest of France, then the conclusion would no longer be true, even though both of the premises would remain true. Thus, there is a case where the premises of this argument are true without the conclusion being true. So the argument is invalid.</p>
+</div>
+<div id="S4.p4" class="ltx_para">
+<p class="ltx_p">The important thing to remember is that validity is not about the <span class="ltx_text ltx_font_bold">actual</span> truth or falsity of the sentences in the argument. It is about whether it is <span class="ltx_text ltx_font_bold">possible</span> for all the premises to be true and the conclusion to be not true at the same time (in some hypothetical case). What is <span class="ltx_text ltx_font_bold">in fact</span> the case has no special role to play; and what the facts are does not determine whether an argument is valid or not.<span id="footnote2" class="ltx_note ltx_role_footnote"><sup class="ltx_note_mark">2</sup><span class="ltx_note_outer"><span class="ltx_note_content"><sup class="ltx_note_mark">2</sup>
+                <span class="ltx_tag ltx_tag_note">2</span>
+                
+                
+                
+                
+                
+                
+                
+              Well, there is one case where it does: if the premises are in fact true and the conclusion is in fact not true, then we live in a counterexample; so the argument is invalid.</span></span></span> Nothing about the way things are can by itself determine if an argument is valid. It is often said that logic doesn’t care about feelings. Actually, it doesn’t care about facts, either.</p>
+</div>
+<div id="S4.p5" class="ltx_para">
+<p class="ltx_p">When we use an argument to prove that its conclusion <span class="ltx_text ltx_font_bold">is true</span>, then, we need two things. First, we need the argument to be valid; i.e., we need the conclusion to follow from the premises. But we also need the premises to be true. We will say that an argument is <dfn>sound</dfn>
+ if and only if it is both valid and all of its premises are true.</p>
+</div>
+<div id="S4.p6" class="ltx_para">
+<p class="ltx_p">The flip side of this is that when you want to rebut an argument, you have two options: you can show that (one or more of) the premises are not true, or you can show that the argument is not valid. Logic, however, will only help you with the latter!</p>
+</div>
+</div>
+</section>
+<section id="S5" class="ltx_section normal">
+<div class="section level2">
+<h2 class="ltx_title ltx_title_section">
+<span class="ltx_tag ltx_tag_section header-section-number">2.5</span> Inductive arguments</h2>
+
+<div id="S5.p1" class="ltx_para">
+<p class="ltx_p">Many good arguments are invalid. Consider this one:</p>
+<ul id="S5.I1" class="ltx_itemize">
+<li id="S5.I1.ix1" class="ltx_item" style="list-style-type:none;"><div id="S5.I1.ix1.p1" class="ltx_para">
+<p class="ltx_p">Every winter so far, it has snowed in Calgary.</p>
+</div></li>
+<li id="S5.I1.ix2" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">∴</span><div id="S5.I1.ix2.p1" class="ltx_para">​<p class="ltx_p">It will snow in Calgary this coming winter.</p>
+</div>
+</li>
+</ul>
+<p class="ltx_p">This argument generalises from observations about many (past) cases to a conclusion about all (future) cases. Such arguments are called <dfn>inductive</dfn>
+ arguments. Nevertheless, the argument is invalid. Even if it has snowed in Calgary every winter thus far, it remains <span class="ltx_text ltx_font_bold">possible</span> that Calgary will stay dry all through the coming winter. In fact, even if it will henceforth snow every winter in Calgary, we could still <span class="ltx_text ltx_font_bold">imagine</span> a case in which this year is the first year it doesn’t snow all winter. And that hypothetical scenario is a case where the premises of the argument are true but the conclusion is not, making the argument invalid.</p>
+</div>
+<div id="S5.p2" class="ltx_para">
+<p class="ltx_p">The point of all this is that inductive arguments—even good inductive arguments—are not (deductively) valid. They are not <span class="ltx_text ltx_font_bold">watertight</span>. Unlikely though it might be, it is <span class="ltx_text ltx_font_bold">possible</span> for their conclusion to be false, even when all of their premises are true. In this book, we will set aside (entirely) the question of what makes for a good inductive argument. Our interest is simply in sorting the (deductively) valid arguments from the invalid ones.</p>
+</div>
+<div id="S5.p3" class="ltx_para">
+<p class="ltx_p">So: we are interested in whether or not a conclusion <span class="ltx_text ltx_font_bold">follows from</span> some premises. Don’t, though, say that the premises <span class="ltx_text ltx_font_bold">infer</span> the conclusion. Entailment is a relation between premises and conclusions; inference is something we do. So if you want to mention inference when the conclusion follows from the premises, you could say that <span class="ltx_text ltx_font_bold">one may infer</span> the conclusion from the premises.</p>
+</div>
+</div>
+</section>
+<section id="Sx1" class="ltx_section normal">
+<div class="section level2">
+<h2 class="ltx_title ltx_title_section">Practice exercises</h2>
+
+<div id="Sx1.p1" class="ltx_para ltx_noindent">
+<p class="ltx_p"><span class="ltx_text ltx_font_bold">A. </span>Which of the following arguments are valid? Which are invalid?</p>
+<ol id="Sx1.I2" class="ltx_enumerate">
+<li id="Sx1.I2.i1" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">1.</span><div id="Sx1.I2.i1.p1" class="ltx_para">
+<ul id="Sx1.I2.i1.I1" class="ltx_itemize">
+<li id="Sx1.I2.i1.I1.i1" class="ltx_item" style="list-style-type:none;"><div id="Sx1.I2.i1.I1.i1.p1" class="ltx_para">
+<p class="ltx_p">Socrates is a man.</p>
+</div></li>
+<li id="Sx1.I2.i1.I1.i2" class="ltx_item" style="list-style-type:none;"><div id="Sx1.I2.i1.I1.i2.p1" class="ltx_para">
+<p class="ltx_p">All men are carrots.</p>
+</div></li>
+<li id="Sx1.I2.i1.I1.ix1" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">∴</span><div id="Sx1.I2.i1.I1.ix1.p1" class="ltx_para">​<p class="ltx_p">Socrates is a carrot.</p>
+</div>
+</li>
+</ul>
+</div>
+</li>
+<li id="Sx1.I2.i2" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">2.</span><div id="Sx1.I2.i2.p1" class="ltx_para">
+<ul id="Sx1.I2.i2.I1" class="ltx_itemize">
+<li id="Sx1.I2.i2.I1.i1" class="ltx_item" style="list-style-type:none;"><div id="Sx1.I2.i2.I1.i1.p1" class="ltx_para">
+<p class="ltx_p">Either Abe Lincoln was born in Illinois or he was once president.</p>
+</div></li>
+<li id="Sx1.I2.i2.I1.i2" class="ltx_item" style="list-style-type:none;"><div id="Sx1.I2.i2.I1.i2.p1" class="ltx_para">
+<p class="ltx_p">Abe Lincoln was never president.</p>
+</div></li>
+<li id="Sx1.I2.i2.I1.ix1" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">∴</span><div id="Sx1.I2.i2.I1.ix1.p1" class="ltx_para">​<p class="ltx_p">Abe Lincoln was born in Illinois.</p>
+</div>
+</li>
+</ul>
+</div>
+</li>
+<li id="Sx1.I2.i3" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">3.</span><div id="Sx1.I2.i3.p1" class="ltx_para">
+<ul id="Sx1.I2.i3.I1" class="ltx_itemize">
+<li id="Sx1.I2.i3.I1.i1" class="ltx_item" style="list-style-type:none;"><div id="Sx1.I2.i3.I1.i1.p1" class="ltx_para">
+<p class="ltx_p">If I pull the trigger, Abe Lincoln will die.</p>
+</div></li>
+<li id="Sx1.I2.i3.I1.i2" class="ltx_item" style="list-style-type:none;"><div id="Sx1.I2.i3.I1.i2.p1" class="ltx_para">
+<p class="ltx_p">I do not pull the trigger.</p>
+</div></li>
+<li id="Sx1.I2.i3.I1.ix1" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">∴</span><div id="Sx1.I2.i3.I1.ix1.p1" class="ltx_para">​<p class="ltx_p">Abe Lincoln will not die.</p>
+</div>
+</li>
+</ul>
+</div>
+</li>
+<li id="Sx1.I2.i4" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">4.</span><div id="Sx1.I2.i4.p1" class="ltx_para">
+<ul id="Sx1.I2.i4.I1" class="ltx_itemize">
+<li id="Sx1.I2.i4.I1.i1" class="ltx_item" style="list-style-type:none;"><div id="Sx1.I2.i4.I1.i1.p1" class="ltx_para">
+<p class="ltx_p">Abe Lincoln was either from France or from Luxembourg.</p>
+</div></li>
+<li id="Sx1.I2.i4.I1.i2" class="ltx_item" style="list-style-type:none;"><div id="Sx1.I2.i4.I1.i2.p1" class="ltx_para">
+<p class="ltx_p">Abe Lincoln was not from Luxembourg.</p>
+</div></li>
+<li id="Sx1.I2.i4.I1.ix1" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">∴</span><div id="Sx1.I2.i4.I1.ix1.p1" class="ltx_para">​<p class="ltx_p">Abe Lincoln was from France.</p>
+</div>
+</li>
+</ul>
+</div>
+</li>
+<li id="Sx1.I2.i5" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">5.</span><div id="Sx1.I2.i5.p1" class="ltx_para">
+<ul id="Sx1.I2.i5.I1" class="ltx_itemize">
+<li id="Sx1.I2.i5.I1.i1" class="ltx_item" style="list-style-type:none;"><div id="Sx1.I2.i5.I1.i1.p1" class="ltx_para">
+<p class="ltx_p">If the world ends today, then I will not need to get up tomorrow morning.</p>
+</div></li>
+<li id="Sx1.I2.i5.I1.i2" class="ltx_item" style="list-style-type:none;"><div id="Sx1.I2.i5.I1.i2.p1" class="ltx_para">
+<p class="ltx_p">I will need to get up tomorrow morning.</p>
+</div></li>
+<li id="Sx1.I2.i5.I1.ix1" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">∴</span><div id="Sx1.I2.i5.I1.ix1.p1" class="ltx_para">​<p class="ltx_p">The world will not end today.</p>
+</div>
+</li>
+</ul>
+</div>
+</li>
+<li id="Sx1.I2.i6" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">6.</span><div id="Sx1.I2.i6.p1" class="ltx_para">
+<ul id="Sx1.I2.i6.I1" class="ltx_itemize">
+<li id="Sx1.I2.i6.I1.i1" class="ltx_item" style="list-style-type:none;"><div id="Sx1.I2.i6.I1.i1.p1" class="ltx_para">
+<p class="ltx_p">Joe is now 19 years old.</p>
+</div></li>
+<li id="Sx1.I2.i6.I1.i2" class="ltx_item" style="list-style-type:none;"><div id="Sx1.I2.i6.I1.i2.p1" class="ltx_para">
+<p class="ltx_p">Joe is now 87 years old.</p>
+</div></li>
+<li id="Sx1.I2.i6.I1.ix1" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">∴</span><div id="Sx1.I2.i6.I1.ix1.p1" class="ltx_para">​<p class="ltx_p">Bob is now 20 years old.</p>
+</div>
+</li>
+</ul>
+</div>
+</li>
+</ol>
+</div>
+<div id="Sx1.p2" class="ltx_para ltx_noindent">
+<p class="ltx_p"><span class="ltx_text ltx_font_bold">B. </span>
+Could there be:</p>
+<ol id="Sx1.I3" class="ltx_enumerate">
+<li id="Sx1.I3.i1" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">1.</span><div id="Sx1.I3.i1.p1" class="ltx_para">​<p class="ltx_p">A valid argument that has one false premise and one true premise?</p>
+</div>
+</li>
+<li id="Sx1.I3.i2" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">2.</span><div id="Sx1.I3.i2.p1" class="ltx_para">​<p class="ltx_p">A valid argument that has only false premises?</p>
+</div>
+</li>
+<li id="Sx1.I3.i3" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">3.</span><div id="Sx1.I3.i3.p1" class="ltx_para">​<p class="ltx_p">A valid argument with only false premises and a false conclusion?</p>
+</div>
+</li>
+<li id="Sx1.I3.i4" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">4.</span><div id="Sx1.I3.i4.p1" class="ltx_para">​<p class="ltx_p">An invalid argument that can be made valid by the addition of a new premise?</p>
+</div>
+</li>
+<li id="Sx1.I3.i5" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">5.</span><div id="Sx1.I3.i5.p1" class="ltx_para">​<p class="ltx_p">A valid argument that can be made invalid by the addition of a new premise?</p>
+</div>
+</li>
+</ol>
+<p class="ltx_p">In each case: if so, give an example; if not, explain why not.</p>
+</div>
+</div>
+</section>
+</div>
+</section>
+</div>
+</div>
+</div>
+<a href="Ch1.html" class="navigation navigation-prev" aria-label="Previous page"><i class="fa fa-angle-left"></i></a><a href="Ch3.html" class="navigation navigation-next" aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+</div>
+</div>
+</body>
+
+</html>

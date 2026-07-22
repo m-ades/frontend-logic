@@ -1,0 +1,480 @@
+<!DOCTYPE html><html style="--bml-ltx-font-size:10;" class="bml_mathjax4" lang="en">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<title>Chapter 46 Functional completeness ‣ Part IX Metatheory ‣ forall x: Calgary</title>
+<!--Generated on Tue Jul 21 20:13:15 2026 by LaTeXML (version 0.8.8) http://dlmf.nist.gov/LaTeXML/.-->
+<!--Document created on Fall 2025 (2026‐07‐18 8642250).-->
+
+<link rel="stylesheet" href="LaTeXML.css" type="text/css">
+<link rel="stylesheet" href="ltx-book.css" type="text/css">
+<link rel="stylesheet" href="bookml/gitbook/css/style.css" type="text/css">
+<link rel="stylesheet" href="bookml/gitbook/css/plugin-table.css" type="text/css">
+<link rel="stylesheet" href="bookml/gitbook/css/plugin-search.css" type="text/css">
+<link rel="stylesheet" href="bookml/gitbook/css/plugin-bookdown.css" type="text/css">
+<link rel="stylesheet" href="bookml/gitbook/css/plugin-fontsettings.css" type="text/css">
+<link rel="stylesheet" href="bookml/CSS/style.css" type="text/css">
+<link rel="stylesheet" href="bookml/CSS/style.gitbook,plain.css" type="text/css">
+<link rel="stylesheet" href="bookml/CSS/style.gitbook.css" type="text/css">
+<link rel="stylesheet" href="bmluser/colors.gitbook-forallxyyc-html.css" type="text/css">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<link rel="stylesheet" href="forallxyyc.css" type="text/css">
+<link rel="stylesheet" href="fitchml.css" type="text/css">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script><script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6"></script>
+<link rel="up" href="Pt9.html" title="Part IX Metatheory ‣ forall x: Calgary">
+<link rel="up up" href="index.html" title="forall x: Calgary">
+<link rel="start" href="index.html" title="forall x: Calgary">
+<link rel="prev" href="Ch45.html" title="Chapter 45 Normal forms ‣ Part IX Metatheory ‣ forall x: Calgary">
+<link rel="next" href="Ch47.html" title="Chapter 47 Proving equivalences ‣ Part IX Metatheory ‣ forall x: Calgary">
+<link rel="chapter" href="Ch45.html" title="Chapter 45 Normal forms ‣ Part IX Metatheory ‣ forall x: Calgary">
+<link rel="chapter" href="Ch47.html" title="Chapter 47 Proving equivalences ‣ Part IX Metatheory ‣ forall x: Calgary">
+<link rel="chapter" href="Ch48.html" title="Chapter 48 Soundness ‣ Part IX Metatheory ‣ forall x: Calgary">
+<link rel="chapter" href="Chx1.html" title="Preface ‣ forall x: Calgary">
+<link rel="part" href="Pt1.html" title="Part I Key notions of logic ‣ forall x: Calgary">
+<link rel="part" href="Pt2.html" title="Part II Truth-functional logic ‣ forall x: Calgary">
+<link rel="part" href="Pt3.html" title="Part III Truth tables ‣ forall x: Calgary">
+<link rel="part" href="Pt4.html" title="Part IV Natural deduction for TFL ‣ forall x: Calgary">
+<link rel="part" href="Pt5.html" title="Part V First-order logic ‣ forall x: Calgary">
+<link rel="part" href="Pt6.html" title="Part VI Interpretations ‣ forall x: Calgary">
+<link rel="part" href="Pt7.html" title="Part VII Natural deduction for FOL ‣ forall x: Calgary">
+<link rel="part" href="Pt8.html" title="Part VIII Modal logic ‣ forall x: Calgary">
+<link rel="part" href="Pt9.html" title="Part IX Metatheory ‣ forall x: Calgary">
+<link rel="part" href="Ptx1.html" title="Appendices ‣ forall x: Calgary">
+<link rel="part" href="Ptx2.html" title="Solutions to selected exercices ‣ forall x: Calgary">
+<script src="bookml/js/mathjax4.js" defer></script>
+</head>
+<body class="bml_class_book">
+<div class="book without-animation font-size-2 font-family-1" data-basepath=".">
+<a href="#bml-main-content" tabindex="0" class="bml-skip-to-content">Skip to content.</a>
+<div class="book-summary"><nav class="ltx_page_navbar">
+<ul class="ltx_toclist summary">
+<li>
+<a href="index.html" title="" class="ltx_ref" rel="start">forall x: Calgary</a>
+</li>
+<li class="divider" aria-hidden="true"></li>
+<li data-level="" data-path="Chx1.html" class="ltx_tocentry ltx_tocentry_chapter  chapter "><a href="Chx1.html" title="In forall x: Calgary" class="ltx_ref">Preface</a></li>
+<li data-level="I" data-path="Pt1.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt1.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">I </span></b>Key notions of logic</a></li>
+<li data-level="II" data-path="Pt2.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt2.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">II </span></b>Truth-functional logic</a></li>
+<li data-level="III" data-path="Pt3.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt3.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">III </span></b>Truth tables</a></li>
+<li data-level="IV" data-path="Pt4.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt4.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">IV </span></b>Natural deduction for TFL</a></li>
+<li data-level="V" data-path="Pt5.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt5.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">V </span></b>First-order logic</a></li>
+<li data-level="VI" data-path="Pt6.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt6.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">VI </span></b>Interpretations</a></li>
+<li data-level="VII" data-path="Pt7.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt7.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">VII </span></b>Natural deduction for FOL</a></li>
+<li data-level="VIII" data-path="Pt8.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt8.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">VIII </span></b>Modal logic</a></li>
+<li data-level="IX" data-path="Pt9.html" class="ltx_tocentry ltx_tocentry_part  chapter ">
+<a href="Pt9.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">IX </span></b>Metatheory</a>
+<ol class="ltx_toclist ltx_toclist_part">
+<li data-level="45" data-path="Ch45.html" class="ltx_tocentry ltx_tocentry_chapter  chapter "><a href="Ch45.html" title="In Part IX Metatheory ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">45 </span></b>Normal forms</a></li>
+<li data-level="46" data-path="" class="ltx_tocentry ltx_tocentry_chapter ltx_ref_self  chapter active">
+<a href="" title="In Part IX Metatheory ‣ forall x: Calgary" aria-current="page" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">46 </span></b>Functional completeness</a>
+<ol class="ltx_toclist ltx_toclist_chapter">
+<li data-level="46.1" data-path="" class="ltx_tocentry ltx_tocentry_section  chapter "><a href="#S1" title="In Chapter 46 Functional completeness ‣ Part IX Metatheory ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">46.1 </span></b>Individually functionally complete connectives</a></li>
+<li data-level="46.2" data-path="" class="ltx_tocentry ltx_tocentry_section  chapter "><a href="#S2" title="In Chapter 46 Functional completeness ‣ Part IX Metatheory ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">46.2 </span></b>Failures of functional completeness</a></li>
+</ol>
+</li>
+<li data-level="47" data-path="Ch47.html" class="ltx_tocentry ltx_tocentry_chapter  chapter "><a href="Ch47.html" title="In Part IX Metatheory ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">47 </span></b>Proving equivalences</a></li>
+<li data-level="48" data-path="Ch48.html" class="ltx_tocentry ltx_tocentry_chapter  chapter "><a href="Ch48.html" title="In Part IX Metatheory ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">48 </span></b>Soundness</a></li>
+</ol>
+</li>
+<li data-level="" data-path="Ptx1.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Ptx1.html" title="In forall x: Calgary" class="ltx_ref">Appendices</a></li>
+<li data-level="" data-path="Ptx2.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Ptx2.html" title="In forall x: Calgary" class="ltx_ref">Solutions to selected exercices</a></li>
+</ul>
+</nav></div>
+
+<div class="ltx_page_main book-body fixed">
+<div class="body-inner">
+<header class="book-header fixed" aria-label="toolbar"><span class="bml-separator"></span></header>
+<div class="page-wrapper" tabindex="-1" role="main">
+<div class="ltx_page_content page-inner" id="bml-main-content">
+<script src="bookml/gitbook/js/app.min.js"></script>
+<script src="bookml/gitbook/js/jquery.highlight.js"></script>
+<script src="bookml/gitbook/js/plugin-search.js"></script>
+<script src="bookml/gitbook/js/plugin-fontsettings.js"></script>
+<script src="bookml/gitbook/js/plugin-bookdown.js"></script>
+<script type="text/javascript">
+                  gitbook.require(["gitbook"], function(gitbook) {
+                  gitbook.start({
+                    "fontsettings": {
+                      "theme": "white",
+                      "family": "sans",
+                      "size": 2
+                    },
+                    "download": [ [ "forallxyyc.pdf", "PDF" ], [ "forallxyyc-accessible.pdf", "PDF (accessible)" ], ],
+                    "search": {
+                      "engine": "fuse"
+                    },
+                    "toc": {
+                      "collapse": "none"
+                    }
+                  });
+                });
+              </script>
+
+<section class="ltx_chapter ltx_authors_1line normal" lang="en">
+<div class="section level1">
+<h1 class="ltx_title ltx_title_chapter">
+<span class="ltx_tag ltx_tag_chapter header-section-number">Chapter 46</span> Functional completeness</h1>
+
+<div id="p1" class="ltx_para">
+<p class="ltx_p">Of our connectives, <math id="p1.m1" class="ltx_Math" alttext="\neg" display="inline"><mo>¬</mo></math> attaches to a single sentence, and the others all combine exactly two sentences. We may also introduce the idea of an <math id="p1.m2" class="ltx_Math" alttext="n" display="inline"><mi>n</mi></math>-place connective. For example, we could consider a three-place connective, ‘<math id="p1.m3" class="ltx_Math" alttext="\heartsuit" display="inline"><mi mathvariant="normal">♡</mi></math>’, and stipulate that it is to have the following characteristic truth table:</p>
+<div class="bml-overflow-wrapper">
+<table class="ltx_tabular ltx_centering ltx_align_middle">
+<tr class="ltx_tr">
+<td class="ltx_td ltx_align_center"><math id="p1.m4" class="ltx_Math" alttext="A" display="inline"><mi>A</mi></math></td>
+<td class="ltx_td ltx_align_center"><math id="p1.m5" class="ltx_Math" alttext="B" display="inline"><mi>B</mi></math></td>
+<td class="ltx_td ltx_align_center ltx_border_r"><math id="p1.m6" class="ltx_Math" alttext="C" display="inline"><mi>C</mi></math></td>
+<td class="ltx_td ltx_align_center"><math id="p1.m7" class="ltx_Math" alttext="\heartsuit(A,B,C)" display="inline"><mrow><mi mathvariant="normal">♡</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mi>A</mi><mo>,</mo><mi>B</mi><mo>,</mo><mi>C</mi><mo stretchy="false">)</mo></mrow></mrow></math></td>
+</tr>
+<tr class="ltx_tr">
+<td class="ltx_td ltx_align_center ltx_border_t">T</td>
+<td class="ltx_td ltx_align_center ltx_border_t">T</td>
+<td class="ltx_td ltx_align_center ltx_border_r ltx_border_t">T</td>
+<td class="ltx_td ltx_align_center ltx_border_t">F</td>
+</tr>
+<tr class="ltx_tr">
+<td class="ltx_td ltx_align_center">T</td>
+<td class="ltx_td ltx_align_center">T</td>
+<td class="ltx_td ltx_align_center ltx_border_r">F</td>
+<td class="ltx_td ltx_align_center">T</td>
+</tr>
+<tr class="ltx_tr">
+<td class="ltx_td ltx_align_center">T</td>
+<td class="ltx_td ltx_align_center">F</td>
+<td class="ltx_td ltx_align_center ltx_border_r">T</td>
+<td class="ltx_td ltx_align_center">T</td>
+</tr>
+<tr class="ltx_tr">
+<td class="ltx_td ltx_align_center">T</td>
+<td class="ltx_td ltx_align_center">F</td>
+<td class="ltx_td ltx_align_center ltx_border_r">F</td>
+<td class="ltx_td ltx_align_center">F</td>
+</tr>
+<tr class="ltx_tr">
+<td class="ltx_td ltx_align_center">F</td>
+<td class="ltx_td ltx_align_center">T</td>
+<td class="ltx_td ltx_align_center ltx_border_r">T</td>
+<td class="ltx_td ltx_align_center">F</td>
+</tr>
+<tr class="ltx_tr">
+<td class="ltx_td ltx_align_center">F</td>
+<td class="ltx_td ltx_align_center">T</td>
+<td class="ltx_td ltx_align_center ltx_border_r">F</td>
+<td class="ltx_td ltx_align_center">T</td>
+</tr>
+<tr class="ltx_tr">
+<td class="ltx_td ltx_align_center">F</td>
+<td class="ltx_td ltx_align_center">F</td>
+<td class="ltx_td ltx_align_center ltx_border_r">T</td>
+<td class="ltx_td ltx_align_center">F</td>
+</tr>
+<tr class="ltx_tr">
+<td class="ltx_td ltx_align_center">F</td>
+<td class="ltx_td ltx_align_center">F</td>
+<td class="ltx_td ltx_align_center ltx_border_r">F</td>
+<td class="ltx_td ltx_align_center">F</td>
+</tr>
+</table>
+</div>
+<p class="ltx_p">Probably this new connective would not correspond with any natural English expression (at least not in the way that ‘<math id="p1.m8" class="ltx_Math" alttext="\wedge" display="inline"><mo>∧</mo></math>’ corresponds with ‘and’). But a question arises: if we wanted to employ a connective with this characteristic truth table, must we add a <span class="ltx_text ltx_font_bold">new</span> connective to TFL? Or can we get by with the connectives we <span class="ltx_text ltx_font_bold">already have</span> (as we can for the connective ‘neither…nor’ for instance)?</p>
+</div>
+<div id="p2" class="ltx_para">
+<p class="ltx_p">Let us make this question more precise. Say that some connectives are <dfn>jointly functionally complete</dfn>
+ <span class="ltx_text ltx_font_bold">if⁠f</span>, for any possible truth table, there is a sentence containing only those connectives with that truth table.</p>
+</div>
+<div id="p3" class="ltx_para">
+<p class="ltx_p">The general point is, when we are armed with some jointly functionally complete connectives, no characteristic truth table lies beyond our grasp. And in fact, we are in luck.</p>
+<div class="ltx_logical-block bml_background-color_FDF4FA bml_background-color_FDF4FA" style="padding:9pt;">
+          
+<div id="p3.p1" class="ltx_para ltx_noindent">
+<p class="ltx_p"><span class="ltx_text ltx_font_bold">Functional Completeness Theorem.</span>
+The connectives of TFL are jointly functionally complete. Indeed, the following pairs of connectives are jointly functionally complete:</p>
+<ol id="S0.I1" class="ltx_enumerate">
+<li id="S0.I1.i1" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">1.</span><div id="S0.I1.i1.p1" class="ltx_para">​<p class="ltx_p">‘<math id="S0.I1.i1.p1.m1" class="ltx_Math" alttext="\neg" display="inline"><mo>¬</mo></math>’ and ‘<math id="S0.I1.i1.p1.m2" class="ltx_Math" alttext="\vee" display="inline"><mo>∨</mo></math>’</p>
+</div>
+</li>
+<li id="S0.I1.i2" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">2.</span><div id="S0.I1.i2.p1" class="ltx_para">​<p class="ltx_p">‘<math id="S0.I1.i2.p1.m1" class="ltx_Math" alttext="\neg" display="inline"><mo>¬</mo></math>’ and ‘<math id="S0.I1.i2.p1.m2" class="ltx_Math" alttext="\wedge" display="inline"><mo>∧</mo></math>’</p>
+</div>
+</li>
+<li id="S0.I1.i3" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">3.</span><div id="S0.I1.i3.p1" class="ltx_para">​<p class="ltx_p">‘<math id="S0.I1.i3.p1.m1" class="ltx_Math" alttext="\neg" display="inline"><mo>¬</mo></math>’ and ‘<math id="S0.I1.i3.p1.m2" class="ltx_Math" alttext="\rightarrow" display="inline"><mo stretchy="false">→</mo></math>’</p>
+</div>
+</li>
+</ol>
+</div>
+        
+</div>
+</div>
+<div id="p4" class="ltx_para">
+<p class="ltx_p">Given any truth table, we can use the method of proving the DNF Theorem (or the CNF Theorem) via truth tables from <a href="Ch45.html" title="Chapter 45 Normal forms ‣ Part IX Metatheory ‣ forall x: Calgary" class="ltx_ref"><span class="ltx_text ltx_ref_tag">chapter</span> <span class="ltx_text ltx_ref_tag">45</span></a>, to write down a scheme which has the same truth table. For example, employing the truth table method for proving the DNF Theorem, we find that the following scheme has the same characteristic truth table as <math id="p4.m1" class="ltx_Math" alttext="\heartsuit(A,B,C)" display="inline"><mrow><mi mathvariant="normal">♡</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mi>A</mi><mo>,</mo><mi>B</mi><mo>,</mo><mi>C</mi><mo stretchy="false">)</mo></mrow></mrow></math>, above:</p>
+<div id="Ex1" class="ltx_equation bml_equation bml_equation_container ltx_align_baseline">
+<div class="ltx_Math bml_eqn_cell ltx_align_center"><math id="Ex1.m1" class="ltx_Math" alttext="(A\wedge B\wedge\neg C)\vee(A\wedge\neg B\wedge C)\vee(\neg A\wedge B\wedge%
+\neg C)" display="block"><mrow><mrow><mo stretchy="false">(</mo><mrow><mi>A</mi><mo>∧</mo><mi>B</mi><mo>∧</mo><mrow><mo rspace="0.167em">¬</mo><mi>C</mi></mrow></mrow><mo stretchy="false">)</mo></mrow><mo>∨</mo><mrow><mo stretchy="false">(</mo><mrow><mi>A</mi><mo>∧</mo><mrow><mo rspace="0.167em">¬</mo><mi>B</mi></mrow><mo>∧</mo><mi>C</mi></mrow><mo stretchy="false">)</mo></mrow><mo>∨</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mo rspace="0.167em">¬</mo><mi>A</mi></mrow><mo>∧</mo><mi>B</mi><mo>∧</mo><mrow><mo rspace="0.167em">¬</mo><mi>C</mi></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></math></div>
+</div>
+<p class="ltx_p">It follows that the connectives of TFL are jointly functionally complete. We now prove each of the subsidiary results.</p>
+</div>
+<div id="p5" class="ltx_para">
+<p class="ltx_p"><span class="ltx_text ltx_font_bold">Subsidiary Result 1: functional completeness of ‘<math id="p5.m1" class="ltx_Math" alttext="\neg" display="inline"><mo>¬</mo></math>’ and ‘<math id="p5.m2" class="ltx_Math" alttext="\vee" display="inline"><mo>∨</mo></math>’.</span> Observe that the scheme that we generate, using the truth table method of proving the DNF Theorem, will only contain the connectives ‘<math id="p5.m3" class="ltx_Math" alttext="\neg" display="inline"><mo>¬</mo></math>’, ‘<math id="p5.m4" class="ltx_Math" alttext="\wedge" display="inline"><mo>∧</mo></math>’ and ‘<math id="p5.m5" class="ltx_Math" alttext="\vee" display="inline"><mo>∨</mo></math>’. So it suffices to show that there is an equivalent scheme which contains only ‘<math id="p5.m6" class="ltx_Math" alttext="\neg" display="inline"><mo>¬</mo></math>’ and ‘<math id="p5.m7" class="ltx_Math" alttext="\vee" display="inline"><mo>∨</mo></math>’. To demonstrate this, we simply consider that</p>
+<div id="A48.S0.EGx23" class="ltx_equationgroup ltx_eqn_align bml_equationgroup bml_equation_container ltx_align_baseline">
+<div id="Ex2" class="ltx_equation bml_equation ltx_align_baseline" role="group" aria-label="equation">
+<div class="ltx_td ltx_align_right bml_eqn_cell"><math id="Ex2.m1" class="ltx_Math" alttext="\displaystyle(\mathscr{A}\wedge\mathscr{B})" display="inline"><mrow><mo stretchy="false">(</mo><mrow><mi class="ltx_font_mathscript">𝒜︁</mi><mo>∧</mo><mi class="ltx_font_mathscript">ℬ︁</mi></mrow><mo stretchy="false">)</mo></mrow></math></div>
+<div class="ltx_td ltx_align_left bml_eqn_cell"><math id="Ex2.m2" class="ltx_Math" alttext="\displaystyle{}\Leftrightarrow\neg(\neg\mathscr{A}\vee\neg\mathscr{B})" display="inline"><mrow><mi></mi><mo stretchy="false">⇔</mo><mrow><mo>¬</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mo rspace="0.167em">¬</mo><mi class="ltx_font_mathscript">𝒜︁</mi></mrow><mo>∨</mo><mrow><mo rspace="0.167em">¬</mo><mi class="ltx_font_mathscript">ℬ︁</mi></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math></div>
+</div>
+</div>
+<p class="ltx_p">are logically equivalent.<span id="footnote1" class="ltx_note ltx_role_footnote"><sup class="ltx_note_mark">1</sup><span class="ltx_note_outer"><span class="ltx_note_content"><sup class="ltx_note_mark">1</sup>
+              <span class="ltx_tag ltx_tag_note">1</span>
+              
+              
+              
+              
+              
+              
+              
+            We’re here using the convention
+that to say that <math id="footnote1.m1" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math> and <math id="footnote1.m2" class="ltx_Math" alttext="\mathscr{B}" display="inline"><mi class="ltx_font_mathscript">ℬ︁</mi></math> are equivalent can be
+abbreviated as <math id="footnote1.m3" class="ltx_Math" alttext="\mathscr{A}\Leftrightarrow\mathscr{B}" display="inline"><mrow><mi class="ltx_font_mathscript">𝒜︁</mi><mo stretchy="false">⇔</mo><mi class="ltx_font_mathscript">ℬ︁</mi></mrow></math>. Note that
+‘<math id="footnote1.m4" class="ltx_Math" alttext="\Leftrightarrow" display="inline"><mo stretchy="false">⇔</mo></math>’ is <span class="ltx_text ltx_font_bold">not</span> a connective like ‘<math id="footnote1.m5" class="ltx_Math" alttext="\leftrightarrow" display="inline"><mo stretchy="false">↔</mo></math>’, but a
+metalinguistic symbol just like ‘<math id="footnote1.m6" class="ltx_Math" alttext="\vDash" display="inline"><mo>⊨</mo></math>’; compare the discussion
+of ‘<math id="footnote1.m7" class="ltx_Math" alttext="\vDash" display="inline"><mo>⊨</mo></math>’ and ‘<math id="footnote1.m8" class="ltx_Math" alttext="\leftrightarrow" display="inline"><mo stretchy="false">↔</mo></math>’ in <a href="Ch12.html#S6" title="12.6 ‘⊨’ versus ‘→’ ‣ Chapter 12 Semantic concepts ‣ Part III Truth tables ‣ forall x: Calgary" class="ltx_ref"><span class="ltx_text ltx_ref_tag">section</span> <span class="ltx_text ltx_ref_tag">12.6</span></a>.</span></span></span></p>
+</div>
+<div id="p6" class="ltx_para">
+<p class="ltx_p"><span class="ltx_text ltx_font_bold">Subsidiary Result 2: functional completeness of ‘<math id="p6.m1" class="ltx_Math" alttext="\neg" display="inline"><mo>¬</mo></math>’ and ‘<math id="p6.m2" class="ltx_Math" alttext="\wedge" display="inline"><mo>∧</mo></math>’.</span> Exactly as in Subsidiary Result 1, making use of the fact that</p>
+<div id="A48.S0.EGx24" class="ltx_equationgroup ltx_eqn_align bml_equationgroup bml_equation_container ltx_align_baseline">
+<div id="Ex3" class="ltx_equation bml_equation ltx_align_baseline" role="group" aria-label="equation">
+<div class="ltx_td ltx_align_right bml_eqn_cell"><math id="Ex3.m1" class="ltx_Math" alttext="\displaystyle(\mathscr{A}\vee\mathscr{B})" display="inline"><mrow><mo stretchy="false">(</mo><mrow><mi class="ltx_font_mathscript">𝒜︁</mi><mo>∨</mo><mi class="ltx_font_mathscript">ℬ︁</mi></mrow><mo stretchy="false">)</mo></mrow></math></div>
+<div class="ltx_td ltx_align_left bml_eqn_cell"><math id="Ex3.m2" class="ltx_Math" alttext="\displaystyle{}\Leftrightarrow\neg(\neg\mathscr{A}\wedge\neg\mathscr{B})" display="inline"><mrow><mi></mi><mo stretchy="false">⇔</mo><mrow><mo>¬</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mo rspace="0.167em">¬</mo><mi class="ltx_font_mathscript">𝒜︁</mi></mrow><mo>∧</mo><mrow><mo rspace="0.167em">¬</mo><mi class="ltx_font_mathscript">ℬ︁</mi></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math></div>
+</div>
+</div>
+<p class="ltx_p">are logically equivalent.</p>
+</div>
+<div id="p7" class="ltx_para">
+<p class="ltx_p"><span class="ltx_text ltx_font_bold">Subsidiary Result 3: functional completeness of ‘<math id="p7.m1" class="ltx_Math" alttext="\neg" display="inline"><mo>¬</mo></math>’ and ‘<math id="p7.m2" class="ltx_Math" alttext="\rightarrow" display="inline"><mo stretchy="false">→</mo></math>’.</span> Exactly as in Subsidiary Result 1, making use of these equivalences instead:</p>
+<div id="A48.S0.EGx25" class="ltx_equationgroup ltx_eqn_align bml_equationgroup bml_equation_container ltx_align_baseline">
+<div id="Ex4" class="ltx_equation bml_equation ltx_align_baseline" role="group" aria-label="equation">
+<div class="ltx_td ltx_align_right bml_eqn_cell"><math id="Ex4.m1" class="ltx_Math" alttext="\displaystyle(\mathscr{A}\vee\mathscr{B})" display="inline"><mrow><mo stretchy="false">(</mo><mrow><mi class="ltx_font_mathscript">𝒜︁</mi><mo>∨</mo><mi class="ltx_font_mathscript">ℬ︁</mi></mrow><mo stretchy="false">)</mo></mrow></math></div>
+<div class="ltx_td ltx_align_left bml_eqn_cell"><math id="Ex4.m2" class="ltx_Math" alttext="\displaystyle{}\Leftrightarrow(\neg\mathscr{A}\rightarrow\mathscr{B})" display="inline"><mrow><mi></mi><mo stretchy="false">⇔</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mo rspace="0.167em">¬</mo><mi class="ltx_font_mathscript">𝒜︁</mi></mrow><mo stretchy="false">→</mo><mi class="ltx_font_mathscript">ℬ︁</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math></div>
+</div>
+<div id="Ex5" class="ltx_equation bml_equation ltx_align_baseline" role="group" aria-label="equation">
+<div class="ltx_td ltx_align_right bml_eqn_cell"><math id="Ex5.m1" class="ltx_Math" alttext="\displaystyle(\mathscr{A}\wedge\mathscr{B})" display="inline"><mrow><mo stretchy="false">(</mo><mrow><mi class="ltx_font_mathscript">𝒜︁</mi><mo>∧</mo><mi class="ltx_font_mathscript">ℬ︁</mi></mrow><mo stretchy="false">)</mo></mrow></math></div>
+<div class="ltx_td ltx_align_left bml_eqn_cell"><math id="Ex5.m2" class="ltx_Math" alttext="\displaystyle{}\Leftrightarrow\neg(\mathscr{A}\rightarrow\neg\mathscr{B})" display="inline"><mrow><mi></mi><mo stretchy="false">⇔</mo><mrow><mo>¬</mo><mrow><mo stretchy="false">(</mo><mrow><mi class="ltx_font_mathscript">𝒜︁</mi><mo stretchy="false">→</mo><mrow><mo rspace="0.167em">¬</mo><mi class="ltx_font_mathscript">ℬ︁</mi></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math></div>
+</div>
+</div>
+<p class="ltx_p">Alternatively, we could simply rely upon one of the other two subsidiary results, and (repeatedly) invoke only one of these two equivalences.</p>
+</div>
+<div id="p8" class="ltx_para">
+<p class="ltx_p">In short, there is never any <span class="ltx_text ltx_font_bold">need</span> to add new connectives to TFL. Indeed, there is already some redundancy among the connectives we have: we could have made do with just two connectives, if we had been feeling really austere.</p>
+</div>
+<section id="S1" class="ltx_section normal">
+<div class="section level2">
+<h2 class="ltx_title ltx_title_section">
+<span class="ltx_tag ltx_tag_section header-section-number">46.1</span> Individually functionally complete connectives</h2>
+
+<div id="S1.p1" class="ltx_para">
+<p class="ltx_p">In fact, some two-place connectives are <span class="ltx_text ltx_font_bold">individually</span> functionally complete. These connectives are not standardly included in TFL, since they are rather cumbersome to use. But their existence shows that, if we had wanted to, we could have defined a truth-functional language that was functionally complete, which contained only a single primitive connective.</p>
+</div>
+<div id="S1.p2" class="ltx_para">
+<p class="ltx_p">The first such connective we will consider is ‘<math id="S1.p2.m1" class="ltx_Math" alttext="\uparrow" display="inline"><mo stretchy="false">↑</mo></math>’, which has the following characteristic truth table.</p>
+<div class="bml-overflow-wrapper">
+<table class="ltx_tabular ltx_centering ltx_align_middle">
+<tr class="ltx_tr">
+<td class="ltx_td ltx_align_center"><math id="S1.p2.m2" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math></td>
+<td class="ltx_td ltx_align_center ltx_border_r"><math id="S1.p2.m3" class="ltx_Math" alttext="\mathscr{B}" display="inline"><mi class="ltx_font_mathscript">ℬ︁</mi></math></td>
+<td class="ltx_td ltx_align_center"><math id="S1.p2.m4" class="ltx_Math" alttext="\mathscr{A}\mathrel{\uparrow}\mathscr{B}" display="inline"><mrow><mi class="ltx_font_mathscript">𝒜︁</mi><mo stretchy="false">↑</mo><mi class="ltx_font_mathscript">ℬ︁</mi></mrow></math></td>
+</tr>
+<tr class="ltx_tr">
+<td class="ltx_td ltx_align_center ltx_border_t">T</td>
+<td class="ltx_td ltx_align_center ltx_border_r ltx_border_t">T</td>
+<td class="ltx_td ltx_align_center ltx_border_t">F</td>
+</tr>
+<tr class="ltx_tr">
+<td class="ltx_td ltx_align_center">T</td>
+<td class="ltx_td ltx_align_center ltx_border_r">F</td>
+<td class="ltx_td ltx_align_center">T</td>
+</tr>
+<tr class="ltx_tr">
+<td class="ltx_td ltx_align_center">F</td>
+<td class="ltx_td ltx_align_center ltx_border_r">T</td>
+<td class="ltx_td ltx_align_center">T</td>
+</tr>
+<tr class="ltx_tr">
+<td class="ltx_td ltx_align_center">F</td>
+<td class="ltx_td ltx_align_center ltx_border_r">F</td>
+<td class="ltx_td ltx_align_center">T</td>
+</tr>
+</table>
+</div>
+<p class="ltx_p">This is often called ‘the Sheffer stroke’, after Henry Sheffer, who
+used it to show how to reduce the number of logical connectives in
+Russell and Whitehead’s <span class="ltx_text ltx_font_italic">Principia
+Mathematica</span>.<span id="footnote2" class="ltx_note ltx_role_footnote"><sup class="ltx_note_mark">2</sup><span class="ltx_note_outer"><span class="ltx_note_content"><sup class="ltx_note_mark">2</sup>
+                <span class="ltx_tag ltx_tag_note">2</span>
+                
+                
+                
+                
+                
+                
+                
+              Sheffer, “A set of five independent
+postulates for Boolean algebras, with application to logical
+constants”, <span class="ltx_text ltx_font_italic">Transactions of the American Mathematical
+Society</span> 14 (1913), pp. 481–488</span></span></span> (In fact, Charles Sanders Peirce
+had anticipated Sheffer by about 30 years, but never published his
+results, and the Polish philosopher Edward Stamm published the same
+result two years before Sheffer.)<span id="footnote3" class="ltx_note ltx_role_footnote"><sup class="ltx_note_mark">3</sup><span class="ltx_note_outer"><span class="ltx_note_content"><sup class="ltx_note_mark">3</sup>
+                <span class="ltx_tag ltx_tag_note">3</span>
+                
+                
+                
+                
+                
+                
+                
+              See Peirce’s “A Boolian
+algebra with one constant”, which dates to c. 1880, in Peirce’s
+<span class="ltx_text ltx_font_italic">Collected Papers</span>, vol. 4, pp. 264–5, and Edward Stamm,
+“<span class="ltx_text" lang="de">Beitrag zur Algebra der Logik”,
+<span class="ltx_text ltx_font_italic">Monatshefte für Mathematik und
+Physik</span> 22 (1911), pp. 137–49.</span></span></span></span> It is quite common, as well, to
+call it ‘nand’, since its characteristic truth table is the negation
+of the truth table for ‘<math id="S1.p2.m5" class="ltx_Math" alttext="\wedge" display="inline"><mo>∧</mo></math>’.</p>
+<div class="ltx_logical-block bml_background-color_FDF4FA bml_background-color_FDF4FA" style="padding:9pt;">
+            
+<div id="S1.p2.p1" class="ltx_para ltx_noindent">
+<p class="ltx_p">‘<math id="S1.p2.p1.m1" class="ltx_Math" alttext="\uparrow" display="inline"><mo stretchy="false">↑</mo></math>’ is functionally complete all by itself.</p>
+</div>
+          
+</div>
+</div>
+<div id="S1.p3" class="ltx_para">
+<p class="ltx_p">The Functional Completeness Theorem tells us that ‘<math id="S1.p3.m1" class="ltx_Math" alttext="\neg" display="inline"><mo>¬</mo></math>’ and ‘<math id="S1.p3.m2" class="ltx_Math" alttext="\vee" display="inline"><mo>∨</mo></math>’ are jointly functionally complete. So it suffices to show that, given any scheme which contains only those two connectives, we can rewrite it as an equivalent scheme which contains only ‘<math id="S1.p3.m3" class="ltx_Math" alttext="\uparrow" display="inline"><mo stretchy="false">↑</mo></math>’. As in the proof of the subsidiary cases of the Functional Completeness Theorem, then, we simply apply the following equivalences:</p>
+<div id="A48.S0.EGx26" class="ltx_equationgroup ltx_eqn_align bml_equationgroup bml_equation_container ltx_align_baseline">
+<div id="Ex6" class="ltx_equation bml_equation ltx_align_baseline" role="group" aria-label="equation">
+<div class="ltx_td ltx_align_right bml_eqn_cell"><math id="Ex6.m1" class="ltx_Math" alttext="\displaystyle\neg\mathscr{A}" display="inline"><mrow><mo rspace="0.167em">¬</mo><mi class="ltx_font_mathscript">𝒜︁</mi></mrow></math></div>
+<div class="ltx_td ltx_align_left bml_eqn_cell"><math id="Ex6.m2" class="ltx_Math" alttext="\displaystyle{}\Leftrightarrow(\mathscr{A}\uparrow\mathscr{A})" display="inline"><mrow><mi></mi><mo stretchy="false">⇔</mo><mrow><mo stretchy="false">(</mo><mrow><mi class="ltx_font_mathscript">𝒜︁</mi><mo stretchy="false">↑</mo><mi class="ltx_font_mathscript">𝒜︁</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math></div>
+</div>
+<div id="Ex7" class="ltx_equation bml_equation ltx_align_baseline" role="group" aria-label="equation">
+<div class="ltx_td ltx_align_right bml_eqn_cell"><math id="Ex7.m1" class="ltx_Math" alttext="\displaystyle(\mathscr{A}\vee\mathscr{B})" display="inline"><mrow><mo stretchy="false">(</mo><mrow><mi class="ltx_font_mathscript">𝒜︁</mi><mo>∨</mo><mi class="ltx_font_mathscript">ℬ︁</mi></mrow><mo stretchy="false">)</mo></mrow></math></div>
+<div class="ltx_td ltx_align_left bml_eqn_cell"><math id="Ex7.m2" class="ltx_Math" alttext="\displaystyle{}\Leftrightarrow((\mathscr{A}\uparrow\mathscr{A})\uparrow(%
+\mathscr{B}\uparrow\mathscr{B}))" display="inline"><mrow><mi></mi><mo stretchy="false">⇔</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mo stretchy="false">(</mo><mrow><mi class="ltx_font_mathscript">𝒜︁</mi><mo stretchy="false">↑</mo><mi class="ltx_font_mathscript">𝒜︁</mi></mrow><mo stretchy="false">)</mo></mrow><mo stretchy="false">↑</mo><mrow><mo stretchy="false">(</mo><mrow><mi class="ltx_font_mathscript">ℬ︁</mi><mo stretchy="false">↑</mo><mi class="ltx_font_mathscript">ℬ︁</mi></mrow><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></math></div>
+</div>
+</div>
+<p class="ltx_p">to the Subsidiary Result <span class="ltx_ref ltx_nolink ltx_ref_self"><span class="ltx_text ltx_ref_tag">1.</span></span>.</p>
+</div>
+<div id="S1.p4" class="ltx_para">
+<p class="ltx_p">Similarly, we can consider the connective ‘<math id="S1.p4.m1" class="ltx_Math" alttext="\downarrow" display="inline"><mo stretchy="false">↓</mo></math>’:</p>
+<div class="bml-overflow-wrapper">
+<table class="ltx_tabular ltx_centering ltx_align_middle">
+<tr class="ltx_tr">
+<td class="ltx_td ltx_align_center"><math id="S1.p4.m2" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math></td>
+<td class="ltx_td ltx_align_center ltx_border_r"><math id="S1.p4.m3" class="ltx_Math" alttext="\mathscr{B}" display="inline"><mi class="ltx_font_mathscript">ℬ︁</mi></math></td>
+<td class="ltx_td ltx_align_center"><math id="S1.p4.m4" class="ltx_Math" alttext="\mathscr{A}\mathrel{\downarrow}\mathscr{B}" display="inline"><mrow><mi class="ltx_font_mathscript">𝒜︁</mi><mo stretchy="false">↓</mo><mi class="ltx_font_mathscript">ℬ︁</mi></mrow></math></td>
+</tr>
+<tr class="ltx_tr">
+<td class="ltx_td ltx_align_center ltx_border_t">T</td>
+<td class="ltx_td ltx_align_center ltx_border_r ltx_border_t">T</td>
+<td class="ltx_td ltx_align_center ltx_border_t">F</td>
+</tr>
+<tr class="ltx_tr">
+<td class="ltx_td ltx_align_center">T</td>
+<td class="ltx_td ltx_align_center ltx_border_r">F</td>
+<td class="ltx_td ltx_align_center">F</td>
+</tr>
+<tr class="ltx_tr">
+<td class="ltx_td ltx_align_center">F</td>
+<td class="ltx_td ltx_align_center ltx_border_r">T</td>
+<td class="ltx_td ltx_align_center">F</td>
+</tr>
+<tr class="ltx_tr">
+<td class="ltx_td ltx_align_center">F</td>
+<td class="ltx_td ltx_align_center ltx_border_r">F</td>
+<td class="ltx_td ltx_align_center">T</td>
+</tr>
+</table>
+</div>
+<p class="ltx_p">This is sometimes called the ‘Peirce arrow’ (Peirce himself called it ‘ampheck’). More often, though, it is called ‘nor’, since its characteristic truth table is the negation of ‘<math id="S1.p4.m5" class="ltx_Math" alttext="\vee" display="inline"><mo>∨</mo></math>’, that is, of ‘neither … nor …’.</p>
+<div class="ltx_logical-block bml_background-color_FDF4FA bml_background-color_FDF4FA" style="padding:9pt;">
+            
+<div id="S1.p4.p1" class="ltx_para ltx_noindent">
+<p class="ltx_p">‘<math id="S1.p4.p1.m1" class="ltx_Math" alttext="\downarrow" display="inline"><mo stretchy="false">↓</mo></math>’ is functionally complete all by itself.</p>
+</div>
+          
+</div>
+</div>
+<div id="S1.p5" class="ltx_para">
+<p class="ltx_p">As in the previous result for <math id="S1.p5.m1" class="ltx_Math" alttext="\uparrow" display="inline"><mo stretchy="false">↑</mo></math>, although invoking the equivalences:</p>
+<div id="A48.S0.EGx27" class="ltx_equationgroup ltx_eqn_align bml_equationgroup bml_equation_container ltx_align_baseline">
+<div id="Ex8" class="ltx_equation bml_equation ltx_align_baseline" role="group" aria-label="equation">
+<div class="ltx_td ltx_align_right bml_eqn_cell"><math id="Ex8.m1" class="ltx_Math" alttext="\displaystyle\neg\mathscr{A}" display="inline"><mrow><mo rspace="0.167em">¬</mo><mi class="ltx_font_mathscript">𝒜︁</mi></mrow></math></div>
+<div class="ltx_td ltx_align_left bml_eqn_cell"><math id="Ex8.m2" class="ltx_Math" alttext="\displaystyle{}\Leftrightarrow(\mathscr{A}\downarrow\mathscr{A})" display="inline"><mrow><mi></mi><mo stretchy="false">⇔</mo><mrow><mo stretchy="false">(</mo><mrow><mi class="ltx_font_mathscript">𝒜︁</mi><mo stretchy="false">↓</mo><mi class="ltx_font_mathscript">𝒜︁</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math></div>
+</div>
+<div id="Ex9" class="ltx_equation bml_equation ltx_align_baseline" role="group" aria-label="equation">
+<div class="ltx_td ltx_align_right bml_eqn_cell"><math id="Ex9.m1" class="ltx_Math" alttext="\displaystyle(\mathscr{A}\wedge\mathscr{B})" display="inline"><mrow><mo stretchy="false">(</mo><mrow><mi class="ltx_font_mathscript">𝒜︁</mi><mo>∧</mo><mi class="ltx_font_mathscript">ℬ︁</mi></mrow><mo stretchy="false">)</mo></mrow></math></div>
+<div class="ltx_td ltx_align_left bml_eqn_cell"><math id="Ex9.m2" class="ltx_Math" alttext="\displaystyle{}\Leftrightarrow((\mathscr{A}\downarrow\mathscr{A})\downarrow(%
+\mathscr{B}\downarrow\mathscr{B}))" display="inline"><mrow><mi></mi><mo stretchy="false">⇔</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mo stretchy="false">(</mo><mrow><mi class="ltx_font_mathscript">𝒜︁</mi><mo stretchy="false">↓</mo><mi class="ltx_font_mathscript">𝒜︁</mi></mrow><mo stretchy="false">)</mo></mrow><mo stretchy="false">↓</mo><mrow><mo stretchy="false">(</mo><mrow><mi class="ltx_font_mathscript">ℬ︁</mi><mo stretchy="false">↓</mo><mi class="ltx_font_mathscript">ℬ︁</mi></mrow><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></math></div>
+</div>
+</div>
+<p class="ltx_p">and Subsidiary Result <span class="ltx_ref ltx_nolink ltx_ref_self"><span class="ltx_text ltx_ref_tag">2.</span></span>.</p>
+</div>
+</div>
+</section>
+<section id="S2" class="ltx_section normal">
+<div class="section level2">
+<h2 class="ltx_title ltx_title_section">
+<span class="ltx_tag ltx_tag_section header-section-number">46.2</span> Failures of functional completeness</h2>
+
+<div id="S2.p1" class="ltx_para">
+<p class="ltx_p">In fact, the <span class="ltx_text ltx_font_bold">only</span> two-place connectives which are individually functionally complete are ‘<math id="S2.p1.m1" class="ltx_Math" alttext="\uparrow" display="inline"><mo stretchy="false">↑</mo></math>’ and ‘<math id="S2.p1.m2" class="ltx_Math" alttext="\downarrow" display="inline"><mo stretchy="false">↓</mo></math>’. But how would we show this? More generally, how can we show that some connectives are <span class="ltx_text ltx_font_bold">not</span> jointly functionally complete?</p>
+</div>
+<div id="S2.p2" class="ltx_para">
+<p class="ltx_p">The obvious thing to do is to try to find some truth table which we <span class="ltx_text ltx_font_bold">cannot</span> express, using just the given connectives. But there is a bit of an art to this.</p>
+</div>
+<div id="S2.p3" class="ltx_para">
+<p class="ltx_p">To make this concrete, let’s consider the question of whether ‘<math id="S2.p3.m1" class="ltx_Math" alttext="\vee" display="inline"><mo>∨</mo></math>’ is functionally complete all by itself. After a little reflection, it should be clear that it is not. In particular, it should be clear that any scheme which only contains disjunctions cannot have the same truth table as negation, i.e.:</p>
+<div class="bml-overflow-wrapper">
+<table class="ltx_tabular ltx_centering ltx_align_middle">
+<tr class="ltx_tr">
+<td class="ltx_td ltx_align_center ltx_border_r"><math id="S2.p3.m2" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math></td>
+<td class="ltx_td ltx_align_center"><math id="S2.p3.m3" class="ltx_Math" alttext="\neg\mathscr{A}" display="inline"><mrow><mo rspace="0.167em">¬</mo><mi class="ltx_font_mathscript">𝒜︁</mi></mrow></math></td>
+</tr>
+<tr class="ltx_tr">
+<td class="ltx_td ltx_align_center ltx_border_r ltx_border_t">T</td>
+<td class="ltx_td ltx_align_center ltx_border_t">F</td>
+</tr>
+<tr class="ltx_tr">
+<td class="ltx_td ltx_align_center ltx_border_r">F</td>
+<td class="ltx_td ltx_align_center">T</td>
+</tr>
+</table>
+</div>
+<p class="ltx_p">The intuitive reason, why this should be so, is simple: the top line of the desired truth table needs to have the value False; but the top line of any truth table for a scheme which <span class="ltx_text ltx_font_bold">only</span> contains <math id="S2.p3.m4" class="ltx_Math" alttext="\vee" display="inline"><mo>∨</mo></math> will always be True. The same is true for <math id="S2.p3.m5" class="ltx_Math" alttext="\wedge" display="inline"><mo>∧</mo></math>, <math id="S2.p3.m6" class="ltx_Math" alttext="\rightarrow" display="inline"><mo stretchy="false">→</mo></math>, and <math id="S2.p3.m7" class="ltx_Math" alttext="\leftrightarrow" display="inline"><mo stretchy="false">↔</mo></math>.</p>
+<div class="ltx_logical-block bml_background-color_FDF4FA bml_background-color_FDF4FA" style="padding:9pt;">
+            
+<div id="S2.p3.p1" class="ltx_para ltx_noindent">
+<p class="ltx_p">‘<math id="S2.p3.p1.m1" class="ltx_Math" alttext="\vee" display="inline"><mo>∨</mo></math>’, ‘<math id="S2.p3.p1.m2" class="ltx_Math" alttext="\wedge" display="inline"><mo>∧</mo></math>’, ‘<math id="S2.p3.p1.m3" class="ltx_Math" alttext="\rightarrow" display="inline"><mo stretchy="false">→</mo></math>’, and ‘<math id="S2.p3.p1.m4" class="ltx_Math" alttext="\leftrightarrow" display="inline"><mo stretchy="false">↔</mo></math>’ are not functionally complete by themselves.</p>
+</div>
+          
+</div>
+</div>
+<div id="S2.p4" class="ltx_para">
+<p class="ltx_p">In fact, the following is true:</p>
+</div>
+<div id="S2.p5" class="ltx_para bml_background-color_FDF4FA ltx_noindent bml_background-color_FDF4FA" style="padding:9pt;">
+<p class="ltx_p">The <span class="ltx_text ltx_font_bold">only</span> two-place connectives that are functionally complete by themselves are ‘<math id="S2.p5.m1" class="ltx_Math" alttext="\uparrow" display="inline"><mo stretchy="false">↑</mo></math>’ and ‘<math id="S2.p5.m2" class="ltx_Math" alttext="\downarrow" display="inline"><mo stretchy="false">↓</mo></math>’.</p>
+</div>
+<div id="S2.p6" class="ltx_para">
+<p class="ltx_p">This is of course harder to prove than for the primitive connectives. For instance, the “exclusive or” connective does not have a T in the first line of its characteristic truth table, and so the method used above no longer suffices to show that it cannot express all truth tables. It is also harder to show that, e.g., ‘<math id="S2.p6.m1" class="ltx_Math" alttext="\leftrightarrow" display="inline"><mo stretchy="false">↔</mo></math>’ and ‘<math id="S2.p6.m2" class="ltx_Math" alttext="\neg" display="inline"><mo>¬</mo></math>’ <span class="ltx_text ltx_font_bold">together</span> are not functionally complete.</p>
+</div>
+</div>
+</section>
+</div>
+</section>
+</div>
+</div>
+</div>
+<a href="Ch45.html" class="navigation navigation-prev" aria-label="Previous page"><i class="fa fa-angle-left"></i></a><a href="Ch47.html" class="navigation navigation-next" aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+</div>
+</div>
+</body>
+
+</html>

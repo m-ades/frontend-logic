@@ -1,6 +1,7 @@
 import {
   Dashboard as DashboardIcon,
   MenuBook as GradebookIcon,
+  Link as TextbookLinksIcon,
   ContactSupport as ContactIcon,
   AdminPanelSettings as ControlsIcon,
   Assignment as AssignmentIcon,
@@ -29,24 +30,30 @@ export default [
   },
   {
     id: 3,
+    label: "Textbook Links",
+    link: "/instructor/textbook-links",
+    icon: <TextbookLinksIcon />,
+  },
+  {
+    id: 4,
     label: "Gradebook",
     link: "/instructor/gradebook",
     icon: <GradebookIcon />,
   },
   {
-    id: 4,
+    id: 5,
     label: "Roster",
     link: "/instructor/roster",
     icon: <RosterIcon />,
   },
   {
-    id: 5,
+    id: 6,
     label: "Contact",
     link: "/instructor/contact",
     icon: <ContactIcon />,
   },
   {
-    id: 6,
+    id: 7,
     label: "Course Controls",
     link: "/instructor/controls",
     icon: <ControlsIcon />,

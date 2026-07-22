@@ -1,0 +1,630 @@
+<!DOCTYPE html><html style="--bml-ltx-font-size:10;" class="bml_mathjax4" lang="en">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<title>Chapter 22 Soundness and completeness ‣ Part IV Natural deduction for TFL ‣ forall x: Calgary</title>
+<!--Generated on Tue Jul 21 20:13:15 2026 by LaTeXML (version 0.8.8) http://dlmf.nist.gov/LaTeXML/.-->
+<!--Document created on Fall 2025 (2026‐07‐18 8642250).-->
+
+<link rel="stylesheet" href="LaTeXML.css" type="text/css">
+<link rel="stylesheet" href="ltx-book.css" type="text/css">
+<link rel="stylesheet" href="bookml/gitbook/css/style.css" type="text/css">
+<link rel="stylesheet" href="bookml/gitbook/css/plugin-table.css" type="text/css">
+<link rel="stylesheet" href="bookml/gitbook/css/plugin-search.css" type="text/css">
+<link rel="stylesheet" href="bookml/gitbook/css/plugin-bookdown.css" type="text/css">
+<link rel="stylesheet" href="bookml/gitbook/css/plugin-fontsettings.css" type="text/css">
+<link rel="stylesheet" href="bookml/CSS/style.css" type="text/css">
+<link rel="stylesheet" href="bookml/CSS/style.gitbook,plain.css" type="text/css">
+<link rel="stylesheet" href="bookml/CSS/style.gitbook.css" type="text/css">
+<link rel="stylesheet" href="bmluser/colors.gitbook-forallxyyc-html.css" type="text/css">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<link rel="stylesheet" href="forallxyyc.css" type="text/css">
+<link rel="stylesheet" href="fitchml.css" type="text/css">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script><script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6"></script>
+<link rel="up" href="Pt4.html" title="Part IV Natural deduction for TFL ‣ forall x: Calgary">
+<link rel="up up" href="index.html" title="forall x: Calgary">
+<link rel="start" href="index.html" title="forall x: Calgary">
+<link rel="prev" href="Ch21.html" title="Chapter 21 Derived rules ‣ Part IV Natural deduction for TFL ‣ forall x: Calgary">
+<link rel="next" href="Pt5.html" title="Part V First-order logic ‣ forall x: Calgary">
+<link rel="chapter" href="Ch16.html" title="Chapter 16 The very idea of natural deduction ‣ Part IV Natural deduction for TFL ‣ forall x: Calgary">
+<link rel="chapter" href="Ch17.html" title="Chapter 17 Basic rules for TFL ‣ Part IV Natural deduction for TFL ‣ forall x: Calgary">
+<link rel="chapter" href="Ch18.html" title="Chapter 18 Constructing proofs ‣ Part IV Natural deduction for TFL ‣ forall x: Calgary">
+<link rel="chapter" href="Ch19.html" title="Chapter 19 Additional rules for TFL ‣ Part IV Natural deduction for TFL ‣ forall x: Calgary">
+<link rel="chapter" href="Ch20.html" title="Chapter 20 Proof-theoretic concepts ‣ Part IV Natural deduction for TFL ‣ forall x: Calgary">
+<link rel="chapter" href="Ch21.html" title="Chapter 21 Derived rules ‣ Part IV Natural deduction for TFL ‣ forall x: Calgary">
+<link rel="chapter" href="Chx1.html" title="Preface ‣ forall x: Calgary">
+<link rel="part" href="Pt1.html" title="Part I Key notions of logic ‣ forall x: Calgary">
+<link rel="part" href="Pt2.html" title="Part II Truth-functional logic ‣ forall x: Calgary">
+<link rel="part" href="Pt3.html" title="Part III Truth tables ‣ forall x: Calgary">
+<link rel="part" href="Pt4.html" title="Part IV Natural deduction for TFL ‣ forall x: Calgary">
+<link rel="part" href="Pt5.html" title="Part V First-order logic ‣ forall x: Calgary">
+<link rel="part" href="Pt6.html" title="Part VI Interpretations ‣ forall x: Calgary">
+<link rel="part" href="Pt7.html" title="Part VII Natural deduction for FOL ‣ forall x: Calgary">
+<link rel="part" href="Pt8.html" title="Part VIII Modal logic ‣ forall x: Calgary">
+<link rel="part" href="Pt9.html" title="Part IX Metatheory ‣ forall x: Calgary">
+<link rel="part" href="Ptx1.html" title="Appendices ‣ forall x: Calgary">
+<link rel="part" href="Ptx2.html" title="Solutions to selected exercices ‣ forall x: Calgary">
+<script src="bookml/js/mathjax4.js" defer></script>
+</head>
+<body class="bml_class_book">
+<div class="book without-animation font-size-2 font-family-1" data-basepath=".">
+<a href="#bml-main-content" tabindex="0" class="bml-skip-to-content">Skip to content.</a>
+<div class="book-summary"><nav class="ltx_page_navbar">
+<ul class="ltx_toclist summary">
+<li>
+<a href="index.html" title="" class="ltx_ref" rel="start">forall x: Calgary</a>
+</li>
+<li class="divider" aria-hidden="true"></li>
+<li data-level="" data-path="Chx1.html" class="ltx_tocentry ltx_tocentry_chapter  chapter "><a href="Chx1.html" title="In forall x: Calgary" class="ltx_ref">Preface</a></li>
+<li data-level="I" data-path="Pt1.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt1.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">I </span></b>Key notions of logic</a></li>
+<li data-level="II" data-path="Pt2.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt2.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">II </span></b>Truth-functional logic</a></li>
+<li data-level="III" data-path="Pt3.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt3.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">III </span></b>Truth tables</a></li>
+<li data-level="IV" data-path="Pt4.html" class="ltx_tocentry ltx_tocentry_part  chapter ">
+<a href="Pt4.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">IV </span></b>Natural deduction for TFL</a>
+<ol class="ltx_toclist ltx_toclist_part">
+<li data-level="16" data-path="Ch16.html" class="ltx_tocentry ltx_tocentry_chapter  chapter "><a href="Ch16.html" title="In Part IV Natural deduction for TFL ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">16 </span></b>The very idea of natural deduction</a></li>
+<li data-level="17" data-path="Ch17.html" class="ltx_tocentry ltx_tocentry_chapter  chapter "><a href="Ch17.html" title="In Part IV Natural deduction for TFL ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">17 </span></b>Basic rules for TFL</a></li>
+<li data-level="18" data-path="Ch18.html" class="ltx_tocentry ltx_tocentry_chapter  chapter "><a href="Ch18.html" title="In Part IV Natural deduction for TFL ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">18 </span></b>Constructing proofs</a></li>
+<li data-level="19" data-path="Ch19.html" class="ltx_tocentry ltx_tocentry_chapter  chapter "><a href="Ch19.html" title="In Part IV Natural deduction for TFL ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">19 </span></b>Additional rules for TFL</a></li>
+<li data-level="20" data-path="Ch20.html" class="ltx_tocentry ltx_tocentry_chapter  chapter "><a href="Ch20.html" title="In Part IV Natural deduction for TFL ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">20 </span></b>Proof-theoretic concepts</a></li>
+<li data-level="21" data-path="Ch21.html" class="ltx_tocentry ltx_tocentry_chapter  chapter "><a href="Ch21.html" title="In Part IV Natural deduction for TFL ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">21 </span></b>Derived rules</a></li>
+<li data-level="22" data-path="" class="ltx_tocentry ltx_tocentry_chapter ltx_ref_self  chapter active">
+<a href="" title="In Part IV Natural deduction for TFL ‣ forall x: Calgary" aria-current="page" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">22 </span></b>Soundness and completeness</a>
+<ol class="ltx_toclist ltx_toclist_chapter">
+<li data-level="" data-path="" class="ltx_tocentry ltx_tocentry_section  chapter "><a href="#Sx1" title="In Chapter 22 Soundness and completeness ‣ Part IV Natural deduction for TFL ‣ forall x: Calgary" class="ltx_ref">Practice exercises</a></li>
+</ol>
+</li>
+</ol>
+</li>
+<li data-level="V" data-path="Pt5.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt5.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">V </span></b>First-order logic</a></li>
+<li data-level="VI" data-path="Pt6.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt6.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">VI </span></b>Interpretations</a></li>
+<li data-level="VII" data-path="Pt7.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt7.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">VII </span></b>Natural deduction for FOL</a></li>
+<li data-level="VIII" data-path="Pt8.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt8.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">VIII </span></b>Modal logic</a></li>
+<li data-level="IX" data-path="Pt9.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt9.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">IX </span></b>Metatheory</a></li>
+<li data-level="" data-path="Ptx1.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Ptx1.html" title="In forall x: Calgary" class="ltx_ref">Appendices</a></li>
+<li data-level="" data-path="Ptx2.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Ptx2.html" title="In forall x: Calgary" class="ltx_ref">Solutions to selected exercices</a></li>
+</ul>
+</nav></div>
+
+<div class="ltx_page_main book-body fixed">
+<div class="body-inner">
+<header class="book-header fixed" aria-label="toolbar"><span class="bml-separator"></span></header>
+<div class="page-wrapper" tabindex="-1" role="main">
+<div class="ltx_page_content page-inner" id="bml-main-content">
+<script src="bookml/gitbook/js/app.min.js"></script>
+<script src="bookml/gitbook/js/jquery.highlight.js"></script>
+<script src="bookml/gitbook/js/plugin-search.js"></script>
+<script src="bookml/gitbook/js/plugin-fontsettings.js"></script>
+<script src="bookml/gitbook/js/plugin-bookdown.js"></script>
+<script type="text/javascript">
+                  gitbook.require(["gitbook"], function(gitbook) {
+                  gitbook.start({
+                    "fontsettings": {
+                      "theme": "white",
+                      "family": "sans",
+                      "size": 2
+                    },
+                    "download": [ [ "forallxyyc.pdf", "PDF" ], [ "forallxyyc-accessible.pdf", "PDF (accessible)" ], ],
+                    "search": {
+                      "engine": "fuse"
+                    },
+                    "toc": {
+                      "collapse": "none"
+                    }
+                  });
+                });
+              </script>
+
+<section class="ltx_chapter ltx_authors_1line normal" lang="en">
+<div class="section level1">
+<h1 class="ltx_title ltx_title_chapter">
+<span class="ltx_tag ltx_tag_chapter header-section-number">Chapter 22</span> Soundness and completeness</h1>
+
+<div id="p1" class="ltx_para">
+<p class="ltx_p">In <a href="A20.html" title="Solutions to Chapter 20 Proof-theoretic concepts ‣ Solutions to selected exercices ‣ forall x: Calgary" class="ltx_ref"><span class="ltx_text ltx_ref_tag">appendix</span> <span class="ltx_text ltx_ref_tag">20</span></a>, we saw that we could use
+derivations to test for similar things we used truth tables to test
+for. Not only could show that a conclusion is derivable from some
+premises, we could also use them to test if a sentence is a theorem or
+a pair of sentences are interderivable. We also started using the
+single turnstile the same way we used the double turnstile. If we
+could prove that <math id="p1.m1" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math> was a tautology using a truth table, we
+wrote <math id="p1.m2" class="ltx_Math" alttext="\vDash\mathscr{A}" display="inline"><mrow><mi></mi><mo>⊨</mo><mi class="ltx_font_mathscript">𝒜︁</mi></mrow></math>, and if we could prove it using a
+derivation, we wrote <math id="p1.m3" class="ltx_Math" alttext="\vdash\mathscr{A}" display="inline"><mrow><mi></mi><mo>⊢</mo><mi class="ltx_font_mathscript">𝒜︁</mi></mrow></math>.</p>
+</div>
+<div id="p2" class="ltx_para">
+<p class="ltx_p">You may have wondered at that point if the two kinds of turnstiles
+always worked the same way. If you can show that <math id="p2.m1" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math> is a
+tautology using truth tables, can you also always show that it is a
+theorem using a derivation? Is the reverse true? Are these things also
+true for valid arguments and pairs of equivalent sentences? As it
+turns out, the answer to all these questions and many more like them
+is yes. We can show this by proving that the concepts based on truth
+tables and the corresponding concepts based on derivations are
+equivalent. That is, we show that, e.g., <math id="p2.m2" class="ltx_Math" alttext="\vDash\mathscr{A}" display="inline"><mrow><mi></mi><mo>⊨</mo><mi class="ltx_font_mathscript">𝒜︁</mi></mrow></math> if⁠f
+<math id="p2.m3" class="ltx_Math" alttext="\vdash\mathscr{A}" display="inline"><mrow><mi></mi><mo>⊢</mo><mi class="ltx_font_mathscript">𝒜︁</mi></mrow></math> for any sentence <math id="p2.m4" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math>.</p>
+</div>
+<div id="p3" class="ltx_para">
+<p class="ltx_p">To begin with, we need to define all of our logical concepts separately for truth tables and derivations. A lot of this work has already been done. We handled all of the truth table definitions in <a href="Ch12.html" title="Chapter 12 Semantic concepts ‣ Part III Truth tables ‣ forall x: Calgary" class="ltx_ref"><span class="ltx_text ltx_ref_tag">chapter</span> <span class="ltx_text ltx_ref_tag">12</span></a>. We have also already given proof-theoretic definitions for theorems and pairs of interderivable sentences. The other definitions follow naturally. For most logical properties we can devise a test using derivations, and those that we cannot test for directly can be defined in terms of the concepts that we can define.</p>
+</div>
+<div id="p4" class="ltx_para">
+<p class="ltx_p">For instance, we defined a theorem as a sentence that can be derived
+without any premises (p. <a href="Ch20.html" title="Chapter 20 Proof-theoretic concepts ‣ Part IV Natural deduction for TFL ‣ forall x: Calgary" class="ltx_ref"><span class="ltx_text ltx_ref_tag">20</span></a>).
+We can define an <dfn>inconsistent sentence in TFL</dfn>
+ as a sentence from which we
+can derive the contradiction ‘<math id="p4.m1" class="ltx_Math" alttext="\bot" display="inline"><mo>⊥</mo></math>’.<span id="footnote1" class="ltx_note ltx_role_footnote"><sup class="ltx_note_mark">1</sup><span class="ltx_note_outer"><span class="ltx_note_content"><sup class="ltx_note_mark">1</sup>
+              <span class="ltx_tag ltx_tag_note">1</span>
+              
+              
+              
+              
+              
+              
+              
+            Note that <math id="footnote1.m1" class="ltx_Math" alttext="\mathscr{A}\vdash\bot" display="inline"><mrow><mi class="ltx_font_mathscript">𝒜︁</mi><mo rspace="0em">⊢</mo><mo lspace="0em">⊥</mo></mrow></math> if⁠f <math id="footnote1.m2" class="ltx_Math" alttext="\lnot\mathscr{A}" display="inline"><mrow><mo rspace="0.167em">¬</mo><mi class="ltx_font_mathscript">𝒜︁</mi></mrow></math> is a theorem.</span></span></span> The syntactic
+definition of a contingent sentence is a little different. We don’t
+have any practical, finite method for proving that a sentence is
+contingent using derivations, the way we did using truth tables. So we
+have to content ourselves with defining “contingent sentence”
+negatively. A sentence is <dfn>proof-theoretically contingent in
+TFL</dfn>
+  if it is neither a
+theorem nor an inconsistent sentence.</p>
+</div>
+<div id="p5" class="ltx_para">
+<p class="ltx_p">A collection of sentences is <dfn>inconsistent in TFL</dfn>
+
+ if and only if one can
+derive the contradiction <math id="p5.m1" class="ltx_Math" alttext="\bot" display="inline"><mo>⊥</mo></math> from them. Consistency, on the other
+hand, is like contingency, in that we do not have a practical finite
+method to test for it directly. So again, we have to define a term
+negatively. A collection of sentences is <dfn>consistent in TFL</dfn>
+
+ if and only if it is not
+inconsistent.</p>
+</div>
+<div id="p6" class="ltx_para">
+<p class="ltx_p">Finally, an argument is <dfn>provably valid in TFL</dfn>
+  if and only if there is a derivation of its conclusion from its premises. All of these definitions are given in <a href="#T1" title="In Chapter 22 Soundness and completeness ‣ Part IV Natural deduction for TFL ‣ forall x: Calgary" class="ltx_ref"><span class="ltx_text ltx_ref_tag">table</span> <span class="ltx_text ltx_ref_tag">22.1</span></a>.</p>
+</div>
+<figure id="T1" class="ltx_table"><div class="bml-overflow-wrapper">
+<table class="ltx_tabular ltx_align_middle">
+<tr class="ltx_tr">
+<td class="ltx_td ltx_align_justify ltx_border_rr">
+<span class="ltx_inline-block ltx_align_top">
+<span class="ltx_p"><span class="ltx_text ltx_font_bold">Concepts</span></span>
+</span>
+</td>
+<td class="ltx_td ltx_align_justify ltx_border_r">
+<span class="ltx_inline-block ltx_align_top">
+<span class="ltx_p"><span class="ltx_text ltx_font_bold">Truth table (semantic) definition</span></span>
+</span>
+</td>
+<td class="ltx_td ltx_align_justify">
+<span class="ltx_inline-block ltx_align_top">
+<span class="ltx_p"><span class="ltx_text ltx_font_bold">Proof-theoretic (syntactic) definition</span></span>
+</span>
+</td>
+</tr>
+<tr class="ltx_tr">
+<td class="ltx_td ltx_align_justify ltx_border_rr ltx_border_tt">
+<span class="ltx_inline-block ltx_align_top">
+<span class="ltx_p">Tautology/ theorem</span>
+</span>
+</td>
+<td class="ltx_td ltx_align_justify ltx_border_r ltx_border_tt">
+<span class="ltx_inline-block ltx_align_top">
+<span class="ltx_p">A sentence whose truth table only has Ts under the main connective</span>
+</span>
+</td>
+<td class="ltx_td ltx_align_justify ltx_border_tt">
+<span class="ltx_inline-block ltx_align_top">
+<span class="ltx_p">A sentence that can be derived without any premises.</span>
+</span>
+</td>
+</tr>
+<tr class="ltx_tr">
+<td class="ltx_td ltx_align_justify ltx_border_rr ltx_border_t">
+<span class="ltx_inline-block ltx_align_top">
+<span class="ltx_p">Contradiction/ inconsistent sentence</span>
+</span>
+</td>
+<td class="ltx_td ltx_align_justify ltx_border_r ltx_border_t">
+<span class="ltx_inline-block ltx_align_top">
+<span class="ltx_p">A sentence whose truth table
+only has Fs under the main connective</span>
+</span>
+</td>
+<td class="ltx_td ltx_align_justify ltx_border_t">
+<span class="ltx_inline-block ltx_align_top">
+<span class="ltx_p">A sentence from which the
+contradiction <math id="T1.m1" class="ltx_Math" alttext="\bot" display="inline"><mo>⊥</mo></math> can be derived</span>
+</span>
+</td>
+</tr>
+<tr class="ltx_tr">
+<td class="ltx_td ltx_align_justify ltx_border_rr ltx_border_t">
+<span class="ltx_inline-block ltx_align_top">
+<span class="ltx_p">Contingent sentence</span>
+</span>
+</td>
+<td class="ltx_td ltx_align_justify ltx_border_r ltx_border_t">
+<span class="ltx_inline-block ltx_align_top">
+<span class="ltx_p">A sentence whose truth table contains both Ts and Fs under the main connective</span>
+</span>
+</td>
+<td class="ltx_td ltx_align_justify ltx_border_t">
+<span class="ltx_inline-block ltx_align_top">
+<span class="ltx_p">A sentence that is not a theorem or inconsistent</span>
+</span>
+</td>
+</tr>
+<tr class="ltx_tr">
+<td class="ltx_td ltx_align_justify ltx_border_rr ltx_border_t">
+<span class="ltx_inline-block ltx_align_top">
+<span class="ltx_p">Equivalent/ interderivable sentences</span>
+</span>
+</td>
+<td class="ltx_td ltx_align_justify ltx_border_r ltx_border_t">
+<span class="ltx_inline-block ltx_align_top">
+<span class="ltx_p">The columns under the main connectives are identical.</span>
+</span>
+</td>
+<td class="ltx_td ltx_align_justify ltx_border_t">
+<span class="ltx_inline-block ltx_align_top">
+<span class="ltx_p">The sentences can be derived from each other</span>
+</span>
+</td>
+</tr>
+<tr class="ltx_tr">
+<td class="ltx_td ltx_align_justify ltx_border_rr ltx_border_t">
+<span class="ltx_inline-block ltx_align_top">
+<span class="ltx_p">Unsatisfiable/ inconsistent sentences</span>
+</span>
+</td>
+<td class="ltx_td ltx_align_justify ltx_border_r ltx_border_t">
+<span class="ltx_inline-block ltx_align_top">
+<span class="ltx_p">Sentences which do not have a single line in their truth table where they are all true.</span>
+</span>
+</td>
+<td class="ltx_td ltx_align_justify ltx_border_t">
+<span class="ltx_inline-block ltx_align_top">
+<span class="ltx_p">Sentences from which one can derive the contradiction <math id="T1.m2" class="ltx_Math" alttext="\bot" display="inline"><mo>⊥</mo></math></span>
+</span>
+</td>
+</tr>
+<tr class="ltx_tr">
+<td class="ltx_td ltx_align_justify ltx_border_rr ltx_border_t">
+<span class="ltx_inline-block ltx_align_top">
+<span class="ltx_p">Satisfiable/ Consistent sentences</span>
+</span>
+</td>
+<td class="ltx_td ltx_align_justify ltx_border_r ltx_border_t">
+<span class="ltx_inline-block ltx_align_top">
+<span class="ltx_p">Sentences which have at least one
+line in their truth table where they are all true.</span>
+</span>
+</td>
+<td class="ltx_td ltx_align_justify ltx_border_t">
+<span class="ltx_inline-block ltx_align_top">
+<span class="ltx_p">Sentences from
+which the contradiction <math id="T1.m3" class="ltx_Math" alttext="\bot" display="inline"><mo>⊥</mo></math> cannot be derived</span>
+</span>
+</td>
+</tr>
+<tr class="ltx_tr">
+<td class="ltx_td ltx_align_justify ltx_border_rr ltx_border_t">
+<span class="ltx_inline-block ltx_align_top">
+<span class="ltx_p">Valid argument</span>
+</span>
+</td>
+<td class="ltx_td ltx_align_justify ltx_border_r ltx_border_t">
+<span class="ltx_inline-block ltx_align_top">
+<span class="ltx_p">An argument whose truth table has no lines where there are all Ts under main connectives for the premises and an F under the main connective for the conclusion.</span>
+</span>
+</td>
+<td class="ltx_td ltx_align_justify ltx_border_t">
+<span class="ltx_inline-block ltx_align_top">
+<span class="ltx_p">An argument where one can derive the conclusion from the premises.</span>
+</span>
+</td>
+</tr>
+</table>
+</div>
+<figcaption class="ltx_caption"><span class="ltx_tag ltx_tag_table">Table 22.1: </span>Two ways to define logical concepts.</figcaption>
+</figure>
+<div id="p7" class="ltx_para">
+<p class="ltx_p">We now have matching pairs of concepts defined once
+semantically (using valuations and truth tables) and once
+proof-theoretically (on the basis of natural deduction). How can we
+establish that these definitions always work the same way? A full
+proof here goes well beyond the scope of this book. However, we can
+sketch what it would be like. We will focus on showing the two notions
+of validity to be equivalent. From that the other concepts will follow
+quickly. The proof will have to go in two directions. First we will
+have to show that things which are proof-theoretically valid will also
+be semantically valid. In other words, everything that we can prove
+using derivations could also be proven using truth tables. Put
+symbolically, we want to show that <math id="p7.m1" class="ltx_Math" alttext="\vdash" display="inline"><mo>⊢</mo></math> implies
+<math id="p7.m2" class="ltx_Math" alttext="\vDash" display="inline"><mo>⊨</mo></math>. Afterwards, we will need to show things in the
+other directions, <math id="p7.m3" class="ltx_Math" alttext="\vDash" display="inline"><mo>⊨</mo></math> implies <math id="p7.m4" class="ltx_Math" alttext="\vdash" display="inline"><mo>⊢</mo></math></p>
+</div>
+<div id="p8" class="ltx_para">
+<p class="ltx_p">This argument from <math id="p8.m1" class="ltx_Math" alttext="\vdash" display="inline"><mo>⊢</mo></math> to <math id="p8.m2" class="ltx_Math" alttext="\vDash" display="inline"><mo>⊨</mo></math> is the problem of
+<dfn>soundness</dfn>
+. A proof system is
+<dfn>sound</dfn>
+ if there are no derivations of arguments that can be
+shown invalid by truth tables.  Demonstrating
+that the proof system is sound would require showing that <span class="ltx_text ltx_font_bold">any</span>
+possible proof is the proof of a valid argument. It would not be
+enough simply to succeed when trying to prove many valid arguments and
+to fail when trying to prove invalid ones. The proof itself requires
+some care. In a nutshell, it involves showing that every inference
+rule preserves the property that its conclusion is entailed by the
+premises of the proof together with whatever assumptions are open. You
+can find the details of this proof worked out in <a href="Ch48.html" title="Chapter 48 Soundness ‣ Part IX Metatheory ‣ forall x: Calgary" class="ltx_ref"><span class="ltx_text ltx_ref_tag">chapter</span> <span class="ltx_text ltx_ref_tag">48</span></a>.</p>
+</div>
+<div id="p9" class="ltx_para">
+<p class="ltx_p">Soundness means that <math id="p9.m1" class="ltx_Math" alttext="\mathscr{A}\vdash\mathscr{B}" display="inline"><mrow><mi class="ltx_font_mathscript">𝒜︁</mi><mo>⊢</mo><mi class="ltx_font_mathscript">ℬ︁</mi></mrow></math> implies <math id="p9.m2" class="ltx_Math" alttext="\mathscr{A}\vDash\mathscr{B}." display="inline"><mrow><mrow><mi class="ltx_font_mathscript">𝒜︁</mi><mo>⊨</mo><mi class="ltx_font_mathscript">ℬ︁</mi></mrow><mo lspace="0em">.</mo></mrow></math> What about the other direction, that is, why
+think that <span class="ltx_text ltx_font_bold">every</span> argument that can be shown valid using truth
+tables can also be proven using a derivation?</p>
+</div>
+<div id="p10" class="ltx_para">
+<p class="ltx_p">This is the problem of completeness. A proof system has the property of <dfn>completeness</dfn>
+ if and only if there is a derivation of every semantically valid argument. Proving that a system is complete is generally harder than proving that it is sound. Proving that a system is sound amounts to showing that all of the rules of your proof system work the way they are supposed to. Showing that a system is complete means showing that you have included <span class="ltx_text ltx_font_bold">all</span> the rules you need, that you haven’t left any out. Showing this is beyond the scope of this book. The important point is that, happily, the proof system for TFL is both sound and complete. This is not the case for all proof systems or all formal languages. Because it is true of TFL, we can choose to give proofs or give truth tables—whichever is easier for the task at hand.</p>
+</div>
+<div id="p11" class="ltx_para">
+<p class="ltx_p">Now that we know that the truth table method is interchangeable with the method of derivations, you can chose which method you want to use for any given problem. Students often prefer to use truth tables, because they can be produced purely mechanically, and that seems ‘easier’. However, we have already seen that truth tables become impossibly large after just a few sentence letters. On the other hand, there are a couple of situations where using proofs simply isn’t possible. We syntactically defined a contingent sentence as a sentence that couldn’t be proven to be a tautology or a contradiction. There is no practical way to prove this kind of negative statement. We will never know if there isn’t some proof out there that a statement is a contradiction and we just haven’t found it yet. We have nothing to do in this situation but resort to truth tables. Similarly, we can use derivations to prove two sentences equivalent, but what if we want to prove that they are <span class="ltx_text ltx_font_bold">not</span> equivalent? We have no way of proving that we will never find the relevant proof. So we have to fall back on truth tables again.</p>
+</div>
+<div id="p12" class="ltx_para">
+<p class="ltx_p"><a href="#T2" title="In Chapter 22 Soundness and completeness ‣ Part IV Natural deduction for TFL ‣ forall x: Calgary" class="ltx_ref"><span class="ltx_text ltx_ref_tag">Table</span> <span class="ltx_text ltx_ref_tag">22.2</span></a> summarizes when it is best to give proofs
+and when it is best to give truth tables.</p>
+</div>
+<figure id="T2" class="ltx_table"><div class="bml-overflow-wrapper">
+<table class="ltx_tabular ltx_align_middle">
+<tr class="ltx_tr">
+<td class="ltx_td ltx_align_justify ltx_border_rr">
+<span class="ltx_inline-block ltx_align_top">
+<span class="ltx_p"><span class="ltx_text ltx_font_bold">Logical property</span></span>
+</span>
+</td>
+<td class="ltx_td ltx_align_justify ltx_border_r">
+<span class="ltx_inline-block ltx_align_top">
+<span class="ltx_p"><span class="ltx_text ltx_font_bold">To prove it present</span></span>
+</span>
+</td>
+<td class="ltx_td ltx_align_justify">
+<span class="ltx_inline-block ltx_align_top">
+<span class="ltx_p"><span class="ltx_text ltx_font_bold">To prove it absent</span></span>
+</span>
+</td>
+</tr>
+<tr class="ltx_tr">
+<td class="ltx_td ltx_align_justify ltx_border_rr ltx_border_tt">
+<span class="ltx_inline-block ltx_align_top">
+<span class="ltx_p">Being a tautology/theorem</span>
+</span>
+</td>
+<td class="ltx_td ltx_align_justify ltx_border_r ltx_border_tt">
+<span class="ltx_inline-block ltx_align_top">
+<span class="ltx_p">Derive the sentence</span>
+</span>
+</td>
+<td class="ltx_td ltx_align_justify ltx_border_tt">
+<span class="ltx_inline-block ltx_align_top">
+<span class="ltx_p">Find a false line in the truth table for the sentence</span>
+</span>
+</td>
+</tr>
+<tr class="ltx_tr">
+<td class="ltx_td ltx_align_justify ltx_border_rr ltx_border_t">
+<span class="ltx_inline-block ltx_align_top">
+<span class="ltx_p">Being a contradiction</span>
+</span>
+</td>
+<td class="ltx_td ltx_align_justify ltx_border_r ltx_border_t">
+<span class="ltx_inline-block ltx_align_top">
+<span class="ltx_p">Derive <math id="T2.m1" class="ltx_Math" alttext="\bot" display="inline"><mo>⊥</mo></math> from the sentence</span>
+</span>
+</td>
+<td class="ltx_td ltx_align_justify ltx_border_t">
+<span class="ltx_inline-block ltx_align_top">
+<span class="ltx_p">Find a true line in the truth table for the sentence</span>
+</span>
+</td>
+</tr>
+<tr class="ltx_tr">
+<td class="ltx_td ltx_align_justify ltx_border_rr ltx_border_t">
+<span class="ltx_inline-block ltx_align_top">
+<span class="ltx_p">Contingency</span>
+</span>
+</td>
+<td class="ltx_td ltx_align_justify ltx_border_r ltx_border_t">
+<span class="ltx_inline-block ltx_align_top">
+<span class="ltx_p">Find a false line and a true line in the truth table for the sentence</span>
+</span>
+</td>
+<td class="ltx_td ltx_align_justify ltx_border_t">
+<span class="ltx_inline-block ltx_align_top">
+<span class="ltx_p">Prove the sentence or its negation</span>
+</span>
+</td>
+</tr>
+<tr class="ltx_tr">
+<td class="ltx_td ltx_align_justify ltx_border_rr ltx_border_t">
+<span class="ltx_inline-block ltx_align_top">
+<span class="ltx_p">Equivalence</span>
+</span>
+</td>
+<td class="ltx_td ltx_align_justify ltx_border_r ltx_border_t">
+<span class="ltx_inline-block ltx_align_top">
+<span class="ltx_p">Derive each sentence from the other</span>
+</span>
+</td>
+<td class="ltx_td ltx_align_justify ltx_border_t">
+<span class="ltx_inline-block ltx_align_top">
+<span class="ltx_p">Find a line in the truth tables for the sentence where they have different values</span>
+</span>
+</td>
+</tr>
+<tr class="ltx_tr">
+<td class="ltx_td ltx_align_justify ltx_border_rr ltx_border_t">
+<span class="ltx_inline-block ltx_align_top">
+<span class="ltx_p">Consistency</span>
+</span>
+</td>
+<td class="ltx_td ltx_align_justify ltx_border_r ltx_border_t">
+<span class="ltx_inline-block ltx_align_top">
+<span class="ltx_p">Find a line in truth table for the sentence where they all are true</span>
+</span>
+</td>
+<td class="ltx_td ltx_align_justify ltx_border_t">
+<span class="ltx_inline-block ltx_align_top">
+<span class="ltx_p">Derive <math id="T2.m2" class="ltx_Math" alttext="\bot" display="inline"><mo>⊥</mo></math> from the sentences</span>
+</span>
+</td>
+</tr>
+<tr class="ltx_tr">
+<td class="ltx_td ltx_align_justify ltx_border_rr ltx_border_t">
+<span class="ltx_inline-block ltx_align_top">
+<span class="ltx_p">Validity</span>
+</span>
+</td>
+<td class="ltx_td ltx_align_justify ltx_border_r ltx_border_t">
+<span class="ltx_inline-block ltx_align_top">
+<span class="ltx_p">Derive the conclusion from the premises</span>
+</span>
+</td>
+<td class="ltx_td ltx_align_justify ltx_border_t">
+<span class="ltx_inline-block ltx_align_top">
+<span class="ltx_p">Find a line in the truth table where the premises are true and the conclusion false.</span>
+</span>
+</td>
+</tr>
+</table>
+</div>
+<figcaption class="ltx_caption"><span class="ltx_tag ltx_tag_table">Table 22.2: </span>When to provide a truth table and when to provide a proof.</figcaption>
+</figure>
+<section id="Sx1" class="ltx_section ltx_pruned_first normal">
+<div class="section level2">
+<h2 class="ltx_title ltx_title_section">Practice exercises</h2>
+
+<div id="Sx1.p2" class="ltx_para ltx_noindent">
+<p class="ltx_p"><span class="ltx_text ltx_font_bold">A. </span>Use either a derivation or a truth table for each of the following.</p>
+<ol id="Sx1.I1" class="ltx_enumerate">
+<li id="Sx1.I1.i1" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">1.</span><div id="Sx1.I1.i1.p1" class="ltx_para">​<p class="ltx_p">Show that <math id="Sx1.I1.i1.p1.m1" class="ltx_Math" alttext="A\rightarrow[((B\wedge C)\vee D)\rightarrow A]" display="inline"><mrow><mi>A</mi><mo stretchy="false">→</mo><mrow><mo stretchy="false">[</mo><mrow><mrow><mo stretchy="false">(</mo><mrow><mrow><mo stretchy="false">(</mo><mrow><mi>B</mi><mo>∧</mo><mi>C</mi></mrow><mo stretchy="false">)</mo></mrow><mo>∨</mo><mi>D</mi></mrow><mo stretchy="false">)</mo></mrow><mo stretchy="false">→</mo><mi>A</mi></mrow><mo stretchy="false">]</mo></mrow></mrow></math> is a theorem.</p>
+</div>
+</li>
+<li id="Sx1.I1.i2" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">2.</span><div id="Sx1.I1.i2.p1" class="ltx_para">​<p class="ltx_p">Show that <math id="Sx1.I1.i2.p1.m1" class="ltx_Math" alttext="A\rightarrow(A\rightarrow B)" display="inline"><mrow><mi>A</mi><mo stretchy="false">→</mo><mrow><mo stretchy="false">(</mo><mrow><mi>A</mi><mo stretchy="false">→</mo><mi>B</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math> is not a theorem.</p>
+</div>
+</li>
+<li id="Sx1.I1.i3" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">3.</span><div id="Sx1.I1.i3.p1" class="ltx_para">​<p class="ltx_p">Show that the sentence <math id="Sx1.I1.i3.p1.m1" class="ltx_Math" alttext="A\rightarrow\neg{A}" display="inline"><mrow><mi>A</mi><mo stretchy="false">→</mo><mrow><mo rspace="0.167em">¬</mo><mi>A</mi></mrow></mrow></math> is not a contradiction.</p>
+</div>
+</li>
+<li id="Sx1.I1.i4" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">4.</span><div id="Sx1.I1.i4.p1" class="ltx_para">​<p class="ltx_p">Show that the sentence <math id="Sx1.I1.i4.p1.m1" class="ltx_Math" alttext="A\leftrightarrow\neg A" display="inline"><mrow><mi>A</mi><mo stretchy="false">↔</mo><mrow><mo rspace="0.167em">¬</mo><mi>A</mi></mrow></mrow></math> is a contradiction.</p>
+</div>
+</li>
+<li id="Sx1.I1.i5" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">5.</span><div id="Sx1.I1.i5.p1" class="ltx_para">​<p class="ltx_p">Show that the sentence <math id="Sx1.I1.i5.p1.m1" class="ltx_Math" alttext="\neg(W\rightarrow(J\vee J))" display="inline"><mrow><mo>¬</mo><mrow><mo stretchy="false">(</mo><mrow><mi>W</mi><mo stretchy="false">→</mo><mrow><mo stretchy="false">(</mo><mrow><mi>J</mi><mo>∨</mo><mi>J</mi></mrow><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></math> is contingent.</p>
+</div>
+</li>
+<li id="Sx1.I1.i6" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">6.</span><div id="Sx1.I1.i6.p1" class="ltx_para">​<p class="ltx_p">Show that the sentence <math id="Sx1.I1.i6.p1.m1" class="ltx_Math" alttext="\neg(X\vee(Y\vee Z))\vee(X\vee(Y\vee Z))" display="inline"><mrow><mrow><mo>¬</mo><mrow><mo stretchy="false">(</mo><mrow><mi>X</mi><mo>∨</mo><mrow><mo stretchy="false">(</mo><mrow><mi>Y</mi><mo>∨</mo><mi>Z</mi></mrow><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow><mo>∨</mo><mrow><mo stretchy="false">(</mo><mrow><mi>X</mi><mo>∨</mo><mrow><mo stretchy="false">(</mo><mrow><mi>Y</mi><mo>∨</mo><mi>Z</mi></mrow><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></math> is not contingent.</p>
+</div>
+</li>
+<li id="Sx1.I1.i7" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">7.</span><div id="Sx1.I1.i7.p1" class="ltx_para">​<p class="ltx_p">Show that the sentence <math id="Sx1.I1.i7.p1.m1" class="ltx_Math" alttext="B\rightarrow\neg S" display="inline"><mrow><mi>B</mi><mo stretchy="false">→</mo><mrow><mo rspace="0.167em">¬</mo><mi>S</mi></mrow></mrow></math> is equivalent to the sentence <math id="Sx1.I1.i7.p1.m2" class="ltx_Math" alttext="\neg\neg B\rightarrow\neg S" display="inline"><mrow><mrow><mo rspace="0.167em">¬</mo><mrow><mo rspace="0.167em">¬</mo><mi>B</mi></mrow></mrow><mo stretchy="false">→</mo><mrow><mo rspace="0.167em">¬</mo><mi>S</mi></mrow></mrow></math>.</p>
+</div>
+</li>
+<li id="Sx1.I1.i8" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">8.</span><div id="Sx1.I1.i8.p1" class="ltx_para">​<p class="ltx_p">Show that the sentence <math id="Sx1.I1.i8.p1.m1" class="ltx_Math" alttext="\neg(X\vee O)" display="inline"><mrow><mo>¬</mo><mrow><mo stretchy="false">(</mo><mrow><mi>X</mi><mo>∨</mo><mi>O</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math> is not equivalent to the sentence <math id="Sx1.I1.i8.p1.m2" class="ltx_Math" alttext="X\wedge O" display="inline"><mrow><mi>X</mi><mo>∧</mo><mi>O</mi></mrow></math>.</p>
+</div>
+</li>
+<li id="Sx1.I1.i9" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">9.</span><div id="Sx1.I1.i9.p1" class="ltx_para">​<p class="ltx_p">Show that the sentences <math id="Sx1.I1.i9.p1.m1" class="ltx_Math" alttext="\neg(A\vee B)" display="inline"><mrow><mo>¬</mo><mrow><mo stretchy="false">(</mo><mrow><mi>A</mi><mo>∨</mo><mi>B</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math>, <math id="Sx1.I1.i9.p1.m2" class="ltx_Math" alttext="C" display="inline"><mi>C</mi></math>, <math id="Sx1.I1.i9.p1.m3" class="ltx_Math" alttext="C\rightarrow A" display="inline"><mrow><mi>C</mi><mo stretchy="false">→</mo><mi>A</mi></mrow></math> are jointly inconsistent.</p>
+</div>
+</li>
+<li id="Sx1.I1.i10" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">10.</span><div id="Sx1.I1.i10.p1" class="ltx_para">​<p class="ltx_p">Show that the sentences <math id="Sx1.I1.i10.p1.m1" class="ltx_Math" alttext="\neg(A\vee B)" display="inline"><mrow><mo>¬</mo><mrow><mo stretchy="false">(</mo><mrow><mi>A</mi><mo>∨</mo><mi>B</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math>, <math id="Sx1.I1.i10.p1.m2" class="ltx_Math" alttext="\neg{B}" display="inline"><mrow><mo rspace="0.167em">¬</mo><mi>B</mi></mrow></math>, <math id="Sx1.I1.i10.p1.m3" class="ltx_Math" alttext="B\rightarrow A" display="inline"><mrow><mi>B</mi><mo stretchy="false">→</mo><mi>A</mi></mrow></math> are jointly consistent.</p>
+</div>
+</li>
+<li id="Sx1.I1.i11" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">11.</span><div id="Sx1.I1.i11.p1" class="ltx_para">​<p class="ltx_p">Show that <math id="Sx1.I1.i11.p1.m1" class="ltx_Math" alttext="\neg(A\vee(B\vee C))" display="inline"><mrow><mo>¬</mo><mrow><mo stretchy="false">(</mo><mrow><mi>A</mi><mo>∨</mo><mrow><mo stretchy="false">(</mo><mrow><mi>B</mi><mo>∨</mo><mi>C</mi></mrow><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></math> <math id="Sx1.I1.i11.p1.m2" class="ltx_Math" alttext="\therefore" display="inline"><mo>∴</mo></math><math id="Sx1.I1.i11.p1.m3" class="ltx_Math" alttext="\neg{C}" display="inline"><mrow><mo rspace="0.167em">¬</mo><mi>C</mi></mrow></math> is valid.</p>
+</div>
+</li>
+<li id="Sx1.I1.i12" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">12.</span><div id="Sx1.I1.i12.p1" class="ltx_para">​<p class="ltx_p">Show that <math id="Sx1.I1.i12.p1.m1" class="ltx_Math" alttext="\neg(A\wedge(B\vee C))" display="inline"><mrow><mo>¬</mo><mrow><mo stretchy="false">(</mo><mrow><mi>A</mi><mo>∧</mo><mrow><mo stretchy="false">(</mo><mrow><mi>B</mi><mo>∨</mo><mi>C</mi></mrow><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></math> <math id="Sx1.I1.i12.p1.m2" class="ltx_Math" alttext="\therefore" display="inline"><mo>∴</mo></math><math id="Sx1.I1.i12.p1.m3" class="ltx_Math" alttext="\neg{C}" display="inline"><mrow><mo rspace="0.167em">¬</mo><mi>C</mi></mrow></math> is invalid.</p>
+</div>
+</li>
+</ol>
+</div>
+<div id="Sx1.p4" class="ltx_para ltx_noindent">
+<p class="ltx_p"><span class="ltx_text ltx_font_bold">B. </span>Use either a derivation or a truth table for each of the following.</p>
+<ol id="Sx1.I2" class="ltx_enumerate">
+<li id="Sx1.I2.i1" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">1.</span><div id="Sx1.I2.i1.p1" class="ltx_para">​<p class="ltx_p">Show that <math id="Sx1.I2.i1.p1.m1" class="ltx_Math" alttext="A\rightarrow(B\rightarrow A)" display="inline"><mrow><mi>A</mi><mo stretchy="false">→</mo><mrow><mo stretchy="false">(</mo><mrow><mi>B</mi><mo stretchy="false">→</mo><mi>A</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math> is a theorem.</p>
+</div>
+</li>
+<li id="Sx1.I2.i2" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">2.</span><div id="Sx1.I2.i2.p1" class="ltx_para">​<p class="ltx_p">Show that <math id="Sx1.I2.i2.p1.m1" class="ltx_math_unparsed" alttext="\neg(((N\leftrightarrow Q)\vee Q)\vee N)" display="inline"><mrow><mo>¬</mo><mrow><mo stretchy="false">(</mo><mrow><mo stretchy="false">(</mo><mrow><mo stretchy="false">(</mo><mi>N</mi><mo stretchy="false">↔</mo><mi>Q</mi><mo stretchy="false">)</mo></mrow><mo>∨</mo><mi>Q</mi><mo stretchy="false">)</mo></mrow><mo>∨</mo><mi>N</mi><mo stretchy="false">)</mo></mrow></mrow></math> is not a theorem.</p>
+</div>
+</li>
+<li id="Sx1.I2.i3" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">3.</span><div id="Sx1.I2.i3.p1" class="ltx_para">​<p class="ltx_p">Show that <math id="Sx1.I2.i3.p1.m1" class="ltx_math_unparsed" alttext="Z\vee(\neg Z\leftrightarrow Z)" display="inline"><mrow><mi>Z</mi><mo>∨</mo><mrow><mo stretchy="false">(</mo><mo rspace="0.167em">¬</mo><mi>Z</mi><mo stretchy="false">↔</mo><mi>Z</mi><mo stretchy="false">)</mo></mrow></mrow></math> is contingent.</p>
+</div>
+</li>
+<li id="Sx1.I2.i4" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">4.</span><div id="Sx1.I2.i4.p1" class="ltx_para">​<p class="ltx_p">Show that <math id="Sx1.I2.i4.p1.m1" class="ltx_math_unparsed" alttext="(L\leftrightarrow((N\rightarrow N)\rightarrow L))\vee H" display="inline"><mrow><mrow><mo stretchy="false">(</mo><mi>L</mi><mo stretchy="false">↔</mo><mrow><mo stretchy="false">(</mo><mrow><mo stretchy="false">(</mo><mi>N</mi><mo stretchy="false">→</mo><mi>N</mi><mo stretchy="false">)</mo></mrow><mo stretchy="false">→</mo><mi>L</mi><mo stretchy="false">)</mo></mrow><mo stretchy="false">)</mo></mrow><mo>∨</mo><mi>H</mi></mrow></math> is not contingent.</p>
+</div>
+</li>
+<li id="Sx1.I2.i5" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">5.</span><div id="Sx1.I2.i5.p1" class="ltx_para">​<p class="ltx_p">Show that <math id="Sx1.I2.i5.p1.m1" class="ltx_math_unparsed" alttext="(A\leftrightarrow A)\wedge(B\wedge\neg B)" display="inline"><mrow><mrow><mo stretchy="false">(</mo><mi>A</mi><mo stretchy="false">↔</mo><mi>A</mi><mo stretchy="false">)</mo></mrow><mo>∧</mo><mrow><mo stretchy="false">(</mo><mi>B</mi><mo>∧</mo><mo rspace="0.167em">¬</mo><mi>B</mi><mo stretchy="false">)</mo></mrow></mrow></math> is a contradiction.</p>
+</div>
+</li>
+<li id="Sx1.I2.i6" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">6.</span><div id="Sx1.I2.i6.p1" class="ltx_para">​<p class="ltx_p">Show that <math id="Sx1.I2.i6.p1.m1" class="ltx_Math" alttext="(B\leftrightarrow(C\vee B))" display="inline"><mrow><mo stretchy="false">(</mo><mrow><mi>B</mi><mo stretchy="false">↔</mo><mrow><mo stretchy="false">(</mo><mrow><mi>C</mi><mo>∨</mo><mi>B</mi></mrow><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">)</mo></mrow></math> is not a contradiction.</p>
+</div>
+</li>
+<li id="Sx1.I2.i7" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">7.</span><div id="Sx1.I2.i7.p1" class="ltx_para">​<p class="ltx_p">Show that <math id="Sx1.I2.i7.p1.m1" class="ltx_math_unparsed" alttext="((\neg X\leftrightarrow X)\vee X)" display="inline"><mrow><mo stretchy="false">(</mo><mrow><mo stretchy="false">(</mo><mo rspace="0.167em">¬</mo><mi>X</mi><mo stretchy="false">↔</mo><mi>X</mi><mo stretchy="false">)</mo></mrow><mo>∨</mo><mi>X</mi><mo stretchy="false">)</mo></mrow></math> is equivalent to <math id="Sx1.I2.i7.p1.m2" class="ltx_Math" alttext="X" display="inline"><mi>X</mi></math>.</p>
+</div>
+</li>
+<li id="Sx1.I2.i8" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">8.</span><div id="Sx1.I2.i8.p1" class="ltx_para">​<p class="ltx_p">Show that <math id="Sx1.I2.i8.p1.m1" class="ltx_Math" alttext="F\wedge(K\wedge R)" display="inline"><mrow><mi>F</mi><mo>∧</mo><mrow><mo stretchy="false">(</mo><mrow><mi>K</mi><mo>∧</mo><mi>R</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math> is not equivalent to <math id="Sx1.I2.i8.p1.m2" class="ltx_math_unparsed" alttext="(F\leftrightarrow(K\leftrightarrow R))" display="inline"><mrow><mo stretchy="false">(</mo><mi>F</mi><mo stretchy="false">↔</mo><mrow><mo stretchy="false">(</mo><mi>K</mi><mo stretchy="false">↔</mo><mi>R</mi><mo stretchy="false">)</mo></mrow><mo stretchy="false">)</mo></mrow></math>.</p>
+</div>
+</li>
+<li id="Sx1.I2.i9" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">9.</span><div id="Sx1.I2.i9.p1" class="ltx_para">​<p class="ltx_p">Show that the sentences <math id="Sx1.I2.i9.p1.m1" class="ltx_Math" alttext="\neg(W\rightarrow W)" display="inline"><mrow><mo>¬</mo><mrow><mo stretchy="false">(</mo><mrow><mi>W</mi><mo stretchy="false">→</mo><mi>W</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math>, <math id="Sx1.I2.i9.p1.m2" class="ltx_math_unparsed" alttext="(W\leftrightarrow W)\wedge W" display="inline"><mrow><mrow><mo stretchy="false">(</mo><mi>W</mi><mo stretchy="false">↔</mo><mi>W</mi><mo stretchy="false">)</mo></mrow><mo>∧</mo><mi>W</mi></mrow></math>, <math id="Sx1.I2.i9.p1.m3" class="ltx_Math" alttext="E\vee(W\rightarrow\neg(E\wedge W))" display="inline"><mrow><mi>E</mi><mo>∨</mo><mrow><mo stretchy="false">(</mo><mrow><mi>W</mi><mo stretchy="false">→</mo><mrow><mo>¬</mo><mrow><mo stretchy="false">(</mo><mrow><mi>E</mi><mo>∧</mo><mi>W</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></math> are jointly inconsistent.</p>
+</div>
+</li>
+<li id="Sx1.I2.i10" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">10.</span><div id="Sx1.I2.i10.p1" class="ltx_para">​<p class="ltx_p">Show that the sentences <math id="Sx1.I2.i10.p1.m1" class="ltx_Math" alttext="\neg R\vee C" display="inline"><mrow><mrow><mo rspace="0.167em">¬</mo><mi>R</mi></mrow><mo>∨</mo><mi>C</mi></mrow></math>, <math id="Sx1.I2.i10.p1.m2" class="ltx_Math" alttext="(C\wedge R)\rightarrow\neg R" display="inline"><mrow><mrow><mo stretchy="false">(</mo><mrow><mi>C</mi><mo>∧</mo><mi>R</mi></mrow><mo stretchy="false">)</mo></mrow><mo stretchy="false">→</mo><mrow><mo rspace="0.167em">¬</mo><mi>R</mi></mrow></mrow></math>, <math id="Sx1.I2.i10.p1.m3" class="ltx_Math" alttext="(\neg(R\vee C)\rightarrow R)" display="inline"><mrow><mo stretchy="false">(</mo><mrow><mrow><mo>¬</mo><mrow><mo stretchy="false">(</mo><mrow><mi>R</mi><mo>∨</mo><mi>C</mi></mrow><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">→</mo><mi>R</mi></mrow><mo stretchy="false">)</mo></mrow></math> are jointly consistent.</p>
+</div>
+</li>
+<li id="Sx1.I2.i11" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">11.</span><div id="Sx1.I2.i11.p1" class="ltx_para">​<p class="ltx_p">Show that <math id="Sx1.I2.i11.p1.m1" class="ltx_math_unparsed" alttext="\neg\neg(C\leftrightarrow\neg C),((G\vee C)\vee G)\therefore((G\rightarrow C)%
+\wedge G)" display="inline"><mrow><mo rspace="0.167em">¬</mo><mo>¬</mo><mrow><mo stretchy="false">(</mo><mi>C</mi><mo stretchy="false">↔</mo><mo rspace="0.167em">¬</mo><mi>C</mi><mo stretchy="false">)</mo></mrow><mo>,</mo><mrow><mo stretchy="false">(</mo><mrow><mo stretchy="false">(</mo><mi>G</mi><mo>∨</mo><mi>C</mi><mo stretchy="false">)</mo></mrow><mo>∨</mo><mi>G</mi><mo stretchy="false">)</mo></mrow><mo>∴</mo><mrow><mo stretchy="false">(</mo><mrow><mo stretchy="false">(</mo><mi>G</mi><mo stretchy="false">→</mo><mi>C</mi><mo stretchy="false">)</mo></mrow><mo>∧</mo><mi>G</mi><mo stretchy="false">)</mo></mrow></mrow></math> is valid.</p>
+</div>
+</li>
+<li id="Sx1.I2.i12" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">12.</span><div id="Sx1.I2.i12.p1" class="ltx_para">​<p class="ltx_p">Show that <math id="Sx1.I2.i12.p1.m1" class="ltx_math_unparsed" alttext="\neg\neg L,(C\rightarrow\neg L)\rightarrow C)\therefore\neg C" display="inline"><mrow><mo rspace="0.167em">¬</mo><mo rspace="0.167em">¬</mo><mi>L</mi><mo>,</mo><mrow><mo stretchy="false">(</mo><mi>C</mi><mo stretchy="false">→</mo><mo rspace="0.167em">¬</mo><mi>L</mi><mo stretchy="false">)</mo></mrow><mo stretchy="false">→</mo><mi>C</mi><mo stretchy="false">)</mo><mo>∴</mo><mo rspace="0.167em">¬</mo><mi>C</mi></mrow></math> is invalid.</p>
+</div>
+</li>
+</ol>
+</div>
+</div>
+</section>
+</div>
+</section>
+</div>
+</div>
+</div>
+<a href="Ch21.html" class="navigation navigation-prev" aria-label="Previous page"><i class="fa fa-angle-left"></i></a><a href="Pt5.html" class="navigation navigation-next" aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+</div>
+</div>
+</body>
+
+</html>
