@@ -3,8 +3,9 @@ const studentSectionLabels = {
   courses: "My Courses",
   assignments: "Assignments",
   grades: "Grades",
-  practice: "Practice",
-  textbook: "Textbook",
+  learn: "Learn",
+  practice: "Learn",
+  textbook: "Learn",
   contact: "Contact",
   profile: "Profile & Preferences",
 };
@@ -50,9 +51,15 @@ export function buildRuntimePaths(routeKind, routePrefix = getRoutePrefix(routeK
     assignmentsPath: `${routePrefix}/assignments`,
     gradesPath,
     gradebookPath: isInstructor ? `${routePrefix}/gradebook` : undefined,
-    practicePath: `${routePrefix}/practice`,
-    textbookPath: `${routePrefix}/textbook`,
-    textbookChapterPath: (slug) => `${routePrefix}/textbook/${slug}`,
+    practicePath: isInstructor ? `${routePrefix}/practice` : `${routePrefix}/learn`,
+    learnPath: isInstructor ? undefined : `${routePrefix}/learn`,
+    learnChapterPath: isInstructor
+      ? undefined
+      : (slug) => `${routePrefix}/learn/${slug}`,
+    textbookPath: isInstructor ? undefined : `${routePrefix}/learn`,
+    textbookChapterPath: isInstructor
+      ? undefined
+      : (slug) => `${routePrefix}/learn/${slug}`,
     contactPath: `${routePrefix}/contact`,
     profilePath: `${routePrefix}/profile`,
     rosterPath: isInstructor ? `${routePrefix}/roster` : undefined,
@@ -72,6 +79,13 @@ export function buildBreadcrumbInfo(pathname, {
     : pathname.startsWith(`${stripPrefix}/`)
     ? pathname.slice(stripPrefix.length) || "/dashboard"
     : pathname;
+
+  if (normalizedPath.startsWith("/learn/") || normalizedPath === "/learn") {
+    return {
+      label: "Learn",
+      path: `${routePrefix}/learn`,
+    };
+  }
 
   if (normalizedPath.startsWith("/assignment/") || normalizedPath.startsWith("/assignment-builder")) {
     return {

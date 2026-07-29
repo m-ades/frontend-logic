@@ -15,7 +15,7 @@ import {
 
 const STUDENT_SANDBOX_PREFIX = "/sandbox/student";
 const INSTRUCTOR_SANDBOX_PREFIX = "/sandbox/instructor";
-const sandboxSidebarLabels = new Set(["Dashboard", "Assignments", "Practice", "Textbook", "Grades"]);
+const sandboxSidebarLabels = new Set(["Dashboard", "Assignments", "Learn", "Grades"]);
 const remapInstructorPath = (path) => remapRoutePath(path, "/instructor", INSTRUCTOR_SANDBOX_PREFIX);
 
 function SandboxFrame({ children, runtimeValue, sidebarStructure, onExit }) {

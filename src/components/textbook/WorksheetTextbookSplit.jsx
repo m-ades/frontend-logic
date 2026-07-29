@@ -20,7 +20,7 @@ export default function WorksheetTextbookSplit({
   children,
 }) {
   const location = useLocation()
-  const { routePrefix } = useAppRuntime()
+  const { routePrefix, learnChapterPath } = useAppRuntime()
   const { resolvedLinks } = useTextbookPracticeLinks()
 
   const practiceLinks = linksForPracticeId(resolvedLinks, practiceId)
@@ -37,7 +37,9 @@ export default function WorksheetTextbookSplit({
     return children
   }
 
-  const linkBase = `${routePrefix || '/student'}/textbook`
+  const linkBase = learnChapterPath
+    ? learnChapterPath('').replace(/\/$/, '')
+    : `${routePrefix || '/student'}/learn`
   const chapterLinks = practiceLinks.filter((link) => link.textbookSlug === linkedSlug)
 
   return (

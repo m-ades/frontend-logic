@@ -1,8 +1,7 @@
 import {
   Dashboard as DashboardIcon,
   Assignment as AssignmentIcon,
-  Psychology as PracticeIcon,
-  MenuBook as TextbookIcon,
+  AutoStories as LearnIcon,
   Grade as GradeIcon,
   ContactSupport as ContactIcon,
 } from "@mui/icons-material";
@@ -22,24 +21,18 @@ export default [
   },
   {
     id: 2,
-    label: "Practice",
-    link: "/student/practice",
-    icon: <PracticeIcon />,
+    label: "Learn",
+    link: "/student/learn",
+    icon: <LearnIcon />,
   },
   {
     id: 3,
-    label: "Textbook",
-    link: "/student/textbook",
-    icon: <TextbookIcon />,
-  },
-  {
-    id: 4,
     label: "Grades",
     link: "/student/grades",
     icon: <GradeIcon />,
   },
   {
-    id: 5,
+    id: 4,
     label: "Contact",
     link: "/student/contact",
     icon: <ContactIcon />,

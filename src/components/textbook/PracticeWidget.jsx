@@ -14,7 +14,7 @@ export default function PracticeWidget({
   textbookSlug = null,
 }) {
   const navigate = useNavigate()
-  const { assignmentPath, practicePath } = useAppRuntime()
+  const { assignmentPath, practicePath, learnPath, learnChapterPath } = useAppRuntime()
 
   if (practiceId == null) return null
 
@@ -22,9 +22,14 @@ export default function PracticeWidget({
 
   const openPractice = () => {
     const path = assignmentPath?.(practiceId) || `/student/assignment/${practiceId}`
+    const returnTo =
+      (textbookSlug && learnChapterPath?.(textbookSlug)) ||
+      learnPath ||
+      practicePath ||
+      '/student/learn'
     navigate(path, {
       state: {
-        returnTo: practicePath || '/student/practice',
+        returnTo,
         textbookSlug: textbookSlug || undefined,
         textbookSectionId: sectionId || undefined,
       },

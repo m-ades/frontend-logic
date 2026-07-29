@@ -13,7 +13,7 @@ export default function AssignmentWorkspace({
   textbookSlug = null,
 }) {
   const navigate = useNavigate()
-  const { assignmentPath, practicePath } = useAppRuntime()
+  const { assignmentPath, practicePath, learnPath, learnChapterPath } = useAppRuntime()
 
   return (
     <Box
@@ -58,17 +58,17 @@ export default function AssignmentWorkspace({
             </Stack>
             <Typography sx={{ fontSize: '0.9375rem', color: 'text.secondary', lineHeight: 1.6 }}>
               Instructors can connect forall x chapters to HuLA practice sets from
-              <strong> Textbook Links</strong> in Course Controls. Until then, use this pane
-              as reading space and open Practice from the sidebar when ready.
+              <strong> Textbook Links</strong>. Until then, use this pane as reading
+              space and browse chapters from Learn.
             </Typography>
-            {practicePath && (
+            {(learnPath || practicePath) && (
               <Button
                 sx={{ mt: 2 }}
                 size="small"
                 variant="outlined"
-                onClick={() => navigate(practicePath)}
+                onClick={() => navigate(learnPath || practicePath)}
               >
-                Browse practice
+                Back to Learn
               </Button>
             )}
           </Box>
@@ -105,7 +105,11 @@ export default function AssignmentWorkspace({
                       `/student/assignment/${link.practiceId}`
                     navigate(path, {
                       state: {
-                        returnTo: practicePath || '/student/practice',
+                        returnTo:
+                          (textbookSlug && learnChapterPath?.(textbookSlug)) ||
+                          learnPath ||
+                          practicePath ||
+                          '/student/learn',
                         textbookSlug: textbookSlug || link.textbookSlug,
                         textbookSectionId: link.sectionId || undefined,
                       },
