@@ -94,6 +94,41 @@ export function listTextbookNavItems() {
   return [cover, ...entries]
 }
 
+/**
+ * Hierarchical TOC for hub + in-reader nav: cover/preface, then Parts with chapters.
+ */
+export function buildTextbookTocTree() {
+  const items = listTextbookNavItems()
+  const tree = []
+  let currentPart = null
+
+  for (const item of items) {
+    if (item.kind === 'part' || item.kind === 'backmatter') {
+      currentPart = {
+        ...item,
+        children: [],
+      }
+      tree.push(currentPart)
+      continue
+    }
+
+    if (
+      (item.kind === 'chapter' || item.kind === 'appendix') &&
+      currentPart &&
+      item.partSlug === currentPart.slug
+    ) {
+      currentPart.children.push(item)
+      continue
+    }
+
+    // cover, preface, or orphans — top-level
+    currentPart = null
+    tree.push({ ...item, children: [] })
+  }
+
+  return tree
+}
+
 export function resolveTextbookAssetUrl(slug) {
   const normalized = normalizeTextbookSlug(slug)
   if (normalized === 'index') {

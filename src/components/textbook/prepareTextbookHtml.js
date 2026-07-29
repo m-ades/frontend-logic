@@ -60,7 +60,7 @@ export function extractTextbookBody(fullHtml) {
  * Rewrite relative asset/page URLs so they resolve under /textbook and
  * in-app routes for chapter hops.
  */
-export function rewriteTextbookUrls(html, { linkBase = '/student/textbook' } = {}) {
+export function rewriteTextbookUrls(html, { linkBase = '/student/learn' } = {}) {
   if (typeof html !== 'string') return ''
 
   const parser = new DOMParser()
@@ -191,7 +191,7 @@ export function injectPracticeWidgetSlots(html, slug) {
  * Full pipeline: extract → rewrite URLs.
  * Practice widgets are attached via course link metadata (not HTML slots).
  */
-export function prepareTextbookHtml(fullHtml, { linkBase = '/student/textbook' } = {}) {
+export function prepareTextbookHtml(fullHtml, { linkBase = '/student/learn' } = {}) {
   const body = extractTextbookBody(fullHtml)
   return rewriteTextbookUrls(body, { linkBase })
 }

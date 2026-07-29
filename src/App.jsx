@@ -1,6 +1,6 @@
 import { ThemeProvider as MuiThemeProvider } from "@mui/material/styles";
 import { CssBaseline } from "@mui/material";
-import { BrowserRouter, Routes, Route, Navigate, Outlet } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, Outlet, useParams } from "react-router-dom";
 import { ThemeProvider } from "./context/ThemeContext.jsx";
 import { useThemeState } from "./context/ThemeContext.jsx";
 import { LayoutProvider } from "./context/LayoutContext.jsx";
@@ -16,7 +16,6 @@ import SandboxLayout, { InstructorSandboxLayout } from "./components/layout/Sand
 import Dashboard from "./pages/Dashboard.jsx";
 import Worksheet from "./pages/Worksheet.jsx";
 import Assignments from "./pages/Assignments.jsx";
-import Practice from "./pages/Practice.jsx";
 import Grades from "./pages/Grades.jsx";
 import ContactStudent from "./pages/ContactStudent.jsx";
 import InstructorDashboard from "./pages/instructor/InstructorDashboard.jsx";
@@ -31,8 +30,14 @@ import Profile from "./pages/Profile.jsx";
 import InstructorPractice from "./pages/instructor/InstructorPractice.jsx";
 import InstructorRoster from "./pages/instructor/InstructorRoster.jsx";
 import InstructorContact from "./pages/instructor/Contact.jsx";
-import TextbookPage from "./pages/TextbookPage.jsx";
+import LearnHubPage from "./pages/LearnHubPage.jsx";
+import LearnChapterPage from "./pages/LearnChapterPage.jsx";
 import InstructorTextbookLinks from "./pages/instructor/InstructorTextbookLinks.jsx";
+
+function RedirectToLearnChapter({ basePath }) {
+  const { chapter } = useParams();
+  return <Navigate to={`${basePath}/${chapter || "Ch1"}`} replace />;
+}
 
 const withLayout = (LayoutComponent, PageComponent) => (
   <LayoutComponent>
@@ -120,24 +125,32 @@ function AppRoutes() {
           )}
         />
         <Route
-          path="/sandbox/student/practice"
+          path="/sandbox/student/learn"
           element={(
             <SandboxLayout>
-              <Practice />
+              <LearnHubPage />
             </SandboxLayout>
           )}
+        />
+        <Route
+          path="/sandbox/student/learn/:chapter"
+          element={(
+            <SandboxLayout>
+              <LearnChapterPage />
+            </SandboxLayout>
+          )}
+        />
+        <Route
+          path="/sandbox/student/practice"
+          element={<Navigate to="/sandbox/student/learn" replace />}
         />
         <Route
           path="/sandbox/student/textbook"
-          element={<Navigate to="/sandbox/student/textbook/Ch1" replace />}
+          element={<Navigate to="/sandbox/student/learn" replace />}
         />
         <Route
           path="/sandbox/student/textbook/:chapter"
-          element={(
-            <SandboxLayout>
-              <TextbookPage />
-            </SandboxLayout>
-          )}
+          element={<RedirectToLearnChapter basePath="/sandbox/student/learn" />}
         />
         <Route
           path="/sandbox/student/grades"
@@ -207,12 +220,30 @@ function AppRoutes() {
           }
         />
         <Route
-          path="/student/practice"
+          path="/student/learn"
           element={
             <ProtectedRoute allowedRoles={["student"]}>
               <AppLayout>
-                <Practice />
+                <LearnHubPage />
               </AppLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/student/learn/:chapter"
+          element={
+            <ProtectedRoute allowedRoles={["student"]}>
+              <AppLayout>
+                <LearnChapterPage />
+              </AppLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/student/practice"
+          element={
+            <ProtectedRoute allowedRoles={["student"]}>
+              <Navigate to="/student/learn" replace />
             </ProtectedRoute>
           }
         />
@@ -220,7 +251,7 @@ function AppRoutes() {
           path="/student/textbook"
           element={
             <ProtectedRoute allowedRoles={["student"]}>
-              <Navigate to="/student/textbook/Ch1" replace />
+              <Navigate to="/student/learn" replace />
             </ProtectedRoute>
           }
         />
@@ -228,9 +259,7 @@ function AppRoutes() {
           path="/student/textbook/:chapter"
           element={
             <ProtectedRoute allowedRoles={["student"]}>
-              <AppLayout>
-                <TextbookPage />
-              </AppLayout>
+              <RedirectToLearnChapter basePath="/student/learn" />
             </ProtectedRoute>
           }
         />

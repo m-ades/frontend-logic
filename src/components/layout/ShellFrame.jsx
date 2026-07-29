@@ -30,6 +30,7 @@ export default function ShellFrame({
   const shouldShiftShellForRulebook = isWorksheetRoute && isDesktopRulebookLayout && isRulesReferenceOpen;
   const isDashboardRoute = /\/dashboard$/.test(location.pathname);
   const isImmersiveSplitRoute =
+    /\/learn\/[^/]+$/.test(location.pathname) ||
     /\/textbook\/[^/]+$/.test(location.pathname) ||
     /\/assignment\/[^/]+$/.test(location.pathname);
 
