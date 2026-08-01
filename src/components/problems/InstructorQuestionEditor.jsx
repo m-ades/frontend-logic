@@ -28,6 +28,7 @@ import getSyntax from '../../lib/logicpenguin/symbolic/libsyntax.js'
 import {
   DEFAULT_LOGIC_SYSTEM,
   getNotation,
+  getSymbols,
   isDerivationProblemType,
   normalizeLogicSystem,
 } from '../../lib/logicSystems.js'
@@ -1160,9 +1161,10 @@ function TrueFalseEditorForm({ proof, value, onChange }) {
 function EvaluateTruthEditorForm({ proof, value, onChange, logicSystem = DEFAULT_LOGIC_SYSTEM }) {
   const statement = value.statement ?? proof?.evaluateTruth ?? proof?.description ?? ''
   const answer = value.answer ?? proof?.answer ?? false
+  const symbols = getSymbols(logicSystem)
   return (
     <Stack spacing={2}>
-      <TextField label="Statement" multiline minRows={1} value={statement} onChange={(e) => onChange({ ...value, statement: normalizeFormulaInput(e.target.value, logicSystem) })} fullWidth variant="outlined" placeholder="e.g. P & Q" />
+      <TextField label="Statement" multiline minRows={1} value={statement} onChange={(e) => onChange({ ...value, statement: normalizeFormulaInput(e.target.value, logicSystem) })} fullWidth variant="outlined" placeholder={`e.g. P ${symbols.and} Q`} />
       <FormControl>
         <Typography variant="subtitle2" sx={{ mb: 1 }}>Correct answer</Typography>
         <RadioGroup row value={answer ? 'true' : 'false'} onChange={(e) => onChange({ ...value, answer: e.target.value === 'true' })}>
@@ -1176,6 +1178,7 @@ function EvaluateTruthEditorForm({ proof, value, onChange, logicSystem = DEFAULT
 
 function SymbolicTranslationEditorForm({ proof, value, onChange, logicSystem = DEFAULT_LOGIC_SYSTEM }) {
   const tr = proof?.translation || {}
+  const symbols = getSymbols(logicSystem)
   const prompt = value.prompt ?? tr.prompt ?? proof?.description ?? ''
   const legend = value.legend ?? tr.legend ?? proof?.legend ?? ''
   const symbolizationKey = Array.isArray(value.symbolizationKey) ? value.symbolizationKey : (tr.symbolizationKey || [])
@@ -1200,7 +1203,7 @@ function SymbolicTranslationEditorForm({ proof, value, onChange, logicSystem = D
         ))}
         <Button size="small" startIcon={<AddIcon />} onClick={() => onChange({ ...value, symbolizationKey: [...keyList, ''] })}>Add line</Button>
       </Box>
-      <TextField label="Correct answer" value={answer} onChange={(e) => onChange({ ...value, answer: normalizeFormulaInput(e.target.value, logicSystem) })} fullWidth variant="outlined" placeholder="e.g. P & Q" />
+      <TextField label="Correct answer" value={answer} onChange={(e) => onChange({ ...value, answer: normalizeFormulaInput(e.target.value, logicSystem) })} fullWidth variant="outlined" placeholder={`e.g. P ${symbols.and} Q`} />
     </Stack>
   )
 }
@@ -1245,6 +1248,7 @@ function ComboPromptEditorForm({ proof, value, onChange, label = 'Prompt' }) {
 
 function ComboTruthTableEditorForm({ proof, value, onChange, logicSystem = DEFAULT_LOGIC_SYSTEM }) {
   const snapshot = proof?.comboTranslationTruthTable || proof?.snapshot || {}
+  const symbols = getSymbols(logicSystem)
   const prompt = value.prompt ?? snapshot.prompt ?? proof?.description ?? ''
   const answerObj = proof?.answer ?? snapshot?.answer
   const argumentLine =
@@ -1259,7 +1263,7 @@ function ComboTruthTableEditorForm({ proof, value, onChange, logicSystem = DEFAU
         onChange={(e) => onChange({ ...value, argumentLine: normalizeFormulaInput(e.target.value, logicSystem) })}
         fullWidth
         variant="outlined"
-        placeholder="P ⊃ Q / P // Q"
+        placeholder={`P ${symbols.conditional} Q / P // Q`}
       />
     </Stack>
   )

@@ -15,7 +15,7 @@ import DerivationTable from '../../derivation/DerivationTable.jsx'
 import getFormulaClass from '../../../../lib/logicpenguin/symbolic/formula.js'
 import { useProblemChecker } from '../../../../hooks/useProblemChecker.js'
 import PromptText from '../../../ui/PromptText.jsx'
-import { getNotation } from '../../../../lib/logicSystems.js'
+import { getNotation, getSymbols } from '../../../../lib/logicSystems.js'
 import {
   ST_PREDICATE_VARIABLES,
   getConstantLettersFromKey,
@@ -237,6 +237,7 @@ export default function ComboTranslationDerivation({
   const editorRef = useRef(null)
   const openEdit = () => editorRef.current?.open?.()
   const notation = getNotation(logicSystem)
+  const symbols = getSymbols(logicSystem)
   const Formula = useMemo(() => getFormulaClass(notation), [notation])
   const snapshot = proof?.comboTranslationDerivation || proof?.snapshot || proof?.questionSnapshot || proof?.question_snapshot || proof || {}
   const promptText = snapshot?.prompt || proof?.description || ''
@@ -452,13 +453,13 @@ export default function ComboTranslationDerivation({
                 Argument line
               </Typography>
               <Typography variant="body2" sx={{ mb: 1, color: 'text.secondary', fontSize: '0.875rem' }}>
-                Use "/" for separate premises and "//" for the conclusion. Example: A ⊃ B / A // B.
+                Use "/" for separate premises and "//" for the conclusion. Example: A {symbols.conditional} B / A // B.
               </Typography>
               {isPhone ? (
                 <MobileLogicInput
                   value={argumentLine}
                   onChange={handleArgumentChange}
-                  placeholder="e.g. A ⊃ B / A // B"
+                  placeholder={`e.g. A ${symbols.conditional} B / A // B`}
                   aria-label="Argument line"
                   includeQuantifiers
                   symbolizationKey={argumentKeyboardConfig.symbolizationKey}

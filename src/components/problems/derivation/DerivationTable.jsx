@@ -30,7 +30,6 @@ import ThemedCard from '../../ui/ThemedCard.jsx'
 import ProblemSetButtons from '../mui/frame/ProblemSetButtons.jsx'
 import { MobileLogicInput, useMobileLogicKeyboardEnabled } from '../../ui/LogicKeyboard/index.js'
 import { getDerivationCheckerForLogicSystem } from '../../../lib/logicpenguin/checkers/derivation-by-logic-system.js'
-import getFormulaClass from '../../../lib/logicpenguin/symbolic/formula.js'
 import getSyntax from '../../../lib/logicpenguin/symbolic/libsyntax.js'
 import {
   getDerivationProblemType,
@@ -65,18 +64,6 @@ import {
   isResolvedConclusionLine,
 } from './derivationUtils.js'
 
-/** Compare formula strings by canonical form so ∃x(~Hx) and ∃x~Hx count equal */
-function formulasEqualNormally(a, b, normalizeForFallback) {
-  if (!a && !b) return true
-  if (!a || !b) return false
-  try {
-    const Formula = getFormulaClass()
-    return Formula.from(String(a)).normal === Formula.from(String(b)).normal
-  } catch {
-    return normalizeForFallback ? normalizeForFallback(a) === normalizeForFallback(b) : false
-  }
-}
-
 function parseRulesetRules(value, derivationRuleLookup) {
   const source = Array.isArray(value) ? value : String(value ?? '').split(/[,\s]+/g)
   const out = []
@@ -99,7 +86,7 @@ function parseRulesetRules(value, derivationRuleLookup) {
 
 /**
  * Propositional derivations: extract unique uppercase letters from premises + conclusion.
- * Used for the mobile keyboard letter row (e.g. premises "P ⊃ Q", "P", conclusion "Q" → ["P","Q"]).
+ * Used for the mobile keyboard letter row.
  */
 function getPropositionalLettersFromFormulas(premises, conclusion) {
   const formulas = [...(Array.isArray(premises) ? premises : []), conclusion].filter(Boolean).map(String)
@@ -647,6 +634,7 @@ export default function DerivationTable({
       index: lastFilledIndex,
       conclusion: proof?.conclusion,
       normalizeFormula: normalizeFormulaForCheck,
+      notation,
       openAssumptionDepths,
     })
     const readyForRuleGate = Boolean(
@@ -728,6 +716,7 @@ export default function DerivationTable({
         index: lastIndex,
         conclusion: proof?.conclusion,
         normalizeFormula: normalizeFormulaForCheck,
+        notation,
         openAssumptionDepths,
       })
     )
@@ -762,6 +751,7 @@ export default function DerivationTable({
               index: prev.length - 1,
               conclusion: conclusionStr,
               normalizeFormula: normalizeFormulaForCheck,
+              notation,
               openAssumptionDepths,
             })) return prev
             pendingFocusRef.current = prev.length
@@ -810,6 +800,7 @@ export default function DerivationTable({
       index: lastFilledIndex,
       conclusion,
       normalizeFormula: normalizeFormulaForCheck,
+      notation,
       openAssumptionDepths,
     })) return { ok: false, index: null }
     return { ok: true, index: lastFilledIndex }

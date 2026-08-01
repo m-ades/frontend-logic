@@ -68,23 +68,9 @@ export function getPropositionalLettersFromFormulas(premises, conclusion) {
   return letters.length > 0 ? letters : null
 }
 
-export const SYMBOL_BUTTONS = [
-  { label: '~', insert: '~' },
-  { label: '•', insert: '•' },
-  { label: '∨', insert: '∨' },
-  { label: '⊃', insert: '⊃' },
-  { label: '≡', insert: '≡' },
-  { label: '(∀x)', insert: '(∀x)' },
-  { label: '(∃x)', insert: '(∃x)' },
-  { label: '(  )', pair: '()' },
-  { label: '[  ]', pair: '[]' },
-]
-
-export const SYMBOL_ROW2 = [SYMBOL_BUTTONS[5], SYMBOL_BUTTONS[6], SYMBOL_BUTTONS[7], SYMBOL_BUTTONS[8]]
 export const HURLEY_ASSUMPTION_RULES = new Set(['ACP', 'AIP'])
 export const FITCH_ASSUMPTION_RULES = new Set(['AS', 'HYP'])
 export const ASSUMPTION_RULES = new Set([...HURLEY_ASSUMPTION_RULES, ...FITCH_ASSUMPTION_RULES])
-export const INDENT_START_RULES = HURLEY_ASSUMPTION_RULES
 export const INDENT_END_RULES = new Set(['CP', 'IP'])
 export const INDENT_PX = 18
 export const ASSUMPTION_INDENT_PX = 12
@@ -93,11 +79,11 @@ export const AUTO_CHECK_STORAGE_KEY = 'logic-app:autocheck-enabled'
 export const RULE_INPUT_MODE_KEY = 'logic-app:derivation-rule-input-mode'
 export const MOBILE_DERIVATION_PLACEHOLDER_MSG = 'Tap to open proof'
 
-export function formulasEqualNormally(a, b, normalizeForFallback) {
+export function formulasEqualNormally(a, b, normalizeForFallback, notation) {
   if (!a && !b) return true
   if (!a || !b) return false
   try {
-    const Formula = getFormulaClass()
+    const Formula = getFormulaClass(notation)
     return Formula.from(String(a)).normal === Formula.from(String(b)).normal
   } catch {
     return normalizeForFallback ? normalizeForFallback(a) === normalizeForFallback(b) : false
@@ -300,7 +286,7 @@ export const getOpenAssumptionDepths = (linesSnapshot = [], options = {}) => {
     if (INDENT_END_RULES.has(rule)) {
       depth = Math.max(0, depth - 1)
     }
-    if (INDENT_START_RULES.has(rule)) {
+    if (assumptionRules.has(rule)) {
       depth = Math.min(depth + 1, MAX_INDENT_LEVEL)
     }
     return depth
@@ -312,10 +298,11 @@ export const isResolvedConclusionLine = ({
   index,
   conclusion,
   normalizeFormula,
+  notation,
   openAssumptionDepths,
 }) => {
   if (!line || !String(conclusion || '').trim() || !Number.isInteger(index)) return false
-  if (!formulasEqualNormally(line.formula || '', conclusion, normalizeFormula)) return false
+  if (!formulasEqualNormally(line.formula || '', conclusion, normalizeFormula, notation)) return false
   // a matching formula inside an open assumption does not end the proof
   return (openAssumptionDepths?.[index] ?? 0) === 0
 }

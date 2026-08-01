@@ -99,6 +99,17 @@ const mapCourseRecord = (course, index) => ({
   gradingScale: DEFAULT_GRADING_SCALE,
 });
 
+const normalizeCourseSettingsPayload = (settings = {}) => {
+  const payload = { ...settings };
+  const logicSystem = settings.logicSystem ?? settings.logic_system;
+  if (logicSystem !== undefined) {
+    const normalized = normalizeLogicSystem(logicSystem, DEFAULT_LOGIC_SYSTEM);
+    payload.logicSystem = normalized;
+    payload.logic_system = normalized;
+  }
+  return payload;
+};
+
 const mapAssignmentRecord = (assignment) => {
   const dueAt = assignment.due_at ?? assignment.dueAt ?? assignment.due_date ?? null;
   const due = splitDateTime(dueAt);
@@ -265,6 +276,12 @@ export async function updateCourse(courseId, updates) {
   if (updates.name || updates.title) payload.title = updates.name ?? updates.title;
   if (updates.code || updates.course_code) payload.course_code = updates.code ?? updates.course_code;
   if (updates.term || updates.semester) payload.semester = updates.term ?? updates.semester;
+  if (updates.logicSystem || updates.logic_system) {
+    payload.logic_system = normalizeLogicSystem(
+      updates.logicSystem ?? updates.logic_system,
+      DEFAULT_LOGIC_SYSTEM
+    );
+  }
   if (typeof updates.is_active === "boolean") payload.is_active = updates.is_active;
   if (updates.status) payload.is_active = updates.status === "current";
 
@@ -524,7 +541,7 @@ function coursesReducer(state, action) {
         ...state,
         courses: state.courses.map((course) =>
           course.id === action.courseId
-            ? { ...course, ...action.payload }
+            ? { ...course, ...normalizeCourseSettingsPayload(action.payload) }
             : course
         ),
       };
@@ -987,6 +1004,10 @@ export async function createCourse(courseData) {
     title: courseData.name ?? courseData.title,
     course_code: courseData.code ?? courseData.course_code,
     semester: courseData.term ?? courseData.semester,
+    logic_system: normalizeLogicSystem(
+      courseData.logicSystem ?? courseData.logic_system,
+      DEFAULT_LOGIC_SYSTEM
+    ),
     is_active: courseData.status ? courseData.status === "current" : true,
   };
 

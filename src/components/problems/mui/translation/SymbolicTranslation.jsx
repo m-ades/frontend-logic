@@ -20,7 +20,7 @@ import {
   isPredicateLogicKey,
   promptImpliesPredicateLogic,
 } from './symbolizationKeyboard.js'
-import { getNotation } from '../../../../lib/logicSystems.js'
+import { getNotation, getSymbols } from '../../../../lib/logicSystems.js'
 
 function FormulaInputField({ value, onValueChange, fieldReadOnly, formulaInputRef, onEnterKey, ariaLabel, notation }) {
   const theme = useTheme()
@@ -146,6 +146,7 @@ export default function SymbolicTranslation({
   const isPhone = useMediaQuery(theme.breakpoints.down('sm'))
   const editorRef = useRef(null)
   const notation = getNotation(logicSystem)
+  const symbols = getSymbols(logicSystem)
   const openEdit = () => editorRef.current?.open?.()
   const [inputValue, setInputValue] = useState(savedState?.ans || '')
   const formulaInputRef = useRef(null)
@@ -296,7 +297,7 @@ export default function SymbolicTranslation({
                     scheduleStateSave(value)
                   }}
                   disabled={readOnly}
-                  placeholder="e.g. P • Q"
+                  placeholder={`e.g. P ${symbols.and} Q`}
                   aria-label="Formula translation"
                   symbolizationKey={symbolizationKey}
                   includeQuantifiers={isPredicate}
