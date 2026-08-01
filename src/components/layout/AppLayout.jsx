@@ -81,6 +81,8 @@ function AppShell({ children }) {
     ? InstructorSidebarStructure
     : StudentSidebarStructure;
   const sidebarStructure = baseSidebarStructure;
+  const activeCourse = coursesState.courses.find((course) => course.id === coursesState.activeCourseId);
+  const logicSystem = activeCourse?.logicSystem ?? activeCourse?.logic_system;
 
   const routeKind = isInstructorRoute ? "instructor" : "student";
 
@@ -116,6 +118,7 @@ function AppShell({ children }) {
         onCloseAccountSettings={() => setIsAccountSettingsOpen(false)}
         textSize={textSize}
         onTextSizeChange={setTextSize}
+        logicSystem={logicSystem}
       >
         {children}
       </ShellFrame>
