@@ -43,6 +43,7 @@ import {
   getDerivationRuleLookup,
   getDerivationRules,
 } from '../../../lib/derivationRules.js'
+import { getRulesetRestrictions } from '../../../lib/logicpenguin/checkers/derivation-rule-restrictions.js'
 import { justParse } from '../../ui/logicpenguin/justification-parse.js'
 import { getInsertSymbolLabel } from '../../ui/logicpenguin/LogicSymbol.jsx'
 import { buildPersistedSubmissionState, shouldUseApiValidation, submitApiValidation } from '../../../utils/submissionRuntime.js'
@@ -74,6 +75,26 @@ function formulasEqualNormally(a, b, normalizeForFallback) {
   } catch {
     return normalizeForFallback ? normalizeForFallback(a) === normalizeForFallback(b) : false
   }
+}
+
+function parseRulesetRules(value, derivationRuleLookup) {
+  const source = Array.isArray(value) ? value : String(value ?? '').split(/[,\s]+/g)
+  const out = []
+  const seen = new Set()
+  let hasEntries = false
+  for (const entry of source) {
+    const raw = String(entry ?? '').trim()
+    if (!raw) continue
+    hasEntries = true
+    const formatted = formatRuleName(raw)
+    const rule = derivationRuleLookup.get(formatted.toLowerCase())
+    if (!rule || rule.toLowerCase() === 'pr') continue
+    const key = rule.toLowerCase()
+    if (seen.has(key)) continue
+    seen.add(key)
+    out.push(rule)
+  }
+  return { rules: out, hasEntries }
 }
 
 /**
@@ -395,15 +416,15 @@ export default function DerivationTable({
   }, [])
 
   const allowedRules = useMemo(() => {
-    const allow = proof?.ruleset?.allow ?? proof?.options?.ruleset?.allow
-    if (Array.isArray(allow) && allow.length > 0) {
-      const unique = Array.from(new Set(allow.map((rule) => formatRuleName(String(rule)))))
-      const validRules = unique
-        .map((rule) => derivationRuleLookup.get(rule.toLowerCase()) ?? null)
-        .filter((rule) => rule && rule.toLowerCase() !== 'pr')
-      return validRules.length > 0 ? validRules : allDerivationRules
-    }
-    return allDerivationRules
+    const { allow: allowRules, deny: denyRules } = getRulesetRestrictions(
+      { ruleset: proof?.ruleset },
+      proof?.options
+    )
+    const allow = parseRulesetRules(allowRules, derivationRuleLookup)
+    const deny = parseRulesetRules(denyRules, derivationRuleLookup)
+    const denied = new Set(deny.rules.map((rule) => rule.toLowerCase()))
+    const sourceRules = allow.hasEntries ? allow.rules : allDerivationRules
+    return sourceRules.filter((rule) => !denied.has(rule.toLowerCase()))
   }, [proof?.ruleset, proof?.options?.ruleset, allDerivationRules, derivationRuleLookup])
 
   /** Keyboard config for derivations.

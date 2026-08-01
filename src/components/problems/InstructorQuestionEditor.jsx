@@ -185,6 +185,31 @@ function parseRuleList(value, logicSystem = DEFAULT_LOGIC_SYSTEM) {
   return out
 }
 
+function isKnownDerivationRule(rule, logicSystem = DEFAULT_LOGIC_SYSTEM) {
+  const raw = String(rule || '').trim()
+  if (!raw) return true
+  const ruleLookup = getDerivationRuleLookup(logicSystem)
+  const formatted = formatDerivationRuleName(raw)
+  return Boolean(ruleLookup.get(raw.toLowerCase()) || ruleLookup.get(formatted.toLowerCase()))
+}
+
+function invalidRuleTokens(value, logicSystem = DEFAULT_LOGIC_SYSTEM) {
+  const source = Array.isArray(value)
+    ? value.flatMap((entry) => String(entry || '').split(/[,\s]+/g))
+    : String(value || '').split(/[,\s]+/g)
+  const seen = new Set()
+  const out = []
+  source.forEach((entry) => {
+    const token = String(entry || '').trim()
+    if (!token || isKnownDerivationRule(token, logicSystem)) return
+    const key = token.toLowerCase()
+    if (seen.has(key)) return
+    seen.add(key)
+    out.push(token)
+  })
+  return out
+}
+
 function normalizeRuleListText(value, logicSystem = DEFAULT_LOGIC_SYSTEM) {
   return String(value ?? '')
     .split(/([,\s]+)/g)
@@ -192,19 +217,57 @@ function normalizeRuleListText(value, logicSystem = DEFAULT_LOGIC_SYSTEM) {
     .join('')
 }
 
+function getRuleValue(source, keys) {
+  const obj = source && typeof source === 'object' ? source : {}
+  for (const key of keys) {
+    if (obj[key] !== undefined) return obj[key]
+  }
+  return undefined
+}
+
+function removeRuleKeys(source, keys) {
+  const out = { ...(source && typeof source === 'object' ? source : {}) }
+  keys.forEach((key) => {
+    delete out[key]
+  })
+  return out
+}
+
+const ALLOW_RULE_KEYS = ['allow', 'allowed']
+const DISALLOW_RULE_KEYS = ['disallow', 'disallowed', 'deny', 'forbid', 'forbidden']
+const RULE_AVAILABILITY_MODES = new Set(['all', 'only', 'except'])
+
+function getRuleAvailabilityMode(ruleset, logicSystem = DEFAULT_LOGIC_SYSTEM) {
+  if (RULE_AVAILABILITY_MODES.has(ruleset?.availabilityMode)) return ruleset.availabilityMode
+  if (parseRuleList(getRuleValue(ruleset, ALLOW_RULE_KEYS), logicSystem).length) return 'only'
+  if (parseRuleList(getRuleValue(ruleset, DISALLOW_RULE_KEYS), logicSystem).length) return 'except'
+  return 'all'
+}
+
+function getAvailableDerivationRules(ruleset, logicSystem = DEFAULT_LOGIC_SYSTEM) {
+  const allRules = getDerivationRules(logicSystem)
+  const allow = parseRuleList(getRuleValue(ruleset, ALLOW_RULE_KEYS), logicSystem)
+  const disallow = parseRuleList(getRuleValue(ruleset, DISALLOW_RULE_KEYS), logicSystem)
+  const disallowSet = new Set(disallow.map((rule) => rule.toLowerCase()))
+  const source = allow.length ? allow : allRules
+  return source.filter((rule) => !disallowSet.has(rule.toLowerCase()))
+}
+
 function normalizeDerivationRuleset(ruleset, logicSystem = DEFAULT_LOGIC_SYSTEM) {
   const source = ruleset && typeof ruleset === 'object' ? ruleset : {}
-  const allDerivationRules = getDerivationRules(logicSystem)
-  const allowFromInput = parseRuleList(source.allow ?? source.allowed, logicSystem)
-  const disallow = parseRuleList(source.disallow ?? source.disallowed ?? source.forbidden ?? source.forbid, logicSystem)
+  const mode = getRuleAvailabilityMode(source, logicSystem)
+  const allowFromInput = mode === 'only'
+    ? parseRuleList(getRuleValue(source, ALLOW_RULE_KEYS), logicSystem)
+    : []
+  const disallow = mode === 'except'
+    ? parseRuleList(getRuleValue(source, DISALLOW_RULE_KEYS), logicSystem)
+    : []
   const require = parseRuleList(source.require ?? source.required ?? source.necessary, logicSystem)
   const requireAny = parseRuleList(source.requireAny ?? source.requiredAny, logicSystem)
-  const disallowSet = new Set(disallow.map((rule) => rule.toLowerCase()))
-  const allow = allowFromInput.length
-    ? allowFromInput
-    : (disallow.length
-      ? allDerivationRules.filter((rule) => !disallowSet.has(rule.toLowerCase()))
-      : [])
+  const disallowSet = new Set(parseRuleList(getRuleValue(source, DISALLOW_RULE_KEYS), logicSystem).map((rule) => rule.toLowerCase()))
+  const allow = mode === 'only'
+    ? allowFromInput.filter((rule) => !disallowSet.has(rule.toLowerCase()))
+    : []
 
   const normalized = {}
   if (allow.length) normalized.allow = allow
@@ -212,6 +275,37 @@ function normalizeDerivationRuleset(ruleset, logicSystem = DEFAULT_LOGIC_SYSTEM)
   if (require.length) normalized.require = require
   if (requireAny.length) normalized.requireAny = requireAny
   return Object.keys(normalized).length ? normalized : null
+}
+
+function validateDerivationRuleset(ruleset, logicSystem = DEFAULT_LOGIC_SYSTEM) {
+  const source = ruleset && typeof ruleset === 'object' ? ruleset : {}
+  const mode = getRuleAvailabilityMode(source, logicSystem)
+  const allowRaw = getRuleValue(source, ALLOW_RULE_KEYS)
+  const disallowRaw = getRuleValue(source, DISALLOW_RULE_KEYS)
+  const requireRaw = source.require ?? source.required ?? source.necessary
+  const requireAnyRaw = source.requireAny ?? source.requiredAny
+  const invalid = [
+    ...invalidRuleTokens(allowRaw, logicSystem),
+    ...invalidRuleTokens(disallowRaw, logicSystem),
+    ...invalidRuleTokens(requireRaw, logicSystem),
+    ...invalidRuleTokens(requireAnyRaw, logicSystem),
+  ]
+  if (invalid.length) return `Rule does not exist in this logic system: ${invalid[0]}`
+  if (mode === 'only' && !parseRuleList(allowRaw, logicSystem).length) {
+    return 'Choose at least one available rule, or set rule availability to all rules.'
+  }
+  if (mode === 'except' && !parseRuleList(disallowRaw, logicSystem).length) {
+    return 'Choose at least one rule to exclude, or set rule availability to all rules.'
+  }
+
+  const availableSet = new Set(getAvailableDerivationRules(source, logicSystem).map((rule) => rule.toLowerCase()))
+  const required = [
+    ...parseRuleList(requireRaw, logicSystem),
+    ...parseRuleList(requireAnyRaw, logicSystem),
+  ]
+  const unavailableRequired = required.find((rule) => !availableSet.has(rule.toLowerCase()))
+  if (unavailableRequired) return `Required rule is not available to students: ${unavailableRequired}`
+  return ''
 }
 
 function buildMcSnapshot(proof, edited, existing) {
@@ -837,7 +931,8 @@ function DerivationEditorForm({ proof, value, onChange, logicSystem = DEFAULT_LO
   const premises = value.premises ?? proof.premises ?? proof.prems ?? []
   const conclusion = value.conclusion ?? proof.conclusion ?? proof.conc ?? ''
   const prompt = value.prompt ?? proof.description ?? ''
-  const ruleset = value.ruleset ?? proof.ruleset ?? proof.ruleSet ?? {}
+  const rawRuleset = value.ruleset ?? proof.ruleset ?? proof.ruleSet ?? {}
+  const ruleset = rawRuleset && typeof rawRuleset === 'object' ? rawRuleset : {}
 
   const update = (updates) => onChange({ ...value, ...updates })
   const premsList = Array.isArray(premises) ? premises : (premises ? [premises] : [])
@@ -847,10 +942,42 @@ function DerivationEditorForm({ proof, value, onChange, logicSystem = DEFAULT_LO
   const toRuleText = (entries) => parseRuleList(entries, activeLogicSystem).join(', ')
   const getRulesetFieldText = (fieldValue) =>
     Array.isArray(fieldValue) ? toRuleText(fieldValue) : String(fieldValue ?? '')
+  const availabilityMode = getRuleAvailabilityMode(ruleset, activeLogicSystem)
+  const availabilityText = availabilityMode === 'only'
+    ? getAvailableDerivationRules(ruleset, activeLogicSystem).join(', ')
+    : (availabilityMode === 'except' ? toRuleText(getRuleValue(ruleset, DISALLOW_RULE_KEYS)) : '')
+  const availableRules = getAvailableDerivationRules(ruleset, activeLogicSystem)
+  const requiredAll = parseRuleList(ruleset.require ?? ruleset.required ?? ruleset.necessary, activeLogicSystem)
+  const requiredAny = parseRuleList(ruleset.requireAny ?? ruleset.requiredAny, activeLogicSystem)
+  const rulesetMessage = validateDerivationRuleset(ruleset, activeLogicSystem)
+  const availabilitySummary = availabilityMode === 'only'
+    ? `Students may use only: ${availableRules.length ? availableRules.join(', ') : 'no rules selected'}.`
+    : (availabilityMode === 'except'
+      ? `Students may use all rules except: ${toRuleText(getRuleValue(ruleset, DISALLOW_RULE_KEYS)) || 'no rules selected'}.`
+      : 'Students may use all rules.')
+  const requirementSummary = [
+    requiredAll.length ? `Must use: ${requiredAll.join(', ')}.` : '',
+    requiredAny.length ? `Must use at least one of: ${requiredAny.join(', ')}.` : '',
+  ].filter(Boolean).join(' ')
   const setRulesetField = (field, text) => {
     const nextRuleset = {
       ...ruleset,
       [field]: normalizeRuleListText(text, activeLogicSystem),
+    }
+    update({ ruleset: nextRuleset })
+  }
+  const setAvailabilityMode = (mode) => {
+    const nextRuleset = removeRuleKeys(ruleset, [...ALLOW_RULE_KEYS, ...DISALLOW_RULE_KEYS])
+    nextRuleset.availabilityMode = mode
+    update({ ruleset: nextRuleset })
+  }
+  const setAvailabilityRules = (text) => {
+    const nextRuleset = removeRuleKeys(ruleset, [...ALLOW_RULE_KEYS, ...DISALLOW_RULE_KEYS])
+    nextRuleset.availabilityMode = availabilityMode
+    if (availabilityMode === 'only') {
+      nextRuleset.allow = normalizeRuleListText(text, activeLogicSystem)
+    } else if (availabilityMode === 'except') {
+      nextRuleset.disallow = normalizeRuleListText(text, activeLogicSystem)
     }
     update({ ruleset: nextRuleset })
   }
@@ -897,22 +1024,28 @@ function DerivationEditorForm({ proof, value, onChange, logicSystem = DEFAULT_LO
         fullWidth
         variant="outlined"
       />
-      <TextField
-        label="Allowed rules"
-        value={getRulesetFieldText(ruleset.allow)}
-        onChange={(e) => setRulesetField('allow', e.target.value)}
-        fullWidth
-        variant="outlined"
-        placeholder="e.g. MP, MT, DS, CP, IP"
-      />
-      <TextField
-        label="Disallowed rules"
-        value={getRulesetFieldText(ruleset.disallow)}
-        onChange={(e) => setRulesetField('disallow', e.target.value)}
-        fullWidth
-        variant="outlined"
-        placeholder="e.g. DN, DM"
-      />
+      <FormControl component="fieldset">
+        <Typography variant="subtitle2" sx={{ mb: 0.5 }}>Rule availability</Typography>
+        <RadioGroup value={availabilityMode} onChange={(e) => setAvailabilityMode(e.target.value)}>
+          <FormControlLabel value="all" control={<Radio size="small" />} label="All rules are available" />
+          <FormControlLabel value="only" control={<Radio size="small" />} label="Only these rules are available" />
+          <FormControlLabel value="except" control={<Radio size="small" />} label="All except these rules" />
+        </RadioGroup>
+      </FormControl>
+      {availabilityMode !== 'all' && (
+        <TextField
+          label={availabilityMode === 'only' ? 'Available rules' : 'Excluded rules'}
+          value={availabilityText}
+          onChange={(e) => setAvailabilityRules(e.target.value)}
+          fullWidth
+          variant="outlined"
+          placeholder={activeLogicSystem === 'hurley' ? 'e.g. MP, MT, DS, CP, IP' : 'e.g. R, ∧I, ∧E, →E'}
+          error={Boolean(rulesetMessage)}
+          helperText={rulesetMessage || (availabilityMode === 'only'
+            ? 'Only listed rules appear to students and pass validation.'
+            : 'Listed rules are hidden from students and rejected by validation.')}
+        />
+      )}
       <TextField
         label="Required rules (all)"
         value={getRulesetFieldText(ruleset.require)}
@@ -929,6 +1062,9 @@ function DerivationEditorForm({ proof, value, onChange, logicSystem = DEFAULT_LO
         variant="outlined"
         placeholder="e.g. UI, UG, EI, EG"
       />
+      <Typography variant="body2" sx={{ color: rulesetMessage ? 'error.main' : 'text.secondary' }}>
+        {rulesetMessage || `${availabilitySummary}${requirementSummary ? ` ${requirementSummary}` : ''}`}
+      </Typography>
     </Stack>
   )
 }
@@ -1333,6 +1469,15 @@ function InstructorQuestionEditorInner({
       let mergedSnapshot = deepMerge(existing, question_snapshot)
       if (proof.type === 'single-row-truth-table') {
         delete mergedSnapshot.singleRowTruthTable
+      }
+      if (isDerivationProblemType(proof.type)) {
+        const rulesetLogicSystem = proof.type === 'derivation-hurley' ? 'hurley' : activeLogicSystem
+        const rulesetError = validateDerivationRuleset(editValue.ruleset ?? question_snapshot.ruleset, rulesetLogicSystem)
+        if (rulesetError) {
+          setError(rulesetError)
+          setSaving(false)
+          return
+        }
       }
       const formulaError = validateQuestionSnapshotFormulas(mergedSnapshot, activeLogicSystem)
       if (formulaError) {
