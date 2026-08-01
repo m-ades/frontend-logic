@@ -944,8 +944,8 @@ function DerivationEditorForm({ proof, value, onChange, logicSystem = DEFAULT_LO
     Array.isArray(fieldValue) ? toRuleText(fieldValue) : String(fieldValue ?? '')
   const availabilityMode = getRuleAvailabilityMode(ruleset, activeLogicSystem)
   const availabilityText = availabilityMode === 'only'
-    ? getAvailableDerivationRules(ruleset, activeLogicSystem).join(', ')
-    : (availabilityMode === 'except' ? toRuleText(getRuleValue(ruleset, DISALLOW_RULE_KEYS)) : '')
+    ? getRulesetFieldText(getRuleValue(ruleset, ALLOW_RULE_KEYS))
+    : (availabilityMode === 'except' ? getRulesetFieldText(getRuleValue(ruleset, DISALLOW_RULE_KEYS)) : '')
   const availableRules = getAvailableDerivationRules(ruleset, activeLogicSystem)
   const requiredAll = parseRuleList(ruleset.require ?? ruleset.required ?? ruleset.necessary, activeLogicSystem)
   const requiredAny = parseRuleList(ruleset.requireAny ?? ruleset.requiredAny, activeLogicSystem)
