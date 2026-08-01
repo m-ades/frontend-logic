@@ -85,23 +85,34 @@ function mkexistential(v) {
     return this.mkquantifier(v, this.symbols.EXISTS);
 }
 
+function symbolfix(s) {
+    let rv = String(s ?? '');
+
+    rv = rv.replace(/-->/g, this.symbols.IFTHEN);
+    rv = rv.replace(/<->/g, this.symbols.IFF);
+    rv = rv.replace(/<–>/g, this.symbols.IFF);
+    rv = rv.replace(/<=>/g, this.symbols.IFF);
+    rv = rv.replace(/->/g, this.symbols.IFTHEN);
+    rv = rv.replace(/–>/g, this.symbols.IFTHEN);
+    rv = rv.replace(/=>/g, this.symbols.IFTHEN);
+    rv = rv.replace(/>/g, this.symbols.IFTHEN);
+    rv = rv.replace(/\/\\/g, this.symbols.AND);
+    rv = rv.replace(/\\\//g, this.symbols.OR);
+    rv = rv.replace(/[&^∧•·]/g, this.symbols.AND);
+    rv = rv.replace(/[|]/g, this.symbols.OR);
+    rv = rv.replace(/[↔≡]/g, this.symbols.IFF);
+    rv = rv.replace(/[→⇒⊃]/g, this.symbols.IFTHEN);
+    rv = rv.replace(/[~¬]/g, this.symbols.NOT);
+    rv = rv.replace(/[⊥✖]/g, this.symbols.FALSUM);
+    return rv;
+}
+
 // changes to input string you'd be all right applying even to
 // input fields, here we remove redundant spaces
 function inputfix(s) {
-    // remove spaces
-    let rv = s.replace(/\s/g,'');
-    
-    
-    // convert plaintext shorthands to Hurley's notation
-    rv = rv.replace(/-->/g, this.symbols.IFTHEN);
-    rv = rv.replace(/->/g, this.symbols.IFTHEN);
-    rv = rv.replace(/>/g, this.symbols.IFTHEN);
-    if (this.symbols.AND != '&') {
-        rv = rv.replace(/&/g, this.symbols.AND);
-    }
-    if (this.symbols.AND != '^') {
-        rv = rv.replace(/\^/g, this.symbols.AND);
-    }
+    // remove spaces and convert plaintext shorthands to the active notation
+    let rv = this.symbolfix(String(s ?? '').replace(/\s/g,''));
+
     // accept lowercase "v" as a disjunction when used infix (e.g., CvM -> C∨M)
     rv = rv.replace(/([A-Za-z)\]\}])v([A-Za-z(\[\{])/g, `$1${this.symbols.OR}$2`);
     rv = rv.replace(/\ball\b/gi, this.symbols.FORALL); // 'all' becomes ∀
@@ -214,6 +225,7 @@ function generateSyntax(notationname = DEFAULT_NOTATION) {
     syntax.ncRegEx = new RegExp( '[^' + syntax.notation.constantsRange + ']', 'g');
 
     // BIND SYNTAX FUNCTIONS TO THIS SYNTAX
+    syntax.symbolfix = symbolfix;
     syntax.inputfix = inputfix;
     syntax.isbinaryop = isbinaryop;
     syntax.ismonop = ismonop;

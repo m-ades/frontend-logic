@@ -1,5 +1,5 @@
 import { alpha } from '@mui/material/styles'
-import getHurleyRuleset from '../../../lib/logicpenguin/checkers/rules/hurley-rules.js'
+import { formatDerivationRuleName } from '../../../lib/derivationRules.js'
 import getFormulaClass from '../../../lib/logicpenguin/symbolic/formula.js'
 import { justParse } from '../../ui/logicpenguin/justification-parse.js'
 
@@ -81,13 +81,10 @@ export const SYMBOL_BUTTONS = [
 ]
 
 export const SYMBOL_ROW2 = [SYMBOL_BUTTONS[5], SYMBOL_BUTTONS[6], SYMBOL_BUTTONS[7], SYMBOL_BUTTONS[8]]
-export const FORCE_UPPER_RULES = new Set(['UI', 'UG', 'EI', 'EG', 'MP', 'MT', 'HS', 'DS', 'CD', 'DN', 'DM', 'QN', 'CP', 'IP', 'ACP', 'AIP'])
-export const ALL_DERIVATION_RULES = Object.keys(getHurleyRuleset())
-  .filter((rule) => rule !== 'Pr' && rule !== 'Ass')
-  .map((rule) => (FORCE_UPPER_RULES.has(rule.toUpperCase()) ? rule.toUpperCase() : rule.charAt(0).toUpperCase() + rule.slice(1).toLowerCase()))
-export const RULES_ALLOW_NO_LINES = new Set(['ACP', 'AIP', 'HYP'])
-export const ASSUMPTION_RULES = new Set(['ACP', 'AIP', 'HYP'])
-export const INDENT_START_RULES = new Set(['ACP', 'AIP', 'HYP'])
+export const HURLEY_ASSUMPTION_RULES = new Set(['ACP', 'AIP'])
+export const FITCH_ASSUMPTION_RULES = new Set(['AS', 'HYP'])
+export const ASSUMPTION_RULES = new Set([...HURLEY_ASSUMPTION_RULES, ...FITCH_ASSUMPTION_RULES])
+export const INDENT_START_RULES = HURLEY_ASSUMPTION_RULES
 export const INDENT_END_RULES = new Set(['CP', 'IP'])
 export const INDENT_PX = 18
 export const ASSUMPTION_INDENT_PX = 12
@@ -190,32 +187,27 @@ export const applyInsertion = (value, selectionStart, selectionEnd, insertText, 
 }
 
 export const formatRuleName = (rule) => {
-  if (!rule) return ''
-  if (FORCE_UPPER_RULES.has(rule.toUpperCase())) {
-    return rule.toUpperCase()
-  }
-  return rule.charAt(0).toUpperCase() + rule.slice(1).toLowerCase()
+  return formatDerivationRuleName(rule)
 }
 
-export const formatJustificationParts = (nums, ranges, citedrules) => {
+export const formatJustificationParts = (nums, ranges, citedrules, options = {}) => {
   const formattedRules = citedrules.map((rule) => formatRuleName(rule))
-
-  let pretty = nums.map((n) => n.toString()).join(', ')
+  const refs = nums.map((n) => n.toString())
   if (ranges.length > 0) {
-    if (pretty !== '') pretty += ', '
-    pretty += ranges.map(([s, e]) => `${s}–${e}`).join(', ')
+    refs.push(...ranges.map(([s, e]) => `${s}–${e}`))
   }
-  if (formattedRules.length > 0) {
-    if (pretty !== '') pretty += ' '
-    pretty += formattedRules.join(', ')
+  const refsText = refs.join(', ')
+  const rulesText = formattedRules.join(', ')
+  if (options.rulesFirst) {
+    return [rulesText, refsText].filter(Boolean).join(' ')
   }
-  return pretty
+  return [refsText, rulesText].filter(Boolean).join(' ')
 }
 
-export const formatJustificationDisplay = (value) => {
+export const formatJustificationDisplay = (value, options = {}) => {
   if (!value) return ''
   const { nums, ranges, citedrules } = justParse(String(value))
-  return formatJustificationParts(nums, ranges, citedrules)
+  return formatJustificationParts(nums, ranges, citedrules, options)
 }
 
 export const getJustificationMeta = (value) => {
@@ -232,16 +224,16 @@ export const formatJustificationLines = (value) => {
   return formatJustificationParts(nums, ranges, [])
 }
 
-export const applyRuleToJustification = (value, rule) => {
+export const applyRuleToJustification = (value, rule, options = {}) => {
   const { nums, ranges } = justParse(String(value || ''))
   const nextRules = rule ? [rule] : []
-  return formatJustificationParts(nums, ranges, nextRules)
+  return formatJustificationParts(nums, ranges, nextRules, options)
 }
 
-export const applyLinesToJustification = (value, linesInput) => {
+export const applyLinesToJustification = (value, linesInput, options = {}) => {
   const existingRule = getRuleFromJustification(value)
   const { nums, ranges } = justParse(String(linesInput || ''))
-  return formatJustificationParts(nums, ranges, existingRule ? [existingRule] : [])
+  return formatJustificationParts(nums, ranges, existingRule ? [existingRule] : [], options)
 }
 
 export const getRuleFromJustification = (value) => {
@@ -250,7 +242,57 @@ export const getRuleFromJustification = (value) => {
   return formatRuleName(citedrules[0])
 }
 
-export const getOpenAssumptionDepths = (linesSnapshot = []) => {
+const getCitedAssumptionRanges = (
+  linesSnapshot = [],
+  assumptionRules = ASSUMPTION_RULES,
+  { keepUnclosedOpen = false } = {}
+) => {
+  const rangesByStart = new Map()
+  linesSnapshot.forEach((line, idx) => {
+    const lineNumber = idx + 1
+    const { ranges } = justParse(String(line?.justification || ''))
+    ranges.forEach(([start, end]) => {
+      if (!Number.isFinite(start) || !Number.isFinite(end)) return
+      if (start >= end || end >= lineNumber) return
+      const startLine = linesSnapshot[start - 1]
+      const startRule = getRuleFromJustification(startLine?.justification || '').toUpperCase()
+      if (!assumptionRules.has(startRule)) return
+      const currentEnd = rangesByStart.get(start)
+      if (!currentEnd || end > currentEnd) {
+        rangesByStart.set(start, end)
+      }
+    })
+  })
+  if (keepUnclosedOpen) {
+    linesSnapshot.forEach((line, idx) => {
+      const lineNumber = idx + 1
+      const rule = getRuleFromJustification(line?.justification || '').toUpperCase()
+      if (!assumptionRules.has(rule)) return
+      if (rangesByStart.has(lineNumber)) return
+      rangesByStart.set(lineNumber, linesSnapshot.length)
+    })
+  }
+  return rangesByStart
+}
+
+export const getOpenAssumptionDepths = (linesSnapshot = [], options = {}) => {
+  const mode = options.mode ?? 'flat'
+  const assumptionRules = options.assumptionRules ?? ASSUMPTION_RULES
+  if (mode === 'nested') {
+    const rangesByStart = getCitedAssumptionRanges(linesSnapshot, assumptionRules, {
+      keepUnclosedOpen: true,
+    })
+    return linesSnapshot.map((_, idx) => {
+      const lineNumber = idx + 1
+      let depth = 0
+      rangesByStart.forEach((end, start) => {
+        if (lineNumber >= start && lineNumber <= end) {
+          depth += 1
+        }
+      })
+      return Math.min(depth, MAX_INDENT_LEVEL)
+    })
+  }
   let depth = 0
   return linesSnapshot.map((line) => {
     const rule = getRuleFromJustification(line?.justification || '').toUpperCase()
@@ -304,11 +346,7 @@ export const buildErrorRows = (errors, linesSnapshot = [], { skipCompletion = fa
               'formulas must start with an uppercase predicate letter (A–Z) or =/≠; lowercase predicates are not accepted.',
               'derivations must start with an uppercase predicate letter (A–Z); lowercase predicates are not accepted.'
             )
-          if (
-            lineRule &&
-            (lineRule === 'CP' || lineRule === 'IP') &&
-            displayDesc === 'cites the wrong number of subderivation line ranges for the rule specified'
-          ) {
+          if (lineRule && INDENT_END_RULES.has(lineRule) && displayDesc === 'cites the wrong number of subderivation line ranges for the rule specified') {
             descs.push(`${displayDesc} (e.g. 3-9)`)
           } else {
             descs.push(displayDesc)
@@ -375,7 +413,7 @@ export const extractLines = (savedState, premises = []) => {
 }
 
 // rebuild lp nesting from cited ranges
-const buildNestedSubderivationParts = (numbered) => {
+const buildNestedSubderivationParts = (numbered, assumptionRules = ASSUMPTION_RULES) => {
   const byLineNumber = new Map(numbered.map((part) => [Number(part.n), part]))
   const rangesByStart = new Map()
 
@@ -388,12 +426,19 @@ const buildNestedSubderivationParts = (numbered) => {
       if (start >= end || end >= lineNumber) continue
       const startPart = byLineNumber.get(start)
       const startRule = getRuleFromJustification(startPart?.j || '').toUpperCase()
-      if (!ASSUMPTION_RULES.has(startRule)) continue
+      if (!assumptionRules.has(startRule)) continue
       const currentEnd = rangesByStart.get(start)
       if (!currentEnd || end > currentEnd) {
         rangesByStart.set(start, end)
       }
     }
+  }
+  for (const part of numbered) {
+    const lineNumber = Number(part.n)
+    const rule = getRuleFromJustification(part?.j || '').toUpperCase()
+    if (!Number.isFinite(lineNumber) || !assumptionRules.has(rule)) continue
+    if (rangesByStart.has(lineNumber)) continue
+    rangesByStart.set(lineNumber, Number(numbered[numbered.length - 1]?.n ?? lineNumber))
   }
 
   const buildRange = (startLine, endLine, wrappedStartLine = null) => {
@@ -424,7 +469,7 @@ export const buildSubmission = (lines, conclusion, premises, normalizeFormula, n
     j: idx < premises.length ? 'Pr' : normalizeJustification(line.justification ?? ''),
   }))
   const parts = options.nestedSubderivations
-    ? buildNestedSubderivationParts(numbered)
+    ? buildNestedSubderivationParts(numbered, options.assumptionRules)
     : numbered
   return {
     ans: {

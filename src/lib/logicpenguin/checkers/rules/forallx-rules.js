@@ -75,6 +75,8 @@ allRules.cambridge = {
 }
 
 allRules.calgary = {
+    "PR"  : { premiserule: true, hidden: true },
+    "AS"  : { assumptionrule: true, hidden: true },
     "IP"  : { forms: [ { conc: "A", subderivs: [ { needs: ["⊥"], allows: "¬A" } ] } ] },
     "X"   : { forms: [ { prems: ["⊥"], conc: "A" } ] },
     "DS"  : { forms: [ { prems: ["A ∨ B", "¬A"], conc: "B" }, { prems: ["A ∨ B", "¬B"], conc: "A" } ], derived: true },

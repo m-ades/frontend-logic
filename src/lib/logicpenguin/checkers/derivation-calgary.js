@@ -9,6 +9,7 @@
 import getRules from './rules/forallx-rules.js';
 import DerivationCheck from './derivation-check.js';
 import { justParse } from '../../../components/ui/logicpenguin/justification-parse.js';
+import getFormulaClass from '../symbolic/formula.js';
 
 // default notation from settings, but calgary otherwise
 let defaultnotation = 'calgary';
@@ -16,15 +17,24 @@ if ((typeof process != "undefined") && (process?.appsettings?.defaultnotation)) 
     defaultnotation = process.appsettings.defaultnotation;
 }
 
+function normalizeRuleName(rule, notationname = defaultnotation) {
+    if (!rule) return '';
+    const syntax = getFormulaClass(notationname).syntax;
+    const normalized = DerivationCheck.normalizeRuleSymbolName(rule, syntax);
+    return DerivationCheck.ruleAliases?.[normalized] ||
+        DerivationCheck.ruleAliases?.[rule] ||
+        normalized;
+}
+
 // try to determine which lines are actual progress
-function progresslinesin(deriv, errors, rules) {
+function progresslinesin(deriv, errors, rules, notationname = defaultnotation) {
     let ttl = 0;
     // skip empty subderivations
     if (!("parts" in deriv)) { return 0; }
     for (let pt of deriv.parts) {
         // recursively apply to subdirevations
         if ("parts" in pt) {
-            ttl+= progresslinesin(pt, errors, rules);
+            ttl+= progresslinesin(pt, errors, rules, notationname);
         }
         // skip lines without line numbers or justifications
         if ((!("n" in pt)) || (!("j" in pt))) {
@@ -44,7 +54,7 @@ function progresslinesin(deriv, errors, rules) {
         // determine kind of out rule
         const { nums, ranges, citedrules } = justParse(pt.j);
         if (citedrules.length < 1) { continue; }
-        const rule = citedrules[0];
+        const rule = normalizeRuleName(citedrules[0], notationname);
         // skip nonexistent rules
         if (!(rule in rules)) {
             continue;
@@ -71,7 +81,7 @@ export default async function(
         ansclone,
         question.prems,
         question.conc,
-        { notation: notationname }
+        { notation: notationname, assumptionMode: 'nested' }
     ).report();
     // only correct if no errors
     const correct = (Object.keys(checkResult.errors).length == 0);
@@ -83,8 +93,8 @@ export default async function(
         const initialportion = checkResult.pointsportion ?? 0;
         portion = initialportion;
         // check number of good lines versus answer's good lines
-        const goalprogress = progresslinesin(answer, {}, rules);
-        const actualprogress = progresslinesin(givenans, checkResult.errors, rules);
+        const goalprogress = progresslinesin(answer, {}, rules, notationname);
+        const actualprogress = progresslinesin(givenans, checkResult.errors, rules, notationname);
         const progportion = (actualprogress / goalprogress);
         // if mostly wrong, we give points on the number of good steps
         if (initialportion < 0.5) {

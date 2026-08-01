@@ -50,7 +50,7 @@ export default async function(question, givenans, points, options) {
         ansclone,
         question.prems,
         question.conc,
-        { allowOpenScopeCitations: true }
+        { allowOpenScopeCitations: true, assumptionMode: 'flat' }
     ).report();
     const require = options?.ruleset?.require || question?.ruleset?.require;
     const requireAny = options?.ruleset?.requireAny || question?.ruleset?.requireAny;

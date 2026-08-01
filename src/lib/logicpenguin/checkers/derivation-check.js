@@ -10,6 +10,8 @@ import getFormulaClass from '../symbolic/formula.js';
 import { justParse } from '../../../components/ui/logicpenguin/justification-parse.js';
 import { arrayUnion, perms } from '../misc.js';
 
+const FLAT_OPENING_RULES = new Set(['ACP', 'AIP']);
+const FLAT_CLOSING_RULES = new Set(['CP', 'IP']);
 
 export default class DerivationCheck {
     static ruleAliases = {
@@ -41,11 +43,32 @@ export default class DerivationCheck {
         'qn': 'QN', 'Qn': 'QN', 'qN': 'QN',
         
         'UD': 'UG', // logicpenguin compatibility
+        'as': 'AS', 'As': 'AS',
+        'hyp': 'Hyp', 'HYP': 'Hyp',
+        'dne': 'DNE', 'Dne': 'DNE',
+        'lem': 'LEM', 'Lem': 'LEM',
+        'dem': 'DeM', 'Dem': 'DeM',
         'cp': 'CP', 'Cp': 'CP', 'cP': 'CP',
         'ip': 'IP', 'Ip': 'IP', 'iP': 'IP',
         'acp': 'ACP', 'Acp': 'ACP', 'AcP': 'ACP', 'aCp': 'ACP', 'acP': 'ACP',
         'aip': 'AIP', 'Aip': 'AIP', 'AiP': 'AIP', 'aIp': 'AIP', 'aiP': 'AIP',
     };
+
+    static normalizeRuleSymbolName(rule, syntax) {
+        const raw = String(rule ?? '').trim();
+        const match = raw.match(/^(.+)([iIeE])$/);
+        if (!match) { return raw; }
+        let connective = match[1];
+        if (/^v$/i.test(connective)) {
+            connective = syntax?.symbols?.OR ?? '∨';
+        } else if (connective === '-' || connective === '–') {
+            connective = syntax?.symbols?.NOT ?? '¬';
+        } else if (syntax?.symbolfix) {
+            connective = syntax.symbolfix(connective);
+        }
+        if (/^[A-Za-z]+$/.test(connective)) { return raw; }
+        return connective + match[2].toUpperCase();
+    }
 
     constructor(rules, deriv, prems, conc, options = {}) {
         const Formula = getFormulaClass(options.notation);
@@ -57,6 +80,7 @@ export default class DerivationCheck {
         this.conc = Formula.from(conc).normal;
         this.errors = {};
         this.allowOpenScopeCitations = Boolean(options.allowOpenScopeCitations);
+        this.flatAssumptions = options.assumptionMode !== 'nested';
     }
 
     adderror(target, category, severity, desc) {
@@ -81,11 +105,16 @@ export default class DerivationCheck {
     }
 
     normalizeRuleName(rule) {
-        if (!rule) { return ''; }
-        if (rule in DerivationCheck.ruleAliases) {
-            return DerivationCheck.ruleAliases[rule];
+        const raw = String(rule ?? '').trim();
+        if (!raw) { return ''; }
+        const normalized = DerivationCheck.normalizeRuleSymbolName(raw, this.syntax);
+        if (normalized in DerivationCheck.ruleAliases) {
+            return DerivationCheck.ruleAliases[normalized];
         }
-        return rule;
+        if (raw in DerivationCheck.ruleAliases) {
+            return DerivationCheck.ruleAliases[raw];
+        }
+        return normalized;
     }
 
     resolveRuleName(line) {
@@ -164,13 +193,34 @@ export default class DerivationCheck {
 
     checkConc() {
         const Formula = this.Formula;
+        let hasMainScopeConclusion = false;
+        let lastSubstantiveLine = null;
         for (const line of (this.deriv.lines ?? [])) {
             if (!line) { continue; }
+            if ((line.s && line.s.trim()) || (line.j && line.j.trim())) {
+                lastSubstantiveLine = line;
+            }
             const lineNorm = line.formulaNormal ??
                 (line.s ? Formula.from(line.s).normal : '');
-            if (lineNorm == this.conc) {
-                return;
+            const openAssumptions = Array.isArray(line?.openAssumptions)
+                ? line.openAssumptions
+                : [];
+            if (lineNorm === this.conc && openAssumptions.length === 0) {
+                hasMainScopeConclusion = true;
             }
+        }
+        const stillOpen = Array.isArray(lastSubstantiveLine?.openAssumptions) &&
+            lastSubstantiveLine.openAssumptions.length > 0;
+        if (this.flatAssumptions && stillOpen) {
+            this.adderror(
+                lastSubstantiveLine.n || '1',
+                "completion",
+                "high",
+                "open ACP/AIP subderivations must be closed with CP/IP before the proof is complete"
+            );
+        }
+        if (hasMainScopeConclusion) {
+            return;
         }
         
         // we attach the error to line one, which we really shouldn't but
@@ -328,10 +378,11 @@ export default class DerivationCheck {
                 rulename + '” found');
             return line;
         }
-        if (rulename === 'ACP') { return this.checkACP(line); }
-        if (rulename === 'AIP') { return this.checkAIP(line); }
-        if (rulename === 'CP') { return this.checkCP(line); }
-        if (rulename === 'IP') { return this.checkIP(line); }
+        if (this.flatAssumptions && FLAT_OPENING_RULES.has(rulename)) { return this.checkFlatAssumption(line, rulename); }
+        if (this.flatAssumptions && FLAT_CLOSING_RULES.has(rulename)) {
+            if (rulename === 'CP') { return this.checkCP(line); }
+            if (rulename === 'IP') { return this.checkIP(line); }
+        }
         // PREMISE
         if (rule?.premiserule) {
             const norm = Formula.from(line.s).normal;
@@ -352,6 +403,13 @@ export default class DerivationCheck {
         }
         // fitch assumptions start subderivations
         if (rule?.assumptionrule) {
+            const isMainScope = line.mysubderiv === this.deriv ||
+                line.mysubderiv?.showline?.isMainConclusion;
+            if (!this.flatAssumptions && isMainScope) {
+                this.adderror(line.n, 'rule', 'high',
+                    rulename + ' may only be used inside a subderivation');
+                return line;
+            }
             line.mysubderiv.assumptions.push(Formula.from(line.s).normal);
             line.checkedOK = true;
             return line;
@@ -495,7 +553,26 @@ export default class DerivationCheck {
         return line;
     }
 
-    computeIndents() {
+    computeNestedScopes() {
+        if (!this?.deriv?.lines) { return; }
+        for (const line of this.deriv.lines) {
+            const assumptions = [];
+            let subderiv = line?.mysubderiv;
+            while (subderiv && subderiv !== this.deriv) {
+                const assumptionLine = subderiv.lines?.[0];
+                const ruleName = this.resolveRuleName(assumptionLine);
+                if (assumptionLine && this.rules?.[ruleName]?.assumptionrule) {
+                    assumptions.unshift(assumptionLine);
+                }
+                subderiv = subderiv.parentderiv;
+            }
+            line.closedAssumption = null;
+            line.openAssumptions = assumptions;
+            line.indent = line.openAssumptions.length;
+        }
+    }
+
+    computeFlatScopes() {
         if (!this?.deriv?.lines) { return; }
         let indentLevel = 0;
         const assumptionStack = [];
@@ -506,7 +583,7 @@ export default class DerivationCheck {
             line.closedAssumption = null;
             const ruleName = this.resolveRuleName(line);
 
-            if (ruleName === 'ACP' || ruleName === 'AIP') {
+            if (FLAT_OPENING_RULES.has(ruleName)) {
                 if (indentLevel >= 3) {
                     this.adderror(line.n, "rule", "high",
                         "Maximum nested assumption depth (3) exceeded.");
@@ -518,7 +595,7 @@ export default class DerivationCheck {
                 continue;
             }
 
-            if (ruleName === 'CP' || ruleName === 'IP') {
+            if (FLAT_CLOSING_RULES.has(ruleName)) {
                 if (indentLevel === 0 || assumptionStack.length === 0) {
                     this.adderror(line.n, "rule", "high",
                         "CP/IP used with no open assumption.");
@@ -535,6 +612,14 @@ export default class DerivationCheck {
             line.indent = indentLevel;
             line.openAssumptions = [...assumptionStack];
         }
+    }
+
+    computeIndents() {
+        if (this.flatAssumptions) {
+            this.computeFlatScopes();
+            return;
+        }
+        this.computeNestedScopes();
     }
 
     findMostRecentOpenAssumption(currentLine, ruleName, formula) {
@@ -626,20 +711,10 @@ export default class DerivationCheck {
         return null;
     }
 
-    checkACP(line) {
+    checkFlatAssumption(line, rulename) {
         if (!line?.formulaNormal) {
             this.adderror(line.n, "rule", "high",
-                "ACP requires an assumption formula.");
-            return line;
-        }
-        line.checkedOK = true;
-        return line;
-    }
-
-    checkAIP(line) {
-        if (!line?.formulaNormal) {
-            this.adderror(line.n, "rule", "high",
-                "AIP requires an assumption formula.");
+                rulename + " requires an assumption formula.");
             return line;
         }
         line.checkedOK = true;
@@ -973,7 +1048,7 @@ export default class DerivationCheck {
             return false;
         }
         const rulename = this.resolveRuleName(line);
-        if (rulename === 'CP' || rulename === 'IP') {
+        if (this.flatAssumptions && FLAT_CLOSING_RULES.has(rulename)) {
             // For Hurley-style flat indentation, allow simple ranges with no subderiv structure
             if (start < parseInt(line.n) && end < parseInt(line.n)) {
                 return true;

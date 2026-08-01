@@ -39,19 +39,29 @@ import {
   getSymbols,
   normalizeLogicSystem,
 } from '../../../lib/logicSystems.js'
-import { formatDerivationRuleName as formatRuleName, getDerivationRules } from '../../../lib/derivationRules.js'
+import {
+  formatDerivationRuleName as formatRuleName,
+  getDerivationRuleLookup,
+  getDerivationRules,
+} from '../../../lib/derivationRules.js'
 import { justParse } from '../../ui/logicpenguin/justification-parse.js'
 import { getInsertSymbolLabel } from '../../ui/logicpenguin/LogicSymbol.jsx'
 import { buildPersistedSubmissionState, shouldUseApiValidation, submitApiValidation } from '../../../utils/submissionRuntime.js'
 import {
-  ASSUMPTION_RULES,
+  FITCH_ASSUMPTION_RULES,
+  HURLEY_ASSUMPTION_RULES,
   INDENT_END_RULES,
-  INDENT_START_RULES,
-  MAX_INDENT_LEVEL,
-  RULES_ALLOW_NO_LINES,
+  applyLinesToJustification,
+  applyRuleToJustification,
+  buildErrorRows,
   buildSubmission,
   extractLines,
+  formatJustificationDisplay,
+  formatJustificationLines,
+  formatJustificationParts,
+  getJustificationMeta,
   getOpenAssumptionDepths,
+  getRuleFromJustification,
   isResolvedConclusionLine,
 } from './derivationUtils.js'
 
@@ -303,112 +313,6 @@ const applyInsertion = (value, selectionStart, selectionEnd, insertText, replace
   return { nextValue, nextCursor }
 }
 
-const formatJustificationParts = (nums, ranges, citedrules) => {
-  citedrules = citedrules.map((rule) => formatRuleName(rule))
-
-  let pretty = nums.map((n) => n.toString()).join(', ')
-  if (ranges.length > 0) {
-    if (pretty !== '') pretty += ', '
-    pretty += ranges.map(([s, e]) => `${s}–${e}`).join(', ')
-  }
-  if (citedrules.length > 0) {
-    if (pretty !== '') pretty += ' '
-    pretty += citedrules.join(', ')
-  }
-  return pretty
-}
-
-const formatJustificationDisplay = (value) => {
-  if (!value) return ''
-  let { nums, ranges, citedrules } = justParse(String(value))
-  return formatJustificationParts(nums, ranges, citedrules)
-}
-
-const getJustificationMeta = (value) => {
-  const { nums, ranges, citedrules } = justParse(String(value || ''))
-  return {
-    hasLines: nums.length > 0 || ranges.length > 0,
-    hasRule: Array.isArray(citedrules) && citedrules.length > 0,
-  }
-}
-
-const formatJustificationLines = (value) => {
-  if (!value) return ''
-  let { nums, ranges } = justParse(String(value))
-  return formatJustificationParts(nums, ranges, [])
-}
-
-const applyRuleToJustification = (value, rule) => {
-  const { nums, ranges } = justParse(String(value || ''))
-  const nextRules = rule ? [rule] : []
-  return formatJustificationParts(nums, ranges, nextRules)
-}
-
-const applyLinesToJustification = (value, linesInput) => {
-  const existingRule = getRuleFromJustification(value)
-  const { nums, ranges } = justParse(String(linesInput || ''))
-  return formatJustificationParts(nums, ranges, existingRule ? [existingRule] : [])
-}
-
-const getRuleFromJustification = (value) => {
-  const { citedrules } = justParse(String(value || ''))
-  if (!Array.isArray(citedrules) || citedrules.length === 0) return ''
-  return formatRuleName(citedrules[0])
-}
-
-const buildErrorRows = (errors, linesSnapshot = [], { skipCompletion = false } = {}) => {
-  if (!errors) return []
-  const lines = Object.keys(errors).sort((a, b) => {
-    if (a === '??') return -1
-    if (b === '??') return 1
-    return Number(a) - Number(b)
-  })
-  const rows = []
-  for (const line of lines) {
-    const categories = errors[line] || {}
-    const entries = []
-    const idx = line !== '??' ? Number(line) - 1 : -1
-    const lineRule = idx >= 0 ? getRuleFromJustification(linesSnapshot[idx]?.justification || '').toUpperCase() : ''
-    for (const category of Object.keys(categories)) {
-      if (skipCompletion && category === 'completion') continue
-      const severities = categories[category] || {}
-      const descs = []
-      for (const severity of Object.keys(severities)) {
-        const items = severities[severity] || {}
-        for (const desc of Object.keys(items)) {
-          const displayDesc = String(desc || '')
-            .replace(/^syntax error:\s*/i, '')
-            .replace(
-              'formulas must start with an uppercase predicate letter (A–Z) or =/≠; lowercase predicates are not accepted.',
-              'derivations must start with an uppercase predicate letter (A–Z); lowercase predicates are not accepted.'
-            )
-          if (
-            lineRule &&
-            (lineRule === 'CP' || lineRule === 'IP') &&
-            displayDesc === 'cites the wrong number of subderivation line ranges for the rule specified'
-          ) {
-            descs.push(`${displayDesc} (e.g. 3-9)`)
-          } else {
-            descs.push(displayDesc)
-          }
-        }
-      }
-      if (descs.length === 0) continue
-      const isWarning = category === 'dependency'
-      const baseLabel = `${category.charAt(0).toUpperCase()}${category.slice(1)}`
-      entries.push({
-        label: isWarning ? 'Warning' : `${baseLabel} ${descs.length === 1 ? 'error' : 'errors'}`,
-        messages: descs,
-        isWarning,
-      })
-    }
-    if (entries.length > 0) {
-      rows.push({ line, entries })
-    }
-  }
-  return rows
-}
-
 export default function DerivationTable({
   proof,
   logicSystem,
@@ -446,8 +350,11 @@ export default function DerivationTable({
   const symbols = getSymbols(activeLogicSystem)
   const derivationProblemType = getDerivationProblemType(activeLogicSystem)
   const usesNestedSubderivations = derivationProblemType === 'derivation-calgary'
+  const activeAssumptionRules = usesNestedSubderivations ? FITCH_ASSUMPTION_RULES : HURLEY_ASSUMPTION_RULES
+  const conclusionTargetText = proof?.conclusion ? `${usesNestedSubderivations ? '∴' : '//'} ${proof.conclusion}` : ''
   const checkDerivation = DERIVATION_CHECKERS_BY_TYPE[derivationProblemType] ?? DERIVATION_CHECKERS_BY_TYPE['derivation-hurley']
   const allDerivationRules = getDerivationRules(activeLogicSystem)
+  const derivationRuleLookup = getDerivationRuleLookup(activeLogicSystem)
   const [activeFormulaIndex, setActiveFormulaIndex] = useState(null)
   const activeKeyboardFormulaIndexRef = useRef(null)
   const lastFormulaIndexRef = useRef(null)
@@ -495,10 +402,13 @@ export default function DerivationTable({
     const allow = proof?.ruleset?.allow ?? proof?.options?.ruleset?.allow
     if (Array.isArray(allow) && allow.length > 0) {
       const unique = Array.from(new Set(allow.map((rule) => formatRuleName(String(rule)))))
-      return unique.filter((rule) => rule && rule.toLowerCase() !== 'pr')
+      const validRules = unique
+        .map((rule) => derivationRuleLookup.get(rule.toLowerCase()) ?? null)
+        .filter((rule) => rule && rule.toLowerCase() !== 'pr')
+      return validRules.length > 0 ? validRules : allDerivationRules
     }
     return allDerivationRules
-  }, [proof?.ruleset, proof?.options?.ruleset, allDerivationRules])
+  }, [proof?.ruleset, proof?.options?.ruleset, allDerivationRules, derivationRuleLookup])
 
   /** Keyboard config for derivations.
    * - Predicate mode: three letter rows (predicates, constants, variables).
@@ -568,14 +478,14 @@ export default function DerivationTable({
     const { hasLines, hasRule } = getJustificationMeta(line.justification)
     if (!hasRule) return false
     const rule = getRuleFromJustification(line.justification).toUpperCase()
-    if (rule === 'CP' || rule === 'IP') {
+    if (!usesNestedSubderivations && INDENT_END_RULES.has(rule)) {
       const { ranges } = justParse(String(line.justification || ''))
       return ranges.length > 0
     }
     if (hasLines) return true
     if (!rule) return false
-    return RULES_ALLOW_NO_LINES.has(rule)
-  }, [])
+    return activeAssumptionRules.has(rule)
+  }, [activeAssumptionRules, usesNestedSubderivations])
   const [autoCheckEnabled, setAutoCheckEnabled] = useState(() => {
     if (typeof window === 'undefined') return true
     const saved = window.sessionStorage.getItem(AUTO_CHECK_STORAGE_KEY)
@@ -603,34 +513,42 @@ export default function DerivationTable({
         return {
           ...line,
           // Keep indentation/reactivity in sync while line(s) drafts are being edited.
-          justification: applyLinesToJustification(line.justification, lineDrafts[idx]),
+          justification: applyLinesToJustification(line.justification, lineDrafts[idx], {
+            rulesFirst: usesNestedSubderivations,
+          }),
         }
       }),
-    [lineDrafts, lines, useRuleDropdown]
+    [lineDrafts, lines, useRuleDropdown, usesNestedSubderivations]
   )
   const indentLevels = useMemo(() => {
-    let level = 0
-    return effectiveLines.map((line) => {
-      const rule = getRuleFromJustification(line.justification).toUpperCase()
-      if (INDENT_END_RULES.has(rule)) {
-        level = Math.max(0, level - 1)
-      }
-      if (INDENT_START_RULES.has(rule)) {
-        level = Math.min(level + 1, MAX_INDENT_LEVEL)
-      }
-      return level
+    return getOpenAssumptionDepths(effectiveLines, {
+      mode: usesNestedSubderivations ? 'nested' : 'flat',
+      assumptionRules: activeAssumptionRules,
     })
-  }, [effectiveLines])
+  }, [activeAssumptionRules, effectiveLines, usesNestedSubderivations])
 
   const normalizeFormulaForCheck = useMemo(
     () => (value) => {
-      const fixed = syntax.inputfix(String(value ?? '')).replace(/\s+/g, '')
-      return fixed
-        .replace(/([≡⊃∨•])/g, ' $1 ')
-        .replace(/\s+/g, ' ')
-        .trim()
+      return syntax.inputfix(String(value ?? '')).replace(/\s+/g, ' ').trim()
     },
     [syntax]
+  )
+  const normalizeFormulaForDisplay = useCallback(
+    (value) => {
+      const raw = String(value ?? '')
+      if (/[-–]$/.test(raw)) {
+        return syntax.inputfix(raw.slice(0, -1)).replace(/\s+$/g, '') + raw.slice(-1)
+      }
+      return syntax.inputfix(raw)
+    },
+    [syntax]
+  )
+  const normalizeJustificationForDisplay = useCallback(
+    (value) => String(value ?? '').replace(/[^\s,]+/g, (token) => {
+      if (/[0-9?]/.test(token)) return token
+      return formatRuleName(token)
+    }),
+    []
   )
   const normalizeJustificationForCheck = useMemo(
     () => (value) => String(value ?? '').replace(/\s+/g, ''),
@@ -662,7 +580,7 @@ export default function DerivationTable({
       premises,
       normalizeFormulaForCheck,
       normalizeJustificationForSave,
-      { nestedSubderivations: usesNestedSubderivations }
+      { nestedSubderivations: usesNestedSubderivations, assumptionRules: activeAssumptionRules }
     )
     if (options.immediate) {
       return onStateChangeRef.current?.(submission, options)
@@ -670,7 +588,7 @@ export default function DerivationTable({
     queueMicrotask(() => {
       onStateChangeRef.current?.(submission, options)
     })
-  }, [premises, proof?.conclusion, normalizeFormulaForCheck, normalizeJustificationForSave, usesNestedSubderivations])
+  }, [activeAssumptionRules, premises, proof?.conclusion, normalizeFormulaForCheck, normalizeJustificationForSave, usesNestedSubderivations])
 
   const runAutoCheck = useCallback(async (linesSnapshot) => {
     const submission = buildSubmission(
@@ -679,7 +597,7 @@ export default function DerivationTable({
       premises,
       normalizeFormulaForCheck,
       normalizeJustificationForCheck,
-      { nestedSubderivations: usesNestedSubderivations }
+      { nestedSubderivations: usesNestedSubderivations, assumptionRules: activeAssumptionRules }
     )
     const result = await checkDerivation(
       { prems: premises, conc: proof?.conclusion, ruleset: proof?.ruleset },
@@ -703,7 +621,10 @@ export default function DerivationTable({
     const lastFilledIndex = filledLineIndices.length ? filledLineIndices[filledLineIndices.length - 1] : -1
     const lastFilled = lastFilledIndex >= 0 ? linesSnapshot[lastFilledIndex] : null
     const allFilledComplete = filledLineIndices.every((idx) => isLineComplete(idx))
-    const openAssumptionDepths = getOpenAssumptionDepths(linesSnapshot)
+    const openAssumptionDepths = getOpenAssumptionDepths(linesSnapshot, {
+      mode: usesNestedSubderivations ? 'nested' : 'flat',
+      assumptionRules: activeAssumptionRules,
+    })
     const lastFilledResolvesConclusion = isResolvedConclusionLine({
       line: lastFilled,
       index: lastFilledIndex,
@@ -727,9 +648,9 @@ export default function DerivationTable({
         const idx = Number(line) - 1
         if (Number.isFinite(idx)) {
           lineRule = getRuleFromJustification(linesSnapshot[idx]?.justification || '').toUpperCase()
-          isAssumptionLine = ASSUMPTION_RULES.has(lineRule)
+          isAssumptionLine = activeAssumptionRules.has(lineRule)
           if (!isLineComplete(idx) && !isAssumptionLine) {
-            if (lineRule !== 'CP' && lineRule !== 'IP') {
+            if (usesNestedSubderivations || !INDENT_END_RULES.has(lineRule)) {
               return
             }
           }
@@ -756,7 +677,7 @@ export default function DerivationTable({
       const lineRule = getRuleFromJustification(line?.justification || '').toUpperCase()
       const lineErrors = filteredErrors[lineNum] || {}
       if (!formulaFilled) {
-        if (ASSUMPTION_RULES.has(lineRule) && Object.keys(lineErrors).length > 0) {
+        if (activeAssumptionRules.has(lineRule) && Object.keys(lineErrors).length > 0) {
           perLine[idx] = 'error'
         } else {
           perLine[idx] = null
@@ -765,6 +686,10 @@ export default function DerivationTable({
       }
       const { hasLines, hasRule } = getJustificationMeta(line.justification)
       if (!hasRule) {
+        perLine[idx] = null
+        return
+      }
+      if (!isLineCompleteForCheck(line)) {
         perLine[idx] = null
         return
       }
@@ -790,7 +715,7 @@ export default function DerivationTable({
       })
     )
     return { perLine, rows, shouldAutoAdd }
-  }, [checkDerivation, normalizeFormulaForCheck, normalizeJustificationForCheck, notation, premises, proof?.conclusion, proof?.options, proof?.ruleset, isLineCompleteForCheck, usesNestedSubderivations])
+  }, [activeAssumptionRules, checkDerivation, normalizeFormulaForCheck, normalizeJustificationForCheck, notation, premises, proof?.conclusion, proof?.options, proof?.ruleset, isLineCompleteForCheck, usesNestedSubderivations])
 
   useEffect(() => {
     if (!autoCheckEnabled) {
@@ -811,7 +736,10 @@ export default function DerivationTable({
             if (!last || last.readOnly || !isLineCompleteForCheck(last)) return prev
             const conclusionStr = proof?.conclusion || ''
             if (!conclusionStr) return prev
-            const openAssumptionDepths = getOpenAssumptionDepths(prev)
+            const openAssumptionDepths = getOpenAssumptionDepths(prev, {
+              mode: usesNestedSubderivations ? 'nested' : 'flat',
+              assumptionRules: activeAssumptionRules,
+            })
             if (isResolvedConclusionLine({
               line: last,
               index: prev.length - 1,
@@ -832,7 +760,7 @@ export default function DerivationTable({
         clearTimeout(autoCheckTimerRef.current)
       }
     }
-  }, [autoCheckEnabled, lines, runAutoCheck])
+  }, [activeAssumptionRules, autoCheckEnabled, isLineCompleteForCheck, lines, normalizeFormulaForCheck, proof?.conclusion, runAutoCheck, usesNestedSubderivations])
 
   useEffect(() => {
     if (typeof window === 'undefined') return
@@ -856,7 +784,10 @@ export default function DerivationTable({
     if (!lastFilled || lastFilled.readOnly) return { ok: false, index: null }
     if (!isLineCompleteForCheck(lastFilled)) return { ok: false, index: null }
     if (autoCheckState.perLine[lastFilledIndex] !== 'ok') return { ok: false, index: null }
-    const openAssumptionDepths = getOpenAssumptionDepths(lines)
+    const openAssumptionDepths = getOpenAssumptionDepths(lines, {
+      mode: usesNestedSubderivations ? 'nested' : 'flat',
+      assumptionRules: activeAssumptionRules,
+    })
     if (!isResolvedConclusionLine({
       line: lastFilled,
       index: lastFilledIndex,
@@ -865,7 +796,7 @@ export default function DerivationTable({
       openAssumptionDepths,
     })) return { ok: false, index: null }
     return { ok: true, index: lastFilledIndex }
-  }, [autoCheckEnabled, autoCheckState.perLine, isLineCompleteForCheck, lines, normalizeFormulaForCheck, premises.length, proof?.conclusion])
+  }, [activeAssumptionRules, autoCheckEnabled, autoCheckState.perLine, isLineCompleteForCheck, lines, normalizeFormulaForCheck, premises.length, proof?.conclusion, usesNestedSubderivations])
 
   useEffect(() => {
     if (derivationLooksGood.ok) {
@@ -890,9 +821,43 @@ export default function DerivationTable({
 
   const handleLineChange = (index, field, value) => {
     setLines((prev) => applyLineChange(prev, index, field, value))
+    setAutoCheckState((prev) => ({
+      perLine: { ...prev.perLine, [index]: null },
+      rows: (prev.rows || []).filter((row) => row.line !== String(index + 1)),
+    }))
     if (lineGateNotice.index === index) {
       clearLineGateNotice()
     }
+  }
+
+  const handleFormulaChange = (event, index) => {
+    const el = event.target
+    const raw = el?.value ?? ''
+    const normalized = normalizeFormulaForDisplay(raw)
+    handleLineChange(index, 'formula', normalized)
+    if (normalized === raw || typeof el?.selectionStart !== 'number') return
+    const nextCursor = normalizeFormulaForDisplay(raw.slice(0, el.selectionStart)).length
+    setStoredSelection(index, nextCursor)
+    window.setTimeout(() => {
+      if (formulaRefs.current[index] && typeof formulaRefs.current[index].setSelectionRange === 'function') {
+        formulaRefs.current[index].setSelectionRange(nextCursor, nextCursor)
+      }
+    }, 0)
+  }
+
+  const handleJustificationChange = (event, index) => {
+    const el = event.target
+    const raw = el?.value ?? ''
+    const normalized = normalizeJustificationForDisplay(raw)
+    handleLineChange(index, 'justification', normalized)
+    if (normalized === raw || typeof el?.selectionStart !== 'number') return
+    const nextCursor = normalizeJustificationForDisplay(raw.slice(0, el.selectionStart)).length
+    setStoredSelection(index, nextCursor)
+    window.setTimeout(() => {
+      if (justRefs.current[index] && typeof justRefs.current[index].setSelectionRange === 'function') {
+        justRefs.current[index].setSelectionRange(nextCursor, nextCursor)
+      }
+    }, 0)
   }
 
   const commitLines = useCallback((updater, clearNoticeIndex = null) => {
@@ -935,7 +900,9 @@ export default function DerivationTable({
           ? nums.filter((n) => n !== clickedLineNum)
           : [...nums, clickedLineNum]
         const newNums = [...new Set(nextNums)].sort((a, b) => a - b)
-        const newJust = formatJustificationParts(newNums, ranges, citedrules)
+        const newJust = formatJustificationParts(newNums, ranges, citedrules, {
+          rulesFirst: usesNestedSubderivations,
+        })
         return applyLineChange(prev, targetIdx, 'justification', newJust)
       })
       setLineDrafts((prev) => {
@@ -945,7 +912,7 @@ export default function DerivationTable({
         return next
       })
     },
-    [premises.length, commitLines]
+    [premises.length, commitLines, usesNestedSubderivations]
   )
 
   const canAddLine = useMemo(() => {
@@ -1050,6 +1017,26 @@ export default function DerivationTable({
     return fallback >= 0 ? fallback : null
   }
 
+  const resolveActiveInputTarget = () => {
+    if (typeof document !== 'undefined') {
+      const activeElement = document.activeElement
+      for (const [index, el] of Object.entries(justRefs.current)) {
+        if (el && activeElement === el) {
+          return { field: 'justification', index: Number(index) }
+        }
+      }
+      for (const [index, el] of Object.entries(formulaRefs.current)) {
+        if (el && activeElement === el && !lines[Number(index)]?.readOnly) {
+          return { field: 'formula', index: Number(index) }
+        }
+      }
+    }
+    const fallbackIndex = resolveEditableIndex()
+    return fallbackIndex === null || fallbackIndex === -1
+      ? null
+      : { field: 'formula', index: fallbackIndex }
+  }
+
   const handleFormulaKeyDown = (event, index, readOnly) => {
     if (readOnly) return
     const el = event.target
@@ -1098,7 +1085,7 @@ export default function DerivationTable({
     }
 
     if (!hasModifier && (key === '&' || key === '^' || key === '.' || key === '*' || key === '•' || key === '·' || key === '∧')) {
-      insertSymbol('•')
+      insertSymbol(symbols.and)
       return
     }
     if (!hasModifier && (key === 'v' || key === '∨')) {
@@ -1108,11 +1095,11 @@ export default function DerivationTable({
     if (!hasModifier && (key === '>' || key === '→' || key === '⇒' || key === '⊃')) {
       const hyphenMatch = value.slice(0, start).match(/-+$/)
       const replaceBefore = hyphenMatch ? hyphenMatch[0].length : 0
-      insertSymbol('⊃', replaceBefore)
+      insertSymbol(symbols.conditional, replaceBefore)
       return
     }
     if (!hasModifier && key === '=' && start > 0 && value[start - 1] === '=') {
-      insertSymbol('≡', 1)
+      insertSymbol(symbols.biconditional, 1)
       return
     }
     if (!hasModifier && (key === 'l' || key === 'L')) {
@@ -1143,7 +1130,9 @@ export default function DerivationTable({
     }
     if (event.key === 'Enter') {
       event.preventDefault()
-      const formatted = applyLinesToJustification(lines[index]?.justification, event.target.value)
+      const formatted = applyLinesToJustification(lines[index]?.justification, event.target.value, {
+        rulesFirst: usesNestedSubderivations,
+      })
       const nextLines = applyLineChange(lines, index, 'justification', formatted)
       setLines(nextLines)
       emitState(nextLines)
@@ -1214,7 +1203,7 @@ export default function DerivationTable({
         premises,
         normalizeFormulaForCheck,
         normalizeJustificationForCheck,
-        { nestedSubderivations: usesNestedSubderivations }
+        { nestedSubderivations: usesNestedSubderivations, assumptionRules: activeAssumptionRules }
       )
       if (!shouldUseApiValidation(proof?.questionId)) {
         const validation = await checkDerivation(
@@ -1297,12 +1286,20 @@ export default function DerivationTable({
   const submitDisabled = isLocked || isAssignmentLocked || !hasStartedLine
 
   const handleSymbolInsert = ({ insert, pair }) => {
-    const targetIdx = resolveEditableIndex()
-    if (targetIdx === -1 || targetIdx === null) return
-    const inputEl = formulaRefs.current[targetIdx]
-    const current = lines[targetIdx]?.formula || ''
+    const target = resolveActiveInputTarget()
+    if (!target || target.index === -1 || target.index === null) return
+    const targetIdx = target.index
+    const field = target.field
+    const inputEl = field === 'justification' ? justRefs.current[targetIdx] : formulaRefs.current[targetIdx]
+
+    if (field === 'justification' && useRuleDropdown) {
+      inputEl?.focus()
+      return
+    }
+
+    const current = lines[targetIdx]?.[field] || ''
     const stored = getStoredSelection(targetIdx, current.length)
-    const activeFacade = targetIdx === activeKeyboardFormulaIndexRef.current && inputEl
+    const activeFacade = field === 'formula' && targetIdx === activeKeyboardFormulaIndexRef.current && inputEl
     const isFocused = typeof document !== 'undefined' && document.activeElement === inputEl
     const useInputSelection = activeFacade || isFocused
     const start = useInputSelection && typeof inputEl?.selectionStart === 'number' ? inputEl.selectionStart : stored.start
@@ -1318,7 +1315,7 @@ export default function DerivationTable({
       : start + insertText.length
     if (inputEl && typeof inputEl.setRangeText === 'function') {
       inputEl.setRangeText(insertText, start, end, 'end')
-      handleLineChange(targetIdx, 'formula', inputEl.value ?? '')
+      handleLineChange(targetIdx, field, inputEl.value ?? '')
       inputEl.focus()
       setStoredSelection(targetIdx, nextCursor)
       setTimeout(() => inputEl.setSelectionRange(nextCursor, nextCursor), 0)
@@ -1327,7 +1324,7 @@ export default function DerivationTable({
     const before = current.slice(0, start)
     const after = current.slice(end)
     const nextValue = `${before}${insertText}${after}`
-    handleLineChange(targetIdx, 'formula', nextValue)
+    handleLineChange(targetIdx, field, nextValue)
     setStoredSelection(targetIdx, nextCursor)
     if (inputEl) {
       inputEl.focus()
@@ -1503,7 +1500,7 @@ export default function DerivationTable({
                     component="span"
                     sx={{ fontSize: DERIVATION_LINE_FONT_SIZE, color: 'text.primary', '& .clickable-char': { cursor: 'pointer', borderRadius: 1, '&:hover': { backgroundColor: (t) => alpha(t.palette.primary.main, t.palette.action.hoverOpacity) } } }}
                   >
-                    {(`// ${proof.conclusion || ''}`).split('').map((char, i) => {
+                    {conclusionTargetText.split('').map((char, i) => {
                       const isLetter = /^[a-zA-Z]$/.test(char)
                       return isLetter ? (
                         <Box component="span" key={`conc-${i}`} className="clickable-char" onPointerDown={(e) => e.preventDefault()} onClick={() => handleSymbolInsert({ insert: char })} aria-label={getInsertSymbolLabel({ insert: char })}>
@@ -1519,6 +1516,24 @@ export default function DerivationTable({
             )}
             {lines.map((line, idx) => {
               const isActiveLine = activeFormulaIndex === idx
+              const selectedLineRule = getRuleFromJustification(line.justification)
+              const lineRule = selectedLineRule.toUpperCase()
+              const ruleOptions = selectedLineRule && !allowedRules.some((rule) => rule.toLowerCase() === selectedLineRule.toLowerCase())
+                ? [selectedLineRule, ...allowedRules]
+                : allowedRules
+              const hidesNestedAssumptionJustification = usesNestedSubderivations && activeAssumptionRules.has(lineRule)
+              const ruleMenuItems = (
+                <>
+                  <MenuItem value="">
+                    <em>Rule</em>
+                  </MenuItem>
+                  {ruleOptions.map((rule) => (
+                    <MenuItem key={rule} value={rule}>
+                      {rule}
+                    </MenuItem>
+                  ))}
+                </>
+              )
               const indentOffset = `calc(${indentLevels[idx] || 0} * ${DERIVATION_INDENT_STEP}${indentLevels[idx] ? ` + ${DERIVATION_ASSUMPTION_OFFSET}` : ''})`
               return (
               <TableRow
@@ -1620,7 +1635,7 @@ export default function DerivationTable({
                   ) : isPhone && mobileLogicKeyboardEnabled ? (
                     <MobileLogicInput
                       value={line.formula ?? ''}
-                      onChange={(v) => handleLineChange(idx, 'formula', v)}
+                      onChange={(v) => handleLineChange(idx, 'formula', normalizeFormulaForDisplay(v))}
                       onFocus={() => {
                         if (line.readOnly) return
                         setActiveFormulaIndex(idx)
@@ -1652,7 +1667,7 @@ export default function DerivationTable({
                     variant="standard"
                     placeholder=""
                     value={line.formula}
-                    onChange={(e) => handleLineChange(idx, 'formula', e.target.value)}
+                    onChange={(e) => handleFormulaChange(e, idx)}
                     onKeyDown={(e) => handleFormulaKeyDown(e, idx, line.readOnly)}
                     onPointerDown={(e) => {
                       if (line.readOnly) return
@@ -1737,7 +1752,7 @@ export default function DerivationTable({
                         component="span"
                         sx={{ fontSize: DERIVATION_LINE_FONT_SIZE, color: 'text.primary', '& .clickable-char': { cursor: 'pointer', borderRadius: 1, '&:hover': { backgroundColor: (t) => alpha(t.palette.primary.main, t.palette.action.hoverOpacity) } } }}
                       >
-                        {(proof?.conclusion ? `// ${proof.conclusion}` : '').split('').map((char, i) => {
+                        {conclusionTargetText.split('').map((char, i) => {
                           const isLetter = /^[a-zA-Z]$/.test(char)
                           return isLetter ? (
                             <Box component="span" key={`conc-row-${idx}-${i}`} className="clickable-char" onPointerDown={(e) => e.preventDefault()} onClick={() => handleSymbolInsert({ insert: char })} aria-label={getInsertSymbolLabel({ insert: char })}>
@@ -1755,7 +1770,7 @@ export default function DerivationTable({
                     <Stack direction="row" spacing={0.5} alignItems="center" sx={{ flexWrap: 'nowrap', gap: 0, minWidth: 0 }}>
                       {useRuleDropdown ? (
                         <>
-                          {!ASSUMPTION_RULES.has(getRuleFromJustification(line.justification).toUpperCase()) && (
+                          {!activeAssumptionRules.has(lineRule) && (
                             <TextField
                               variant="standard"
                               placeholder="Line(s)"
@@ -1784,7 +1799,9 @@ export default function DerivationTable({
                                 handleLineChange(
                                   idx,
                                   'justification',
-                                  applyLinesToJustification(line.justification, raw)
+                                  applyLinesToJustification(line.justification, raw, {
+                                    rulesFirst: usesNestedSubderivations,
+                                  })
                                 )
                               }}
                               onKeyDown={(e) => handleJustKeyDown(e, idx, line.readOnly)}
@@ -1793,7 +1810,9 @@ export default function DerivationTable({
                                 handleLineCommit(
                                   idx,
                                   'justification',
-                                  applyLinesToJustification(line.justification, raw)
+                                  applyLinesToJustification(line.justification, raw, {
+                                    rulesFirst: usesNestedSubderivations,
+                                  })
                                 )
                                 setLineDrafts((prev) => {
                                   if (!(idx in prev)) return prev
@@ -1809,6 +1828,7 @@ export default function DerivationTable({
                               }}
                               inputRef={(el) => { if (el) justRefs.current[idx] = el }}
                               sx={(theme) => ({
+                                order: usesNestedSubderivations ? -1 : -2,
                                 width: '7ch',
                                 maxWidth: '7ch',
                                 minWidth: '7ch',
@@ -1820,10 +1840,22 @@ export default function DerivationTable({
                               })}
                             />
                           )}
-                          {allowedRules.length > 0 && (
-                            <FormControl variant="standard" sx={{ minWidth: isFullScreen || isMobile ? DERIVATION_RULE_WIDTH_MOBILE : DERIVATION_RULE_WIDTH_DESKTOP }}>
+                          {ruleOptions.length > 0 && (
+                            <FormControl
+                              variant="standard"
+                              sx={hidesNestedAssumptionJustification
+                                ? {
+                                  width: { xs: DERIVATION_JUSTIFICATION_WIDTH_XS, sm: DERIVATION_JUSTIFICATION_WIDTH_SM },
+                                  maxWidth: { xs: DERIVATION_JUSTIFICATION_WIDTH_XS, sm: DERIVATION_JUSTIFICATION_WIDTH_SM },
+                                  minWidth: { xs: DERIVATION_JUSTIFICATION_WIDTH_XS, sm: DERIVATION_JUSTIFICATION_WIDTH_SM },
+                                }
+                                : {
+                                  order: usesNestedSubderivations ? -2 : -1,
+                                  minWidth: isFullScreen || isMobile ? DERIVATION_RULE_WIDTH_MOBILE : DERIVATION_RULE_WIDTH_DESKTOP,
+                                }}
+                            >
                               <Select
-                                value={getRuleFromJustification(line.justification)}
+                                value={selectedLineRule}
                                 displayEmpty
                                 inputProps={{ 'aria-label': `Rule for line ${idx + 1}` }}
                                 onFocus={() => {
@@ -1839,12 +1871,14 @@ export default function DerivationTable({
                                 onChange={(e) => {
                                   const selectedRule = String(e.target.value || '')
                                   const upperRule = selectedRule.toUpperCase()
-                                  const nextValue = ASSUMPTION_RULES.has(upperRule)
-                                    ? applyRuleToJustification('', selectedRule)
-                                    : applyRuleToJustification(line.justification, selectedRule)
+                                  const nextValue = activeAssumptionRules.has(upperRule)
+                                    ? applyRuleToJustification('', selectedRule, { rulesFirst: usesNestedSubderivations })
+                                    : applyRuleToJustification(line.justification, selectedRule, {
+                                      rulesFirst: usesNestedSubderivations,
+                                    })
                                   commitLines((prev) => {
                                     let nextLines = applyLineChange(prev, idx, 'justification', nextValue)
-                                    if (ASSUMPTION_RULES.has(upperRule)) {
+                                    if (activeAssumptionRules.has(upperRule)) {
                                       const nextIdx = idx + 1
                                       const nextLine = nextLines[nextIdx]
                                       const isBlankLine = nextLine &&
@@ -1866,17 +1900,20 @@ export default function DerivationTable({
                                     }
                                     return nextLines
                                   }, idx)
-                                  if (ASSUMPTION_RULES.has(upperRule)) {
+                                  if (activeAssumptionRules.has(upperRule)) {
                                     setLineDrafts((prev) => {
                                       if (!(idx in prev)) return prev
                                       const next = { ...prev }
                                       delete next[idx]
                                       return next
                                     })
+                                  } else if (usesNestedSubderivations) {
+                                    window.setTimeout(() => justRefs.current[idx]?.focus(), 0)
                                   }
                                 }}
-                                renderValue={(value) => value || 'Rule'}
+                                renderValue={(value) => hidesNestedAssumptionJustification ? '' : value || 'Rule'}
                                 sx={(theme) => ({
+                                  width: hidesNestedAssumptionJustification ? '100%' : undefined,
                                   '& .MuiSelect-select': { fontSize: DERIVATION_LINE_FONT_SIZE, py: isMobile ? 0.5 : 1 },
                                   '& .MuiInputBase-input': { fontSize: DERIVATION_LINE_FONT_SIZE, py: isMobile ? 0.5 : 1 },
                                   '& .MuiSelect-select.MuiInputBase-input': { display: 'flex', alignItems: 'center' },
@@ -1886,14 +1923,7 @@ export default function DerivationTable({
                                   PaperProps: { sx: { '& .MuiMenuItem-root': { fontSize: DERIVATION_LINE_FONT_SIZE } } }
                                 }}
                               >
-                                <MenuItem value="">
-                                  <em>Rule</em>
-                                </MenuItem>
-                                {allowedRules.map((rule) => (
-                                  <MenuItem key={rule} value={rule}>
-                                    {rule}
-                                  </MenuItem>
-                                ))}
+                                {ruleMenuItems}
                               </Select>
                             </FormControl>
                           )}
@@ -1917,11 +1947,13 @@ export default function DerivationTable({
                               handleInputRequestFullScreen(idx, 'justification')
                             }
                           }}
-                          onChange={(e) => handleLineChange(idx, 'justification', e.target.value)}
+                          onChange={(e) => handleJustificationChange(e, idx)}
                           onKeyDown={(e) => handleJustKeyDown(e, idx, line.readOnly)}
                           onBlur={(e) => {
                             const raw = (e.target.value || '').trim()
-                            const formatted = raw ? formatJustificationDisplay(raw) : ''
+                            const formatted = raw
+                              ? formatJustificationDisplay(raw, { rulesFirst: usesNestedSubderivations })
+                              : ''
                             if (formatted !== raw) {
                               handleLineChange(idx, 'justification', formatted)
                             }
