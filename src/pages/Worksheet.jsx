@@ -130,12 +130,16 @@ const normalizeType = (snapshot) => (
   snapshot?.type || snapshot?.problemType || snapshot?.logic_problem_type || 'derivation'
 )
 
+const logicSystemForQuestionType = (type, fallback = DEFAULT_LOGIC_SYSTEM) => {
+  if (type === 'derivation-hurley') return LEGACY_LOGIC_SYSTEM
+  if (type === 'derivation-calgary') return DEFAULT_LOGIC_SYSTEM
+  return normalizeLogicSystem(fallback, DEFAULT_LOGIC_SYSTEM)
+}
+
 const mapQuestionToProof = (question, assignment, index, logicSystem = DEFAULT_LOGIC_SYSTEM) => {
   const snapshot = question?.question_snapshot || {}
   const type = normalizeType(snapshot)
-  const proofLogicSystem = type === 'derivation-hurley'
-    ? LEGACY_LOGIC_SYSTEM
-    : normalizeLogicSystem(logicSystem, DEFAULT_LOGIC_SYSTEM)
+  const proofLogicSystem = logicSystemForQuestionType(type, logicSystem)
   const description = snapshot.prompt || snapshot.description || snapshot.text || 'Solve.'
   const questionId = question?.id ?? question?.assignment_question_id ?? question?.assignmentQuestionId ?? null
   const orderIndex = question?.order_index ?? question?.orderIndex ?? index
@@ -530,9 +534,10 @@ function RealWorksheetContent() {
         let worksheetChanged = false
         const proofs = worksheet.proofs || []
         const nextProofs = proofs.map((proof) => {
-          if (proof.logicSystem === courseLogicSystem) return proof
+          const proofLogicSystem = logicSystemForQuestionType(proof.type, courseLogicSystem)
+          if (proof.logicSystem === proofLogicSystem) return proof
           worksheetChanged = true
-          return { ...proof, logicSystem: courseLogicSystem }
+          return { ...proof, logicSystem: proofLogicSystem }
         })
         if (!worksheetChanged) return worksheet
         didChange = true

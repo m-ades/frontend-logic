@@ -1,4 +1,4 @@
-import checkDerivation from '../../../lib/logicpenguin/checkers/derivation-hurley.js'
+import { getDerivationCheckerForLogicSystem } from '../../../lib/logicpenguin/checkers/derivation-by-logic-system.js'
 import { fetchJson, getActiveUserId } from '../../../utils/api.js'
 import { getSubmissionScore } from '../../../utils/problemHelpers.js'
 import {
@@ -19,7 +19,9 @@ export async function runDerivationAutoCheck({
   normalizeJustificationForCheck,
   premises,
   proof,
+  logicSystem,
 }) {
+  const checkDerivation = getDerivationCheckerForLogicSystem(logicSystem)
   const submission = buildSubmission(
     linesSnapshot,
     proof?.conclusion,
@@ -29,8 +31,11 @@ export async function runDerivationAutoCheck({
   )
   const result = await checkDerivation(
     { prems: premises, conc: proof?.conclusion, ruleset: proof?.ruleset },
+    null,
     submission.ans,
+    false,
     -1,
+    true,
     proof?.options
   )
   const normalizedConclusion = normalizeFormulaForCheck(proof?.conclusion || '')

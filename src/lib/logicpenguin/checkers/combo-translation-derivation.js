@@ -9,7 +9,7 @@
 import tr from '../translate.js';
 import getFormulaClass from '../symbolic/formula.js';
 import { equivtest } from '../symbolic/libequivalence.js';
-import derivationHurley from './derivation-hurley.js';
+import { getDerivationCheckerForLogicSystem } from './derivation-by-logic-system.js';
 
 let defaultnotation = 'cambridge';
 if ((typeof process !== 'undefined') && process?.appsettings?.defaultnotation) {
@@ -149,10 +149,14 @@ export default async function(
             prems: given.premises,
             conc: given.conclusion,
         };
-        const derivResult = await derivationHurley(
+        const derivationChecker = getDerivationCheckerForLogicSystem(options?.logicSystem);
+        const derivResult = await derivationChecker(
             derivQuestion,
+            null,
             providedProof,
+            partialcredit,
             derivTtl,
+            cheat,
             options
         );
         if (derivResult.successstatus === 'correct') {

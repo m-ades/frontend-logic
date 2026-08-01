@@ -29,8 +29,7 @@ import PromptText from '../../ui/PromptText.jsx'
 import ThemedCard from '../../ui/ThemedCard.jsx'
 import ProblemSetButtons from '../mui/frame/ProblemSetButtons.jsx'
 import { MobileLogicInput, useMobileLogicKeyboardEnabled } from '../../ui/LogicKeyboard/index.js'
-import checkDerivationHurley from '../../../lib/logicpenguin/checkers/derivation-hurley.js'
-import checkDerivationCalgary from '../../../lib/logicpenguin/checkers/derivation-calgary.js'
+import { getDerivationCheckerForLogicSystem } from '../../../lib/logicpenguin/checkers/derivation-by-logic-system.js'
 import getFormulaClass from '../../../lib/logicpenguin/symbolic/formula.js'
 import getSyntax from '../../../lib/logicpenguin/symbolic/libsyntax.js'
 import {
@@ -217,13 +216,6 @@ function getSymbolButtons(symbols) {
   ]
 }
 
-const DERIVATION_CHECKERS_BY_TYPE = {
-  'derivation-hurley': (question, givenans, points, options) =>
-    checkDerivationHurley(question, givenans, points, options),
-  'derivation-calgary': (question, givenans, points, options) =>
-    checkDerivationCalgary(question, null, givenans, false, points, true, options),
-}
-
 const AUTO_CHECK_STORAGE_KEY = 'logic-app:autocheck-enabled'
 const RULE_INPUT_MODE_KEY = 'logic-app:derivation-rule-input-mode'
 
@@ -352,7 +344,11 @@ export default function DerivationTable({
   const usesNestedSubderivations = derivationProblemType === 'derivation-calgary'
   const activeAssumptionRules = usesNestedSubderivations ? FITCH_ASSUMPTION_RULES : HURLEY_ASSUMPTION_RULES
   const conclusionTargetText = proof?.conclusion ? `${usesNestedSubderivations ? '∴' : '//'} ${proof.conclusion}` : ''
-  const checkDerivation = DERIVATION_CHECKERS_BY_TYPE[derivationProblemType] ?? DERIVATION_CHECKERS_BY_TYPE['derivation-hurley']
+  const checkDerivation = useMemo(() => {
+    const checker = getDerivationCheckerForLogicSystem(activeLogicSystem)
+    return (question, givenans, points, options) =>
+      checker(question, null, givenans, false, points, true, options)
+  }, [activeLogicSystem])
   const allDerivationRules = getDerivationRules(activeLogicSystem)
   const derivationRuleLookup = getDerivationRuleLookup(activeLogicSystem)
   const [activeFormulaIndex, setActiveFormulaIndex] = useState(null)
