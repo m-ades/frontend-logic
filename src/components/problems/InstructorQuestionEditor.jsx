@@ -33,6 +33,7 @@ import {
 } from '../../lib/logicSystems.js'
 import {
   FORCE_UPPER_DERIVATION_RULES,
+  formatDerivationRuleName,
   getDerivationRuleLookup,
   getDerivationRules,
 } from '../../lib/derivationRules.js'
@@ -156,11 +157,15 @@ function validateQuestionSnapshotFormulas(snapshot, logicSystem = DEFAULT_LOGIC_
 function normalizeRuleToken(token, logicSystem = DEFAULT_LOGIC_SYSTEM) {
   const raw = String(token || '').trim()
   if (!raw) return ''
-  const fromLookup = getDerivationRuleLookup(logicSystem).get(raw.toLowerCase())
+  const ruleLookup = getDerivationRuleLookup(logicSystem)
+  const fromLookup = ruleLookup.get(raw.toLowerCase())
   if (fromLookup) return fromLookup
+  const formatted = formatDerivationRuleName(raw)
+  const fromFormatted = ruleLookup.get(formatted.toLowerCase())
+  if (fromFormatted) return fromFormatted
   const upper = raw.toUpperCase()
   if (FORCE_UPPER_DERIVATION_RULES.has(upper)) return upper
-  return raw
+  return formatted
 }
 
 function parseRuleList(value, logicSystem = DEFAULT_LOGIC_SYSTEM) {
@@ -178,6 +183,13 @@ function parseRuleList(value, logicSystem = DEFAULT_LOGIC_SYSTEM) {
     out.push(normalized)
   })
   return out
+}
+
+function normalizeRuleListText(value, logicSystem = DEFAULT_LOGIC_SYSTEM) {
+  return String(value ?? '')
+    .split(/([,\s]+)/g)
+    .map((part) => part.trim() ? normalizeRuleToken(part, logicSystem) : part)
+    .join('')
 }
 
 function normalizeDerivationRuleset(ruleset, logicSystem = DEFAULT_LOGIC_SYSTEM) {
@@ -838,7 +850,7 @@ function DerivationEditorForm({ proof, value, onChange, logicSystem = DEFAULT_LO
   const setRulesetField = (field, text) => {
     const nextRuleset = {
       ...ruleset,
-      [field]: text,
+      [field]: normalizeRuleListText(text, activeLogicSystem),
     }
     update({ ruleset: nextRuleset })
   }

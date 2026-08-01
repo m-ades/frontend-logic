@@ -1518,18 +1518,16 @@ export default function DerivationTable({
                 ? [selectedLineRule, ...allowedRules]
                 : allowedRules
               const hidesNestedAssumptionJustification = usesNestedSubderivations && activeAssumptionRules.has(lineRule)
-              const ruleMenuItems = (
-                <>
-                  <MenuItem value="">
-                    <em>Rule</em>
-                  </MenuItem>
-                  {ruleOptions.map((rule) => (
+              const ruleMenuItems = [
+                <MenuItem key="empty-rule" value="">
+                  <em>Rule</em>
+                </MenuItem>,
+                ...ruleOptions.map((rule) => (
                     <MenuItem key={rule} value={rule}>
                       {rule}
                     </MenuItem>
-                  ))}
-                </>
-              )
+                  )),
+              ]
               const indentOffset = `calc(${indentLevels[idx] || 0} * ${DERIVATION_INDENT_STEP}${indentLevels[idx] ? ` + ${DERIVATION_ASSUMPTION_OFFSET}` : ''})`
               return (
               <TableRow
@@ -1867,9 +1865,14 @@ export default function DerivationTable({
                                 onChange={(e) => {
                                   const selectedRule = String(e.target.value || '')
                                   const upperRule = selectedRule.toUpperCase()
+                                  const currentJustification = idx in lineDrafts
+                                    ? applyLinesToJustification(line.justification, lineDrafts[idx], {
+                                      rulesFirst: usesNestedSubderivations,
+                                    })
+                                    : line.justification
                                   const nextValue = activeAssumptionRules.has(upperRule)
                                     ? applyRuleToJustification('', selectedRule, { rulesFirst: usesNestedSubderivations })
-                                    : applyRuleToJustification(line.justification, selectedRule, {
+                                    : applyRuleToJustification(currentJustification, selectedRule, {
                                       rulesFirst: usesNestedSubderivations,
                                     })
                                   commitLines((prev) => {
@@ -1903,7 +1906,15 @@ export default function DerivationTable({
                                       delete next[idx]
                                       return next
                                     })
-                                  } else if (usesNestedSubderivations) {
+                                  } else {
+                                    setLineDrafts((prev) => {
+                                      if (!(idx in prev)) return prev
+                                      const next = { ...prev }
+                                      delete next[idx]
+                                      return next
+                                    })
+                                  }
+                                  if (!activeAssumptionRules.has(upperRule) && usesNestedSubderivations) {
                                     window.setTimeout(() => justRefs.current[idx]?.focus(), 0)
                                   }
                                 }}
