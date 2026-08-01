@@ -23,6 +23,7 @@ import EditIcon from '@mui/icons-material/Edit'
 import AddIcon from '@mui/icons-material/Add'
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
 import { fetchJson } from '../../utils/api.js'
+import getFormulaClass from '../../lib/logicpenguin/symbolic/formula.js'
 import getSyntax from '../../lib/logicpenguin/symbolic/libsyntax.js'
 import {
   DEFAULT_LOGIC_SYSTEM,
@@ -68,6 +69,88 @@ function normalizeArgumentInput(argument, logicSystem = DEFAULT_LOGIC_SYSTEM) {
   if (out.premises !== undefined) out.premises = normalizeFormulaInputs(out.premises, logicSystem)
   if (out.conclusion !== undefined) out.conclusion = normalizeFormulaInput(out.conclusion, logicSystem)
   return out
+}
+
+function validateFormulaInput(value, logicSystem, label) {
+  const text = String(value ?? '').trim()
+  if (!text) return ''
+  const Formula = getFormulaClass(getNotation(logicSystem))
+  const formula = Formula.from(text)
+  if (formula.wellformed) return ''
+  return `${label}: ${formula.syntaxerrors || 'invalid formula'}`
+}
+
+function validateFormulaInputs(values, logicSystem, label) {
+  const list = Array.isArray(values) ? values : (values ? [values] : [])
+  for (let i = 0; i < list.length; i += 1) {
+    const error = validateFormulaInput(list[i], logicSystem, `${label} ${i + 1}`)
+    if (error) return error
+  }
+  return ''
+}
+
+function validateArgumentInput(argument, logicSystem, label = 'Argument') {
+  const premises = argument?.premises ?? argument?.prems
+  const conclusion = argument?.conclusion ?? argument?.conc
+  return validateFormulaInputs(premises, logicSystem, `${label} premise`)
+    || validateFormulaInput(conclusion, logicSystem, `${label} conclusion`)
+}
+
+function validateArgumentLineInput(value, logicSystem, label = 'Expected argument') {
+  const text = String(value ?? '').trim()
+  if (!text) return ''
+  const parts = text.split('//')
+  if (parts.length !== 2) {
+    return validateFormulaInput(text, logicSystem, label)
+  }
+  const premises = parts[0].split('/').map((part) => part.trim()).filter(Boolean)
+  const conclusion = parts[1].trim()
+  return validateFormulaInputs(premises, logicSystem, `${label} premise`)
+    || validateFormulaInput(conclusion, logicSystem, `${label} conclusion`)
+}
+
+function validateQuestionSnapshotFormulas(snapshot, logicSystem = DEFAULT_LOGIC_SYSTEM) {
+  const type = snapshot?.logic_problem_type || snapshot?.type || snapshot?.problemType
+  if (type === 'truth-table') {
+    const tt = snapshot.truthTable || snapshot.truth_table || {}
+    if (tt.kind === 'equivalence') {
+      return validateFormulaInput(tt.left, logicSystem, 'Left statement')
+        || validateFormulaInput(tt.right, logicSystem, 'Right statement')
+    }
+    if (tt.kind === 'argument') {
+      return validateFormulaInputs(tt.lefts, logicSystem, 'Premise')
+        || validateFormulaInput(tt.right, logicSystem, 'Conclusion')
+    }
+    return validateFormulaInput(tt.statement ?? tt.formula, logicSystem, 'Statement')
+  }
+  if (type === 'indirect-truth-table' || type === 'nonclassical-truth-table') {
+    return validateArgumentInput(snapshot.argument, logicSystem)
+  }
+  if (isDerivationProblemType(type)) {
+    return validateFormulaInputs(snapshot.prems ?? snapshot.premises, logicSystem, 'Premise')
+      || validateFormulaInput(snapshot.conc ?? snapshot.conclusion, logicSystem, 'Conclusion')
+  }
+  if (type === 'evaluate-truth') {
+    return validateFormulaInput(snapshot.statement ?? snapshot.prompt, logicSystem, 'Statement')
+  }
+  if (type === 'symbolic-translation') {
+    return validateFormulaInput(snapshot.answer, logicSystem, 'Correct answer')
+  }
+  if (type === 'single-row-truth-table' || type === 'partial-truth-table') {
+    return validateFormulaInput(snapshot.statement ?? snapshot.formula, logicSystem, 'Statement')
+  }
+  if (type === 'combo-translation-truth-table' || type === 'combo-translation-derivation') {
+    const answer = snapshot.answer
+    if (Array.isArray(answer?.premises) || answer?.conclusion !== undefined) {
+      return validateArgumentInput(answer, logicSystem, 'Expected argument')
+    }
+    if (Array.isArray(answer?.translations)) {
+      return validateFormulaInputs(answer.translations, logicSystem, 'Expected translation')
+    }
+    const argument = typeof answer === 'string' ? answer : (answer?.argumentLine ?? answer?.argument)
+    return validateArgumentLineInput(argument, logicSystem)
+  }
+  return ''
 }
 
 function normalizeRuleToken(token, logicSystem = DEFAULT_LOGIC_SYSTEM) {
@@ -1238,6 +1321,12 @@ function InstructorQuestionEditorInner({
       let mergedSnapshot = deepMerge(existing, question_snapshot)
       if (proof.type === 'single-row-truth-table') {
         delete mergedSnapshot.singleRowTruthTable
+      }
+      const formulaError = validateQuestionSnapshotFormulas(mergedSnapshot, activeLogicSystem)
+      if (formulaError) {
+        setError(`Invalid formula: ${formulaError}`)
+        setSaving(false)
+        return
       }
       const attemptLimit = editValue.attemptLimit
 

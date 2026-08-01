@@ -10,6 +10,11 @@ import getRules from './rules/forallx-rules.js';
 import DerivationCheck from './derivation-check.js';
 import { justParse } from '../../../components/ui/logicpenguin/justification-parse.js';
 import getFormulaClass from '../symbolic/formula.js';
+import {
+    addRequiredRuleErrors,
+    applyRuleFilters,
+    getRulesetRestrictions,
+} from './derivation-rule-restrictions.js';
 
 // default notation from settings, but calgary otherwise
 let defaultnotation = 'calgary';
@@ -75,7 +80,14 @@ export default async function(
     // clone the answer to avoid messing it up when checking it
     const ansclone = JSON.parse(JSON.stringify(givenans));
     const notationname = (options?.notation ?? defaultnotation);
-    const rules = getRules('calgary', notationname);
+    const { allow, deny, require, requireAny } = getRulesetRestrictions(question, options);
+    const normalizeForNotation = (rule) => normalizeRuleName(rule, notationname);
+    const rules = applyRuleFilters(
+        getRules('calgary', notationname),
+        allow,
+        deny,
+        normalizeForNotation
+    );
     const checkResult = new DerivationCheck(
         rules,
         ansclone,
@@ -83,6 +95,7 @@ export default async function(
         question.conc,
         { notation: notationname, assumptionMode: 'nested' }
     ).report();
+    addRequiredRuleErrors(checkResult, ansclone, require, requireAny, normalizeForNotation);
     // only correct if no errors
     const correct = (Object.keys(checkResult.errors).length == 0);
     let portion = 1;
