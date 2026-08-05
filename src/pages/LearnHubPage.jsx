@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import {
   Box,
   Chip,
@@ -16,10 +16,8 @@ import { useNavigate } from 'react-router-dom'
 import ThemedCard from '@/components/ui/ThemedCard.jsx'
 import { useAppRuntime } from '@/hooks/useAppRuntime.js'
 import { useTextbookPracticeLinks } from '@/hooks/useTextbookPracticeLinks.js'
-import {
-  buildTextbookTocTree,
-  getTextbookManifest,
-} from '@/components/textbook/textbookCatalog.js'
+import { useTextbookStructure } from '@/hooks/useTextbookStructure.js'
+import { getTextbookManifest } from '@/components/textbook/textbookCatalog.js'
 import { linksForTextbookSlug } from '@/components/textbook/textbookPracticeLinks.js'
 
 /**
@@ -30,7 +28,7 @@ export default function LearnHubPage() {
   const navigate = useNavigate()
   const { learnChapterPath, learnPath } = useAppRuntime()
   const { resolvedLinks } = useTextbookPracticeLinks()
-  const tree = useMemo(() => buildTextbookTocTree(), [])
+  const { numberedTree: tree } = useTextbookStructure()
   const manifest = getTextbookManifest()
 
   const linkedBySlug = useMemo(() => {
@@ -44,13 +42,18 @@ export default function LearnHubPage() {
     return map
   }, [tree, resolvedLinks])
 
-  const [openParts, setOpenParts] = useState(() => {
-    const initial = {}
-    tree.forEach((node, index) => {
-      if (node.children?.length) initial[node.slug] = index < 2
+  const [openParts, setOpenParts] = useState({})
+
+  useEffect(() => {
+    setOpenParts((prev) => {
+      if (Object.keys(prev).length > 0 || !tree.length) return prev
+      const initial = {}
+      tree.forEach((node, index) => {
+        if (node.children?.length) initial[node.slug] = index < 2
+      })
+      return Object.keys(initial).length ? initial : prev
     })
-    return initial
-  })
+  }, [tree])
 
   const go = (slug) => {
     const path = learnChapterPath?.(slug) || `${learnPath || '/student/learn'}/${slug}`

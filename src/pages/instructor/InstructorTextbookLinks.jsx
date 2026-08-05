@@ -13,6 +13,8 @@ import {
   MenuItem,
   Select,
   Stack,
+  Tab,
+  Tabs,
   Table,
   TableBody,
   TableCell,
@@ -26,11 +28,13 @@ import {
   Add as AddIcon,
   Delete as DeleteIcon,
   RestartAlt as ResetIcon,
+  Sync as SyncIcon,
 } from '@mui/icons-material'
 import { useAppRuntime } from '@/hooks/useAppRuntime.js'
 import { useTextbookPracticeLinks } from '@/hooks/useTextbookPracticeLinks.js'
-import { listTextbookNavItems } from '@/components/textbook/textbookCatalog.js'
+import { useTextbookStructure } from '@/hooks/useTextbookStructure.js'
 import { createLinkId, normalizeLink } from '@/components/textbook/textbookPracticeLinks.js'
+import TextbookStructureEditor from '@/components/textbook/TextbookStructureEditor.jsx'
 import ThemedCard from '@/components/ui/ThemedCard.jsx'
 
 const emptyForm = {
@@ -40,15 +44,7 @@ const emptyForm = {
   label: '',
 }
 
-/**
- * Instructor UI to link forall x chapters to course practice assignments.
- * Persists per-course overrides (localStorage live / sessionStorage sandbox).
- */
-export default function InstructorTextbookLinks() {
-  const { courseState } = useAppRuntime()
-  const { courses, activeCourseId } = courseState || {}
-  const activeCourse = courses?.find((course) => course.id === activeCourseId)
-
+function PracticeLinksPanel({ chapters }) {
   const {
     definitions,
     resolvedLinks,
@@ -62,8 +58,6 @@ export default function InstructorTextbookLinks() {
   const [error, setError] = useState('')
   const [savedFlash, setSavedFlash] = useState(false)
 
-  const chapters = useMemo(() => listTextbookNavItems(), [])
-
   const flashSaved = () => {
     setSavedFlash(true)
     window.setTimeout(() => setSavedFlash(false), 2500)
@@ -72,13 +66,14 @@ export default function InstructorTextbookLinks() {
   const openCreate = () => {
     setForm({
       ...emptyForm,
+      textbookSlug: chapters[0]?.slug || 'Ch1',
       practiceId: practices[0] ? String(practices[0].id) : '',
     })
     setError('')
     setDialogOpen(true)
   }
 
-  const handleSaveLink = () => {
+  const handleSaveLink = async () => {
     if (!form.textbookSlug) {
       setError('Choose a textbook chapter.')
       return
@@ -103,52 +98,47 @@ export default function InstructorTextbookLinks() {
       }),
     ]
 
-    saveLinks(next)
-    setDialogOpen(false)
-    flashSaved()
+    try {
+      await saveLinks(next)
+      setDialogOpen(false)
+      flashSaved()
+    } catch (err) {
+      setError(err?.message || 'Failed to save link.')
+    }
   }
 
-  const handleDelete = (linkId) => {
+  const handleDelete = async (linkId) => {
     const next = definitions.filter((link) => link.id !== linkId)
-    // Saving an empty array still counts as an override (intentional clear).
-    saveLinks(next)
-    flashSaved()
+    try {
+      await saveLinks(next)
+      flashSaved()
+    } catch (err) {
+      setError(err?.message || 'Failed to delete link.')
+    }
   }
 
-  const handleReset = () => {
-    resetToDefaults()
-    flashSaved()
-  }
-
-  if (!activeCourse) {
-    return (
-      <Box>
-        <Typography variant="h4" component="h1" sx={{ mb: 3, fontWeight: 600 }}>
-          Textbook Links
-        </Typography>
-        <Alert severity="info">No course selected</Alert>
-      </Box>
-    )
+  const handleReset = async () => {
+    try {
+      await resetToDefaults()
+      flashSaved()
+    } catch (err) {
+      setError(err?.message || 'Failed to reset links.')
+    }
   }
 
   return (
     <Box>
       <Stack
         direction={{ xs: 'column', sm: 'row' }}
-        spacing={2}
+        spacing={1.5}
         alignItems={{ xs: 'stretch', sm: 'center' }}
         justifyContent="space-between"
-        sx={{ mb: 3 }}
+        sx={{ mb: 2 }}
       >
-        <Box>
-          <Typography variant="h4" component="h1" sx={{ fontWeight: 600 }}>
-            Textbook Links
-          </Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
-            Connect forall x: Calgary chapters to practice sets. Linked chapters show
-            practice widgets while reading; linked practices open with the textbook beside them.
-          </Typography>
-        </Box>
+        <Typography variant="body2" color="text.secondary" sx={{ maxWidth: 40 * 16 }}>
+          Links stay keyed by file slug, so reordering or renaming display titles in Structure
+          does not break practice coupling.
+        </Typography>
         <Stack direction="row" spacing={1}>
           <Tooltip title="Restore HuLA starter links for this course">
             <Button
@@ -218,13 +208,14 @@ export default function InstructorTextbookLinks() {
                               String(item.subchapter) === String(link.match.subchapter)),
                         )
                       : null)
+                  const chapter = chapters.find((item) => item.slug === link.textbookSlug)
 
                   return (
                     <TableRow key={link.id} hover>
                       <TableCell>
                         <Typography fontWeight={600}>{link.textbookSlug}</Typography>
                         <Typography variant="caption" color="text.secondary">
-                          {chapters.find((item) => item.slug === link.textbookSlug)?.label || ''}
+                          {chapter?.label || ''}
                         </Typography>
                       </TableCell>
                       <TableCell>{link.sectionId || '—'}</TableCell>
@@ -361,6 +352,167 @@ export default function InstructorTextbookLinks() {
           </Button>
         </DialogActions>
       </Dialog>
+    </Box>
+  )
+}
+
+/**
+ * Instructor Textbook management — structure editor + practice links.
+ * Route: `/instructor/textbook-links`
+ */
+export default function InstructorTextbookLinks() {
+  const { courseState } = useAppRuntime()
+  const { courses, activeCourseId } = courseState || {}
+  const activeCourse = courses?.find((course) => course.id === activeCourseId)
+
+  const {
+    nodes,
+    numberedFlat,
+    hasOverrides,
+    saveStructure,
+    resetToBundle,
+    syncFiles,
+  } = useTextbookStructure()
+
+  const [tab, setTab] = useState(0)
+  const [flash, setFlash] = useState(null)
+
+  const chapters = useMemo(
+    () => numberedFlat.map((node) => ({ slug: node.slug, label: node.label || node.displayTitle })),
+    [numberedFlat],
+  )
+
+  const showFlash = (message, severity = 'success') => {
+    setFlash({ message, severity })
+    window.setTimeout(() => setFlash(null), 3500)
+  }
+
+  const handleSync = async () => {
+    try {
+      const { added, missing } = await syncFiles()
+      const parts = []
+      if (added.length) parts.push(`added ${added.length}`)
+      if (missing.length) parts.push(`${missing.length} missing from bundle (removed from structure)`)
+      showFlash(
+        parts.length
+          ? `Synced from bundle (${parts.join('; ')}).`
+          : 'Synced from bundle — structure already matches inventory.',
+      )
+    } catch (error) {
+      showFlash(error?.message || 'Failed to sync structure.', 'error')
+    }
+  }
+
+  const handleResetStructure = async () => {
+    try {
+      await resetToBundle()
+      showFlash('Structure reset to BookML bundle defaults.')
+    } catch (error) {
+      showFlash(error?.message || 'Failed to reset structure.', 'error')
+    }
+  }
+
+  if (!activeCourse) {
+    return (
+      <Box>
+        <Typography variant="h4" component="h1" sx={{ mb: 3, fontWeight: 600 }}>
+          Textbook
+        </Typography>
+        <Alert severity="info">No course selected</Alert>
+      </Box>
+    )
+  }
+
+  return (
+    <Box>
+      <Stack
+        direction={{ xs: 'column', sm: 'row' }}
+        spacing={2}
+        alignItems={{ xs: 'stretch', sm: 'flex-start' }}
+        justifyContent="space-between"
+        sx={{ mb: 2 }}
+      >
+        <Box>
+          <Typography variant="h4" component="h1" sx={{ fontWeight: 600 }}>
+            Textbook
+          </Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5, maxWidth: 44 * 16 }}>
+            Manage forall x: Calgary order and display titles for this course, then link chapters
+            to practice. Numbers are computed from order; file slugs stay fixed.
+          </Typography>
+        </Box>
+      </Stack>
+
+      {flash && (
+        <Alert severity={flash.severity} sx={{ mb: 2 }}>
+          {flash.message}
+        </Alert>
+      )}
+
+      <Tabs
+        value={tab}
+        onChange={(_event, value) => setTab(value)}
+        aria-label="Textbook management tabs"
+        sx={{ mb: 2, borderBottom: 1, borderColor: 'divider' }}
+      >
+        <Tab label="Structure" id="textbook-tab-structure" aria-controls="textbook-panel-structure" />
+        <Tab
+          label="Practice links"
+          id="textbook-tab-links"
+          aria-controls="textbook-panel-links"
+        />
+      </Tabs>
+
+      {tab === 0 && (
+        <Box
+          role="tabpanel"
+          id="textbook-panel-structure"
+          aria-labelledby="textbook-tab-structure"
+        >
+          <Stack
+            direction={{ xs: 'column', sm: 'row' }}
+            spacing={1.5}
+            alignItems={{ xs: 'stretch', sm: 'center' }}
+            justifyContent="space-between"
+            sx={{ mb: 2 }}
+          >
+            <Typography variant="body2" color="text.secondary" sx={{ maxWidth: 42 * 16 }}>
+              Drag to reorder. Drop a chapter onto a part to nest it. After replacing HTML in{' '}
+              <code>public/textbook/</code>, regenerate inventory (
+              <code>node scripts/generate-textbook-inventory.mjs</code>) then Sync from bundle.
+              {hasOverrides ? ' Custom order saved for this course.' : ' Using bundle defaults.'}
+            </Typography>
+            <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+              <Button
+                variant="outlined"
+                startIcon={<SyncIcon />}
+                onClick={handleSync}
+                aria-label="Sync textbook structure from bundle inventory"
+              >
+                Sync from bundle
+              </Button>
+              <Tooltip title="Clear course overrides and restore seeded TOC">
+                <Button
+                  variant="outlined"
+                  startIcon={<ResetIcon />}
+                  onClick={handleResetStructure}
+                  aria-label="Reset structure to bundle defaults"
+                >
+                  Reset to bundle
+                </Button>
+              </Tooltip>
+            </Stack>
+          </Stack>
+
+          <TextbookStructureEditor nodes={nodes} onChange={saveStructure} />
+        </Box>
+      )}
+
+      {tab === 1 && (
+        <Box role="tabpanel" id="textbook-panel-links" aria-labelledby="textbook-tab-links">
+          <PracticeLinksPanel chapters={chapters} />
+        </Box>
+      )}
     </Box>
   )
 }
