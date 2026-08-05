@@ -23,11 +23,11 @@ import TextbookTocNav from '@/components/textbook/TextbookTocNav.jsx'
 import EmbeddedPracticePane from '@/components/textbook/EmbeddedPracticePane.jsx'
 import {
   getTextbookEntry,
-  getTextbookNeighbors,
   normalizeTextbookSlug,
 } from '@/components/textbook/textbookCatalog.js'
 import { useAppRuntime } from '@/hooks/useAppRuntime.js'
 import { useTextbookPracticeLinks } from '@/hooks/useTextbookPracticeLinks.js'
+import { useTextbookStructure } from '@/hooks/useTextbookStructure.js'
 import { linksForTextbookSlug } from '@/components/textbook/textbookPracticeLinks.js'
 
 /**
@@ -44,9 +44,25 @@ export default function LearnChapterPage() {
   const { learnPath, learnChapterPath } = useAppRuntime()
   const slug = normalizeTextbookSlug(chapter)
   const entry = getTextbookEntry(slug)
-  const { prev, next } = getTextbookNeighbors(slug)
-  const [pageTitle, setPageTitle] = useState(entry?.pageTitle || entry?.title || '')
+  const { getNeighbors, studentFlat } = useTextbookStructure()
+  const neighbors = useMemo(() => getNeighbors(slug), [getNeighbors, slug])
+  const prev = neighbors.prev
+  const next = neighbors.next
+  const structureEntry = useMemo(
+    () => studentFlat.find((node) => node.slug === slug) || neighbors.entry,
+    [studentFlat, slug, neighbors.entry],
+  )
+  const structureTitle = structureEntry?.label || structureEntry?.displayTitle || ''
+  const [pageTitle, setPageTitle] = useState(structureTitle || entry?.pageTitle || entry?.title || '')
   const [drawerOpen, setDrawerOpen] = useState(false)
+  const [tocCollapsed, setTocCollapsed] = useState(() => {
+    if (typeof window === 'undefined') return false
+    try {
+      return window.localStorage.getItem('hula_learn_toc_width_collapsed') === 'true'
+    } catch {
+      return false
+    }
+  })
   const [activePracticeId, setActivePracticeId] = useState(null)
 
   const { resolvedLinks } = useTextbookPracticeLinks()
@@ -58,6 +74,11 @@ export default function LearnChapterPage() {
     () => [...new Set(resolvedLinks.map((link) => link.textbookSlug))],
     [resolvedLinks],
   )
+
+  // Prefer HuLA structure titles in chrome; fall back to BookML page title.
+  useEffect(() => {
+    setPageTitle(structureTitle || entry?.pageTitle || entry?.title || slug)
+  }, [slug, structureTitle, entry])
 
   // Reset selected practice when chapter (or its links) change
   useEffect(() => {
@@ -89,7 +110,9 @@ export default function LearnChapterPage() {
   }, [])
 
   const hasPractice = chapterLinks.length > 0
-  const displayTitle = pageTitle || entry?.pageTitle || entry?.title || slug
+  const displayTitle = structureTitle || pageTitle || entry?.pageTitle || entry?.title || slug
+  const prevLabel = prev?.label || prev?.displayTitle || prev?.pageTitle || prev?.title
+  const nextLabel = next?.label || next?.displayTitle || next?.pageTitle || next?.title
 
   // Practice is already in the right pane — don't duplicate CTAs inside the reader.
   const reader = (
@@ -134,7 +157,7 @@ export default function LearnChapterPage() {
           </IconButton>
         </Tooltip>
 
-        {!isMdUp && (
+        {!isMdUp ? (
           <Button
             size="small"
             startIcon={<MenuIcon />}
@@ -151,18 +174,34 @@ export default function LearnChapterPage() {
           >
             Contents
           </Button>
+        ) : (
+          <Button
+            size="small"
+            startIcon={<MenuIcon />}
+            onClick={() => setTocCollapsed((prev) => !prev)}
+            aria-label={tocCollapsed ? 'Expand table of contents' : 'Collapse table of contents'}
+            aria-pressed={!tocCollapsed}
+            sx={{
+              textTransform: 'none',
+              '&:focus-visible': {
+                outline: '2px solid',
+                outlineColor: 'primary.main',
+                outlineOffset: 2,
+              },
+            }}
+          >
+            Contents
+          </Button>
         )}
 
-        <Tooltip title={prev ? `Previous: ${prev.pageTitle || prev.title}` : 'No previous chapter'}>
+        <Tooltip title={prev ? `Previous: ${prevLabel}` : 'No previous chapter'}>
           <span>
             <IconButton
               size="small"
               disabled={!prev}
               onClick={() => goChapter(prev?.slug)}
               aria-label={
-                prev
-                  ? `Previous chapter: ${prev.pageTitle || prev.title}`
-                  : 'No previous chapter'
+                prev ? `Previous chapter: ${prevLabel}` : 'No previous chapter'
               }
               sx={{
                 '&:focus-visible': {
@@ -195,14 +234,14 @@ export default function LearnChapterPage() {
           {displayTitle}
         </Typography>
 
-        <Tooltip title={next ? `Next: ${next.pageTitle || next.title}` : 'No next chapter'}>
+        <Tooltip title={next ? `Next: ${nextLabel}` : 'No next chapter'}>
           <span>
             <IconButton
               size="small"
               disabled={!next}
               onClick={() => goChapter(next?.slug)}
               aria-label={
-                next ? `Next chapter: ${next.pageTitle || next.title}` : 'No next chapter'
+                next ? `Next chapter: ${nextLabel}` : 'No next chapter'
               }
               sx={{
                 '&:focus-visible': {
@@ -240,7 +279,12 @@ export default function LearnChapterPage() {
         }}
       >
         {isMdUp && (
-          <ResizableRail storageKey="hula_learn_toc_width">
+          <ResizableRail
+            storageKey="hula_learn_toc_width"
+            collapsible
+            collapsed={tocCollapsed}
+            onCollapsedChange={setTocCollapsed}
+          >
             <TextbookTocNav
               variant="rail"
               activeSlug={slug}

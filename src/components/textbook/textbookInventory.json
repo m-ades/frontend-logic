@@ -1,0 +1,594 @@
+{
+  "generatedAt": "2026-08-02T06:55:45.050Z",
+  "assetBase": "/textbook",
+  "files": [
+    {
+      "slug": "A1",
+      "file": "A1.html",
+      "kind": "appendix",
+      "displayTitle": "Appendix A Symbolic notation"
+    },
+    {
+      "slug": "A11",
+      "file": "A11.html",
+      "kind": "appendix",
+      "displayTitle": "Solutions to Chapter 11 Complete truth tables"
+    },
+    {
+      "slug": "A12",
+      "file": "A12.html",
+      "kind": "appendix",
+      "displayTitle": "Solutions to Chapter 12 Semantic concepts"
+    },
+    {
+      "slug": "A14",
+      "file": "A14.html",
+      "kind": "appendix",
+      "displayTitle": "Solutions to Chapter 14 Truth table shortcuts"
+    },
+    {
+      "slug": "A15",
+      "file": "A15.html",
+      "kind": "appendix",
+      "displayTitle": "Solutions to Chapter 15 Partial truth tables"
+    },
+    {
+      "slug": "A17",
+      "file": "A17.html",
+      "kind": "appendix",
+      "displayTitle": "Solutions to Chapter 17 Basic rules for TFL"
+    },
+    {
+      "slug": "A19",
+      "file": "A19.html",
+      "kind": "appendix",
+      "displayTitle": "Solutions to Chapter 19 Additional rules for TFL"
+    },
+    {
+      "slug": "A1a",
+      "file": "A1a.html",
+      "kind": "appendix",
+      "displayTitle": "Solutions to Chapter 1 Arguments"
+    },
+    {
+      "slug": "A2",
+      "file": "A2.html",
+      "kind": "appendix",
+      "displayTitle": "Appendix B Alternative proof systems"
+    },
+    {
+      "slug": "A20",
+      "file": "A20.html",
+      "kind": "appendix",
+      "displayTitle": "Solutions to Chapter 20 Proof-theoretic concepts"
+    },
+    {
+      "slug": "A21",
+      "file": "A21.html",
+      "kind": "appendix",
+      "displayTitle": "Solutions to Chapter 21 Derived rules"
+    },
+    {
+      "slug": "A22",
+      "file": "A22.html",
+      "kind": "appendix",
+      "displayTitle": "Solutions to Chapter 22 Soundness and completeness"
+    },
+    {
+      "slug": "A24",
+      "file": "A24.html",
+      "kind": "appendix",
+      "displayTitle": "Solutions to Chapter 24 Sentences with one quantifier"
+    },
+    {
+      "slug": "A25",
+      "file": "A25.html",
+      "kind": "appendix",
+      "displayTitle": "Solutions to Chapter 25 Multiple generality"
+    },
+    {
+      "slug": "A26",
+      "file": "A26.html",
+      "kind": "appendix",
+      "displayTitle": "Solutions to Chapter 26 Identity"
+    },
+    {
+      "slug": "A27",
+      "file": "A27.html",
+      "kind": "appendix",
+      "displayTitle": "Solutions to Chapter 27 Sentences of FOL"
+    },
+    {
+      "slug": "A28",
+      "file": "A28.html",
+      "kind": "appendix",
+      "displayTitle": "Solutions to Chapter 28 Definite descriptions"
+    },
+    {
+      "slug": "A29",
+      "file": "A29.html",
+      "kind": "appendix",
+      "displayTitle": "Solutions to Chapter 29 Ambiguity"
+    },
+    {
+      "slug": "A2a",
+      "file": "A2a.html",
+      "kind": "appendix",
+      "displayTitle": "Solutions to Chapter 2 The scope of logic"
+    },
+    {
+      "slug": "A3",
+      "file": "A3.html",
+      "kind": "appendix",
+      "displayTitle": "Appendix C Quick reference"
+    },
+    {
+      "slug": "A31",
+      "file": "A31.html",
+      "kind": "appendix",
+      "displayTitle": "Solutions to Chapter 31 Truth in FOL"
+    },
+    {
+      "slug": "A32",
+      "file": "A32.html",
+      "kind": "appendix",
+      "displayTitle": "Solutions to Chapter 32 Semantic concepts"
+    },
+    {
+      "slug": "A33",
+      "file": "A33.html",
+      "kind": "appendix",
+      "displayTitle": "Solutions to Chapter 33 Using Interpretations"
+    },
+    {
+      "slug": "A35",
+      "file": "A35.html",
+      "kind": "appendix",
+      "displayTitle": "Solutions to Chapter 35 Properties of relations"
+    },
+    {
+      "slug": "A36",
+      "file": "A36.html",
+      "kind": "appendix",
+      "displayTitle": "Solutions to Chapter 36 Basic rules for FOL"
+    },
+    {
+      "slug": "A38",
+      "file": "A38.html",
+      "kind": "appendix",
+      "displayTitle": "Solutions to Chapter 38 Conversion of quantifiers"
+    },
+    {
+      "slug": "A39",
+      "file": "A39.html",
+      "kind": "appendix",
+      "displayTitle": "Solutions to Chapter 39 Rules for identity"
+    },
+    {
+      "slug": "A3a",
+      "file": "A3a.html",
+      "kind": "appendix",
+      "displayTitle": "Solutions to Chapter 3 Other logical notions"
+    },
+    {
+      "slug": "A4",
+      "file": "A4.html",
+      "kind": "appendix",
+      "displayTitle": "Appendix D Notes on accessibility"
+    },
+    {
+      "slug": "A40",
+      "file": "A40.html",
+      "kind": "appendix",
+      "displayTitle": "Solutions to Chapter 40 Derived rules"
+    },
+    {
+      "slug": "A43",
+      "file": "A43.html",
+      "kind": "appendix",
+      "displayTitle": "Solutions to Chapter 43 Natural deduction for ML"
+    },
+    {
+      "slug": "A44",
+      "file": "A44.html",
+      "kind": "appendix",
+      "displayTitle": "Solutions to Chapter 44 Semantics for ML"
+    },
+    {
+      "slug": "A45",
+      "file": "A45.html",
+      "kind": "appendix",
+      "displayTitle": "Solutions to Chapter 45 Normal forms"
+    },
+    {
+      "slug": "A47",
+      "file": "A47.html",
+      "kind": "appendix",
+      "displayTitle": "Solutions to Chapter 47 Proving equivalences"
+    },
+    {
+      "slug": "A5",
+      "file": "A5.html",
+      "kind": "appendix",
+      "displayTitle": "Solutions to Chapter 5 Connectives"
+    },
+    {
+      "slug": "A6",
+      "file": "A6.html",
+      "kind": "appendix",
+      "displayTitle": "Solutions to Chapter 6 Sentences of TFL"
+    },
+    {
+      "slug": "A7",
+      "file": "A7.html",
+      "kind": "appendix",
+      "displayTitle": "Solutions to Chapter 7 Ambiguity"
+    },
+    {
+      "slug": "Ch1",
+      "file": "Ch1.html",
+      "kind": "chapter",
+      "displayTitle": "Arguments"
+    },
+    {
+      "slug": "Ch10",
+      "file": "Ch10.html",
+      "kind": "chapter",
+      "displayTitle": "Truth-functional connectives"
+    },
+    {
+      "slug": "Ch11",
+      "file": "Ch11.html",
+      "kind": "chapter",
+      "displayTitle": "Complete truth tables"
+    },
+    {
+      "slug": "Ch12",
+      "file": "Ch12.html",
+      "kind": "chapter",
+      "displayTitle": "Semantic concepts"
+    },
+    {
+      "slug": "Ch13",
+      "file": "Ch13.html",
+      "kind": "chapter",
+      "displayTitle": "Limitations of TFL"
+    },
+    {
+      "slug": "Ch14",
+      "file": "Ch14.html",
+      "kind": "chapter",
+      "displayTitle": "Truth table shortcuts"
+    },
+    {
+      "slug": "Ch15",
+      "file": "Ch15.html",
+      "kind": "chapter",
+      "displayTitle": "Partial truth tables"
+    },
+    {
+      "slug": "Ch16",
+      "file": "Ch16.html",
+      "kind": "chapter",
+      "displayTitle": "The very idea of natural deduction"
+    },
+    {
+      "slug": "Ch17",
+      "file": "Ch17.html",
+      "kind": "chapter",
+      "displayTitle": "Basic rules for TFL"
+    },
+    {
+      "slug": "Ch18",
+      "file": "Ch18.html",
+      "kind": "chapter",
+      "displayTitle": "Constructing proofs"
+    },
+    {
+      "slug": "Ch19",
+      "file": "Ch19.html",
+      "kind": "chapter",
+      "displayTitle": "Additional rules for TFL"
+    },
+    {
+      "slug": "Ch2",
+      "file": "Ch2.html",
+      "kind": "chapter",
+      "displayTitle": "The scope of logic"
+    },
+    {
+      "slug": "Ch20",
+      "file": "Ch20.html",
+      "kind": "chapter",
+      "displayTitle": "Proof-theoretic concepts"
+    },
+    {
+      "slug": "Ch21",
+      "file": "Ch21.html",
+      "kind": "chapter",
+      "displayTitle": "Derived rules"
+    },
+    {
+      "slug": "Ch22",
+      "file": "Ch22.html",
+      "kind": "chapter",
+      "displayTitle": "Soundness and completeness"
+    },
+    {
+      "slug": "Ch23",
+      "file": "Ch23.html",
+      "kind": "chapter",
+      "displayTitle": "Building blocks of FOL"
+    },
+    {
+      "slug": "Ch24",
+      "file": "Ch24.html",
+      "kind": "chapter",
+      "displayTitle": "Sentences with one quantifier"
+    },
+    {
+      "slug": "Ch25",
+      "file": "Ch25.html",
+      "kind": "chapter",
+      "displayTitle": "Multiple generality"
+    },
+    {
+      "slug": "Ch26",
+      "file": "Ch26.html",
+      "kind": "chapter",
+      "displayTitle": "Identity"
+    },
+    {
+      "slug": "Ch27",
+      "file": "Ch27.html",
+      "kind": "chapter",
+      "displayTitle": "Sentences of FOL"
+    },
+    {
+      "slug": "Ch28",
+      "file": "Ch28.html",
+      "kind": "chapter",
+      "displayTitle": "Definite descriptions"
+    },
+    {
+      "slug": "Ch29",
+      "file": "Ch29.html",
+      "kind": "chapter",
+      "displayTitle": "Ambiguity"
+    },
+    {
+      "slug": "Ch3",
+      "file": "Ch3.html",
+      "kind": "chapter",
+      "displayTitle": "Other logical notions"
+    },
+    {
+      "slug": "Ch30",
+      "file": "Ch30.html",
+      "kind": "chapter",
+      "displayTitle": "Extensionality"
+    },
+    {
+      "slug": "Ch31",
+      "file": "Ch31.html",
+      "kind": "chapter",
+      "displayTitle": "Truth in FOL"
+    },
+    {
+      "slug": "Ch32",
+      "file": "Ch32.html",
+      "kind": "chapter",
+      "displayTitle": "Semantic concepts"
+    },
+    {
+      "slug": "Ch33",
+      "file": "Ch33.html",
+      "kind": "chapter",
+      "displayTitle": "Using interpretations"
+    },
+    {
+      "slug": "Ch34",
+      "file": "Ch34.html",
+      "kind": "chapter",
+      "displayTitle": "Reasoning about interpretations"
+    },
+    {
+      "slug": "Ch35",
+      "file": "Ch35.html",
+      "kind": "chapter",
+      "displayTitle": "Properties of relations"
+    },
+    {
+      "slug": "Ch36",
+      "file": "Ch36.html",
+      "kind": "chapter",
+      "displayTitle": "Basic rules for FOL"
+    },
+    {
+      "slug": "Ch37",
+      "file": "Ch37.html",
+      "kind": "chapter",
+      "displayTitle": "Proofs with quantifiers"
+    },
+    {
+      "slug": "Ch38",
+      "file": "Ch38.html",
+      "kind": "chapter",
+      "displayTitle": "Conversion of quantifiers"
+    },
+    {
+      "slug": "Ch39",
+      "file": "Ch39.html",
+      "kind": "chapter",
+      "displayTitle": "Rules for identity"
+    },
+    {
+      "slug": "Ch4",
+      "file": "Ch4.html",
+      "kind": "chapter",
+      "displayTitle": "First steps to symbolization"
+    },
+    {
+      "slug": "Ch40",
+      "file": "Ch40.html",
+      "kind": "chapter",
+      "displayTitle": "Derived rules"
+    },
+    {
+      "slug": "Ch41",
+      "file": "Ch41.html",
+      "kind": "chapter",
+      "displayTitle": "Proofs and semantics"
+    },
+    {
+      "slug": "Ch42",
+      "file": "Ch42.html",
+      "kind": "chapter",
+      "displayTitle": "Introducing modal logic"
+    },
+    {
+      "slug": "Ch43",
+      "file": "Ch43.html",
+      "kind": "chapter",
+      "displayTitle": "Natural deduction for ML"
+    },
+    {
+      "slug": "Ch44",
+      "file": "Ch44.html",
+      "kind": "chapter",
+      "displayTitle": "Semantics for ML"
+    },
+    {
+      "slug": "Ch45",
+      "file": "Ch45.html",
+      "kind": "chapter",
+      "displayTitle": "Normal forms"
+    },
+    {
+      "slug": "Ch46",
+      "file": "Ch46.html",
+      "kind": "chapter",
+      "displayTitle": "Functional completeness"
+    },
+    {
+      "slug": "Ch47",
+      "file": "Ch47.html",
+      "kind": "chapter",
+      "displayTitle": "Proving equivalences"
+    },
+    {
+      "slug": "Ch48",
+      "file": "Ch48.html",
+      "kind": "chapter",
+      "displayTitle": "Soundness"
+    },
+    {
+      "slug": "Ch5",
+      "file": "Ch5.html",
+      "kind": "chapter",
+      "displayTitle": "Connectives"
+    },
+    {
+      "slug": "Ch6",
+      "file": "Ch6.html",
+      "kind": "chapter",
+      "displayTitle": "Sentences of TFL"
+    },
+    {
+      "slug": "Ch7",
+      "file": "Ch7.html",
+      "kind": "chapter",
+      "displayTitle": "Ambiguity"
+    },
+    {
+      "slug": "Ch8",
+      "file": "Ch8.html",
+      "kind": "chapter",
+      "displayTitle": "Use and mention"
+    },
+    {
+      "slug": "Ch9",
+      "file": "Ch9.html",
+      "kind": "chapter",
+      "displayTitle": "Characteristic truth tables"
+    },
+    {
+      "slug": "Chx1",
+      "file": "Chx1.html",
+      "kind": "preface",
+      "displayTitle": "Preface"
+    },
+    {
+      "slug": "Pt1",
+      "file": "Pt1.html",
+      "kind": "part",
+      "displayTitle": "Key notions of logic"
+    },
+    {
+      "slug": "Pt2",
+      "file": "Pt2.html",
+      "kind": "part",
+      "displayTitle": "Truth-functional logic"
+    },
+    {
+      "slug": "Pt3",
+      "file": "Pt3.html",
+      "kind": "part",
+      "displayTitle": "Truth tables"
+    },
+    {
+      "slug": "Pt4",
+      "file": "Pt4.html",
+      "kind": "part",
+      "displayTitle": "Natural deduction for TFL"
+    },
+    {
+      "slug": "Pt5",
+      "file": "Pt5.html",
+      "kind": "part",
+      "displayTitle": "First-order logic"
+    },
+    {
+      "slug": "Pt6",
+      "file": "Pt6.html",
+      "kind": "part",
+      "displayTitle": "Interpretations"
+    },
+    {
+      "slug": "Pt7",
+      "file": "Pt7.html",
+      "kind": "part",
+      "displayTitle": "Natural deduction for FOL"
+    },
+    {
+      "slug": "Pt8",
+      "file": "Pt8.html",
+      "kind": "part",
+      "displayTitle": "Modal logic"
+    },
+    {
+      "slug": "Pt9",
+      "file": "Pt9.html",
+      "kind": "part",
+      "displayTitle": "Metatheory"
+    },
+    {
+      "slug": "Ptx1",
+      "file": "Ptx1.html",
+      "kind": "backmatter",
+      "displayTitle": "Appendices"
+    },
+    {
+      "slug": "Ptx2",
+      "file": "Ptx2.html",
+      "kind": "backmatter",
+      "displayTitle": "Solutions to selected exercices"
+    },
+    {
+      "slug": "index",
+      "file": "index.html",
+      "kind": "cover",
+      "displayTitle": "Cover & contents"
+    }
+  ]
+}

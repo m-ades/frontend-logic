@@ -1,7 +1,7 @@
 import {
   Dashboard as DashboardIcon,
   MenuBook as GradebookIcon,
-  Link as TextbookLinksIcon,
+  AutoStories as TextbookIcon,
   ContactSupport as ContactIcon,
   AdminPanelSettings as ControlsIcon,
   Assignment as AssignmentIcon,
@@ -30,9 +30,9 @@ export default [
   },
   {
     id: 3,
-    label: "Textbook Links",
+    label: "Textbook",
     link: "/instructor/textbook-links",
-    icon: <TextbookLinksIcon />,
+    icon: <TextbookIcon />,
   },
   {
     id: 4,

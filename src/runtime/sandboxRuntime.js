@@ -20,7 +20,7 @@ const instructorSectionLabels = {
   roster: "Roster",
   profile: "Profile & Preferences",
   practice: "Practice",
-  "textbook-links": "Textbook Links",
+  "textbook-links": "Textbook",
 };
 
 export function getRoutePrefix(routeKind) {

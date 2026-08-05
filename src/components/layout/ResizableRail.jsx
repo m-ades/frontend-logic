@@ -1,12 +1,43 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { Box } from '@mui/material'
+import { Box, IconButton, Tooltip } from '@mui/material'
+import {
+  ChevronLeft as CollapseIcon,
+  ChevronRight as ExpandIcon,
+} from '@mui/icons-material'
 
 const MIN_WIDTH = 180
 const MAX_WIDTH = 420
 const DEFAULT_WIDTH = 240
+const COLLAPSED_WIDTH = 36
+
+function readNumber(key, fallback, min, max) {
+  if (!key || typeof window === 'undefined') return fallback
+  try {
+    const raw = window.localStorage.getItem(key)
+    const value = Number(raw)
+    if (Number.isFinite(value)) {
+      return Math.min(max, Math.max(min, value))
+    }
+  } catch {
+    // ignore
+  }
+  return fallback
+}
+
+function readBool(key, fallback = false) {
+  if (!key || typeof window === 'undefined') return fallback
+  try {
+    const raw = window.localStorage.getItem(key)
+    if (raw === 'true') return true
+    if (raw === 'false') return false
+  } catch {
+    // ignore
+  }
+  return fallback
+}
 
 /**
- * Left rail with a drag handle on its right edge (TOC, filters, etc.).
+ * Left rail with resize handle; optionally collapsible to a thin expand strip.
  */
 export default function ResizableRail({
   children,
@@ -14,24 +45,35 @@ export default function ResizableRail({
   minWidth = MIN_WIDTH,
   maxWidth = MAX_WIDTH,
   storageKey = null,
+  collapsible = false,
+  collapsedStorageKey = null,
+  collapsed: collapsedProp = null,
+  onCollapsedChange,
+  collapseLabel = 'Collapse table of contents',
+  expandLabel = 'Expand table of contents',
 }) {
-  const readStored = () => {
-    if (!storageKey || typeof window === 'undefined') return defaultWidth
-    try {
-      const raw = window.localStorage.getItem(storageKey)
-      const value = Number(raw)
-      if (Number.isFinite(value)) {
-        return Math.min(maxWidth, Math.max(minWidth, value))
-      }
-    } catch {
-      // ignore
-    }
-    return defaultWidth
-  }
-
-  const [width, setWidth] = useState(readStored)
+  const collapseKey = collapsedStorageKey || (storageKey ? `${storageKey}_collapsed` : null)
+  const [width, setWidth] = useState(() =>
+    readNumber(storageKey, defaultWidth, minWidth, maxWidth),
+  )
+  const [internalCollapsed, setInternalCollapsed] = useState(() =>
+    readBool(collapseKey, false),
+  )
   const draggingRef = useRef(false)
   const railRef = useRef(null)
+
+  const collapsed =
+    typeof collapsedProp === 'boolean' ? collapsedProp : internalCollapsed
+
+  const setCollapsed = useCallback(
+    (next) => {
+      if (typeof collapsedProp !== 'boolean') {
+        setInternalCollapsed(next)
+      }
+      onCollapsedChange?.(next)
+    },
+    [collapsedProp, onCollapsedChange],
+  )
 
   useEffect(() => {
     if (!storageKey || typeof window === 'undefined') return
@@ -42,6 +84,15 @@ export default function ResizableRail({
     }
   }, [width, storageKey])
 
+  useEffect(() => {
+    if (!collapseKey || typeof window === 'undefined') return
+    try {
+      window.localStorage.setItem(collapseKey, String(collapsed))
+    } catch {
+      // ignore
+    }
+  }, [collapsed, collapseKey])
+
   const clamp = useCallback(
     (value) => Math.min(maxWidth, Math.max(minWidth, value)),
     [minWidth, maxWidth],
@@ -49,7 +100,7 @@ export default function ResizableRail({
 
   useEffect(() => {
     const onPointerMove = (event) => {
-      if (!draggingRef.current || !railRef.current) return
+      if (!draggingRef.current || !railRef.current || collapsed) return
       event.preventDefault()
       const left = railRef.current.getBoundingClientRect().left
       setWidth(clamp(event.clientX - left))
@@ -70,9 +121,10 @@ export default function ResizableRail({
       window.removeEventListener('pointerup', onPointerUp)
       window.removeEventListener('pointercancel', onPointerUp)
     }
-  }, [clamp])
+  }, [clamp, collapsed])
 
   const startDrag = (event) => {
+    if (collapsed) return
     event.preventDefault()
     draggingRef.current = true
     document.body.style.cursor = 'col-resize'
@@ -80,6 +132,7 @@ export default function ResizableRail({
   }
 
   const onKeyDown = (event) => {
+    if (collapsed) return
     const step = event.shiftKey ? 24 : 12
     if (event.key === 'ArrowLeft') {
       event.preventDefault()
@@ -96,6 +149,43 @@ export default function ResizableRail({
     }
   }
 
+  if (collapsible && collapsed) {
+    return (
+      <Box
+        sx={{
+          width: COLLAPSED_WIDTH,
+          flexShrink: 0,
+          minHeight: 0,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          borderRight: 1,
+          borderColor: 'divider',
+          bgcolor: 'background.paper',
+          py: 1,
+        }}
+      >
+        <Tooltip title={expandLabel}>
+          <IconButton
+            size="small"
+            onClick={() => setCollapsed(false)}
+            aria-label={expandLabel}
+            aria-expanded={false}
+            sx={{
+              '&:focus-visible': {
+                outline: '2px solid',
+                outlineColor: 'primary.main',
+                outlineOffset: 2,
+              },
+            }}
+          >
+            <ExpandIcon fontSize="small" />
+          </IconButton>
+        </Tooltip>
+      </Box>
+    )
+  }
+
   return (
     <Box
       ref={railRef}
@@ -107,8 +197,46 @@ export default function ResizableRail({
         position: 'relative',
       }}
     >
-      <Box sx={{ flexGrow: 1, minWidth: 0, minHeight: 0, overflow: 'hidden' }}>
-        {children}
+      <Box
+        sx={{
+          flexGrow: 1,
+          minWidth: 0,
+          minHeight: 0,
+          overflow: 'hidden',
+          display: 'flex',
+          flexDirection: 'column',
+        }}
+      >
+        {collapsible && (
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'flex-end',
+              px: 0.5,
+              pt: 0.5,
+              flexShrink: 0,
+            }}
+          >
+            <Tooltip title={collapseLabel}>
+              <IconButton
+                size="small"
+                onClick={() => setCollapsed(true)}
+                aria-label={collapseLabel}
+                aria-expanded
+                sx={{
+                  '&:focus-visible': {
+                    outline: '2px solid',
+                    outlineColor: 'primary.main',
+                    outlineOffset: 2,
+                  },
+                }}
+              >
+                <CollapseIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
+          </Box>
+        )}
+        <Box sx={{ flexGrow: 1, minHeight: 0, overflow: 'hidden' }}>{children}</Box>
       </Box>
       <Box
         role="separator"

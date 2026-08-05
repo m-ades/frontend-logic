@@ -58,7 +58,7 @@ export default function AssignmentWorkspace({
             </Stack>
             <Typography sx={{ fontSize: '0.9375rem', color: 'text.secondary', lineHeight: 1.6 }}>
               Instructors can connect forall x chapters to HuLA practice sets from
-              <strong> Textbook Links</strong>. Until then, use this pane as reading
+              <strong> Textbook</strong>. Until then, use this pane as reading
               space and browse chapters from Learn.
             </Typography>
             {(learnPath || practicePath) && (

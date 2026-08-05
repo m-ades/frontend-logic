@@ -14,7 +14,7 @@ import {
   ExpandMore,
   MenuBook as BookIcon,
 } from '@mui/icons-material'
-import { buildTextbookTocTree } from '@/components/textbook/textbookCatalog.js'
+import { useTextbookStructure } from '@/hooks/useTextbookStructure.js'
 
 function TocList({
   tree,
@@ -208,8 +208,10 @@ export default function TextbookTocNav({
   drawerOpen = false,
   onDrawerClose,
   title = 'Contents',
+  tree: treeProp,
 }) {
-  const tree = useMemo(() => buildTextbookTocTree(), [])
+  const { numberedTree } = useTextbookStructure()
+  const tree = treeProp || numberedTree
   const linkedSlugSet = useMemo(() => new Set(linkedSlugs), [linkedSlugs])
 
   const header = (
