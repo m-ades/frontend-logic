@@ -1,6 +1,9 @@
 /**
  * Course-scoped textbook structure: order, hierarchy, display titles.
  * Slugs stay tied to HTML filenames; numbering is computed at render time.
+ *
+ * Part / backmatter nodes are TOC dividers only (navigable: false). BookML may
+ * still ship Pt*.html on disk, but HuLA never treats them as Learn destinations.
  */
 
 import textbookInventory from './textbookInventory.json'
@@ -14,8 +17,20 @@ const ROMAN = [
   'XI', 'XII', 'XIII', 'XIV', 'XV', 'XVI', 'XVII', 'XVIII', 'XIX', 'XX',
 ]
 
+const DIVIDER_KINDS = new Set(['part', 'backmatter'])
+
 export function createStructureNodeId() {
   return `tn-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`
+}
+
+export function isDividerKind(kind) {
+  return DIVIDER_KINDS.has(kind)
+}
+
+export function isNavigableNode(node) {
+  if (!node) return false
+  if (typeof node.navigable === 'boolean') return node.navigable
+  return !isDividerKind(node.kind)
 }
 
 function stripNumberPrefix(title) {
@@ -59,17 +74,55 @@ function writeAll(map, storageScope = 'local') {
   }
 }
 
+function defaultNavigable(kind, explicit) {
+  if (typeof explicit === 'boolean') return explicit
+  return !isDividerKind(kind)
+}
+
+function defaultFile(raw, kind) {
+  if (raw.file === null || raw.file === '') return null
+  if (raw.file) return String(raw.file)
+  if (!raw.slug) return isDividerKind(kind) ? null : 'unknown.html'
+  // Keep BookML part filenames for sync identity even though they are not navigable.
+  return `${raw.slug}.html`
+}
+
 export function normalizeStructureNode(raw = {}) {
+  const kind = raw.kind || 'chapter'
+  const navigable = defaultNavigable(kind, raw.navigable)
   return {
     id: String(raw.id || createStructureNodeId()),
     slug: String(raw.slug || ''),
-    file: String(raw.file || `${raw.slug || 'unknown'}.html`),
-    kind: raw.kind || 'chapter',
+    file: defaultFile(raw, kind),
+    kind,
     displayTitle: stripNumberPrefix(raw.displayTitle || raw.title || raw.pageTitle || raw.slug || ''),
     parentId: raw.parentId ?? null,
     sortIndex: Number.isFinite(Number(raw.sortIndex)) ? Number(raw.sortIndex) : 0,
     hidden: Boolean(raw.hidden),
+    navigable,
   }
+}
+
+/**
+ * Create a HuLA-only section divider (no HTML file).
+ */
+export function createSectionDivider({
+  displayTitle = 'New section',
+  kind = 'part',
+  sortIndex = 0,
+} = {}) {
+  const id = createStructureNodeId()
+  return normalizeStructureNode({
+    id,
+    slug: `section-${id.replace(/^tn-/, '')}`,
+    file: null,
+    kind: isDividerKind(kind) ? kind : 'part',
+    displayTitle,
+    parentId: null,
+    sortIndex,
+    hidden: false,
+    navigable: false,
+  })
 }
 
 /**
@@ -90,6 +143,7 @@ export function seedStructureFromBundle() {
       parentId,
       sortIndex,
       hidden: false,
+      navigable: !isDividerKind(item.kind),
     })
     nodes.push(node)
     return node
@@ -182,12 +236,14 @@ export function treeToNodes(tree = [], parentId = null) {
   return nodes
 }
 
-export function readingOrder(tree = [], { includeHidden = false } = {}) {
+export function readingOrder(tree = [], { includeHidden = false, navigableOnly = true } = {}) {
   const order = []
   const walk = (nodes) => {
     for (const node of nodes) {
       if (!includeHidden && node.hidden) continue
-      order.push(node)
+      if (!navigableOnly || isNavigableNode(node)) {
+        order.push(node)
+      }
       if (node.children?.length) walk(node.children)
     }
   }
@@ -212,7 +268,7 @@ export function assignDynamicNumbers(tree = [], { includeHidden = false } = {}) 
     let number = null
     let label = node.displayTitle
 
-    if (node.kind === 'part' || node.kind === 'backmatter') {
+    if (isDividerKind(node.kind)) {
       if (!node.parentId) {
         partCount += 1
         number = ROMAN[partCount] || String(partCount)
@@ -241,7 +297,7 @@ export function assignDynamicNumbers(tree = [], { includeHidden = false } = {}) 
 
 export function getNeighborsFromStructure(nodes, slug) {
   const tree = nodesToTree(nodes, { includeHidden: false })
-  const order = readingOrder(tree, { includeHidden: false })
+  const order = readingOrder(tree, { includeHidden: false, navigableOnly: true })
   const index = order.findIndex((node) => node.slug === slug)
   if (index < 0) {
     return { prev: null, next: null, entry: null }
@@ -258,9 +314,44 @@ export function findStructureNode(nodes, slug) {
   return (nodes || []).find((node) => node.slug === slug) || null
 }
 
+function firstNavigableDescendant(node) {
+  if (!node) return null
+  for (const child of node.children || []) {
+    if (isNavigableNode(child) && !child.hidden) return child
+    const nested = firstNavigableDescendant(child)
+    if (nested) return nested
+  }
+  return null
+}
+
+function findTreeNodeBySlug(tree, slug) {
+  for (const node of tree || []) {
+    if (node.slug === slug) return node
+    const nested = findTreeNodeBySlug(node.children || [], slug)
+    if (nested) return nested
+  }
+  return null
+}
+
+/**
+ * Resolve a route slug to a navigable chapter.
+ * Dividers (parts) map to their first navigable child; returns null → Learn hub.
+ */
+export function resolveNavigableSlug(nodes, slug) {
+  if (!slug) return null
+  const tree = nodesToTree(nodes, { includeHidden: false })
+  const node = findTreeNodeBySlug(tree, slug) || findStructureNode(nodes, slug)
+  if (!node) return null
+  if (isNavigableNode(node) && !node.hidden) return node.slug
+  const child = firstNavigableDescendant(
+    findTreeNodeBySlug(tree, slug) || { ...node, children: [] },
+  )
+  return child?.slug ?? null
+}
+
 /**
  * Merge disk inventory into existing structure.
- * Keeps titles/order for known slugs; appends new files at root; flags missing.
+ * Keeps titles/order for known slugs; appends new files; preserves custom dividers.
  */
 export function mergeInventory(existingNodes = [], inventoryFiles = textbookInventory.files) {
   const existing = existingNodes.map(normalizeStructureNode)
@@ -268,8 +359,19 @@ export function mergeInventory(existingNodes = [], inventoryFiles = textbookInve
   const inventorySlugs = new Set((inventoryFiles || []).map((file) => file.slug))
 
   const next = existing
-    .filter((node) => inventorySlugs.has(node.slug))
-    .map((node) => ({ ...node }))
+    .filter((node) => {
+      if (inventorySlugs.has(node.slug)) return true
+      // Preserve instructor-created / non-inventory dividers
+      if (isDividerKind(node.kind) && !isNavigableNode(node)) return true
+      return false
+    })
+    .map((node) => {
+      // Never promote dividers to navigable via stale stored JSON
+      if (isDividerKind(node.kind)) {
+        return normalizeStructureNode({ ...node, navigable: false })
+      }
+      return node
+    })
 
   const present = new Set(next.map((node) => node.slug))
   let appendIndex = next.filter((node) => !node.parentId).length
@@ -286,11 +388,11 @@ export function mergeInventory(existingNodes = [], inventoryFiles = textbookInve
         parentId: null,
         sortIndex: appendIndex++,
         hidden: false,
+        navigable: !isDividerKind(file.kind),
       }),
     )
   }
 
-  // Re-pack sortIndex among siblings
   const byParent = new Map()
   for (const node of next) {
     const key = node.parentId || '__root__'
@@ -305,12 +407,16 @@ export function mergeInventory(existingNodes = [], inventoryFiles = textbookInve
       })
   }
 
-  const missing = existing.filter((node) => !inventorySlugs.has(node.slug))
+  const missing = existing.filter(
+    (node) =>
+      !inventorySlugs.has(node.slug) &&
+      !(isDividerKind(node.kind) && !isNavigableNode(node)),
+  )
   return { nodes: next, missing, added: (inventoryFiles || []).filter((f) => !bySlug.has(f.slug)) }
 }
 
 export function canHaveChildren(kind) {
-  return kind === 'part' || kind === 'backmatter'
+  return isDividerKind(kind)
 }
 
 export function canBeChildOf(childKind, parentKind) {
@@ -330,6 +436,10 @@ export function listNumberedFlat(nodes, { includeHidden = true } = {}) {
   }
   walk(tree)
   return flat
+}
+
+export function listNavigableNumberedFlat(nodes, { includeHidden = false } = {}) {
+  return listNumberedFlat(nodes, { includeHidden }).filter(isNavigableNode)
 }
 
 export function getBundleDefaultSlug() {

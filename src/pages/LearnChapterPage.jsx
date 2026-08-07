@@ -44,7 +44,24 @@ export default function LearnChapterPage() {
   const { learnPath, learnChapterPath } = useAppRuntime()
   const slug = normalizeTextbookSlug(chapter)
   const entry = getTextbookEntry(slug)
-  const { getNeighbors, studentFlat } = useTextbookStructure()
+  const { getNeighbors, studentFlat, resolveSlug, nodes } = useTextbookStructure()
+
+  // Part / section dividers are not readable pages — bounce to first chapter or hub.
+  useEffect(() => {
+    const target = resolveSlug(slug)
+    if (target === slug) return
+    if (target) {
+      const path = learnChapterPath?.(target) || `${learnPath || '/student/learn'}/${target}`
+      navigate(path, { replace: true })
+      return
+    }
+    // Known divider with no children, or empty resolve → hub
+    const node = nodes.find((item) => item.slug === slug)
+    if (node && node.navigable === false) {
+      navigate(learnPath || '/student/learn', { replace: true })
+    }
+  }, [slug, resolveSlug, nodes, navigate, learnChapterPath, learnPath])
+
   const neighbors = useMemo(() => getNeighbors(slug), [getNeighbors, slug])
   const prev = neighbors.prev
   const next = neighbors.next
@@ -100,9 +117,10 @@ export default function LearnChapterPage() {
   const goChapter = useCallback(
     (targetSlug) => {
       if (!targetSlug) return
-      navigate(`${linkBase}/${targetSlug}`)
+      const resolved = resolveSlug(targetSlug) || targetSlug
+      navigate(`${linkBase}/${resolved}`)
     },
-    [navigate, linkBase],
+    [navigate, linkBase, resolveSlug],
   )
 
   const handleMetaChange = useCallback((meta) => {
@@ -121,6 +139,7 @@ export default function LearnChapterPage() {
       linkBase={linkBase}
       linkedPractices={[]}
       onMetaChange={handleMetaChange}
+      resolveInternalSlug={resolveSlug}
     />
   )
 

@@ -5,14 +5,17 @@ import { fetchJson } from '@/utils/api.js'
 import {
   assignDynamicNumbers,
   clearCourseStructure,
+  createSectionDivider,
   getCourseStructureNodes,
   getNeighborsFromStructure,
   getTextbookInventory,
+  listNavigableNumberedFlat,
   listNumberedFlat,
   mergeInventory,
   nodesToTree,
   normalizeStructureNode,
   readCourseStructure,
+  resolveNavigableSlug,
   seedStructureFromBundle,
   writeCourseStructure,
 } from '@/components/textbook/textbookStructure.js'
@@ -134,6 +137,10 @@ export function useTextbookStructure() {
     () => listNumberedFlat(nodes, { includeHidden: false }),
     [nodes],
   )
+  const navigableFlat = useMemo(
+    () => listNavigableNumberedFlat(nodes, { includeHidden: false }),
+    [nodes],
+  )
 
   const saveStructure = useCallback(
     async (nextNodes) => {
@@ -173,6 +180,20 @@ export function useTextbookStructure() {
     [nodes],
   )
 
+  const resolveSlug = useCallback(
+    (slug) => resolveNavigableSlug(nodes, slug),
+    [nodes],
+  )
+
+  const addSection = useCallback(
+    async (displayTitle = 'New section') => {
+      const rootCount = nodes.filter((node) => !node.parentId).length
+      const section = createSectionDivider({ displayTitle, sortIndex: rootCount })
+      return saveStructure([...nodes, section])
+    },
+    [nodes, saveStructure],
+  )
+
   return {
     courseId,
     storageScope,
@@ -185,12 +206,15 @@ export function useTextbookStructure() {
     numberedTree,
     numberedFlat,
     studentFlat,
+    navigableFlat,
     hasOverrides,
     usingDefaults: !hasOverrides,
     saveStructure,
     resetToBundle,
     syncFiles,
     getNeighbors,
+    resolveSlug,
+    addSection,
     seedDefaults: seedStructureFromBundle,
   }
 }

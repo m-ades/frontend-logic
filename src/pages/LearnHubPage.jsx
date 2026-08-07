@@ -19,6 +19,7 @@ import { useTextbookPracticeLinks } from '@/hooks/useTextbookPracticeLinks.js'
 import { useTextbookStructure } from '@/hooks/useTextbookStructure.js'
 import { getTextbookManifest } from '@/components/textbook/textbookCatalog.js'
 import { linksForTextbookSlug } from '@/components/textbook/textbookPracticeLinks.js'
+import { isDividerKind, isNavigableNode } from '@/components/textbook/textbookStructure.js'
 
 /**
  * Learn hub — TOC-first entry to textbook + linked practice.
@@ -145,8 +146,10 @@ export default function LearnHubPage() {
 
       <Stack spacing={1.5} sx={{ mt: 3 }}>
         {tree.map((node) => {
-          if (node.children?.length) {
+          const isSection = isDividerKind(node.kind) || (node.children?.length > 0 && !isNavigableNode(node))
+          if (isSection || node.children?.length) {
             const expanded = Boolean(openParts[node.slug])
+            const children = node.children || []
             return (
               <Box key={node.slug}>
                 <Box
@@ -167,8 +170,9 @@ export default function LearnHubPage() {
                     justifyContent: 'space-between',
                     mb: 1,
                     px: 0.5,
-                    py: 0.5,
-                    borderRadius: 1,
+                    py: 0.75,
+                    borderBottom: 1,
+                    borderColor: 'divider',
                     cursor: 'pointer',
                     userSelect: 'none',
                     '&:hover': { bgcolor: 'action.hover' },
@@ -192,14 +196,20 @@ export default function LearnHubPage() {
                   )}
                 </Box>
                 <Collapse in={expanded}>
-                  <Stack spacing={1} sx={{ mb: 1 }}>
-                    {renderLeaf(node, { nested: false })}
-                    {node.children.map((child) => renderLeaf(child, { nested: true }))}
+                  <Stack spacing={1} sx={{ mb: 1, mt: 1 }}>
+                    {children.map((child) => renderLeaf(child, { nested: true }))}
+                    {children.length === 0 && (
+                      <Typography variant="body2" color="text.secondary" sx={{ px: 1, py: 1 }}>
+                        No chapters in this section yet.
+                      </Typography>
+                    )}
                   </Stack>
                 </Collapse>
               </Box>
             )
           }
+
+          if (!isNavigableNode(node)) return null
 
           return (
             <Box key={node.slug} sx={{ mb: 0.5 }}>
