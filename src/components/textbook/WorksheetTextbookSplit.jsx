@@ -4,6 +4,7 @@ import SplitViewLayout from '@/components/layout/SplitViewLayout.jsx'
 import TextbookReader from '@/components/textbook/TextbookReader.jsx'
 import { useAppRuntime } from '@/hooks/useAppRuntime.js'
 import { useTextbookPracticeLinks } from '@/hooks/useTextbookPracticeLinks.js'
+import { useTextbookStructure } from '@/hooks/useTextbookStructure.js'
 import {
   linksForPracticeId,
   primarySectionIdForPractice,
@@ -22,6 +23,7 @@ export default function WorksheetTextbookSplit({
   const location = useLocation()
   const { routePrefix, learnChapterPath } = useAppRuntime()
   const { resolvedLinks } = useTextbookPracticeLinks()
+  const { resolveSlug } = useTextbookStructure()
 
   const practiceLinks = linksForPracticeId(resolvedLinks, practiceId)
   const isPractice =
@@ -61,6 +63,7 @@ export default function WorksheetTextbookSplit({
             linkBase={linkBase}
             linkedPractices={chapterLinks}
             scrollToId={sectionId}
+            resolveInternalSlug={resolveSlug}
           />
         }
         right={

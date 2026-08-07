@@ -3,7 +3,6 @@ import {
   Box,
   Collapse,
   Drawer,
-  IconButton,
   List,
   ListItemButton,
   ListItemText,
@@ -15,6 +14,7 @@ import {
   MenuBook as BookIcon,
 } from '@mui/icons-material'
 import { useTextbookStructure } from '@/hooks/useTextbookStructure.js'
+import { isDividerKind, isNavigableNode } from '@/components/textbook/textbookStructure.js'
 
 function TocList({
   tree,
@@ -26,9 +26,9 @@ function TocList({
   const initiallyOpen = useMemo(() => {
     const open = {}
     for (const node of tree) {
-      if (node.children?.length) {
-        const containsActive = node.children.some((child) => child.slug === activeSlug)
-        open[node.slug] = containsActive || node.kind === 'part'
+      if (node.children?.length || isDividerKind(node.kind)) {
+        const containsActive = (node.children || []).some((child) => child.slug === activeSlug)
+        open[node.slug] = containsActive || isDividerKind(node.kind)
       }
     }
     return open
@@ -40,8 +40,8 @@ function TocList({
     setOpenParts((prev) => {
       const next = { ...prev }
       for (const node of tree) {
-        if (!node.children?.length) continue
-        if (node.children.some((child) => child.slug === activeSlug)) {
+        if (!(node.children?.length || isDividerKind(node.kind))) continue
+        if ((node.children || []).some((child) => child.slug === activeSlug)) {
           next[node.slug] = true
         }
       }
@@ -61,13 +61,13 @@ function TocList({
       sx={{ py: 0.5 }}
     >
       {tree.map((node) => {
-        const hasChildren = node.children?.length > 0
-        const isActive = node.slug === activeSlug
-        const hasLinkedChild =
-          hasChildren && node.children.some((child) => linkedSlugSet?.has(child.slug))
+        const children = node.children || []
+        const isSection = isDividerKind(node.kind) || (children.length > 0 && !isNavigableNode(node))
+        const hasChildren = children.length > 0
+        const hasLinkedChild = children.some((child) => linkedSlugSet?.has(child.slug))
         const selfLinked = linkedSlugSet?.has(node.slug)
 
-        if (hasChildren) {
+        if (isSection || hasChildren) {
           const expanded = Boolean(openParts[node.slug])
           return (
             <Box key={node.slug} component="li" sx={{ listStyle: 'none' }}>
@@ -79,6 +79,8 @@ function TocList({
                   borderRadius: 1,
                   mx: 0.5,
                   fontWeight: 600,
+                  borderBottom: '1px solid',
+                  borderColor: 'divider',
                   '&:focus-visible': {
                     outline: '2px solid',
                     outlineColor: 'primary.main',
@@ -100,32 +102,7 @@ function TocList({
               </ListItemButton>
               <Collapse in={expanded} timeout="auto" unmountOnExit>
                 <List disablePadding dense={dense}>
-                  {/* Part opener page itself */}
-                  <ListItemButton
-                    selected={isActive}
-                    onClick={() => onSelect(node.slug)}
-                    sx={{
-                      pl: 3,
-                      py: dense ? 0.35 : 0.5,
-                      borderRadius: 1,
-                      mx: 0.5,
-                      '&:focus-visible': {
-                        outline: '2px solid',
-                        outlineColor: 'primary.main',
-                        outlineOffset: 2,
-                      },
-                    }}
-                  >
-                    <ListItemText
-                      primary={`Overview · ${node.label}`}
-                      primaryTypographyProps={{
-                        fontSize: '0.8125rem',
-                        fontWeight: isActive ? 600 : 400,
-                        lineHeight: 1.35,
-                      }}
-                    />
-                  </ListItemButton>
-                  {node.children.map((child) => {
+                  {children.map((child) => {
                     const childActive = child.slug === activeSlug
                     const childLinked = linkedSlugSet?.has(child.slug)
                     return (
@@ -134,7 +111,7 @@ function TocList({
                         selected={childActive}
                         onClick={() => onSelect(child.slug)}
                         sx={{
-                          pl: 3.5,
+                          pl: 3,
                           py: dense ? 0.35 : 0.5,
                           borderRadius: 1,
                           mx: 0.5,
@@ -164,6 +141,9 @@ function TocList({
           )
         }
 
+        if (!isNavigableNode(node)) return null
+
+        const isActive = node.slug === activeSlug
         return (
           <ListItemButton
             key={node.slug}

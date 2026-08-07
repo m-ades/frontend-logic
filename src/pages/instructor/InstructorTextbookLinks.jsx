@@ -135,12 +135,11 @@ function PracticeLinksPanel({ chapters }) {
         justifyContent="space-between"
         sx={{ mb: 2 }}
       >
-        <Typography variant="body2" color="text.secondary" sx={{ maxWidth: 40 * 16 }}>
-          Links stay keyed by file slug, so reordering or renaming display titles in Structure
-          does not break practice coupling.
+        <Typography variant="body2" color="text.secondary" sx={{ maxWidth: 36 * 16 }}>
+          Links use chapter file slugs, so Structure renames and reorders won’t break them.
         </Typography>
         <Stack direction="row" spacing={1}>
-          <Tooltip title="Restore HuLA starter links for this course">
+          <Tooltip title="Restore the starter links for this course">
             <Button
               variant="outlined"
               startIcon={<ResetIcon />}
@@ -164,13 +163,13 @@ function PracticeLinksPanel({ chapters }) {
 
       {savedFlash && (
         <Alert severity="success" sx={{ mb: 2 }}>
-          Textbook links saved for this course.
+          Links saved.
         </Alert>
       )}
 
       {!practices.length && (
         <Alert severity="warning" sx={{ mb: 2 }}>
-          This course has no practice assignments yet. Create practices first, then link them here.
+          No practice assignments in this course yet. Add some under Practice, then come back here.
         </Alert>
       )}
 
@@ -310,7 +309,7 @@ function PracticeLinksPanel({ chapters }) {
               onChange={(event) =>
                 setForm((prev) => ({ ...prev, sectionId: event.target.value }))
               }
-              helperText="LaTeXML anchor such as Sx1 or S1 — used to scroll the textbook pane"
+              helperText="Optional LaTeXML anchor (e.g. S1) for scrolling the textbook pane"
               fullWidth
             />
 
@@ -357,7 +356,7 @@ function PracticeLinksPanel({ chapters }) {
 }
 
 /**
- * Instructor Textbook management — structure editor + practice links.
+ * Instructor textbook page: structure editor + practice links.
  * Route: `/instructor/textbook-links`
  */
 export default function InstructorTextbookLinks() {
@@ -367,7 +366,7 @@ export default function InstructorTextbookLinks() {
 
   const {
     nodes,
-    numberedFlat,
+    navigableFlat,
     hasOverrides,
     saveStructure,
     resetToBundle,
@@ -378,8 +377,12 @@ export default function InstructorTextbookLinks() {
   const [flash, setFlash] = useState(null)
 
   const chapters = useMemo(
-    () => numberedFlat.map((node) => ({ slug: node.slug, label: node.label || node.displayTitle })),
-    [numberedFlat],
+    () =>
+      navigableFlat.map((node) => ({
+        slug: node.slug,
+        label: node.label || node.displayTitle,
+      })),
+    [navigableFlat],
   )
 
   const showFlash = (message, severity = 'success') => {
@@ -392,11 +395,11 @@ export default function InstructorTextbookLinks() {
       const { added, missing } = await syncFiles()
       const parts = []
       if (added.length) parts.push(`added ${added.length}`)
-      if (missing.length) parts.push(`${missing.length} missing from bundle (removed from structure)`)
+      if (missing.length) parts.push(`dropped ${missing.length} missing files`)
       showFlash(
         parts.length
-          ? `Synced from bundle (${parts.join('; ')}).`
-          : 'Synced from bundle — structure already matches inventory.',
+          ? `Synced (${parts.join('; ')}).`
+          : 'Already in sync with the inventory.',
       )
     } catch (error) {
       showFlash(error?.message || 'Failed to sync structure.', 'error')
@@ -406,7 +409,7 @@ export default function InstructorTextbookLinks() {
   const handleResetStructure = async () => {
     try {
       await resetToBundle()
-      showFlash('Structure reset to BookML bundle defaults.')
+      showFlash('Reset to bundle defaults.')
     } catch (error) {
       showFlash(error?.message || 'Failed to reset structure.', 'error')
     }
@@ -436,9 +439,8 @@ export default function InstructorTextbookLinks() {
           <Typography variant="h4" component="h1" sx={{ fontWeight: 600 }}>
             Textbook
           </Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5, maxWidth: 44 * 16 }}>
-            Manage forall x: Calgary order and display titles for this course, then link chapters
-            to practice. Numbers are computed from order; file slugs stay fixed.
+          <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5, maxWidth: 40 * 16 }}>
+            Set chapter order and titles for this course, and link chapters to practice.
           </Typography>
         </Box>
       </Stack>
@@ -476,22 +478,22 @@ export default function InstructorTextbookLinks() {
             justifyContent="space-between"
             sx={{ mb: 2 }}
           >
-            <Typography variant="body2" color="text.secondary" sx={{ maxWidth: 42 * 16 }}>
-              Drag to reorder. Drop a chapter onto a part to nest it. After replacing HTML in{' '}
-              <code>public/textbook/</code>, regenerate inventory (
-              <code>node scripts/generate-textbook-inventory.mjs</code>) then Sync from bundle.
-              {hasOverrides ? ' Custom order saved for this course.' : ' Using bundle defaults.'}
+            <Typography variant="body2" color="text.secondary" sx={{ maxWidth: 36 * 16 }}>
+              Parts are section labels only—not pages. Drag chapters to reorder.
+              {hasOverrides ? ' Edits saved for this course.' : ' Showing bundle defaults.'}
             </Typography>
             <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
-              <Button
-                variant="outlined"
-                startIcon={<SyncIcon />}
-                onClick={handleSync}
-                aria-label="Sync textbook structure from bundle inventory"
-              >
-                Sync from bundle
-              </Button>
-              <Tooltip title="Clear course overrides and restore seeded TOC">
+              <Tooltip title="After a new BookML drop, run generate-textbook-inventory.mjs, then sync">
+                <Button
+                  variant="outlined"
+                  startIcon={<SyncIcon />}
+                  onClick={handleSync}
+                  aria-label="Sync textbook structure from bundle inventory"
+                >
+                  Sync from bundle
+                </Button>
+              </Tooltip>
+              <Tooltip title="Discard course edits and restore the seeded TOC">
                 <Button
                   variant="outlined"
                   startIcon={<ResetIcon />}

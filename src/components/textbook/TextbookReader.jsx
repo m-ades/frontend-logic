@@ -79,6 +79,7 @@ export default function TextbookReader({
   linkedPractices = [],
   scrollToId = null,
   onMetaChange,
+  resolveInternalSlug = null,
 }) {
   const navigate = useNavigate()
   const containerRef = useRef(null)
@@ -205,10 +206,20 @@ export default function TextbookReader({
 
       if (href.startsWith(`${linkBase}/`) || href === linkBase) {
         event.preventDefault()
-        navigate(href)
+        if (href === linkBase) {
+          navigate(href)
+          return
+        }
+        const targetSlug = href.slice(linkBase.length + 1).split(/[?#]/)[0]
+        const resolved = resolveInternalSlug?.(decodeURIComponent(targetSlug)) || targetSlug
+        if (!resolved) {
+          navigate(linkBase)
+          return
+        }
+        navigate(`${linkBase}/${resolved}`)
       }
     },
-    [linkBase, navigate],
+    [linkBase, navigate, resolveInternalSlug],
   )
 
   if (isLoading) {

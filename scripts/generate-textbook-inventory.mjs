@@ -6,6 +6,9 @@
  *   node scripts/generate-textbook-inventory.mjs
  *
  * Then use Instructor → Textbook → Sync from bundle to merge into course structure.
+ *
+ * Note: Pt* / Ptx* files are inventoried for sync identity but HuLA treats them as
+ * TOC dividers only (not Learn destinations). Chapter HTML files are the reading units.
  */
 import fs from 'fs'
 import path from 'path'
