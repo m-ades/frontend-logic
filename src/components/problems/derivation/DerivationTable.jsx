@@ -253,6 +253,7 @@ const DERIVATION_RULE_WIDTH_MOBILE = '4.375rem'
 const DERIVATION_RULE_WIDTH_DESKTOP = '5.46875rem'
 const DERIVATION_JUSTIFICATION_WIDTH_XS = 'calc(7ch + 4.375rem)'
 const DERIVATION_JUSTIFICATION_WIDTH_SM = 'calc(7ch + 5.46875rem)'
+const DERIVATION_INDENT_STEP_REM = 1.40625
 const DERIVATION_INDENT_STEP = '1.40625rem'
 const DERIVATION_ASSUMPTION_OFFSET = '0.9375rem'
 
@@ -1585,6 +1586,9 @@ export default function DerivationTable({
                     </MenuItem>
                   )),
               ]
+              const scopeDepth = usesNestedSubderivations
+                ? (indentLevels[idx] || 0)
+                : 0
               const indentOffset = `calc(${indentLevels[idx] || 0} * ${DERIVATION_INDENT_STEP}${indentLevels[idx] ? ` + ${DERIVATION_ASSUMPTION_OFFSET}` : ''})`
               return (
               <TableRow
@@ -1640,6 +1644,36 @@ export default function DerivationTable({
                   </Box>
                 </TableCell>
                 <TableCell sx={{ borderBottom: 'none', pl: isFullScreen ? 1 : undefined, pr: 0.5, verticalAlign: 'middle', ...(isFullScreen ? { width: '50%', minWidth: 0 } : { width: 'auto', whiteSpace: 'nowrap' }) }}>
+                  {scopeDepth > 0 && (
+                    <Box
+                      aria-hidden="true"
+                      sx={{
+                        position: 'absolute',
+                        inset: 0,
+                        overflow: 'visible',
+                        pointerEvents: 'none',
+                        zIndex: 1,
+                      }}
+                    >
+                      {Array.from({ length: scopeDepth }, (_, scopeIndex) => (
+                        <Box
+                          key={`scope-${idx}-${scopeIndex}`}
+                          sx={(theme) => ({
+                            position: 'absolute',
+                            top: -1,
+                            bottom: -1,
+                            left: `-${(scopeDepth - scopeIndex) * DERIVATION_INDENT_STEP_REM}rem`,
+                            width: 2,
+                            borderRadius: 1,
+                            bgcolor: alpha(
+                              theme.palette.text.primary,
+                              theme.palette.mode === 'dark' ? 0.52 : 0.42
+                            ),
+                          })}
+                        />
+                      ))}
+                    </Box>
+                  )}
                   {line.readOnly ? (
                     <Box
                       component="span"
@@ -1798,25 +1832,39 @@ export default function DerivationTable({
                   }}
                 >
                   {idx < premises.length ? (
-                    idx === premises.length - 1 ? (
-                      <Box
-                        component="span"
-                        sx={{ fontSize: DERIVATION_LINE_FONT_SIZE, color: 'text.primary', '& .clickable-char': { cursor: 'pointer', borderRadius: 1, '&:hover': { backgroundColor: (t) => alpha(t.palette.primary.main, t.palette.action.hoverOpacity) } } }}
-                      >
-                        {conclusionTargetText.split('').map((char, i) => {
-                          const isLetter = /^[a-zA-Z]$/.test(char)
-                          return isLetter ? (
-                            <Box component="span" key={`conc-row-${idx}-${i}`} className="clickable-char" onPointerDown={(e) => e.preventDefault()} onClick={() => handleSymbolInsert({ insert: char })} aria-label={getInsertSymbolLabel({ insert: char })}>
-                              {char}
-                            </Box>
-                          ) : (
-                            <Box component="span" key={`conc-row-${idx}-${i}`}>{char}</Box>
-                          )
-                        })}
-                      </Box>
-                    ) : (
-                      <Typography sx={{ color: 'transparent' }}>—</Typography>
-                    )
+                    <Stack direction="row" spacing={1.5} alignItems="center">
+                      {usesNestedSubderivations && (
+                        <Typography
+                          component="span"
+                          sx={{
+                            fontSize: DERIVATION_LINE_FONT_SIZE,
+                            color: 'text.primary',
+                            fontWeight: 600,
+                          }}
+                        >
+                          PR
+                        </Typography>
+                      )}
+                      {idx === premises.length - 1 ? (
+                        <Box
+                          component="span"
+                          sx={{ fontSize: DERIVATION_LINE_FONT_SIZE, color: 'text.primary', '& .clickable-char': { cursor: 'pointer', borderRadius: 1, '&:hover': { backgroundColor: (t) => alpha(t.palette.primary.main, t.palette.action.hoverOpacity) } } }}
+                        >
+                          {conclusionTargetText.split('').map((char, i) => {
+                            const isLetter = /^[a-zA-Z]$/.test(char)
+                            return isLetter ? (
+                              <Box component="span" key={`conc-row-${idx}-${i}`} className="clickable-char" onPointerDown={(e) => e.preventDefault()} onClick={() => handleSymbolInsert({ insert: char })} aria-label={getInsertSymbolLabel({ insert: char })}>
+                                {char}
+                              </Box>
+                            ) : (
+                              <Box component="span" key={`conc-row-${idx}-${i}`}>{char}</Box>
+                            )
+                          })}
+                        </Box>
+                      ) : !usesNestedSubderivations ? (
+                        <Typography sx={{ color: 'transparent' }}>—</Typography>
+                      ) : null}
+                    </Stack>
                   ) : (
                     <Stack direction="row" spacing={0.5} alignItems="center" sx={{ flexWrap: 'nowrap', gap: 0, minWidth: 0 }}>
                       {useRuleDropdown ? (
