@@ -30,6 +30,7 @@ import ThemedCard from '../../ui/ThemedCard.jsx'
 import ProblemSetButtons from '../mui/frame/ProblemSetButtons.jsx'
 import { MobileLogicInput, useMobileLogicKeyboardEnabled } from '../../ui/LogicKeyboard/index.js'
 import { getDerivationCheckerForLogicSystem } from '../../../lib/logicpenguin/checkers/derivation-by-logic-system.js'
+import getFormulaClass from '../../../lib/logicpenguin/symbolic/formula.js'
 import getSyntax from '../../../lib/logicpenguin/symbolic/libsyntax.js'
 import {
   getDerivationProblemType,
@@ -168,14 +169,17 @@ function getConstantLettersFromFormulasAndKey(formulaText, symbolizationKey) {
 
 const PREDICATE_VARIABLES = ['x', 'y', 'z']
 
-function getQuantifierInsertButtonsFromFormulaText(formulaText) {
+function getQuantifierInsertButtonsFromFormulaText(formulaText, syntax) {
   const seen = new Set()
   const buttons = []
 
   for (const [, variable] of String(formulaText ?? '').matchAll(/[∀∃]([y-z])/g)) {
     if (seen.has(variable)) continue
     seen.add(variable)
-    buttons.push({ insert: `(∀${variable})` }, { insert: `(∃${variable})` })
+    buttons.push(
+      { insert: syntax.mkquantifier(variable, syntax.symbols.FORALL) },
+      { insert: syntax.mkquantifier(variable, syntax.symbols.EXISTS) }
+    )
   }
 
   return buttons
@@ -192,12 +196,13 @@ function isPredicateLogicKey(symbolizationKey, allowIndexedSymbols = false) {
   })
 }
 
-const DEFAULT_QUANTIFIER_INSERTS = new Set(['(∀x)', '(∃x)'])
-
-function getQuantifierButtonsFromFormulas(premises, conclusion) {
+function getQuantifierButtonsFromFormulas(premises, conclusion, syntax) {
   const formulas = [...(Array.isArray(premises) ? premises : []), conclusion].filter(Boolean).map(String)
   const text = formulas.join(' ')
-  const seen = new Set(DEFAULT_QUANTIFIER_INSERTS)
+  const seen = new Set([
+    syntax.mkquantifier('x', syntax.symbols.FORALL),
+    syntax.mkquantifier('x', syntax.symbols.EXISTS),
+  ])
   const buttons = []
   const matches = text.match(/\(?[∀∃][x-z]\)?/g)
 
@@ -206,7 +211,7 @@ function getQuantifierButtonsFromFormulas(premises, conclusion) {
   for (const rawMatch of matches) {
     const match = rawMatch.match(/[∀∃][x-z]/)
     if (!match) continue
-    const insert = `(${match[0]})`
+    const insert = syntax.mkquantifier(match[0][1], match[0][0])
     if (seen.has(insert)) continue
     seen.add(insert)
     buttons.push({ label: insert, insert })
@@ -215,15 +220,21 @@ function getQuantifierButtonsFromFormulas(premises, conclusion) {
   return buttons
 }
 
-function getSymbolButtons(symbols) {
+function getSymbolButtons(symbols, syntax) {
   return [
     { label: symbols.not, insert: symbols.not },
     { label: symbols.and, insert: symbols.and },
     { label: symbols.or, insert: symbols.or },
     { label: symbols.conditional, insert: symbols.conditional },
     { label: symbols.biconditional, insert: symbols.biconditional },
-    { label: '(∀x)', insert: '(∀x)' },
-    { label: '(∃x)', insert: '(∃x)' },
+    {
+      label: syntax.mkquantifier('x', syntax.symbols.FORALL),
+      insert: syntax.mkquantifier('x', syntax.symbols.FORALL),
+    },
+    {
+      label: syntax.mkquantifier('x', syntax.symbols.EXISTS),
+      insert: syntax.mkquantifier('x', syntax.symbols.EXISTS),
+    },
     { label: '(  )', pair: '()' },
     { label: '[  ]', pair: '[]' },
   ]
@@ -357,7 +368,6 @@ export default function DerivationTable({
   const usesNestedSubderivations = derivationProblemType === 'derivation-calgary'
   const allowIndexedSymbols = activeLogicSystem === 'fitch'
   const activeAssumptionRules = usesNestedSubderivations ? FITCH_ASSUMPTION_RULES : HURLEY_ASSUMPTION_RULES
-  const conclusionTargetText = proof?.conclusion ? `${usesNestedSubderivations ? '∴' : '//'} ${proof.conclusion}` : ''
   const checkDerivation = useMemo(() => {
     const checker = getDerivationCheckerForLogicSystem(activeLogicSystem)
     return (question, givenans, points, options) =>
@@ -371,17 +381,36 @@ export default function DerivationTable({
   const lastEditableIndexRef = useRef(null)
   const cursorPositionsRef = useRef({})
   const syntax = useMemo(() => getSyntax(notation), [notation])
+  const Formula = useMemo(() => getFormulaClass(notation), [notation])
+  const canonicalizeFormula = useCallback((value) => {
+    const normalized = syntax.inputfix(String(value ?? '')).replace(/\s+/g, ' ').trim()
+    if (!normalized) return normalized
+    const formula = Formula.from(normalized)
+    return formula.wellformed ? formula.normal : normalized
+  }, [Formula, syntax])
+  const conclusionTargetText = proof?.conclusion
+    ? `${usesNestedSubderivations ? '∴' : '//'} ${canonicalizeFormula(proof.conclusion)}`
+    : ''
   const premises = useMemo(
     () => (Array.isArray(proof?.premises) ? proof.premises : []),
     [proof?.premises]
   )
   const initialLines = useMemo(() => {
     const fromState = extractLines(savedState, premises)
-    if (fromState.length) return fromState
-    const premLines = premises.map((p) => ({ formula: p, justification: '', readOnly: true }))
+    if (fromState.length) {
+      return fromState.map((line) => ({
+        ...line,
+        formula: canonicalizeFormula(line.formula),
+      }))
+    }
+    const premLines = premises.map((p) => ({
+      formula: canonicalizeFormula(p),
+      justification: '',
+      readOnly: true,
+    }))
     const blanks = Array.from({ length: 1 }, () => ({ formula: '', justification: '', readOnly: false }))
     return [...premLines, ...blanks]
-  }, [savedState, premises])
+  }, [canonicalizeFormula, savedState, premises])
 
   const [lines, setLines] = useState(initialLines)
   const [lastSubmitStatus, setLastSubmitStatus] = useState(null)
@@ -436,7 +465,11 @@ export default function DerivationTable({
     const premises = Array.isArray(proof?.premises) ? proof.premises : []
     const conclusion = proof?.conclusion ?? proof?.conc ?? ''
     const formulaText = [...premises, conclusion].filter(Boolean).map(String).join(' ')
-    const extraQuantifierButtons = getQuantifierButtonsFromFormulas(premises, conclusion)
+    const extraQuantifierButtons = getQuantifierButtonsFromFormulas(
+      premises,
+      conclusion,
+      syntax
+    )
 
     const isPredicate = isPredicateLogicKey(key, allowIndexedSymbols) || /[∀∃]/.test(formulaText) || /[A-Z][a-z]/.test(formulaText)
 
@@ -462,7 +495,10 @@ export default function DerivationTable({
         predicateLetters,
         constantLetters,
         variableLetters,
-        extraInsertButtons: getQuantifierInsertButtonsFromFormulaText(formulaText),
+        extraInsertButtons: getQuantifierInsertButtonsFromFormulaText(
+          formulaText,
+          syntax
+        ),
         extraQuantifierButtons,
       }
     }
@@ -478,9 +514,9 @@ export default function DerivationTable({
       symbolizationKey: predicateLetters,
       extraQuantifierButtons,
     }
-  }, [allowIndexedSymbols, proof])
+  }, [allowIndexedSymbols, proof, syntax])
   const symbolButtons = useMemo(() => {
-    const baseSymbolButtons = getSymbolButtons(symbols)
+    const baseSymbolButtons = getSymbolButtons(symbols, syntax)
     const extraQuantifierButtons = derivationKeyboardConfig.extraQuantifierButtons || []
     if (extraQuantifierButtons.length === 0) return baseSymbolButtons
     return [
@@ -488,7 +524,7 @@ export default function DerivationTable({
       ...extraQuantifierButtons,
       ...baseSymbolButtons.slice(7),
     ]
-  }, [derivationKeyboardConfig.extraQuantifierButtons, symbols])
+  }, [derivationKeyboardConfig.extraQuantifierButtons, symbols, syntax])
   const isLineCompleteForCheck = useCallback((line) => {
     if (!line) return false
     const formulaFilled = (line.formula || '').trim().length > 0
@@ -545,12 +581,7 @@ export default function DerivationTable({
     })
   }, [activeAssumptionRules, effectiveLines, usesNestedSubderivations])
 
-  const normalizeFormulaForCheck = useMemo(
-    () => (value) => {
-      return syntax.inputfix(String(value ?? '')).replace(/\s+/g, ' ').trim()
-    },
-    [syntax]
-  )
+  const normalizeFormulaForCheck = canonicalizeFormula
   const normalizeFormulaForDisplay = useCallback(
     (value) => {
       const raw = String(value ?? '')

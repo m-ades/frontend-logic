@@ -298,16 +298,6 @@ function generateFormulaClass(notationname = 'hurley') {
             if ("_opspot" in this) {
                 return this._opspot;
             }
-            // set whether parentheses around quantifiers
-            // Check both the notation definition and if the actual string has parentheses
-            const parensinqs = (Formula.syntax.notation
-                .quantifierForm.indexOf('(') != -1);
-            // Also check if the parsed string actually starts with a parenthesized quantifier
-            const actualParensinqs = (() => {
-                const qMatch = this.parsedstr.match(Formula.syntax.qaRegEx);
-                return qMatch && qMatch[0].startsWith('(') && qMatch[0].endsWith(')');
-            })();
-
             // -1 means no operator found so far
             this._opspot = -1;
             let currdepth = 0;
@@ -346,20 +336,23 @@ function generateFormulaClass(notationname = 'hurley') {
                 // if we're at the start of a quantifier
                 let isop = Formula.syntax.isop(c);
                 let startswithq = remainder.match(Formula.syntax.qaRegEx);
+                const quantifierHasParens = startswithq &&
+                    startswithq[0].startsWith('(') &&
+                    startswithq[0].endsWith(')');
                 // don't count ∃ as an operator if matching (∃x) at the
                 // parenthesis as well
-                if ((parensinqs || actualParensinqs) && c == Formula.syntax.symbols.EXISTS &&
+                if (quantifierHasParens && c == Formula.syntax.symbols.EXISTS &&
                     !startswithq) { isop = false; }
                 // quantifiers starting with parentheses really have
                 // one less depth
                 const realdepth = (
-                    (startswithq && (parensinqs || actualParensinqs)) ? currdepth -1 : currdepth
+                    quantifierHasParens ? currdepth -1 : currdepth
                 );
                 // determine operator, either the symbol, or the quantifier
                 let thisop = c;
                 if (startswithq) {
                     let m = startswithq[0];
-                    // check if it's just (x) without a quantifier symbol, treat as (∀x)
+                    // Hurley allows (x) without a quantifier symbol as (∀x).
                     const varOnlyMatch = m.match(new RegExp('^\\(' + '[' + Formula.syntax.notation.variableRange + ']' + '\\)$'));
                     if (varOnlyMatch) {
                         thisop = Formula.syntax.symbols.FORALL;

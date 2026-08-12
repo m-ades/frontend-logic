@@ -153,7 +153,10 @@ function inputfix(s) {
 function stripmatching(s) {
     if (s.length < 2) { return s; }
 
-    const qMatch = s.match(/^(?:[∃∀][x-z]|\([∃∀][x-z]\)|\([x-z]\))/);
+    // A leading quantifier is part of the formula, not a removable pair of
+    // grouping parentheses. In Calgary, however, an atomic term list such as
+    // the `(x)` in F(x) must be stripped normally.
+    const qMatch = s.match(this.qaRegEx);
     if (qMatch) { return s;}
     
     const openBrackets = { '(': ')', '[': ']', '{': '}' };
@@ -205,22 +208,19 @@ function generateSyntax(notationname = DEFAULT_NOTATION) {
     // Syntax Regular Expressions (RegExp)
     //
 
-    // generate regex description for quantifiers from
-    // quantifierForm
-    // allow parentheses around quantifiers
-    let baseForm = syntax.notation.quantifierForm
-        .replaceAll('(',"\\(").replaceAll(')',"\\)")
+    // Accept both explicit quantifier styles in every notation, then render
+    // with quantifierForm. The variable-only universal abbreviation `(x)` is
+    // Hurley-specific; treating it as a quantifier in Calgary breaks F(x).
+    const baseForm = syntax.notation.quantifierForm
+        .replaceAll('(', '').replaceAll(')', '')
         .replaceAll('Q?',symbols.EXISTS + '?')
         .replaceAll('Q','[' + symbols.EXISTS + symbols.FORALL + ']')
         .replaceAll('x','[' + syntax.notation.variableRange + ']');
-
-    if (!syntax.notation.quantifierForm.includes('(')) {
-        // Also allow (x) as a valid quantifier (equivalent to (∀x) in Hurley's notation)
-        const varOnlyForm = '\\(' + '[' + syntax.notation.variableRange + ']' + '\\)';
-        syntax.qRegExStr = '(?:\\(' + baseForm + '\\)|' + baseForm + '|' + varOnlyForm + ')';
-    } else {
-        syntax.qRegExStr = baseForm;
+    const acceptedForms = ['\\(' + baseForm + '\\)', baseForm];
+    if (syntax.notationname === 'hurley') {
+        acceptedForms.push('\\([' + syntax.notation.variableRange + ']\\)');
     }
+    syntax.qRegExStr = '(?:' + acceptedForms.join('|') + ')';
 
     // regular quantifier regex
     syntax.qRegEx = new RegExp(syntax.qRegExStr);

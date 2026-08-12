@@ -11,6 +11,8 @@ const SYMBOL_SPEECH = {
 }
 
 const EXPR_SPEECH = {
+  '∀x': 'universal quantifier x',
+  '∃x': 'existential quantifier x',
   '(∀x)': 'universal quantifier x',
   '(∃x)': 'existential quantifier x',
   '()': 'parentheses',

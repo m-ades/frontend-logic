@@ -65,6 +65,10 @@ export default function SymbolButtonRow({
   const syntax = getSyntax(getNotation(logicSystem))
   const inputSymbols = inputRef?.current?.symbols
   const symbols = inputSymbols || syntax?.symbols || {}
+  const getQuantifierText = (op) => {
+    const sym = symbols?.[op] || FALLBACK_SYMBOLS[op] || op
+    return syntax?.mkquantifier?.('x', sym) ?? `${sym}x`
+  }
 
   const resolveLabel = (op, quantifier = false, insert = null, pair = null, backspace = false) => {
     if (backspace) return '←'
@@ -75,7 +79,7 @@ export default function SymbolButtonRow({
       return `${open}  ${close}`
     }
     const sym = symbols?.[op] || FALLBACK_SYMBOLS[op] || op
-    return quantifier ? `(${sym}x)` : sym
+    return quantifier ? getQuantifierText(op) : sym
   }
 
   const finalizeChange = (input) => {
@@ -91,8 +95,7 @@ export default function SymbolButtonRow({
   }
 
   const insertQuantifier = (input, op) => {
-    const sym = symbols?.[op] || FALLBACK_SYMBOLS[op] || op
-    const text = `(${sym}x)`
+    const text = getQuantifierText(op)
     const start = input.selectionStart ?? input.value.length
     const end = input.selectionEnd ?? start
     input.setRangeText(text, start, end, 'end')

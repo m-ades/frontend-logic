@@ -26,10 +26,12 @@ import {
   promptImpliesPredicateLogic,
 } from './symbolizationKeyboard.js'
 
-function FormulaInputField({ value, onValueChange, formulaInputRef, notation }) {
+function FormulaInputField({ value, onValueChange, onBlurValue, formulaInputRef, notation }) {
   const theme = useTheme()
   const containerRef = useRef(null)
   const changeHandlerRef = useRef(null)
+  const blurHandlerRef = useRef(onBlurValue)
+  blurHandlerRef.current = onBlurValue
 
   useEffect(() => {
     if (!containerRef.current) return
@@ -44,6 +46,7 @@ function FormulaInputField({ value, onValueChange, formulaInputRef, notation }) 
       formulaInput.style.fontFamily = 'monospace'
       formulaInput.style.backgroundColor = theme.palette.background.paper
       formulaInput.style.color = theme.palette.text.primary
+      formulaInput.blurHook = () => blurHandlerRef.current?.(formulaInput.value)
       containerRef.current.appendChild(formulaInput)
     } else if (!containerRef.current.contains(formulaInputRef.current)) {
       containerRef.current.appendChild(formulaInputRef.current)
@@ -246,6 +249,16 @@ export default function ComboTranslationDerivation({
   const symbols = getSymbols(logicSystem)
   const allowIndexedSymbols = normalizeLogicSystem(logicSystem) === 'fitch'
   const Formula = useMemo(() => getFormulaClass(notation), [notation])
+  const canonicalizeArgumentLine = useCallback((value) => {
+    const parsed = parseArgumentLine(value)
+    if (parsed.error) return value
+    const premises = parsed.premises.map((premise) => Formula.from(premise))
+    const conclusion = Formula.from(parsed.conclusion)
+    if (premises.some((formula) => !formula.wellformed) || !conclusion.wellformed) {
+      return value
+    }
+    return `${premises.map((formula) => formula.normal).join(' / ')} // ${conclusion.normal}`
+  }, [Formula])
   const snapshot = proof?.comboTranslationDerivation || proof?.snapshot || proof?.questionSnapshot || proof?.question_snapshot || proof || {}
   const promptText = snapshot?.prompt || proof?.description || ''
   const symbolizationKey = useMemo(
@@ -259,7 +272,9 @@ export default function ComboTranslationDerivation({
     proof?.question_snapshot?.answer,
     snapshot
   ) ?? proof?.answer ?? snapshot?.answer
-  const [argumentLine, setArgumentLine] = useState(savedState?.argumentLine ?? '')
+  const [argumentLine, setArgumentLine] = useState(
+    () => canonicalizeArgumentLine(savedState?.argumentLine ?? '')
+  )
   const [derivationState, setDerivationState] = useState(savedState?.derivationState ?? null)
   const inputRef = useRef(null)
   const [fullScreenOpen, setFullScreenOpen] = useState(false)
@@ -267,9 +282,9 @@ export default function ComboTranslationDerivation({
 
   useEffect(() => {
     if (savedState?.argumentLine !== undefined) {
-      setArgumentLine(savedState.argumentLine)
+      setArgumentLine(canonicalizeArgumentLine(savedState.argumentLine))
     }
-  }, [savedState?.argumentLine])
+  }, [canonicalizeArgumentLine, savedState?.argumentLine])
 
   useEffect(() => {
     setDerivationState(savedState?.derivationState ?? null)
@@ -289,8 +304,11 @@ export default function ComboTranslationDerivation({
       return { ok: false, reason: parsed.error, parsed: null }
     }
     try {
-      parsed.premises.forEach((premise) => Formula.from(premise))
-      Formula.from(parsed.conclusion)
+      const formulas = parsed.premises.map((premise) => Formula.from(premise))
+      formulas.push(Formula.from(parsed.conclusion))
+      if (formulas.some((formula) => !formula.wellformed)) {
+        return { ok: false, reason: 'Fix the argument line before starting the derivation.', parsed: null }
+      }
       return { ok: true, reason: '', parsed }
     } catch {
       return { ok: false, reason: 'Fix the argument line before starting the derivation.', parsed: null }
@@ -355,6 +373,10 @@ export default function ComboTranslationDerivation({
     setArgumentLine(value)
     setDerivationState(null)
     updateState({ argumentLine: value, derivationState: null })
+  }
+  const handleArgumentBlur = () => {
+    const canonical = canonicalizeArgumentLine(argumentLine)
+    if (canonical !== argumentLine) handleArgumentChange(canonical)
   }
 
   const handleDerivationChange = (state) => {
@@ -467,6 +489,7 @@ export default function ComboTranslationDerivation({
                 <MobileLogicInput
                   value={argumentLine}
                   onChange={handleArgumentChange}
+                  onBlur={handleArgumentBlur}
                   placeholder={`e.g. A ${symbols.conditional} B / A // B`}
                   aria-label="Argument line"
                   includeQuantifiers
@@ -482,6 +505,7 @@ export default function ComboTranslationDerivation({
                   <FormulaInputField
                     value={argumentLine}
                     onValueChange={handleArgumentChange}
+                    onBlurValue={handleArgumentBlur}
                     formulaInputRef={inputRef}
                     notation={notation}
                   />
