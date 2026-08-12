@@ -820,3 +820,11 @@ export default function getFormulaClass(notationname = 'hurley') {
     formulaClasses[notationname] = generateFormulaClass(notationname);
     return formulaClasses[notationname];
 }
+
+export function canonicalizeFormula(value, notationname = 'hurley') {
+    const Formula = getFormulaClass(notationname);
+    const normalized = Formula.syntax.inputfix(String(value ?? '')).replace(/\s+/g, ' ').trim();
+    if (!normalized) { return normalized; }
+    const formula = Formula.from(normalized);
+    return formula.wellformed ? formula.normal : normalized;
+}

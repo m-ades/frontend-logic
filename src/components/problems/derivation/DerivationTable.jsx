@@ -30,7 +30,7 @@ import ThemedCard from '../../ui/ThemedCard.jsx'
 import ProblemSetButtons from '../mui/frame/ProblemSetButtons.jsx'
 import { MobileLogicInput, useMobileLogicKeyboardEnabled } from '../../ui/LogicKeyboard/index.js'
 import { getDerivationCheckerForLogicSystem } from '../../../lib/logicpenguin/checkers/derivation-by-logic-system.js'
-import getFormulaClass from '../../../lib/logicpenguin/symbolic/formula.js'
+import { canonicalizeFormula } from '../../../lib/logicpenguin/symbolic/formula.js'
 import getSyntax from '../../../lib/logicpenguin/symbolic/libsyntax.js'
 import {
   getDerivationProblemType,
@@ -382,15 +382,12 @@ export default function DerivationTable({
   const lastEditableIndexRef = useRef(null)
   const cursorPositionsRef = useRef({})
   const syntax = useMemo(() => getSyntax(notation), [notation])
-  const Formula = useMemo(() => getFormulaClass(notation), [notation])
-  const canonicalizeFormula = useCallback((value) => {
-    const normalized = syntax.inputfix(String(value ?? '')).replace(/\s+/g, ' ').trim()
-    if (!normalized) return normalized
-    const formula = Formula.from(normalized)
-    return formula.wellformed ? formula.normal : normalized
-  }, [Formula, syntax])
+  const normalizeFormulaForCheck = useCallback(
+    (value) => canonicalizeFormula(value, notation),
+    [notation]
+  )
   const conclusionTargetText = proof?.conclusion
-    ? `${usesNestedSubderivations ? '∴' : '//'} ${canonicalizeFormula(proof.conclusion)}`
+    ? `${usesNestedSubderivations ? '∴' : '//'} ${normalizeFormulaForCheck(proof.conclusion)}`
     : ''
   const premises = useMemo(
     () => (Array.isArray(proof?.premises) ? proof.premises : []),
@@ -401,17 +398,17 @@ export default function DerivationTable({
     if (fromState.length) {
       return fromState.map((line) => ({
         ...line,
-        formula: canonicalizeFormula(line.formula),
+        formula: normalizeFormulaForCheck(line.formula),
       }))
     }
     const premLines = premises.map((p) => ({
-      formula: canonicalizeFormula(p),
+      formula: normalizeFormulaForCheck(p),
       justification: '',
       readOnly: true,
     }))
     const blanks = Array.from({ length: 1 }, () => ({ formula: '', justification: '', readOnly: false }))
     return [...premLines, ...blanks]
-  }, [canonicalizeFormula, savedState, premises])
+  }, [normalizeFormulaForCheck, savedState, premises])
 
   const [lines, setLines] = useState(initialLines)
   const [lastSubmitStatus, setLastSubmitStatus] = useState(null)
@@ -582,7 +579,6 @@ export default function DerivationTable({
     })
   }, [activeAssumptionRules, effectiveLines, usesNestedSubderivations])
 
-  const normalizeFormulaForCheck = canonicalizeFormula
   const normalizeFormulaForDisplay = useCallback(
     (value) => {
       const raw = String(value ?? '')

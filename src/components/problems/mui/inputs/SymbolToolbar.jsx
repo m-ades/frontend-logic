@@ -37,12 +37,10 @@ const INSERT_LABELS = {
   '[]': 'Insert brackets',
 }
 
-const getInsertText = (syntax, symbols, { op, quantifier = false, pair = null }) => {
+const getInsertText = (symbols, { op, quantifier = false, pair = null }) => {
   if (pair) return pair
   const symbol = symbols?.[op] || FALLBACK_SYMBOLS[op] || op
-  return quantifier
-    ? (syntax?.mkquantifier?.('x', symbol) ?? `${symbol}x`)
-    : symbol
+  return quantifier ? `(${symbol}x)` : symbol
 }
 
 const getToolbarLabel = (insertText, pair) => {
@@ -108,7 +106,7 @@ export default function SymbolToolbar({
   return (
     <Stack direction="row" spacing={0.5} flexWrap="wrap" useFlexGap aria-label="Symbol shortcuts">
       {visibleButtons.map(({ op, quantifier, pair }) => {
-        const insertText = getInsertText(syntax, symbols, { op, quantifier, pair })
+        const insertText = getInsertText(symbols, { op, quantifier, pair })
         return (
           <Button
             key={op || pair}

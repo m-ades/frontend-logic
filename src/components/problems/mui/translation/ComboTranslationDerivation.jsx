@@ -26,12 +26,10 @@ import {
   promptImpliesPredicateLogic,
 } from './symbolizationKeyboard.js'
 
-function FormulaInputField({ value, onValueChange, onBlurValue, formulaInputRef, notation }) {
+function FormulaInputField({ value, onValueChange, onBlur, formulaInputRef, notation }) {
   const theme = useTheme()
   const containerRef = useRef(null)
   const changeHandlerRef = useRef(null)
-  const blurHandlerRef = useRef(onBlurValue)
-  blurHandlerRef.current = onBlurValue
 
   useEffect(() => {
     if (!containerRef.current) return
@@ -46,7 +44,6 @@ function FormulaInputField({ value, onValueChange, onBlurValue, formulaInputRef,
       formulaInput.style.fontFamily = 'monospace'
       formulaInput.style.backgroundColor = theme.palette.background.paper
       formulaInput.style.color = theme.palette.text.primary
-      formulaInput.blurHook = () => blurHandlerRef.current?.(formulaInput.value)
       containerRef.current.appendChild(formulaInput)
     } else if (!containerRef.current.contains(formulaInputRef.current)) {
       containerRef.current.appendChild(formulaInputRef.current)
@@ -101,6 +98,7 @@ function FormulaInputField({ value, onValueChange, onBlurValue, formulaInputRef,
   return (
     <Box
       ref={containerRef}
+      onBlur={onBlur}
       sx={{
         width: '100%',
         minHeight: '56px',
@@ -505,7 +503,7 @@ export default function ComboTranslationDerivation({
                   <FormulaInputField
                     value={argumentLine}
                     onValueChange={handleArgumentChange}
-                    onBlurValue={handleArgumentBlur}
+                    onBlur={handleArgumentBlur}
                     formulaInputRef={inputRef}
                     notation={notation}
                   />
