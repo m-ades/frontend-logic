@@ -2,6 +2,11 @@ import { alpha } from '@mui/material/styles'
 import { formatDerivationRuleName } from '../../../lib/derivationRules.js'
 import getFormulaClass from '../../../lib/logicpenguin/symbolic/formula.js'
 import { justParse } from '../../ui/logicpenguin/justification-parse.js'
+import {
+  getIndexedUpperSymbols,
+  getLeadingIndexedUpperSymbol,
+  isPropositionalSymbol,
+} from '../../../lib/indexedSymbols.js'
 
 const CONSTANT_POOL = 'abcdefghijklmnopqrstuvw'.split('')
 export const PREDICATE_VARIABLES = ['x', 'y', 'z']
@@ -12,23 +17,26 @@ export function getLeftPart(line) {
   return idx === -1 ? s.trim() : s.slice(0, idx).trim()
 }
 
-export function isPredicateLogicKey(symbolizationKey) {
+export function isPredicateLogicKey(symbolizationKey, allowIndexedSymbols = false) {
   if (!Array.isArray(symbolizationKey) || symbolizationKey.length === 0) return false
   return symbolizationKey.some((line) => {
     const left = getLeftPart(line)
     const isConstantStyle =
       left.length === 1 && /^[a-z]$/.test(left) && !['x', 'y', 'z'].includes(left)
-    const isPredicateStyle = left.length > 1 && /^[A-Z]/.test(left)
+    const isPredicateStyle = /^[A-Z]/.test(left) && left.length > 1 && !(
+      allowIndexedSymbols && isPropositionalSymbol(left)
+    )
     return isConstantStyle || isPredicateStyle
   })
 }
 
-export function getPredicateLettersFromKey(symbolizationKey) {
+export function getPredicateLettersFromKey(symbolizationKey, allowIndexedSymbols = false) {
   if (!Array.isArray(symbolizationKey) || symbolizationKey.length === 0) return []
   const seen = new Set()
   return symbolizationKey
     .map((line) => {
       const left = getLeftPart(line)
+      if (allowIndexedSymbols) return getLeadingIndexedUpperSymbol(left)
       const match = left.match(/^[A-Z]+/)
       return match ? match[0] : null
     })
@@ -51,20 +59,16 @@ export function getConstantLettersFromPrompt(promptText, count = 3) {
   return result.length > 0 ? result : ['a', 'b', 'c']
 }
 
-export function getPropositionalLettersFromFormulas(premises, conclusion) {
+export function getPropositionalLettersFromFormulas(
+  premises,
+  conclusion,
+  allowIndexedSymbols = false
+) {
   const formulas = [...(Array.isArray(premises) ? premises : []), conclusion].filter(Boolean).map(String)
   const text = formulas.join(' ')
-  const letters = []
-  const seen = new Set()
-  const match = text.match(/[A-Z]/g)
-  if (match) {
-    for (const char of match) {
-      if (!seen.has(char)) {
-        seen.add(char)
-        letters.push(char)
-      }
-    }
-  }
+  const letters = allowIndexedSymbols
+    ? getIndexedUpperSymbols(text)
+    : Array.from(new Set(text.match(/[A-Z]/g) || []))
   return letters.length > 0 ? letters : null
 }
 

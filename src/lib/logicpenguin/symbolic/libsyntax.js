@@ -12,6 +12,11 @@ import notations from './notations.js';
 const DEFAULT_NOTATION = 'hurley';
 const syntaxes = {};
 
+const subscriptDigits = {
+    '₀': '0', '₁': '1', '₂': '2', '₃': '3', '₄': '4',
+    '₅': '5', '₆': '6', '₇': '7', '₈': '8', '₉': '9'
+};
+
 // adicities for operators
 const symbolcat = {
     OR      : 2,
@@ -85,8 +90,20 @@ function mkexistential(v) {
     return this.mkquantifier(v, this.symbols.EXISTS);
 }
 
+// Carnap-style canonicalization: indexed symbols are stored as E_1, while
+// pasted/displayed Unicode forms such as E₁ and E₁₂ remain valid input.
+function normalizeSubscriptIndices(s) {
+    return String(s ?? '').replace(/([A-Za-z])_?([₀-₉]+)/g,
+        (_match, letter, digits) => letter + '_' + Array.from(digits)
+            .map((digit) => subscriptDigits[digit])
+            .join(''));
+}
+
 function symbolfix(s) {
     let rv = String(s ?? '');
+    if (this.notationname === 'calgary') {
+        rv = normalizeSubscriptIndices(rv);
+    }
 
     rv = rv.replace(/-->/g, this.symbols.IFTHEN);
     rv = rv.replace(/<->/g, this.symbols.IFF);
@@ -114,7 +131,8 @@ function inputfix(s) {
     let rv = this.symbolfix(String(s ?? '').replace(/\s/g,''));
 
     // accept lowercase "v" as a disjunction when used infix (e.g., CvM -> C∨M)
-    rv = rv.replace(/([A-Za-z)\]\}])v([A-Za-z(\[\{])/g, `$1${this.symbols.OR}$2`);
+    rv = rv.replace(/([A-Za-z0-9_)\]\}])v([A-Za-z(\[\{])/g,
+        `$1${this.symbols.OR}$2`);
     rv = rv.replace(/\ball\b/gi, this.symbols.FORALL); // 'all' becomes ∀
     rv = rv.replace(/\bsome\b/gi, this.symbols.EXISTS); // 'some' becomes ∃ 
     rv = rv.replace(/==/g, this.symbols.IFF); // '==' becomes ≡
@@ -217,15 +235,23 @@ function generateSyntax(notationname = DEFAULT_NOTATION) {
     // terms regex
     syntax.termsRegEx = new RegExp('[' + syntax.notation.variableRange +
         syntax.notation.constantsRange + ']', 'g');
-    // predicate letter/ propositional letter regEx
-    syntax.pletterRegEx = new RegExp ('[' + syntax.notation
-        .predicatesRange + ']');
+    // Fitch/Calgary predicate and propositional symbols may carry a numeric
+    // index. Other course notations retain their original atomic grammar.
+    const indexedPredicateRange = syntax.notation.predicatesRange
+        .replaceAll('=', '').replaceAll('≠', '');
+    const indexedSuffix = syntax.notationname === 'calgary'
+        ? '(?:_[1-9][0-9]*)?'
+        : '';
+    syntax.pletterRegEx = new RegExp(
+        '(?:[=≠]|[' + indexedPredicateRange + ']' + indexedSuffix + ')'
+    );
     // constants and nonconstants regexex
     syntax.cRegEx = new RegExp('^[' + syntax.notation.constantsRange + ']$');
     syntax.ncRegEx = new RegExp( '[^' + syntax.notation.constantsRange + ']', 'g');
 
     // BIND SYNTAX FUNCTIONS TO THIS SYNTAX
     syntax.symbolfix = symbolfix;
+    syntax.normalizeSubscriptIndices = normalizeSubscriptIndices;
     syntax.inputfix = inputfix;
     syntax.isbinaryop = isbinaryop;
     syntax.ismonop = ismonop;

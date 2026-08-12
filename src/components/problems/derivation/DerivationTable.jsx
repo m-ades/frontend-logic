@@ -44,6 +44,11 @@ import {
 } from '../../../lib/derivationRules.js'
 import { getRulesetRestrictions } from '../../../lib/logicpenguin/checkers/derivation-rule-restrictions.js'
 import { justParse } from '../../ui/logicpenguin/justification-parse.js'
+import {
+  getIndexedUpperSymbols,
+  getLeadingIndexedUpperSymbol,
+  isPropositionalSymbol,
+} from '../../../lib/indexedSymbols.js'
 import { getInsertSymbolLabel } from '../../ui/logicpenguin/LogicSymbol.jsx'
 import { buildPersistedSubmissionState, shouldUseApiValidation, submitApiValidation } from '../../../utils/submissionRuntime.js'
 import {
@@ -88,20 +93,16 @@ function parseRulesetRules(value, derivationRuleLookup) {
  * Propositional derivations: extract unique uppercase letters from premises + conclusion.
  * Used for the mobile keyboard letter row.
  */
-function getPropositionalLettersFromFormulas(premises, conclusion) {
+function getPropositionalLettersFromFormulas(
+  premises,
+  conclusion,
+  allowIndexedSymbols = false
+) {
   const formulas = [...(Array.isArray(premises) ? premises : []), conclusion].filter(Boolean).map(String)
   const text = formulas.join(' ')
-  const letters = []
-  const seen = new Set()
-  const match = text.match(/[A-Z]/g)
-  if (match) {
-    for (const c of match) {
-      if (!seen.has(c)) {
-        seen.add(c)
-        letters.push(c)
-      }
-    }
-  }
+  const letters = allowIndexedSymbols
+    ? getIndexedUpperSymbols(text)
+    : Array.from(new Set(text.match(/[A-Z]/g) || []))
   return letters.length > 0 ? letters : null
 }
 
@@ -111,13 +112,14 @@ function getPropositionalLettersFromFormulas(premises, conclusion) {
  * Constants: first 3 lowercase letters [a-z] not used in the prompt (skip letters that appear in question text).
  * Variables: always x, y, z.
  */
-function getPredicateLettersFromKey(symbolizationKey) {
+function getPredicateLettersFromKey(symbolizationKey, allowIndexedSymbols = false) {
   if (!Array.isArray(symbolizationKey) || symbolizationKey.length === 0) return []
   const seen = new Set()
   return symbolizationKey
     .map((line) => {
       const s = typeof line === 'string' ? line : String(line ?? '')
       const left = s.split(':')[0].trim()
+      if (allowIndexedSymbols) return getLeadingIndexedUpperSymbol(left)
       const match = left.match(/^[A-Z]+/)
       return match ? match[0] : null
     })
@@ -179,11 +181,14 @@ function getQuantifierInsertButtonsFromFormulaText(formulaText) {
   return buttons
 }
 
-function isPredicateLogicKey(symbolizationKey) {
+function isPredicateLogicKey(symbolizationKey, allowIndexedSymbols = false) {
   if (!Array.isArray(symbolizationKey) || symbolizationKey.length === 0) return false
   return symbolizationKey.some((line) => {
     const s = typeof line === 'string' ? line : String(line ?? '')
-    return s.includes(':') && /^[A-Z]/.test(s.split(':')[0].trim())
+    const left = s.split(':')[0].trim()
+    return s.includes(':') && /^[A-Z]/.test(left) && left.length > 1 && !(
+      allowIndexedSymbols && isPropositionalSymbol(left)
+    )
   })
 }
 
@@ -350,6 +355,7 @@ export default function DerivationTable({
   const symbols = getSymbols(activeLogicSystem)
   const derivationProblemType = getDerivationProblemType(activeLogicSystem)
   const usesNestedSubderivations = derivationProblemType === 'derivation-calgary'
+  const allowIndexedSymbols = activeLogicSystem === 'fitch'
   const activeAssumptionRules = usesNestedSubderivations ? FITCH_ASSUMPTION_RULES : HURLEY_ASSUMPTION_RULES
   const conclusionTargetText = proof?.conclusion ? `${usesNestedSubderivations ? '∴' : '//'} ${proof.conclusion}` : ''
   const checkDerivation = useMemo(() => {
@@ -432,7 +438,7 @@ export default function DerivationTable({
     const formulaText = [...premises, conclusion].filter(Boolean).map(String).join(' ')
     const extraQuantifierButtons = getQuantifierButtonsFromFormulas(premises, conclusion)
 
-    const isPredicate = isPredicateLogicKey(key) || /[∀∃]/.test(formulaText) || /[A-Z][a-z]/.test(formulaText)
+    const isPredicate = isPredicateLogicKey(key, allowIndexedSymbols) || /[∀∃]/.test(formulaText) || /[A-Z][a-z]/.test(formulaText)
 
     if (isPredicate) {
       const keyText = key.map((line) => (typeof line === 'string' ? line : String(line ?? ''))).join(' ')
@@ -444,8 +450,12 @@ export default function DerivationTable({
       ]
       const variableLetters = PREDICATE_VARIABLES
       // Prefer predicate letters from the symbolization key; if missing, fall back to uppercase letters in formulas.
-      const fromKey = getPredicateLettersFromKey(key)
-      const fromFormulas = getPropositionalLettersFromFormulas(premises, conclusion) ?? []
+      const fromKey = getPredicateLettersFromKey(key, allowIndexedSymbols)
+      const fromFormulas = getPropositionalLettersFromFormulas(
+        premises,
+        conclusion,
+        allowIndexedSymbols
+      ) ?? []
       const predicateLetters = fromKey.length > 0 ? fromKey : fromFormulas
       return {
         isPredicateMode: true,
@@ -458,13 +468,17 @@ export default function DerivationTable({
     }
 
     // Propositional derivation: only show propositional letters (no lowercase rows, no quantifiers).
-    const predicateLetters = getPropositionalLettersFromFormulas(premises, conclusion) ?? []
+    const predicateLetters = getPropositionalLettersFromFormulas(
+      premises,
+      conclusion,
+      allowIndexedSymbols
+    ) ?? []
     return {
       isPredicateMode: false,
       symbolizationKey: predicateLetters,
       extraQuantifierButtons,
     }
-  }, [proof])
+  }, [allowIndexedSymbols, proof])
   const symbolButtons = useMemo(() => {
     const baseSymbolButtons = getSymbolButtons(symbols)
     const extraQuantifierButtons = derivationKeyboardConfig.extraQuantifierButtons || []

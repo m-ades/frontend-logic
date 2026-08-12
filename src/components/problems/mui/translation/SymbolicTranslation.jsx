@@ -20,7 +20,7 @@ import {
   isPredicateLogicKey,
   promptImpliesPredicateLogic,
 } from './symbolizationKeyboard.js'
-import { getNotation, getSymbols } from '../../../../lib/logicSystems.js'
+import { getNotation, getSymbols, normalizeLogicSystem } from '../../../../lib/logicSystems.js'
 
 function FormulaInputField({ value, onValueChange, fieldReadOnly, formulaInputRef, onEnterKey, ariaLabel, notation }) {
   const theme = useTheme()
@@ -147,6 +147,7 @@ export default function SymbolicTranslation({
   const editorRef = useRef(null)
   const notation = getNotation(logicSystem)
   const symbols = getSymbols(logicSystem)
+  const allowIndexedSymbols = normalizeLogicSystem(logicSystem) === 'fitch'
   const openEdit = () => editorRef.current?.open?.()
   const [inputValue, setInputValue] = useState(savedState?.ans || '')
   const formulaInputRef = useRef(null)
@@ -167,8 +168,10 @@ export default function SymbolicTranslation({
       ? symbolizationKeyRaw.split('\n').map((line) => line.trim()).filter(Boolean)
       : [])
 
-  const isPredicate = isPredicateLogicKey(symbolizationKey) || promptImpliesPredicateLogic(prompt)
-  const predicateLetters = isPredicate ? getPredicateLettersFromKey(symbolizationKey) : []
+  const isPredicate = isPredicateLogicKey(symbolizationKey, allowIndexedSymbols) || promptImpliesPredicateLogic(prompt)
+  const predicateLetters = isPredicate
+    ? getPredicateLettersFromKey(symbolizationKey, allowIndexedSymbols)
+    : []
   const constantsFromKey = getConstantLettersFromKey(symbolizationKey)
   const constantLetters = isPredicate
     ? (constantsFromKey.length > 0

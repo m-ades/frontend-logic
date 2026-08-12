@@ -23,12 +23,6 @@ if ((typeof process != 'undefined') &&
 function checkTranslation(ansstr, givenstr, pred = true,
     notationname = defaultnotation) {
     let maxfrac = 1;
-    // answer is totally right if strings match
-    if (ansstr == givenstr) { return {
-        correct: true,
-        determinate: true,
-        ptfrac: maxfrac
-    }};
     // load formula class for the notation
     const Formula = getFormulaClass(notationname);
     // parse strings
@@ -38,6 +32,17 @@ function checkTranslation(ansstr, givenstr, pred = true,
     let message = '';
     let correct = true;
     let determinate = true;
+    // Never let a raw string match bypass parsing. If the stored answer is
+    // malformed, grading is indeterminate until the question is corrected.
+    if (!ans.wellformed) {
+        return {
+            correct: false,
+            determinate: false,
+            message: tr('the intended translation is not syntactically well ' +
+                'formed (' + ans.syntaxerrors + ')'),
+            ptfrac: 0
+        };
+    }
     // ensure well formed
     if (!given.wellformed) {
         maxfrac = 0.8;

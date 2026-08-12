@@ -420,7 +420,8 @@ function generateFormulaClass(notationname = 'hurley') {
                 this._pletter = false;
                 return this._pletter;
             }
-            // look for first character which is a predicate
+            // Look for the predicate/propositional symbol, including any
+            // canonical numeric index (for example, E_1).
             const match = this.parsedstr.match(Formula.syntax.pletterRegEx);
             // has no pletter, which is not ok
             if (!match) {
@@ -528,8 +529,18 @@ function generateFormulaClass(notationname = 'hurley') {
                 this._termshadcommas = true;
             }
 
-            
-            this._terms = nocommas.match(Formula.syntax.termsRegEx);
+            // Keep only valid term symbols. More importantly, report rather
+            // than silently discard anything else in an atomic formula.
+            const invalidTermSymbol = new RegExp(
+                '[^' + Formula.syntax.notation.variableRange +
+                Formula.syntax.notation.constantsRange + ']', 'g'
+            );
+            const termstr = nocommas.replace(invalidTermSymbol, '');
+            if ((!this.op) && (nocommas != termstr)) {
+                this.syntaxError('unexpected symbols occur within an ' +
+                    'atomic (sub)formula');
+            }
+            this._terms = termstr.match(Formula.syntax.termsRegEx);
             if (!this._terms) { this._terms = []; }
             return this._terms;
         }

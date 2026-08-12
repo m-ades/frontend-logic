@@ -15,7 +15,7 @@ import DerivationTable from '../../derivation/DerivationTable.jsx'
 import getFormulaClass from '../../../../lib/logicpenguin/symbolic/formula.js'
 import { useProblemChecker } from '../../../../hooks/useProblemChecker.js'
 import PromptText from '../../../ui/PromptText.jsx'
-import { getNotation, getSymbols } from '../../../../lib/logicSystems.js'
+import { getNotation, getSymbols, normalizeLogicSystem } from '../../../../lib/logicSystems.js'
 import {
   ST_PREDICATE_VARIABLES,
   getConstantLettersFromKey,
@@ -163,16 +163,22 @@ function firstWithFormulas(...candidates) {
   return null
 }
 
-function getArgumentKeyboardConfig(answer, symbolizationKey, prompt, argumentLine) {
+function getArgumentKeyboardConfig(
+  answer,
+  symbolizationKey,
+  prompt,
+  argumentLine,
+  allowIndexedSymbols
+) {
   const answerFormulas = getAnswerFormulas(answer)
   const formulas = answerFormulas.length > 0
     ? answerFormulas
     : getAnswerFormulas(argumentLine)
-  const formulaKeyboardConfig = getFormulaKeyboardConfig(formulas)
+  const formulaKeyboardConfig = getFormulaKeyboardConfig(formulas, allowIndexedSymbols)
   if (formulaKeyboardConfig) return formulaKeyboardConfig
   if (symbolizationKey.length > 0) {
-    const isPredicate = isPredicateLogicKey(symbolizationKey) || promptImpliesPredicateLogic(prompt)
-    const predicateLetters = getPredicateLettersFromKey(symbolizationKey)
+    const isPredicate = isPredicateLogicKey(symbolizationKey, allowIndexedSymbols) || promptImpliesPredicateLogic(prompt)
+    const predicateLetters = getPredicateLettersFromKey(symbolizationKey, allowIndexedSymbols)
     const constantsFromKey = getConstantLettersFromKey(symbolizationKey)
     const constantLetters = isPredicate
       ? (constantsFromKey.length > 0 ? constantsFromKey : [])
@@ -238,12 +244,13 @@ export default function ComboTranslationDerivation({
   const openEdit = () => editorRef.current?.open?.()
   const notation = getNotation(logicSystem)
   const symbols = getSymbols(logicSystem)
+  const allowIndexedSymbols = normalizeLogicSystem(logicSystem) === 'fitch'
   const Formula = useMemo(() => getFormulaClass(notation), [notation])
   const snapshot = proof?.comboTranslationDerivation || proof?.snapshot || proof?.questionSnapshot || proof?.question_snapshot || proof || {}
   const promptText = snapshot?.prompt || proof?.description || ''
   const symbolizationKey = useMemo(
-    () => parseSymbolizationKeyFromPrompt(promptText),
-    [promptText]
+    () => parseSymbolizationKeyFromPrompt(promptText, allowIndexedSymbols),
+    [allowIndexedSymbols, promptText]
   )
   const answer = firstWithFormulas(
     proof?.answer,
@@ -295,9 +302,10 @@ export default function ComboTranslationDerivation({
       answer,
       symbolizationKey,
       promptText,
-      argumentLine
+      argumentLine,
+      allowIndexedSymbols
     ),
-    [answer, argumentLine, promptText, symbolizationKey]
+    [allowIndexedSymbols, answer, argumentLine, promptText, symbolizationKey]
   )
 
   const derivationProof = useMemo(() => {
