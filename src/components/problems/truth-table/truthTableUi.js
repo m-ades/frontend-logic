@@ -10,6 +10,10 @@ import {
   equivTables,
   formulaTable,
 } from '../../../lib/logicpenguin/symbolic/libsemantics.js'
+import {
+  displayIndexedSymbolsForNotation,
+  isPropositionalSymbol,
+} from '../../../lib/indexedSymbols.js'
 
 
 export function buildClassificationState(selection = []) {
@@ -123,7 +127,18 @@ export function tokenizeTruthTableHeader(statement, syntax) {
   rstr += '[)\\]}]*'
   const regex = new RegExp(rstr, 'g')
   const normalizedStatement = syntax.inputfix(statement).replace(/\s/g, '')
-  return Array.from(normalizedStatement.matchAll(regex)).map((match) => match[0])
+  return Array.from(normalizedStatement.matchAll(regex)).map((match) => (
+    displayIndexedSymbolsForNotation(match[0], syntax.notationname)
+  ))
+}
+
+export function isAtomicTruthTableToken(token, operatorSet, syntax) {
+  if (!token) return false
+  const stripped = token.replace(/[()\[\]{}]/g, '')
+  if (syntax?.notationname === 'calgary' && isPropositionalSymbol(stripped)) {
+    return true
+  }
+  return stripped.length === 1 && !operatorSet.has(stripped)
 }
 
 export function deriveTruthTableSolutionClassification(kind, solution, statements, Formula, notation) {

@@ -26,6 +26,7 @@ import {
   buildTruthTableStatePayload,
   buildTruthTableSubmissionData,
   deriveTruthTableSolutionClassification,
+  isAtomicTruthTableToken,
   normalizeSavedClassification,
   submitTruthTableAnswer,
   tokenizeTruthTableHeader,
@@ -33,6 +34,7 @@ import {
 import PromptText from '../../ui/PromptText.jsx'
 import { tablesEqual, clearDebounce, scheduleDebouncedChange } from '../../../utils/tablePerf.js'
 import { getNotation } from '../../../lib/logicSystems.js'
+import { displayIndexedSymbolsForNotation } from '../../../lib/indexedSymbols.js'
 
 const KIND_BY_PROOF_TYPE = {
   'formula-truth-table': 'formula',
@@ -148,7 +150,7 @@ export default function TruthTable({
     return statements.map((label, idx) => {
       const statement = statements[idx]
       return {
-        label,
+        label: displayIndexedSymbolsForNotation(label, syntax.notationname),
         tokens: res.tables[idx]?.tokens ?? [],
         rows: res.tables[idx]?.rows ?? [],
         headerTokens: tokenizeTruthTableHeader(statement, syntax),
@@ -157,13 +159,8 @@ export default function TruthTable({
   }, [Formula, statements, syntax])
 
   const isAtomicToken = React.useCallback(
-    (token) => {
-      if (!token) return false
-      const stripped = token.replace(/[()\[\]{}]/g, '')
-      if (stripped.length !== 1) return false
-      return !operatorSet.has(stripped)
-    },
-    [operatorSet]
+    (token) => isAtomicTruthTableToken(token, operatorSet, syntax),
+    [operatorSet, syntax]
   )
 
   const expectedTables = React.useMemo(

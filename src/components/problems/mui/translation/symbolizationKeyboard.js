@@ -1,4 +1,5 @@
 import {
+  getIndexedLowerSymbols,
   getIndexedUpperSymbols,
   getLeadingIndexedUpperSymbol,
   isPropositionalSymbol,
@@ -21,8 +22,10 @@ export function isPredicateLogicKey(symbolizationKey, allowIndexedSymbols = fals
   return symbolizationKey.some((line) => {
     const left = getLeftPart(line)
     // Constant: single lowercase a–w (e.g. "a = Alice")
-    const isConstantStyle =
-      left.length === 1 && /^[a-z]$/.test(left) && !['x', 'y', 'z'].includes(left)
+    const normalizedLeft = normalizeIndexedSymbols(left)
+    const isConstantStyle = allowIndexedSymbols
+      ? /^[a-r](?:_[1-9][0-9]*)?$/.test(normalizedLeft)
+      : left.length === 1 && /^[a-z]$/.test(left) && !['x', 'y', 'z'].includes(left)
     // Indexed sentence letters such as E_1/E₁ are still propositional atoms.
     const isPredicateStyle = /^[A-Z]/.test(left) && !(
       allowIndexedSymbols && isPropositionalSymbol(left)
@@ -51,20 +54,19 @@ export function getPredicateLettersFromKey(symbolizationKey, allowIndexedSymbols
 }
 
 /** Constants from key: lines whose left part is a single lowercase letter (a–w, not x,y,z). */
-export function getConstantLettersFromKey(symbolizationKey) {
+export function getConstantLettersFromKey(symbolizationKey, allowIndexedSymbols = false) {
   if (!Array.isArray(symbolizationKey) || symbolizationKey.length === 0) return []
   const result = []
   const seen = new Set()
   for (const line of symbolizationKey) {
     const left = getLeftPart(line)
-    if (
-      left.length === 1 &&
-      /^[a-z]$/.test(left) &&
-      !['x', 'y', 'z'].includes(left) &&
-      !seen.has(left)
-    ) {
-      seen.add(left)
-      result.push(left)
+    const normalizedLeft = normalizeIndexedSymbols(left)
+    const isConstant = allowIndexedSymbols
+      ? /^[a-r](?:_[1-9][0-9]*)?$/.test(normalizedLeft)
+      : left.length === 1 && /^[a-z]$/.test(left) && !['x', 'y', 'z'].includes(left)
+    if (isConstant && !seen.has(normalizedLeft)) {
+      seen.add(normalizedLeft)
+      result.push(normalizedLeft)
     }
   }
   return result
@@ -100,8 +102,13 @@ export function getFormulaKeyboardConfig(formulas, allowIndexedSymbols = false) 
   const predicateLetters = allowIndexedSymbols
     ? getIndexedUpperSymbols(formulaText)
     : unique(formulaText.match(/[A-Z]/g) || [])
-  const constantLetters = unique(formulaText.match(/[a-w]/g) || [])
-  const variableLetters = unique(formulaText.match(/[x-z]/g) || [])
+  const indexedTerms = allowIndexedSymbols ? getIndexedLowerSymbols(formulaText) : []
+  const constantLetters = allowIndexedSymbols
+    ? indexedTerms.filter((term) => /^[a-r]/.test(term))
+    : unique(formulaText.match(/[a-w]/g) || [])
+  const variableLetters = allowIndexedSymbols
+    ? indexedTerms.filter((term) => /^[s-z]/.test(term))
+    : unique(formulaText.match(/[x-z]/g) || [])
   const isPredicate =
     constantLetters.length > 0 ||
     variableLetters.length > 0 ||
@@ -135,7 +142,7 @@ export function parseSymbolizationKeyFromPrompt(promptText, allowIndexedSymbols 
   }
   return Array.from(
     keyMatch[1].matchAll(
-      /\b[A-Za-z]+(?:_[1-9][0-9]*|[₁-₉][₀-₉]*)?\s*[=:]/g
+      /\b[A-Za-z](?:_[1-9][0-9]*|[₁-₉][₀-₉]*)?(?:\([^)]*\))?\s*[=:]/g
     )
   ).map((match) => normalizeIndexedSymbols(match[0]))
 }

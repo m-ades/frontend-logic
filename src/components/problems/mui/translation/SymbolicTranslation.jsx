@@ -21,7 +21,8 @@ import {
   isPredicateLogicKey,
   promptImpliesPredicateLogic,
 } from './symbolizationKeyboard.js'
-import { getNotation, getSymbols, normalizeLogicSystem } from '../../../../lib/logicSystems.js'
+import { getNotation, getSymbols } from '../../../../lib/logicSystems.js'
+import { displayIndexedSymbolsForNotation } from '../../../../lib/indexedSymbols.js'
 
 function FormulaInputField({ value, onValueChange, onBlur, fieldReadOnly, formulaInputRef, onEnterKey, ariaLabel, notation }) {
   const theme = useTheme()
@@ -153,10 +154,14 @@ export default function SymbolicTranslation({
     (value) => canonicalizeFormula(value, notation),
     [notation]
   )
-  const allowIndexedSymbols = normalizeLogicSystem(logicSystem) === 'fitch'
+  const displayFormula = useCallback(
+    (value) => displayIndexedSymbolsForNotation(normalizeFormula(value), notation),
+    [normalizeFormula, notation]
+  )
+  const allowIndexedSymbols = notation === 'calgary'
   const openEdit = () => editorRef.current?.open?.()
   const [inputValue, setInputValue] = useState(
-    () => normalizeFormula(savedState?.ans || '')
+    () => displayFormula(savedState?.ans || '')
   )
   const formulaInputRef = useRef(null)
   const solutionInputRef = useRef(null)
@@ -180,7 +185,7 @@ export default function SymbolicTranslation({
   const predicateLetters = isPredicate
     ? getPredicateLettersFromKey(symbolizationKey, allowIndexedSymbols)
     : []
-  const constantsFromKey = getConstantLettersFromKey(symbolizationKey)
+  const constantsFromKey = getConstantLettersFromKey(symbolizationKey, allowIndexedSymbols)
   const constantLetters = isPredicate
     ? (constantsFromKey.length > 0
         ? constantsFromKey
@@ -192,27 +197,28 @@ export default function SymbolicTranslation({
 
   const scheduleStateSave = useCallback((nextValue) => {
     if (!onStateChange) return
+    const canonical = normalizeFormula(nextValue)
     if (saveTimerRef.current) {
       clearTimeout(saveTimerRef.current)
     }
     saveTimerRef.current = setTimeout(() => {
-      if (lastSavedValueRef.current === nextValue) return
-      lastSavedValueRef.current = nextValue
-      onStateChange({ ans: nextValue })
+      if (lastSavedValueRef.current === canonical) return
+      lastSavedValueRef.current = canonical
+      onStateChange({ ans: canonical })
     }, 200)
-  }, [onStateChange])
+  }, [normalizeFormula, onStateChange])
   const applyCanonicalValue = useCallback((value) => {
     if (readOnly) return
-    const canonical = normalizeFormula(value)
-    setInputValue(canonical)
-    scheduleStateSave(canonical)
-  }, [normalizeFormula, readOnly, scheduleStateSave])
+    const displayed = displayFormula(value)
+    setInputValue(displayed)
+    scheduleStateSave(displayed)
+  }, [displayFormula, readOnly, scheduleStateSave])
   
   const { status, message, isChecking, handleCheck, handleStartOver, setMessage, attemptCount, maxAttempts, isLocked } = useProblemChecker({
     answer,
     problemType: 'symbolic-translation',
     question: problem,
-    getAnswer: () => inputValue,
+    getAnswer: () => normalizeFormula(inputValue),
     onComplete,
     isDisabled: () => !inputValue.trim(),
     resetInput: () => {
@@ -224,8 +230,8 @@ export default function SymbolicTranslation({
     },
     onStateChange: (state) => {
       if (state?.ans !== undefined) {
-        setInputValue(state.ans)
-        lastSavedValueRef.current = state.ans
+        setInputValue(displayFormula(state.ans))
+        lastSavedValueRef.current = normalizeFormula(state.ans)
       }
       onStateChange?.(state)
     },
@@ -240,10 +246,10 @@ export default function SymbolicTranslation({
     if (savedState?.ans !== undefined) {
       hasHydratedRef.current = true
       const canonical = normalizeFormula(savedState.ans)
-      setInputValue(canonical)
+      setInputValue(displayFormula(canonical))
       lastSavedValueRef.current = canonical
     }
-  }, [normalizeFormula, savedState?.ans])
+  }, [displayFormula, normalizeFormula, savedState?.ans])
 
   useEffect(() => () => {
     if (saveTimerRef.current) {
@@ -294,7 +300,7 @@ export default function SymbolicTranslation({
                         variant="body2"
                         sx={{ mb: 0.5 }}
                       >
-                        {line}
+                        {displayIndexedSymbolsForNotation(line, notation)}
                       </Typography>
                     ))}
                   </Box>
@@ -362,7 +368,7 @@ export default function SymbolicTranslation({
               /* show answer in card */
               <SolutionReveal show={showSolution}>
                 <FormulaInputField
-                  value={normalizeFormula(answer ?? '')}
+                  value={displayFormula(answer ?? '')}
                   onValueChange={null}
                   fieldReadOnly
                   formulaInputRef={solutionInputRef}

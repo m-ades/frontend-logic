@@ -15,7 +15,11 @@ import DerivationTable from '../../derivation/DerivationTable.jsx'
 import getFormulaClass from '../../../../lib/logicpenguin/symbolic/formula.js'
 import { useProblemChecker } from '../../../../hooks/useProblemChecker.js'
 import PromptText from '../../../ui/PromptText.jsx'
-import { getNotation, getSymbols, normalizeLogicSystem } from '../../../../lib/logicSystems.js'
+import { getNotation, getSymbols } from '../../../../lib/logicSystems.js'
+import {
+  displayIndexedSymbolsForNotation,
+  normalizeIndexedSymbols,
+} from '../../../../lib/indexedSymbols.js'
 import {
   ST_PREDICATE_VARIABLES,
   getConstantLettersFromKey,
@@ -180,7 +184,7 @@ function getArgumentKeyboardConfig(
   if (symbolizationKey.length > 0) {
     const isPredicate = isPredicateLogicKey(symbolizationKey, allowIndexedSymbols) || promptImpliesPredicateLogic(prompt)
     const predicateLetters = getPredicateLettersFromKey(symbolizationKey, allowIndexedSymbols)
-    const constantsFromKey = getConstantLettersFromKey(symbolizationKey)
+    const constantsFromKey = getConstantLettersFromKey(symbolizationKey, allowIndexedSymbols)
     const constantLetters = isPredicate
       ? (constantsFromKey.length > 0 ? constantsFromKey : [])
       : []
@@ -245,7 +249,7 @@ export default function ComboTranslationDerivation({
   const openEdit = () => editorRef.current?.open?.()
   const notation = getNotation(logicSystem)
   const symbols = getSymbols(logicSystem)
-  const allowIndexedSymbols = normalizeLogicSystem(logicSystem) === 'fitch'
+  const allowIndexedSymbols = notation === 'calgary'
   const Formula = useMemo(() => getFormulaClass(notation), [notation])
   const canonicalizeArgumentLine = useCallback((value) => {
     const parsed = parseArgumentLine(value)
@@ -255,8 +259,9 @@ export default function ComboTranslationDerivation({
     if (premises.some((formula) => !formula.wellformed) || !conclusion.wellformed) {
       return value
     }
-    return `${premises.map((formula) => formula.normal).join(' / ')} // ${conclusion.normal}`
-  }, [Formula])
+    const canonical = `${premises.map((formula) => formula.normal).join(' / ')} // ${conclusion.normal}`
+    return displayIndexedSymbolsForNotation(canonical, notation)
+  }, [Formula, notation])
   const snapshot = proof?.comboTranslationDerivation || proof?.snapshot || proof?.questionSnapshot || proof?.question_snapshot || proof || {}
   const promptText = snapshot?.prompt || proof?.description || ''
   const symbolizationKey = useMemo(
@@ -290,7 +295,12 @@ export default function ComboTranslationDerivation({
 
   const updateState = (updates) => {
     const state = { argumentLine, derivationState, ...updates }
-    onStateChange?.(state)
+    onStateChange?.({
+      ...state,
+      argumentLine: allowIndexedSymbols
+        ? normalizeIndexedSymbols(state.argumentLine)
+        : state.argumentLine,
+    })
   }
 
   const parseStatus = useMemo(() => {
