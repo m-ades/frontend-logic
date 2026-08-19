@@ -43,7 +43,7 @@ function RulesCard({ title, children, defaultExpanded = false }) {
           sx={{ 
             color: 'inherit',
             fontWeight: expanded ? 600 : 400,
-            fontSize: '0.9rem',
+            fontSize: '1rem',
           }}
         >
           {title}
@@ -66,7 +66,7 @@ function RulesCard({ title, children, defaultExpanded = false }) {
       {expanded && (
         <Box 
           sx={{ 
-            fontSize: '0.9rem', 
+            fontSize: '1rem',
             lineHeight: 1.5, 
             color: 'text.primary',
             padding: '8px 12px',
@@ -96,10 +96,10 @@ function FitchRuleEntries({ group }) {
       component="section"
       sx={{ px: 0.5, py: 1.25, borderBottom: 1, borderColor: 'divider' }}
     >
-      <Typography component="h4" sx={{ m: 0, fontSize: '0.85rem', fontWeight: 700 }}>
+      <Typography component="h4" sx={{ m: 0, fontSize: '1rem', fontWeight: 700 }}>
         {group.start + index}. {rule.title} ({rule.name})
       </Typography>
-      <Typography component="div" sx={{ mt: 0.6, fontSize: '0.8rem', color: 'text.primary' }}>
+      <Typography component="div" sx={{ mt: 0.6, fontSize: '1rem', color: 'text.primary' }}>
         <EmphasizedText text={rule.description} bold={rule.bold} />
       </Typography>
       {(FITCH_RULE_EXAMPLES[rule.name] || []).map((example, exampleIndex) => (
@@ -126,13 +126,13 @@ function FitchRuleEntries({ group }) {
         </Box>
       ))}
       {rule.note && (
-        <Typography component="div" sx={{ mt: 0.6, fontSize: '0.78rem', color: 'text.secondary' }}>
+        <Typography component="div" sx={{ mt: 0.6, fontSize: '1rem', color: 'text.secondary' }}>
           {rule.noteLabelBold ? <strong>Note:</strong> : 'Note:'}{' '}
           <EmphasizedText text={rule.note} bold={rule.noteBold} />
         </Typography>
       )}
       {rule.notes?.map((note) => (
-        <Typography key={note.text} component="div" sx={{ mt: 0.6, fontSize: '0.78rem', color: 'text.secondary' }}>
+        <Typography key={note.text} component="div" sx={{ mt: 0.6, fontSize: '1rem', color: 'text.secondary' }}>
           {note.labelBold ? <strong>Note:</strong> : 'Note:'}{' '}
           <EmphasizedText text={note.text} bold={note.bold} />
         </Typography>
@@ -172,7 +172,7 @@ function FitchRuleGroup({ group }) {
           '&:hover': { bgcolor: (t) => alpha(t.palette.primary.main, 0.1) },
         }}
       >
-        <Typography component="span" sx={{ fontWeight: 700, fontSize: '0.95rem' }}>
+        <Typography component="span" sx={{ fontWeight: 700, fontSize: '1rem' }}>
           {group.title}
         </Typography>
         {expanded ? <ExpandLessIcon fontSize="small" /> : <ExpandMoreIcon fontSize="small" />}
@@ -234,7 +234,7 @@ function ShortcutTable({ rows }) {
                       bgcolor: 'transparent',
                       color: 'text.primary',
                       fontFamily: 'monospace',
-                      fontSize: '0.75rem',
+                      fontSize: '0.875rem',
                       lineHeight: 1.4,
                       textAlign: 'center',
                     }}
@@ -244,7 +244,7 @@ function ShortcutTable({ rows }) {
                 ))}
               </Box>
             </Box>
-            <Box component="td" sx={{ py: 0.75, color: 'text.secondary', fontSize: '0.8rem' }}>
+            <Box component="td" sx={{ py: 0.75, color: 'text.secondary', fontSize: '1rem' }}>
               {meaning}
             </Box>
           </Box>
@@ -302,10 +302,10 @@ export default function RulesReference({ logicSystem }) {
     >
       <RulesCard title="Keyboard Shortcuts" defaultExpanded={true}>
         <ShortcutTable rows={shortcutRows} />
-        <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 0.5, color: 'primary.main', fontSize: '0.95rem' }}>
+        <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 0.5, color: 'primary.main', fontSize: '1rem' }}>
           Navigation
         </Typography>
-        <Box component="div" sx={{ fontSize: '0.85rem' }}>
+        <Box component="div" sx={{ fontSize: '1rem' }}>
           <div><strong>•</strong> Press <strong>Enter</strong> to go to the justification line</div>
         </Box>
       </RulesCard>
@@ -314,9 +314,9 @@ export default function RulesReference({ logicSystem }) {
         {isFitch ? (
           <>
             <Box sx={{ mb: 2, p: 1, borderRadius: 1, bgcolor: (t) => alpha(t.palette.primary.main, 0.06) }}>
-              <Typography component="div" sx={{ mb: 0.75, fontSize: '0.85rem', fontWeight: 700 }}>Definitions</Typography>
+              <Typography component="div" sx={{ mb: 0.75, fontSize: '1rem', fontWeight: 700 }}>Definitions</Typography>
               {FITCH_DEFINITIONS.map((definition) => (
-                <Typography key={definition.text} component="p" sx={{ m: 0, '&:not(:last-child)': { mb: 1 }, fontSize: '0.8rem', color: 'text.primary' }}>
+                <Typography key={definition.text} component="p" sx={{ m: 0, '&:not(:last-child)': { mb: 1 }, fontSize: '1rem', color: 'text.primary' }}>
                   <EmphasizedText text={definition.text} bold={definition.bold} />
                 </Typography>
               ))}
@@ -325,10 +325,10 @@ export default function RulesReference({ logicSystem }) {
           </>
         ) : (
           <>
-            <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 0.5, color: 'primary.main', fontSize: '0.95rem' }}>
+            <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 0.5, color: 'primary.main', fontSize: '1rem' }}>
               Rules of Implication
             </Typography>
-            <Box component="div" sx={{ mb: 1.5, fontSize: '0.85rem' }}>
+            <Box component="div" sx={{ mb: 1.5, fontSize: '1rem' }}>
               <div><strong>1. MP:</strong> p ⊃ q, p / q</div>
               <div><strong>2. MT:</strong> p ⊃ q, ~q / ~p</div>
               <div><strong>3. HS:</strong> p ⊃ q, q ⊃ r / p ⊃ r</div>
@@ -338,10 +338,10 @@ export default function RulesReference({ logicSystem }) {
               <div><strong>7. Conj:</strong> p, q / p • q</div>
               <div><strong>8. Add:</strong> p / p ∨ q</div>
             </Box>
-            <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 0.5, color: 'primary.main', fontSize: '0.95rem' }}>
+            <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 0.5, color: 'primary.main', fontSize: '1rem' }}>
               Rules of Replacement
             </Typography>
-            <Box component="div" sx={{ fontSize: '0.85rem' }}>
+            <Box component="div" sx={{ fontSize: '1rem' }}>
               <div><strong>9. DM:</strong></div>
               <div style={{ paddingLeft: '28px' }}>~(p • q) :: (~p ∨ ~q)</div>
               <div style={{ paddingLeft: '28px' }}>~(p ∨ q) :: (~p • ~q)</div>
@@ -375,7 +375,7 @@ export default function RulesReference({ logicSystem }) {
       
       <RulesCard title={isFitch ? 'Natural Deduction Rules for FOL' : 'Predicate Logic Rules'} defaultExpanded={false}>
         {!isFitch && (
-          <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 0.5, color: 'primary.main', fontSize: '0.95rem' }}>
+          <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 0.5, color: 'primary.main', fontSize: '1rem' }}>
             Predicate Logic Rules
           </Typography>
         )}
@@ -383,16 +383,16 @@ export default function RulesReference({ logicSystem }) {
           <FitchRuleGroups groups={FITCH_FOL_RULE_GROUPS} />
         ) : (
           <>
-            <Box component="div" sx={{ mb: 1.5, fontSize: '0.85rem' }}>
+            <Box component="div" sx={{ mb: 1.5, fontSize: '1rem' }}>
               <div><strong>UI:</strong> (x)Fx / Fx &nbsp;or&nbsp; (x)Fx / Fa</div>
               <div><strong>UG:</strong> Fx / (x)Fx</div>
               <div><strong>EI:</strong> (∃x)Fx / Fa</div>
               <div><strong>EG:</strong> Fa / (∃x)Fx &nbsp;or&nbsp; Fx / (∃x)Fx</div>
             </Box>
-            <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 0.5, color: 'primary.main', fontSize: '0.95rem' }}>
+            <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 0.5, color: 'primary.main', fontSize: '1rem' }}>
               Quantifier Negation (QN)
             </Typography>
-            <Box component="div" sx={{ mb: 1.5, fontSize: '0.85rem' }}>
+            <Box component="div" sx={{ mb: 1.5, fontSize: '1rem' }}>
               <div><strong>QN:</strong> ~(x)Fx :: (∃x)~Fx</div>
               <div><strong>QN:</strong> ~(∃x)Fx :: (x)~Fx</div>
               <div><strong>QN:</strong> (x)Fx :: ~(∃x)~Fx</div>
@@ -404,7 +404,7 @@ export default function RulesReference({ logicSystem }) {
 
       {!isFitch && (
         <RulesCard title="Conditional & Indirect Proofs" defaultExpanded={false}>
-          <Box component="div" sx={{ fontSize: '0.85rem' }}>
+          <Box component="div" sx={{ fontSize: '1rem' }}>
             <div><strong>ACP:</strong> Assumption for Conditional Proof</div>
             <div><strong>CP:</strong> To prove p ⊃ q, assume p (ACP) in an indented subderivation, derive q, then discharge with CP citing the subderivation range</div>
             <div><strong>AIP:</strong> Assumption for Indirect Proof</div>
@@ -433,8 +433,8 @@ export default function RulesReference({ logicSystem }) {
     return (
       <Box
         sx={{
-          width: isRulesReferenceOpen ? 'clamp(380px, 32vw, 520px)' : 0,
-          maxWidth: isRulesReferenceOpen ? 'min(520px, 40vw)' : 0,
+          width: isRulesReferenceOpen ? 'clamp(480px, 40vw, 680px)' : 0,
+          maxWidth: isRulesReferenceOpen ? 'min(680px, 48vw)' : 0,
           minWidth: 0,
           flexShrink: 0,
           overflow: 'hidden',
@@ -472,8 +472,8 @@ export default function RulesReference({ logicSystem }) {
       sx={{
         display: 'block',
         '& .MuiDrawer-paper': {
-          width: { xs: '92%', sm: '480px' },
-          maxWidth: 'min(480px, 92vw)',
+          width: { xs: '92%', sm: '560px' },
+          maxWidth: 'min(560px, 92vw)',
         },
       }}
     >
