@@ -60,7 +60,7 @@ export default function DerivationJustificationCell({
   usesNestedSubderivations,
 }) {
   const selectedRule = getRuleFromJustification(line.justification)
-  const isAssumption = assumptionRules.has(selectedRule.toUpperCase())
+  const omitsCitations = assumptionRules.has(selectedRule.toUpperCase())
   const isPremise = lineIndex < premisesCount
   const ruleOptions = selectedRule && !allowedRules.some((rule) => (
     rule.toLowerCase() === selectedRule.toLowerCase()
@@ -104,7 +104,7 @@ export default function DerivationJustificationCell({
         <Stack direction="row" alignItems="center" sx={{ flexWrap: 'nowrap', gap: 0, minWidth: 0 }}>
           {useRuleDropdown ? (
             <>
-              {!isAssumption && (
+              {!omitsCitations && (
                 <TextField
                   variant="standard"
                   placeholder="Line(s)"
@@ -132,7 +132,7 @@ export default function DerivationJustificationCell({
               {ruleOptions.length > 0 && (
                 <FormControl
                   variant="standard"
-                  sx={isAssumption
+                  sx={omitsCitations
                     ? justificationWidth
                     : {
                         order: usesNestedSubderivations ? -2 : -1,
@@ -148,9 +148,9 @@ export default function DerivationJustificationCell({
                     inputProps={{ 'aria-label': `Rule for line ${lineIndex + 1}` }}
                     onFocus={onActivate}
                     onChange={(event) => onRuleChange(String(event.target.value || ''))}
-                    renderValue={(value) => isAssumption ? '' : value || 'Rule'}
+                    renderValue={(value) => value || 'Rule'}
                     sx={{
-                      width: isAssumption ? '100%' : undefined,
+                      width: omitsCitations ? '100%' : undefined,
                       '& .MuiSelect-select, & .MuiInputBase-input': {
                         fontSize: DERIVATION_LINE_FONT_SIZE,
                         py: 0.5,
