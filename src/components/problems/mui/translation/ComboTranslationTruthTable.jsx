@@ -4,7 +4,7 @@ import EditIcon from '@mui/icons-material/Edit'
 import InstructorQuestionEditor from '../../InstructorQuestionEditor.jsx'
 import StatusBanner, { isTerminalStatus } from '../../../ui/StatusBanner.jsx'
 import { useTheme, useMediaQuery } from '@mui/material'
-import getSyntax from '../../../../lib/logicpenguin/symbolic/libsyntax.js'
+import getSyntax, { resolveNotationName } from '../../../../lib/logicpenguin/symbolic/libsyntax.js'
 import ProblemSetButtons from '../frame/ProblemSetButtons.jsx'
 import FormulaInput from '../../../ui/logicpenguin/formula-input.js'
 import SymbolButtonRow from '../../../ui/logicpenguin/SymbolButtonRow.jsx'
@@ -111,7 +111,8 @@ export default function ComboTranslationTruthTable({
   const editorRef = useRef(null)
   const openEdit = () => editorRef.current?.open?.()
   const Formula = useMemo(() => getFormulaClass(), [])
-  const syntax = useMemo(() => getSyntax(), [])
+  const notation = useMemo(() => resolveNotationName(proof), [proof])
+  const syntax = useMemo(() => getSyntax(notation), [notation])
   const snapshot = proof?.comboTranslationTruthTable || proof?.snapshot || {}
   const promptText = snapshot?.prompt || proof?.description || ''
   const symbolizationKey = useMemo(
@@ -127,7 +128,7 @@ export default function ComboTranslationTruthTable({
     if (isPhone) return
     const container = inputContainerRef.current
     if (!container) return
-    const inp = FormulaInput.getnew({})
+    const inp = FormulaInput.getnew({ notation })
     inputRef.current = inp
     Object.assign(inp.style, {
       width: '100%',
@@ -154,7 +155,7 @@ export default function ComboTranslationTruthTable({
       if (inp.parentNode) inp.parentNode.removeChild(inp)
       inputRef.current = null
     }
-  }, [theme, isPhone])
+  }, [theme, isPhone, notation])
 
   useEffect(() => {
     if (isPhone) return
@@ -180,14 +181,11 @@ export default function ComboTranslationTruthTable({
       return { ok: false, reason: '', parsed: null }
     }
     const quantSymbols = [syntax?.symbols?.FORALL, syntax?.symbols?.EXISTS].filter(Boolean)
-    if (quantSymbols.length > 0) {
-      const quantRegex = new RegExp(`[${quantSymbols.join('')}]`)
-      if (quantRegex.test(argumentLine)) {
-        return {
-          ok: false,
-          reason: 'Truth tables do not support quantifiers.',
-          parsed: null,
-        }
+    if (quantSymbols.some((symbol) => argumentLine.includes(symbol))) {
+      return {
+        ok: false,
+        reason: 'Truth tables do not support quantifiers.',
+        parsed: null,
       }
     }
     const parsed = parseArgumentLine(argumentLine)
@@ -201,7 +199,7 @@ export default function ComboTranslationTruthTable({
     } catch {
       return { ok: false, reason: 'Fix the argument line before building the table.', parsed: null }
     }
-  }, [Formula, argumentLine])
+  }, [Formula, argumentLine, syntax])
 
   const tableProof = useMemo(() => {
     if (!parseStatus.ok || !parseStatus.parsed) return null
@@ -318,6 +316,7 @@ export default function ComboTranslationTruthTable({
                   symbolizationKey={symbolizationKey}
                   includeQuantifiers={false}
                   extraInsertButtons={[{ insert: '/' }, { insert: '//' }]}
+                  notation={notation}
                 />
               ) : (
                 <>
@@ -330,6 +329,8 @@ export default function ComboTranslationTruthTable({
                       inputRef={inputRef}
                       onValueChange={handleArgumentChange}
                       includeQuantifiers={false}
+                      extraInsertButtons={[{ insert: '/' }, { insert: '//' }]}
+                      notation={notation}
                     />
                   </Box>
                 </>

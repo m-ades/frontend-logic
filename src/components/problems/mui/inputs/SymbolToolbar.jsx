@@ -26,19 +26,27 @@ const BUTTONS = [
 
 const INSERT_LABELS = {
   '~': 'Insert tilde',
+  '¬': 'Insert negation',
   '•': 'Insert dot',
+  '∧': 'Insert conjunction',
   '∨': 'Insert wedge',
   '⊃': 'Insert horseshoe',
+  '→': 'Insert arrow',
   '≡': 'Insert triple bar',
+  '↔': 'Insert biconditional',
   '∀': 'Insert universal quantifier',
   '∃': 'Insert existential quantifier',
   '()': 'Insert parentheses',
   '[]': 'Insert brackets',
 }
 
-const getInsertText = (symbols, { op, quantifier = false, pair = null }) => {
+const getInsertText = (syntax, { op, quantifier = false, pair = null }) => {
   if (pair) return pair
+  const symbols = syntax?.symbols || {}
   const symbol = symbols?.[op] || FALLBACK_SYMBOLS[op] || op
+  if (quantifier && typeof syntax?.mkquantifier === 'function') {
+    return syntax.mkquantifier('x', symbol)
+  }
   return quantifier ? `(${symbol}x)` : symbol
 }
 
@@ -89,11 +97,11 @@ export default function SymbolToolbar({
   onValueChange,
   disabled = false,
   includeQuantifiers = true,
+  notation,
 }) {
   const theme = useTheme()
   const isPhone = useMediaQuery(theme.breakpoints.down('sm'))
-  const syntax = getSyntax()
-  const symbols = syntax?.symbols || {}
+  const syntax = getSyntax(notation)
   const visibleButtons = includeQuantifiers
     ? BUTTONS
     : BUTTONS.filter((button) => !button.quantifier)
@@ -104,7 +112,7 @@ export default function SymbolToolbar({
   return (
     <Stack direction="row" spacing={0.5} flexWrap="wrap" useFlexGap aria-label="Symbol shortcuts">
       {visibleButtons.map(({ op, quantifier, pair }) => {
-        const insertText = getInsertText(symbols, { op, quantifier, pair })
+        const insertText = getInsertText(syntax, { op, quantifier, pair })
         return (
           <Button
             key={op || pair}

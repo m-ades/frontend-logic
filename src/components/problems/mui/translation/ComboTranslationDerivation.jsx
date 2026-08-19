@@ -11,6 +11,7 @@ import ProblemSetButtons from '../frame/ProblemSetButtons.jsx'
 import FormulaInput from '../../../ui/logicpenguin/formula-input.js'
 import SymbolButtonRow from '../../../ui/logicpenguin/SymbolButtonRow.jsx'
 import { MobileLogicInput } from '../../../ui/LogicKeyboard/index.js'
+import { resolveNotationName } from '../../../../lib/logicpenguin/symbolic/libsyntax.js'
 import DerivationTable from '../../derivation/DerivationTable.jsx'
 import getFormulaClass from '../../../../lib/logicpenguin/symbolic/formula.js'
 import { useProblemChecker } from '../../../../hooks/useProblemChecker.js'
@@ -25,7 +26,7 @@ import {
   promptImpliesPredicateLogic,
 } from './symbolizationKeyboard.js'
 
-function FormulaInputField({ value, onValueChange, formulaInputRef }) {
+function FormulaInputField({ value, onValueChange, formulaInputRef, notation }) {
   const theme = useTheme()
   const containerRef = useRef(null)
   const changeHandlerRef = useRef(null)
@@ -33,7 +34,7 @@ function FormulaInputField({ value, onValueChange, formulaInputRef }) {
   useEffect(() => {
     if (!containerRef.current) return
     if (!formulaInputRef.current) {
-      const formulaInput = FormulaInput.getnew({})
+      const formulaInput = FormulaInput.getnew({ notation })
       formulaInputRef.current = formulaInput
       formulaInput.style.width = '100%'
       formulaInput.style.padding = theme.spacing(1.5)
@@ -60,7 +61,7 @@ function FormulaInputField({ value, onValueChange, formulaInputRef }) {
         formulaInputRef.current = null
       }
     }
-  }, [formulaInputRef, theme])
+  }, [formulaInputRef, notation, theme])
 
   useEffect(() => {
     const formulaInput = formulaInputRef.current
@@ -253,6 +254,7 @@ export default function ComboTranslationDerivation({
   const inputRef = useRef(null)
   const [fullScreenOpen, setFullScreenOpen] = useState(false)
   const [fullScreenFocusTarget, setFullScreenFocusTarget] = useState(null)
+  const notation = resolveNotationName(proof)
 
   useEffect(() => {
     if (savedState?.argumentLine !== undefined) {
@@ -456,12 +458,13 @@ export default function ComboTranslationDerivation({
                   onChange={handleArgumentChange}
                   placeholder="e.g. A ⊃ B / A // B"
                   aria-label="Argument line"
-                  includeQuantifiers
+                  includeQuantifiers={Boolean(argumentKeyboardConfig.isPredicateMode)}
                   symbolizationKey={argumentKeyboardConfig.symbolizationKey}
                   extraInsertButtons={[{ insert: '/' }, { insert: '//' }]}
                   predicateLetters={argumentKeyboardConfig.isPredicateMode ? argumentKeyboardConfig.predicateLetters : undefined}
                   constantLetters={argumentKeyboardConfig.isPredicateMode ? argumentKeyboardConfig.constantLetters : undefined}
                   variableLetters={argumentKeyboardConfig.isPredicateMode ? argumentKeyboardConfig.variableLetters : undefined}
+                  notation={notation}
                 />
               ) : (
                 <>
@@ -469,11 +472,15 @@ export default function ComboTranslationDerivation({
                     value={argumentLine}
                     onValueChange={handleArgumentChange}
                     formulaInputRef={inputRef}
+                    notation={notation}
                   />
                   <Box sx={{ mt: 1 }}>
                     <SymbolButtonRow
                       inputRef={inputRef}
                       onValueChange={handleArgumentChange}
+                      includeQuantifiers={Boolean(argumentKeyboardConfig.isPredicateMode)}
+                      extraInsertButtons={[{ insert: '/' }, { insert: '//' }]}
+                      notation={notation}
                     />
                   </Box>
                 </>

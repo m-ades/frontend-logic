@@ -1,5 +1,6 @@
 import { useCallback, useState, useEffect, useRef } from 'react'
 import { Box } from '@mui/material'
+import { alpha } from '@mui/material/styles'
 
 const visuallyHiddenSx = {
   position: 'absolute',
@@ -77,13 +78,16 @@ export default function LogicInput({
     (e) => {
       if (disabled) return
       const target = e.target
-      const index = target.getAttribute('data-char-index')
-      if (index !== null) {
+      const index = target.getAttribute?.('data-char-index')
+      if (index !== null && index !== undefined) {
         const i = parseInt(index, 10)
-        if (Number.isFinite(i)) setCursor(i + 1)
-      } else {
-        setCursor(len)
+        if (!Number.isFinite(i)) return
+        const rect = target.getBoundingClientRect()
+        setCursor(e.clientX > rect.left + rect.width / 2 ? i + 1 : i)
+        return
       }
+      const rect = e.currentTarget.getBoundingClientRect()
+      setCursor(e.clientX < rect.left + rect.width / 2 ? 0 : len)
     },
     [disabled, setCursor, len]
   )
@@ -91,9 +95,8 @@ export default function LogicInput({
   const handleFocus = useCallback(() => {
     if (disabled) return
     setIsFocused(true)
-    if (value.length > 0 && clampedCursor === 0) setCursor(value.length)
     onFocus?.()
-  }, [disabled, onFocus, value.length, clampedCursor, setCursor])
+  }, [disabled, onFocus])
 
   const handleBlur = useCallback(() => {
     setIsFocused(false)
@@ -122,6 +125,16 @@ export default function LogicInput({
         if (clampedCursor < len) setCursor(clampedCursor + 1)
         return
       }
+      if (e.key === 'Home') {
+        e.preventDefault()
+        setCursor(0)
+        return
+      }
+      if (e.key === 'End') {
+        e.preventDefault()
+        setCursor(len)
+        return
+      }
       if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) {
         e.preventDefault()
         const next = value.slice(0, clampedCursor) + e.key + value.slice(clampedCursor)
@@ -139,6 +152,7 @@ export default function LogicInput({
       aria-multiline={false}
       aria-placeholder={placeholder || undefined}
       aria-readonly={disabled ? 'true' : undefined}
+      aria-disabled={disabled ? 'true' : undefined}
       tabIndex={disabled ? undefined : 0}
       onClick={handleContainerClick}
       onFocus={handleFocus}
@@ -150,7 +164,9 @@ export default function LogicInput({
         py: 1,
         border: '1px solid',
         borderColor: isFocused ? 'primary.main' : 'divider',
-        borderRadius: 1,
+        borderRadius: 1.5,
+        boxShadow: (theme) =>
+          isFocused ? `0 0 0 3px ${alpha(theme.palette.primary.main, 0.16)}` : 'none',
         bgcolor: 'background.paper',
         color: 'text.primary',
         fontFamily: 'monospace',
@@ -199,8 +215,18 @@ export default function LogicInput({
             />
           ) : null}
           {i < len ? (
-            <Box component="span" data-char-index={i}>
-              {value[i]}
+            <Box
+              component="span"
+              data-char-index={i}
+              sx={{
+                display: 'inline-block',
+                minWidth: '0.7em',
+                minHeight: '1.35em',
+                px: '1px',
+                textAlign: 'center',
+              }}
+            >
+              {value[i] === ' ' ? '\u00a0' : value[i]}
             </Box>
           ) : null}
         </Box>

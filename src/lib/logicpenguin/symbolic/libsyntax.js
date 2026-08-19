@@ -10,7 +10,6 @@
 import notations from './notations.js';
 
 const DEFAULT_NOTATION = 'hurley';
-let cachedSyntax = null;
 
 // adicities for operators
 const symbolcat = {
@@ -154,12 +153,13 @@ function stripmatching(s) {
 }
 
 //////////// Main function for generating new syntax
-function generateSyntax() {
+function generateSyntax(notationName = DEFAULT_NOTATION) {
     // initialize return value
     const syntax = {};
+    const name = notations[notationName] ? notationName : DEFAULT_NOTATION;
 
-    syntax.notation = notations[DEFAULT_NOTATION];
-    syntax.notationname = DEFAULT_NOTATION;
+    syntax.notation = notations[name];
+    syntax.notationname = name;
 
     // symbols are those things in notation also in symbolcat
     const symbols = {}
@@ -228,17 +228,34 @@ function generateSyntax() {
     syntax.symbolcat = symbolcat;
     return syntax;
 }
-//
-// EXPORTED FUNCTION
-//
-// returns the app's (single) syntax object
-export default function getSyntax() {
-    if (cachedSyntax) {
-        // regenerate if notation has changed (e.g., updated ranges)
-        if (cachedSyntax?.notation?.predicatesRange?.includes('a')) {
-            return cachedSyntax;
-        }
-    }
-    cachedSyntax = generateSyntax();
-    return cachedSyntax;
+const syntaxCache = new Map();
+
+function normalizeNotationName(raw) {
+    if (typeof raw !== 'string') return undefined;
+    const name = raw.trim().toLowerCase();
+    return notations[name] ? name : undefined;
+}
+
+/** Accepts a notation id (`'cambridge'`) or a proof/problem object. */
+export function resolveNotationName(source) {
+    if (source == null) return undefined;
+    if (typeof source === 'string') return normalizeNotationName(source);
+    if (typeof source !== 'object') return undefined;
+    return normalizeNotationName(
+        (typeof source.notation === 'string' && source.notation) ||
+        source.options?.notation ||
+        source.questionSnapshot?.options?.notation ||
+        source.snapshot?.options?.notation ||
+        source.question_snapshot?.options?.notation
+    );
+}
+
+// returns a syntax object for the given notation (default: Hurley)
+export default function getSyntax(notationName) {
+    const name = resolveNotationName(notationName) || DEFAULT_NOTATION;
+    const cached = syntaxCache.get(name);
+    if (cached) return cached;
+    const syntax = generateSyntax(name);
+    syntaxCache.set(name, syntax);
+    return syntax;
 }
