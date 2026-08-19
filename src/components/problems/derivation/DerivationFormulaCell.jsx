@@ -128,7 +128,7 @@ export default function DerivationFormulaCell({
           inputRef={registerInput}
           onCursorChange={onMobileCursorChange}
           includeQuantifiers={keyboardConfig.isPredicateMode}
-          extraInsertButtons={keyboardConfig.extraQuantifierButtons}
+          extraInsertButtons={keyboardConfig.extraSymbolButtons}
           predicateLetters={keyboardConfig.isPredicateMode ? keyboardConfig.predicateLetters : undefined}
           constantLetters={keyboardConfig.isPredicateMode ? keyboardConfig.constantLetters : undefined}
           variableLetters={keyboardConfig.isPredicateMode ? keyboardConfig.variableLetters : undefined}

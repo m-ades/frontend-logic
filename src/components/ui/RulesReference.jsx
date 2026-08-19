@@ -188,6 +188,72 @@ function FitchRuleGroups({ groups }) {
   ))
 }
 
+function ShortcutTable({ rows }) {
+  const headerSx = {
+    pb: 0.6,
+    color: 'text.secondary',
+    fontSize: '0.68rem',
+    fontWeight: 700,
+    letterSpacing: '0.06em',
+    textAlign: 'left',
+    textTransform: 'uppercase',
+  }
+
+  return (
+    <Box component="table" sx={{ width: '100%', mb: 1.5, borderCollapse: 'collapse', tableLayout: 'fixed' }}>
+      <Box component="thead">
+        <Box component="tr">
+          <Box component="th" sx={headerSx}>Symbol</Box>
+          <Box component="th" sx={headerSx}>Shortcut</Box>
+          <Box component="th" sx={headerSx}>Meaning</Box>
+        </Box>
+      </Box>
+      <Box component="tbody">
+        {rows.map(({ symbol, shortcuts, meaning }) => (
+          <Box component="tr" key={`${symbol}-${meaning}`}>
+            <Box
+              component="th"
+              scope="row"
+              sx={{ py: 0.75, pr: 1, fontSize: '1rem', fontWeight: 600, textAlign: 'left' }}
+            >
+              {symbol}
+            </Box>
+            <Box component="td" sx={{ py: 0.75, pr: 1 }}>
+              <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
+                {shortcuts.map((shortcut) => (
+                  <Box
+                    component="kbd"
+                    key={shortcut}
+                    sx={{
+                      minWidth: '1.6rem',
+                      px: 0.5,
+                      py: 0.1,
+                      border: 1,
+                      borderColor: 'divider',
+                      borderRadius: 0.75,
+                      bgcolor: 'transparent',
+                      color: 'text.primary',
+                      fontFamily: 'monospace',
+                      fontSize: '0.75rem',
+                      lineHeight: 1.4,
+                      textAlign: 'center',
+                    }}
+                  >
+                    {shortcut}
+                  </Box>
+                ))}
+              </Box>
+            </Box>
+            <Box component="td" sx={{ py: 0.75, color: 'text.secondary', fontSize: '0.8rem' }}>
+              {meaning}
+            </Box>
+          </Box>
+        ))}
+      </Box>
+    </Box>
+  )
+}
+
 export default function RulesReference({ logicSystem }) {
   const { isRulesReferenceOpen } = useLayoutState()
   const dispatch = useLayoutDispatch()
@@ -198,6 +264,21 @@ export default function RulesReference({ logicSystem }) {
   const activeLogicSystem = normalizeLogicSystem(logicSystem)
   const symbols = getSymbols(activeLogicSystem)
   const isFitch = activeLogicSystem === 'fitch'
+  const shortcutRows = [
+    { symbol: symbols.and, shortcuts: ['&', '^'], meaning: 'Conjunction' },
+    { symbol: symbols.or, shortcuts: ['v', '\\/'], meaning: 'Disjunction' },
+    { symbol: symbols.conditional, shortcuts: ['>', '->', '-->'], meaning: 'Conditional' },
+    { symbol: symbols.biconditional, shortcuts: ['==', '<->'], meaning: 'Biconditional' },
+    { symbol: symbols.not, shortcuts: ['~', '!'], meaning: 'Negation' },
+    { symbol: symbols.forall, shortcuts: ['all'], meaning: 'Universal quantifier' },
+    { symbol: symbols.exists, shortcuts: ['some'], meaning: 'Existential quantifier' },
+    ...(symbols.falsum
+      ? [{ symbol: symbols.falsum, shortcuts: ['#', 'XX'], meaning: 'Contradiction' }]
+      : []),
+    ...(isFitch
+      ? [{ symbol: 'x₂', shortcuts: ['_'], meaning: 'Numeric subscript' }]
+      : []),
+  ]
   
   const blurActiveElement = () => {
     const el = document.activeElement
@@ -220,21 +301,7 @@ export default function RulesReference({ logicSystem }) {
       }}
     >
       <RulesCard title="Keyboard Shortcuts" defaultExpanded={true}>
-        <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 0.5, color: 'primary.main', fontSize: '0.95rem' }}>
-          Symbols
-        </Typography>
-        <Box component="div" sx={{ mb: 1.5, fontSize: '0.85rem' }}>
-          <div><strong>{symbols.and}</strong> Type <strong>&</strong> or <strong>^</strong> for {symbols.and} (conjunction)</div>
-          <div><strong>{symbols.or}</strong> Type <strong>v</strong> or <strong>\/</strong> for {symbols.or} (disjunction)</div>
-          <div><strong>{symbols.conditional}</strong> Type <strong>{'>'}</strong>, <strong>-&gt;</strong>, or <strong>--&gt;</strong> for {symbols.conditional} (conditional)</div>
-          <div><strong>{symbols.biconditional}</strong> Type <strong>==</strong> or <strong>&lt;-&gt;</strong> for {symbols.biconditional} (biconditional)</div>
-          <div><strong>{symbols.not}</strong> Type <strong>~</strong> or <strong>!</strong> for {symbols.not} (negation)</div>
-          <div><strong>{symbols.forall}</strong> Type <strong>all</strong> for {symbols.forall} (universal quantifier)</div>
-          <div><strong>{symbols.exists}</strong> Type <strong>some</strong> for {symbols.exists} (existential quantifier)</div>
-          {symbols.falsum && (
-            <div><strong>{symbols.falsum}</strong> Type <strong>#</strong>, <strong>_</strong>, or <strong>XX</strong> for {symbols.falsum} (contradiction)</div>
-          )}
-        </Box>
+        <ShortcutTable rows={shortcutRows} />
         <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 0.5, color: 'primary.main', fontSize: '0.95rem' }}>
           Navigation
         </Typography>

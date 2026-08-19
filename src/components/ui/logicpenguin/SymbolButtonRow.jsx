@@ -70,8 +70,9 @@ export default function SymbolButtonRow({
     return syntax?.mkquantifier?.('x', sym) ?? `${sym}x`
   }
 
-  const resolveLabel = (op, quantifier = false, insert = null, pair = null, backspace = false) => {
+  const resolveLabel = ({ op, quantifier = false, insert = null, pair = null, backspace = false, label }) => {
     if (backspace) return '←'
+    if (label) return label
     if (insert) return insert
     if (pair) {
       const open = pair[0]
@@ -193,10 +194,10 @@ export default function SymbolButtonRow({
         useFlexGap
         sx={centerButtons ? { justifyContent: 'center' } : undefined}
       >
-        {visibleButtons.map(({ op, quantifier, insert, pair, backspace }) => {
-          const visualSymbol = resolveLabel(op, quantifier, insert, pair, backspace)
+        {visibleButtons.map(({ op, quantifier, insert, pair, backspace, label }) => {
+          const visualSymbol = resolveLabel({ op, quantifier, insert, pair, backspace, label })
           const a11yLabel = backspace ? 'Backspace' : getInsertSymbolLabel({
-            insert: pair ? null : visualSymbol,
+            insert: pair ? null : insert || visualSymbol,
             pair,
           })
           return (
