@@ -160,6 +160,8 @@ export function InstructorSandboxLayout({ children }) {
       saveAccommodations: sandbox.saveAccommodations,
       getDeadlines: sandbox.getDeadlines,
       saveDeadline: sandbox.saveDeadline,
+      getAssignmentExtensions: sandbox.getAssignmentExtensions,
+      saveClasswideExtension: sandbox.saveClasswideExtension,
       loadInstructorDashboard: async (courseId) => {
         const snapshot = sandbox.dashboardAnalyticsByCourse?.[courseId];
         return {

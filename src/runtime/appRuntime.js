@@ -256,6 +256,30 @@ export function createAppRuntime({ coursesDispatch, coursesState, routeKind, use
         }),
       });
     },
+    getAssignmentExtensions: async (assignmentId) => {
+      const id = Number(assignmentId);
+      if (!Number.isInteger(id) || id <= 0) return [];
+      const rows = await fetchJson(`/api/instructor/assignments/${id}/extensions`);
+      return Array.isArray(rows) ? rows : [];
+    },
+    saveClasswideExtension: async (assignmentId, { extendedDueDate, reason } = {}) => {
+      const id = Number(assignmentId);
+      if (!Number.isInteger(id) || id <= 0) {
+        throw new Error("A valid assignment is required.");
+      }
+      if (!extendedDueDate || Number.isNaN(Date.parse(extendedDueDate))) {
+        throw new Error("A valid extended due date is required.");
+      }
+      const trimmedReason = typeof reason === "string" ? reason.trim().slice(0, 500) : null;
+      return fetchJson(`/api/instructor/assignments/${id}/extensions/classwide`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          extended_due_date: extendedDueDate,
+          reason: trimmedReason || null,
+        }),
+      });
+    },
     loadInstructorDashboard: async (courseId) => {
       const [analytics, summary] = await Promise.all([
         fetchJson(`/api/analytics/instructor-dashboard?courseId=${courseId}`),
