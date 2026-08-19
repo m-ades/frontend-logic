@@ -1,6 +1,7 @@
 import { alpha } from '@mui/material/styles'
 import getHurleyRuleset from '../../../lib/logicpenguin/checkers/rules/hurley-rules.js'
 import getFormulaClass from '../../../lib/logicpenguin/symbolic/formula.js'
+import getSyntax from '../../../lib/logicpenguin/symbolic/libsyntax.js'
 import { justParse } from '../../ui/logicpenguin/justification-parse.js'
 
 const CONSTANT_POOL = 'abcdefghijklmnopqrstuvw'.split('')
@@ -68,19 +69,33 @@ export function getPropositionalLettersFromFormulas(premises, conclusion) {
   return letters.length > 0 ? letters : null
 }
 
-export const SYMBOL_BUTTONS = [
-  { label: '~', insert: '~' },
-  { label: '•', insert: '•' },
-  { label: '∨', insert: '∨' },
-  { label: '⊃', insert: '⊃' },
-  { label: '≡', insert: '≡' },
-  { label: '(∀x)', insert: '(∀x)' },
-  { label: '(∃x)', insert: '(∃x)' },
-  { label: '(  )', pair: '()' },
-  { label: '[  ]', pair: '[]' },
-]
+export function formatQuantifier(syntax, op, variable = 'x') {
+  const symbol = syntax?.symbols?.[op]
+  if (!symbol) return ''
+  if (typeof syntax.mkquantifier === 'function') {
+    return syntax.mkquantifier(variable, symbol)
+  }
+  return `(${symbol}${variable})`
+}
 
-export const SYMBOL_ROW2 = [SYMBOL_BUTTONS[5], SYMBOL_BUTTONS[6], SYMBOL_BUTTONS[7], SYMBOL_BUTTONS[8]]
+export function getDerivationSymbolButtons(syntax = getSyntax()) {
+  const symbols = syntax?.symbols || {}
+  const forall = formatQuantifier(syntax, 'FORALL')
+  const exists = formatQuantifier(syntax, 'EXISTS')
+  return [
+    { label: symbols.NOT, insert: symbols.NOT },
+    { label: symbols.AND, insert: symbols.AND },
+    { label: symbols.OR, insert: symbols.OR },
+    { label: symbols.IFTHEN, insert: symbols.IFTHEN },
+    { label: symbols.IFF, insert: symbols.IFF },
+    { label: forall, insert: forall },
+    { label: exists, insert: exists },
+    { label: '(  )', pair: '()' },
+    { label: '[  ]', pair: '[]' },
+  ].filter((button) => button.pair || Boolean(button.insert))
+}
+
+export const SYMBOL_BUTTONS = getDerivationSymbolButtons()
 export const FORCE_UPPER_RULES = new Set(['UI', 'UG', 'EI', 'EG', 'MP', 'MT', 'HS', 'DS', 'CD', 'DN', 'DM', 'QN', 'CP', 'IP', 'ACP', 'AIP'])
 export const ALL_DERIVATION_RULES = Object.keys(getHurleyRuleset())
   .filter((rule) => rule !== 'Pr' && rule !== 'Ass')

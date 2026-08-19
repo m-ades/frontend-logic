@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
-import { Box, Stack, Typography, Alert, Tooltip } from '@mui/material'
+import { Box, Stack, Typography, Tooltip } from '@mui/material'
 import EditIcon from '@mui/icons-material/Edit'
 import InstructorQuestionEditor from '../../InstructorQuestionEditor.jsx'
 import { useTheme, useMediaQuery } from '@mui/material'
@@ -7,6 +7,7 @@ import ProblemSetButtons from '../frame/ProblemSetButtons.jsx'
 import FormulaInput from '../../../ui/logicpenguin/formula-input.js'
 import SymbolButtonRow from '../../../ui/logicpenguin/SymbolButtonRow.jsx'
 import { MobileLogicInput } from '../../../ui/LogicKeyboard/index.js'
+import { resolveNotationName } from '../../../../lib/logicpenguin/symbolic/libsyntax.js'
 import { useProblemChecker } from '../../../../hooks/useProblemChecker.js'
 import SolutionReveal from '../../SolutionReveal.jsx'
 import StatusBanner, { isTerminalStatus } from '../../../ui/StatusBanner.jsx'
@@ -21,7 +22,7 @@ import {
   promptImpliesPredicateLogic,
 } from './symbolizationKeyboard.js'
 
-function FormulaInputField({ value, onValueChange, fieldReadOnly, formulaInputRef, onEnterKey, ariaLabel }) {
+function FormulaInputField({ value, onValueChange, fieldReadOnly, formulaInputRef, onEnterKey, ariaLabel, notation }) {
   const theme = useTheme()
   const containerRef = useRef(null)
   const changeHandlerRef = useRef(null)
@@ -29,7 +30,7 @@ function FormulaInputField({ value, onValueChange, fieldReadOnly, formulaInputRe
   useEffect(() => {
     if (!containerRef.current) return
     if (!formulaInputRef.current) {
-      const formulaInput = FormulaInput.getnew({})
+      const formulaInput = FormulaInput.getnew({ notation })
       formulaInputRef.current = formulaInput
       formulaInput.style.width = '100%'
       formulaInput.style.padding = theme.spacing(1.5)
@@ -57,7 +58,7 @@ function FormulaInputField({ value, onValueChange, fieldReadOnly, formulaInputRe
         formulaInputRef.current = null
       }
     }
-  }, [ariaLabel, formulaInputRef, theme])
+  }, [ariaLabel, formulaInputRef, notation, theme])
 
   useEffect(() => {
     if (!formulaInputRef.current) return
@@ -174,6 +175,7 @@ export default function SymbolicTranslation({
             : []))
     : []
   const variableLetters = isPredicate ? ST_PREDICATE_VARIABLES : []
+  const notation = resolveNotationName(proof) || resolveNotationName(problem)
 
   const scheduleStateSave = useCallback((nextValue) => {
     if (!onStateChange) return
@@ -301,6 +303,7 @@ export default function SymbolicTranslation({
                   predicateLetters={isPredicate ? predicateLetters : undefined}
                   constantLetters={isPredicate ? constantLetters : undefined}
                   variableLetters={isPredicate ? variableLetters : undefined}
+                  notation={notation}
                 />
               ) : (
                 <>
@@ -315,12 +318,14 @@ export default function SymbolicTranslation({
                     formulaInputRef={formulaInputRef}
                     onEnterKey={!readOnly && !hideActions ? handleCheck : undefined}
                     ariaLabel="Your translation"
+                    notation={notation}
                   />
                   <Box sx={{ mt: 1 }}>
                     <SymbolButtonRow
                       inputRef={formulaInputRef}
                       disabled={readOnly}
                       includeQuantifiers={isPredicate}
+                      notation={notation}
                       onValueChange={(value) => {
                         if (readOnly) return
                         setInputValue(value)
@@ -340,6 +345,7 @@ export default function SymbolicTranslation({
                   fieldReadOnly
                   formulaInputRef={solutionInputRef}
                   ariaLabel="Correct translation"
+                  notation={notation}
                 />
               </SolutionReveal>
             )}

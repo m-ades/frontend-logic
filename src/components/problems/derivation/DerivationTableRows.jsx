@@ -17,6 +17,7 @@ import RemoveIcon from '@mui/icons-material/Remove'
 import { alpha } from '@mui/material/styles'
 import { getInsertSymbolLabel } from '../../ui/logicpenguin/LogicSymbol.jsx'
 import MobileLogicInput from '../../ui/LogicKeyboard/MobileLogicInput.jsx'
+import { resolveNotationName } from '../../../lib/logicpenguin/symbolic/libsyntax.js'
 import {
   applyLinesToJustification,
   applyRuleToJustification,
@@ -69,6 +70,7 @@ export default function DerivationTableRows({
   updateCursorPosition,
   useRuleDropdown,
 }) {
+  const notation = resolveNotationName(proof)
   return (
     <>
       {premises.length === 0 && proof?.conclusion && (
@@ -242,6 +244,7 @@ export default function DerivationTableRows({
                       constantLetters={derivationKeyboardConfig?.isPredicateMode ? derivationKeyboardConfig.constantLetters : undefined}
                       variableLetters={derivationKeyboardConfig?.isPredicateMode ? derivationKeyboardConfig.variableLetters : undefined}
                       symbolizationKey={derivationKeyboardConfig?.symbolizationKey}
+                      notation={notation}
                     />
                   </Box>
                 ) : (

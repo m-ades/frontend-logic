@@ -32,11 +32,11 @@ import { MobileLogicInput, useMobileLogicKeyboardEnabled } from '../../ui/LogicK
 import checkDerivation from '../../../lib/logicpenguin/checkers/derivation-hurley.js'
 import getHurleyRuleset from '../../../lib/logicpenguin/checkers/rules/hurley-rules.js'
 import getFormulaClass from '../../../lib/logicpenguin/symbolic/formula.js'
-import getSyntax from '../../../lib/logicpenguin/symbolic/libsyntax.js'
+import getSyntax, { resolveNotationName } from '../../../lib/logicpenguin/symbolic/libsyntax.js'
 import { justParse } from '../../ui/logicpenguin/justification-parse.js'
 import { getInsertSymbolLabel } from '../../ui/logicpenguin/LogicSymbol.jsx'
 import { buildPersistedSubmissionState, shouldUseApiValidation, submitApiValidation } from '../../../utils/submissionRuntime.js'
-import { getOpenAssumptionDepths, isResolvedConclusionLine } from './derivationUtils.js'
+import { formatQuantifier, getDerivationSymbolButtons, getOpenAssumptionDepths, isResolvedConclusionLine } from './derivationUtils.js'
 
 /** Compare formula strings by canonical form so ∃x(~Hx) and ∃x~Hx count equal */
 function formulasEqualNormally(a, b, normalizeForFallback) {
@@ -132,14 +132,20 @@ function getConstantLettersFromFormulasAndKey(formulaText, symbolizationKey) {
 
 const PREDICATE_VARIABLES = ['x', 'y', 'z']
 
-function getQuantifierInsertButtonsFromFormulaText(formulaText) {
+function getQuantifierInsertButtonsFromFormulaText(formulaText, syntax) {
   const seen = new Set()
   const buttons = []
+  const forall = syntax?.symbols?.FORALL || '∀'
+  const exists = syntax?.symbols?.EXISTS || '∃'
+  const match = String(formulaText ?? '').matchAll(new RegExp(`[${forall}${exists}]([y-z])`, 'g'))
 
-  for (const [, variable] of String(formulaText ?? '').matchAll(/[∀∃]([y-z])/g)) {
+  for (const [, variable] of match) {
     if (seen.has(variable)) continue
     seen.add(variable)
-    buttons.push({ insert: `(∀${variable})` }, { insert: `(∃${variable})` })
+    const forallInsert = formatQuantifier(syntax, 'FORALL', variable)
+    const existsInsert = formatQuantifier(syntax, 'EXISTS', variable)
+    if (forallInsert) buttons.push({ insert: forallInsert })
+    if (existsInsert) buttons.push({ insert: existsInsert })
   }
 
   return buttons
@@ -153,42 +159,34 @@ function isPredicateLogicKey(symbolizationKey) {
   })
 }
 
-const DEFAULT_QUANTIFIER_INSERTS = new Set(['(∀x)', '(∃x)'])
-
-function getQuantifierButtonsFromFormulas(premises, conclusion) {
+function getQuantifierButtonsFromFormulas(premises, conclusion, syntax) {
   const formulas = [...(Array.isArray(premises) ? premises : []), conclusion].filter(Boolean).map(String)
   const text = formulas.join(' ')
-  const seen = new Set(DEFAULT_QUANTIFIER_INSERTS)
+  const forall = syntax?.symbols?.FORALL || '∀'
+  const exists = syntax?.symbols?.EXISTS || '∃'
+  const defaultInserts = new Set([
+    formatQuantifier(syntax, 'FORALL'),
+    formatQuantifier(syntax, 'EXISTS'),
+  ].filter(Boolean))
   const buttons = []
-  const matches = text.match(/\(?[∀∃][x-z]\)?/g)
+  const matches = text.match(new RegExp(`\\(?[${forall}${exists}][x-z]\\)?`, 'g'))
 
   if (!matches) return buttons
 
   for (const rawMatch of matches) {
-    const match = rawMatch.match(/[∀∃][x-z]/)
-    if (!match) continue
-    const insert = `(${match[0]})`
-    if (seen.has(insert)) continue
-    seen.add(insert)
+    const pieces = rawMatch.match(new RegExp(`[${forall}${exists}]([x-z])`))
+    if (!pieces) continue
+    const [, variable] = pieces
+    const op = pieces[0][0] === exists ? 'EXISTS' : 'FORALL'
+    const insert = formatQuantifier(syntax, op, variable)
+    if (!insert || defaultInserts.has(insert)) continue
+    defaultInserts.add(insert)
     buttons.push({ label: insert, insert })
   }
 
   return buttons
 }
 
-const SYMBOL_BUTTONS = [
-  { label: '~', insert: '~' },
-  { label: '•', insert: '•' },
-  { label: '∨', insert: '∨' },
-  { label: '⊃', insert: '⊃' },
-  { label: '≡', insert: '≡' },
-  { label: '(∀x)', insert: '(∀x)' },
-  { label: '(∃x)', insert: '(∃x)' },
-  { label: '(  )', pair: '()' },
-  { label: '[  ]', pair: '[]' },
-]
-// mobile fullscreen only. second row: (∀x) (∃x) ( ) [ ] under ~ • ∨ ⊃
-const SYMBOL_ROW2 = [SYMBOL_BUTTONS[5], SYMBOL_BUTTONS[6], SYMBOL_BUTTONS[7], SYMBOL_BUTTONS[8]]
 const FORCE_UPPER_RULES = new Set(['UI','UG','EI','EG','MP','MT','HS','DS','CD','DN','DM','QN','CP','IP','ACP','AIP'])
 const ALL_DERIVATION_RULES = Object.keys(getHurleyRuleset())
   .filter((r) => r !== 'Pr' && r !== 'Ass')
@@ -490,7 +488,8 @@ export default function DerivationTable({
   const lastFormulaIndexRef = useRef(null)
   const lastEditableIndexRef = useRef(null)
   const cursorPositionsRef = useRef({})
-  const syntax = useMemo(() => getSyntax(), [])
+  const notation = useMemo(() => resolveNotationName(proof), [proof])
+  const syntax = useMemo(() => getSyntax(notation), [notation])
   const premises = useMemo(
     () => (Array.isArray(proof?.premises) ? proof.premises : []),
     [proof?.premises]
@@ -553,9 +552,11 @@ export default function DerivationTable({
     const premises = Array.isArray(proof?.premises) ? proof.premises : []
     const conclusion = proof?.conclusion ?? proof?.conc ?? ''
     const formulaText = [...premises, conclusion].filter(Boolean).map(String).join(' ')
-    const extraQuantifierButtons = getQuantifierButtonsFromFormulas(premises, conclusion)
+    const extraQuantifierButtons = getQuantifierButtonsFromFormulas(premises, conclusion, syntax)
+    const forall = syntax?.symbols?.FORALL || '∀'
+    const exists = syntax?.symbols?.EXISTS || '∃'
 
-    const isPredicate = isPredicateLogicKey(key) || /[∀∃]/.test(formulaText) || /[A-Z][a-z]/.test(formulaText)
+    const isPredicate = isPredicateLogicKey(key) || formulaText.includes(forall) || formulaText.includes(exists) || /[A-Z][a-z]/.test(formulaText)
 
     if (isPredicate) {
       const keyText = key.map((line) => (typeof line === 'string' ? line : String(line ?? ''))).join(' ')
@@ -575,7 +576,7 @@ export default function DerivationTable({
         predicateLetters,
         constantLetters,
         variableLetters,
-        extraInsertButtons: getQuantifierInsertButtonsFromFormulaText(formulaText),
+        extraInsertButtons: getQuantifierInsertButtonsFromFormulaText(formulaText, syntax),
         extraQuantifierButtons,
       }
     }
@@ -587,16 +588,16 @@ export default function DerivationTable({
       symbolizationKey: predicateLetters,
       extraQuantifierButtons,
     }
-  }, [proof])
+  }, [proof, syntax])
+  const connectiveButtons = useMemo(() => getDerivationSymbolButtons(syntax), [syntax])
   const symbolButtons = useMemo(() => {
     const extraQuantifierButtons = derivationKeyboardConfig.extraQuantifierButtons || []
-    if (extraQuantifierButtons.length === 0) return SYMBOL_BUTTONS
-    return [
-      ...SYMBOL_BUTTONS.slice(0, 7),
-      ...extraQuantifierButtons,
-      ...SYMBOL_BUTTONS.slice(7),
-    ]
-  }, [derivationKeyboardConfig.extraQuantifierButtons])
+    if (extraQuantifierButtons.length === 0) return connectiveButtons
+    const pairsStart = connectiveButtons.findIndex((button) => button.pair)
+    const head = pairsStart === -1 ? connectiveButtons : connectiveButtons.slice(0, pairsStart)
+    const tail = pairsStart === -1 ? [] : connectiveButtons.slice(pairsStart)
+    return [...head, ...extraQuantifierButtons, ...tail]
+  }, [connectiveButtons, derivationKeyboardConfig.extraQuantifierButtons])
   const isLineCompleteForCheck = useCallback((line) => {
     if (!line) return false
     const formulaFilled = (line.formula || '').trim().length > 0
@@ -660,11 +661,13 @@ export default function DerivationTable({
 
   const normalizeFormulaForCheck = useMemo(
     () => (value) => {
+      const ops = [syntax?.symbols?.IFF, syntax?.symbols?.IFTHEN, syntax?.symbols?.OR, syntax?.symbols?.AND]
+        .filter(Boolean)
+        .map((op) => op.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
+        .join('')
       const fixed = syntax.inputfix(String(value ?? '')).replace(/\s+/g, '')
-      return fixed
-        .replace(/([≡⊃∨•])/g, ' $1 ')
-        .replace(/\s+/g, ' ')
-        .trim()
+      const spaced = ops ? fixed.replace(new RegExp(`([${ops}])`, 'g'), ' $1 ') : fixed
+      return spaced.replace(/\s+/g, ' ').trim()
     },
     [syntax]
   )
@@ -1131,35 +1134,40 @@ export default function DerivationTable({
       setTimeout(() => el.setSelectionRange(nextCursor, nextCursor), 0)
     }
 
+    const symbols = syntax?.symbols || {}
     if (!hasModifier && (key === '&' || key === '^' || key === '.' || key === '*' || key === '•' || key === '·' || key === '∧')) {
-      insertSymbol('•')
+      insertSymbol(symbols.AND || '•')
       return
     }
     if (!hasModifier && (key === 'v' || key === '∨')) {
-      insertSymbol('∨')
+      insertSymbol(symbols.OR || '∨')
       return
     }
     if (!hasModifier && (key === '>' || key === '→' || key === '⇒' || key === '⊃')) {
       const hyphenMatch = value.slice(0, start).match(/-+$/)
       const replaceBefore = hyphenMatch ? hyphenMatch[0].length : 0
-      insertSymbol('⊃', replaceBefore)
+      insertSymbol(symbols.IFTHEN || '⊃', replaceBefore)
       return
     }
     if (!hasModifier && key === '=' && start > 0 && value[start - 1] === '=') {
-      insertSymbol('≡', 1)
+      insertSymbol(symbols.IFF || '≡', 1)
+      return
+    }
+    if (!hasModifier && (key === '~' || key === '¬' || key === '!')) {
+      insertSymbol(symbols.NOT || '~')
       return
     }
     if (!hasModifier && (key === 'l' || key === 'L')) {
       const textWithKey = value.slice(0, start) + key.toLowerCase()
       if (/all$/i.test(textWithKey)) {
-        insertSymbol('∀', 2) // replace only 'al' so ~all → ~∀
+        insertSymbol(symbols.FORALL || '∀', 2) // replace only 'al' so ~all → ~∀
       }
       return
     }
     if (!hasModifier && (key === 'e' || key === 'E')) {
       const textWithKey = value.slice(0, start) + key.toLowerCase()
       if (/some$/i.test(textWithKey)) {
-        insertSymbol('∃', 3) // replace only 'som' so ~some → ~∃
+        insertSymbol(symbols.EXISTS || '∃', 3) // replace only 'som' so ~some → ~∃
       }
     }
   }
@@ -1678,6 +1686,7 @@ export default function DerivationTable({
                       constantLetters={derivationKeyboardConfig.isPredicateMode ? derivationKeyboardConfig.constantLetters : undefined}
                       variableLetters={derivationKeyboardConfig.isPredicateMode ? derivationKeyboardConfig.variableLetters : undefined}
                       symbolizationKey={derivationKeyboardConfig.symbolizationKey}
+                      notation={notation}
                     />
                   ) : (
                   <TextField

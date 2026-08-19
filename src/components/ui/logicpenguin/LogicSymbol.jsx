@@ -2,17 +2,26 @@ import { Box } from '@mui/material'
 
 const SYMBOL_SPEECH = {
   '~': 'tilde',
+  '¬': 'negation',
   '•': 'dot',
+  '∧': 'conjunction',
+  '&': 'ampersand',
   '∨': 'wedge',
   '⊃': 'horseshoe',
+  '→': 'arrow',
   '≡': 'triple bar',
+  '↔': 'biconditional',
   '∀': 'universal quantifier',
   '∃': 'existential quantifier',
+  '⊥': 'falsum',
+  '✖': 'falsum',
 }
 
 const EXPR_SPEECH = {
   '(∀x)': 'universal quantifier x',
   '(∃x)': 'existential quantifier x',
+  '∀x': 'universal quantifier x',
+  '∃x': 'existential quantifier x',
   '()': 'parentheses',
   '[]': 'brackets',
 }
@@ -76,11 +85,18 @@ export const getInsertSymbolLabel = ({ insert, pair } = {}) => {
   return `Insert ${insert}`
 }
 
-export default function LogicSymbol({ symbol, component = 'span', sx }) {
+export default function LogicSymbol({ symbol, component = 'span', sx, decorative = false }) {
+  if (decorative) {
+    return (
+      <Box component={component} aria-hidden sx={sx}>
+        {symbol}
+      </Box>
+    )
+  }
   const expressionSpeech = EXPR_SPEECH[symbol]
   const symbolSpeech = expressionSpeech || getTokenSpeechLabel(symbol)
   return (
-    <Box component={component} role="text" aria-label={symbolSpeech} sx={sx}>
+    <Box component={component} aria-label={symbolSpeech} sx={sx}>
       <Box component="span" aria-hidden="true">{symbol}</Box>
     </Box>
   )
