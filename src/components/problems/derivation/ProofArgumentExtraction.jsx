@@ -25,7 +25,7 @@ function hasEveryCitation(derivationState, premises, fixedLineCount) {
   if (proofLines.length < premises.length + fixedLineCount) return false
   return proofLines
     .slice(premises.length, premises.length + fixedLineCount)
-    .every((line) => String(line?.j ?? '').trim())
+    .every((line) => String(line?.justification ?? '').trim())
 }
 
 function hasArgumentShape(value, premiseCount, Formula) {
