@@ -4,6 +4,13 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import ExpandLessIcon from '@mui/icons-material/ExpandLess'
 import { useLayoutState, useLayoutDispatch, closeRulesReference } from '../../context/LayoutContext.jsx'
 import { getSymbols, normalizeLogicSystem } from '../../lib/logicSystems.js'
+import {
+  FITCH_DEFINITIONS,
+  FITCH_FOL_RULE_GROUPS,
+  FITCH_TFL_RULE_GROUPS,
+} from '../../lib/fitchRulebook.js'
+import { FITCH_RULE_EXAMPLES } from '../../lib/fitchRuleExamples.js'
+import MathJaxFormula from './MathJaxFormula.jsx'
 
 function RulesCard({ title, children, defaultExpanded = false }) {
   const [expanded, setExpanded] = useState(defaultExpanded)
@@ -73,6 +80,114 @@ function RulesCard({ title, children, defaultExpanded = false }) {
   )
 }
 
+function EmphasizedText({ text, bold = [] }) {
+  if (!bold.length) return text
+  const escaped = bold.map((term) => term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
+  const parts = text.split(new RegExp(`(${escaped.join('|')})`, 'g'))
+  return parts.map((part, index) => (
+    bold.includes(part) ? <strong key={`${part}-${index}`}>{part}</strong> : part
+  ))
+}
+
+function FitchRuleEntries({ group }) {
+  return group.rules.map((rule, index) => (
+    <Box
+      key={rule.name}
+      component="section"
+      sx={{ px: 0.5, py: 1.25, borderBottom: 1, borderColor: 'divider' }}
+    >
+      <Typography component="h4" sx={{ m: 0, fontSize: '0.85rem', fontWeight: 700 }}>
+        {group.start + index}. {rule.title} ({rule.name})
+      </Typography>
+      <Typography component="div" sx={{ mt: 0.6, fontSize: '0.8rem', color: 'text.primary' }}>
+        <EmphasizedText text={rule.description} bold={rule.bold} />
+      </Typography>
+      {(FITCH_RULE_EXAMPLES[rule.name] || []).map((example, exampleIndex) => (
+        <Box
+          key={`${rule.name}-${exampleIndex}`}
+          sx={{
+            width: '100%',
+            my: 1,
+            px: 1,
+            py: 0.75,
+            minHeight: 44,
+            overflowX: 'auto',
+            textAlign: 'center',
+            borderRadius: 1,
+            bgcolor: (t) => alpha(t.palette.text.primary, 0.035),
+            '& mjx-container': { m: '0 !important' },
+          }}
+        >
+          <MathJaxFormula
+            key={example}
+            tex={example}
+            fallback={`${rule.title} (${rule.name}) proof example${FITCH_RULE_EXAMPLES[rule.name].length > 1 ? ` ${exampleIndex + 1}` : ''}`}
+          />
+        </Box>
+      ))}
+      {rule.note && (
+        <Typography component="div" sx={{ mt: 0.6, fontSize: '0.78rem', color: 'text.secondary' }}>
+          {rule.noteLabelBold ? <strong>Note:</strong> : 'Note:'}{' '}
+          <EmphasizedText text={rule.note} bold={rule.noteBold} />
+        </Typography>
+      )}
+      {rule.notes?.map((note) => (
+        <Typography key={note.text} component="div" sx={{ mt: 0.6, fontSize: '0.78rem', color: 'text.secondary' }}>
+          {note.labelBold ? <strong>Note:</strong> : 'Note:'}{' '}
+          <EmphasizedText text={note.text} bold={note.bold} />
+        </Typography>
+      ))}
+    </Box>
+  ))
+}
+
+function FitchRuleGroup({ group }) {
+  const [expanded, setExpanded] = useState(true)
+
+  if (!group.title) {
+    return <FitchRuleEntries group={group} />
+  }
+
+  return (
+    <Box sx={{ '&:not(:last-child)': { mb: 1 } }}>
+      <Box
+        component="button"
+        type="button"
+        aria-expanded={expanded}
+        onClick={() => setExpanded((current) => !current)}
+        sx={{
+          width: '100%',
+          border: 0,
+          borderRadius: 1,
+          bgcolor: (t) => alpha(t.palette.primary.main, 0.06),
+          color: 'primary.main',
+          py: 1,
+          px: 1,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: 1,
+          textAlign: 'left',
+          cursor: 'pointer',
+          '&:hover': { bgcolor: (t) => alpha(t.palette.primary.main, 0.1) },
+        }}
+      >
+        <Typography component="span" sx={{ fontWeight: 700, fontSize: '0.95rem' }}>
+          {group.title}
+        </Typography>
+        {expanded ? <ExpandLessIcon fontSize="small" /> : <ExpandMoreIcon fontSize="small" />}
+      </Box>
+      {expanded && <FitchRuleEntries group={group} />}
+    </Box>
+  )
+}
+
+function FitchRuleGroups({ groups }) {
+  return groups.map((group) => (
+    <FitchRuleGroup key={group.title || `rules-${group.start}`} group={group} />
+  ))
+}
+
 export default function RulesReference({ logicSystem }) {
   const { isRulesReferenceOpen } = useLayoutState()
   const dispatch = useLayoutDispatch()
@@ -128,44 +243,18 @@ export default function RulesReference({ logicSystem }) {
         </Box>
       </RulesCard>
       
-      <RulesCard title="Rules of Inference" defaultExpanded={false}>
+      <RulesCard title={isFitch ? 'Natural Deduction Rules for TFL' : 'Rules of Inference'} defaultExpanded={false}>
         {isFitch ? (
           <>
-            <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 0.5, color: 'primary.main', fontSize: '0.95rem' }}>
-              Basic TFL Rules
-            </Typography>
-            <Box component="div" sx={{ mb: 1.5, fontSize: '0.85rem' }}>
-              <div><strong>R:</strong> A / A</div>
-              <div><strong>∧I:</strong> A, B / A ∧ B</div>
-              <div><strong>∧E:</strong> A ∧ B / A</div>
-              <div style={{ paddingLeft: '28px' }}>A ∧ B / B</div>
-              <div><strong>→I:</strong> subproof A ⟹ B / A → B</div>
-              <div><strong>→E:</strong> A → B, A / B</div>
-              <div><strong>↔I:</strong> subproof A ⟹ B, subproof B ⟹ A / A ↔ B</div>
-              <div><strong>↔E:</strong> A ↔ B, A / B</div>
-              <div style={{ paddingLeft: '28px' }}>A ↔ B, B / A</div>
-              <div><strong>∨I:</strong> A / A ∨ B</div>
-              <div style={{ paddingLeft: '28px' }}>A / B ∨ A</div>
-              <div><strong>∨E:</strong> A ∨ B, subproof A ⟹ C, subproof B ⟹ C / C</div>
-              <div><strong>¬I:</strong> subproof A ⟹ ⊥ / ¬A</div>
-              <div><strong>¬E:</strong> A, ¬A / ⊥</div>
-              <div><strong>IP:</strong> subproof ¬A ⟹ ⊥ / A</div>
-              <div><strong>X:</strong> ⊥ / A</div>
+            <Box sx={{ mb: 2, p: 1, borderRadius: 1, bgcolor: (t) => alpha(t.palette.primary.main, 0.06) }}>
+              <Typography component="div" sx={{ mb: 0.75, fontSize: '0.85rem', fontWeight: 700 }}>Definitions</Typography>
+              {FITCH_DEFINITIONS.map((definition) => (
+                <Typography key={definition.text} component="p" sx={{ m: 0, '&:not(:last-child)': { mb: 1 }, fontSize: '0.8rem', color: 'text.primary' }}>
+                  <EmphasizedText text={definition.text} bold={definition.bold} />
+                </Typography>
+              ))}
             </Box>
-            <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 0.5, color: 'primary.main', fontSize: '0.95rem' }}>
-              Additional TFL Rules
-            </Typography>
-            <Box component="div" sx={{ fontSize: '0.85rem' }}>
-              <div><strong>DS:</strong> A ∨ B, ¬A / B</div>
-              <div style={{ paddingLeft: '28px' }}>A ∨ B, ¬B / A</div>
-              <div><strong>MT:</strong> A → B, ¬B / ¬A</div>
-              <div><strong>DNE:</strong> ¬¬A / A</div>
-              <div><strong>LEM:</strong> subproof A ⟹ C, subproof ¬A ⟹ C / C</div>
-              <div><strong>DeM:</strong> ¬(A ∧ B) / ¬A ∨ ¬B</div>
-              <div style={{ paddingLeft: '28px' }}>¬A ∨ ¬B / ¬(A ∧ B)</div>
-              <div style={{ paddingLeft: '28px' }}>¬(A ∨ B) / ¬A ∧ ¬B</div>
-              <div style={{ paddingLeft: '28px' }}>¬A ∧ ¬B / ¬(A ∨ B)</div>
-            </Box>
+            <FitchRuleGroups groups={FITCH_TFL_RULE_GROUPS} />
           </>
         ) : (
           <>
@@ -217,37 +306,14 @@ export default function RulesReference({ logicSystem }) {
         )}
       </RulesCard>
       
-      <RulesCard title="Predicate Logic Rules" defaultExpanded={false}>
-        <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 0.5, color: 'primary.main', fontSize: '0.95rem' }}>
-          Predicate Logic Rules
-        </Typography>
+      <RulesCard title={isFitch ? 'Natural Deduction Rules for FOL' : 'Predicate Logic Rules'} defaultExpanded={false}>
+        {!isFitch && (
+          <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 0.5, color: 'primary.main', fontSize: '0.95rem' }}>
+            Predicate Logic Rules
+          </Typography>
+        )}
         {isFitch ? (
-          <>
-            <Box component="div" sx={{ mb: 1.5, fontSize: '0.85rem' }}>
-              <div><strong>∀E:</strong> ∀xFx / Fa</div>
-              <div><strong>∃I:</strong> Fa / ∃xFx</div>
-              <div><strong>∀I:</strong> Fa / ∀xFx, when a does not occur in any undischarged assumption</div>
-              <div><strong>∃E:</strong> ∃xFx plus subproof Fa ⟹ B / B</div>
-              <div style={{ paddingLeft: '28px' }}>a must not occur in any undischarged assumption, the existential premise, or the conclusion</div>
-            </Box>
-            <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 0.5, color: 'primary.main', fontSize: '0.95rem' }}>
-              Conversion of Quantifiers
-            </Typography>
-            <Box component="div" sx={{ mb: 1.5, fontSize: '0.85rem' }}>
-              <div><strong>CQ:</strong> ∀x¬Fx / ¬∃xFx</div>
-              <div><strong>CQ:</strong> ¬∃xFx / ∀x¬Fx</div>
-              <div><strong>CQ:</strong> ∃x¬Fx / ¬∀xFx</div>
-              <div><strong>CQ:</strong> ¬∀xFx / ∃x¬Fx</div>
-            </Box>
-            <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 0.5, color: 'primary.main', fontSize: '0.95rem' }}>
-              Identity Rules
-            </Typography>
-            <Box component="div" sx={{ mb: 1.5, fontSize: '0.85rem' }}>
-              <div><strong>=I:</strong> a = a</div>
-              <div><strong>=E:</strong> a = b, Fa / Fb</div>
-              <div style={{ paddingLeft: '28px' }}>replace one or more occurrences in either direction</div>
-            </Box>
-          </>
+          <FitchRuleGroups groups={FITCH_FOL_RULE_GROUPS} />
         ) : (
           <>
             <Box component="div" sx={{ mb: 1.5, fontSize: '0.85rem' }}>
@@ -269,25 +335,16 @@ export default function RulesReference({ logicSystem }) {
         )}
       </RulesCard>
 
-      <RulesCard title="Conditional & Indirect Proofs" defaultExpanded={false}>
-        <Box component="div" sx={{ fontSize: '0.85rem' }}>
-          {isFitch ? (
-            <>
-              <div><strong>AS:</strong> starts a subproof assumption</div>
-              <div><strong>→I:</strong> discharge a subproof from A to B</div>
-              <div><strong>¬I:</strong> discharge a subproof from A to ⊥</div>
-              <div><strong>IP:</strong> discharge a subproof from ¬A to ⊥</div>
-            </>
-          ) : (
-            <>
-              <div><strong>ACP:</strong> Assumption for Conditional Proof</div>
-              <div><strong>CP:</strong> To prove p ⊃ q, assume p (ACP) in an indented subderivation, derive q, then discharge with CP citing the subderivation range</div>
-              <div><strong>AIP:</strong> Assumption for Indirect Proof</div>
-              <div><strong>IP:</strong> To prove ~p, assume p (AIP) in an indented subderivation, derive a contradiction (q • ~q), then discharge with IP citing the subderivation range</div>
-            </>
-          )}
-        </Box>
-      </RulesCard>
+      {!isFitch && (
+        <RulesCard title="Conditional & Indirect Proofs" defaultExpanded={false}>
+          <Box component="div" sx={{ fontSize: '0.85rem' }}>
+            <div><strong>ACP:</strong> Assumption for Conditional Proof</div>
+            <div><strong>CP:</strong> To prove p ⊃ q, assume p (ACP) in an indented subderivation, derive q, then discharge with CP citing the subderivation range</div>
+            <div><strong>AIP:</strong> Assumption for Indirect Proof</div>
+            <div><strong>IP:</strong> To prove ~p, assume p (AIP) in an indented subderivation, derive a contradiction (q • ~q), then discharge with IP citing the subderivation range</div>
+          </Box>
+        </RulesCard>
+      )}
     </Box>
   )
   
@@ -309,8 +366,8 @@ export default function RulesReference({ logicSystem }) {
     return (
       <Box
         sx={{
-          width: isRulesReferenceOpen ? 'clamp(280px, 24vw, 360px)' : 0,
-          maxWidth: isRulesReferenceOpen ? 'min(360px, 32vw)' : 0,
+          width: isRulesReferenceOpen ? 'clamp(380px, 32vw, 520px)' : 0,
+          maxWidth: isRulesReferenceOpen ? 'min(520px, 40vw)' : 0,
           minWidth: 0,
           flexShrink: 0,
           overflow: 'hidden',
@@ -348,8 +405,8 @@ export default function RulesReference({ logicSystem }) {
       sx={{
         display: 'block',
         '& .MuiDrawer-paper': {
-          width: { xs: '85%', sm: '400px' },
-          maxWidth: '400px',
+          width: { xs: '92%', sm: '480px' },
+          maxWidth: 'min(480px, 92vw)',
         },
       }}
     >
