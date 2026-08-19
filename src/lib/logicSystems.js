@@ -38,12 +38,23 @@ export const LOGIC_SYSTEMS = {
   },
 }
 
+/** Historical / notation-style aliases → canonical system ids (fitch ≈ calgary/forallx glyphs). */
+const LOGIC_SYSTEM_ALIASES = {
+  calgary: 'fitch',
+  cambridge: 'fitch',
+  forallx: 'fitch',
+  'forall-x': 'fitch',
+}
+
 export function isLogicSystem(value) {
   return typeof value === 'string' && value in LOGIC_SYSTEMS
 }
 
 export function normalizeLogicSystem(value, fallback = DEFAULT_LOGIC_SYSTEM) {
-  return isLogicSystem(value) ? value : fallback
+  if (typeof value !== 'string') return fallback
+  if (isLogicSystem(value)) return value
+  const aliased = LOGIC_SYSTEM_ALIASES[value]
+  return aliased && isLogicSystem(aliased) ? aliased : fallback
 }
 
 export function getLogicSystem(value, fallback = DEFAULT_LOGIC_SYSTEM) {
