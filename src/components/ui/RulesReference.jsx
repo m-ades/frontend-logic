@@ -331,7 +331,7 @@ export default function RulesReference({ logicSystem }) {
           Navigation
         </Typography>
         <Box component="div" sx={{ fontSize: '1rem' }}>
-          <div><strong>•</strong> Press <strong>Enter</strong> to go to the justification line</div>
+          <div><strong>•</strong> Press <strong>Enter</strong> or the <strong>greater-than key</strong> to go to the rule justification line</div>
         </Box>
       </RulesCard>
       
