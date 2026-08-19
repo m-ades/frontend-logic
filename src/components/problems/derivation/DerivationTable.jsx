@@ -838,7 +838,11 @@ export default function DerivationTable({
         addLine()
         setTimeout(() => focusFormula(nextIndex), 0)
       } else {
-        focusFormula(nextIndex)
+        if (isFixedProof) {
+          focusJustification(nextIndex)
+        } else {
+          focusFormula(nextIndex)
+        }
       }
     }
   }
