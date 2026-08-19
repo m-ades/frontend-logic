@@ -46,9 +46,8 @@ import {
 import { getRulesetRestrictions } from '../../../lib/logicpenguin/checkers/derivation-rule-restrictions.js'
 import { justParse } from '../../ui/logicpenguin/justification-parse.js'
 import {
-  getIndexedUpperSymbols,
-  getLeadingIndexedUpperSymbol,
-  isPropositionalSymbol,
+  displayIndexedSymbolsForNotation,
+  normalizeIndexedSymbols,
 } from '../../../lib/indexedSymbols.js'
 import { getInsertSymbolLabel } from '../../ui/logicpenguin/LogicSymbol.jsx'
 import { buildPersistedSubmissionState, shouldUseApiValidation, submitApiValidation } from '../../../utils/submissionRuntime.js'
@@ -56,6 +55,8 @@ import {
   FITCH_ASSUMPTION_RULES,
   HURLEY_ASSUMPTION_RULES,
   INDENT_END_RULES,
+  MOBILE_DERIVATION_PLACEHOLDER_MSG,
+  PREDICATE_VARIABLES,
   applyLinesToJustification,
   applyRuleToJustification,
   buildErrorRows,
@@ -64,9 +65,14 @@ import {
   formatJustificationDisplay,
   formatJustificationLines,
   formatJustificationParts,
+  getConstantLettersFromFormulasAndKey,
+  getConstantLettersFromPrompt,
   getJustificationMeta,
   getOpenAssumptionDepths,
+  getPredicateLettersFromKey,
+  getPropositionalLettersFromFormulas,
   getRuleFromJustification,
+  isPredicateLogicKey,
   isResolvedConclusionLine,
 } from './derivationUtils.js'
 
@@ -90,112 +96,6 @@ function parseRulesetRules(value, derivationRuleLookup) {
   return { rules: out, hasEntries }
 }
 
-/**
- * Propositional derivations: extract unique uppercase letters from premises + conclusion.
- * Used for the mobile keyboard letter row.
- */
-function getPropositionalLettersFromFormulas(
-  premises,
-  conclusion,
-  allowIndexedSymbols = false
-) {
-  const formulas = [...(Array.isArray(premises) ? premises : []), conclusion].filter(Boolean).map(String)
-  const text = formulas.join(' ')
-  const letters = allowIndexedSymbols
-    ? getIndexedUpperSymbols(text)
-    : Array.from(new Set(text.match(/[A-Z]/g) || []))
-  return letters.length > 0 ? letters : null
-}
-
-/**
- * Predicate-logic keyboard: parse letter rows from proof.
- * Predicates: leading uppercase letter(s) from each symbolizationKey entry (e.g. "Mx: ..." → "M").
- * Constants: first 3 lowercase letters [a-z] not used in the prompt (skip letters that appear in question text).
- * Variables: always x, y, z.
- */
-function getPredicateLettersFromKey(symbolizationKey, allowIndexedSymbols = false) {
-  if (!Array.isArray(symbolizationKey) || symbolizationKey.length === 0) return []
-  const seen = new Set()
-  return symbolizationKey
-    .map((line) => {
-      const s = typeof line === 'string' ? line : String(line ?? '')
-      const left = s.split(':')[0].trim()
-      if (allowIndexedSymbols) return getLeadingIndexedUpperSymbol(left)
-      const match = left.match(/^[A-Z]+/)
-      return match ? match[0] : null
-    })
-    .filter((letter) => letter && !seen.has(letter) && (seen.add(letter), true))
-}
-
-/** Alphabet a-w (exclude x,y,z — reserved for variables). */
-const CONSTANT_POOL = 'abcdefghijklmnopqrstuvw'.split('')
-
-function getConstantLettersFromPrompt(promptText, count = 3) {
-  if (!promptText || typeof promptText !== 'string') {
-    return CONSTANT_POOL.slice(0, count)
-  }
-  const text = promptText.replace(/<[^>]+>/g, ' ').toLowerCase()
-  const used = new Set(text.match(/[a-z]/g) || [])
-  const result = []
-  for (const c of CONSTANT_POOL) {
-    if (!used.has(c)) {
-      result.push(c)
-      if (result.length >= count) break
-    }
-  }
-  return result.length > 0 ? result : ['a', 'b', 'c']
-}
-
-function getConstantLettersFromFormulasAndKey(formulaText, symbolizationKey) {
-  const seen = new Set()
-  const result = []
-  const add = (letter) => {
-    if (!seen.has(letter)) {
-      seen.add(letter)
-      result.push(letter)
-    }
-  }
-
-  for (const letter of formulaText.match(/[a-w]/g) || []) add(letter)
-  for (const line of Array.isArray(symbolizationKey) ? symbolizationKey : []) {
-    const s = typeof line === 'string' ? line : String(line ?? '')
-    const splitAt = s.search(/[=:]/)
-    const left = (splitAt === -1 ? s : s.slice(0, splitAt)).trim()
-    if (/^[a-w]$/.test(left)) add(left)
-  }
-
-  return result
-}
-
-const PREDICATE_VARIABLES = ['x', 'y', 'z']
-
-function getQuantifierInsertButtonsFromFormulaText(formulaText, syntax) {
-  const seen = new Set()
-  const buttons = []
-
-  for (const [, variable] of String(formulaText ?? '').matchAll(/[∀∃]([y-z])/g)) {
-    if (seen.has(variable)) continue
-    seen.add(variable)
-    buttons.push(
-      { insert: syntax.mkquantifier(variable, syntax.symbols.FORALL) },
-      { insert: syntax.mkquantifier(variable, syntax.symbols.EXISTS) }
-    )
-  }
-
-  return buttons
-}
-
-function isPredicateLogicKey(symbolizationKey, allowIndexedSymbols = false) {
-  if (!Array.isArray(symbolizationKey) || symbolizationKey.length === 0) return false
-  return symbolizationKey.some((line) => {
-    const s = typeof line === 'string' ? line : String(line ?? '')
-    const left = s.split(':')[0].trim()
-    return s.includes(':') && /^[A-Z]/.test(left) && left.length > 1 && !(
-      allowIndexedSymbols && isPropositionalSymbol(left)
-    )
-  })
-}
-
 function getQuantifierButtonsFromFormulas(premises, conclusion, syntax) {
   const formulas = [...(Array.isArray(premises) ? premises : []), conclusion].filter(Boolean).map(String)
   const text = formulas.join(' ')
@@ -204,17 +104,19 @@ function getQuantifierButtonsFromFormulas(premises, conclusion, syntax) {
     syntax.mkquantifier('x', syntax.symbols.EXISTS),
   ])
   const buttons = []
-  const matches = text.match(/\(?[∀∃][x-z]\)?/g)
+  const matches = normalizeIndexedSymbols(text).matchAll(/[∀∃]([s-z](?:_[1-9][0-9]*)?)/g)
 
-  if (!matches) return buttons
-
-  for (const rawMatch of matches) {
-    const match = rawMatch.match(/[∀∃][x-z]/)
-    if (!match) continue
-    const insert = syntax.mkquantifier(match[0][1], match[0][0])
-    if (seen.has(insert)) continue
-    seen.add(insert)
-    buttons.push({ label: insert, insert })
+  for (const [, variable] of matches) {
+    for (const quantifier of [syntax.symbols.FORALL, syntax.symbols.EXISTS]) {
+      const insert = displayIndexedSymbolsForNotation(
+        syntax.mkquantifier(variable, quantifier),
+        syntax.notationname
+      )
+      if (!seen.has(insert)) {
+        seen.add(insert)
+        buttons.push({ label: insert, insert })
+      }
+    }
   }
 
   return buttons
@@ -256,9 +158,12 @@ const DERIVATION_JUSTIFICATION_WIDTH_SM = 'calc(7ch + 5.46875rem)'
 const DERIVATION_INDENT_STEP_REM = 1.40625
 const DERIVATION_INDENT_STEP = '1.40625rem'
 const DERIVATION_ASSUMPTION_OFFSET = '0.9375rem'
+const FITCH_LINE_WIDTH = 1
 
-// Message shown on mobile when derivation is not fullscreen (table not rendered)
-const MOBILE_DERIVATION_PLACEHOLDER_MSG = 'Tap to open proof'
+const getFitchLineColor = (theme) => alpha(
+  theme.palette.text.primary,
+  theme.palette.mode === 'dark' ? 0.52 : 0.42
+)
 
 const symbolBtnSx = (isFullScreen, isMobile, isPhone) => {
   const mobileFullscreen = isPhone && isFullScreen
@@ -386,29 +291,46 @@ export default function DerivationTable({
     (value) => canonicalizeFormula(value, notation),
     [notation]
   )
-  const conclusionTargetText = proof?.conclusion
-    ? `${usesNestedSubderivations ? '∴' : '//'} ${normalizeFormulaForCheck(proof.conclusion)}`
-    : ''
+  const normalizeFormulaForDisplay = useCallback(
+    (value) => {
+      const raw = String(value ?? '')
+      if (/[-–]$/.test(raw)) {
+        const fixed = syntax.inputfix(raw.slice(0, -1)).replace(/\s+$/g, '') + raw.slice(-1)
+        return displayIndexedSymbolsForNotation(fixed, notation)
+      }
+      return displayIndexedSymbolsForNotation(syntax.inputfix(raw), notation)
+    },
+    [notation, syntax]
+  )
   const premises = useMemo(
     () => (Array.isArray(proof?.premises) ? proof.premises : []),
     [proof?.premises]
   )
+  const normalizedConclusion = proof?.conclusion
+    ? normalizeFormulaForDisplay(normalizeFormulaForCheck(proof.conclusion))
+    : ''
+  const conclusionTargetText = normalizedConclusion
+    ? `// ${normalizedConclusion}`
+    : ''
+  const argumentTargetText = usesNestedSubderivations && normalizedConclusion
+    ? `${premises.map((premise) => normalizeFormulaForDisplay(normalizeFormulaForCheck(premise))).join(', ')}${premises.length ? ' ' : ''}∴ ${normalizedConclusion}`
+    : ''
   const initialLines = useMemo(() => {
     const fromState = extractLines(savedState, premises)
     if (fromState.length) {
       return fromState.map((line) => ({
         ...line,
-        formula: normalizeFormulaForCheck(line.formula),
+        formula: normalizeFormulaForDisplay(normalizeFormulaForCheck(line.formula)),
       }))
     }
     const premLines = premises.map((p) => ({
-      formula: normalizeFormulaForCheck(p),
+      formula: normalizeFormulaForDisplay(normalizeFormulaForCheck(p)),
       justification: '',
       readOnly: true,
     }))
     const blanks = Array.from({ length: 1 }, () => ({ formula: '', justification: '', readOnly: false }))
     return [...premLines, ...blanks]
-  }, [normalizeFormulaForCheck, savedState, premises])
+  }, [normalizeFormulaForCheck, normalizeFormulaForDisplay, savedState, premises])
 
   const [lines, setLines] = useState(initialLines)
   const [lastSubmitStatus, setLastSubmitStatus] = useState(null)
@@ -469,12 +391,12 @@ export default function DerivationTable({
       syntax
     )
 
-    const isPredicate = isPredicateLogicKey(key, allowIndexedSymbols) || /[∀∃]/.test(formulaText) || /[A-Z][a-z]/.test(formulaText)
+    const isPredicate = isPredicateLogicKey(key, allowIndexedSymbols) || /[∀∃]/.test(formulaText) || /[A-Z][a-z]/.test(formulaText) || /[A-Z](?:_[1-9][0-9]*|[₁-₉][₀-₉]*)?\s*\(/.test(formulaText)
 
     if (isPredicate) {
       const keyText = key.map((line) => (typeof line === 'string' ? line : String(line ?? ''))).join(' ')
       const textForConstants = [formulaText, keyText].filter(Boolean).join(' ') || ''
-      const constantsFromAnswer = getConstantLettersFromFormulasAndKey(formulaText, key)
+      const constantsFromAnswer = getConstantLettersFromFormulasAndKey(formulaText, key, allowIndexedSymbols)
       const constantLetters = [
         ...constantsFromAnswer,
         ...getConstantLettersFromPrompt(textForConstants, 3).filter((letter) => !constantsFromAnswer.includes(letter)),
@@ -493,10 +415,6 @@ export default function DerivationTable({
         predicateLetters,
         constantLetters,
         variableLetters,
-        extraInsertButtons: getQuantifierInsertButtonsFromFormulaText(
-          formulaText,
-          syntax
-        ),
         extraQuantifierButtons,
       }
     }
@@ -579,16 +497,6 @@ export default function DerivationTable({
     })
   }, [activeAssumptionRules, effectiveLines, usesNestedSubderivations])
 
-  const normalizeFormulaForDisplay = useCallback(
-    (value) => {
-      const raw = String(value ?? '')
-      if (/[-–]$/.test(raw)) {
-        return syntax.inputfix(raw.slice(0, -1)).replace(/\s+$/g, '') + raw.slice(-1)
-      }
-      return syntax.inputfix(raw)
-    },
-    [syntax]
-  )
   const normalizeJustificationForDisplay = useCallback(
     (value) => String(value ?? '').replace(/[^\s,]+/g, (token) => {
       if (/[0-9?]/.test(token)) return token
@@ -596,11 +504,7 @@ export default function DerivationTable({
     }),
     []
   )
-  const normalizeJustificationForCheck = useMemo(
-    () => (value) => String(value ?? '').replace(/\s+/g, ''),
-    []
-  )
-  const normalizeJustificationForSave = useCallback((value) => String(value ?? '').trim(), [])
+  const normalizeJustification = useCallback((value) => String(value ?? '').trim(), [])
 
   useEffect(() => {
     onStateChangeRef.current = onStateChange
@@ -625,7 +529,7 @@ export default function DerivationTable({
       proof?.conclusion,
       premises,
       normalizeFormulaForCheck,
-      normalizeJustificationForSave,
+      normalizeJustification,
       { nestedSubderivations: usesNestedSubderivations, assumptionRules: activeAssumptionRules }
     )
     if (options.immediate) {
@@ -634,7 +538,7 @@ export default function DerivationTable({
     queueMicrotask(() => {
       onStateChangeRef.current?.(submission, options)
     })
-  }, [activeAssumptionRules, premises, proof?.conclusion, normalizeFormulaForCheck, normalizeJustificationForSave, usesNestedSubderivations])
+  }, [activeAssumptionRules, premises, proof?.conclusion, normalizeFormulaForCheck, normalizeJustification, usesNestedSubderivations])
 
   const runAutoCheck = useCallback(async (linesSnapshot) => {
     const submission = buildSubmission(
@@ -642,7 +546,7 @@ export default function DerivationTable({
       proof?.conclusion,
       premises,
       normalizeFormulaForCheck,
-      normalizeJustificationForCheck,
+      normalizeJustification,
       { nestedSubderivations: usesNestedSubderivations, assumptionRules: activeAssumptionRules }
     )
     const result = await checkDerivation(
@@ -763,7 +667,7 @@ export default function DerivationTable({
       })
     )
     return { perLine, rows, shouldAutoAdd }
-  }, [activeAssumptionRules, checkDerivation, normalizeFormulaForCheck, normalizeJustificationForCheck, notation, premises, proof?.conclusion, proof?.options, proof?.ruleset, isLineCompleteForCheck, usesNestedSubderivations])
+  }, [activeAssumptionRules, checkDerivation, normalizeFormulaForCheck, normalizeJustification, notation, premises, proof?.conclusion, proof?.options, proof?.ruleset, isLineCompleteForCheck, usesNestedSubderivations])
 
   useEffect(() => {
     if (!autoCheckEnabled) {
@@ -929,8 +833,11 @@ export default function DerivationTable({
   }, [lines.length])
 
   const handleLineCommit = (index, field, value) => {
+    const committedValue = field === 'formula'
+      ? normalizeFormulaForDisplay(value)
+      : value
     commitLines(
-      (prev) => applyLineChange(prev, index, field, value),
+      (prev) => applyLineChange(prev, index, field, committedValue),
       index
     )
   }
@@ -1218,7 +1125,11 @@ export default function DerivationTable({
   const handleStartOver = async () => {
     if (isLocked || isAssignmentLocked) return
     const previousLines = lines
-    const premLines = premises.map((p) => ({ formula: p, justification: '', readOnly: true }))
+    const premLines = premises.map((p) => ({
+      formula: normalizeFormulaForDisplay(normalizeFormulaForCheck(p)),
+      justification: '',
+      readOnly: true,
+    }))
     const blanks = Array.from({ length: 1 }, () => ({ formula: '', justification: '', readOnly: false }))
     const nextLines = [...premLines, ...blanks]
     setLines(nextLines)
@@ -1252,7 +1163,7 @@ export default function DerivationTable({
         proof?.conclusion,
         premises,
         normalizeFormulaForCheck,
-        normalizeJustificationForCheck,
+        normalizeJustification,
         { nestedSubderivations: usesNestedSubderivations, assumptionRules: activeAssumptionRules }
       )
       if (!shouldUseApiValidation(proof?.questionId)) {
@@ -1382,6 +1293,42 @@ export default function DerivationTable({
     }
   }
 
+  const renderTargetText = (text, keyPrefix, sx) => (
+    <Box
+      component="span"
+      sx={[
+        {
+          fontSize: DERIVATION_LINE_FONT_SIZE,
+          color: 'text.primary',
+          '& .clickable-char': {
+            cursor: 'pointer',
+            borderRadius: 1,
+            '&:hover': { backgroundColor: (t) => alpha(t.palette.primary.main, t.palette.action.hoverOpacity) },
+          },
+        },
+        sx,
+      ]}
+    >
+      {text.split('').map((char, index) => {
+        const isLetter = /^[a-zA-Z]$/.test(char)
+        return isLetter ? (
+          <Box
+            component="span"
+            key={`${keyPrefix}-${index}`}
+            className="clickable-char"
+            onPointerDown={(event) => event.preventDefault()}
+            onClick={() => handleSymbolInsert({ insert: char })}
+            aria-label={getInsertSymbolLabel({ insert: char })}
+          >
+            {char}
+          </Box>
+        ) : (
+          <Box component="span" key={`${keyPrefix}-${index}`}>{char}</Box>
+        )
+      })}
+    </Box>
+  )
+
   // open fullscreen when user taps an input on the table. phones only (not tablets).
   const canOpenFullScreen = isPhone && !isFullScreen && typeof onOpenFullScreen === 'function'
 
@@ -1472,38 +1419,70 @@ export default function DerivationTable({
           </Box>
         ) : (
         <>
-        {allowedRules.length > 0 && (
-          <Box sx={{ mb: 1.5, display: 'flex', alignItems: 'center', gap: 0.5, flexWrap: 'wrap', ...(isFullScreen && { pl: 2 }) }}>
-            <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-              Rule input:
-            </Typography>
-            <ToggleButtonGroup
-              value={ruleInputMode}
-              exclusive
-              onChange={handleRuleInputModeChange}
-              size="small"
-              sx={{
-                border: 'none',
-                '& .MuiToggleButtonGroup-grouped': { border: 'none' },
-                '& .MuiToggleButton-root': {
-                  py: 0.25,
-                  px: 1.25,
-                  fontSize: '0.8125rem',
-                  border: 'none',
-                  '&.Mui-selected': { fontWeight: 600 },
-                },
-              }}
+        {argumentTargetText && (
+          <Box
+            sx={{
+              mb: 2,
+              ...(isFullScreen && { pl: 2 }),
+            }}
+          >
+            <Typography
+              component="h3"
+              variant="overline"
+              sx={{ display: 'block', mb: 0.5, color: 'text.secondary', fontWeight: 700, lineHeight: 1.2 }}
             >
-              <ToggleButton value="type" aria-label="Type rule">
-                TYPE
-              </ToggleButton>
-              <Typography component="span" variant="body2" sx={{ color: 'text.secondary', alignSelf: 'center', px: 0.5 }}>
-                or
+              Argument
+            </Typography>
+            <Box sx={{ overflowX: 'auto', whiteSpace: 'nowrap' }}>
+              {renderTargetText(argumentTargetText, 'argument-target')}
+            </Box>
+          </Box>
+        )}
+        {(usesNestedSubderivations || allowedRules.length > 0) && (
+          <Box sx={{ mb: 1.5, display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap', ...(isFullScreen && { pl: 2 }) }}>
+            {usesNestedSubderivations && (
+              <Typography
+                component="h3"
+                variant="overline"
+                sx={{ mr: 0.5, color: 'text.secondary', fontWeight: 700, lineHeight: 1.2 }}
+              >
+                Derivation
               </Typography>
-              <ToggleButton value="dropdown" aria-label="Select rule from dropdown">
-                SELECT FROM LIST
-              </ToggleButton>
-            </ToggleButtonGroup>
+            )}
+            {allowedRules.length > 0 && (
+              <>
+                <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                  Rule input:
+                </Typography>
+                <ToggleButtonGroup
+                  value={ruleInputMode}
+                  exclusive
+                  onChange={handleRuleInputModeChange}
+                  size="small"
+                  sx={{
+                    border: 'none',
+                    '& .MuiToggleButtonGroup-grouped': { border: 'none' },
+                    '& .MuiToggleButton-root': {
+                      py: 0.25,
+                      px: 1.25,
+                      fontSize: '0.8125rem',
+                      border: 'none',
+                      '&.Mui-selected': { fontWeight: 600 },
+                    },
+                  }}
+                >
+                  <ToggleButton value="type" aria-label="Type rule">
+                    TYPE
+                  </ToggleButton>
+                  <Typography component="span" variant="body2" sx={{ color: 'text.secondary', alignSelf: 'center', px: 0.5 }}>
+                    or
+                  </Typography>
+                  <ToggleButton value="dropdown" aria-label="Select rule from dropdown">
+                    SELECT FROM LIST
+                  </ToggleButton>
+                </ToggleButtonGroup>
+              </>
+            )}
           </Box>
         )}
         <TableContainer
@@ -1528,7 +1507,7 @@ export default function DerivationTable({
             }
           >
             <TableBody>
-            {premises.length === 0 && proof?.conclusion && (
+            {!usesNestedSubderivations && premises.length === 0 && proof?.conclusion && (
               <TableRow
                 key="conclusion-row"
                 sx={{
@@ -1546,21 +1525,7 @@ export default function DerivationTable({
                   <Typography sx={{ color: 'transparent' }}>—</Typography>
                 </TableCell>
                 <TableCell sx={{ borderBottom: 'none', pl: 0.5, verticalAlign: 'middle', ...(isFullScreen ? { width: '50%', minWidth: 0 } : { width: 'auto', whiteSpace: 'nowrap' }) }}>
-                  <Box
-                    component="span"
-                    sx={{ fontSize: DERIVATION_LINE_FONT_SIZE, color: 'text.primary', '& .clickable-char': { cursor: 'pointer', borderRadius: 1, '&:hover': { backgroundColor: (t) => alpha(t.palette.primary.main, t.palette.action.hoverOpacity) } } }}
-                  >
-                    {conclusionTargetText.split('').map((char, i) => {
-                      const isLetter = /^[a-zA-Z]$/.test(char)
-                      return isLetter ? (
-                        <Box component="span" key={`conc-${i}`} className="clickable-char" onPointerDown={(e) => e.preventDefault()} onClick={() => handleSymbolInsert({ insert: char })} aria-label={getInsertSymbolLabel({ insert: char })}>
-                          {char}
-                        </Box>
-                      ) : (
-                        <Box component="span" key={`conc-${i}`}>{char}</Box>
-                      )
-                    })}
-                  </Box>
+                  {renderTargetText(conclusionTargetText, 'conclusion-target')}
                 </TableCell>
               </TableRow>
             )}
@@ -1568,6 +1533,7 @@ export default function DerivationTable({
               const isActiveLine = activeFormulaIndex === idx
               const selectedLineRule = getRuleFromJustification(line.justification)
               const lineRule = selectedLineRule.toUpperCase()
+              const startsScope = usesNestedSubderivations && activeAssumptionRules.has(lineRule)
               const ruleOptions = selectedLineRule && !allowedRules.some((rule) => rule.toLowerCase() === selectedLineRule.toLowerCase())
                 ? [selectedLineRule, ...allowedRules]
                 : allowedRules
@@ -1586,22 +1552,29 @@ export default function DerivationTable({
                 ? (indentLevels[idx] || 0)
                 : 0
               const indentOffset = `calc(${indentLevels[idx] || 0} * ${DERIVATION_INDENT_STEP}${indentLevels[idx] ? ` + ${DERIVATION_ASSUMPTION_OFFSET}` : ''})`
+              const formulaCellBasePadding = isFullScreen ? '0.5rem' : '1rem'
+              const formulaCellPadding = scopeDepth > 0
+                ? `calc(${formulaCellBasePadding} + ${indentOffset})`
+                : formulaCellBasePadding
+              const isPremiseLine = usesNestedSubderivations && idx < premises.length
+              const showsFitchDivider = isPremiseLine || startsScope
+              const fitchDividerLeft = startsScope
+                ? `calc(${formulaCellBasePadding} + ${DERIVATION_ASSUMPTION_OFFSET} + ${Math.max(0, scopeDepth - 1) * DERIVATION_INDENT_STEP_REM}rem)`
+                : `-${FITCH_LINE_WIDTH}px`
               return (
               <TableRow
                 key={`line-${idx}`}
                 sx={{
-                  transform: indentLevels[idx] ? `translateX(${indentOffset})` : 'none',
-                  transition: 'transform 120ms ease',
                   '& td': {
                     py: isMobile ? 0.25 : 0.5,
                     position: 'relative',
                     verticalAlign: 'middle',
                     transition: 'background-color 160ms ease',
+                    ...(isActiveLine && {
+                      backgroundColor: (t) => alpha(t.palette.primary.main, t.palette.mode === 'dark' ? 0.12 : 0.06),
+                    }),
                   },
                   ...(isActiveLine && {
-                    '& td': {
-                      backgroundColor: (t) => alpha(t.palette.primary.main, t.palette.mode === 'dark' ? 0.12 : 0.06),
-                    },
                     '& td:first-of-type': {
                       borderTopLeftRadius: 10,
                       borderBottomLeftRadius: 10,
@@ -1615,7 +1588,31 @@ export default function DerivationTable({
                   }),
                 }}
               >
-                <TableCell sx={{ width: isFullScreen || isMobile ? DERIVATION_NUMBER_CELL_WIDTH_MOBILE : DERIVATION_NUMBER_CELL_WIDTH_DESKTOP, minWidth: isFullScreen || isMobile ? DERIVATION_NUMBER_CELL_WIDTH_MOBILE : undefined, borderBottom: 'none', color: (t) => alpha(t.palette.text.primary, t.palette.mode === 'dark' ? 0.78 : 0.7), fontWeight: 600, verticalAlign: 'middle', ...(isFullScreen && { pr: 1 }) }}>
+                <TableCell
+                  sx={{
+                    width: isFullScreen || isMobile ? DERIVATION_NUMBER_CELL_WIDTH_MOBILE : DERIVATION_NUMBER_CELL_WIDTH_DESKTOP,
+                    minWidth: isFullScreen || isMobile ? DERIVATION_NUMBER_CELL_WIDTH_MOBILE : undefined,
+                    borderBottom: 'none',
+                    color: (t) => alpha(t.palette.text.primary, t.palette.mode === 'dark' ? 0.78 : 0.7),
+                    fontWeight: 600,
+                    verticalAlign: 'middle',
+                    ...(usesNestedSubderivations && {
+                      '&::after': {
+                        content: '""',
+                        position: 'absolute',
+                        top: -1,
+                        bottom: -1,
+                        right: -1,
+                        width: FITCH_LINE_WIDTH,
+                        borderRadius: 1,
+                        bgcolor: getFitchLineColor,
+                        pointerEvents: 'none',
+                        zIndex: 1,
+                      },
+                    }),
+                    ...(isFullScreen && { pr: 1 }),
+                  }}
+                >
                   <Box
                     component="button"
                     type="button"
@@ -1639,7 +1636,32 @@ export default function DerivationTable({
                     {idx + 1}
                   </Box>
                 </TableCell>
-                <TableCell sx={{ borderBottom: 'none', pl: isFullScreen ? 1 : undefined, pr: 0.5, verticalAlign: 'middle', ...(isFullScreen ? { width: '50%', minWidth: 0 } : { width: 'auto', whiteSpace: 'nowrap' }) }}>
+                <TableCell
+                  sx={{
+                    borderBottom: 'none',
+                    pl: formulaCellPadding,
+                    pr: 0.5,
+                    verticalAlign: 'middle',
+                    transition: 'padding-left 120ms ease',
+                    ...(showsFitchDivider && {
+                      '&::after': {
+                        content: '""',
+                        position: 'absolute',
+                        left: fitchDividerLeft,
+                        right: '0.5rem',
+                        bottom: -1,
+                        height: FITCH_LINE_WIDTH,
+                        borderRadius: 1,
+                        bgcolor: getFitchLineColor,
+                        pointerEvents: 'none',
+                        zIndex: 2,
+                      },
+                    }),
+                    ...(isFullScreen
+                      ? { width: '50%', minWidth: 0 }
+                      : { width: 'auto', whiteSpace: 'nowrap' }),
+                  }}
+                >
                   {scopeDepth > 0 && (
                     <Box
                       aria-hidden="true"
@@ -1656,63 +1678,35 @@ export default function DerivationTable({
                           key={`scope-${idx}-${scopeIndex}`}
                           sx={(theme) => ({
                             position: 'absolute',
-                            top: -1,
+                            top: startsScope && scopeIndex === scopeDepth - 1 ? 7 : -1,
                             bottom: -1,
-                            left: `-${(scopeDepth - scopeIndex) * DERIVATION_INDENT_STEP_REM}rem`,
-                            width: 2,
+                            left: `calc(${formulaCellBasePadding} + ${DERIVATION_ASSUMPTION_OFFSET} + ${scopeIndex * DERIVATION_INDENT_STEP_REM}rem)`,
+                            width: FITCH_LINE_WIDTH,
                             borderRadius: 1,
-                            bgcolor: alpha(
-                              theme.palette.text.primary,
-                              theme.palette.mode === 'dark' ? 0.52 : 0.42
-                            ),
+                            bgcolor: getFitchLineColor(theme),
                           })}
                         />
                       ))}
                     </Box>
                   )}
-                  {line.readOnly ? (
-                    <Box
-                      component="span"
-                      sx={(theme) => ({
-                        display: isPhone && isFullScreen ? 'block' : 'inline',
-                        ...(isPhone && isFullScreen
-                          ? {
-                              width: '100%',
-                              maxWidth: '100%',
-                              overflowX: 'auto',
-                              overflowY: 'hidden',
-                              whiteSpace: 'nowrap',
-                              WebkitOverflowScrolling: 'touch',
-                            }
-                          : {}),
-                        fontSize: DERIVATION_LINE_FONT_SIZE,
-                        py: isMobile ? 0.5 : 1,
-                        ...getInputUnderlineSx(theme),
-                        '& .clickable-char': {
-                          cursor: 'pointer',
-                          borderRadius: 1,
-                          '&:hover': { backgroundColor: (t) => alpha(t.palette.primary.main, t.palette.action.hoverOpacity) },
-                        },
-                      })}
-                    >
-                      {(line.formula || '').split('').map((char, i) => {
-                        const isLetter = /^[a-zA-Z]$/.test(char)
-                        return isLetter ? (
-                          <Box
-                            component="span"
-                            key={`${idx}-${i}`}
-                            className="clickable-char"
-                            onPointerDown={(e) => e.preventDefault()}
-                            onClick={() => handleSymbolInsert({ insert: char })}
-                            aria-label={getInsertSymbolLabel({ insert: char })}
-                          >
-                            {char}
-                          </Box>
-                        ) : (
-                          <Box component="span" key={`${idx}-${i}`}>{char}</Box>
-                        )
-                      })}
-                    </Box>
+                  {line.readOnly ? renderTargetText(
+                    line.formula || '',
+                    `formula-${idx}`,
+                    (theme) => ({
+                      display: isPhone && isFullScreen ? 'block' : 'inline',
+                      ...(isPhone && isFullScreen
+                        ? {
+                            width: '100%',
+                            maxWidth: '100%',
+                            overflowX: 'auto',
+                            overflowY: 'hidden',
+                            whiteSpace: 'nowrap',
+                            WebkitOverflowScrolling: 'touch',
+                          }
+                        : {}),
+                      py: isMobile ? 0.5 : 1,
+                      ...getInputUnderlineSx(theme),
+                    })
                   ) : isPhone && mobileLogicKeyboardEnabled ? (
                     <MobileLogicInput
                       value={line.formula ?? ''}
@@ -1736,7 +1730,7 @@ export default function DerivationTable({
                         setStoredSelection(idx, Math.max(0, Math.min(safePosition, maxPosition)))
                       }}
                       includeQuantifiers={derivationKeyboardConfig.isPredicateMode}
-                      extraInsertButtons={derivationKeyboardConfig.isPredicateMode ? derivationKeyboardConfig.extraInsertButtons : derivationKeyboardConfig.extraQuantifierButtons}
+                      extraInsertButtons={derivationKeyboardConfig.extraQuantifierButtons}
                       predicateLetters={derivationKeyboardConfig.isPredicateMode ? derivationKeyboardConfig.predicateLetters : undefined}
                       constantLetters={derivationKeyboardConfig.isPredicateMode ? derivationKeyboardConfig.constantLetters : undefined}
                       variableLetters={derivationKeyboardConfig.isPredicateMode ? derivationKeyboardConfig.variableLetters : undefined}
@@ -1829,7 +1823,7 @@ export default function DerivationTable({
                 >
                   {idx < premises.length ? (
                     <Stack direction="row" spacing={1.5} alignItems="center">
-                      {usesNestedSubderivations && (
+                      {usesNestedSubderivations ? (
                         <Typography
                           component="span"
                           sx={{
@@ -1840,26 +1834,11 @@ export default function DerivationTable({
                         >
                           PR
                         </Typography>
-                      )}
-                      {idx === premises.length - 1 ? (
-                        <Box
-                          component="span"
-                          sx={{ fontSize: DERIVATION_LINE_FONT_SIZE, color: 'text.primary', '& .clickable-char': { cursor: 'pointer', borderRadius: 1, '&:hover': { backgroundColor: (t) => alpha(t.palette.primary.main, t.palette.action.hoverOpacity) } } }}
-                        >
-                          {conclusionTargetText.split('').map((char, i) => {
-                            const isLetter = /^[a-zA-Z]$/.test(char)
-                            return isLetter ? (
-                              <Box component="span" key={`conc-row-${idx}-${i}`} className="clickable-char" onPointerDown={(e) => e.preventDefault()} onClick={() => handleSymbolInsert({ insert: char })} aria-label={getInsertSymbolLabel({ insert: char })}>
-                                {char}
-                              </Box>
-                            ) : (
-                              <Box component="span" key={`conc-row-${idx}-${i}`}>{char}</Box>
-                            )
-                          })}
-                        </Box>
-                      ) : !usesNestedSubderivations ? (
+                      ) : idx === premises.length - 1 ? (
+                        renderTargetText(conclusionTargetText, `conclusion-row-${idx}`)
+                      ) : (
                         <Typography sx={{ color: 'transparent' }}>—</Typography>
-                      ) : null}
+                      )}
                     </Stack>
                   ) : (
                     <Stack direction="row" spacing={0.5} alignItems="center" sx={{ flexWrap: 'nowrap', gap: 0, minWidth: 0 }}>
@@ -2039,7 +2018,9 @@ export default function DerivationTable({
                       ) : (
                         <TextField
                           variant="standard"
-                          placeholder={idx === premises.length ? 'line(s) and rule' : ''}
+                          placeholder={idx === premises.length
+                            ? (usesNestedSubderivations ? 'rule line(s)' : 'line(s) and rule')
+                            : ''}
                           value={line.justification}
                           onFocus={() => {
                             if (!line.readOnly) {
@@ -2059,9 +2040,9 @@ export default function DerivationTable({
                           onKeyDown={(e) => handleJustKeyDown(e, idx, line.readOnly)}
                           onBlur={(e) => {
                             const raw = (e.target.value || '').trim()
-                            const formatted = raw
-                              ? formatJustificationDisplay(raw, { rulesFirst: usesNestedSubderivations })
-                              : ''
+                            const formatted = raw && !usesNestedSubderivations
+                              ? formatJustificationDisplay(raw)
+                              : raw
                             if (formatted !== raw) {
                               handleLineChange(idx, 'justification', formatted)
                             }

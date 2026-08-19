@@ -3,9 +3,11 @@ import { formatDerivationRuleName } from '../../../lib/derivationRules.js'
 import getFormulaClass from '../../../lib/logicpenguin/symbolic/formula.js'
 import { justParse } from '../../ui/logicpenguin/justification-parse.js'
 import {
+  getIndexedLowerSymbols,
   getIndexedUpperSymbols,
   getLeadingIndexedUpperSymbol,
   isPropositionalSymbol,
+  normalizeIndexedSymbols,
 } from '../../../lib/indexedSymbols.js'
 
 const CONSTANT_POOL = 'abcdefghijklmnopqrstuvw'.split('')
@@ -21,8 +23,10 @@ export function isPredicateLogicKey(symbolizationKey, allowIndexedSymbols = fals
   if (!Array.isArray(symbolizationKey) || symbolizationKey.length === 0) return false
   return symbolizationKey.some((line) => {
     const left = getLeftPart(line)
-    const isConstantStyle =
-      left.length === 1 && /^[a-z]$/.test(left) && !['x', 'y', 'z'].includes(left)
+    const normalizedLeft = normalizeIndexedSymbols(left)
+    const isConstantStyle = allowIndexedSymbols
+      ? /^[a-r](?:_[1-9][0-9]*)?$/.test(normalizedLeft)
+      : /^[a-w]$/.test(left)
     const isPredicateStyle = /^[A-Z]/.test(left) && left.length > 1 && !(
       allowIndexedSymbols && isPropositionalSymbol(left)
     )
@@ -57,6 +61,27 @@ export function getConstantLettersFromPrompt(promptText, count = 3) {
     }
   }
   return result.length > 0 ? result : ['a', 'b', 'c']
+}
+
+export function getConstantLettersFromFormulasAndKey(
+  formulaText,
+  symbolizationKey,
+  allowIndexedSymbols = false
+) {
+  const constants = allowIndexedSymbols
+    ? getIndexedLowerSymbols(formulaText).filter((term) => /^[a-r]/.test(term))
+    : (formulaText.match(/[a-w]/g) || [])
+
+  for (const line of Array.isArray(symbolizationKey) ? symbolizationKey : []) {
+    const left = getLeftPart(line)
+    const normalized = normalizeIndexedSymbols(left)
+    const isConstant = allowIndexedSymbols
+      ? /^[a-r](?:_[1-9][0-9]*)?$/.test(normalized)
+      : /^[a-w]$/.test(left)
+    if (isConstant) constants.push(normalized)
+  }
+
+  return Array.from(new Set(constants))
 }
 
 export function getPropositionalLettersFromFormulas(
