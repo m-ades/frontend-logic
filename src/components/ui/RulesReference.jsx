@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useId, useState } from 'react'
 import { Box, Typography, IconButton, Drawer, alpha, useMediaQuery, useTheme } from '@mui/material'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import ExpandLessIcon from '@mui/icons-material/ExpandLess'
@@ -14,33 +14,46 @@ import MathJaxFormula from './MathJaxFormula.jsx'
 
 function RulesCard({ title, children, defaultExpanded = false }) {
   const [expanded, setExpanded] = useState(defaultExpanded)
+  const accordionId = useId()
+  const triggerId = `${accordionId}-trigger`
+  const contentId = `${accordionId}-content`
 
   return (
+    <Box sx={{ width: '100%', mb: 1 }}>
       <Box
+        component="button"
+        type="button"
+        id={triggerId}
+        aria-expanded={expanded}
+        aria-controls={contentId}
+        onClick={() => setExpanded((current) => !current)}
         sx={{
           width: '100%',
-          mb: 1,
-        }}
-      >
-        <Box 
-        onClick={() => setExpanded(!expanded)}
-        sx={{ 
-          display: 'flex', 
-          alignItems: 'center', 
+          border: 0,
+          bgcolor: 'transparent',
+          font: 'inherit',
+          display: 'flex',
+          alignItems: 'center',
           justifyContent: 'space-between',
           padding: '10px 12px',
           color: 'primary.main',
+          textAlign: 'left',
           cursor: 'pointer',
-          transition: 'all 0.2s ease',
+          transition: 'color 0.2s ease, background-color 0.2s ease',
           '&:hover': {
             color: 'primary.main',
             backgroundColor: (theme) => alpha(theme.palette.primary.main, 0.08),
           },
+          '&:focus-visible': {
+            outline: '2px solid',
+            outlineColor: 'primary.main',
+            outlineOffset: '-2px',
+          },
         }}
       >
-        <Typography 
-          variant="body1" 
-          sx={{ 
+        <Typography
+          component="span"
+          sx={{
             color: 'inherit',
             fontWeight: expanded ? 600 : 400,
             fontSize: '1rem',
@@ -48,26 +61,18 @@ function RulesCard({ title, children, defaultExpanded = false }) {
         >
           {title}
         </Typography>
-        <IconButton
-          size="small"
-          onClick={(e) => {
-            e.stopPropagation()
-            setExpanded(!expanded)
-          }}
-          sx={{ 
-            color: 'inherit',
-            padding: '4px',
-            '&:hover': { backgroundColor: 'transparent' }
-          }}
-        >
-          {expanded ? <ExpandLessIcon fontSize="small" /> : <ExpandMoreIcon fontSize="small" />}
-        </IconButton>
+        {expanded
+          ? <ExpandLessIcon aria-hidden="true" fontSize="small" />
+          : <ExpandMoreIcon aria-hidden="true" fontSize="small" />}
       </Box>
       {expanded && (
-        <Box 
-          sx={{ 
+        <Box
+          id={contentId}
+          role="region"
+          aria-labelledby={triggerId}
+          sx={{
             fontSize: '1rem',
-            lineHeight: 1.5, 
+            lineHeight: 1.5,
             color: 'text.primary',
             padding: '8px 12px',
             paddingTop: '6px',
@@ -143,6 +148,9 @@ function FitchRuleEntries({ group }) {
 
 function FitchRuleGroup({ group }) {
   const [expanded, setExpanded] = useState(true)
+  const accordionId = useId()
+  const triggerId = `${accordionId}-trigger`
+  const contentId = `${accordionId}-content`
 
   if (!group.title) {
     return <FitchRuleEntries group={group} />
@@ -153,7 +161,9 @@ function FitchRuleGroup({ group }) {
       <Box
         component="button"
         type="button"
+        id={triggerId}
         aria-expanded={expanded}
+        aria-controls={contentId}
         onClick={() => setExpanded((current) => !current)}
         sx={{
           width: '100%',
@@ -175,9 +185,15 @@ function FitchRuleGroup({ group }) {
         <Typography component="span" sx={{ fontWeight: 700, fontSize: '1rem' }}>
           {group.title}
         </Typography>
-        {expanded ? <ExpandLessIcon fontSize="small" /> : <ExpandMoreIcon fontSize="small" />}
+        {expanded
+          ? <ExpandLessIcon aria-hidden="true" fontSize="small" />
+          : <ExpandMoreIcon aria-hidden="true" fontSize="small" />}
       </Box>
-      {expanded && <FitchRuleEntries group={group} />}
+      {expanded && (
+        <Box id={contentId} role="region" aria-labelledby={triggerId}>
+          <FitchRuleEntries group={group} />
+        </Box>
+      )}
     </Box>
   )
 }
