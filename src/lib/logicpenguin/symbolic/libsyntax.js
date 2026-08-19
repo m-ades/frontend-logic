@@ -58,7 +58,7 @@ function isop(c) {
 
 // tests if a given character is a variable
 function isvar(c) {
-    return this.varRegEx.test(c);
+    return this.varaRegEx.test(c);
 }
 
 // this: make quantifier with proper notation
@@ -211,11 +211,20 @@ function generateSyntax(notationname = DEFAULT_NOTATION) {
     // Accept both explicit quantifier styles in every notation, then render
     // with quantifierForm. The variable-only universal abbreviation `(x)` is
     // Hurley-specific; treating it as a quantifier in Calgary breaks F(x).
+    const indexedSuffix = syntax.notationname === 'calgary'
+        ? '(?:_[1-9][0-9]*)?'
+        : '';
+    const variablePattern = '[' + syntax.notation.variableRange + ']' +
+        indexedSuffix;
+    const constantPattern = '[' + syntax.notation.constantsRange + ']' +
+        indexedSuffix;
+    const termPattern = '[' + syntax.notation.variableRange +
+        syntax.notation.constantsRange + ']' + indexedSuffix;
     const baseForm = syntax.notation.quantifierForm
         .replaceAll('(', '').replaceAll(')', '')
         .replaceAll('Q?',symbols.EXISTS + '?')
         .replaceAll('Q','[' + symbols.EXISTS + symbols.FORALL + ']')
-        .replaceAll('x','[' + syntax.notation.variableRange + ']');
+        .replaceAll('x', variablePattern);
     const acceptedForms = ['\\(' + baseForm + '\\)', baseForm];
     if (syntax.notationname === 'hurley') {
         acceptedForms.push('\\([' + syntax.notation.variableRange + ']\\)');
@@ -229,25 +238,21 @@ function generateSyntax(notationname = DEFAULT_NOTATION) {
     // anchored to start
     syntax.qaRegEx = new RegExp('^' + syntax.qRegExStr);
     // variable regex
-    syntax.varRegEx = new RegExp('[' + syntax.notation.variableRange + ']');
+    syntax.varRegEx = new RegExp(variablePattern);
     // variable regex, anchored
-    syntax.varaRegEx = new RegExp('^[' + syntax.notation.variableRange + ']$');
+    syntax.varaRegEx = new RegExp('^' + variablePattern + '$');
     // terms regex
-    syntax.termsRegEx = new RegExp('[' + syntax.notation.variableRange +
-        syntax.notation.constantsRange + ']', 'g');
+    syntax.termsRegEx = new RegExp(termPattern, 'g');
+    syntax.termaRegEx = new RegExp('^' + termPattern + '$');
     // Fitch/Calgary predicate and propositional symbols may carry a numeric
     // index. Other course notations retain their original atomic grammar.
     const indexedPredicateRange = syntax.notation.predicatesRange
         .replaceAll('=', '').replaceAll('≠', '');
-    const indexedSuffix = syntax.notationname === 'calgary'
-        ? '(?:_[1-9][0-9]*)?'
-        : '';
     syntax.pletterRegEx = new RegExp(
         '(?:[=≠]|[' + indexedPredicateRange + ']' + indexedSuffix + ')'
     );
-    // constants and nonconstants regexex
-    syntax.cRegEx = new RegExp('^[' + syntax.notation.constantsRange + ']$');
-    syntax.ncRegEx = new RegExp( '[^' + syntax.notation.constantsRange + ']', 'g');
+    // constants regex
+    syntax.cRegEx = new RegExp('^' + constantPattern + '$');
 
     // BIND SYNTAX FUNCTIONS TO THIS SYNTAX
     syntax.symbolfix = symbolfix;

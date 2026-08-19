@@ -424,21 +424,24 @@ function generateFormulaClass(notationname = 'hurley') {
                     + 'predicates are not accepted.');
                 return this._pletter;
             }
-            // position should be 0, or 2 in the case of =; may need to
-            // change this to accommodate complex terms
+            // Ordinary predicates begin the atomic formula. Identity is
+            // infix and must have one complete term on each side.
             this._pletter = match[0];
             const pos = match.index;
             if (pos != 0 && this._pletter != '=' && this._pletter != '≠') {
                 this.syntaxError('unexpected characters appear before the ' +
                     'letter ' + this._pletter);
             }
-            if (pos != 2 && this._pletter == '=') {
-                this.syntaxError('the identity relation symbol = occurs ' +
-                    'in an unexpected place');
-            }
-            if (pos != 2 && this._pletter == '≠') {
-                this.syntaxError('the nonidentity symbol ≠ occurs ' +
-                    'in an unexpected place');
+            if (this._pletter == '=' || this._pletter == '≠') {
+                const leftTerm = this.parsedstr.slice(0, pos).trim();
+                const rightTerm = this.parsedstr.slice(pos + 1).trim();
+                if (!Formula.syntax.termaRegEx.test(leftTerm) ||
+                    !Formula.syntax.termaRegEx.test(rightTerm)) {
+                    this.syntaxError('the ' +
+                        ((this._pletter == '=') ? 'identity' : 'nonidentity') +
+                        ' relation symbol ' + this._pletter +
+                        ' must occur between two complete terms');
+                }
             }
 
             return this._pletter;
@@ -522,19 +525,14 @@ function generateFormulaClass(notationname = 'hurley') {
                 this._termshadcommas = true;
             }
 
-            // Keep only valid term symbols. More importantly, report rather
-            // than silently discard anything else in an atomic formula.
-            const invalidTermSymbol = new RegExp(
-                '[^' + Formula.syntax.notation.variableRange +
-                Formula.syntax.notation.constantsRange + ']', 'g'
-            );
-            const termstr = nocommas.replace(invalidTermSymbol, '');
-            if ((!this.op) && (nocommas != termstr)) {
+            // Parse complete term tokens so indexed names/variables such as
+            // a_1 and x_2 remain indivisible terms. For atomic formulas,
+            // reject rather than silently discard any unmatched characters.
+            this._terms = nocommas.match(Formula.syntax.termsRegEx) ?? [];
+            if ((!this.op) && (this._terms.join('') != nocommas)) {
                 this.syntaxError('unexpected symbols occur within an ' +
                     'atomic (sub)formula');
             }
-            this._terms = termstr.match(Formula.syntax.termsRegEx);
-            if (!this._terms) { this._terms = []; }
             return this._terms;
         }
 
