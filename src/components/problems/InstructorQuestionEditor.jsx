@@ -161,6 +161,10 @@ function validateQuestionSnapshotFormulas(snapshot, logicSystem = DEFAULT_LOGIC_
     const argument = typeof answer === 'string' ? answer : (answer?.argumentLine ?? answer?.argument)
     return validateArgumentLineInput(argument, logicSystem)
   }
+  if (type === 'proof-argument-extraction') {
+    return validateFormulaInputs(snapshot.prems, logicSystem, 'Premise')
+      || validateFormulaInputs(snapshot.lines, logicSystem, 'Proof line')
+  }
   return ''
 }
 
@@ -432,6 +436,17 @@ function buildDerivationSnapshot(proof, edited, existing, logicSystem = DEFAULT_
     patch.ruleset = mergedRuleset
   }
   return patch
+}
+
+function buildProofArgumentExtractionSnapshot(proof, edited, existing, logicSystem = DEFAULT_LOGIC_SYSTEM) {
+  const snapshot = proof.questionSnapshot || proof.snapshot || {}
+  const e = existing && typeof existing === 'object' ? existing : {}
+  return {
+    [typeKey(e)]: 'proof-argument-extraction',
+    prompt: edited.prompt ?? snapshot.prompt ?? proof.description ?? '',
+    prems: normalizeFormulaInputs(edited.premises ?? proof.premises ?? snapshot.prems ?? [], logicSystem),
+    lines: normalizeFormulaInputs(edited.lines ?? proof.lines ?? snapshot.lines ?? [], logicSystem),
+  }
 }
 
 function AttemptLimitField({ value, onChange }) {
@@ -1003,30 +1018,14 @@ function DerivationEditorForm({ proof, value, onChange, logicSystem = DEFAULT_LO
         fullWidth
         variant="outlined"
       />
-      <Box>
-        <Typography variant="subtitle2" sx={{ mb: 1 }}>Premises</Typography>
-        {(premsList.length ? premsList : ['']).map((line, idx) => (
-          <Stack key={idx} direction="row" alignItems="center" spacing={1} sx={{ mb: 1 }}>
-            <TextField
-              size="small"
-              value={line}
-              onChange={(e) => {
-                const next = [...(premsList.length ? premsList : [''])]
-                next[idx] = displayFormulaInput(e.target.value, activeLogicSystem)
-                update({ premises: next })
-              }}
-              fullWidth
-              placeholder={`Premise ${idx + 1}`}
-            />
-            <IconButton size="small" onClick={() => update({ premises: premsList.filter((_, i) => i !== idx) })} aria-label="Remove">
-              <DeleteOutlineIcon />
-            </IconButton>
-          </Stack>
-        ))}
-        <Button size="small" startIcon={<AddIcon />} onClick={() => update({ premises: [...(premsList.length ? premsList : ['']), ''] })}>
-          Add premise
-        </Button>
-      </Box>
+      <FormulaListEditor
+        label="Premises"
+        values={premsList}
+        onChange={(next) => update({
+          premises: next.map((formula) => displayFormulaInput(formula, activeLogicSystem)),
+        })}
+        placeholder="Premise"
+      />
       <TextField
         label="Conclusion"
         value={conclusion}
@@ -1074,6 +1073,83 @@ function DerivationEditorForm({ proof, value, onChange, logicSystem = DEFAULT_LO
       />
       <Typography variant="body2" sx={{ color: rulesetMessage ? 'error.main' : 'text.secondary' }}>
         {rulesetMessage || `${availabilitySummary}${requirementSummary ? ` ${requirementSummary}` : ''}`}
+      </Typography>
+    </Stack>
+  )
+}
+
+function FormulaListEditor({ label, values, onChange, placeholder, finalLabel }) {
+  const list = Array.isArray(values) && values.length ? values : ['']
+  return (
+    <Box>
+      <Typography variant="subtitle2" sx={{ mb: 1 }}>{label}</Typography>
+      {list.map((formula, index) => (
+        <Stack key={index} direction="row" alignItems="center" spacing={1} sx={{ mb: 1 }}>
+          <TextField
+            size="small"
+            value={formula}
+            onChange={(event) => {
+              const next = [...list]
+              next[index] = event.target.value
+              onChange(next)
+            }}
+            fullWidth
+            label={finalLabel && index === list.length - 1 ? finalLabel : undefined}
+            placeholder={`${placeholder} ${index + 1}`}
+          />
+          <IconButton
+            size="small"
+            onClick={() => {
+              const next = list.filter((_, itemIndex) => itemIndex !== index)
+              onChange(next)
+            }}
+            aria-label={`Remove ${placeholder.toLowerCase()} ${index + 1}`}
+          >
+            <DeleteOutlineIcon />
+          </IconButton>
+        </Stack>
+      ))}
+      <Button size="small" startIcon={<AddIcon />} onClick={() => onChange([...list, ''])}>
+        Add {placeholder.toLowerCase()}
+      </Button>
+    </Box>
+  )
+}
+
+function ProofArgumentExtractionEditorForm({ proof, value, onChange, logicSystem = DEFAULT_LOGIC_SYSTEM }) {
+  const snapshot = proof?.questionSnapshot || proof?.snapshot || {}
+  const premises = value.premises ?? proof?.premises ?? snapshot.prems ?? []
+  const lines = value.lines ?? proof?.lines ?? snapshot.lines ?? []
+  const update = (updates) => onChange({ ...value, ...updates })
+  return (
+    <Stack spacing={2}>
+      <TextField
+        label="Prompt"
+        multiline
+        minRows={2}
+        value={value.prompt ?? snapshot.prompt ?? proof?.description ?? ''}
+        onChange={(event) => update({ prompt: event.target.value })}
+        fullWidth
+      />
+      <FormulaListEditor
+        label="Premises"
+        values={premises}
+        onChange={(next) => update({
+          premises: next.map((formula) => displayFormulaInput(formula, logicSystem)),
+        })}
+        placeholder="Premise"
+      />
+      <FormulaListEditor
+        label="Lines after the premises"
+        values={lines}
+        onChange={(next) => update({
+          lines: next.map((formula) => displayFormulaInput(formula, logicSystem)),
+        })}
+        placeholder="Line"
+        finalLabel="Conclusion"
+      />
+      <Typography variant="body2" color="text.secondary">
+        The final line is the conclusion
       </Typography>
     </Stack>
   )
@@ -1293,6 +1369,7 @@ const SUPPORTED_TYPES = new Set([
   'partial-truth-table',
   'combo-translation-truth-table',
   'combo-translation-derivation',
+  'proof-argument-extraction',
 ])
 
 function InstructorQuestionEditorInner({
@@ -1412,6 +1489,12 @@ function InstructorQuestionEditorInner({
       const ans = proof.answer ?? snap.answer
       base.argumentLine = typeof ans === 'string' ? ans : ans?.argumentLine ?? ans?.argument ?? ''
     }
+    if (proof?.type === 'proof-argument-extraction') {
+      const snap = proof.questionSnapshot || proof.snapshot || {}
+      base.prompt = snap.prompt ?? proof.description ?? ''
+      base.premises = Array.isArray(proof.premises) ? [...proof.premises] : [...(snap.prems || [])]
+      base.lines = Array.isArray(proof.lines) ? [...proof.lines] : [...(snap.lines || [])]
+    }
     setEditValue(base)
     initialEditValueRef.current = JSON.parse(JSON.stringify(base))
     setError('')
@@ -1436,6 +1519,7 @@ function InstructorQuestionEditorInner({
     proof?.partialTruthTable,
     proof?.comboTranslationTruthTable,
     proof?.comboTranslationDerivation,
+    proof?.lines,
     proof?.snapshot,
   ])
 
@@ -1475,6 +1559,8 @@ function InstructorQuestionEditorInner({
         question_snapshot = buildComboSnapshot(proof, editValue, existing, 'comboTranslationTruthTable', activeLogicSystem)
       } else if (proof.type === 'combo-translation-derivation') {
         question_snapshot = buildComboSnapshot(proof, editValue, existing, 'comboTranslationDerivation', activeLogicSystem)
+      } else if (proof.type === 'proof-argument-extraction') {
+        question_snapshot = buildProofArgumentExtractionSnapshot(proof, editValue, existing, activeLogicSystem)
       } else {
         setSaving(false)
         return
@@ -1488,6 +1574,20 @@ function InstructorQuestionEditorInner({
         const rulesetError = validateDerivationRuleset(editValue.ruleset ?? question_snapshot.ruleset, rulesetLogicSystem)
         if (rulesetError) {
           setError(rulesetError)
+          setSaving(false)
+          return
+        }
+      }
+      if (proof.type === 'proof-argument-extraction') {
+        const premises = Array.isArray(mergedSnapshot.prems) ? mergedSnapshot.prems : []
+        const lines = Array.isArray(mergedSnapshot.lines) ? mergedSnapshot.lines : []
+        if (premises.length === 0 || premises.some((formula) => !String(formula || '').trim())) {
+          setError('Add at least one complete premise')
+          setSaving(false)
+          return
+        }
+        if (lines.length === 0 || lines.some((formula) => !String(formula || '').trim())) {
+          setError('Add at least one complete proof line')
           setSaving(false)
           return
         }
@@ -1632,6 +1732,9 @@ function InstructorQuestionEditorInner({
             )}
             {proof.type === 'combo-translation-derivation' && (
               <ComboPromptEditorForm proof={proof} value={editValue} onChange={setEditValue} label="Prompt" />
+            )}
+            {proof.type === 'proof-argument-extraction' && (
+              <ProofArgumentExtractionEditorForm proof={proof} value={editValue} onChange={setEditValue} logicSystem={activeLogicSystem} />
             )}
           </Stack>
         </DialogContent>

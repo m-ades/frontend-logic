@@ -195,7 +195,7 @@ export default function DerivationJustificationCell({
           {autoCheckEnabled && autoCheckStatus === 'error' && (
             <CancelIcon fontSize="small" color="error" />
           )}
-          {!line.readOnly && (
+          {!line.readOnly && !line.formulaReadOnly && (
             <Tooltip title="Delete line">
               <IconButton
                 onClick={onDelete}

@@ -24,6 +24,8 @@ export default function ProofEditor({
   onQuestionSaved,
   problemLabel,
   logicSystem,
+  fixedLines = null,
+  hideActions = false,
 }) {
   const theme = useTheme()
   const editorRef = useRef(null)
@@ -146,6 +148,8 @@ export default function ProofEditor({
         onEditQuestion={openEdit}
         problemLabel={problemLabel}
         logicSystem={logicSystem}
+        fixedLines={fixedLines}
+        hideActions={hideActions}
       />
     </Box>,
     document.body
@@ -183,6 +187,8 @@ export default function ProofEditor({
             onEditQuestion={openEdit}
             problemLabel={problemLabel}
             logicSystem={logicSystem}
+            fixedLines={fixedLines}
+            hideActions={hideActions}
           />
         )}
 

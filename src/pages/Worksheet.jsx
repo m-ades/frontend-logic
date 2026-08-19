@@ -174,6 +174,19 @@ const mapQuestionToProof = (question, assignment, index, logicSystem = DEFAULT_L
     orderIndex,
   }
 
+  if (type === 'proof-argument-extraction') {
+    const lines = Array.isArray(snapshot.lines) ? snapshot.lines : []
+    return {
+      ...proofBase,
+      type: 'proof-argument-extraction',
+      premises: Array.isArray(snapshot.prems) ? snapshot.prems : [],
+      lines,
+      conclusion: lines.at(-1) || '',
+      ruleset: snapshot.ruleset || {},
+      options: snapshot.options || {},
+    }
+  }
+
   if (isDerivationProblemType(type)) {
     return {
       ...proofBase,
@@ -1061,6 +1074,15 @@ function RealWorksheetContent() {
             initial.derivationState = data.ans
           }
           initialStates[proof.id] = initial
+          return
+        }
+
+        if (proof.type === 'proof-argument-extraction') {
+          initialStates[proof.id] = {
+            argumentLine: data?.argumentLine ?? data?.argument ?? '',
+            derivationState: data?.derivationState
+              ?? (data?.proof ? { ans: data.proof } : null),
+          }
           return
         }
 
