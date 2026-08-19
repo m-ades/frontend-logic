@@ -1,5 +1,6 @@
-import { useId, useState } from 'react'
+import { useCallback, useEffect, useId, useState } from 'react'
 import { Box, Typography, IconButton, Drawer, alpha, useMediaQuery, useTheme } from '@mui/material'
+import CloseIcon from '@mui/icons-material/Close'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import ExpandLessIcon from '@mui/icons-material/ExpandLess'
 import { useLayoutState, useLayoutDispatch, closeRulesReference } from '../../context/LayoutContext.jsx'
@@ -296,17 +297,25 @@ export default function RulesReference({ logicSystem }) {
       : []),
   ]
   
-  const blurActiveElement = () => {
-    const el = document.activeElement
-    if (el && typeof el.blur === 'function') {
-      el.blur()
-    }
-  }
-
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
     closeRulesReference(dispatch)
-    blurActiveElement()
-  }
+    window.requestAnimationFrame(() => {
+      document.getElementById('rules-reference-trigger')?.focus()
+    })
+  }, [dispatch])
+
+  useEffect(() => {
+    if (!isDesktop || !isRulesReferenceOpen) return undefined
+
+    const handleKeyDown = (event) => {
+      if (event.key !== 'Escape') return
+      event.preventDefault()
+      handleClose()
+    }
+
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [handleClose, isDesktop, isRulesReferenceOpen])
   
   const rulesContent = (
     <Box
@@ -439,8 +448,8 @@ export default function RulesReference({ logicSystem }) {
           {isFitch ? 'Fitch rules & shortcuts' : 'Hurley rules & shortcuts'}
         </Typography>
       </Box>
-      <IconButton onClick={handleClose}>
-        <ExpandLessIcon />
+      <IconButton onClick={handleClose} aria-label="Close rulebook">
+        <CloseIcon />
       </IconButton>
     </Box>
   )
@@ -448,6 +457,9 @@ export default function RulesReference({ logicSystem }) {
   if (isDesktop) {
     return (
       <Box
+        component="aside"
+        id="rules-reference"
+        aria-label="Rulebook"
         sx={{
           width: isRulesReferenceOpen ? 'clamp(480px, 40vw, 680px)' : 0,
           maxWidth: isRulesReferenceOpen ? 'min(680px, 48vw)' : 0,
@@ -484,6 +496,12 @@ export default function RulesReference({ logicSystem }) {
       onClose={handleClose}
       ModalProps={{
         keepMounted: true,
+      }}
+      slotProps={{
+        paper: {
+          id: 'rules-reference',
+          'aria-label': 'Rulebook',
+        },
       }}
       sx={{
         display: 'block',
