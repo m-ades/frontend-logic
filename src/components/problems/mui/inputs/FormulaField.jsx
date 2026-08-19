@@ -2,6 +2,9 @@ import { forwardRef } from 'react'
 import { TextField, useMediaQuery } from '@mui/material'
 import { useTheme } from '@mui/material/styles'
 import MobileLogicInput from '../../../ui/LogicKeyboard/MobileLogicInput.jsx'
+import FormulaInput from '../../../ui/logicpenguin/formula-input.js'
+import getSyntax from '../../../../lib/logicpenguin/symbolic/libsyntax.js'
+import { getNotation } from '../../../../lib/logicSystems.js'
 
 // shared formula field for symbolic inputs
 const FormulaField = forwardRef(function FormulaField({
@@ -21,6 +24,8 @@ const FormulaField = forwardRef(function FormulaField({
 }, ref) {
   const theme = useTheme()
   const isPhone = useMediaQuery(theme.breakpoints.down('sm'))
+  const notation = getNotation(logicSystem)
+  const syntax = getSyntax(notation)
 
   if (isPhone) {
     // on phones route back through the existing custom keyboard path
@@ -49,9 +54,23 @@ const FormulaField = forwardRef(function FormulaField({
       value={value}
       onChange={(event) => onValueChange?.(event.target.value)}
       onKeyDown={(event) => {
+        if (readOnly) return
         if (event.key === 'Enter' && onEnterKey) {
           event.preventDefault()
           onEnterKey()
+          return
+        }
+        const input = event.currentTarget
+        input.syntax = syntax
+        input.notation = notation
+        input.symbols = syntax.symbols
+        input.inputfix = FormulaInput.formatForDisplay
+        input.autoChange = FormulaInput.autoChange
+        input.insertHere = FormulaInput.insertHere
+        input.insOp = FormulaInput.insOp
+        FormulaInput.keydown.call(input, event)
+        if (input.value !== value) {
+          onValueChange?.(input.value)
         }
       }}
       placeholder={placeholder}
