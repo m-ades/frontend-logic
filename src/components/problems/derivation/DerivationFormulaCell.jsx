@@ -64,15 +64,18 @@ export default function DerivationFormulaCell({
             pr: 0.25,
             borderBottom: `${FITCH_LINE_WIDTH} solid`,
             borderBottomColor: getFitchLineColor,
-            color: 'transparent',
             fontSize: DERIVATION_LINE_FONT_SIZE,
             lineHeight: 'normal',
             whiteSpace: 'pre',
             pointerEvents: 'none',
+            userSelect: 'none',
+            WebkitUserSelect: 'none',
             zIndex: 2,
           }}
         >
-          {line.formula || ' '}
+          <Box component="span" sx={{ visibility: 'hidden' }}>
+            {line.formula || ' '}
+          </Box>
         </Box>
       )}
 
