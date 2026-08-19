@@ -105,6 +105,7 @@ export default function DerivationTable({
   isInstructorView = false,
   onEditQuestion,
   hideActions = false,
+  fixedLines = null,
 }) {
   const formulaRefs = useRef({})
   const justRefs = useRef({})
@@ -148,31 +149,54 @@ export default function DerivationTable({
     () => (Array.isArray(proof?.premises) ? proof.premises : []),
     [proof?.premises]
   )
+  const normalizedFixedLines = useMemo(() => (
+    Array.isArray(fixedLines)
+      ? fixedLines.map((formula) => normalizeFormulaForDisplay(normalizeFormulaForCheck(formula)))
+      : null
+  ), [fixedLines, normalizeFormulaForCheck, normalizeFormulaForDisplay])
+  const isFixedProof = normalizedFixedLines !== null
   const normalizedConclusion = proof?.conclusion
     ? normalizeFormulaForDisplay(normalizeFormulaForCheck(proof.conclusion))
     : ''
   const conclusionTargetText = normalizedConclusion
     ? `// ${normalizedConclusion}`
     : ''
-  const argumentTargetText = usesNestedSubderivations && normalizedConclusion
+  const argumentTargetText = !isFixedProof && usesNestedSubderivations && normalizedConclusion
     ? `${premises.map((premise) => normalizeFormulaForDisplay(normalizeFormulaForCheck(premise))).join(', ')}${premises.length ? ' ' : ''}∴ ${normalizedConclusion}`
     : ''
+  const buildFreshLines = useCallback((restoredLines = []) => {
+    const premiseLines = premises.map((premise) => ({
+      formula: normalizeFormulaForDisplay(normalizeFormulaForCheck(premise)),
+      justification: '',
+      readOnly: true,
+    }))
+    if (normalizedFixedLines) {
+      return [
+        ...premiseLines,
+        ...normalizedFixedLines.map((formula, index) => ({
+          formula,
+          justification: restoredLines[premises.length + index]?.justification ?? '',
+          readOnly: false,
+          formulaReadOnly: true,
+        })),
+      ]
+    }
+    return [
+      ...premiseLines,
+      { formula: '', justification: '', readOnly: false },
+    ]
+  }, [normalizeFormulaForCheck, normalizeFormulaForDisplay, normalizedFixedLines, premises])
   const initialLines = useMemo(() => {
     const fromState = extractLines(savedState, premises)
+    if (isFixedProof) return buildFreshLines(fromState)
     if (fromState.length) {
       return fromState.map((line) => ({
         ...line,
         formula: normalizeFormulaForDisplay(normalizeFormulaForCheck(line.formula)),
       }))
     }
-    const premLines = premises.map((p) => ({
-      formula: normalizeFormulaForDisplay(normalizeFormulaForCheck(p)),
-      justification: '',
-      readOnly: true,
-    }))
-    const blanks = Array.from({ length: 1 }, () => ({ formula: '', justification: '', readOnly: false }))
-    return [...premLines, ...blanks]
-  }, [normalizeFormulaForCheck, normalizeFormulaForDisplay, savedState, premises])
+    return buildFreshLines()
+  }, [buildFreshLines, isFixedProof, normalizeFormulaForCheck, normalizeFormulaForDisplay, savedState, premises])
 
   const [lines, setLines] = useState(initialLines)
   const [lastSubmitStatus, setLastSubmitStatus] = useState(null)
@@ -404,6 +428,7 @@ export default function DerivationTable({
   }
 
   const handleFormulaChange = (event, index) => {
+    if (lines[index]?.formulaReadOnly) return
     const el = event.target
     const raw = el?.value ?? ''
     const normalized = normalizeFormulaForDisplay(raw)
@@ -452,6 +477,7 @@ export default function DerivationTable({
   }, [lines.length])
 
   const handleLineCommit = (index, field, value) => {
+    if (field === 'formula' && lines[index]?.formulaReadOnly) return
     const committedValue = field === 'formula'
       ? normalizeFormulaForDisplay(value)
       : value
@@ -507,6 +533,7 @@ export default function DerivationTable({
     commitLines((previous) => {
       let nextLines = applyLineChange(previous, index, 'justification', nextValue)
       if (!activeAssumptionRules.has(upperRule)) return nextLines
+      if (isFixedProof) return nextLines
 
       const nextIndex = index + 1
       const nextLine = nextLines[nextIndex]
@@ -534,7 +561,10 @@ export default function DerivationTable({
   const handleRowNumberClick = useCallback(
     (clickedLineNum) => {
       const targetIdx =
-        activeKeyboardFormulaIndexRef.current ?? lastFormulaIndexRef.current ?? premises.length
+        activeFormulaIndex
+        ?? activeKeyboardFormulaIndexRef.current
+        ?? lastFormulaIndexRef.current
+        ?? premises.length
       if (targetIdx < premises.length) return
       commitLines((prev) => {
         const line = prev[targetIdx]
@@ -557,7 +587,7 @@ export default function DerivationTable({
         return next
       })
     },
-    [premises.length, commitLines, usesNestedSubderivations]
+    [activeFormulaIndex, premises.length, commitLines, usesNestedSubderivations]
   )
 
   const canAddLine = useMemo(() => {
@@ -569,6 +599,7 @@ export default function DerivationTable({
   }, [autoCheckEnabled, lines, autoCheckState.perLine, isLineCompleteForCheck])
 
   const addLine = () => {
+    if (isFixedProof) return
     if (autoCheckEnabled && !canAddLine) {
       setLineGateErrorNotice(lines.length - 1, 'Re-check current line to move onto the next line.')
       return
@@ -579,6 +610,7 @@ export default function DerivationTable({
   }
 
   const deleteLine = (index) => {
+    if (isFixedProof) return
     if (index < premises.length) return
     commitLines((prev) => {
       if (index < premises.length || prev.length === 0) return prev
@@ -683,7 +715,7 @@ export default function DerivationTable({
   }
 
   const handleFormulaKeyDown = (event, index, readOnly) => {
-    if (readOnly) return
+    if (readOnly || lines[index]?.formulaReadOnly) return
     const el = event.target
     if (!el) return
     if (event.key === 'Enter') {
@@ -801,6 +833,7 @@ export default function DerivationTable({
         }
       }
       const nextIndex = index + 1
+      if (isFixedProof && nextIndex >= lines.length) return
       if (nextIndex >= lines.length) {
         addLine()
         setTimeout(() => focusFormula(nextIndex), 0)
@@ -813,13 +846,7 @@ export default function DerivationTable({
   const handleStartOver = async () => {
     if (isLocked || isAssignmentLocked) return
     const previousLines = lines
-    const premLines = premises.map((p) => ({
-      formula: normalizeFormulaForDisplay(normalizeFormulaForCheck(p)),
-      justification: '',
-      readOnly: true,
-    }))
-    const blanks = Array.from({ length: 1 }, () => ({ formula: '', justification: '', readOnly: false }))
-    const nextLines = [...premLines, ...blanks]
+    const nextLines = buildFreshLines()
     setLines(nextLines)
     setLastSubmitStatus(null)
     setStatusBanner({ status: 'unanswered', message: '' })
@@ -836,8 +863,8 @@ export default function DerivationTable({
 
   const hasStartedLine = lines.some((line) => (
     !line.readOnly && (
-      String(line.formula || '').trim() ||
       String(line.justification || '').trim()
+      || (!isFixedProof && String(line.formula || '').trim())
     )
   ))
 
@@ -1268,7 +1295,7 @@ export default function DerivationTable({
                   autoCheckEnabled={autoCheckEnabled}
                   autoCheckStatus={autoCheckState.perLine[idx]}
                   citationDraft={lineDrafts[idx]}
-                  conclusion={conclusionTargetText}
+                  conclusion={isFixedProof ? '' : conclusionTargetText}
                   isFullScreen={isFullScreen}
                   isMobile={isMobile}
                   isPhone={isPhone}
@@ -1312,17 +1339,20 @@ export default function DerivationTable({
               onInsert={handleSymbolInsert}
               onToggleAutoCheck={() => setAutoCheckEnabled((enabled) => !enabled)}
               symbolButtons={symbolButtons}
+              showEditingControls={!isFixedProof}
             />
             </TableBody>
           </Table>
         </TableContainer>
 
-        <DerivationFeedbackPanel
-          autoCheckEnabled={autoCheckEnabled}
-          autoCheckRows={autoCheckState.rows}
-          isFullScreen={isFullScreen}
-          lineGateNotice={lineGateNotice}
-        />
+        {(!isFixedProof || hasStartedLine) && (
+          <DerivationFeedbackPanel
+            autoCheckEnabled={autoCheckEnabled}
+            autoCheckRows={autoCheckState.rows}
+            isFullScreen={isFullScreen}
+            lineGateNotice={lineGateNotice}
+          />
+        )}
 
         </>
         )}
