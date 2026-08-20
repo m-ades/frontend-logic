@@ -164,11 +164,13 @@ export default function DerivationTable({
           formula: normalizeFormulaForDisplay(normalizeFormulaForCheck(line.formula)),
           justification: String(line.justification ?? '').trim(),
           scopeDepth: Number.isInteger(line.scopeDepth) ? line.scopeDepth : null,
+          startsScope: line.startsScope === true,
           requiredRules: Array.isArray(line.requiredRules) ? line.requiredRules : null,
         }))
       : null
   ), [fixedLines, normalizeFormulaForCheck, normalizeFormulaForDisplay])
   const isFixedProof = normalizedFixedLines !== null
+  const usesFixedScopeNesting = isFixedProof && usesNestedSubderivations
   const normalizedConclusion = proof?.conclusion
     ? normalizeFormulaForDisplay(normalizeFormulaForCheck(proof.conclusion))
     : ''
@@ -196,6 +198,7 @@ export default function DerivationTable({
           formulaReadOnly: true,
           justificationReadOnly: Boolean(line.justification),
           scopeDepth: line.scopeDepth,
+          startsScope: line.startsScope,
           requiredRules: line.requiredRules,
         })),
       ]
@@ -401,7 +404,11 @@ export default function DerivationTable({
       premises,
       normalizeFormulaForCheck,
       normalizeJustification,
-      { nestedSubderivations: usesNestedSubderivations, assumptionRules: activeAssumptionRules }
+      {
+        nestedSubderivations: usesNestedSubderivations,
+        assumptionRules: activeAssumptionRules,
+        canonicalScopes: usesFixedScopeNesting,
+      }
     )
     if (options.immediate) {
       return onStateChangeRef.current?.(submission, options)
@@ -409,7 +416,7 @@ export default function DerivationTable({
     queueMicrotask(() => {
       onStateChangeRef.current?.(submission, options)
     })
-  }, [activeAssumptionRules, premises, proof?.conclusion, normalizeFormulaForCheck, normalizeJustification, usesNestedSubderivations])
+  }, [activeAssumptionRules, premises, proof?.conclusion, normalizeFormulaForCheck, normalizeJustification, usesFixedScopeNesting, usesNestedSubderivations])
 
   const {
     autoCheckEnabled,
@@ -431,6 +438,7 @@ export default function DerivationTable({
     premises,
     proof,
     setLines,
+    usesFixedScopeNesting,
     usesNestedSubderivations,
   })
 
@@ -919,7 +927,11 @@ export default function DerivationTable({
         premises,
         normalizeFormulaForCheck,
         normalizeJustification,
-        { nestedSubderivations: usesNestedSubderivations, assumptionRules: activeAssumptionRules }
+        {
+          nestedSubderivations: usesNestedSubderivations,
+          assumptionRules: activeAssumptionRules,
+          canonicalScopes: usesFixedScopeNesting,
+        }
       )
       if (!shouldUseApiValidation(proof?.questionId)) {
         const validation = await checkDerivation(
@@ -1223,7 +1235,7 @@ export default function DerivationTable({
               const scopeDepth = indentLevels[idx] || 0
               const startsScope = usesNestedSubderivations && (
                 isFixedProof
-                  ? scopeDepth > (indentLevels[idx - 1] || 0)
+                  ? line.startsScope === true
                   : activeAssumptionRules.has(
                       getRuleFromJustification(line.justification).toUpperCase()
                     )

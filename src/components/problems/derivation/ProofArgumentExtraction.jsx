@@ -34,6 +34,7 @@ function getQuestionLines(snapshot, logicSystem) {
     logicSystem
   )
   const depths = getAssumptionDepths(scopes, formulas.length)
+  const scopeStarts = new Set(scopes.map(({ start }) => start))
   const requiredRules = new Map(
     getAssumptionRuleRequirements(scopes, logicSystem)
       .map(({ line, rules }) => [line, rules])
@@ -42,6 +43,7 @@ function getQuestionLines(snapshot, logicSystem) {
     formula,
     justification: String(supplied[index] ?? '').trim(),
     scopeDepth: depths[index],
+    startsScope: scopeStarts.has(index),
     requiredRules: requiredRules.get(index) ?? null,
   }))
 }
