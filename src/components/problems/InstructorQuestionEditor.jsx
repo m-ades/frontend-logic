@@ -44,6 +44,7 @@ import {
   getJustificationRule,
   parseAssumptionScopes,
 } from '../../lib/proofArgumentExtractionScopes.js'
+import { rebaseProofJustifications } from '../../lib/proofArgumentExtractionEdits.js'
 import AssumptionScopesEditor from './derivation/AssumptionScopesEditor.jsx'
 
 // deep merge. source overwrites. arrays replace.
@@ -1200,8 +1201,34 @@ function ProofArgumentExtractionEditorForm({ proof, value, onChange, logicSystem
     })
     update({
       lines: nextLines.map((formula) => displayFormulaInput(formula, logicSystem)),
-      justifications: nextJustifications,
+      justifications: removedIndex == null
+        ? nextJustifications
+        : rebaseProofJustifications(nextJustifications, {
+            lineNumber: premises.length + removedIndex + 1,
+            operation: 'remove',
+            rulesFirst: logicSystem !== 'hurley',
+          }),
       assumptionScopes: nextScopes,
+    })
+  }
+  const updatePremises = (nextPremises, _nextSecondary, removedIndex) => {
+    let nextJustifications = justifications
+    if (removedIndex != null && nextPremises.length < premises.length) {
+      nextJustifications = rebaseProofJustifications(justifications, {
+        lineNumber: removedIndex + 1,
+        operation: 'remove',
+        rulesFirst: logicSystem !== 'hurley',
+      })
+    } else if (nextPremises.length > premises.length) {
+      nextJustifications = rebaseProofJustifications(justifications, {
+        lineNumber: premises.length + 1,
+        operation: 'insert',
+        rulesFirst: logicSystem !== 'hurley',
+      })
+    }
+    update({
+      premises: nextPremises.map((formula) => displayFormulaInput(formula, logicSystem)),
+      justifications: nextJustifications,
     })
   }
   return (
@@ -1217,9 +1244,7 @@ function ProofArgumentExtractionEditorForm({ proof, value, onChange, logicSystem
       <FormulaListEditor
         label="Premises"
         values={premises}
-        onChange={(next) => update({
-          premises: next.map((formula) => displayFormulaInput(formula, logicSystem)),
-        })}
+        onChange={updatePremises}
         placeholder="Premise"
       />
       <FormulaListEditor
