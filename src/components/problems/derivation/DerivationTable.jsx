@@ -431,7 +431,11 @@ export default function DerivationTable({
     if (lines[index]?.formulaReadOnly) return
     const el = event.target
     const raw = el?.value ?? ''
-    const normalized = normalizeFormulaForDisplay(raw)
+    const inputType = event.nativeEvent?.inputType ?? ''
+    // Do not restore operator padding that the user is trying to erase.
+    const normalized = inputType.startsWith('delete')
+      ? raw
+      : normalizeFormulaForDisplay(raw)
     handleLineChange(index, 'formula', normalized)
     if (normalized === raw || typeof el?.selectionStart !== 'number') return
     const nextCursor = normalizeFormulaForDisplay(raw.slice(0, el.selectionStart)).length

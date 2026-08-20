@@ -60,7 +60,7 @@ const FormulaField = forwardRef(function FormulaField({
           onEnterKey()
           return
         }
-        const input = event.currentTarget
+        const input = event.target
         input.syntax = syntax
         input.notation = notation
         input.symbols = syntax.symbols
