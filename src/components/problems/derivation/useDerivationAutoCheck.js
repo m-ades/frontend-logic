@@ -12,16 +12,12 @@ import { AUTO_CHECK_STORAGE_KEY } from './derivationTableConfig.js'
 
 const EMPTY_AUTO_CHECK = { perLine: {}, rows: [] }
 const EMPTY_NOTICE = { index: null, message: '', tone: 'error' }
-const REQUIRED_ASSUMPTION_MESSAGE = 'must use AS because this line begins an assumption scope'
 
-const getEffectiveAssumptionDepths = (lines, usesNestedSubderivations, assumptionRules) => {
-  const inferred = getOpenAssumptionDepths(lines, {
-    mode: usesNestedSubderivations ? 'nested' : 'flat',
-    assumptionRules,
-  })
-  return lines.map((line, index) => (
-    Number.isInteger(line.scopeDepth) ? line.scopeDepth : inferred[index]
-  ))
+const getRequiredRuleError = (line, rule) => {
+  if (!rule || !Array.isArray(line?.requiredRules) || line.requiredRules.includes(rule)) {
+    return ''
+  }
+  return `must use ${line.requiredRules.join(' or ')} on this line`
 }
 
 export default function useDerivationAutoCheck({
@@ -78,11 +74,10 @@ export default function useDerivationAutoCheck({
       .map(({ index }) => index)
     const lastFilledIndex = filledIndices.at(-1) ?? -1
     const lastFilled = linesSnapshot[lastFilledIndex]
-    const openAssumptionDepths = getEffectiveAssumptionDepths(
-      linesSnapshot,
-      usesNestedSubderivations,
-      activeAssumptionRules
-    )
+    const openAssumptionDepths = getOpenAssumptionDepths(linesSnapshot, {
+      mode: usesNestedSubderivations ? 'nested' : 'flat',
+      assumptionRules: activeAssumptionRules,
+    })
     const lastFilledResolvesConclusion = isResolvedConclusionLine({
       line: lastFilled,
       index: lastFilledIndex,
@@ -130,7 +125,8 @@ export default function useDerivationAutoCheck({
 
     linesSnapshot.forEach((line, index) => {
       const rule = getRuleFromJustification(line?.justification || '').toUpperCase()
-      if (!line?.startsSubproof || !rule || activeAssumptionRules.has(rule)) return
+      const requiredRuleError = getRequiredRuleError(line, rule)
+      if (!requiredRuleError) return
       const lineNumber = String(index + 1)
       const existing = filteredErrors[lineNumber] || {}
       filteredErrors[lineNumber] = {
@@ -139,7 +135,7 @@ export default function useDerivationAutoCheck({
           ...(existing.rule || {}),
           high: {
             ...(existing.rule?.high || {}),
-            [REQUIRED_ASSUMPTION_MESSAGE]: 1,
+            [requiredRuleError]: 1,
           },
         },
       }
@@ -160,7 +156,7 @@ export default function useDerivationAutoCheck({
         return
       }
       const { hasRule } = getJustificationMeta(line.justification)
-      if (line.startsSubproof && hasRule && !activeAssumptionRules.has(rule)) {
+      if (hasRule && getRequiredRuleError(line, rule)) {
         perLine[index] = 'error'
         return
       }
@@ -232,11 +228,10 @@ export default function useDerivationAutoCheck({
           if (previous.length !== lines.length) return previous
           const last = previous.at(-1)
           if (!last || last.readOnly || !isLineComplete(last) || !proof?.conclusion) return previous
-          const openAssumptionDepths = getEffectiveAssumptionDepths(
-            previous,
-            usesNestedSubderivations,
-            activeAssumptionRules
-          )
+          const openAssumptionDepths = getOpenAssumptionDepths(previous, {
+            mode: usesNestedSubderivations ? 'nested' : 'flat',
+            assumptionRules: activeAssumptionRules,
+          })
           if (isResolvedConclusionLine({
             line: last,
             index: previous.length - 1,
@@ -295,11 +290,10 @@ export default function useDerivationAutoCheck({
       return { ok: false, index: null }
     }
     if (state.perLine[lastFilledIndex] !== 'ok') return { ok: false, index: null }
-    const openAssumptionDepths = getEffectiveAssumptionDepths(
-      lines,
-      usesNestedSubderivations,
-      activeAssumptionRules
-    )
+    const openAssumptionDepths = getOpenAssumptionDepths(lines, {
+      mode: usesNestedSubderivations ? 'nested' : 'flat',
+      assumptionRules: activeAssumptionRules,
+    })
     const resolved = isResolvedConclusionLine({
       line: lastFilled,
       index: lastFilledIndex,

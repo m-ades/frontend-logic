@@ -16,10 +16,11 @@ import ProblemSetButtons from '../mui/frame/ProblemSetButtons.jsx'
 import FormulaField from '../mui/inputs/FormulaField.jsx'
 import SymbolToolbar from '../mui/inputs/SymbolToolbar.jsx'
 import { useProblemChecker } from '../../../hooks/useProblemChecker.js'
-import { getDerivationProblemType, getNotation } from '../../../lib/logicSystems.js'
+import { getNotation } from '../../../lib/logicSystems.js'
 import getFormulaClass from '../../../lib/logicpenguin/symbolic/formula.js'
 import {
   getAssumptionDepths,
+  getAssumptionRuleRequirements,
   parseAssumptionScopes,
 } from '../../../lib/proofArgumentExtractionScopes.js'
 import { extractLines } from './derivationUtils.js'
@@ -27,17 +28,21 @@ import { extractLines } from './derivationUtils.js'
 function getQuestionLines(snapshot, logicSystem) {
   const formulas = Array.isArray(snapshot?.lines) ? snapshot.lines : []
   const supplied = Array.isArray(snapshot?.justifications) ? snapshot.justifications : []
-  const scopeInput = getDerivationProblemType(logicSystem) === 'derivation-calgary'
-    ? snapshot?.assumptionScopes
-    : null
-  const { scopes } = parseAssumptionScopes(scopeInput, formulas.length)
+  const { scopes } = parseAssumptionScopes(
+    snapshot?.assumptionScopes,
+    formulas.length,
+    logicSystem
+  )
   const depths = getAssumptionDepths(scopes, formulas.length)
-  const scopeStarts = new Set(scopes.map(({ start }) => start))
+  const requiredRules = new Map(
+    getAssumptionRuleRequirements(scopes, logicSystem)
+      .map(({ line, rules }) => [line, rules])
+  )
   return formulas.map((formula, index) => ({
     formula,
     justification: String(supplied[index] ?? '').trim(),
     scopeDepth: depths[index],
-    startsSubproof: scopeStarts.has(index),
+    requiredRules: requiredRules.get(index) ?? null,
   }))
 }
 
@@ -215,18 +220,16 @@ export default function ProofArgumentExtraction({
             logicSystem={logicSystem}
           />
 
-          <Box>
+          <Box sx={{ width: '100%', maxWidth: '34rem' }}>
             <Typography variant="body2" sx={{ mb: 1, fontWeight: 600 }}>
               Corresponding argument
-            </Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-              Use / between premises and // before the conclusion
             </Typography>
             <FormulaField
               ref={argumentInputRef}
               value={argumentLine}
               onValueChange={handleArgumentChange}
-              placeholder="Enter the corresponding argument"
+              aria-label="Corresponding argument"
+              placeholder="Use / between premises and // before the conclusion"
               extraInsertButtons={[{ insert: '/' }, { insert: '//' }]}
               logicSystem={logicSystem}
             />

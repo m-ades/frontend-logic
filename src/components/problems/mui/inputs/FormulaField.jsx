@@ -21,6 +21,7 @@ const FormulaField = forwardRef(function FormulaField({
   variableLetters,
   logicSystem,
   sx,
+  'aria-label': ariaLabel,
 }, ref) {
   const theme = useTheme()
   const isPhone = useMediaQuery(theme.breakpoints.down('sm'))
@@ -35,7 +36,7 @@ const FormulaField = forwardRef(function FormulaField({
         onChange={(nextValue) => onValueChange?.(nextValue)}
         disabled={readOnly}
         placeholder={placeholder}
-        aria-label={placeholder || 'Formula input'}
+        aria-label={ariaLabel || placeholder || 'Formula input'}
         symbolizationKey={symbolizationKey}
         includeQuantifiers={includeQuantifiers}
         extraInsertButtons={extraInsertButtons}
@@ -79,6 +80,7 @@ const FormulaField = forwardRef(function FormulaField({
       inputProps={{
         autoComplete: 'off',
         spellCheck: false,
+        'aria-label': ariaLabel || placeholder || 'Formula input',
       }}
       sx={{
         '& .MuiInputBase-input': {
