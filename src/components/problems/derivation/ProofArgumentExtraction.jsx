@@ -16,16 +16,28 @@ import ProblemSetButtons from '../mui/frame/ProblemSetButtons.jsx'
 import FormulaField from '../mui/inputs/FormulaField.jsx'
 import SymbolToolbar from '../mui/inputs/SymbolToolbar.jsx'
 import { useProblemChecker } from '../../../hooks/useProblemChecker.js'
-import { getNotation } from '../../../lib/logicSystems.js'
+import { getDerivationProblemType, getNotation } from '../../../lib/logicSystems.js'
 import getFormulaClass from '../../../lib/logicpenguin/symbolic/formula.js'
+import {
+  getAssumptionDepths,
+  parseAssumptionScopes,
+} from '../../../lib/proofArgumentExtractionScopes.js'
 import { extractLines } from './derivationUtils.js'
 
-function getQuestionLines(snapshot) {
+function getQuestionLines(snapshot, logicSystem) {
   const formulas = Array.isArray(snapshot?.lines) ? snapshot.lines : []
   const supplied = Array.isArray(snapshot?.justifications) ? snapshot.justifications : []
+  const scopeInput = getDerivationProblemType(logicSystem) === 'derivation-calgary'
+    ? snapshot?.assumptionScopes
+    : null
+  const { scopes } = parseAssumptionScopes(scopeInput, formulas.length)
+  const depths = getAssumptionDepths(scopes, formulas.length)
+  const scopeStarts = new Set(scopes.map(({ start }) => start))
   return formulas.map((formula, index) => ({
     formula,
     justification: String(supplied[index] ?? '').trim(),
+    scopeDepth: depths[index],
+    startsSubproof: scopeStarts.has(index),
   }))
 }
 
@@ -87,8 +99,8 @@ export default function ProofArgumentExtraction({
     [snapshot?.prems]
   )
   const fixedLines = useMemo(
-    () => getQuestionLines(snapshot),
-    [snapshot?.justifications, snapshot?.lines]
+    () => getQuestionLines(snapshot, logicSystem),
+    [logicSystem, snapshot?.assumptionScopes, snapshot?.justifications, snapshot?.lines]
   )
   const conclusion = fixedLines.at(-1)?.formula ?? ''
   const prompt = snapshot?.prompt || proof?.description || ''

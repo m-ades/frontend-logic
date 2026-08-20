@@ -485,14 +485,43 @@ const buildNestedSubderivationParts = (numbered, assumptionRules = ASSUMPTION_RU
   return buildRange(Number(numbered[0].n), Number(numbered[numbered.length - 1].n))
 }
 
+// Fixed proofs declare their structure independently of the student's rules.
+// This keeps checking aligned with the subproof boundaries shown in the table.
+const buildDeclaredSubderivationParts = (numbered, lines, premiseCount) => {
+  const root = []
+  const containers = [root]
+  let depth = 0
+
+  numbered.forEach((part, index) => {
+    const targetDepth = index < premiseCount ? 0 : lines[index].scopeDepth
+    while (depth > targetDepth) {
+      containers.pop()
+      depth -= 1
+    }
+    while (depth < targetDepth) {
+      const subproof = { parts: [] }
+      containers.at(-1).push(subproof)
+      containers.push(subproof.parts)
+      depth += 1
+    }
+    containers.at(-1).push(part)
+  })
+
+  return root
+}
+
 export const buildSubmission = (lines, conclusion, premises, normalizeFormula, normalizeJustification, options = {}) => {
   const numbered = lines.map((line, idx) => ({
     n: String(idx + 1),
     s: normalizeFormula(line.formula ?? ''),
     j: idx < premises.length ? 'Pr' : normalizeJustification(line.justification ?? ''),
   }))
+  const hasDeclaredScopes = lines.length > premises.length
+    && lines.slice(premises.length).every((line) => Number.isInteger(line.scopeDepth))
   const parts = options.nestedSubderivations
-    ? buildNestedSubderivationParts(numbered, options.assumptionRules)
+    ? (hasDeclaredScopes
+        ? buildDeclaredSubderivationParts(numbered, lines, premises.length)
+        : buildNestedSubderivationParts(numbered, options.assumptionRules))
     : numbered
   return {
     ans: {
