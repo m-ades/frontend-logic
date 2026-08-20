@@ -485,14 +485,55 @@ const buildNestedSubderivationParts = (numbered, assumptionRules = ASSUMPTION_RU
   return buildRange(Number(numbered[0].n), Number(numbered[numbered.length - 1].n))
 }
 
+const getCanonicalScopeMetadata = (lines) => {
+  const metadata = lines.map((line) => ({
+    depth: line?.scopeDepth ?? 0,
+    startsScope: line?.startsScope === true,
+  }))
+  let previousDepth = 0
+  for (const { depth, startsScope } of metadata) {
+    if (!Number.isInteger(depth) || depth < 0 || depth > previousDepth + 1) return null
+    if ((depth > previousDepth && !startsScope) || (startsScope && depth === 0)) return null
+    previousDepth = depth
+  }
+  return metadata
+}
+
+const buildCanonicalSubderivationParts = (numbered, lines) => {
+  const metadata = getCanonicalScopeMetadata(lines)
+  if (!metadata) return null
+  const root = []
+  const stack = [root]
+  numbered.forEach((part, index) => {
+    const { depth, startsScope } = metadata[index]
+    while (stack.length - 1 > depth) stack.pop()
+    if (startsScope && stack.length - 1 === depth) stack.pop()
+    while (stack.length - 1 < depth) {
+      const subproof = { parts: [] }
+      stack.at(-1).push(subproof)
+      stack.push(subproof.parts)
+    }
+    stack.at(-1).push(part)
+  })
+  return root
+}
+
+// canonical scope metadata applies only when explicitly enabled for fixed proof lines
+// each line provides a nonnegative scope depth and marks every scope start
+// invalid metadata produces an empty proof
 export const buildSubmission = (lines, conclusion, premises, normalizeFormula, normalizeJustification, options = {}) => {
   const numbered = lines.map((line, idx) => ({
     n: String(idx + 1),
     s: normalizeFormula(line.formula ?? ''),
     j: idx < premises.length ? 'Pr' : normalizeJustification(line.justification ?? ''),
   }))
+  const canonicalParts = options.canonicalScopes
+    ? buildCanonicalSubderivationParts(numbered, lines)
+    : null
   const parts = options.nestedSubderivations
-    ? buildNestedSubderivationParts(numbered, options.assumptionRules)
+    ? (options.canonicalScopes
+        ? (canonicalParts ?? [])
+        : buildNestedSubderivationParts(numbered, options.assumptionRules))
     : numbered
   return {
     ans: {
