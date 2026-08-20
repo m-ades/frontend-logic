@@ -1,5 +1,9 @@
 import getFormulaClass from '../symbolic/formula.js';
 import { getDerivationCheckerForLogicSystem } from './derivation-by-logic-system.js';
+import {
+    getAssumptionDepths,
+    parseAssumptionScopes,
+} from '../../proofArgumentExtractionScopes.js';
 
 function flattenProofLines(parts = []) {
     const lines = [];
@@ -77,7 +81,29 @@ function argumentMatches(argumentLine, premises, conclusion, Formula) {
     ));
 }
 
-function buildCanonicalProof(premises, lines, submittedJustifications) {
+function nestProofParts(parts, scopes) {
+    if (scopes.length === 0) return parts;
+    const depths = getAssumptionDepths(scopes, parts.length);
+    const root = [];
+    const containers = [root];
+    let depth = 0;
+    parts.forEach((part, index) => {
+        while (depth > depths[index]) {
+            containers.pop();
+            depth -= 1;
+        }
+        while (depth < depths[index]) {
+            const subproof = { parts: [] };
+            containers.at(-1).push(subproof);
+            containers.push(subproof.parts);
+            depth += 1;
+        }
+        containers.at(-1).push(part);
+    });
+    return root;
+}
+
+function buildCanonicalProof(premises, lines, justifications, scopes) {
     const conclusion = lines.at(-1)?.formula ?? '';
     const premiseParts = premises.map((formula, index) => ({
         n: String(index + 1),
@@ -87,12 +113,12 @@ function buildCanonicalProof(premises, lines, submittedJustifications) {
     const proofParts = lines.map((line, index) => ({
         n: String(premises.length + index + 1),
         s: line.formula,
-        j: line.justification || String(submittedJustifications[index] ?? '').trim(),
+        j: justifications[index],
     }));
     return {
         parts: [{
             showline: { s: conclusion, j: '', isMainConclusion: true, n: '' },
-            parts: [...premiseParts, ...proofParts],
+            parts: [...premiseParts, ...nestProofParts(proofParts, scopes)],
         }],
         prems: premises,
         conc: conclusion,
@@ -118,7 +144,28 @@ export default async function(
     const notation = options?.notation || 'hurley';
     const Formula = getFormulaClass(notation);
     const submittedJustifications = getSubmittedJustifications(givenans, premises.length);
-    const proof = buildCanonicalProof(premises, lines, submittedJustifications);
+    const justifications = lines.map((line, index) => (
+        line.justification || String(submittedJustifications[index] ?? '').trim()
+    ));
+    const parsedScopes = options?.logicSystem === 'fitch'
+        ? parseAssumptionScopes(question?.assumptionScopes, lines.length)
+        : { scopes: [], error: '' };
+    if (parsedScopes.error) {
+        return {
+            successstatus: 'incorrect',
+            points: 0,
+            message: `This question has invalid assumption scopes: ${parsedScopes.error}`,
+        };
+    }
+    const assumptionRulesCorrect = parsedScopes.scopes.every(({ start }) => (
+        justifications[start].toUpperCase() === 'AS'
+    ));
+    const proof = buildCanonicalProof(
+        premises,
+        lines,
+        justifications,
+        parsedScopes.scopes
+    );
     const derivationChecker = getDerivationCheckerForLogicSystem(options?.logicSystem);
     const derivationResult = await derivationChecker(
         { prems: premises, conc: conclusion, ruleset: question?.ruleset },
@@ -136,9 +183,10 @@ export default async function(
         Formula
     );
     const derivationCorrect = derivationResult?.successstatus === 'correct';
-    const correct = argumentCorrect && derivationCorrect;
+    const correct = argumentCorrect && derivationCorrect && assumptionRulesCorrect;
     const messages = [];
     if (!derivationCorrect) messages.push('The citations do not complete the proof yet.');
+    if (!assumptionRulesCorrect) messages.push('Each assumption scope must begin with AS.');
     if (!argumentCorrect) messages.push('The argument does not match the displayed proof.');
 
     const result = {

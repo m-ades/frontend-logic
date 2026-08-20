@@ -163,6 +163,8 @@ export default function DerivationTable({
       ? fixedLines.map((line) => ({
           formula: normalizeFormulaForDisplay(normalizeFormulaForCheck(line.formula)),
           justification: String(line.justification ?? '').trim(),
+          scopeDepth: Number.isInteger(line.scopeDepth) ? line.scopeDepth : null,
+          startsSubproof: Boolean(line.startsSubproof),
         }))
       : null
   ), [fixedLines, normalizeFormulaForCheck, normalizeFormulaForDisplay])
@@ -193,6 +195,8 @@ export default function DerivationTable({
           readOnly: false,
           formulaReadOnly: true,
           justificationReadOnly: Boolean(line.justification),
+          scopeDepth: line.scopeDepth,
+          startsSubproof: line.startsSubproof,
         })),
       ]
     }
@@ -354,11 +358,15 @@ export default function DerivationTable({
     [lineDrafts, lines, useRuleDropdown, usesNestedSubderivations]
   )
   const indentLevels = useMemo(() => {
-    return getOpenAssumptionDepths(effectiveLines, {
+    const inferred = getOpenAssumptionDepths(effectiveLines, {
       mode: usesNestedSubderivations ? 'nested' : 'flat',
       assumptionRules: activeAssumptionRules,
     })
-  }, [activeAssumptionRules, effectiveLines, usesNestedSubderivations])
+    if (!isFixedProof) return inferred
+    return effectiveLines.map((line, index) => (
+      Number.isInteger(line.scopeDepth) ? line.scopeDepth : inferred[index]
+    ))
+  }, [activeAssumptionRules, effectiveLines, isFixedProof, usesNestedSubderivations])
 
   const normalizeJustificationForDisplay = useCallback(
     (value) => String(value ?? '').replace(/[^\s,]+/g, (token) => {
@@ -1212,8 +1220,12 @@ export default function DerivationTable({
               </TableRow>
             )}
             {lines.map((line, idx) => {
-              const startsScope = usesNestedSubderivations && activeAssumptionRules.has(
-                getRuleFromJustification(line.justification).toUpperCase()
+              const startsScope = usesNestedSubderivations && (
+                isFixedProof
+                  ? line.startsSubproof
+                  : activeAssumptionRules.has(
+                      getRuleFromJustification(line.justification).toUpperCase()
+                    )
               )
               const scopeDepth = usesNestedSubderivations
                 ? (indentLevels[idx] || 0)
@@ -1377,14 +1389,12 @@ export default function DerivationTable({
           </Table>
         </TableContainer>
 
-        {(!isFixedProof || hasStartedLine) && (
-          <DerivationFeedbackPanel
-            autoCheckEnabled={autoCheckEnabled}
-            autoCheckRows={autoCheckState.rows}
-            isFullScreen={isFullScreen}
-            lineGateNotice={lineGateNotice}
-          />
-        )}
+        <DerivationFeedbackPanel
+          autoCheckEnabled={autoCheckEnabled}
+          autoCheckRows={autoCheckState.rows}
+          isFullScreen={isFullScreen}
+          lineGateNotice={lineGateNotice}
+        />
 
         </>
         )}
