@@ -53,6 +53,7 @@ import {
   getPredicateLettersFromKey,
   getPropositionalLettersFromFormulas,
   getRuleFromJustification,
+  isDerivationFieldReadOnly,
   isPredicateLogicKey,
 } from './derivationUtils.js'
 import {
@@ -76,6 +77,14 @@ import DerivationHeader from './DerivationHeader.jsx'
 import DerivationJustificationCell from './DerivationJustificationCell.jsx'
 import DerivationKeyboardRow from './DerivationKeyboardRow.jsx'
 import useDerivationAutoCheck from './useDerivationAutoCheck.js'
+
+function applyLineChange(lines, index, field, value) {
+  const line = lines[index]
+  if (isDerivationFieldReadOnly(line, field)) return lines
+  return lines.map((item, itemIndex) => (
+    itemIndex === index ? { ...item, [field]: value } : item
+  ))
+}
 
 export default function DerivationTable({
   proof,
@@ -151,7 +160,10 @@ export default function DerivationTable({
   )
   const normalizedFixedLines = useMemo(() => (
     Array.isArray(fixedLines)
-      ? fixedLines.map((formula) => normalizeFormulaForDisplay(normalizeFormulaForCheck(formula)))
+      ? fixedLines.map((line) => ({
+          formula: normalizeFormulaForDisplay(normalizeFormulaForCheck(line.formula)),
+          justification: String(line.justification ?? '').trim(),
+        }))
       : null
   ), [fixedLines, normalizeFormulaForCheck, normalizeFormulaForDisplay])
   const isFixedProof = normalizedFixedLines !== null
@@ -173,11 +185,14 @@ export default function DerivationTable({
     if (normalizedFixedLines) {
       return [
         ...premiseLines,
-        ...normalizedFixedLines.map((formula, index) => ({
-          formula,
-          justification: restoredLines[premises.length + index]?.justification ?? '',
+        ...normalizedFixedLines.map((line, index) => ({
+          formula: line.formula,
+          justification: line.justification
+            || restoredLines[premises.length + index]?.justification
+            || '',
           readOnly: false,
           formulaReadOnly: true,
+          justificationReadOnly: Boolean(line.justification),
         })),
       ]
     }
@@ -411,12 +426,8 @@ export default function DerivationTable({
     usesNestedSubderivations,
   })
 
-  const applyLineChange = (currentLines, index, field, value) =>
-    currentLines.map((line, idx) =>
-      idx === index ? { ...line, [field]: value } : line
-    )
-
   const handleLineChange = (index, field, value) => {
+    if (isDerivationFieldReadOnly(lines[index], field)) return
     setLines((prev) => applyLineChange(prev, index, field, value))
     setAutoCheckState((prev) => ({
       perLine: { ...prev.perLine, [index]: null },
@@ -428,7 +439,7 @@ export default function DerivationTable({
   }
 
   const handleFormulaChange = (event, index) => {
-    if (lines[index]?.formulaReadOnly) return
+    if (isDerivationFieldReadOnly(lines[index], 'formula')) return
     const el = event.target
     const raw = el?.value ?? ''
     const inputType = event.nativeEvent?.inputType ?? ''
@@ -448,6 +459,7 @@ export default function DerivationTable({
   }
 
   const handleJustificationChange = (event, index) => {
+    if (isDerivationFieldReadOnly(lines[index], 'justification')) return
     const el = event.target
     const raw = el?.value ?? ''
     const normalized = normalizeJustificationForDisplay(raw)
@@ -481,7 +493,7 @@ export default function DerivationTable({
   }, [lines.length])
 
   const handleLineCommit = (index, field, value) => {
-    if (field === 'formula' && lines[index]?.formulaReadOnly) return
+    if (isDerivationFieldReadOnly(lines[index], field)) return
     const committedValue = field === 'formula'
       ? normalizeFormulaForDisplay(value)
       : value
@@ -499,6 +511,7 @@ export default function DerivationTable({
   })
 
   const handleCitationChange = (index, line, raw) => {
+    if (isDerivationFieldReadOnly(line, 'justification')) return
     setLineDrafts((previous) => ({ ...previous, [index]: raw }))
     handleLineChange(index, 'justification', applyLinesToJustification(line.justification, raw, {
       rulesFirst: usesNestedSubderivations,
@@ -522,6 +535,7 @@ export default function DerivationTable({
   }
 
   const handleRuleChange = (index, line, selectedRule) => {
+    if (isDerivationFieldReadOnly(line, 'justification')) return
     const upperRule = selectedRule.toUpperCase()
     const currentJustification = index in lineDrafts
       ? applyLinesToJustification(line.justification, lineDrafts[index], {
@@ -572,7 +586,7 @@ export default function DerivationTable({
       if (targetIdx < premises.length) return
       commitLines((prev) => {
         const line = prev[targetIdx]
-        if (!line) return prev
+        if (isDerivationFieldReadOnly(line, 'justification')) return prev
         const { nums, ranges, citedrules } = justParse(String(line.justification || ''))
         const hasLineNum = nums.includes(clickedLineNum)
         const nextNums = hasLineNum
@@ -654,7 +668,14 @@ export default function DerivationTable({
   }
 
   const focusJustification = (index) => {
-    const el = justRefs.current[index]
+    let targetIndex = index
+    while (
+      targetIndex < lines.length
+      && isDerivationFieldReadOnly(lines[targetIndex], 'justification')
+    ) {
+      targetIndex += 1
+    }
+    const el = justRefs.current[targetIndex]
     if (el && typeof el.focus === 'function') {
       el.focus()
     }
@@ -688,13 +709,14 @@ export default function DerivationTable({
   }
 
   const resolveEditableIndex = () => {
-    if (activeFormulaIndex !== null && !lines[activeFormulaIndex]?.readOnly) {
+    if (activeFormulaIndex !== null && !isDerivationFieldReadOnly(lines[activeFormulaIndex], 'formula')) {
       return activeFormulaIndex
     }
-    if (lastEditableIndexRef.current !== null && !lines[lastEditableIndexRef.current]?.readOnly) {
+    if (lastEditableIndexRef.current !== null
+      && !isDerivationFieldReadOnly(lines[lastEditableIndexRef.current], 'formula')) {
       return lastEditableIndexRef.current
     }
-    const fallback = lines.findIndex((line) => !line.readOnly)
+    const fallback = lines.findIndex((line) => !isDerivationFieldReadOnly(line, 'formula'))
     return fallback >= 0 ? fallback : null
   }
 
@@ -702,12 +724,14 @@ export default function DerivationTable({
     if (typeof document !== 'undefined') {
       const activeElement = document.activeElement
       for (const [index, el] of Object.entries(justRefs.current)) {
-        if (el && activeElement === el) {
+        if (el && activeElement === el
+          && !isDerivationFieldReadOnly(lines[Number(index)], 'justification')) {
           return { field: 'justification', index: Number(index) }
         }
       }
       for (const [index, el] of Object.entries(formulaRefs.current)) {
-        if (el && activeElement === el && !lines[Number(index)]?.readOnly) {
+        if (el && activeElement === el
+          && !isDerivationFieldReadOnly(lines[Number(index)], 'formula')) {
           return { field: 'formula', index: Number(index) }
         }
       }
@@ -718,8 +742,8 @@ export default function DerivationTable({
       : { field: 'formula', index: fallbackIndex }
   }
 
-  const handleFormulaKeyDown = (event, index, readOnly) => {
-    if (readOnly || lines[index]?.formulaReadOnly) return
+  const handleFormulaKeyDown = (event, index) => {
+    if (isDerivationFieldReadOnly(lines[index], 'formula')) return
     const el = event.target
     if (!el) return
     if (event.key === 'Enter') {
@@ -798,8 +822,8 @@ export default function DerivationTable({
     }
   }
 
-  const handleJustKeyDown = async (event, index, readOnly) => {
-    if (readOnly) return
+  const handleJustKeyDown = async (event, index) => {
+    if (isDerivationFieldReadOnly(lines[index], 'justification')) return
     if (event.key === 'ArrowLeft' && !event.ctrlKey && !event.metaKey && !event.altKey) {
       const el = event.target
       const start = typeof el.selectionStart === 'number' ? el.selectionStart : 0
@@ -1280,7 +1304,7 @@ export default function DerivationTable({
                     updateCursorPosition(idx, event)
                   }}
                   onInsert={(insert) => handleSymbolInsert({ insert })}
-                  onKeyDown={(event) => handleFormulaKeyDown(event, idx, line.readOnly)}
+                  onKeyDown={(event) => handleFormulaKeyDown(event, idx)}
                   onMobileChange={(value) => handleLineChange(idx, 'formula', normalizeFormulaForDisplay(value))}
                   onMobileCursorChange={(position) => {
                     const max = (line.formula ?? '').length
@@ -1310,7 +1334,7 @@ export default function DerivationTable({
                   line={line}
                   lineIndex={idx}
                   onActivate={() => {
-                    if (line.readOnly) return
+                    if (isDerivationFieldReadOnly(line, 'justification')) return
                     setActiveFormulaIndex(idx)
                     lastEditableIndexRef.current = idx
                   }}
@@ -1319,7 +1343,7 @@ export default function DerivationTable({
                   onDelete={() => deleteLine(idx)}
                   onInsert={(insert) => handleSymbolInsert({ insert })}
                   onJustificationChange={(event) => handleJustificationChange(event, idx)}
-                  onKeyDown={(event) => handleJustKeyDown(event, idx, line.readOnly)}
+                  onKeyDown={(event) => handleJustKeyDown(event, idx)}
                   onRequestFullScreen={(event) => {
                     if (!canOpenFullScreen) return
                     event.preventDefault()

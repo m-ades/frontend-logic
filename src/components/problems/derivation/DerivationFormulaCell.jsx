@@ -1,6 +1,7 @@
 import { Box, TableCell, TextField } from '@mui/material'
 import { MobileLogicInput } from '../../ui/LogicKeyboard/index.js'
 import DerivationFormulaText from './DerivationFormulaText.jsx'
+import { isDerivationFieldReadOnly } from './derivationUtils.js'
 import {
   DERIVATION_FORMULA_WIDTH,
   DERIVATION_INDENT_STEP,
@@ -32,7 +33,7 @@ export default function DerivationFormulaCell({
   showsDivider,
   startsScope,
 }) {
-  const formulaReadOnly = line.readOnly || line.formulaReadOnly
+  const formulaReadOnly = isDerivationFieldReadOnly(line, 'formula')
   const basePadding = '0.5rem'
   const paddingLeft = depth > 0
     ? `calc(${basePadding} + ${depth} * ${DERIVATION_INDENT_STEP})`

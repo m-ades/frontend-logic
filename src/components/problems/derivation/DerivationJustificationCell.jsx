@@ -23,6 +23,7 @@ import {
 import {
   formatJustificationLines,
   getRuleFromJustification,
+  isDerivationFieldReadOnly,
 } from './derivationUtils.js'
 
 const justificationWidth = {
@@ -60,13 +61,14 @@ export default function DerivationJustificationCell({
   usesNestedSubderivations,
 }) {
   const selectedRule = getRuleFromJustification(line.justification)
+  const justificationReadOnly = isDerivationFieldReadOnly(line, 'justification')
   const omitsCitations = assumptionRules.has(selectedRule.toUpperCase())
   const isPremise = lineIndex < premisesCount
   const ruleOptions = selectedRule && !allowedRules.some((rule) => (
     rule.toLowerCase() === selectedRule.toLowerCase()
   )) ? [selectedRule, ...allowedRules] : allowedRules
   const requestFullScreen = (event) => {
-    if (line.readOnly) return
+    if (justificationReadOnly) return
     onRequestFullScreen(event)
   }
 
@@ -114,7 +116,7 @@ export default function DerivationJustificationCell({
                   onChange={(event) => onCitationChange(event.target.value)}
                   onKeyDown={onKeyDown}
                   onBlur={(event) => onCitationCommit(event.target.value)}
-                  InputProps={{ disableUnderline: true, readOnly: line.readOnly }}
+                  InputProps={{ disableUnderline: true, readOnly: justificationReadOnly }}
                   inputProps={{
                     autoComplete: 'off',
                     'aria-label': `Referenced line numbers for line ${lineIndex + 1}`,
@@ -143,6 +145,7 @@ export default function DerivationJustificationCell({
                 >
                   <Select
                     value={selectedRule}
+                    readOnly={justificationReadOnly}
                     displayEmpty
                     disableUnderline
                     inputProps={{ 'aria-label': `Rule for line ${lineIndex + 1}` }}
@@ -179,7 +182,7 @@ export default function DerivationJustificationCell({
               onChange={onJustificationChange}
               onKeyDown={onKeyDown}
               onBlur={(event) => onTypedCommit(event.target.value)}
-              InputProps={{ disableUnderline: true, readOnly: line.readOnly }}
+              InputProps={{ disableUnderline: true, readOnly: justificationReadOnly }}
               inputProps={{ autoComplete: 'off', 'aria-label': `Justification for line ${lineIndex + 1}` }}
               inputRef={registerInput}
               sx={{
