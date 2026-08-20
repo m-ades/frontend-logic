@@ -27,7 +27,6 @@ import getFormulaClass from '../../lib/logicpenguin/symbolic/formula.js'
 import getSyntax from '../../lib/logicpenguin/symbolic/libsyntax.js'
 import {
   DEFAULT_LOGIC_SYSTEM,
-  getDerivationProblemType,
   getNotation,
   getSymbols,
   isDerivationProblemType,
@@ -40,8 +39,12 @@ import {
   getDerivationRules,
 } from '../../lib/derivationRules.js'
 import { displayIndexedSymbolsForNotation } from '../../lib/indexedSymbols.js'
-import { parseAssumptionScopes } from '../../lib/proofArgumentExtractionScopes.js'
-import ProofExtractionLinesEditor from './derivation/ProofExtractionLinesEditor.jsx'
+import {
+  getAssumptionRuleRequirements,
+  getJustificationRule,
+  parseAssumptionScopes,
+} from '../../lib/proofArgumentExtractionScopes.js'
+import AssumptionScopesEditor from './derivation/AssumptionScopesEditor.jsx'
 
 // deep merge. source overwrites. arrays replace.
 function deepMerge(target, source) {
@@ -1092,29 +1095,65 @@ function DerivationEditorForm({ proof, value, onChange, logicSystem = DEFAULT_LO
   )
 }
 
-function FormulaListEditor({ label, values, onChange, placeholder }) {
+function FormulaListEditor({
+  label,
+  values,
+  onChange,
+  placeholder,
+  secondaryValues,
+  secondaryLabel,
+  secondaryPlaceholder,
+}) {
   const list = Array.isArray(values) && values.length ? values : ['']
+  const hasSecondaryValues = Array.isArray(secondaryValues)
+  const secondaryList = hasSecondaryValues
+    ? list.map((_, index) => String(secondaryValues[index] ?? ''))
+    : null
+  const emitChange = (nextValues, nextSecondaryValues = secondaryList, removedIndex) => {
+    onChange(nextValues, nextSecondaryValues, removedIndex)
+  }
   return (
     <Box>
       <Typography variant="subtitle2" sx={{ mb: 1 }}>{label}</Typography>
       {list.map((formula, index) => (
-        <Stack key={index} direction="row" alignItems="center" spacing={1} sx={{ mb: 1 }}>
+        <Stack
+          key={index}
+          direction={hasSecondaryValues ? { xs: 'column', sm: 'row' } : 'row'}
+          alignItems={hasSecondaryValues ? { xs: 'stretch', sm: 'center' } : 'center'}
+          spacing={1}
+          sx={{ mb: 1 }}
+        >
           <TextField
             size="small"
             value={formula}
             onChange={(event) => {
               const next = [...list]
               next[index] = event.target.value
-              onChange(next)
+              emitChange(next)
             }}
             fullWidth
             placeholder={`${placeholder} ${index + 1}`}
           />
+          {hasSecondaryValues && (
+            <TextField
+              size="small"
+              value={secondaryList[index]}
+              onChange={(event) => {
+                const next = [...secondaryList]
+                next[index] = event.target.value
+                emitChange(list, next)
+              }}
+              fullWidth
+              label={secondaryLabel}
+              placeholder={secondaryPlaceholder}
+            />
+          )}
           <IconButton
             size="small"
             onClick={() => {
               const next = list.filter((_, itemIndex) => itemIndex !== index)
-              onChange(next)
+              const nextSecondary = secondaryList?.filter((_, itemIndex) => itemIndex !== index)
+              emitChange(next, nextSecondary, index)
             }}
             aria-label={`Remove ${placeholder.toLowerCase()} ${index + 1}`}
           >
@@ -1122,7 +1161,14 @@ function FormulaListEditor({ label, values, onChange, placeholder }) {
           </IconButton>
         </Stack>
       ))}
-      <Button size="small" startIcon={<AddIcon />} onClick={() => onChange([...list, ''])}>
+      <Button
+        size="small"
+        startIcon={<AddIcon />}
+        onClick={() => emitChange(
+          [...list, ''],
+          secondaryList ? [...secondaryList, ''] : null
+        )}
+      >
         Add {placeholder.toLowerCase()}
       </Button>
     </Box>
@@ -1141,8 +1187,23 @@ function ProofArgumentExtractionEditorForm({ proof, value, onChange, logicSystem
     ?? proof?.assumptionScopes
     ?? snapshot.assumptionScopes
     ?? []
-  const showAssumptionScopes = getDerivationProblemType(logicSystem) === 'derivation-calgary'
   const update = (updates) => onChange({ ...value, ...updates })
+  const updateLines = (nextLines, nextJustifications, removedIndex) => {
+    const nextScopes = removedIndex == null ? assumptionScopes : assumptionScopes.flatMap((scope) => {
+      if (!Number.isInteger(scope.start) || !Number.isInteger(scope.end)) return [scope]
+      if (scope.start === removedIndex) return []
+      if (removedIndex < scope.start) {
+        return [{ start: scope.start - 1, end: scope.end - 1 }]
+      }
+      if (removedIndex <= scope.end) return [{ ...scope, end: scope.end - 1 }]
+      return [scope]
+    })
+    update({
+      lines: nextLines.map((formula) => displayFormulaInput(formula, logicSystem)),
+      justifications: nextJustifications,
+      assumptionScopes: nextScopes,
+    })
+  }
   return (
     <Stack spacing={2}>
       <TextField
@@ -1161,14 +1222,20 @@ function ProofArgumentExtractionEditorForm({ proof, value, onChange, logicSystem
         })}
         placeholder="Premise"
       />
-      <ProofExtractionLinesEditor
+      <FormulaListEditor
+        label="Lines after the premises"
+        values={lines}
+        secondaryValues={justifications}
+        onChange={updateLines}
+        placeholder="Line"
+        secondaryLabel="Provided justification"
+        secondaryPlaceholder="Leave blank for the student"
+      />
+      <AssumptionScopesEditor
+        scopes={assumptionScopes}
         lines={lines}
-        justifications={justifications}
-        assumptionScopes={assumptionScopes}
         premiseCount={premises.length}
-        formatFormula={(formula) => displayFormulaInput(formula, logicSystem)}
-        showAssumptionScopes={showAssumptionScopes}
-        onChange={update}
+        onChange={(next) => update({ assumptionScopes: next })}
       />
     </Stack>
   )
@@ -1620,30 +1687,31 @@ function InstructorQuestionEditorInner({
           setSaving(false)
           return
         }
-        if (getDerivationProblemType(activeLogicSystem) === 'derivation-calgary') {
-          const { scopes, error: scopeError } = parseAssumptionScopes(
-            mergedSnapshot.assumptionScopes,
-            lines.length
-          )
-          if (scopeError) {
-            setError(scopeError)
-            setSaving(false)
-            return
-          }
-          const invalidScope = scopes.find(({ start }) => {
-            const supplied = String(mergedSnapshot.justifications?.[start] ?? '').trim()
-            return supplied && supplied.toUpperCase() !== 'AS'
-          })
-          if (invalidScope) {
-            setError(`Proof line ${premises.length + invalidScope.start + 1} begins an assumption scope, so its provided justification must be AS or blank`)
-            setSaving(false)
-            return
-          }
-          // The update API deep-merges snapshots, so [] is the explicit clear value.
-          mergedSnapshot.assumptionScopes = scopes
-        } else {
-          delete mergedSnapshot.assumptionScopes
+        const { scopes, error: scopeError } = parseAssumptionScopes(
+          mergedSnapshot.assumptionScopes,
+          lines.length,
+          activeLogicSystem
+        )
+        if (scopeError) {
+          setError(scopeError)
+          setSaving(false)
+          return
         }
+        const suppliedRules = (mergedSnapshot.justifications ?? []).map(getJustificationRule)
+        const badRequirement = getAssumptionRuleRequirements(scopes, activeLogicSystem)
+          .find(({ line, rules }) => (
+            line >= lines.length || (suppliedRules[line] && !rules.includes(suppliedRules[line]))
+          ))
+        if (badRequirement) {
+          const placement = badRequirement.kind === 'opening' ? 'begin with' : 'be followed by'
+          setError(
+            `Each assumption scope must ${placement} ${badRequirement.rules.join(' or ')}`
+          )
+          setSaving(false)
+          return
+        }
+        // The update API deep-merges snapshots, so [] is the explicit clear value.
+        mergedSnapshot.assumptionScopes = scopes
       }
       const formulaError = validateQuestionSnapshotFormulas(mergedSnapshot, activeLogicSystem)
       if (formulaError) {

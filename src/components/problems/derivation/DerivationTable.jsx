@@ -164,7 +164,7 @@ export default function DerivationTable({
           formula: normalizeFormulaForDisplay(normalizeFormulaForCheck(line.formula)),
           justification: String(line.justification ?? '').trim(),
           scopeDepth: Number.isInteger(line.scopeDepth) ? line.scopeDepth : null,
-          startsSubproof: Boolean(line.startsSubproof),
+          requiredRules: Array.isArray(line.requiredRules) ? line.requiredRules : null,
         }))
       : null
   ), [fixedLines, normalizeFormulaForCheck, normalizeFormulaForDisplay])
@@ -196,7 +196,7 @@ export default function DerivationTable({
           formulaReadOnly: true,
           justificationReadOnly: Boolean(line.justification),
           scopeDepth: line.scopeDepth,
-          startsSubproof: line.startsSubproof,
+          requiredRules: line.requiredRules,
         })),
       ]
     }
@@ -1174,7 +1174,7 @@ export default function DerivationTable({
           component={Box}
           sx={{
             width: '100%',
-            ...(isFullScreen ? { overflowX: 'hidden', overflow: 'visible', padding: 0, margin: 0 } : { overflowX: 'auto', WebkitOverflowScrolling: 'touch' }), // fullscreen: no extra padding
+            ...(isFullScreen ? { overflowX: 'hidden', overflow: 'visible', padding: 0, margin: 0 } : { overflowX: 'auto', overflowY: 'hidden', WebkitOverflowScrolling: 'touch' }), // fullscreen: no extra padding
           }}
         >
           {/* mobile: small table. fullscreen: last column no right padding (mui default). */}
@@ -1220,16 +1220,14 @@ export default function DerivationTable({
               </TableRow>
             )}
             {lines.map((line, idx) => {
+              const scopeDepth = indentLevels[idx] || 0
               const startsScope = usesNestedSubderivations && (
                 isFixedProof
-                  ? line.startsSubproof
+                  ? scopeDepth > (indentLevels[idx - 1] || 0)
                   : activeAssumptionRules.has(
                       getRuleFromJustification(line.justification).toUpperCase()
                     )
               )
-              const scopeDepth = usesNestedSubderivations
-                ? (indentLevels[idx] || 0)
-                : 0
               const isPremiseLine = usesNestedSubderivations && idx < premises.length
               const showsFitchDivider = isPremiseLine || startsScope
               return (
@@ -1372,19 +1370,18 @@ export default function DerivationTable({
               </TableRow>
               )
             })}
-            <DerivationKeyboardRow
-              autoCheckEnabled={autoCheckEnabled}
-              canAddLine={canAddLine}
-              isFullScreen={isFullScreen}
-              isMobile={isMobile}
-              isPhone={isPhone}
-              mobileLogicKeyboardEnabled={mobileLogicKeyboardEnabled}
-              onAddLine={addLine}
-              onInsert={handleSymbolInsert}
-              onToggleAutoCheck={() => setAutoCheckEnabled((enabled) => !enabled)}
-              symbolButtons={symbolButtons}
-              showEditingControls={!isFixedProof}
-            />
+            {!isFixedProof && (
+              <DerivationKeyboardRow
+                canAddLine={canAddLine}
+                isFullScreen={isFullScreen}
+                isMobile={isMobile}
+                isPhone={isPhone}
+                mobileLogicKeyboardEnabled={mobileLogicKeyboardEnabled}
+                onAddLine={addLine}
+                onInsert={handleSymbolInsert}
+                symbolButtons={symbolButtons}
+              />
+            )}
             </TableBody>
           </Table>
         </TableContainer>
@@ -1394,6 +1391,7 @@ export default function DerivationTable({
           autoCheckRows={autoCheckState.rows}
           isFullScreen={isFullScreen}
           lineGateNotice={lineGateNotice}
+          onToggleAutoCheck={() => setAutoCheckEnabled((enabled) => !enabled)}
         />
 
         </>
