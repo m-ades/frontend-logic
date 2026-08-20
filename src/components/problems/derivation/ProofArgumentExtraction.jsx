@@ -20,12 +20,21 @@ import { getNotation } from '../../../lib/logicSystems.js'
 import getFormulaClass from '../../../lib/logicpenguin/symbolic/formula.js'
 import { extractLines } from './derivationUtils.js'
 
-function hasEveryCitation(derivationState, premises, fixedLineCount) {
+function getQuestionLines(snapshot) {
+  const formulas = Array.isArray(snapshot?.lines) ? snapshot.lines : []
+  const supplied = Array.isArray(snapshot?.justifications) ? snapshot.justifications : []
+  return formulas.map((formula, index) => ({
+    formula,
+    justification: String(supplied[index] ?? '').trim(),
+  }))
+}
+
+function hasEveryCitation(derivationState, premises, fixedLines) {
   const proofLines = extractLines(derivationState, premises)
-  if (proofLines.length < premises.length + fixedLineCount) return false
-  return proofLines
-    .slice(premises.length, premises.length + fixedLineCount)
-    .every((line) => String(line?.justification ?? '').trim())
+  return fixedLines.map((line, index) => (
+    line.justification
+    || String(proofLines[premises.length + index]?.justification ?? '').trim()
+  )).every(Boolean)
 }
 
 function hasArgumentShape(value, premiseCount, Formula) {
@@ -78,10 +87,10 @@ export default function ProofArgumentExtraction({
     [snapshot?.prems]
   )
   const fixedLines = useMemo(
-    () => (Array.isArray(snapshot?.lines) ? snapshot.lines : []),
-    [snapshot?.lines]
+    () => getQuestionLines(snapshot),
+    [snapshot?.justifications, snapshot?.lines]
   )
-  const conclusion = fixedLines.at(-1) ?? ''
+  const conclusion = fixedLines.at(-1)?.formula ?? ''
   const prompt = snapshot?.prompt || proof?.description || ''
   const notation = getNotation(logicSystem)
   const Formula = useMemo(() => getFormulaClass(notation), [notation])
@@ -136,7 +145,7 @@ export default function ProofArgumentExtraction({
       onComplete,
       isDisabled: () => (
         !hasArgumentShape(argumentLine, premises.length, Formula)
-        || !hasEveryCitation(derivationState, premises, fixedLines.length)
+        || !hasEveryCitation(derivationState, premises, fixedLines)
       ),
       resetInput: resetInputs,
       onStateChange: handleCheckerStateChange,
@@ -158,7 +167,7 @@ export default function ProofArgumentExtraction({
   const submitDisabled = isLocked
     || isAssignmentLocked
     || !hasArgumentShape(argumentLine, premises.length, Formula)
-    || !hasEveryCitation(derivationState, premises, fixedLines.length)
+    || !hasEveryCitation(derivationState, premises, fixedLines)
 
   return (
     <Stack spacing={3} sx={{ width: '100%' }}>

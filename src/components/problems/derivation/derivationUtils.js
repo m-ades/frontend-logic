@@ -13,6 +13,13 @@ import {
 const CONSTANT_POOL = 'abcdefghijklmnopqrstuvw'.split('')
 export const PREDICATE_VARIABLES = ['x', 'y', 'z']
 
+export function isDerivationFieldReadOnly(line, field) {
+  if (!line || line.readOnly) return true
+  if (field === 'formula') return Boolean(line.formulaReadOnly)
+  if (field === 'justification') return Boolean(line.justificationReadOnly)
+  return false
+}
+
 export function getLeftPart(line) {
   const s = typeof line === 'string' ? line : String(line ?? '')
   const idx = s.search(/[=:]/)

@@ -32,6 +32,17 @@ function getSubmittedJustifications(givenans, premiseCount) {
         .map((line) => String(line?.j ?? '').trim());
 }
 
+function getQuestionLines(question) {
+    const formulas = Array.isArray(question?.lines) ? question.lines : [];
+    const supplied = Array.isArray(question?.justifications)
+        ? question.justifications
+        : [];
+    return formulas.map((formula, index) => ({
+        formula,
+        justification: String(supplied[index] ?? '').trim(),
+    }));
+}
+
 function parseArgumentLine(value) {
     if (typeof value !== 'string') return null;
     const pieces = value.split('//');
@@ -66,33 +77,36 @@ function argumentMatches(argumentLine, premises, conclusion, Formula) {
     ));
 }
 
-function buildCanonicalProof(premises, lines, justifications) {
-    const conclusion = lines.at(-1) ?? '';
-    const formulas = [...premises, ...lines];
-    const parts = formulas.map((formula, index) => ({
+function buildCanonicalProof(premises, lines, submittedJustifications) {
+    const conclusion = lines.at(-1)?.formula ?? '';
+    const premiseParts = premises.map((formula, index) => ({
         n: String(index + 1),
         s: formula,
-        j: index < premises.length
-            ? 'Pr'
-            : (justifications[index - premises.length] ?? ''),
+        j: 'Pr',
+    }));
+    const proofParts = lines.map((line, index) => ({
+        n: String(premises.length + index + 1),
+        s: line.formula,
+        j: line.justification || String(submittedJustifications[index] ?? '').trim(),
     }));
     return {
         parts: [{
             showline: { s: conclusion, j: '', isMainConclusion: true, n: '' },
-            parts,
+            parts: [...premiseParts, ...proofParts],
         }],
         prems: premises,
         conc: conclusion,
     };
 }
 
-// the question owns every formula and the submission owns only citations and argument text
+// the question owns every formula and any supplied justification; the submission
+// owns only the missing citations and argument text
 export default async function(
     question, _answer, givenans, partialcredit, points, cheat, options = {}
 ) {
     const premises = Array.isArray(question?.prems) ? question.prems : [];
-    const lines = Array.isArray(question?.lines) ? question.lines : [];
-    const conclusion = lines.at(-1) ?? '';
+    const lines = getQuestionLines(question);
+    const conclusion = lines.at(-1)?.formula ?? '';
     if (!conclusion) {
         return {
             successstatus: 'incorrect',
@@ -103,8 +117,8 @@ export default async function(
 
     const notation = options?.notation || 'hurley';
     const Formula = getFormulaClass(notation);
-    const justifications = getSubmittedJustifications(givenans, premises.length);
-    const proof = buildCanonicalProof(premises, lines, justifications);
+    const submittedJustifications = getSubmittedJustifications(givenans, premises.length);
+    const proof = buildCanonicalProof(premises, lines, submittedJustifications);
     const derivationChecker = getDerivationCheckerForLogicSystem(options?.logicSystem);
     const derivationResult = await derivationChecker(
         { prems: premises, conc: conclusion, ruleset: question?.ruleset },

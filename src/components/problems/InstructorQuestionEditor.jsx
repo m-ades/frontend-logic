@@ -441,11 +441,18 @@ function buildDerivationSnapshot(proof, edited, existing, logicSystem = DEFAULT_
 function buildProofArgumentExtractionSnapshot(proof, edited, existing, logicSystem = DEFAULT_LOGIC_SYSTEM) {
   const snapshot = proof.questionSnapshot || proof.snapshot || {}
   const e = existing && typeof existing === 'object' ? existing : {}
+  const lines = normalizeFormulaInputs(edited.lines ?? proof.lines ?? snapshot.lines ?? [], logicSystem)
+  const justificationInput = edited.justifications
+    ?? proof.justifications
+    ?? snapshot.justifications
+    ?? []
+  const justifications = Array.isArray(justificationInput) ? justificationInput : []
   return {
     [typeKey(e)]: 'proof-argument-extraction',
     prompt: edited.prompt ?? snapshot.prompt ?? proof.description ?? '',
     prems: normalizeFormulaInputs(edited.premises ?? proof.premises ?? snapshot.prems ?? [], logicSystem),
-    lines: normalizeFormulaInputs(edited.lines ?? proof.lines ?? snapshot.lines ?? [], logicSystem),
+    lines,
+    justifications: lines.map((_, index) => String(justifications[index] ?? '').trim()),
   }
 }
 
@@ -1078,30 +1085,68 @@ function DerivationEditorForm({ proof, value, onChange, logicSystem = DEFAULT_LO
   )
 }
 
-function FormulaListEditor({ label, values, onChange, placeholder, finalLabel }) {
+function FormulaListEditor({
+  label,
+  values,
+  onChange,
+  placeholder,
+  finalLabel,
+  secondaryValues,
+  secondaryLabel,
+  secondaryPlaceholder,
+}) {
   const list = Array.isArray(values) && values.length ? values : ['']
+  const hasSecondaryValues = Array.isArray(secondaryValues)
+  const secondaryList = hasSecondaryValues
+    ? list.map((_, index) => String(secondaryValues[index] ?? ''))
+    : null
+  const emitChange = (nextValues, nextSecondaryValues = secondaryList) => {
+    onChange(nextValues, nextSecondaryValues)
+  }
+
   return (
     <Box>
       <Typography variant="subtitle2" sx={{ mb: 1 }}>{label}</Typography>
       {list.map((formula, index) => (
-        <Stack key={index} direction="row" alignItems="center" spacing={1} sx={{ mb: 1 }}>
+        <Stack
+          key={index}
+          direction={hasSecondaryValues ? { xs: 'column', sm: 'row' } : 'row'}
+          alignItems={hasSecondaryValues ? { xs: 'stretch', sm: 'center' } : 'center'}
+          spacing={1}
+          sx={{ mb: 1 }}
+        >
           <TextField
             size="small"
             value={formula}
             onChange={(event) => {
               const next = [...list]
               next[index] = event.target.value
-              onChange(next)
+              emitChange(next)
             }}
             fullWidth
             label={finalLabel && index === list.length - 1 ? finalLabel : undefined}
             placeholder={`${placeholder} ${index + 1}`}
           />
+          {hasSecondaryValues && (
+            <TextField
+              size="small"
+              value={secondaryList[index]}
+              onChange={(event) => {
+                const next = [...secondaryList]
+                next[index] = event.target.value
+                emitChange(list, next)
+              }}
+              fullWidth
+              label={secondaryLabel}
+              placeholder={secondaryPlaceholder}
+            />
+          )}
           <IconButton
             size="small"
             onClick={() => {
               const next = list.filter((_, itemIndex) => itemIndex !== index)
-              onChange(next)
+              const nextSecondary = secondaryList?.filter((_, itemIndex) => itemIndex !== index)
+              emitChange(next, nextSecondary)
             }}
             aria-label={`Remove ${placeholder.toLowerCase()} ${index + 1}`}
           >
@@ -1109,7 +1154,14 @@ function FormulaListEditor({ label, values, onChange, placeholder, finalLabel })
           </IconButton>
         </Stack>
       ))}
-      <Button size="small" startIcon={<AddIcon />} onClick={() => onChange([...list, ''])}>
+      <Button
+        size="small"
+        startIcon={<AddIcon />}
+        onClick={() => emitChange(
+          [...list, ''],
+          secondaryList ? [...secondaryList, ''] : null
+        )}
+      >
         Add {placeholder.toLowerCase()}
       </Button>
     </Box>
@@ -1120,6 +1172,10 @@ function ProofArgumentExtractionEditorForm({ proof, value, onChange, logicSystem
   const snapshot = proof?.questionSnapshot || proof?.snapshot || {}
   const premises = value.premises ?? proof?.premises ?? snapshot.prems ?? []
   const lines = value.lines ?? proof?.lines ?? snapshot.lines ?? []
+  const justifications = value.justifications
+    ?? proof?.justifications
+    ?? snapshot.justifications
+    ?? []
   const update = (updates) => onChange({ ...value, ...updates })
   return (
     <Stack spacing={2}>
@@ -1142,11 +1198,15 @@ function ProofArgumentExtractionEditorForm({ proof, value, onChange, logicSystem
       <FormulaListEditor
         label="Lines after the premises"
         values={lines}
-        onChange={(next) => update({
-          lines: next.map((formula) => displayFormulaInput(formula, logicSystem)),
+        secondaryValues={justifications}
+        onChange={(nextLines, nextJustifications) => update({
+          lines: nextLines.map((formula) => displayFormulaInput(formula, logicSystem)),
+          justifications: nextJustifications,
         })}
         placeholder="Line"
         finalLabel="Conclusion"
+        secondaryLabel="Provided justification"
+        secondaryPlaceholder="Leave blank for the student"
       />
       <Typography variant="body2" color="text.secondary">
         The final line is the conclusion
@@ -1494,6 +1554,9 @@ function InstructorQuestionEditorInner({
       base.prompt = snap.prompt ?? proof.description ?? ''
       base.premises = Array.isArray(proof.premises) ? [...proof.premises] : [...(snap.prems || [])]
       base.lines = Array.isArray(proof.lines) ? [...proof.lines] : [...(snap.lines || [])]
+      base.justifications = Array.isArray(proof.justifications)
+        ? [...proof.justifications]
+        : [...(snap.justifications || [])]
     }
     setEditValue(base)
     initialEditValueRef.current = JSON.parse(JSON.stringify(base))
@@ -1520,6 +1583,8 @@ function InstructorQuestionEditorInner({
     proof?.comboTranslationTruthTable,
     proof?.comboTranslationDerivation,
     proof?.lines,
+    proof?.justifications,
+    proof?.questionSnapshot,
     proof?.snapshot,
   ])
 
