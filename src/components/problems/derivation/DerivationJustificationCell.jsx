@@ -182,12 +182,16 @@ export default function DerivationJustificationCell({
               onChange={onJustificationChange}
               onKeyDown={onKeyDown}
               onBlur={(event) => onTypedCommit(event.target.value)}
-              InputProps={{ disableUnderline: true, readOnly: justificationReadOnly }}
+              InputProps={{ readOnly: justificationReadOnly }}
               inputProps={{ autoComplete: 'off', 'aria-label': `Justification for line ${lineIndex + 1}` }}
               inputRef={registerInput}
               sx={{
                 ...justificationWidth,
                 '& .MuiInputBase-input': { fontSize: DERIVATION_LINE_FONT_SIZE, py: 0.5 },
+                '& .MuiInput-root:before, & .MuiInput-root:after': {
+                  right: 'auto',
+                  width: '75%',
+                },
               }}
             />
           )}
