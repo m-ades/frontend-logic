@@ -160,6 +160,8 @@ export function InstructorSandboxLayout({ children }) {
       saveAccommodations: sandbox.saveAccommodations,
       getDeadlines: sandbox.getDeadlines,
       saveDeadline: sandbox.saveDeadline,
+      getQuestionAttemptOverrides: sandbox.getQuestionAttemptOverrides,
+      saveQuestionAttemptOverride: sandbox.saveQuestionAttemptOverride,
       loadInstructorDashboard: async (courseId) => {
         const snapshot = sandbox.dashboardAnalyticsByCourse?.[courseId];
         return {
