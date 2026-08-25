@@ -289,7 +289,7 @@ export default function InstructorAssignments() {
         extendedDueDate: iso,
         reason: classwideForm.reason?.trim().slice(0, 500) || null,
       });
-      if (result?.updated === 0) {
+      if ((result?.total ?? 0) === 0) {
         setClasswideError("No enrolled students to extend.");
         return;
       }

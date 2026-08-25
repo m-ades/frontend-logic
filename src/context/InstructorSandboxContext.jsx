@@ -673,15 +673,27 @@ export function InstructorSandboxProvider({ children }) {
     if (!extendedDueDate || Number.isNaN(Date.parse(extendedDueDate))) {
       throw new Error("A valid extended due date is required.")
     }
+    const classwideMs = Date.parse(extendedDueDate)
     const courseId = courseState.activeCourseId
     const students = (courseState.gradebookByCourse?.[courseId] || []).filter(
       (student) => String(student.role || "student").toLowerCase() !== "ta"
     )
     const grantedAt = new Date().toISOString()
     const trimmedReason = typeof reason === "string" ? reason.trim().slice(0, 500) : null
+    let updated = 0
+    let preserved = 0
+
     setState((prev) => {
       const courseDeadlines = { ...(prev.deadlinesByCourse?.[courseId] || {}) }
       for (const student of students) {
+        const existing = courseDeadlines[student.id]?.[assignmentId]
+        const existingMs = existing?.extension_due_at
+          ? Date.parse(existing.extension_due_at)
+          : NaN
+        if (existing?.extension_due_at && !Number.isNaN(existingMs) && existingMs > classwideMs) {
+          preserved += 1
+          continue
+        }
         courseDeadlines[student.id] = {
           ...(courseDeadlines[student.id] || {}),
           [assignmentId]: {
@@ -692,6 +704,7 @@ export function InstructorSandboxProvider({ children }) {
             created_at: grantedAt,
           },
         }
+        updated += 1
       }
       return {
         ...prev,
@@ -701,7 +714,7 @@ export function InstructorSandboxProvider({ children }) {
         },
       }
     })
-    return { updated: students.length }
+    return { updated, preserved, total: students.length }
   }
 
   const getActivity = (activityId) => {
