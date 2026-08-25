@@ -48,9 +48,9 @@ export default function ClasswideExtensionDialog({
                 {assignment.name}
               </Typography>
             )}
-            <Alert severity="warning">
-              This sets the same extended due date for every enrolled student. Existing
-              per-student extensions for this assignment will be overwritten.
+            <Alert severity="info">
+              Applies this due date to enrolled students. Anyone with an individual extension
+              that ends later will keep that later date.
             </Alert>
             {error && <Alert severity="error">{error}</Alert>}
             <TextField
