@@ -10,6 +10,7 @@ import TruthTableEditor from './truth-table/TruthTableEditor.jsx'
 import { ProblemNavigationContext } from './ProblemNavigationContext.jsx'
 import { allowPartialForProof, displayScoreForProof } from '../../utils/problemHelpers.js'
 import InstructorQuestionEditor from './InstructorQuestionEditor.jsx'
+import QuestionAttemptOverrideDialog from '../ui/assignments/QuestionAttemptOverrideDialog.jsx'
 
 function TabPanel(props) {
   const { children, value, index, direction, isMobile, ...other } = props;
@@ -97,6 +98,9 @@ function ProofTabs({
   const [createProof, setCreateProof] = React.useState(null)
   const createEditorRef = React.useRef(null)
   const pendingCreateOpenRef = React.useRef(false)
+  const [attemptOverrideOpen, setAttemptOverrideOpen] = React.useState(false)
+
+  const currentProof = proofs?.[currentProofIndex] ?? null
 
   const nextOrderIndex = React.useMemo(() => {
     if (!proofs?.length) return 0
@@ -427,7 +431,7 @@ function ProofTabs({
             gap: 0
           }}>
             {isInstructorView && (
-              <Box sx={{ display: 'flex', justifyContent: 'flex-end', pb: 1, px: 1 }}>
+              <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 0.5, pb: 1, px: 1 }}>
                 <Button
                   size="small"
                   startIcon={<AddIcon />}
@@ -445,6 +449,23 @@ function ProofTabs({
                   }}
                 >
                   Add question
+                </Button>
+                <Button
+                  size="small"
+                  variant="text"
+                  onClick={() => setAttemptOverrideOpen(true)}
+                  disabled={!currentProof?.questionId}
+                  sx={{
+                    width: 160,
+                    justifyContent: 'flex-start',
+                    textTransform: 'none',
+                    fontSize: { xs: '0.875rem', md: '1rem' },
+                    fontWeight: 400,
+                    color: 'primary.main',
+                    '&:hover': { backgroundColor: 'rgba(47, 107, 255, 0.08)' },
+                  }}
+                >
+                  Extra attempts
                 </Button>
                 <Menu
                   anchorEl={createAnchorEl}
@@ -561,6 +582,18 @@ function ProofTabs({
                 isMobile={isMobile}
               >
                 <Stack spacing={3} sx={{ minWidth: 0 }}>
+                  {isInstructorView && isMobile && (
+                    <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        onClick={() => setAttemptOverrideOpen(true)}
+                        disabled={!proof?.questionId}
+                      >
+                        Extra attempts
+                      </Button>
+                    </Box>
+                  )}
                   <Box sx={{ minWidth: 0 }}>
                     <div ref={el => { if (el) proofRefs.current[proof.id] = el }}>
                       {(() => {
@@ -649,6 +682,13 @@ function ProofTabs({
             </ProblemNavigationContext.Provider>
           )
         })}
+      <QuestionAttemptOverrideDialog
+        open={attemptOverrideOpen}
+        onClose={() => setAttemptOverrideOpen(false)}
+        questionId={currentProof?.questionId}
+        questionLabel={currentProof ? `Problem ${currentProofIndex + 1}` : ""}
+        baseAttemptLimit={currentProof?.attemptLimit ?? 3}
+      />
     </Box>
   )
 }
