@@ -124,6 +124,7 @@ function SandboxWorksheetContent() {
         total={total}
         completionPercent={completionPercent}
         gradeLabel={gradeLabel}
+        isInstructorView={isInstructor}
       />
     </WorksheetLayout>
   )
