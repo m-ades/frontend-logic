@@ -232,6 +232,12 @@ export const formatJustificationDisplay = (value, options = {}) => {
   return formatJustificationParts(nums, ranges, citedrules, options)
 }
 
+// normalizes rule shortcuts while preserving incomplete citation input
+export const normalizeJustificationForDisplay = (value) => String(value ?? '').replace(/[^\s,]+/g, (token) => {
+  if (/[0-9?]/.test(token)) return token
+  return formatRuleName(token)
+})
+
 export const getJustificationMeta = (value) => {
   const { nums, ranges, citedrules } = justParse(String(value || ''))
   return {

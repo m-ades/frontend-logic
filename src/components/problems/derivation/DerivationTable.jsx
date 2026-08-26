@@ -26,7 +26,6 @@ import {
   normalizeLogicSystem,
 } from '../../../lib/logicSystems.js'
 import {
-  formatDerivationRuleName as formatRuleName,
   getDerivationRuleLookup,
   getDerivationRules,
 } from '../../../lib/derivationRules.js'
@@ -55,6 +54,7 @@ import {
   getRuleFromJustification,
   isDerivationFieldReadOnly,
   isPredicateLogicKey,
+  normalizeJustificationForDisplay,
 } from './derivationUtils.js'
 import {
   DERIVATION_FORMULA_MIN_WIDTH,
@@ -371,13 +371,6 @@ export default function DerivationTable({
     ))
   }, [activeAssumptionRules, effectiveLines, isFixedProof, usesNestedSubderivations])
 
-  const normalizeJustificationForDisplay = useCallback(
-    (value) => String(value ?? '').replace(/[^\s,]+/g, (token) => {
-      if (/[0-9?]/.test(token)) return token
-      return formatRuleName(token)
-    }),
-    []
-  )
   const normalizeJustification = useCallback((value) => String(value ?? '').trim(), [])
 
   useEffect(() => {

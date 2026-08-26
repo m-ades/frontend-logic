@@ -46,6 +46,7 @@ import {
 } from '../../lib/proofArgumentExtractionScopes.js'
 import { rebaseProofJustifications } from '../../lib/proofArgumentExtractionEdits.js'
 import AssumptionScopesEditor from './derivation/AssumptionScopesEditor.jsx'
+import { normalizeJustificationForDisplay } from './derivation/derivationUtils.js'
 
 // deep merge. source overwrites. arrays replace.
 function deepMerge(target, source) {
@@ -1190,6 +1191,7 @@ function ProofArgumentExtractionEditorForm({ proof, value, onChange, logicSystem
     ?? []
   const update = (updates) => onChange({ ...value, ...updates })
   const updateLines = (nextLines, nextJustifications, removedIndex) => {
+    const displayedJustifications = nextJustifications.map(normalizeJustificationForDisplay)
     const nextScopes = removedIndex == null ? assumptionScopes : assumptionScopes.flatMap((scope) => {
       if (!Number.isInteger(scope.start) || !Number.isInteger(scope.end)) return [scope]
       if (scope.start === removedIndex) return []
@@ -1202,8 +1204,8 @@ function ProofArgumentExtractionEditorForm({ proof, value, onChange, logicSystem
     update({
       lines: nextLines.map((formula) => displayFormulaInput(formula, logicSystem)),
       justifications: removedIndex == null
-        ? nextJustifications
-        : rebaseProofJustifications(nextJustifications, {
+        ? displayedJustifications
+        : rebaseProofJustifications(displayedJustifications, {
             lineNumber: premises.length + removedIndex + 1,
             operation: 'remove',
             rulesFirst: logicSystem !== 'hurley',
