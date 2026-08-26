@@ -715,9 +715,9 @@ function TruthTableEditorForm({ proof, value, onChange, logicSystem = DEFAULT_LO
           label="Question type"
           onChange={(e) => update({ kind: e.target.value })}
         >
-          <MenuItem value="formula">Single statement</MenuItem>
-          <MenuItem value="equivalence">Equivalence</MenuItem>
-          <MenuItem value="argument">Argument</MenuItem>
+          <MenuItem value="formula">Single sentence</MenuItem>
+          <MenuItem value="argument">Multiple sentences</MenuItem>
+          <MenuItem value="equivalence">Two sentences</MenuItem>
         </Select>
       </FormControl>
 

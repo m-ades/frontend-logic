@@ -27,6 +27,7 @@ import {
   buildTruthTableStatePayload,
   buildTruthTableSubmissionData,
   deriveTruthTableSolutionClassification,
+  getTruthTableClassification,
   isAtomicTruthTableToken,
   normalizeSavedClassification,
   submitTruthTableAnswer,
@@ -70,31 +71,11 @@ export default function TruthTableEditor({
       false
     )
   }, [proof?.options?.question, truthTable?.options?.question])
-  const classificationOptions = React.useMemo(() => {
-    if (!classificationEnabled) { return []; }
-    if (kind === 'formula') {
-      return [
-        { value: 'tautology', label: 'Tautology' },
-        { value: 'contingent', label: 'Contingent' },
-        { value: 'self-contradiction', label: 'Self-contradiction' },
-      ];
-    }
-    if (kind === 'equivalence') {
-      return [
-        { value: 'equivalent', label: 'Logically equivalent' },
-        { value: 'contradictory', label: 'Contradictory' },
-        { value: 'consistent', label: 'Consistent' },
-        { value: 'inconsistent', label: 'Inconsistent' },
-      ];
-    }
-    if (kind === 'argument') {
-      return [
-        { value: 'valid', label: 'Valid' },
-        { value: 'invalid', label: 'Invalid' },
-      ];
-    }
-    return [];
-  }, [classificationEnabled, kind])
+  const classification = React.useMemo(
+    () => getTruthTableClassification(kind),
+    [kind]
+  )
+  const classificationOptions = classificationEnabled ? classification.options : []
   const operatorSet = React.useMemo(() => new Set(Object.keys(syntax.operators)), [syntax])
   const statements = React.useMemo(() => {
     if (Array.isArray(truthTable.statements) && truthTable.statements.length > 0) {
@@ -447,9 +428,9 @@ export default function TruthTableEditor({
           <Box sx={{ width: '100%' }}>
             <FormControl component="fieldset" variant="standard">
               <FormLabel component="legend">
-                {kind === 'argument' ? 'Is this argument valid or invalid?' : 'Select all that apply'}
+                {classification.prompt}
               </FormLabel>
-              {kind === 'argument' || kind === 'formula' ? (
+              {classification.selectionMode === 'single' ? (
                 <RadioGroup
                   value={mcSelection[0] || ''}
                   onChange={(event) => {

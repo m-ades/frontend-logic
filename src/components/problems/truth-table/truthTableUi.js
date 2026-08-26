@@ -31,6 +31,42 @@ export function buildClassificationState(selection = []) {
   }
 }
 
+export function getTruthTableClassification(kind) {
+  if (kind === 'formula') {
+    return {
+      selectionMode: 'single',
+      prompt: 'Use a truth table to classify the following sentence',
+      options: [
+        { value: 'tautology', label: 'A tautology' },
+        { value: 'self-contradiction', label: 'A contradiction' },
+        { value: 'contingent', label: 'Contingent (neither a tautology nor a contradiction)' },
+      ],
+    }
+  }
+  if (kind === 'argument') {
+    return {
+      selectionMode: 'single',
+      prompt: 'Use a truth table to determine whether the following set of sentences is jointly satisfiable or jointly unsatisfiable',
+      options: [
+        { value: 'valid', label: 'Jointly satisfiable' },
+        { value: 'invalid', label: 'Jointly unsatisfiable' },
+      ],
+    }
+  }
+  if (kind === 'equivalence') {
+    return {
+      selectionMode: 'multiple',
+      prompt: 'Use a truth table to determine which relationships hold between the two sentences Select all that apply',
+      options: [
+        { value: 'consistent', label: 'Jointly satisfiable' },
+        { value: 'inconsistent', label: 'Jointly unsatisfiable' },
+        { value: 'equivalent', label: 'Equivalent' },
+      ],
+    }
+  }
+  return { selectionMode: 'multiple', prompt: 'Select all that apply', options: [] }
+}
+
 export function buildTruthTableStatePayload(rows, selection = []) {
   return {
     tables: rows.map((tableRows) => ({ rows: tableRows })),
