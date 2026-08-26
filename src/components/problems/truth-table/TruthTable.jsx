@@ -60,6 +60,7 @@ export default function TruthTable({
   const kind = truthTable.kind
     ?? KIND_BY_PROOF_TYPE[proof?.type]
     ?? (truthTable.lefts && truthTable.right ? 'argument' : null)
+    ?? (truthTable.statements?.length > 1 ? 'equivalence' : null)
     ?? (truthTable.left && truthTable.right ? 'equivalence' : 'formula')
   const tableConfig = React.useMemo(() => {
     const base = { ...truthTable, kind }
@@ -72,11 +73,15 @@ export default function TruthTable({
       }
     }
     if (kind === 'equivalence') {
-      if (base.left === undefined || base.left === '') {
-        base.left = proof?.left ?? proof?.leftFormula ?? proof?.formulaLeft ?? ''
-      }
-      if (base.right === undefined || base.right === '') {
-        base.right = proof?.right ?? proof?.rightFormula ?? proof?.formulaRight ?? proof?.conclusion ?? proof?.conc ?? ''
+      if (!Array.isArray(base.statements) || base.statements.length === 0) {
+        const proofStatements = proof?.statements ?? proof?.formulas
+        if (Array.isArray(proofStatements) && proofStatements.length > 0) {
+          base.statements = proofStatements
+        } else {
+          const left = base.left ?? proof?.left ?? proof?.leftFormula ?? proof?.formulaLeft ?? ''
+          const right = base.right ?? proof?.right ?? proof?.rightFormula ?? proof?.formulaRight ?? proof?.conclusion ?? proof?.conc ?? ''
+          base.statements = [left, right]
+        }
       }
     }
     if (kind === 'argument') {
@@ -114,9 +119,6 @@ export default function TruthTable({
     }
     if (kind === 'argument' && tableConfig.lefts && tableConfig.right) {
       return [...tableConfig.lefts, tableConfig.right]
-    }
-    if (kind === 'equivalence' && tableConfig.left && tableConfig.right) {
-      return [tableConfig.left, tableConfig.right]
     }
     if (tableConfig.statement || tableConfig.formula) {
       return [tableConfig.statement ?? tableConfig.formula]
@@ -289,6 +291,16 @@ export default function TruthTable({
     hasTruthTable &&
     tableChecks.length > 0 &&
     tableChecks.every((res) => res.rowdiff === 0 && res.offcells.length === 0)
+  const solutionMcValues = React.useMemo(
+    () => deriveTruthTableSolutionClassification(kind, proof?.solution, statements, Formula, notation),
+    [Formula, kind, notation, proof?.solution, statements]
+  )
+  const classificationCorrect = !classificationEnabled || (
+    kind === 'equivalence'
+      ? mcSelection.length === solutionMcValues.length &&
+        mcSelection.every((value) => solutionMcValues.includes(value))
+      : mcSelection.length > 0
+  )
 
   if (!hasTruthTable) {
     return (
@@ -315,7 +327,7 @@ export default function TruthTable({
       const result = await submitTruthTableAnswer({
         assignmentQuestionId,
         submissionData: buildTruthTableSubmissionData(kind, tableInputs, mcSelection, classificationEnabled),
-        localIsCorrect: tableCorrect && (!classificationEnabled || mcSelection.length > 0),
+        localIsCorrect: tableCorrect && classificationCorrect,
         attemptLimit,
         classificationEnabled,
         selection: mcSelection,
@@ -397,12 +409,6 @@ export default function TruthTable({
   )
   const showSolution =
     attemptCount >= attemptLimit && status !== 'correct' && displaySolutionTables.length > 0
-
-  // Correct multiple-choice answer for solution reveal (from proof.solution or derived from problem)
-  const solutionMcValues = React.useMemo(
-    () => deriveTruthTableSolutionClassification(kind, proof?.solution, statements, Formula, notation),
-    [Formula, kind, notation, proof?.solution, statements]
-  )
 
   const promptContent = embedded && (proof.description || tableConfig.prompt)
     ? (

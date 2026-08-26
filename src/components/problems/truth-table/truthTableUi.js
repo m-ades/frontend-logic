@@ -7,7 +7,7 @@ Shared truth table helpers for truthtable and truthtableeditor
 import { shouldUseApiValidation, submitApiValidation } from '../../../utils/submissionRuntime.js'
 import {
   argumentTables,
-  equivTables,
+  equivTablesMany,
   formulaTable,
 } from '../../../lib/logicpenguin/symbolic/libsemantics.js'
 import {
@@ -56,7 +56,7 @@ export function getTruthTableClassification(kind) {
   if (kind === 'equivalence') {
     return {
       selectionMode: 'multiple',
-      prompt: 'Use a truth table to determine which relationships hold between the two sentences Select all that apply',
+      prompt: 'Use a truth table to determine which relationships hold among the following sentences Select all that apply',
       options: [
         { value: 'consistent', label: 'Jointly satisfiable' },
         { value: 'inconsistent', label: 'Jointly unsatisfiable' },
@@ -101,8 +101,8 @@ export function buildTruthTableSubmissionData(kind, rows, selection = [], classi
 
   if (kind === 'equivalence') {
     return {
-      lefts: [tableData[0]],
-      right: tableData[1],
+      lefts: tableData.slice(0, -1),
+      right: tableData[tableData.length - 1],
       rowhls: [],
       ...(classificationEnabled
         ? {
@@ -209,24 +209,20 @@ export function deriveTruthTableSolutionClassification(kind, solution, statement
   }
 
   if (kind === 'equivalence') {
-    if (solution?.equiv === true) return ['equivalent']
     if (statements.length < 2) return []
     try {
-      const fa = Formula.from(statements[0])
-      const fb = Formula.from(statements[1])
-      const { equiv, A, B } = equivTables(fa, fb, notation)
-      if (equiv) return ['equivalent']
+      const wffs = statements.map((statement) => Formula.from(statement))
+      const { equiv, tables } = equivTablesMany(wffs, notation)
       const toBool = (value) => value === true || value === 'T'
-      let contra = true
       let consistent = false
-      for (let i = 0; i < A.rows.length; i += 1) {
-        const tvA = toBool(A.rows[i][A.opspot])
-        const tvB = toBool(B.rows[i][B.opspot])
-        if (tvA !== tvB) contra = false
-        if (tvA && tvB) consistent = true
+      for (let rowIndex = 0; rowIndex < tables[0].rows.length; rowIndex += 1) {
+        if (tables.every((table) => toBool(table.rows[rowIndex][table.opspot]))) {
+          consistent = true
+          break
+        }
       }
       const labels = []
-      if (contra) labels.push('contradictory')
+      if (equiv) labels.push('equivalent')
       if (consistent) labels.push('consistent')
       if (!consistent) labels.push('inconsistent')
       return labels

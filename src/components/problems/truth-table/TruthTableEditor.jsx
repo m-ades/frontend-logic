@@ -63,6 +63,7 @@ export default function TruthTableEditor({
   const syntax = React.useMemo(() => getSyntax(notation), [notation])
   const Formula = React.useMemo(() => getFormulaClass(notation), [notation])
   const kind = truthTable.kind
+    ?? (truthTable.statements?.length > 1 ? 'equivalence' : null)
     ?? (truthTable.left && truthTable.right ? 'equivalence' : 'formula')
   const classificationEnabled = React.useMemo(() => {
     return Boolean(
@@ -260,6 +261,16 @@ export default function TruthTableEditor({
     hasTruthTable &&
     tableChecks.length > 0 &&
     tableChecks.every((res) => res.rowdiff === 0 && res.offcells.length === 0)
+  const solutionMcValues = React.useMemo(
+    () => deriveTruthTableSolutionClassification(kind, proof?.solution, statements, Formula, notation),
+    [Formula, kind, notation, proof?.solution, statements]
+  )
+  const classificationCorrect = !classificationEnabled || (
+    kind === 'equivalence'
+      ? mcSelection.length === solutionMcValues.length &&
+        mcSelection.every((value) => solutionMcValues.includes(value))
+      : mcSelection.length > 0
+  )
 
   if (!hasTruthTable) {
     return (
@@ -286,7 +297,7 @@ export default function TruthTableEditor({
       const result = await submitTruthTableAnswer({
         assignmentQuestionId,
         submissionData: buildTruthTableSubmissionData(kind, tableInputs, mcSelection, classificationEnabled),
-        localIsCorrect: tableCorrect && (!classificationEnabled || mcSelection.length > 0),
+        localIsCorrect: tableCorrect && classificationCorrect,
         attemptLimit,
         classificationEnabled,
         selection: mcSelection,
@@ -387,12 +398,6 @@ export default function TruthTableEditor({
   const effectiveAttemptLimit = embedded && parentAttemptLimit != null ? parentAttemptLimit : attemptLimit
   const showSolution =
     effectiveAttemptCount >= effectiveAttemptLimit && effectiveStatus !== 'correct' && displaySolutionTables.length > 0
-
-  // Correct multiple-choice answer for solution reveal (from proof.solution or derived from problem)
-  const solutionMcValues = React.useMemo(
-    () => deriveTruthTableSolutionClassification(kind, proof?.solution, statements, Formula, notation),
-    [Formula, kind, notation, proof?.solution, statements]
-  )
 
   const promptContent = embedded && (proof.description || truthTable.prompt)
     ? (
