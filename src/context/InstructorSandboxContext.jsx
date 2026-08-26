@@ -644,6 +644,62 @@ export function InstructorSandboxProvider({ children }) {
     }))
   }
 
+  const getAssignmentSubmissions = async (assignmentId) => {
+    const courseId = courseState.activeCourseId
+    const assignments = Object.values(courseState.assignmentsByCourse || {}).flat()
+    const practices = Object.values(courseState.practicesByCourse || {}).flat()
+    const assignment = [...assignments, ...practices].find(
+      (item) => String(item.id) === String(assignmentId)
+    )
+    const proofs = assignment?.proofs || []
+    if (!proofs.length) return []
+
+    const students = (courseState.gradebookByCourse?.[courseId] || []).filter(
+      (student) => String(student.role || "student").toLowerCase() !== "ta"
+    )
+
+    const rows = []
+    let nextId = 1
+    for (const student of students) {
+      if (!student.submittedAssignments?.[assignmentId]) continue
+      const attemptCount = Math.min(
+        5,
+        Math.max(1, Number(student.attemptCounts?.[assignmentId]) || 1)
+      )
+      const grade = Number(student.grades?.[assignmentId])
+      const submittedAt = student.submissionDates?.[assignmentId] || new Date().toISOString()
+
+      proofs.forEach((proof, index) => {
+        const questionId = proof.questionId ?? proof.id ?? `${assignmentId}-q-${index + 1}`
+        for (let attempt = 1; attempt <= attemptCount; attempt += 1) {
+          const isFinal = attempt === attemptCount
+          const score = Number.isFinite(grade)
+            ? (isFinal ? Math.round(grade) : Math.max(0, Math.round(grade) - (attemptCount - attempt) * 10))
+            : 0
+          rows.push({
+            id: nextId++,
+            assignment_question_id: questionId,
+            user_id: student.id,
+            attempt,
+            score,
+            is_correct: score >= 100,
+            auto_submitted: false,
+            submitted_at: submittedAt,
+            validated_at: submittedAt,
+            User: { id: student.id, username: student.username },
+            AssignmentQuestion: {
+              id: questionId,
+              order_index: Number.isFinite(Number(proof.orderIndex)) ? Number(proof.orderIndex) : index,
+              points_value: 100,
+            },
+          })
+        }
+      })
+    }
+
+    return rows.sort((a, b) => String(b.submitted_at).localeCompare(String(a.submitted_at)))
+  }
+
   const getActivity = (activityId) => {
     const assignments = Object.values(courseState.assignmentsByCourse || {}).flat()
     const practices = Object.values(courseState.practicesByCourse || {}).flat()
@@ -729,6 +785,7 @@ export function InstructorSandboxProvider({ children }) {
     saveAccommodations,
     getDeadlines,
     saveDeadline,
+    getAssignmentSubmissions,
     getActivity,
     getQuestionState: (questionId) => state.questionStates?.[questionId] || null,
     isQuestionComplete: (questionId) => completedQuestionIds.has(questionId),

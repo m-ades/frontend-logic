@@ -256,6 +256,12 @@ export function createAppRuntime({ coursesDispatch, coursesState, routeKind, use
         }),
       });
     },
+    getAssignmentSubmissions: async (assignmentId) => {
+      const id = Number(assignmentId);
+      if (!Number.isInteger(id) || id <= 0) return [];
+      const rows = await fetchJson(`/api/instructor/assignments/${id}/submissions`);
+      return Array.isArray(rows) ? rows : [];
+    },
     loadInstructorDashboard: async (courseId) => {
       const [analytics, summary] = await Promise.all([
         fetchJson(`/api/analytics/instructor-dashboard?courseId=${courseId}`),
