@@ -274,6 +274,12 @@ export function createAppRuntime({ coursesDispatch, coursesState, routeKind, use
         }),
       });
     },
+    getAssignmentSubmissions: async (assignmentId) => {
+      const id = Number(assignmentId);
+      if (!Number.isInteger(id) || id <= 0) return [];
+      const rows = await fetchJson(`/api/instructor/assignments/${id}/submissions`);
+      return Array.isArray(rows) ? rows : [];
+    },
     /**
      * loads instructor analytics while preserving an explicit empty class average
      */
