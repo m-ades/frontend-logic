@@ -85,31 +85,6 @@ export const getSymbolButtons = (symbols, syntax) => [
   { label: '[  ]', pair: '[]' },
 ]
 
-export const symbolButtonSx = (isFullScreen, isPhone) => {
-  const mobileFullscreen = isPhone && isFullScreen
-  return {
-    minWidth: mobileFullscreen ? 42 : (isFullScreen ? 28 : 34),
-    px: mobileFullscreen ? 1.25 : (isFullScreen ? 0.75 : 1),
-    py: mobileFullscreen ? 0.5 : 0.35,
-    fontSize: mobileFullscreen ? '1.0625rem' : (isFullScreen ? '0.8125rem' : '0.95rem'),
-    lineHeight: 1.1,
-    minHeight: mobileFullscreen ? 44 : 32,
-    fontWeight: 600,
-    textTransform: 'none',
-    boxShadow: 'none',
-    border: 'none',
-    bgcolor: (theme) => theme.palette.mode === 'dark'
-      ? alpha(theme.palette.common.white, 0.08)
-      : theme.palette.grey[100],
-    color: 'text.primary',
-    '&:hover': (theme) => ({
-      boxShadow: 'none',
-      border: 'none',
-      backgroundColor: alpha(theme.palette.primary.main, theme.palette.action.hoverOpacity),
-    }),
-  }
-}
-
 export function applyInsertion(value, selectionStart, selectionEnd, insertText, replaceBefore = 0) {
   const start = selectionStart ?? value.length
   const end = selectionEnd ?? start
