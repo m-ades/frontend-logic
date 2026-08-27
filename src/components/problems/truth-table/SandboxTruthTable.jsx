@@ -17,6 +17,10 @@ import { useProblemChecker } from '../../../hooks/useProblemChecker.js'
 import SolutionReveal from '../SolutionReveal.jsx'
 import PromptText from '../../ui/PromptText.jsx'
 import { rowsEqual, matrixEqual, clearDebounce, scheduleDebouncedChange } from '../../../utils/tablePerf.js'
+import { getNotation } from '../../../lib/logicSystems.js'
+import { formatTruthTableStatements } from './truthTableUi.js'
+import { logicStatementsToTex } from '../../../lib/logicTex.js'
+import MathJaxFormula from '../../ui/MathJaxFormula.jsx'
 
 const DEFAULT_TOGGLE = ['T', 'F']
 
@@ -93,18 +97,12 @@ export default function SandboxTruthTable({
   }, [problem?.answer, problem?.answerIndex, problem?.choicePrompt, problem?.choices, problem?.questions])
   const layout = argument.layout || problem?.layout
   const labels = useMemo(() => getArgumentLabels(argument), [argument])
-  const normalizedToggleValues = useMemo(
-    () => normalizeToggleValues(toggleValues, defaultToggleValues),
-    [toggleValues, defaultToggleValues]
-  )
-
-  // build table columns with separators
-  const sandboxColumns = useMemo(() => {
-    const columns = []
-    const totalPremises = argument.premises?.length || 0
-    const hasConclusion = Boolean(argument.conclusion)
-    const totalStatements = labels.length
-    labels.forEach((statement, idx) => {
+  const notation = getNotation(logicSystem)
+  const isHurley = notation === 'hurley'
+  const statementText = formatTruthTableStatements(labels, notation, Boolean(argument.conclusion))
+  const statementTex = logicStatementsToTex(labels, Boolean(argument.conclusion))
+  const tableSpecs = useMemo(() => {
+    return labels.map((statement) => {
       let tokens = []
       if (tokenizeStatement) {
         tokens = tokenizeStatement(statement) || []
@@ -112,17 +110,20 @@ export default function SandboxTruthTable({
       if (!tokens.length) {
         tokens = statement ? [statement] : []
       }
-      tokens.forEach((token) => columns.push({ token, separator: false }))
-      if (idx < totalStatements - 1) {
-        const isBeforeConclusion = hasConclusion && idx === totalPremises - 1
-        columns.push({ token: isBeforeConclusion ? '//' : '/', separator: true })
+      return {
+        label: statement,
+        tokens,
+        headerTokens: tokens,
       }
     })
-    return columns
-  }, [argument.conclusion, argument.premises, labels, tokenizeStatement])
+  }, [labels, tokenizeStatement])
+  const normalizedToggleValues = useMemo(
+    () => normalizeToggleValues(toggleValues, defaultToggleValues),
+    [toggleValues, defaultToggleValues]
+  )
   const sandboxCellCount = useMemo(
-    () => sandboxColumns.filter((col) => !col.separator).length,
-    [sandboxColumns]
+    () => tableSpecs.reduce((count, table) => count + table.tokens.length, 0),
+    [tableSpecs]
   )
   const defaultRow = useMemo(() => Array(sandboxCellCount).fill(''), [sandboxCellCount])
 
@@ -186,22 +187,6 @@ export default function SandboxTruthTable({
     })
   }
 
-  const tableSpecs = useMemo(() => {
-    return labels.map((statement) => {
-      let tokens = []
-      if (tokenizeStatement) {
-        tokens = tokenizeStatement(statement) || []
-      }
-      if (!tokens.length) {
-        tokens = statement ? [statement] : []
-      }
-      return {
-        label: statement,
-        tokens,
-        headerTokens: tokens,
-      }
-    })
-  }, [labels, tokenizeStatement])
   const tableOffsets = useMemo(() => {
     let offset = 0
     return tableSpecs.map((table) => {
@@ -313,7 +298,7 @@ export default function SandboxTruthTable({
       problemLabel={problemLabel}
       prompt={prompt}
       minHeight="200px"
-      cardMaxWidth="1060px"
+      contentSized
       isInstructorView={isInstructorView && !!proof}
       onEditQuestion={proof ? openEdit : undefined}
       status={status}
@@ -344,7 +329,7 @@ export default function SandboxTruthTable({
     >
             {argument.premises?.length > 0 && (
               <Box sx={{ width: '100%', display: 'flex', alignItems: 'flex-start', gap: 0.5 }}>
-                {isStackedLayout(layout) ? (
+                {isHurley && isStackedLayout(layout) ? (
                   <Stack spacing={0.5} sx={{ fontSize: '1.1rem', fontFamily: 'monospace' }}>
                     {argument.premises.map((premise, idx) => (
                       <Typography key={`premise-${idx}`} sx={{ fontSize: '1.1rem' }}>
@@ -360,15 +345,19 @@ export default function SandboxTruthTable({
                       </>
                     )}
                   </Stack>
-                ) : (
+                ) : isHurley ? (
                   <Typography sx={{ fontSize: '1.1rem', fontFamily: 'monospace' }}>
                     {labels.join(' / ')}
                   </Typography>
+                ) : (
+                  <Box sx={{ fontSize: '1.2rem', lineHeight: 1.6, overflowX: 'auto', overflowY: 'clip' }}>
+                    <MathJaxFormula tex={statementTex} fallback={statementText} display={false} block />
+                  </Box>
                 )}
               </Box>
             )}
 
-            {sandboxColumns.length > 0 && (
+            {sandboxCellCount > 0 && (
               <Box>
                 <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
                   Sandbox (not graded)
@@ -385,7 +374,7 @@ export default function SandboxTruthTable({
                       onToggleColumn={toggleColumn}
                       onToggleRow={toggleRow}
                       onCellChange={handleSandboxChange}
-                      showConclusionMarker={Boolean(argument.conclusion)}
+                      showHurleySeparators={isHurley && Boolean(argument.conclusion)}
                       toggleValues={normalizedToggleValues}
                       shrinkWrap
                     />

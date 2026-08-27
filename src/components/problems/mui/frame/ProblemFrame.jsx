@@ -4,6 +4,8 @@ import PromptText from '../../../ui/PromptText.jsx'
 import EditQuestionButton from './EditQuestionButton.jsx'
 
 // shared shell for migrated problem cards
+// contentsized shrink wraps the card and action region to intrinsic content
+// intrinsic content remains capped at the available parent width
 export const promptTextSx = { flex: 1 }
 export const choiceLabelSx = {
   '& .MuiFormControlLabel-label': { fontSize: '1rem' },
@@ -62,19 +64,23 @@ export default function ProblemFrame({
   editorNode,
   cardMaxWidth,
   cardSx,
+  contentSized = false,
   children,
 }) {
   const resolvedPromptSx = promptSx ? { ...promptTextSx, ...promptSx } : promptTextSx
   const frameSx = {
-    width: '100%',
+    width: contentSized ? 'fit-content' : '100%',
     maxWidth: cardMaxWidth || '100%',
     alignSelf: 'flex-start',
   }
+  const resolvedCardSx = contentSized
+    ? { width: 'fit-content', maxWidth: '100%', alignSelf: 'flex-start', ...cardSx }
+    : cardSx
 
   return (
-    <Stack spacing={3} sx={{ px: 0, width: '100%', alignItems: 'stretch', flexGrow: 1 }}>
+    <Stack spacing={3} sx={{ px: 0, width: '100%', alignItems: contentSized ? 'flex-start' : 'stretch', flexGrow: 1 }}>
       <Box sx={frameSx}>
-        <ProblemCard minHeight={minHeight} cardMaxWidth="100%" cardSx={cardSx}>
+        <ProblemCard minHeight={minHeight} cardMaxWidth="100%" cardSx={resolvedCardSx}>
             <Stack spacing={1.5} sx={{ px: { xs: 2, md: 2 }, pb: { xs: 2, md: 2 }, pt: { xs: 1.125, md: 1.375 }, position: 'relative' }}>
               {problemLabel && (
                 <Box sx={{ color: 'text.secondary', fontSize: '0.875rem', lineHeight: 1.2, pr: 4 }}>

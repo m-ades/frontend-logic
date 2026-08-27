@@ -116,12 +116,19 @@ function FitchRuleEntries({ group }) {
             my: 1,
             px: 1,
             py: 0.75,
-            minHeight: 44,
             overflowX: 'auto',
+            overflowY: 'hidden',
             textAlign: 'center',
             borderRadius: 1,
             bgcolor: (t) => alpha(t.palette.text.primary, 0.035),
-            '& mjx-container': { m: '0 !important' },
+            '& mjx-container': {
+              display: 'block !important',
+              m: '0 !important',
+            },
+            '& mjx-container > svg': {
+              display: 'block',
+              mx: 'auto',
+            },
           }}
         >
           <MathJaxFormula

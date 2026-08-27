@@ -46,10 +46,8 @@ export function TruthValueButton({
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
-        width: '100%',
-        minWidth: '100%',
-        height: '100%',
-        minHeight: '100%',
+        position: 'absolute',
+        inset: 0,
         px: 0.25,
         py: 0.5,
         border: 'none',
@@ -79,7 +77,8 @@ export function TruthValueButton({
   )
 }
 
-export function TruthTableSelectorButton({ selected, onClick, ariaLabel, tooltip }) {
+// row selector uses a visible label and exposes selected state
+export function TruthTableSelectorButton({ selected, onClick, ariaLabel, tooltip, label }) {
   const theme = useTheme()
   const primary = theme.palette.primary.main
   const borderColor = theme.palette.mode === 'dark'
@@ -93,15 +92,19 @@ export function TruthTableSelectorButton({ selected, onClick, ariaLabel, tooltip
     <Tooltip title={tooltip || ''}>
       <ButtonBase
         aria-label={ariaLabel}
+        aria-pressed={selected}
         onClick={onClick}
         sx={{
-          width: 14,
-          height: 14,
-          minWidth: 14,
-          minHeight: 14,
+          width: 28,
+          height: 28,
+          minWidth: 28,
+          minHeight: 28,
           border: `1px solid ${selected ? primary : borderColor}`,
-          borderRadius: 0.5,
+          borderRadius: 1,
           bgcolor: selected ? selectedBg : 'transparent',
+          color: selected ? primary : 'text.secondary',
+          fontSize: '0.75rem',
+          fontWeight: 600,
           boxShadow: 'none',
           transition: 'background-color 0.16s ease, border-color 0.16s ease, transform 0.12s ease',
           '&:hover': {
@@ -113,7 +116,9 @@ export function TruthTableSelectorButton({ selected, onClick, ariaLabel, tooltip
             outlineOffset: 2,
           },
         }}
-      />
+      >
+        {label}
+      </ButtonBase>
     </Tooltip>
   )
 }

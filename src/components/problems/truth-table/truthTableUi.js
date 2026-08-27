@@ -31,42 +31,6 @@ export function buildClassificationState(selection = []) {
   }
 }
 
-export function getTruthTableClassification(kind) {
-  if (kind === 'formula') {
-    return {
-      selectionMode: 'single',
-      prompt: 'Use a truth table to classify the following sentence',
-      options: [
-        { value: 'tautology', label: 'A tautology' },
-        { value: 'self-contradiction', label: 'A contradiction' },
-        { value: 'contingent', label: 'Contingent (neither a tautology nor a contradiction)' },
-      ],
-    }
-  }
-  if (kind === 'argument') {
-    return {
-      selectionMode: 'single',
-      prompt: 'Use a truth table to determine whether the following set of sentences is jointly satisfiable or jointly unsatisfiable',
-      options: [
-        { value: 'valid', label: 'Jointly satisfiable' },
-        { value: 'invalid', label: 'Jointly unsatisfiable' },
-      ],
-    }
-  }
-  if (kind === 'equivalence') {
-    return {
-      selectionMode: 'multiple',
-      prompt: 'Use a truth table to determine which relationships hold among the following sentences Select all that apply',
-      options: [
-        { value: 'consistent', label: 'Jointly satisfiable' },
-        { value: 'inconsistent', label: 'Jointly unsatisfiable' },
-        { value: 'equivalent', label: 'Equivalent' },
-      ],
-    }
-  }
-  return { selectionMode: 'multiple', prompt: 'Select all that apply', options: [] }
-}
-
 export function buildTruthTableStatePayload(rows, selection = []) {
   return {
     tables: rows.map((tableRows) => ({ rows: tableRows })),
@@ -177,6 +141,16 @@ export function isAtomicTruthTableToken(token, operatorSet, syntax) {
   return stripped.length === 1 && !operatorSet.has(stripped)
 }
 
+// formats multiple statements as a single line for display above a truth table
+export function formatTruthTableStatements(statements, notation, isArgument = false) {
+  if (!Array.isArray(statements) || statements.length === 0) return ''
+  const displayed = statements.map((statement) => displayIndexedSymbolsForNotation(statement, notation))
+  if (isArgument && displayed.length > 1) {
+    return `${displayed.slice(0, -1).join(', ')} ∴ ${displayed.at(-1)}`
+  }
+  return displayed.join(', ')
+}
+
 export function deriveTruthTableSolutionClassification(kind, solution, statements, Formula, notation) {
   if (kind === 'formula') {
     if (solution?.taut) return ['tautology']
@@ -222,7 +196,7 @@ export function deriveTruthTableSolutionClassification(kind, solution, statement
         }
       }
       const labels = []
-      if (equiv) labels.push('equivalent')
+      if (equiv && statements.length === 2) labels.push('equivalent')
       if (consistent) labels.push('consistent')
       if (!consistent) labels.push('inconsistent')
       return labels
@@ -408,10 +382,10 @@ export function getDisplayedColumnCount(tables = [], combined) {
 // keep wide tables readable without measuring the dom
 export function getTruthTableDensity(columnCount) {
   if (columnCount >= 11) {
-    return { cell: 56, cellMax: 60, separator: 28, selectorLane: 18 }
+    return { cell: 56, cellMax: 60, separator: 28, selectorLane: 36 }
   }
   if (columnCount >= 8) {
-    return { cell: 64, cellMax: 68, separator: 32, selectorLane: 19 }
+    return { cell: 64, cellMax: 68, separator: 32, selectorLane: 36 }
   }
-  return { cell: 76, cellMax: 80, separator: 36, selectorLane: 20 }
+  return { cell: 76, cellMax: 80, separator: 36, selectorLane: 36 }
 }
