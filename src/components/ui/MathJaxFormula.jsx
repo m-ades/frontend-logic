@@ -1,16 +1,30 @@
 import { useEffect, useRef, useState } from 'react'
 import mathJaxUrl from 'mathjax/es5/tex-svg.js?url'
+import mathJaxSafeUrl from 'mathjax/es5/ui/safe.js?url'
 import './MathJaxFormula.css'
 
 let mathJaxReady
 let typesetQueue = Promise.resolve()
 
+// the mathjax contract is that it may format tex but must not emit author controlled urls
 function loadMathJax() {
   if (window.MathJax?.typesetPromise) return Promise.resolve(window.MathJax)
   if (mathJaxReady) return mathJaxReady
 
   window.MathJax = {
-    options: { enableMenu: false },
+    loader: {
+      load: ['ui/safe'],
+      source: { 'ui/safe': mathJaxSafeUrl },
+    },
+    options: {
+      enableMenu: false,
+      safeOptions: {
+        allow: { URLs: 'none' },
+      },
+    },
+    tex: {
+      autoload: { html: [] },
+    },
     svg: { fontCache: 'local' },
     startup: { typeset: false },
   }
