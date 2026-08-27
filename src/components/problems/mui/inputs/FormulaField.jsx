@@ -1,4 +1,4 @@
-import { forwardRef } from 'react'
+import { forwardRef, useCallback } from 'react'
 import { TextField, useMediaQuery } from '@mui/material'
 import { useTheme } from '@mui/material/styles'
 import MobileLogicInput from '../../../ui/LogicKeyboard/MobileLogicInput.jsx'
@@ -16,6 +16,7 @@ const FormulaField = forwardRef(function FormulaField({
   symbolizationKey,
   includeQuantifiers = true,
   extraInsertButtons,
+  allowTherefore = false,
   predicateLetters,
   constantLetters,
   variableLetters,
@@ -27,6 +28,20 @@ const FormulaField = forwardRef(function FormulaField({
   const isPhone = useMediaQuery(theme.breakpoints.down('sm'))
   const notation = getNotation(logicSystem)
   const syntax = getSyntax(notation)
+  const registerInput = useCallback((input) => {
+    if (input) {
+      input.syntax = syntax
+      input.notation = notation
+      input.symbols = syntax.symbols
+      input.inputfix = FormulaInput.formatForDisplay
+      input.autoChange = FormulaInput.autoChange
+      input.insertHere = FormulaInput.insertHere
+      input.insOp = FormulaInput.insOp
+      input.allowTherefore = allowTherefore
+    }
+    if (typeof ref === 'function') ref(input)
+    else if (ref) ref.current = input
+  }, [allowTherefore, notation, ref, syntax])
 
   if (isPhone) {
     // on phones route back through the existing custom keyboard path
@@ -35,6 +50,7 @@ const FormulaField = forwardRef(function FormulaField({
         value={value}
         onChange={(nextValue) => onValueChange?.(nextValue)}
         disabled={readOnly}
+        inputRef={ref}
         placeholder={placeholder}
         aria-label={ariaLabel || placeholder || 'Formula input'}
         symbolizationKey={symbolizationKey}
@@ -61,21 +77,13 @@ const FormulaField = forwardRef(function FormulaField({
           onEnterKey()
           return
         }
-        const input = event.target
-        input.syntax = syntax
-        input.notation = notation
-        input.symbols = syntax.symbols
-        input.inputfix = FormulaInput.formatForDisplay
-        input.autoChange = FormulaInput.autoChange
-        input.insertHere = FormulaInput.insertHere
-        input.insOp = FormulaInput.insOp
-        FormulaInput.keydown.call(input, event)
-        if (input.value !== value) {
-          onValueChange?.(input.value)
+        FormulaInput.keydown.call(event.target, event)
+        if (event.target.value !== value) {
+          onValueChange?.(event.target.value)
         }
       }}
       placeholder={placeholder}
-      inputRef={ref}
+      inputRef={registerInput}
       InputProps={{ readOnly }}
       inputProps={{
         autoComplete: 'off',

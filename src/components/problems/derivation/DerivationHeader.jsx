@@ -1,18 +1,22 @@
 import { Box, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material'
-import DerivationFormulaText from './DerivationFormulaText.jsx'
+import MathJaxFormula from '../../ui/MathJaxFormula.jsx'
+import { DERIVATION_LINE_FONT_SIZE } from './derivationTableConfig.js'
 
+/**
+ * renders the argument and rule controls above a derivation table
+ * argument contains matching plain text and tex representations
+ */
 export default function DerivationHeader({
   allowedRules,
   argument,
   isFullScreen,
-  onInsert,
   onRuleInputModeChange,
   ruleInputMode,
   usesNestedSubderivations,
 }) {
   return (
     <>
-      {argument && (
+      {argument?.text && (
         <Box sx={{ mb: 2, ...(isFullScreen && { pl: 2 }) }}>
           <Typography
             component="h3"
@@ -21,25 +25,30 @@ export default function DerivationHeader({
           >
             Argument
           </Typography>
-          <Box sx={{ overflowX: 'auto', whiteSpace: 'nowrap' }}>
-            <DerivationFormulaText text={argument} id="argument-target" onInsert={onInsert} />
+          <Box sx={{ overflowX: 'auto', whiteSpace: 'nowrap', fontSize: DERIVATION_LINE_FONT_SIZE, lineHeight: 1.6 }}>
+            <MathJaxFormula
+              tex={argument.tex}
+              fallback={argument.text}
+              display={false}
+              block
+            />
           </Box>
         </Box>
       )}
 
       {(usesNestedSubderivations || allowedRules.length > 0) && (
-        <Box sx={{ mb: 1.5, display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap', ...(isFullScreen && { pl: 2 }) }}>
+        <Box sx={{ mb: 1.5, ...(isFullScreen && { pl: 2 }) }}>
           {usesNestedSubderivations && (
             <Typography
               component="h3"
               variant="overline"
-              sx={{ mr: 0.5, color: 'text.secondary', fontWeight: 700, lineHeight: 1.2 }}
+              sx={{ mb: allowedRules.length > 0 ? 0.5 : 0, color: 'text.secondary', fontWeight: 700, lineHeight: 1.2 }}
             >
               Derivation
             </Typography>
           )}
           {allowedRules.length > 0 && (
-            <>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
               <Typography variant="body2" sx={{ color: 'text.secondary' }}>
                 Rule input:
               </Typography>
@@ -68,7 +77,7 @@ export default function DerivationHeader({
                   SELECT FROM LIST
                 </ToggleButton>
               </ToggleButtonGroup>
-            </>
+            </Box>
           )}
         </Box>
       )}

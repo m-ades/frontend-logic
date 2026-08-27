@@ -174,7 +174,7 @@ export default function DerivationJustificationCell({
             <TextField
               variant="standard"
               placeholder={lineIndex === premisesCount
-                ? (usesNestedSubderivations ? 'rule line(s)' : 'line(s) and rule')
+                ? (usesNestedSubderivations ? 'Rule & line(s)' : 'line(s) and rule')
                 : ''}
               value={line.justification}
               onFocus={onActivate}

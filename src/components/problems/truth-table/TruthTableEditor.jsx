@@ -544,7 +544,6 @@ export default function TruthTableEditor({
             attemptCount={attemptCount}
             attemptLimit={attemptLimit}
             isInstructorView={isInstructorView}
-            navigationPlacement="separate"
             sx={{ mt: 0 }}
           />
         ) : null}

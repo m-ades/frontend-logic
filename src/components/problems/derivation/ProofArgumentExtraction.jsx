@@ -5,7 +5,9 @@ import {
   Stack,
   Tooltip,
   Typography,
+  useMediaQuery,
 } from '@mui/material'
+import { useTheme } from '@mui/material/styles'
 import EditIcon from '@mui/icons-material/Edit'
 import InstructorQuestionEditor from '../InstructorQuestionEditor.jsx'
 import ProofEditor from '../ProofEditor.jsx'
@@ -14,16 +16,22 @@ import PromptText from '../../ui/PromptText.jsx'
 import { ProblemCard } from '../mui/frame/ProblemFrame.jsx'
 import ProblemSetButtons from '../mui/frame/ProblemSetButtons.jsx'
 import FormulaField from '../mui/inputs/FormulaField.jsx'
-import SymbolToolbar from '../mui/inputs/SymbolToolbar.jsx'
+import SymbolButtonRow from '../../ui/logicpenguin/SymbolButtonRow.jsx'
 import { useProblemChecker } from '../../../hooks/useProblemChecker.js'
 import { getNotation } from '../../../lib/logicSystems.js'
 import getFormulaClass from '../../../lib/logicpenguin/symbolic/formula.js'
+import { parseExtractionArgument } from '../../../lib/proofArgumentExtractionArgument.js'
 import {
   getAssumptionDepths,
   getAssumptionRuleRequirements,
   parseAssumptionScopes,
 } from '../../../lib/proofArgumentExtractionScopes.js'
 import { extractLines } from './derivationUtils.js'
+import { getFormulaKeyboardConfig } from '../mui/translation/symbolizationKeyboard.js'
+
+const ARGUMENT_SEPARATOR_BUTTONS = [
+  { insert: ' ∴ ', label: '∴' },
+]
 
 function getQuestionLines(snapshot, logicSystem) {
   const formulas = Array.isArray(snapshot?.lines) ? snapshot.lines : []
@@ -57,13 +65,11 @@ function hasEveryCitation(derivationState, premises, fixedLines) {
 }
 
 function hasArgumentShape(value, premiseCount, Formula) {
-  if (typeof value !== 'string') return false
-  const pieces = value.split('//')
-  if (pieces.length !== 2 || !pieces[1].trim()) return false
-  const premises = pieces[0].split('/').map((part) => part.trim()).filter(Boolean)
-  if (premises.length !== premiseCount) return false
+  const parsed = parseExtractionArgument(value)
+  if (!parsed || parsed.premises.length !== premiseCount) return false
   try {
-    return [...premises, pieces[1].trim()].every((formula) => Formula.from(formula).wellformed)
+    return [...parsed.premises, parsed.conclusion]
+      .every((formula) => Formula.from(formula).wellformed)
   } catch {
     return false
   }
@@ -94,6 +100,8 @@ export default function ProofArgumentExtraction({
   problemLabel,
   logicSystem,
 }) {
+  const theme = useTheme()
+  const isPhone = useMediaQuery(theme.breakpoints.down('sm'))
   const editorRef = useRef(null)
   const argumentInputRef = useRef(null)
   const [resetVersion, setResetVersion] = useState(0)
@@ -113,6 +121,12 @@ export default function ProofArgumentExtraction({
   const prompt = snapshot?.prompt || proof?.description || ''
   const notation = getNotation(logicSystem)
   const Formula = useMemo(() => getFormulaClass(notation), [notation])
+  const argumentKeyboardConfig = useMemo(() => (
+    getFormulaKeyboardConfig(
+      [...premises, ...fixedLines.map((line) => line.formula)],
+      notation === 'calgary'
+    ) ?? { isPredicateMode: false, symbolizationKey: [] }
+  ), [fixedLines, notation, premises])
   const [argumentLine, setArgumentLine] = useState(savedState?.argumentLine ?? '')
   const [derivationState, setDerivationState] = useState(() => getSavedDerivationState(savedState))
 
@@ -231,17 +245,33 @@ export default function ProofArgumentExtraction({
               value={argumentLine}
               onValueChange={handleArgumentChange}
               aria-label="Corresponding argument"
-              placeholder="Use / between premises and // before the conclusion"
-              extraInsertButtons={[{ insert: '/' }, { insert: '//' }]}
+              placeholder="e.g. P, Q ∴ R"
+              symbolizationKey={argumentKeyboardConfig.symbolizationKey}
+              includeQuantifiers={argumentKeyboardConfig.isPredicateMode}
+              extraInsertButtons={ARGUMENT_SEPARATOR_BUTTONS}
+              predicateLetters={argumentKeyboardConfig.isPredicateMode
+                ? argumentKeyboardConfig.predicateLetters
+                : undefined}
+              constantLetters={argumentKeyboardConfig.isPredicateMode
+                ? argumentKeyboardConfig.constantLetters
+                : undefined}
+              variableLetters={argumentKeyboardConfig.isPredicateMode
+                ? argumentKeyboardConfig.variableLetters
+                : undefined}
+              allowTherefore
               logicSystem={logicSystem}
             />
-            <Box sx={{ mt: 0.75 }}>
-              <SymbolToolbar
-                inputRef={argumentInputRef}
-                onValueChange={handleArgumentChange}
-                logicSystem={logicSystem}
-              />
-            </Box>
+            {!isPhone && (
+              <Box sx={{ mt: 0.75 }}>
+                <SymbolButtonRow
+                  inputRef={argumentInputRef}
+                  onValueChange={handleArgumentChange}
+                  includeQuantifiers={argumentKeyboardConfig.isPredicateMode}
+                  extraInsertButtons={ARGUMENT_SEPARATOR_BUTTONS}
+                  logicSystem={logicSystem}
+                />
+              </Box>
+            )}
           </Box>
         </Stack>
       </ProblemCard>

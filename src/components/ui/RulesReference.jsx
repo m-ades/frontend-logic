@@ -13,7 +13,7 @@ import {
 import { FITCH_RULE_EXAMPLES } from '../../lib/fitchRuleExamples.js'
 import MathJaxFormula from './MathJaxFormula.jsx'
 
-function RulesCard({ title, children, defaultExpanded = false }) {
+function RulesCard({ title, children, defaultExpanded = true }) {
   const [expanded, setExpanded] = useState(defaultExpanded)
   const accordionId = useId()
   const triggerId = `${accordionId}-trigger`
@@ -335,17 +335,11 @@ export default function RulesReference({ logicSystem }) {
         p: 1.5,
       }}
     >
-      <RulesCard title="Keyboard Shortcuts" defaultExpanded={true}>
+      <RulesCard title="Keyboard Shortcuts">
         <ShortcutTable rows={shortcutRows} />
-        <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 0.5, color: 'primary.main', fontSize: '1rem' }}>
-          Navigation
-        </Typography>
-        <Box component="div" sx={{ fontSize: '1rem' }}>
-          <div><strong>•</strong> Press <strong>Enter</strong> or the <strong>greater-than key</strong> to go to the rule justification line</div>
-        </Box>
       </RulesCard>
       
-      <RulesCard title={isFitch ? 'Natural Deduction Rules for TFL' : 'Rules of Inference'} defaultExpanded={false}>
+      <RulesCard title={isFitch ? 'Natural Deduction Rules for TFL' : 'Rules of Inference'}>
         {isFitch ? (
           <>
             <Box sx={{ mb: 2, p: 1, borderRadius: 1, bgcolor: (t) => alpha(t.palette.primary.main, 0.06) }}>
@@ -408,7 +402,7 @@ export default function RulesReference({ logicSystem }) {
         )}
       </RulesCard>
       
-      <RulesCard title={isFitch ? 'Natural Deduction Rules for FOL' : 'Predicate Logic Rules'} defaultExpanded={false}>
+      <RulesCard title={isFitch ? 'Natural Deduction Rules for FOL' : 'Predicate Logic Rules'}>
         {!isFitch && (
           <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 0.5, color: 'primary.main', fontSize: '1rem' }}>
             Predicate Logic Rules
@@ -438,7 +432,7 @@ export default function RulesReference({ logicSystem }) {
       </RulesCard>
 
       {!isFitch && (
-        <RulesCard title="Conditional & Indirect Proofs" defaultExpanded={false}>
+        <RulesCard title="Conditional & Indirect Proofs">
           <Box component="div" sx={{ fontSize: '1rem' }}>
             <div><strong>ACP:</strong> Assumption for Conditional Proof</div>
             <div><strong>CP:</strong> To prove p ⊃ q, assume p (ACP) in an indented subderivation, derive q, then discharge with CP citing the subderivation range</div>

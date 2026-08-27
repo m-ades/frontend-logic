@@ -5,6 +5,7 @@ import {
     getJustificationRule,
     parseAssumptionScopes,
 } from '../../proofArgumentExtractionScopes.js';
+import { parseExtractionArgument } from '../../proofArgumentExtractionArgument.js';
 
 function flattenProofLines(parts = []) {
     const lines = [];
@@ -48,19 +49,6 @@ function getQuestionLines(question) {
     }));
 }
 
-function parseArgumentLine(value) {
-    if (typeof value !== 'string') return null;
-    const pieces = value.split('//');
-    if (pieces.length !== 2) return null;
-    const premises = pieces[0]
-        .split('/')
-        .map((formula) => formula.trim())
-        .filter(Boolean);
-    const conclusion = pieces[1].trim();
-    if (!conclusion) return null;
-    return { premises, conclusion };
-}
-
 function formulasMatch(expected, submitted, Formula) {
     try {
         const expectedFormula = Formula.from(String(expected ?? ''));
@@ -74,7 +62,7 @@ function formulasMatch(expected, submitted, Formula) {
 }
 
 function argumentMatches(argumentLine, premises, conclusion, Formula) {
-    const submitted = parseArgumentLine(argumentLine);
+    const submitted = parseExtractionArgument(argumentLine);
     if (!submitted || submitted.premises.length !== premises.length) return false;
     if (!formulasMatch(conclusion, submitted.conclusion, Formula)) return false;
     return premises.every((premise, index) => (

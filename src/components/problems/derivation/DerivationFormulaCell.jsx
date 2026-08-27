@@ -125,7 +125,7 @@ export default function DerivationFormulaCell({
           onFocus={onActivate}
           disabled={formulaReadOnly}
           onBlur={() => onCommit(line.formula ?? '')}
-          placeholder=""
+          placeholder="Statement"
           aria-label={`Formula line ${lineIndex + 1}`}
           inputRef={registerInput}
           onCursorChange={onMobileCursorChange}
@@ -140,7 +140,7 @@ export default function DerivationFormulaCell({
       ) : (
         <TextField
           variant="standard"
-          placeholder=""
+          placeholder="Statement"
           value={line.formula}
           onChange={onChange}
           onKeyDown={onKeyDown}

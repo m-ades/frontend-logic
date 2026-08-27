@@ -520,7 +520,6 @@ export default function TruthTable({
             align="flex-start"
             attemptCount={attemptCount}
             attemptLimit={attemptLimit}
-            navigationPlacement="separate"
             sx={{ mt: 0 }}
           />
         ) : null}
