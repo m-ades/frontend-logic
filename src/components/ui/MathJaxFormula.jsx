@@ -8,10 +8,11 @@ let typesetQueue = Promise.resolve()
 
 // the mathjax contract is that it may format tex but must not emit author controlled urls
 function loadMathJax() {
-  if (window.MathJax?.typesetPromise) return Promise.resolve(window.MathJax)
+  if (window.MathJax?.__lpSafeConfigured) return Promise.resolve(window.MathJax)
   if (mathJaxReady) return mathJaxReady
 
   window.MathJax = {
+    __lpSafeConfigured: true,
     loader: {
       load: ['ui/safe'],
       source: { 'ui/safe': mathJaxSafeUrl },
@@ -29,6 +30,12 @@ function loadMathJax() {
     startup: { typeset: false },
   }
   mathJaxReady = new Promise((resolve, reject) => {
+    const preload = document.createElement('link')
+    preload.rel = 'preload'
+    preload.as = 'script'
+    preload.href = mathJaxSafeUrl
+    document.head.appendChild(preload)
+
     const script = document.createElement('script')
     script.src = mathJaxUrl
     script.async = true
@@ -45,7 +52,7 @@ function loadMathJax() {
 // block formulas use intrinsic svg height without baseline overflow
 export default function MathJaxFormula({ tex, fallback, display = true, block = display }) {
   const containerRef = useRef(null)
-  const [ready, setReady] = useState(Boolean(window.MathJax?.typesetPromise))
+  const [ready, setReady] = useState(Boolean(window.MathJax?.__lpSafeConfigured))
 
   useEffect(() => {
     let cancelled = false
