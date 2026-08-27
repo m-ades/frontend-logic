@@ -47,6 +47,10 @@ import {
 import { rebaseProofJustifications } from '../../lib/proofArgumentExtractionEdits.js'
 import AssumptionScopesEditor from './derivation/AssumptionScopesEditor.jsx'
 import { normalizeJustificationForDisplay } from './derivation/derivationUtils.js'
+import {
+  mapTranslationAnswer,
+  parseTranslationAnswer,
+} from '../../lib/logicpenguin/translation-answer.js'
 
 // deep merge. source overwrites. arrays replace.
 function deepMerge(target, source) {
@@ -79,6 +83,22 @@ function displayFormulaInput(value, logicSystem = DEFAULT_LOGIC_SYSTEM) {
   ).trim()
 }
 
+function normalizeTranslationAnswerInput(value, logicSystem = DEFAULT_LOGIC_SYSTEM) {
+  return mapTranslationAnswer(
+    value,
+    getNotation(logicSystem),
+    (statement) => normalizeFormulaInput(statement, logicSystem)
+  )
+}
+
+function displayTranslationAnswerInput(value, logicSystem = DEFAULT_LOGIC_SYSTEM) {
+  return mapTranslationAnswer(
+    value,
+    getNotation(logicSystem),
+    (statement) => displayFormulaInput(statement, logicSystem)
+  )
+}
+
 function normalizeFormulaInputs(values, logicSystem = DEFAULT_LOGIC_SYSTEM) {
   return (Array.isArray(values) ? values : (values ? [values] : [])).map((value) => normalizeFormulaInput(value, logicSystem))
 }
@@ -106,6 +126,17 @@ function validateFormulaInputs(values, logicSystem, label) {
     if (error) return error
   }
   return ''
+}
+
+function validateTranslationAnswerInput(value, logicSystem) {
+  const text = String(value ?? '').trim()
+  if (!text) return ''
+  const parsed = parseTranslationAnswer(text, getNotation(logicSystem))
+  if (!parsed.complete) return 'Correct answer contains an empty statement'
+  const statements = parsed.hasConclusion
+    ? [...parsed.statements, parsed.conclusion]
+    : parsed.statements
+  return validateFormulaInputs(statements, logicSystem, 'Correct answer statement')
 }
 
 function validateArgumentInput(argument, logicSystem, label = 'Argument') {
@@ -155,7 +186,7 @@ function validateQuestionSnapshotFormulas(snapshot, logicSystem = DEFAULT_LOGIC_
     return validateFormulaInput(snapshot.statement ?? snapshot.prompt, logicSystem, 'Statement')
   }
   if (type === 'symbolic-translation') {
-    return validateFormulaInput(snapshot.answer, logicSystem, 'Correct answer')
+    return validateTranslationAnswerInput(snapshot.answer, logicSystem)
   }
   if (type === 'single-row-truth-table' || type === 'partial-truth-table') {
     return validateFormulaInput(snapshot.statement ?? snapshot.formula, logicSystem, 'Statement')
@@ -1320,7 +1351,7 @@ function buildSymbolicTranslationSnapshot(proof, edited, existing, logicSystem =
   const prompt = edited.prompt ?? tr.prompt ?? proof.description ?? ''
   const rawKey = Array.isArray(edited.symbolizationKey) ? edited.symbolizationKey : (tr.symbolizationKey || [])
   const symbolizationKey = rawKey.filter((x) => x != null && String(x).trim() !== '')
-  const answer = normalizeFormulaInput(edited.answer ?? proof.answer ?? tr.answer ?? '', logicSystem)
+  const answer = normalizeTranslationAnswerInput(edited.answer ?? proof.answer ?? tr.answer ?? '', logicSystem)
   const patch = { [typeKey(e)]: 'symbolic-translation', prompt, symbolizationKey, answer }
   if (e.legend !== undefined) patch.legend = edited.legend ?? tr.legend ?? proof.legend ?? ''
   return patch
@@ -1432,7 +1463,7 @@ function SymbolicTranslationEditorForm({ proof, value, onChange, logicSystem = D
         ))}
         <Button size="small" startIcon={<AddIcon />} onClick={() => onChange({ ...value, symbolizationKey: [...keyList, ''] })}>Add line</Button>
       </Box>
-      <TextField label="Correct answer" value={answer} onChange={(e) => onChange({ ...value, answer: displayFormulaInput(e.target.value, logicSystem) })} fullWidth variant="outlined" placeholder={`e.g. P ${symbols.and} Q`} />
+      <TextField label="Correct answer" value={answer} onChange={(e) => onChange({ ...value, answer: displayTranslationAnswerInput(e.target.value, logicSystem) })} fullWidth variant="outlined" placeholder={getNotation(logicSystem) === 'calgary' ? 'e.g. P, Q ∴ R' : `e.g. P / Q // ${symbols.not}R`} />
     </Stack>
   )
 }

@@ -23,6 +23,11 @@ import {
 } from './symbolizationKeyboard.js'
 import { getNotation, getSymbols } from '../../../../lib/logicSystems.js'
 import { displayIndexedSymbolsForNotation } from '../../../../lib/indexedSymbols.js'
+import {
+  isCompleteTranslationAnswer,
+  mapTranslationAnswer,
+  parseTranslationAnswer,
+} from '../../../../lib/logicpenguin/translation-answer.js'
 
 function FormulaInputField({ value, onValueChange, onBlur, fieldReadOnly, formulaInputRef, onEnterKey, ariaLabel, notation }) {
   const theme = useTheme()
@@ -32,7 +37,8 @@ function FormulaInputField({ value, onValueChange, onBlur, fieldReadOnly, formul
   useEffect(() => {
     if (!containerRef.current) return
     if (!formulaInputRef.current) {
-      const formulaInput = FormulaInput.getnew({ notation })
+      // enables the fitch therefore shortcut for translation answer lines
+      const formulaInput = FormulaInput.getnew({ notation, allowTherefore: true })
       formulaInputRef.current = formulaInput
       formulaInput.style.width = '100%'
       formulaInput.style.padding = theme.spacing(1.5)
@@ -150,18 +156,32 @@ export default function SymbolicTranslation({
   const editorRef = useRef(null)
   const notation = getNotation(logicSystem)
   const symbols = getSymbols(logicSystem)
-  const normalizeFormula = useCallback(
-    (value) => canonicalizeFormula(value, notation),
+  const normalizeAnswer = useCallback(
+    (value) => mapTranslationAnswer(
+      value,
+      notation,
+      (statement) => canonicalizeFormula(statement, notation)
+    ),
     [notation]
   )
-  const displayFormula = useCallback(
-    (value) => displayIndexedSymbolsForNotation(normalizeFormula(value), notation),
-    [normalizeFormula, notation]
+  const displayAnswer = useCallback(
+    (value) => mapTranslationAnswer(
+      normalizeAnswer(value),
+      notation,
+      (statement) => displayIndexedSymbolsForNotation(statement, notation)
+    ),
+    [normalizeAnswer, notation]
   )
+  const expectedAnswer = parseTranslationAnswer(answer, notation)
+  const hasMultipleStatements = expectedAnswer.statements.length > 1
+  const hasConclusion = expectedAnswer.hasConclusion
+  const separatorButtons = notation === 'calgary'
+    ? [{ insert: ' ∴ ', label: '∴' }]
+    : [{ insert: '/' }, { insert: '//' }]
   const allowIndexedSymbols = notation === 'calgary'
   const openEdit = () => editorRef.current?.open?.()
   const [inputValue, setInputValue] = useState(
-    () => displayFormula(savedState?.ans || '')
+    () => displayAnswer(savedState?.ans || '')
   )
   const formulaInputRef = useRef(null)
   const solutionInputRef = useRef(null)
@@ -197,7 +217,7 @@ export default function SymbolicTranslation({
 
   const scheduleStateSave = useCallback((nextValue) => {
     if (!onStateChange) return
-    const canonical = normalizeFormula(nextValue)
+    const canonical = normalizeAnswer(nextValue)
     if (saveTimerRef.current) {
       clearTimeout(saveTimerRef.current)
     }
@@ -206,21 +226,21 @@ export default function SymbolicTranslation({
       lastSavedValueRef.current = canonical
       onStateChange({ ans: canonical })
     }, 200)
-  }, [normalizeFormula, onStateChange])
+  }, [normalizeAnswer, onStateChange])
   const applyCanonicalValue = useCallback((value) => {
     if (readOnly) return
-    const displayed = displayFormula(value)
+    const displayed = displayAnswer(value)
     setInputValue(displayed)
     scheduleStateSave(displayed)
-  }, [displayFormula, readOnly, scheduleStateSave])
+  }, [displayAnswer, readOnly, scheduleStateSave])
   
   const { status, message, isChecking, handleCheck, handleStartOver, setMessage, attemptCount, maxAttempts, isLocked } = useProblemChecker({
     answer,
     problemType: 'symbolic-translation',
     question: problem,
-    getAnswer: () => normalizeFormula(inputValue),
+    getAnswer: () => normalizeAnswer(inputValue),
     onComplete,
-    isDisabled: () => !inputValue.trim(),
+    isDisabled: () => !isCompleteTranslationAnswer(inputValue, notation),
     resetInput: () => {
       setInputValue('')
       if (formulaInputRef.current) {
@@ -230,8 +250,8 @@ export default function SymbolicTranslation({
     },
     onStateChange: (state) => {
       if (state?.ans !== undefined) {
-        setInputValue(displayFormula(state.ans))
-        lastSavedValueRef.current = normalizeFormula(state.ans)
+        setInputValue(displayAnswer(state.ans))
+        lastSavedValueRef.current = normalizeAnswer(state.ans)
       }
       onStateChange?.(state)
     },
@@ -245,11 +265,11 @@ export default function SymbolicTranslation({
     if (hasHydratedRef.current) return
     if (savedState?.ans !== undefined) {
       hasHydratedRef.current = true
-      const canonical = normalizeFormula(savedState.ans)
-      setInputValue(displayFormula(canonical))
+      const canonical = normalizeAnswer(savedState.ans)
+      setInputValue(displayAnswer(canonical))
       lastSavedValueRef.current = canonical
     }
-  }, [displayFormula, normalizeFormula, savedState?.ans])
+  }, [displayAnswer, normalizeAnswer, savedState?.ans])
 
   useEffect(() => () => {
     if (saveTimerRef.current) {
@@ -322,7 +342,15 @@ export default function SymbolicTranslation({
                   }}
                   onBlur={() => applyCanonicalValue(inputValue)}
                   disabled={readOnly}
-                  placeholder={`e.g. P ${symbols.and} Q`}
+                  placeholder={hasMultipleStatements
+                    ? (hasConclusion
+                        ? (notation === 'calgary'
+                            ? 'e.g. P, Q ∴ R'
+                            : 'e.g. P / Q // R')
+                        : (notation === 'calgary'
+                            ? `e.g. P ${symbols.and} Q, ${symbols.not}R`
+                            : `e.g. P ${symbols.and} Q / ${symbols.not}R`))
+                    : `e.g. P ${symbols.and} Q`}
                   aria-label="Formula translation"
                   symbolizationKey={symbolizationKey}
                   includeQuantifiers={isPredicate}
@@ -331,6 +359,7 @@ export default function SymbolicTranslation({
                   constantLetters={isPredicate ? constantLetters : undefined}
                   variableLetters={isPredicate ? variableLetters : undefined}
                   logicSystem={logicSystem}
+                  extraInsertButtons={separatorButtons}
                 />
               ) : (
                 <>
@@ -359,6 +388,7 @@ export default function SymbolicTranslation({
                         scheduleStateSave(value)
                       }}
                       logicSystem={logicSystem}
+                      extraInsertButtons={separatorButtons}
                     />
                   </Box>
                 </>
@@ -368,7 +398,7 @@ export default function SymbolicTranslation({
               /* show answer in card */
               <SolutionReveal show={showSolution}>
                 <FormulaInputField
-                  value={displayFormula(answer ?? '')}
+                  value={displayAnswer(answer ?? '')}
                   onValueChange={null}
                   fieldReadOnly
                   formulaInputRef={solutionInputRef}
@@ -394,7 +424,7 @@ export default function SymbolicTranslation({
           onCheck={handleCheck}
           onStartOver={handleStartOver}
           isChecking={isChecking}
-          isDisabled={!inputValue.trim() || isLocked || isAssignmentLocked}
+          isDisabled={!isCompleteTranslationAnswer(inputValue, notation) || isLocked || isAssignmentLocked}
           align="flex-start"
           attemptCount={attemptCount}
           attemptLimit={maxAttempts}
