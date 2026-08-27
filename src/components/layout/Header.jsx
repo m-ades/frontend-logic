@@ -122,6 +122,7 @@ export default function Header({ onSignOut }) {
         </Box>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <Button
+            id="rules-reference-trigger"
             onClick={() => {
               if (isRulesReferenceOpen) {
                 closeRulesReference(layoutDispatch);
@@ -130,7 +131,8 @@ export default function Header({ onSignOut }) {
               openRulesReference(layoutDispatch);
             }}
             startIcon={<MenuBookIcon />}
-            aria-pressed={isRulesReferenceOpen}
+            aria-expanded={isRulesReferenceOpen}
+            aria-controls="rules-reference"
             sx={{ 
               textTransform: 'none',
               color: 'primary.main',

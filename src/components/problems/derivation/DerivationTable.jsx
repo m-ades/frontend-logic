@@ -227,11 +227,11 @@ export default function DerivationTable({
     const premises = Array.isArray(proof?.premises) ? proof.premises : []
     const conclusion = proof?.conclusion ?? proof?.conc ?? ''
     const formulaText = [...premises, conclusion].filter(Boolean).map(String).join(' ')
-    const extraQuantifierButtons = getQuantifierButtonsFromFormulas(
-      premises,
-      conclusion,
-      syntax
-    )
+    const extraSymbolButtons = [
+      { label: symbols.falsum, insert: symbols.falsum },
+      ...(allowIndexedSymbols ? [{ label: 'x₂', insert: '_' }] : []),
+      ...getQuantifierButtonsFromFormulas(premises, conclusion, syntax),
+    ]
 
     const isPredicate = isPredicateLogicKey(key, allowIndexedSymbols) || /[∀∃]/.test(formulaText) || /[A-Z][a-z]/.test(formulaText) || /[A-Z](?:_[1-9][0-9]*|[₁-₉][₀-₉]*)?\s*\(/.test(formulaText)
 
@@ -257,7 +257,7 @@ export default function DerivationTable({
         predicateLetters,
         constantLetters,
         variableLetters,
-        extraQuantifierButtons,
+        extraSymbolButtons,
       }
     }
 
@@ -270,19 +270,19 @@ export default function DerivationTable({
     return {
       isPredicateMode: false,
       symbolizationKey: predicateLetters,
-      extraQuantifierButtons,
+      extraSymbolButtons,
     }
-  }, [allowIndexedSymbols, proof, syntax])
+  }, [allowIndexedSymbols, proof, symbols.falsum, syntax])
   const symbolButtons = useMemo(() => {
     const baseSymbolButtons = getSymbolButtons(symbols, syntax)
-    const extraQuantifierButtons = derivationKeyboardConfig.extraQuantifierButtons || []
-    if (extraQuantifierButtons.length === 0) return baseSymbolButtons
+    const extraSymbolButtons = derivationKeyboardConfig.extraSymbolButtons || []
+    if (extraSymbolButtons.length === 0) return baseSymbolButtons
     return [
       ...baseSymbolButtons.slice(0, 7),
-      ...extraQuantifierButtons,
+      ...extraSymbolButtons,
       ...baseSymbolButtons.slice(7),
     ]
-  }, [derivationKeyboardConfig.extraQuantifierButtons, symbols, syntax])
+  }, [derivationKeyboardConfig.extraSymbolButtons, symbols, syntax])
   const isLineCompleteForCheck = useCallback((line) => {
     if (!line) return false
     const formulaFilled = (line.formula || '').trim().length > 0
