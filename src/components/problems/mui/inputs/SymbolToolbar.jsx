@@ -1,6 +1,7 @@
 import { Button, Stack, useMediaQuery } from '@mui/material'
 import { alpha, useTheme } from '@mui/material/styles'
 import getSyntax from '../../../../lib/logicpenguin/symbolic/libsyntax.js'
+import { getNotation } from '../../../../lib/logicSystems.js'
 
 const FALLBACK_SYMBOLS = {
   NOT: '~',
@@ -89,10 +90,11 @@ export default function SymbolToolbar({
   onValueChange,
   disabled = false,
   includeQuantifiers = true,
+  logicSystem,
 }) {
   const theme = useTheme()
   const isPhone = useMediaQuery(theme.breakpoints.down('sm'))
-  const syntax = getSyntax()
+  const syntax = getSyntax(getNotation(logicSystem))
   const symbols = syntax?.symbols || {}
   const visibleButtons = includeQuantifiers
     ? BUTTONS

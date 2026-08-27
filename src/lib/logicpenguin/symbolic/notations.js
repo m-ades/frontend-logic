@@ -3,10 +3,26 @@
 // https://www.gnu.org/licenses/.
 
 ////////////////// notations.js ///////////////////////////
-// This app uses a single notation: Hurley.           //
+// This app supports the course notation selected by logic_system. //
 ///////////////////////////////////////////////////////////
 
 const notations = {
+    calgary: {
+        OR      : '∨',
+        AND     : '∧',
+        IFTHEN  : '→',
+        IFF     : '↔',
+        NOT     : '¬',
+        FORALL  : '∀',
+        EXISTS  : '∃',
+        FALSUM  : '⊥',
+        constantsRange: 'a-r',
+        predicatesRange: '=≠A-Z',
+        quantifierForm: 'Qx',
+        schematicLetters: '𝒜𝒜𝓍𝒸𝒸',
+        useTermParensCommas: true,
+        variableRange: 'x-zs-w'
+    },
     hurley: {
         OR      : '∨',
         AND     : '•',

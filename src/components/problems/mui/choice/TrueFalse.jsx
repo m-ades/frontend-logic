@@ -21,6 +21,7 @@ export default function TrueFalse({
   isInstructorView = false,
   onQuestionSaved,
   problemLabel,
+  logicSystem,
 }) {
   const editorRef = useRef(null)
   const openEdit = () => editorRef.current?.open?.()
@@ -88,7 +89,7 @@ export default function TrueFalse({
         />
       ) : null}
       editorNode={isInstructorView && proof ? (
-        <InstructorQuestionEditor ref={editorRef} proof={proof} isInstructorView onSaved={onQuestionSaved} trigger="none" />
+        <InstructorQuestionEditor ref={editorRef} proof={proof} isInstructorView onSaved={onQuestionSaved} trigger="none" logicSystem={logicSystem} />
       ) : null}
     >
       <FormControl component="fieldset" sx={{ width: '100%' }}>

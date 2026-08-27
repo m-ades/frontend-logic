@@ -18,6 +18,7 @@ export default function ShellFrame({
   onCloseAccountSettings,
   textSize = "default",
   onTextSizeChange,
+  logicSystem,
 }) {
   const { isRulesReferenceOpen } = useLayoutState();
   const mainContentRef = useRef(null);
@@ -114,7 +115,7 @@ export default function ShellFrame({
           onTextSizeChange={onTextSizeChange}
         />
       )}
-      <RulesReference />
+      <RulesReference logicSystem={logicSystem} />
     </Box>
   );
 }

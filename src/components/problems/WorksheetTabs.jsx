@@ -39,6 +39,7 @@ export default function WorksheetTabs({
   isInstructorView = false,
   onQuestionSaved,
   onQuestionCreated,
+  logicSystem,
 }) {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
@@ -71,6 +72,7 @@ export default function WorksheetTabs({
             onQuestionSaved={onQuestionSaved}
             onQuestionCreated={onQuestionCreated}
             assignmentId={worksheet.id}
+            logicSystem={logicSystem}
           />
         </WorksheetTabPanel>
       ))}

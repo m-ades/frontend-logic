@@ -6,6 +6,7 @@ import {
   getInstructorSandboxAssignments,
   getInstructorSandboxPractices,
 } from '../sandbox/instructorSandboxData.js'
+import { DEFAULT_LOGIC_SYSTEM, normalizeLogicSystem } from '../lib/logicSystems.js'
 
 const STORAGE_KEY = 'logicapp_instructor_sandbox_state_v1'
 const InstructorSandboxContext = createContext(null)
@@ -13,6 +14,16 @@ const InstructorSandboxContext = createContext(null)
 const isPlainObject = (value) => (
   value != null && typeof value === 'object' && !Array.isArray(value)
 )
+
+const logicSystemFields = (logicSystem) => {
+  const normalized = normalizeLogicSystem(logicSystem, DEFAULT_LOGIC_SYSTEM)
+  return { logicSystem: normalized, logic_system: normalized }
+}
+
+const optionalLogicSystemFields = (value) => {
+  const raw = value?.logicSystem ?? value?.logic_system
+  return raw === undefined ? {} : logicSystemFields(raw)
+}
 
 const average = (values) => (
   values.length > 0 ? values.reduce((sum, value) => sum + value, 0) / values.length : 0
@@ -274,6 +285,7 @@ export function InstructorSandboxProvider({ children }) {
         name: courseData.name ?? courseData.title ?? 'Untitled Course',
         code: courseData.code ?? courseData.course_code ?? `DEMO-${courseId}`,
         semester: courseData.term ?? courseData.semester ?? 'Demo Session',
+        ...logicSystemFields(courseData.logicSystem ?? courseData.logic_system),
         status: courseData.status ?? 'current',
         createdAt: new Date().toISOString(),
         studentCount: 0,
@@ -501,6 +513,7 @@ export function InstructorSandboxProvider({ children }) {
               ...(settings.name ? { name: settings.name } : {}),
               ...(settings.code ? { code: settings.code } : {}),
               ...(settings.semester ? { semester: settings.semester } : {}),
+              ...optionalLogicSystemFields(settings),
               ...(settings.color ? { color: settings.color } : {}),
               ...(settings.latePolicy ? { latePolicy: settings.latePolicy } : {}),
               ...(settings.gradingScale ? { gradingScale: settings.gradingScale } : {}),

@@ -12,6 +12,7 @@ import TruthTableSection from './TruthTableSection.jsx'
 import { tokenizeTruthTableHeader } from './truthTableUi.js'
 import { useProblemChecker } from '../../../hooks/useProblemChecker.js'
 import { rowsEqual, clearDebounce, scheduleDebouncedChange } from '../../../utils/tablePerf.js'
+import { getNotation } from '../../../lib/logicSystems.js'
 
 const toSymbol = (value) => {
   if (value === true || value === 'T' || value === 't' || value === 1) return 'T'
@@ -33,11 +34,13 @@ export default function SingleRowTruthTable({
   isInstructorView = false,
   onQuestionSaved,
   problemLabel,
+  logicSystem,
 }) {
   const editorRef = useRef(null)
   const openEdit = () => editorRef.current?.open?.()
-  const syntax = useMemo(() => getSyntax(), [])
-  const Formula = useMemo(() => getFormulaClass(), [])
+  const notation = getNotation(logicSystem)
+  const syntax = useMemo(() => getSyntax(notation), [notation])
+  const Formula = useMemo(() => getFormulaClass(notation), [notation])
   const statement = problem?.statement || problem?.prompt || ''
   const prompt = problem?.prompt && problem?.prompt !== statement ? problem.prompt : ''
   const interpretation = useMemo(() => problem?.interpretation ?? {}, [problem?.interpretation])
@@ -265,7 +268,7 @@ export default function SingleRowTruthTable({
         />
       ) : null}
       editorNode={isInstructorView && proof ? (
-        <InstructorQuestionEditor ref={editorRef} proof={proof} isInstructorView onSaved={onQuestionSaved} trigger="none" />
+        <InstructorQuestionEditor ref={editorRef} proof={proof} isInstructorView onSaved={onQuestionSaved} trigger="none" logicSystem={logicSystem} />
       ) : null}
     >
       {renderTableSet(gridInputs, false)}

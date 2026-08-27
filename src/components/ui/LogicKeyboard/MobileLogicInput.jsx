@@ -7,6 +7,7 @@ import FormulaInput from '../logicpenguin/formula-input.js'
 import LogicInput from './LogicInput.jsx'
 import SymbolButtonRow, { symbolRowButtonSx } from '../logicpenguin/SymbolButtonRow.jsx'
 import getSyntax from '../../../lib/logicpenguin/symbolic/libsyntax.js'
+import { getNotation } from '../../../lib/logicSystems.js'
 
 const DEFAULT_LETTERS = ['P', 'Q', 'R', 'S', 'T']
 const DESKTOP_KEYBOARD_ON_MOBILE_KEY = 'logicapp_desktop_keyboard_on_mobile'
@@ -89,6 +90,7 @@ export default function MobileLogicInput({
   predicateLetters,
   constantLetters,
   variableLetters: variableLettersProp,
+  logicSystem,
   children,
 }) {
   const theme = useTheme()
@@ -110,7 +112,7 @@ export default function MobileLogicInput({
   valueRef.current = value ?? ''
   cursorRef.current = cursorPosition
 
-  const syntax = getSyntax()
+  const syntax = getSyntax(getNotation(logicSystem))
   const symbols = syntax?.symbols || {}
   const symbolcat = syntax?.symbolcat || {}
   const usePredicateLayout = Array.isArray(predicateLetters) && Array.isArray(constantLetters) && Array.isArray(variableLettersProp)
@@ -332,6 +334,7 @@ export default function MobileLogicInput({
             disabled={disabled}
             includeQuantifiers={includeQuantifiers}
             extraInsertButtons={extraInsertButtons}
+            logicSystem={logicSystem}
           />
         </Box>
       </>
@@ -400,6 +403,7 @@ export default function MobileLogicInput({
                 showBackspace={false}
                 extraInsertButtons={extraInsertButtons}
                 centerButtons
+                logicSystem={logicSystem}
               />
             </Box>
             {usePredicateLayout ? (

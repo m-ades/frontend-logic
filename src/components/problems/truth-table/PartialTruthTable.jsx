@@ -16,6 +16,7 @@ import ProblemFrame from '../mui/frame/ProblemFrame.jsx'
 import TruthTableGrid from './TruthTableGrid.jsx'
 import { useProblemChecker } from '../../../hooks/useProblemChecker.js'
 import { rowsEqual, clearDebounce, scheduleDebouncedChange } from '../../../utils/tablePerf.js'
+import { getNotation } from '../../../lib/logicSystems.js'
 
 const toTruth = (value) => {
   if (value === true || value === 'T' || value === 't' || value === 1) return true
@@ -44,20 +45,22 @@ export default function PartialTruthTable({
   isInstructorView = false,
   onQuestionSaved,
   problemLabel,
+  logicSystem,
 }) {
   const theme = useTheme()
   const editorRef = useRef(null)
   const openEdit = () => editorRef.current?.open?.()
-  const Formula = useMemo(() => getFormulaClass(), [])
+  const notation = getNotation(logicSystem)
+  const Formula = useMemo(() => getFormulaClass(notation), [notation])
   const statement = problem?.statement || problem?.formula || ''
   const prompt = problem?.prompt || ''
   const givenRow = Array.isArray(problem?.row) ? problem.row : []
   const tokens = useMemo(() => {
     if (!statement) return []
     const wff = Formula.from(statement)
-    const tables = multiTables([wff])
+    const tables = multiTables([wff], notation)
     return tables?.tables?.[0]?.tokens ?? []
-  }, [Formula, statement])
+  }, [Formula, notation, statement])
 
   const editableIndices = useMemo(
     () => tokens.map((_, idx) => toTruth(givenRow[idx]) === null),
@@ -170,7 +173,7 @@ export default function PartialTruthTable({
         />
       ) : null}
       editorNode={isInstructorView && proof ? (
-        <InstructorQuestionEditor ref={editorRef} proof={proof} isInstructorView onSaved={onQuestionSaved} trigger="none" />
+        <InstructorQuestionEditor ref={editorRef} proof={proof} isInstructorView onSaved={onQuestionSaved} trigger="none" logicSystem={logicSystem} />
       ) : null}
     >
       {statement && (

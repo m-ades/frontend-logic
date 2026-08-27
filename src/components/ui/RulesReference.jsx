@@ -3,6 +3,7 @@ import { Box, Typography, IconButton, Drawer, alpha, useMediaQuery, useTheme } f
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import ExpandLessIcon from '@mui/icons-material/ExpandLess'
 import { useLayoutState, useLayoutDispatch, closeRulesReference } from '../../context/LayoutContext.jsx'
+import { getSymbols, normalizeLogicSystem } from '../../lib/logicSystems.js'
 
 function RulesCard({ title, children, defaultExpanded = false }) {
   const [expanded, setExpanded] = useState(defaultExpanded)
@@ -72,13 +73,16 @@ function RulesCard({ title, children, defaultExpanded = false }) {
   )
 }
 
-export default function RulesReference() {
+export default function RulesReference({ logicSystem }) {
   const { isRulesReferenceOpen } = useLayoutState()
   const dispatch = useLayoutDispatch()
   const theme = useTheme()
   const isLargeScreen = useMediaQuery(theme.breakpoints.up('lg'))
   const hasDesktopPointer = useMediaQuery('(hover: hover) and (pointer: fine)')
   const isDesktop = isLargeScreen && hasDesktopPointer
+  const activeLogicSystem = normalizeLogicSystem(logicSystem)
+  const symbols = getSymbols(activeLogicSystem)
+  const isFitch = activeLogicSystem === 'fitch'
   
   const blurActiveElement = () => {
     const el = document.activeElement
@@ -105,12 +109,16 @@ export default function RulesReference() {
           Symbols
         </Typography>
         <Box component="div" sx={{ mb: 1.5, fontSize: '0.85rem' }}>
-          <div><strong>•</strong> Type <strong>&</strong> or <strong>^</strong> for • (conjunction)</div>
-          <div><strong>•</strong> Type <strong>v</strong> for ∨ (disjunction)</div>
-          <div><strong>•</strong> Type <strong>{'>'}</strong> or <strong>→</strong> or <strong>--&gt;</strong> for ⊃ (conditional)</div>
-          <div><strong>•</strong> Type <strong>==</strong> for ≡ (biconditional)</div>
-          <div><strong>•</strong> Type <strong>all</strong> for ∀ (universal quantifier)</div>
-          <div><strong>•</strong> Type <strong>some</strong> for ∃ (existential quantifier)</div>
+          <div><strong>{symbols.and}</strong> Type <strong>&</strong> or <strong>^</strong> for {symbols.and} (conjunction)</div>
+          <div><strong>{symbols.or}</strong> Type <strong>v</strong> or <strong>\/</strong> for {symbols.or} (disjunction)</div>
+          <div><strong>{symbols.conditional}</strong> Type <strong>{'>'}</strong>, <strong>-&gt;</strong>, or <strong>--&gt;</strong> for {symbols.conditional} (conditional)</div>
+          <div><strong>{symbols.biconditional}</strong> Type <strong>==</strong> or <strong>&lt;-&gt;</strong> for {symbols.biconditional} (biconditional)</div>
+          <div><strong>{symbols.not}</strong> Type <strong>~</strong> or <strong>!</strong> for {symbols.not} (negation)</div>
+          <div><strong>{symbols.forall}</strong> Type <strong>all</strong> for {symbols.forall} (universal quantifier)</div>
+          <div><strong>{symbols.exists}</strong> Type <strong>some</strong> for {symbols.exists} (existential quantifier)</div>
+          {symbols.falsum && (
+            <div><strong>{symbols.falsum}</strong> Type <strong>#</strong>, <strong>_</strong>, or <strong>XX</strong> for {symbols.falsum} (contradiction)</div>
+          )}
         </Box>
         <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 0.5, color: 'primary.main', fontSize: '0.95rem' }}>
           Navigation
@@ -120,80 +128,164 @@ export default function RulesReference() {
         </Box>
       </RulesCard>
       
-      <RulesCard title="Rules of Reference" defaultExpanded={false}>
-        <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 0.5, color: 'primary.main', fontSize: '0.95rem' }}>
-          Rules of Implication
-        </Typography>
-        <Box component="div" sx={{ mb: 1.5, fontSize: '0.85rem' }}>
-          <div><strong>1. MP:</strong> p ⊃ q, p / q</div>
-          <div><strong>2. MT:</strong> p ⊃ q, ~q / ~p</div>
-          <div><strong>3. HS:</strong> p ⊃ q, q ⊃ r / p ⊃ r</div>
-          <div><strong>4. DS:</strong> p ∨ q, ~p / q</div>
-          <div><strong>5. CD:</strong> (p ⊃ q) • (r ⊃ s), p ∨ r / q ∨ s</div>
-          <div><strong>6. Simp:</strong> p • q / p</div>
-          <div><strong>7. Conj:</strong> p, q / p • q</div>
-          <div><strong>8. Add:</strong> p / p ∨ q</div>
-        </Box>
-        <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 0.5, color: 'primary.main', fontSize: '0.95rem' }}>
-          Rules of Replacement
-        </Typography>
-        <Box component="div" sx={{ fontSize: '0.85rem' }}>
-          <div><strong>9. DM:</strong></div>
-          <div style={{ paddingLeft: '28px' }}>~(p • q) :: (~p ∨ ~q)</div>
-          <div style={{ paddingLeft: '28px' }}>~(p ∨ q) :: (~p • ~q)</div>
-          <div><strong>10. Com:</strong></div>
-          <div style={{ paddingLeft: '28px' }}>(p ∨ q) :: (q ∨ p)</div>
-          <div style={{ paddingLeft: '28px' }}>(p • q) :: (q • p)</div>
-          <div><strong>11. Assoc:</strong></div>
-          <div style={{ paddingLeft: '28px' }}>[p ∨ (q ∨ r)] :: [(p ∨ q) ∨ r]</div>
-          <div style={{ paddingLeft: '28px' }}>[p • (q • r)] :: [(p • q) • r]</div>
-          <div><strong>12. Dist:</strong></div>
-          <div style={{ paddingLeft: '28px' }}>[p • (q ∨ r)] :: [(p • q) ∨ (p • r)]</div>
-          <div style={{ paddingLeft: '28px' }}>[p ∨ (q • r)] :: [(p ∨ q) • (p ∨ r)]</div>
-          <div><strong>13. DN:</strong></div>
-          <div style={{ paddingLeft: '28px' }}>p :: ~~p</div>
-          <div><strong>14. Trans:</strong></div>
-          <div style={{ paddingLeft: '28px' }}>(p ⊃ q) :: (~q ⊃ ~p)</div>
-          <div><strong>15. Impl:</strong></div>
-          <div style={{ paddingLeft: '28px' }}>(p ⊃ q) :: (~p ∨ q)</div>
-          <div><strong>16. Equiv:</strong></div>
-          <div style={{ paddingLeft: '28px' }}>(p ≡ q) :: [(p ⊃ q) • (q ⊃ p)]</div>
-          <div style={{ paddingLeft: '28px' }}>(p ≡ q) :: [(p • q) ∨ (~p • ~q)]</div>
-          <div><strong>17. Exp:</strong></div>
-          <div style={{ paddingLeft: '28px' }}>[(p • q) ⊃ r] :: [p ⊃ (q ⊃ r)]</div>
-          <div><strong>18. Taut:</strong></div>
-          <div style={{ paddingLeft: '28px' }}>p :: (p ∨ p)</div>
-          <div style={{ paddingLeft: '28px' }}>p :: (p • p)</div>
-        </Box>
+      <RulesCard title="Rules of Inference" defaultExpanded={false}>
+        {isFitch ? (
+          <>
+            <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 0.5, color: 'primary.main', fontSize: '0.95rem' }}>
+              Basic TFL Rules
+            </Typography>
+            <Box component="div" sx={{ mb: 1.5, fontSize: '0.85rem' }}>
+              <div><strong>R:</strong> A / A</div>
+              <div><strong>∧I:</strong> A, B / A ∧ B</div>
+              <div><strong>∧E:</strong> A ∧ B / A</div>
+              <div style={{ paddingLeft: '28px' }}>A ∧ B / B</div>
+              <div><strong>→I:</strong> subproof A ⟹ B / A → B</div>
+              <div><strong>→E:</strong> A → B, A / B</div>
+              <div><strong>↔I:</strong> subproof A ⟹ B, subproof B ⟹ A / A ↔ B</div>
+              <div><strong>↔E:</strong> A ↔ B, A / B</div>
+              <div style={{ paddingLeft: '28px' }}>A ↔ B, B / A</div>
+              <div><strong>∨I:</strong> A / A ∨ B</div>
+              <div style={{ paddingLeft: '28px' }}>A / B ∨ A</div>
+              <div><strong>∨E:</strong> A ∨ B, subproof A ⟹ C, subproof B ⟹ C / C</div>
+              <div><strong>¬I:</strong> subproof A ⟹ ⊥ / ¬A</div>
+              <div><strong>¬E:</strong> A, ¬A / ⊥</div>
+              <div><strong>IP:</strong> subproof ¬A ⟹ ⊥ / A</div>
+              <div><strong>X:</strong> ⊥ / A</div>
+            </Box>
+            <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 0.5, color: 'primary.main', fontSize: '0.95rem' }}>
+              Additional TFL Rules
+            </Typography>
+            <Box component="div" sx={{ fontSize: '0.85rem' }}>
+              <div><strong>DS:</strong> A ∨ B, ¬A / B</div>
+              <div style={{ paddingLeft: '28px' }}>A ∨ B, ¬B / A</div>
+              <div><strong>MT:</strong> A → B, ¬B / ¬A</div>
+              <div><strong>DNE:</strong> ¬¬A / A</div>
+              <div><strong>LEM:</strong> subproof A ⟹ C, subproof ¬A ⟹ C / C</div>
+              <div><strong>DeM:</strong> ¬(A ∧ B) / ¬A ∨ ¬B</div>
+              <div style={{ paddingLeft: '28px' }}>¬A ∨ ¬B / ¬(A ∧ B)</div>
+              <div style={{ paddingLeft: '28px' }}>¬(A ∨ B) / ¬A ∧ ¬B</div>
+              <div style={{ paddingLeft: '28px' }}>¬A ∧ ¬B / ¬(A ∨ B)</div>
+            </Box>
+          </>
+        ) : (
+          <>
+            <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 0.5, color: 'primary.main', fontSize: '0.95rem' }}>
+              Rules of Implication
+            </Typography>
+            <Box component="div" sx={{ mb: 1.5, fontSize: '0.85rem' }}>
+              <div><strong>1. MP:</strong> p ⊃ q, p / q</div>
+              <div><strong>2. MT:</strong> p ⊃ q, ~q / ~p</div>
+              <div><strong>3. HS:</strong> p ⊃ q, q ⊃ r / p ⊃ r</div>
+              <div><strong>4. DS:</strong> p ∨ q, ~p / q</div>
+              <div><strong>5. CD:</strong> (p ⊃ q) • (r ⊃ s), p ∨ r / q ∨ s</div>
+              <div><strong>6. Simp:</strong> p • q / p</div>
+              <div><strong>7. Conj:</strong> p, q / p • q</div>
+              <div><strong>8. Add:</strong> p / p ∨ q</div>
+            </Box>
+            <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 0.5, color: 'primary.main', fontSize: '0.95rem' }}>
+              Rules of Replacement
+            </Typography>
+            <Box component="div" sx={{ fontSize: '0.85rem' }}>
+              <div><strong>9. DM:</strong></div>
+              <div style={{ paddingLeft: '28px' }}>~(p • q) :: (~p ∨ ~q)</div>
+              <div style={{ paddingLeft: '28px' }}>~(p ∨ q) :: (~p • ~q)</div>
+              <div><strong>10. Com:</strong></div>
+              <div style={{ paddingLeft: '28px' }}>(p ∨ q) :: (q ∨ p)</div>
+              <div style={{ paddingLeft: '28px' }}>(p • q) :: (q • p)</div>
+              <div><strong>11. Assoc:</strong></div>
+              <div style={{ paddingLeft: '28px' }}>[p ∨ (q ∨ r)] :: [(p ∨ q) ∨ r]</div>
+              <div style={{ paddingLeft: '28px' }}>[p • (q • r)] :: [(p • q) • r]</div>
+              <div><strong>12. Dist:</strong></div>
+              <div style={{ paddingLeft: '28px' }}>[p • (q ∨ r)] :: [(p • q) ∨ (p • r)]</div>
+              <div style={{ paddingLeft: '28px' }}>[p ∨ (q • r)] :: [(p ∨ q) • (p ∨ r)]</div>
+              <div><strong>13. DN:</strong></div>
+              <div style={{ paddingLeft: '28px' }}>p :: ~~p</div>
+              <div><strong>14. Trans:</strong></div>
+              <div style={{ paddingLeft: '28px' }}>(p ⊃ q) :: (~q ⊃ ~p)</div>
+              <div><strong>15. Impl:</strong></div>
+              <div style={{ paddingLeft: '28px' }}>(p ⊃ q) :: (~p ∨ q)</div>
+              <div><strong>16. Equiv:</strong></div>
+              <div style={{ paddingLeft: '28px' }}>(p ≡ q) :: [(p ⊃ q) • (q ⊃ p)]</div>
+              <div style={{ paddingLeft: '28px' }}>(p ≡ q) :: [(p • q) ∨ (~p • ~q)]</div>
+              <div><strong>17. Exp:</strong></div>
+              <div style={{ paddingLeft: '28px' }}>[(p • q) ⊃ r] :: [p ⊃ (q ⊃ r)]</div>
+              <div><strong>18. Taut:</strong></div>
+              <div style={{ paddingLeft: '28px' }}>p :: (p ∨ p)</div>
+              <div style={{ paddingLeft: '28px' }}>p :: (p • p)</div>
+            </Box>
+          </>
+        )}
       </RulesCard>
       
       <RulesCard title="Predicate Logic Rules" defaultExpanded={false}>
         <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 0.5, color: 'primary.main', fontSize: '0.95rem' }}>
           Predicate Logic Rules
         </Typography>
-        <Box component="div" sx={{ mb: 1.5, fontSize: '0.85rem' }}>
-          <div><strong>UI:</strong> (x)Fx / Fx &nbsp;or&nbsp; (x)Fx / Fa</div>
-          <div><strong>UG:</strong> Fx / (x)Fx</div>
-          <div><strong>EI:</strong> (∃x)Fx / Fa</div>
-          <div><strong>EG:</strong> Fa / (∃x)Fx &nbsp;or&nbsp; Fx / (∃x)Fx</div>
-        </Box>
-        <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 0.5, color: 'primary.main', fontSize: '0.95rem' }}>
-          Quantifier Negation (QN)
-        </Typography>
-        <Box component="div" sx={{ mb: 1.5, fontSize: '0.85rem' }}>
-          <div><strong>QN:</strong> ~(x)Fx :: (∃x)~Fx</div>
-          <div><strong>QN:</strong> ~(∃x)Fx :: (x)~Fx</div>
-          <div><strong>QN:</strong> (x)Fx :: ~(∃x)~Fx</div>
-          <div><strong>QN:</strong> (∃x)Fx :: ~(x)~Fx</div>
-        </Box>
+        {isFitch ? (
+          <>
+            <Box component="div" sx={{ mb: 1.5, fontSize: '0.85rem' }}>
+              <div><strong>∀E:</strong> ∀xFx / Fa</div>
+              <div><strong>∃I:</strong> Fa / ∃xFx</div>
+              <div><strong>∀I:</strong> Fa / ∀xFx, when a does not occur in any undischarged assumption</div>
+              <div><strong>∃E:</strong> ∃xFx plus subproof Fa ⟹ B / B</div>
+              <div style={{ paddingLeft: '28px' }}>a must not occur in any undischarged assumption, the existential premise, or the conclusion</div>
+            </Box>
+            <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 0.5, color: 'primary.main', fontSize: '0.95rem' }}>
+              Conversion of Quantifiers
+            </Typography>
+            <Box component="div" sx={{ mb: 1.5, fontSize: '0.85rem' }}>
+              <div><strong>CQ:</strong> ∀x¬Fx / ¬∃xFx</div>
+              <div><strong>CQ:</strong> ¬∃xFx / ∀x¬Fx</div>
+              <div><strong>CQ:</strong> ∃x¬Fx / ¬∀xFx</div>
+              <div><strong>CQ:</strong> ¬∀xFx / ∃x¬Fx</div>
+            </Box>
+            <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 0.5, color: 'primary.main', fontSize: '0.95rem' }}>
+              Identity Rules
+            </Typography>
+            <Box component="div" sx={{ mb: 1.5, fontSize: '0.85rem' }}>
+              <div><strong>=I:</strong> a = a</div>
+              <div><strong>=E:</strong> a = b, Fa / Fb</div>
+              <div style={{ paddingLeft: '28px' }}>replace one or more occurrences in either direction</div>
+            </Box>
+          </>
+        ) : (
+          <>
+            <Box component="div" sx={{ mb: 1.5, fontSize: '0.85rem' }}>
+              <div><strong>UI:</strong> (x)Fx / Fx &nbsp;or&nbsp; (x)Fx / Fa</div>
+              <div><strong>UG:</strong> Fx / (x)Fx</div>
+              <div><strong>EI:</strong> (∃x)Fx / Fa</div>
+              <div><strong>EG:</strong> Fa / (∃x)Fx &nbsp;or&nbsp; Fx / (∃x)Fx</div>
+            </Box>
+            <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 0.5, color: 'primary.main', fontSize: '0.95rem' }}>
+              Quantifier Negation (QN)
+            </Typography>
+            <Box component="div" sx={{ mb: 1.5, fontSize: '0.85rem' }}>
+              <div><strong>QN:</strong> ~(x)Fx :: (∃x)~Fx</div>
+              <div><strong>QN:</strong> ~(∃x)Fx :: (x)~Fx</div>
+              <div><strong>QN:</strong> (x)Fx :: ~(∃x)~Fx</div>
+              <div><strong>QN:</strong> (∃x)Fx :: ~(x)~Fx</div>
+            </Box>
+          </>
+        )}
       </RulesCard>
 
       <RulesCard title="Conditional & Indirect Proofs" defaultExpanded={false}>
         <Box component="div" sx={{ fontSize: '0.85rem' }}>
-          <div><strong>ACP:</strong> Assumption for Conditional Proof</div>
-          <div><strong>CP:</strong> To prove p ⊃ q, assume p (ACP) in an indented subderivation, derive q, then discharge with CP citing the subderivation range</div>
-          <div><strong>AIP:</strong> Assumption for Indirect Proof</div>
-          <div><strong>IP:</strong> To prove ~p, assume p (AIP) in an indented subderivation, derive a contradiction (q • ~q), then discharge with IP citing the subderivation range</div>
+          {isFitch ? (
+            <>
+              <div><strong>AS:</strong> starts a subproof assumption</div>
+              <div><strong>→I:</strong> discharge a subproof from A to B</div>
+              <div><strong>¬I:</strong> discharge a subproof from A to ⊥</div>
+              <div><strong>IP:</strong> discharge a subproof from ¬A to ⊥</div>
+            </>
+          ) : (
+            <>
+              <div><strong>ACP:</strong> Assumption for Conditional Proof</div>
+              <div><strong>CP:</strong> To prove p ⊃ q, assume p (ACP) in an indented subderivation, derive q, then discharge with CP citing the subderivation range</div>
+              <div><strong>AIP:</strong> Assumption for Indirect Proof</div>
+              <div><strong>IP:</strong> To prove ~p, assume p (AIP) in an indented subderivation, derive a contradiction (q • ~q), then discharge with IP citing the subderivation range</div>
+            </>
+          )}
         </Box>
       </RulesCard>
     </Box>
@@ -204,7 +296,7 @@ export default function RulesReference() {
       <Box>
         <Typography variant="h2" sx={{ fontSize: '1.142rem', fontWeight: 600 }}>Rulebook</Typography>
         <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.75rem' }}>
-          Logic Rules & Shortcuts
+          {isFitch ? 'Fitch rules & shortcuts' : 'Hurley rules & shortcuts'}
         </Typography>
       </Box>
       <IconButton onClick={handleClose}>

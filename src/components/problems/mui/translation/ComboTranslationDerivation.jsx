@@ -15,6 +15,7 @@ import DerivationTable from '../../derivation/DerivationTable.jsx'
 import getFormulaClass from '../../../../lib/logicpenguin/symbolic/formula.js'
 import { useProblemChecker } from '../../../../hooks/useProblemChecker.js'
 import PromptText from '../../../ui/PromptText.jsx'
+import { getNotation, getSymbols } from '../../../../lib/logicSystems.js'
 import {
   ST_PREDICATE_VARIABLES,
   getConstantLettersFromKey,
@@ -25,7 +26,7 @@ import {
   promptImpliesPredicateLogic,
 } from './symbolizationKeyboard.js'
 
-function FormulaInputField({ value, onValueChange, formulaInputRef }) {
+function FormulaInputField({ value, onValueChange, formulaInputRef, notation }) {
   const theme = useTheme()
   const containerRef = useRef(null)
   const changeHandlerRef = useRef(null)
@@ -33,7 +34,7 @@ function FormulaInputField({ value, onValueChange, formulaInputRef }) {
   useEffect(() => {
     if (!containerRef.current) return
     if (!formulaInputRef.current) {
-      const formulaInput = FormulaInput.getnew({})
+      const formulaInput = FormulaInput.getnew({ notation })
       formulaInputRef.current = formulaInput
       formulaInput.style.width = '100%'
       formulaInput.style.padding = theme.spacing(1.5)
@@ -60,7 +61,7 @@ function FormulaInputField({ value, onValueChange, formulaInputRef }) {
         formulaInputRef.current = null
       }
     }
-  }, [formulaInputRef, theme])
+  }, [formulaInputRef, notation, theme])
 
   useEffect(() => {
     const formulaInput = formulaInputRef.current
@@ -228,13 +229,16 @@ export default function ComboTranslationDerivation({
   isAssignmentLocked = false,
   isInstructorView = false,
   onQuestionSaved,
+  logicSystem,
 }) {
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
   const isPhone = useMediaQuery(theme.breakpoints.down('sm'))
   const editorRef = useRef(null)
   const openEdit = () => editorRef.current?.open?.()
-  const Formula = useMemo(() => getFormulaClass(), [])
+  const notation = getNotation(logicSystem)
+  const symbols = getSymbols(logicSystem)
+  const Formula = useMemo(() => getFormulaClass(notation), [notation])
   const snapshot = proof?.comboTranslationDerivation || proof?.snapshot || proof?.questionSnapshot || proof?.question_snapshot || proof || {}
   const promptText = snapshot?.prompt || proof?.description || ''
   const symbolizationKey = useMemo(
@@ -380,6 +384,7 @@ export default function ComboTranslationDerivation({
         onOpenFullScreen: openFullScreen,
         onCloseFullScreen: closeFullScreen,
         hideActions: true,
+        logicSystem,
       }
     : null
 
@@ -448,13 +453,13 @@ export default function ComboTranslationDerivation({
                 Argument line
               </Typography>
               <Typography variant="body2" sx={{ mb: 1, color: 'text.secondary', fontSize: '0.875rem' }}>
-                Use "/" for separate premises and "//" for the conclusion. Example: A ⊃ B / A // B.
+                Use "/" for separate premises and "//" for the conclusion. Example: A {symbols.conditional} B / A // B.
               </Typography>
               {isPhone ? (
                 <MobileLogicInput
                   value={argumentLine}
                   onChange={handleArgumentChange}
-                  placeholder="e.g. A ⊃ B / A // B"
+                  placeholder={`e.g. A ${symbols.conditional} B / A // B`}
                   aria-label="Argument line"
                   includeQuantifiers
                   symbolizationKey={argumentKeyboardConfig.symbolizationKey}
@@ -462,6 +467,7 @@ export default function ComboTranslationDerivation({
                   predicateLetters={argumentKeyboardConfig.isPredicateMode ? argumentKeyboardConfig.predicateLetters : undefined}
                   constantLetters={argumentKeyboardConfig.isPredicateMode ? argumentKeyboardConfig.constantLetters : undefined}
                   variableLetters={argumentKeyboardConfig.isPredicateMode ? argumentKeyboardConfig.variableLetters : undefined}
+                  logicSystem={logicSystem}
                 />
               ) : (
                 <>
@@ -469,11 +475,13 @@ export default function ComboTranslationDerivation({
                     value={argumentLine}
                     onValueChange={handleArgumentChange}
                     formulaInputRef={inputRef}
+                    notation={notation}
                   />
                   <Box sx={{ mt: 1 }}>
                     <SymbolButtonRow
                       inputRef={inputRef}
                       onValueChange={handleArgumentChange}
+                      logicSystem={logicSystem}
                     />
                   </Box>
                 </>
@@ -513,7 +521,7 @@ export default function ComboTranslationDerivation({
           isInstructorView={isInstructorView}
         />
         {isInstructorView && proof && (
-          <InstructorQuestionEditor ref={editorRef} proof={proof} isInstructorView onSaved={onQuestionSaved} trigger="none" />
+          <InstructorQuestionEditor ref={editorRef} proof={proof} isInstructorView onSaved={onQuestionSaved} trigger="none" logicSystem={logicSystem} />
         )}
       </Stack>
     </>

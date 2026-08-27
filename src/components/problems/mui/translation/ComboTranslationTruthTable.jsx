@@ -13,6 +13,7 @@ import TruthTableEditor from '../../truth-table/TruthTableEditor.jsx'
 import getFormulaClass from '../../../../lib/logicpenguin/symbolic/formula.js'
 import { useProblemChecker } from '../../../../hooks/useProblemChecker.js'
 import PromptText from '../../../ui/PromptText.jsx'
+import { getNotation, getSymbols } from '../../../../lib/logicSystems.js'
 
 /** Extract symbolization key lines from prompt text (e.g. "E = ...\\nL = ..."). Used for mobile keyboard variable letters. */
 function parseSymbolizationKeyFromPrompt(promptText) {
@@ -105,13 +106,16 @@ export default function ComboTranslationTruthTable({
   isAssignmentLocked = false,
   isInstructorView = false,
   onQuestionSaved,
+  logicSystem,
 }) {
   const theme = useTheme()
   const isPhone = useMediaQuery(theme.breakpoints.down('sm'))
   const editorRef = useRef(null)
   const openEdit = () => editorRef.current?.open?.()
-  const Formula = useMemo(() => getFormulaClass(), [])
-  const syntax = useMemo(() => getSyntax(), [])
+  const notation = getNotation(logicSystem)
+  const symbols = getSymbols(logicSystem)
+  const Formula = useMemo(() => getFormulaClass(notation), [notation])
+  const syntax = useMemo(() => getSyntax(notation), [notation])
   const snapshot = proof?.comboTranslationTruthTable || proof?.snapshot || {}
   const promptText = snapshot?.prompt || proof?.description || ''
   const symbolizationKey = useMemo(
@@ -127,7 +131,7 @@ export default function ComboTranslationTruthTable({
     if (isPhone) return
     const container = inputContainerRef.current
     if (!container) return
-    const inp = FormulaInput.getnew({})
+    const inp = FormulaInput.getnew({ notation })
     inputRef.current = inp
     Object.assign(inp.style, {
       width: '100%',
@@ -154,7 +158,7 @@ export default function ComboTranslationTruthTable({
       if (inp.parentNode) inp.parentNode.removeChild(inp)
       inputRef.current = null
     }
-  }, [theme, isPhone])
+  }, [theme, isPhone, notation])
 
   useEffect(() => {
     if (isPhone) return
@@ -313,11 +317,12 @@ export default function ComboTranslationTruthTable({
                 <MobileLogicInput
                   value={argumentLine}
                   onChange={handleArgumentChange}
-                  placeholder="e.g. P ⊃ Q / P // Q"
+                  placeholder={`e.g. P ${symbols.conditional} Q / P // Q`}
                   aria-label="Argument line"
                   symbolizationKey={symbolizationKey}
                   includeQuantifiers={false}
                   extraInsertButtons={[{ insert: '/' }, { insert: '//' }]}
+                  logicSystem={logicSystem}
                 />
               ) : (
                 <>
@@ -330,6 +335,7 @@ export default function ComboTranslationTruthTable({
                       inputRef={inputRef}
                       onValueChange={handleArgumentChange}
                       includeQuantifiers={false}
+                      logicSystem={logicSystem}
                     />
                   </Box>
                 </>
@@ -411,7 +417,7 @@ export default function ComboTranslationTruthTable({
         isInstructorView={isInstructorView}
       />
       {isInstructorView && proof && (
-        <InstructorQuestionEditor ref={editorRef} proof={proof} isInstructorView onSaved={onQuestionSaved} trigger="none" />
+        <InstructorQuestionEditor ref={editorRef} proof={proof} isInstructorView onSaved={onQuestionSaved} trigger="none" logicSystem={logicSystem} />
       )}
     </Stack>
   )

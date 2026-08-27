@@ -128,8 +128,9 @@ export default class DerivationExercise extends LogicPenguinProblem {
             }
         };
 
-        // assign notation, symbols, syntax
-        this.syntax = getSyntax();
+        // use the active notation
+        this.notationname = options?.notation ?? 'calgary';
+        this.syntax = getSyntax(this.notationname);
         this.symbols = this.syntax.symbols;
         this.notation = this.syntax.notation;
 

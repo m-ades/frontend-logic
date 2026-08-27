@@ -20,6 +20,10 @@ const remapInstructorPath = (path) => remapRoutePath(path, "/instructor", INSTRU
 
 function SandboxFrame({ children, runtimeValue, sidebarStructure, onExit }) {
   const location = useLocation();
+  const activeCourse = runtimeValue?.courseState?.courses?.find(
+    (course) => course.id === runtimeValue?.courseState?.activeCourseId
+  );
+  const logicSystem = activeCourse?.logicSystem ?? activeCourse?.logic_system;
 
   return (
     <AppRuntimeProvider value={runtimeValue}>
@@ -28,6 +32,7 @@ function SandboxFrame({ children, runtimeValue, sidebarStructure, onExit }) {
         sidebarStructure={sidebarStructure}
         onSignOut={onExit}
         onOpenSettings={undefined}
+        logicSystem={logicSystem}
       >
         {children}
       </ShellFrame>

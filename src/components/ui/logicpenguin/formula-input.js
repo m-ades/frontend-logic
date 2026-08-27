@@ -156,7 +156,7 @@ export default class FormulaInput {
         elem.autoChange = FormulaInput.autoChange;
 
         // attach syntax, symbols and inputfix
-        const syntax = getSyntax();
+        const syntax = getSyntax(options.notation);
         elem.syntax = syntax;
         elem.symbols = syntax.symbols;
         elem.inputfix = syntax.inputfix;

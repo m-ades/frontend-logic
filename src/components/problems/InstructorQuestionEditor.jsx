@@ -23,8 +23,21 @@ import EditIcon from '@mui/icons-material/Edit'
 import AddIcon from '@mui/icons-material/Add'
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
 import { fetchJson } from '../../utils/api.js'
-import getHurleyRuleset from '../../lib/logicpenguin/checkers/rules/hurley-rules.js'
+import getFormulaClass from '../../lib/logicpenguin/symbolic/formula.js'
 import getSyntax from '../../lib/logicpenguin/symbolic/libsyntax.js'
+import {
+  DEFAULT_LOGIC_SYSTEM,
+  getNotation,
+  getSymbols,
+  isDerivationProblemType,
+  normalizeLogicSystem,
+} from '../../lib/logicSystems.js'
+import {
+  FORCE_UPPER_DERIVATION_RULES,
+  formatDerivationRuleName,
+  getDerivationRuleLookup,
+  getDerivationRules,
+} from '../../lib/derivationRules.js'
 
 // deep merge. source overwrites. arrays replace.
 function deepMerge(target, source) {
@@ -45,50 +58,125 @@ function typeKey(existing) {
   return e.logic_problem_type !== undefined ? 'logic_problem_type' : (e.type !== undefined ? 'type' : 'logic_problem_type')
 }
 
-function normalizeFormulaInput(value) {
-  return getSyntax().inputfix(String(value ?? '')).trim()
+function normalizeFormulaInput(value, logicSystem = DEFAULT_LOGIC_SYSTEM) {
+  return getSyntax(getNotation(logicSystem)).inputfix(String(value ?? '')).trim()
 }
 
-function normalizeFormulaInputs(values) {
-  return (Array.isArray(values) ? values : (values ? [values] : [])).map(normalizeFormulaInput)
+function normalizeFormulaInputs(values, logicSystem = DEFAULT_LOGIC_SYSTEM) {
+  return (Array.isArray(values) ? values : (values ? [values] : [])).map((value) => normalizeFormulaInput(value, logicSystem))
 }
 
-function normalizeArgumentInput(argument) {
+function normalizeArgumentInput(argument, logicSystem = DEFAULT_LOGIC_SYSTEM) {
   const out = { ...(argument && typeof argument === 'object' ? argument : {}) }
-  if (out.premises !== undefined) out.premises = normalizeFormulaInputs(out.premises)
-  if (out.conclusion !== undefined) out.conclusion = normalizeFormulaInput(out.conclusion)
+  if (out.premises !== undefined) out.premises = normalizeFormulaInputs(out.premises, logicSystem)
+  if (out.conclusion !== undefined) out.conclusion = normalizeFormulaInput(out.conclusion, logicSystem)
   return out
 }
 
-const FORCE_UPPER_RULES = new Set(['UI', 'UG', 'EI', 'EG', 'MP', 'MT', 'HS', 'DS', 'CD', 'DN', 'DM', 'QN', 'CP', 'IP', 'ACP', 'AIP', 'PR'])
-const ALL_DERIVATION_RULES = Object.keys(getHurleyRuleset()).map((rule) => {
-  const upper = String(rule || '').toUpperCase()
-  if (FORCE_UPPER_RULES.has(upper)) return upper
-  const lower = String(rule || '').toLowerCase()
-  return lower ? lower.charAt(0).toUpperCase() + lower.slice(1) : ''
-})
-const DERIVATION_RULE_LOOKUP = new Map(
-  ALL_DERIVATION_RULES.map((rule) => [rule.toLowerCase(), rule])
-)
-
-function normalizeRuleToken(token) {
-  const raw = String(token || '').trim()
-  if (!raw) return ''
-  const fromLookup = DERIVATION_RULE_LOOKUP.get(raw.toLowerCase())
-  if (fromLookup) return fromLookup
-  const upper = raw.toUpperCase()
-  if (FORCE_UPPER_RULES.has(upper)) return upper
-  return raw
+function validateFormulaInput(value, logicSystem, label) {
+  const text = String(value ?? '').trim()
+  if (!text) return ''
+  const Formula = getFormulaClass(getNotation(logicSystem))
+  const formula = Formula.from(text)
+  if (formula.wellformed) return ''
+  return `${label}: ${formula.syntaxerrors || 'invalid formula'}`
 }
 
-function parseRuleList(value) {
+function validateFormulaInputs(values, logicSystem, label) {
+  const list = Array.isArray(values) ? values : (values ? [values] : [])
+  for (let i = 0; i < list.length; i += 1) {
+    const error = validateFormulaInput(list[i], logicSystem, `${label} ${i + 1}`)
+    if (error) return error
+  }
+  return ''
+}
+
+function validateArgumentInput(argument, logicSystem, label = 'Argument') {
+  const premises = argument?.premises ?? argument?.prems
+  const conclusion = argument?.conclusion ?? argument?.conc
+  return validateFormulaInputs(premises, logicSystem, `${label} premise`)
+    || validateFormulaInput(conclusion, logicSystem, `${label} conclusion`)
+}
+
+function validateArgumentLineInput(value, logicSystem, label = 'Expected argument') {
+  const text = String(value ?? '').trim()
+  if (!text) return ''
+  const parts = text.split('//')
+  if (parts.length !== 2) {
+    return validateFormulaInput(text, logicSystem, label)
+  }
+  const premises = parts[0].split('/').map((part) => part.trim()).filter(Boolean)
+  const conclusion = parts[1].trim()
+  return validateFormulaInputs(premises, logicSystem, `${label} premise`)
+    || validateFormulaInput(conclusion, logicSystem, `${label} conclusion`)
+}
+
+function validateQuestionSnapshotFormulas(snapshot, logicSystem = DEFAULT_LOGIC_SYSTEM) {
+  const type = snapshot?.logic_problem_type || snapshot?.type || snapshot?.problemType
+  if (type === 'truth-table') {
+    const tt = snapshot.truthTable || snapshot.truth_table || {}
+    if (tt.kind === 'equivalence') {
+      return validateFormulaInput(tt.left, logicSystem, 'Left statement')
+        || validateFormulaInput(tt.right, logicSystem, 'Right statement')
+    }
+    if (tt.kind === 'argument') {
+      return validateFormulaInputs(tt.lefts, logicSystem, 'Premise')
+        || validateFormulaInput(tt.right, logicSystem, 'Conclusion')
+    }
+    return validateFormulaInput(tt.statement ?? tt.formula, logicSystem, 'Statement')
+  }
+  if (type === 'indirect-truth-table' || type === 'nonclassical-truth-table') {
+    return validateArgumentInput(snapshot.argument, logicSystem)
+  }
+  if (isDerivationProblemType(type)) {
+    return validateFormulaInputs(snapshot.prems ?? snapshot.premises, logicSystem, 'Premise')
+      || validateFormulaInput(snapshot.conc ?? snapshot.conclusion, logicSystem, 'Conclusion')
+  }
+  if (type === 'evaluate-truth') {
+    return validateFormulaInput(snapshot.statement ?? snapshot.prompt, logicSystem, 'Statement')
+  }
+  if (type === 'symbolic-translation') {
+    return validateFormulaInput(snapshot.answer, logicSystem, 'Correct answer')
+  }
+  if (type === 'single-row-truth-table' || type === 'partial-truth-table') {
+    return validateFormulaInput(snapshot.statement ?? snapshot.formula, logicSystem, 'Statement')
+  }
+  if (type === 'combo-translation-truth-table' || type === 'combo-translation-derivation') {
+    const answer = snapshot.answer
+    if (Array.isArray(answer?.premises) || answer?.conclusion !== undefined) {
+      return validateArgumentInput(answer, logicSystem, 'Expected argument')
+    }
+    if (Array.isArray(answer?.translations)) {
+      return validateFormulaInputs(answer.translations, logicSystem, 'Expected translation')
+    }
+    const argument = typeof answer === 'string' ? answer : (answer?.argumentLine ?? answer?.argument)
+    return validateArgumentLineInput(argument, logicSystem)
+  }
+  return ''
+}
+
+function normalizeRuleToken(token, logicSystem = DEFAULT_LOGIC_SYSTEM) {
+  const raw = String(token || '').trim()
+  if (!raw) return ''
+  const ruleLookup = getDerivationRuleLookup(logicSystem)
+  const fromLookup = ruleLookup.get(raw.toLowerCase())
+  if (fromLookup) return fromLookup
+  const formatted = formatDerivationRuleName(raw)
+  const fromFormatted = ruleLookup.get(formatted.toLowerCase())
+  if (fromFormatted) return fromFormatted
+  const upper = raw.toUpperCase()
+  if (FORCE_UPPER_DERIVATION_RULES.has(upper)) return upper
+  return formatted
+}
+
+function parseRuleList(value, logicSystem = DEFAULT_LOGIC_SYSTEM) {
   const source = Array.isArray(value)
     ? value.flatMap((entry) => String(entry || '').split(/[,\s]+/g))
     : String(value || '').split(/[,\s]+/g)
   const out = []
   const seen = new Set()
   source.forEach((entry) => {
-    const normalized = normalizeRuleToken(entry)
+    const normalized = normalizeRuleToken(entry, logicSystem)
     if (!normalized) return
     const key = normalized.toLowerCase()
     if (seen.has(key)) return
@@ -98,18 +186,89 @@ function parseRuleList(value) {
   return out
 }
 
-function normalizeDerivationRuleset(ruleset) {
-  const source = ruleset && typeof ruleset === 'object' ? ruleset : {}
-  const allowFromInput = parseRuleList(source.allow ?? source.allowed)
-  const disallow = parseRuleList(source.disallow ?? source.disallowed ?? source.forbidden ?? source.forbid)
-  const require = parseRuleList(source.require ?? source.required ?? source.necessary)
-  const requireAny = parseRuleList(source.requireAny ?? source.requiredAny)
+function isKnownDerivationRule(rule, logicSystem = DEFAULT_LOGIC_SYSTEM) {
+  const raw = String(rule || '').trim()
+  if (!raw) return true
+  const ruleLookup = getDerivationRuleLookup(logicSystem)
+  const formatted = formatDerivationRuleName(raw)
+  return Boolean(ruleLookup.get(raw.toLowerCase()) || ruleLookup.get(formatted.toLowerCase()))
+}
+
+function invalidRuleTokens(value, logicSystem = DEFAULT_LOGIC_SYSTEM) {
+  const source = Array.isArray(value)
+    ? value.flatMap((entry) => String(entry || '').split(/[,\s]+/g))
+    : String(value || '').split(/[,\s]+/g)
+  const seen = new Set()
+  const out = []
+  source.forEach((entry) => {
+    const token = String(entry || '').trim()
+    if (!token || isKnownDerivationRule(token, logicSystem)) return
+    const key = token.toLowerCase()
+    if (seen.has(key)) return
+    seen.add(key)
+    out.push(token)
+  })
+  return out
+}
+
+function normalizeRuleListText(value, logicSystem = DEFAULT_LOGIC_SYSTEM) {
+  return String(value ?? '')
+    .split(/([,\s]+)/g)
+    .map((part) => part.trim() ? normalizeRuleToken(part, logicSystem) : part)
+    .join('')
+}
+
+function getRuleValue(source, keys) {
+  const obj = source && typeof source === 'object' ? source : {}
+  for (const key of keys) {
+    if (obj[key] !== undefined) return obj[key]
+  }
+  return undefined
+}
+
+function removeRuleKeys(source, keys) {
+  const out = { ...(source && typeof source === 'object' ? source : {}) }
+  keys.forEach((key) => {
+    delete out[key]
+  })
+  return out
+}
+
+const ALLOW_RULE_KEYS = ['allow', 'allowed']
+const DISALLOW_RULE_KEYS = ['disallow', 'disallowed', 'deny', 'forbid', 'forbidden']
+const RULE_AVAILABILITY_MODES = new Set(['all', 'only', 'except'])
+
+function getRuleAvailabilityMode(ruleset, logicSystem = DEFAULT_LOGIC_SYSTEM) {
+  if (RULE_AVAILABILITY_MODES.has(ruleset?.availabilityMode)) return ruleset.availabilityMode
+  if (parseRuleList(getRuleValue(ruleset, ALLOW_RULE_KEYS), logicSystem).length) return 'only'
+  if (parseRuleList(getRuleValue(ruleset, DISALLOW_RULE_KEYS), logicSystem).length) return 'except'
+  return 'all'
+}
+
+function getAvailableDerivationRules(ruleset, logicSystem = DEFAULT_LOGIC_SYSTEM) {
+  const allRules = getDerivationRules(logicSystem)
+  const allow = parseRuleList(getRuleValue(ruleset, ALLOW_RULE_KEYS), logicSystem)
+  const disallow = parseRuleList(getRuleValue(ruleset, DISALLOW_RULE_KEYS), logicSystem)
   const disallowSet = new Set(disallow.map((rule) => rule.toLowerCase()))
-  const allow = allowFromInput.length
-    ? allowFromInput
-    : (disallow.length
-      ? ALL_DERIVATION_RULES.filter((rule) => !disallowSet.has(rule.toLowerCase()))
-      : [])
+  const source = allow.length ? allow : allRules
+  return source.filter((rule) => !disallowSet.has(rule.toLowerCase()))
+}
+
+function normalizeDerivationRuleset(ruleset, logicSystem = DEFAULT_LOGIC_SYSTEM) {
+  const source = ruleset && typeof ruleset === 'object' ? ruleset : {}
+  const mode = getRuleAvailabilityMode(source, logicSystem)
+  const allowFromInput = mode === 'only'
+    ? parseRuleList(getRuleValue(source, ALLOW_RULE_KEYS), logicSystem)
+    : []
+  const disallow = mode === 'except'
+    ? parseRuleList(getRuleValue(source, DISALLOW_RULE_KEYS), logicSystem)
+    : []
+  const require = parseRuleList(source.require ?? source.required ?? source.necessary, logicSystem)
+  const requireAny = parseRuleList(source.requireAny ?? source.requiredAny, logicSystem)
+  const disallowSet = new Set(parseRuleList(getRuleValue(source, DISALLOW_RULE_KEYS), logicSystem).map((rule) => rule.toLowerCase()))
+  const allow = mode === 'only'
+    ? allowFromInput.filter((rule) => !disallowSet.has(rule.toLowerCase()))
+    : []
 
   const normalized = {}
   if (allow.length) normalized.allow = allow
@@ -117,6 +276,37 @@ function normalizeDerivationRuleset(ruleset) {
   if (require.length) normalized.require = require
   if (requireAny.length) normalized.requireAny = requireAny
   return Object.keys(normalized).length ? normalized : null
+}
+
+function validateDerivationRuleset(ruleset, logicSystem = DEFAULT_LOGIC_SYSTEM) {
+  const source = ruleset && typeof ruleset === 'object' ? ruleset : {}
+  const mode = getRuleAvailabilityMode(source, logicSystem)
+  const allowRaw = getRuleValue(source, ALLOW_RULE_KEYS)
+  const disallowRaw = getRuleValue(source, DISALLOW_RULE_KEYS)
+  const requireRaw = source.require ?? source.required ?? source.necessary
+  const requireAnyRaw = source.requireAny ?? source.requiredAny
+  const invalid = [
+    ...invalidRuleTokens(allowRaw, logicSystem),
+    ...invalidRuleTokens(disallowRaw, logicSystem),
+    ...invalidRuleTokens(requireRaw, logicSystem),
+    ...invalidRuleTokens(requireAnyRaw, logicSystem),
+  ]
+  if (invalid.length) return `Rule does not exist in this logic system: ${invalid[0]}`
+  if (mode === 'only' && !parseRuleList(allowRaw, logicSystem).length) {
+    return 'Choose at least one available rule, or set rule availability to all rules.'
+  }
+  if (mode === 'except' && !parseRuleList(disallowRaw, logicSystem).length) {
+    return 'Choose at least one rule to exclude, or set rule availability to all rules.'
+  }
+
+  const availableSet = new Set(getAvailableDerivationRules(source, logicSystem).map((rule) => rule.toLowerCase()))
+  const required = [
+    ...parseRuleList(requireRaw, logicSystem),
+    ...parseRuleList(requireAnyRaw, logicSystem),
+  ]
+  const unavailableRequired = required.find((rule) => !availableSet.has(rule.toLowerCase()))
+  if (unavailableRequired) return `Required rule is not available to students: ${unavailableRequired}`
+  return ''
 }
 
 function buildMcSnapshot(proof, edited, existing) {
@@ -144,7 +334,7 @@ function buildMcSnapshot(proof, edited, existing) {
   return patch
 }
 
-function buildTruthTableSnapshot(proof, edited, existing) {
+function buildTruthTableSnapshot(proof, edited, existing, logicSystem = DEFAULT_LOGIC_SYSTEM) {
   const tt = proof.truthTable || {}
   const e = existing && typeof existing === 'object' ? existing : {}
   const kind = edited.kind ?? tt.kind ?? 'formula'
@@ -158,15 +348,15 @@ function buildTruthTableSnapshot(proof, edited, existing) {
     kind,
     options,
     ...(kind === 'formula' && {
-      statement: normalizeFormulaInput(edited.statement ?? tt.statement ?? tt.formula ?? ''),
+      statement: normalizeFormulaInput(edited.statement ?? tt.statement ?? tt.formula ?? '', logicSystem),
     }),
     ...(kind === 'equivalence' && {
-      left: normalizeFormulaInput(edited.left ?? tt.left ?? ''),
-      right: normalizeFormulaInput(edited.right ?? tt.right ?? ''),
+      left: normalizeFormulaInput(edited.left ?? tt.left ?? '', logicSystem),
+      right: normalizeFormulaInput(edited.right ?? tt.right ?? '', logicSystem),
     }),
     ...(kind === 'argument' && {
-      lefts: normalizeFormulaInputs(Array.isArray(edited.lefts) ? edited.lefts : (tt.lefts || [])),
-      right: normalizeFormulaInput(edited.right ?? tt.right ?? ''),
+      lefts: normalizeFormulaInputs(Array.isArray(edited.lefts) ? edited.lefts : (tt.lefts || []), logicSystem),
+      right: normalizeFormulaInput(edited.right ?? tt.right ?? '', logicSystem),
     }),
   }
   const patch = { [typeKey(e)]: 'truth-table', prompt }
@@ -175,11 +365,11 @@ function buildTruthTableSnapshot(proof, edited, existing) {
   return patch
 }
 
-function buildIndirectTruthTableSnapshot(proof, edited, existing) {
+function buildIndirectTruthTableSnapshot(proof, edited, existing, logicSystem = DEFAULT_LOGIC_SYSTEM) {
   const itt = proof.indirectTruthTable || {}
   const e = existing && typeof existing === 'object' ? existing : {}
   const prompt = edited.prompt ?? itt.prompt ?? proof.description ?? ''
-  const normalizedArgument = normalizeArgumentInput(edited.argument ?? itt.argument ?? {})
+  const normalizedArgument = normalizeArgumentInput(edited.argument ?? itt.argument ?? {}, logicSystem)
   const questions = Array.isArray(edited.questions) ? edited.questions : (itt.questions || itt.subquestions || [])
   const patch = { [typeKey(e)]: 'indirect-truth-table', prompt, argument: normalizedArgument, questions }
   if (edited.partialCredit !== undefined) {
@@ -189,12 +379,13 @@ function buildIndirectTruthTableSnapshot(proof, edited, existing) {
   return patch
 }
 
-function buildNonClassicalTruthTableSnapshot(proof, edited, existing) {
+function buildNonClassicalTruthTableSnapshot(proof, edited, existing, logicSystem = DEFAULT_LOGIC_SYSTEM) {
   const nctt = proof.nonclassicalTruthTable || {}
   const e = existing && typeof existing === 'object' ? existing : {}
   const prompt = edited.prompt ?? nctt.prompt ?? proof.description ?? ''
   const normalizedArgument = normalizeArgumentInput(
-    (edited.argument && typeof edited.argument === 'object') ? edited.argument : {}
+    (edited.argument && typeof edited.argument === 'object') ? edited.argument : {},
+    logicSystem
   )
   const questions = Array.isArray(edited.questions) ? edited.questions : (nctt.questions || nctt.subquestions || [])
   const truthValueToggle = Array.isArray(edited.truthValueToggle)
@@ -211,14 +402,22 @@ function buildNonClassicalTruthTableSnapshot(proof, edited, existing) {
   return patch
 }
 
-function buildDerivationSnapshot(proof, edited, existing) {
+function buildDerivationSnapshot(proof, edited, existing, logicSystem = DEFAULT_LOGIC_SYSTEM) {
   const e = existing && typeof existing === 'object' ? existing : {}
-  const prems = normalizeFormulaInputs(edited.premises ?? proof.premises ?? proof.prems ?? [])
-  const conclusion = normalizeFormulaInput(edited.conclusion ?? proof.conclusion ?? proof.conc ?? '')
+  const key = typeKey(e)
+  const savedType = e[key] === 'derivation-hurley' ? 'derivation-hurley' : 'derivation'
+  const activeLogicSystem = savedType === 'derivation-hurley'
+    ? 'hurley'
+    : normalizeLogicSystem(logicSystem, DEFAULT_LOGIC_SYSTEM)
+  const prems = normalizeFormulaInputs(edited.premises ?? proof.premises ?? proof.prems ?? [], activeLogicSystem)
+  const conclusion = normalizeFormulaInput(edited.conclusion ?? proof.conclusion ?? proof.conc ?? '', activeLogicSystem)
   const prompt = edited.prompt ?? proof.description ?? ''
-  const patch = { [typeKey(e)]: 'derivation', prompt, prems, conc: conclusion }
+  // new derivations stay generic and the course chooses the system
+  // old hurley snapshots keep their mark
+  const patch = { [key]: savedType, prompt, prems, conc: conclusion }
   const mergedRuleset = normalizeDerivationRuleset(
-    edited.ruleset ?? proof.ruleset ?? proof.ruleSet ?? e.ruleset
+    edited.ruleset ?? proof.ruleset ?? proof.ruleSet ?? e.ruleset,
+    activeLogicSystem
   )
   if (mergedRuleset) {
     patch.ruleset = mergedRuleset
@@ -440,7 +639,7 @@ function McEditorForm({ proof, value, onChange }) {
   )
 }
 
-function TruthTableEditorForm({ proof, value, onChange }) {
+function TruthTableEditorForm({ proof, value, onChange, logicSystem = DEFAULT_LOGIC_SYSTEM }) {
   const tt = proof?.truthTable || {}
   const kind = value.kind ?? tt.kind ?? 'formula'
   const prompt = value.prompt ?? tt.prompt ?? proof?.description ?? ''
@@ -483,7 +682,7 @@ function TruthTableEditorForm({ proof, value, onChange }) {
         <TextField
           label="Statement"
           value={statement}
-          onChange={(e) => update({ statement: normalizeFormulaInput(e.target.value) })}
+          onChange={(e) => update({ statement: normalizeFormulaInput(e.target.value, logicSystem) })}
           fullWidth
           variant="outlined"
           placeholder="e.g. (P & Q) → R"
@@ -494,14 +693,14 @@ function TruthTableEditorForm({ proof, value, onChange }) {
           <TextField
             label="Left statement"
             value={left}
-            onChange={(e) => update({ left: normalizeFormulaInput(e.target.value) })}
+            onChange={(e) => update({ left: normalizeFormulaInput(e.target.value, logicSystem) })}
             fullWidth
             variant="outlined"
           />
           <TextField
             label="Right statement"
             value={right}
-            onChange={(e) => update({ right: normalizeFormulaInput(e.target.value) })}
+            onChange={(e) => update({ right: normalizeFormulaInput(e.target.value, logicSystem) })}
             fullWidth
             variant="outlined"
           />
@@ -518,7 +717,7 @@ function TruthTableEditorForm({ proof, value, onChange }) {
                   value={line}
                   onChange={(e) => {
                     const next = [...(lefts.length ? lefts : [''])]
-                    next[idx] = normalizeFormulaInput(e.target.value)
+                    next[idx] = normalizeFormulaInput(e.target.value, logicSystem)
                     update({ lefts: next })
                   }}
                   fullWidth
@@ -547,7 +746,7 @@ function TruthTableEditorForm({ proof, value, onChange }) {
           <TextField
             label="Conclusion"
             value={right}
-            onChange={(e) => update({ right: normalizeFormulaInput(e.target.value) })}
+            onChange={(e) => update({ right: normalizeFormulaInput(e.target.value, logicSystem) })}
             fullWidth
             variant="outlined"
           />
@@ -576,7 +775,7 @@ function TruthTableEditorForm({ proof, value, onChange }) {
   )
 }
 
-function IndirectTruthTableEditorForm({ proof, value, onChange }) {
+function IndirectTruthTableEditorForm({ proof, value, onChange, logicSystem = DEFAULT_LOGIC_SYSTEM }) {
   const itt = proof?.indirectTruthTable || {}
   const prompt = value.prompt ?? itt.prompt ?? proof?.description ?? ''
   const argument = value.argument ?? itt.argument ?? {}
@@ -618,7 +817,7 @@ function IndirectTruthTableEditorForm({ proof, value, onChange }) {
               value={line}
               onChange={(e) => {
                 const next = [...(premises.length ? premises : [''])]
-                next[idx] = normalizeFormulaInput(e.target.value)
+                next[idx] = normalizeFormulaInput(e.target.value, logicSystem)
                 setPremises(next)
               }}
               fullWidth
@@ -636,7 +835,7 @@ function IndirectTruthTableEditorForm({ proof, value, onChange }) {
       <TextField
         label="Conclusion"
         value={conclusion}
-        onChange={(e) => setArgument({ conclusion: normalizeFormulaInput(e.target.value) })}
+        onChange={(e) => setArgument({ conclusion: normalizeFormulaInput(e.target.value, logicSystem) })}
         fullWidth
         variant="outlined"
       />
@@ -703,7 +902,7 @@ function IndirectTruthTableEditorForm({ proof, value, onChange }) {
   )
 }
 
-function NonClassicalTruthTableEditorForm({ proof, value, onChange }) {
+function NonClassicalTruthTableEditorForm({ proof, value, onChange, logicSystem = DEFAULT_LOGIC_SYSTEM }) {
   const rawToggle = value.truthValueToggle ?? proof?.nonclassicalTruthTable?.truthValueToggle ?? ['T', 'F', 'N']
   const toggleText = Array.isArray(rawToggle) ? rawToggle.join(',') : String(rawToggle || '')
 
@@ -724,26 +923,62 @@ function NonClassicalTruthTableEditorForm({ proof, value, onChange }) {
         fullWidth
         helperText="Comma-separated values (e.g., T, F, N or T, F, B or T, F, N, B)."
       />
-      <IndirectTruthTableEditorForm proof={proof} value={value} onChange={onChange} />
+      <IndirectTruthTableEditorForm proof={proof} value={value} onChange={onChange} logicSystem={logicSystem} />
     </Stack>
   )
 }
 
-function DerivationEditorForm({ proof, value, onChange }) {
+function DerivationEditorForm({ proof, value, onChange, logicSystem = DEFAULT_LOGIC_SYSTEM }) {
   const premises = value.premises ?? proof.premises ?? proof.prems ?? []
   const conclusion = value.conclusion ?? proof.conclusion ?? proof.conc ?? ''
   const prompt = value.prompt ?? proof.description ?? ''
-  const ruleset = value.ruleset ?? proof.ruleset ?? proof.ruleSet ?? {}
+  const rawRuleset = value.ruleset ?? proof.ruleset ?? proof.ruleSet ?? {}
+  const ruleset = rawRuleset && typeof rawRuleset === 'object' ? rawRuleset : {}
 
   const update = (updates) => onChange({ ...value, ...updates })
   const premsList = Array.isArray(premises) ? premises : (premises ? [premises] : [])
-  const toRuleText = (entries) => parseRuleList(entries).join(', ')
+  const activeLogicSystem = proof?.type === 'derivation-hurley'
+    ? 'hurley'
+    : normalizeLogicSystem(logicSystem, DEFAULT_LOGIC_SYSTEM)
+  const toRuleText = (entries) => parseRuleList(entries, activeLogicSystem).join(', ')
   const getRulesetFieldText = (fieldValue) =>
     Array.isArray(fieldValue) ? toRuleText(fieldValue) : String(fieldValue ?? '')
+  const availabilityMode = getRuleAvailabilityMode(ruleset, activeLogicSystem)
+  const availabilityText = availabilityMode === 'only'
+    ? getRulesetFieldText(getRuleValue(ruleset, ALLOW_RULE_KEYS))
+    : (availabilityMode === 'except' ? getRulesetFieldText(getRuleValue(ruleset, DISALLOW_RULE_KEYS)) : '')
+  const availableRules = getAvailableDerivationRules(ruleset, activeLogicSystem)
+  const requiredAll = parseRuleList(ruleset.require ?? ruleset.required ?? ruleset.necessary, activeLogicSystem)
+  const requiredAny = parseRuleList(ruleset.requireAny ?? ruleset.requiredAny, activeLogicSystem)
+  const rulesetMessage = validateDerivationRuleset(ruleset, activeLogicSystem)
+  const availabilitySummary = availabilityMode === 'only'
+    ? `Students may use only: ${availableRules.length ? availableRules.join(', ') : 'no rules selected'}.`
+    : (availabilityMode === 'except'
+      ? `Students may use all rules except: ${toRuleText(getRuleValue(ruleset, DISALLOW_RULE_KEYS)) || 'no rules selected'}.`
+      : 'Students may use all rules.')
+  const requirementSummary = [
+    requiredAll.length ? `Must use: ${requiredAll.join(', ')}.` : '',
+    requiredAny.length ? `Must use at least one of: ${requiredAny.join(', ')}.` : '',
+  ].filter(Boolean).join(' ')
   const setRulesetField = (field, text) => {
     const nextRuleset = {
       ...ruleset,
-      [field]: text,
+      [field]: normalizeRuleListText(text, activeLogicSystem),
+    }
+    update({ ruleset: nextRuleset })
+  }
+  const setAvailabilityMode = (mode) => {
+    const nextRuleset = removeRuleKeys(ruleset, [...ALLOW_RULE_KEYS, ...DISALLOW_RULE_KEYS])
+    nextRuleset.availabilityMode = mode
+    update({ ruleset: nextRuleset })
+  }
+  const setAvailabilityRules = (text) => {
+    const nextRuleset = removeRuleKeys(ruleset, [...ALLOW_RULE_KEYS, ...DISALLOW_RULE_KEYS])
+    nextRuleset.availabilityMode = availabilityMode
+    if (availabilityMode === 'only') {
+      nextRuleset.allow = normalizeRuleListText(text, activeLogicSystem)
+    } else if (availabilityMode === 'except') {
+      nextRuleset.disallow = normalizeRuleListText(text, activeLogicSystem)
     }
     update({ ruleset: nextRuleset })
   }
@@ -768,7 +1003,7 @@ function DerivationEditorForm({ proof, value, onChange }) {
               value={line}
               onChange={(e) => {
                 const next = [...(premsList.length ? premsList : [''])]
-                next[idx] = normalizeFormulaInput(e.target.value)
+                next[idx] = normalizeFormulaInput(e.target.value, activeLogicSystem)
                 update({ premises: next })
               }}
               fullWidth
@@ -786,26 +1021,32 @@ function DerivationEditorForm({ proof, value, onChange }) {
       <TextField
         label="Conclusion"
         value={conclusion}
-        onChange={(e) => update({ conclusion: normalizeFormulaInput(e.target.value) })}
+        onChange={(e) => update({ conclusion: normalizeFormulaInput(e.target.value, activeLogicSystem) })}
         fullWidth
         variant="outlined"
       />
-      <TextField
-        label="Allowed rules"
-        value={getRulesetFieldText(ruleset.allow)}
-        onChange={(e) => setRulesetField('allow', e.target.value)}
-        fullWidth
-        variant="outlined"
-        placeholder="e.g. MP, MT, DS, CP, IP"
-      />
-      <TextField
-        label="Disallowed rules"
-        value={getRulesetFieldText(ruleset.disallow)}
-        onChange={(e) => setRulesetField('disallow', e.target.value)}
-        fullWidth
-        variant="outlined"
-        placeholder="e.g. DN, DM"
-      />
+      <FormControl component="fieldset">
+        <Typography variant="subtitle2" sx={{ mb: 0.5 }}>Rule availability</Typography>
+        <RadioGroup value={availabilityMode} onChange={(e) => setAvailabilityMode(e.target.value)}>
+          <FormControlLabel value="all" control={<Radio size="small" />} label="All rules are available" />
+          <FormControlLabel value="only" control={<Radio size="small" />} label="Only these rules are available" />
+          <FormControlLabel value="except" control={<Radio size="small" />} label="All except these rules" />
+        </RadioGroup>
+      </FormControl>
+      {availabilityMode !== 'all' && (
+        <TextField
+          label={availabilityMode === 'only' ? 'Available rules' : 'Excluded rules'}
+          value={availabilityText}
+          onChange={(e) => setAvailabilityRules(e.target.value)}
+          fullWidth
+          variant="outlined"
+          placeholder={activeLogicSystem === 'hurley' ? 'e.g. MP, MT, DS, CP, IP' : 'e.g. R, ∧I, ∧E, →E'}
+          error={Boolean(rulesetMessage)}
+          helperText={rulesetMessage || (availabilityMode === 'only'
+            ? 'Only listed rules appear to students and pass validation.'
+            : 'Listed rules are hidden from students and rejected by validation.')}
+        />
+      )}
       <TextField
         label="Required rules (all)"
         value={getRulesetFieldText(ruleset.require)}
@@ -822,6 +1063,9 @@ function DerivationEditorForm({ proof, value, onChange }) {
         variant="outlined"
         placeholder="e.g. UI, UG, EI, EG"
       />
+      <Typography variant="body2" sx={{ color: rulesetMessage ? 'error.main' : 'text.secondary' }}>
+        {rulesetMessage || `${availabilitySummary}${requirementSummary ? ` ${requirementSummary}` : ''}`}
+      </Typography>
     </Stack>
   )
 }
@@ -834,28 +1078,28 @@ function buildTrueFalseSnapshot(proof, edited, existing) {
   return { [typeKey(e)]: 'true-false', prompt, answer: Boolean(answer) }
 }
 
-function buildEvaluateTruthSnapshot(proof, edited, existing) {
+function buildEvaluateTruthSnapshot(proof, edited, existing, logicSystem = DEFAULT_LOGIC_SYSTEM) {
   const e = existing && typeof existing === 'object' ? existing : {}
-  const statement = normalizeFormulaInput(edited.statement ?? proof.evaluateTruth ?? proof.description ?? '')
+  const statement = normalizeFormulaInput(edited.statement ?? proof.evaluateTruth ?? proof.description ?? '', logicSystem)
   const answer = edited.answer !== undefined ? edited.answer : (proof.answer ?? false)
   return { [typeKey(e)]: 'evaluate-truth', prompt: statement, statement, answer: Boolean(answer) }
 }
 
-function buildSymbolicTranslationSnapshot(proof, edited, existing) {
+function buildSymbolicTranslationSnapshot(proof, edited, existing, logicSystem = DEFAULT_LOGIC_SYSTEM) {
   const tr = proof.translation || {}
   const e = existing && typeof existing === 'object' ? existing : {}
   const prompt = edited.prompt ?? tr.prompt ?? proof.description ?? ''
   const rawKey = Array.isArray(edited.symbolizationKey) ? edited.symbolizationKey : (tr.symbolizationKey || [])
   const symbolizationKey = rawKey.filter((x) => x != null && String(x).trim() !== '')
-  const answer = normalizeFormulaInput(edited.answer ?? proof.answer ?? tr.answer ?? '')
+  const answer = normalizeFormulaInput(edited.answer ?? proof.answer ?? tr.answer ?? '', logicSystem)
   const patch = { [typeKey(e)]: 'symbolic-translation', prompt, symbolizationKey, answer }
   if (e.legend !== undefined) patch.legend = edited.legend ?? tr.legend ?? proof.legend ?? ''
   return patch
 }
 
-function buildSingleRowTruthTableSnapshot(proof, edited, existing) {
+function buildSingleRowTruthTableSnapshot(proof, edited, existing, logicSystem = DEFAULT_LOGIC_SYSTEM) {
   const sr = proof.singleRowTruthTable || {}
-  const statement = normalizeFormulaInput(edited.statement ?? sr.statement ?? sr.formula ?? proof.description ?? '')
+  const statement = normalizeFormulaInput(edited.statement ?? sr.statement ?? sr.formula ?? proof.description ?? '', logicSystem)
   const prompt = edited.prompt ?? sr.prompt ?? proof.description ?? ''
   const editedInterp = edited.interpretation ?? sr.interpretation ?? {}
   const hasEditedInterp = editedInterp && typeof editedInterp === 'object' && Object.keys(editedInterp).length > 0
@@ -868,16 +1112,16 @@ function buildSingleRowTruthTableSnapshot(proof, edited, existing) {
   }
 }
 
-function buildPartialTruthTableSnapshot(proof, edited, existing) {
+function buildPartialTruthTableSnapshot(proof, edited, existing, logicSystem = DEFAULT_LOGIC_SYSTEM) {
   const pt = proof.partialTruthTable || {}
   const e = existing && typeof existing === 'object' ? existing : {}
-  const statement = normalizeFormulaInput(edited.statement ?? pt.statement ?? pt.formula ?? '')
+  const statement = normalizeFormulaInput(edited.statement ?? pt.statement ?? pt.formula ?? '', logicSystem)
   const prompt = edited.prompt ?? pt.prompt ?? proof.description ?? ''
   const row = Array.isArray(edited.row) ? edited.row : (pt.row || [])
   return { [typeKey(e)]: 'partial-truth-table', prompt, statement, row }
 }
 
-function buildComboSnapshot(proof, edited, existing, comboTypeKey) {
+function buildComboSnapshot(proof, edited, existing, comboTypeKey, logicSystem = DEFAULT_LOGIC_SYSTEM) {
   const snapshot = proof[comboTypeKey] || proof.snapshot || {}
   const e = existing && typeof existing === 'object' ? existing : {}
   const prompt = edited.prompt ?? snapshot.prompt ?? proof.description ?? ''
@@ -888,7 +1132,7 @@ function buildComboSnapshot(proof, edited, existing, comboTypeKey) {
     const answer =
       raw != null && raw !== ''
         ? typeof raw === 'string'
-          ? { argument: normalizeFormulaInput(raw) }
+          ? { argument: normalizeFormulaInput(raw, logicSystem) }
           : raw
         : proof.answer ?? snapshot.answer
     if (answer != null) patch.answer = answer
@@ -914,12 +1158,13 @@ function TrueFalseEditorForm({ proof, value, onChange }) {
   )
 }
 
-function EvaluateTruthEditorForm({ proof, value, onChange }) {
+function EvaluateTruthEditorForm({ proof, value, onChange, logicSystem = DEFAULT_LOGIC_SYSTEM }) {
   const statement = value.statement ?? proof?.evaluateTruth ?? proof?.description ?? ''
   const answer = value.answer ?? proof?.answer ?? false
+  const symbols = getSymbols(logicSystem)
   return (
     <Stack spacing={2}>
-      <TextField label="Statement" multiline minRows={1} value={statement} onChange={(e) => onChange({ ...value, statement: normalizeFormulaInput(e.target.value) })} fullWidth variant="outlined" placeholder="e.g. P & Q" />
+      <TextField label="Statement" multiline minRows={1} value={statement} onChange={(e) => onChange({ ...value, statement: normalizeFormulaInput(e.target.value, logicSystem) })} fullWidth variant="outlined" placeholder={`e.g. P ${symbols.and} Q`} />
       <FormControl>
         <Typography variant="subtitle2" sx={{ mb: 1 }}>Correct answer</Typography>
         <RadioGroup row value={answer ? 'true' : 'false'} onChange={(e) => onChange({ ...value, answer: e.target.value === 'true' })}>
@@ -931,8 +1176,9 @@ function EvaluateTruthEditorForm({ proof, value, onChange }) {
   )
 }
 
-function SymbolicTranslationEditorForm({ proof, value, onChange }) {
+function SymbolicTranslationEditorForm({ proof, value, onChange, logicSystem = DEFAULT_LOGIC_SYSTEM }) {
   const tr = proof?.translation || {}
+  const symbols = getSymbols(logicSystem)
   const prompt = value.prompt ?? tr.prompt ?? proof?.description ?? ''
   const legend = value.legend ?? tr.legend ?? proof?.legend ?? ''
   const symbolizationKey = Array.isArray(value.symbolizationKey) ? value.symbolizationKey : (tr.symbolizationKey || [])
@@ -957,24 +1203,24 @@ function SymbolicTranslationEditorForm({ proof, value, onChange }) {
         ))}
         <Button size="small" startIcon={<AddIcon />} onClick={() => onChange({ ...value, symbolizationKey: [...keyList, ''] })}>Add line</Button>
       </Box>
-      <TextField label="Correct answer" value={answer} onChange={(e) => onChange({ ...value, answer: normalizeFormulaInput(e.target.value) })} fullWidth variant="outlined" placeholder="e.g. P & Q" />
+      <TextField label="Correct answer" value={answer} onChange={(e) => onChange({ ...value, answer: normalizeFormulaInput(e.target.value, logicSystem) })} fullWidth variant="outlined" placeholder={`e.g. P ${symbols.and} Q`} />
     </Stack>
   )
 }
 
-function SingleRowTruthTableEditorForm({ proof, value, onChange }) {
+function SingleRowTruthTableEditorForm({ proof, value, onChange, logicSystem = DEFAULT_LOGIC_SYSTEM }) {
   const sr = proof?.singleRowTruthTable || {}
   const statement = value.statement ?? sr.statement ?? proof?.description ?? ''
   const prompt = value.prompt ?? sr.prompt ?? proof?.description ?? ''
   return (
     <Stack spacing={2}>
-      <TextField label="Statement" value={statement} onChange={(e) => onChange({ ...value, statement: normalizeFormulaInput(e.target.value) })} fullWidth variant="outlined" />
+      <TextField label="Statement" value={statement} onChange={(e) => onChange({ ...value, statement: normalizeFormulaInput(e.target.value, logicSystem) })} fullWidth variant="outlined" />
       <TextField label="Prompt" multiline minRows={1} value={prompt} onChange={(e) => onChange({ ...value, prompt: e.target.value })} fullWidth variant="outlined" />
     </Stack>
   )
 }
 
-function PartialTruthTableEditorForm({ proof, value, onChange }) {
+function PartialTruthTableEditorForm({ proof, value, onChange, logicSystem = DEFAULT_LOGIC_SYSTEM }) {
   const pt = proof?.partialTruthTable || {}
   const statement = value.statement ?? pt.statement ?? pt.formula ?? proof?.description ?? ''
   const prompt = value.prompt ?? pt.prompt ?? proof?.description ?? ''
@@ -985,7 +1231,7 @@ function PartialTruthTableEditorForm({ proof, value, onChange }) {
   }
   return (
     <Stack spacing={2}>
-      <TextField label="Statement" value={statement} onChange={(e) => onChange({ ...value, statement: normalizeFormulaInput(e.target.value) })} fullWidth variant="outlined" />
+      <TextField label="Statement" value={statement} onChange={(e) => onChange({ ...value, statement: normalizeFormulaInput(e.target.value, logicSystem) })} fullWidth variant="outlined" />
       <TextField label="Prompt" value={prompt} onChange={(e) => onChange({ ...value, prompt: e.target.value })} fullWidth variant="outlined" />
       <TextField label="Given row" value={rowStr} onChange={(e) => setRow(e.target.value)} fullWidth variant="outlined" placeholder="T, F, , T" />
     </Stack>
@@ -1000,8 +1246,9 @@ function ComboPromptEditorForm({ proof, value, onChange, label = 'Prompt' }) {
   )
 }
 
-function ComboTruthTableEditorForm({ proof, value, onChange }) {
+function ComboTruthTableEditorForm({ proof, value, onChange, logicSystem = DEFAULT_LOGIC_SYSTEM }) {
   const snapshot = proof?.comboTranslationTruthTable || proof?.snapshot || {}
+  const symbols = getSymbols(logicSystem)
   const prompt = value.prompt ?? snapshot.prompt ?? proof?.description ?? ''
   const answerObj = proof?.answer ?? snapshot?.answer
   const argumentLine =
@@ -1013,10 +1260,10 @@ function ComboTruthTableEditorForm({ proof, value, onChange }) {
       <TextField
         label="Expected argument"
         value={argumentLine}
-        onChange={(e) => onChange({ ...value, argumentLine: normalizeFormulaInput(e.target.value) })}
+        onChange={(e) => onChange({ ...value, argumentLine: normalizeFormulaInput(e.target.value, logicSystem) })}
         fullWidth
         variant="outlined"
-        placeholder="P ⊃ Q / P // Q"
+        placeholder={`P ${symbols.conditional} Q / P // Q`}
       />
     </Stack>
   )
@@ -1029,6 +1276,7 @@ const SUPPORTED_TYPES = new Set([
   'nonclassical-truth-table',
   'derivation',
   'derivation-hurley',
+  'derivation-calgary',
   'true-false',
   'evaluate-truth',
   'symbolic-translation',
@@ -1048,6 +1296,7 @@ function InstructorQuestionEditorInner({
   mode = 'edit',
   trigger = 'button',
   forwardedRef,
+  logicSystem,
 }) {
   const [open, setOpen] = React.useState(false)
   const [editValue, setEditValue] = React.useState({})
@@ -1058,6 +1307,9 @@ function InstructorQuestionEditorInner({
   const questionId = proof?.questionId
   const supported = proof?.type && SUPPORTED_TYPES.has(proof.type)
   const isCreate = mode === 'create'
+  const activeLogicSystem = proof?.type === 'derivation-hurley'
+    ? 'hurley'
+    : normalizeLogicSystem(logicSystem ?? proof?.logicSystem, DEFAULT_LOGIC_SYSTEM)
 
   const handleOpen = React.useCallback(() => {
     const base = { attemptLimit: proof?.attemptLimit ?? 3 }
@@ -1110,7 +1362,7 @@ function InstructorQuestionEditorInner({
       base.truthValueToggle = Array.isArray(nctt.truthValueToggle) ? [...nctt.truthValueToggle] : ['T', 'F', 'N']
       base.partialCredit = Boolean(proof.partialCredit)
     }
-    if (proof?.type === 'derivation' || proof?.type === 'derivation-hurley') {
+    if (isDerivationProblemType(proof?.type)) {
       base.prompt = proof.description ?? ''
       base.premises = Array.isArray(proof.premises) ? [...proof.premises] : (Array.isArray(proof.prems) ? [...proof.prems] : [])
       base.conclusion = proof.conclusion ?? proof.conc ?? ''
@@ -1193,27 +1445,27 @@ function InstructorQuestionEditorInner({
       if (proof.type === 'multiple-choice') {
         question_snapshot = buildMcSnapshot(proof, editValue, existing)
       } else if (proof.type === 'truth-table') {
-        question_snapshot = buildTruthTableSnapshot(proof, editValue, existing)
+        question_snapshot = buildTruthTableSnapshot(proof, editValue, existing, activeLogicSystem)
       } else if (proof.type === 'indirect-truth-table') {
-        question_snapshot = buildIndirectTruthTableSnapshot(proof, editValue, existing)
+        question_snapshot = buildIndirectTruthTableSnapshot(proof, editValue, existing, activeLogicSystem)
       } else if (proof.type === 'nonclassical-truth-table') {
-        question_snapshot = buildNonClassicalTruthTableSnapshot(proof, editValue, existing)
-      } else if (proof.type === 'derivation' || proof.type === 'derivation-hurley') {
-        question_snapshot = buildDerivationSnapshot(proof, editValue, existing)
+        question_snapshot = buildNonClassicalTruthTableSnapshot(proof, editValue, existing, activeLogicSystem)
+      } else if (isDerivationProblemType(proof.type)) {
+        question_snapshot = buildDerivationSnapshot(proof, editValue, existing, activeLogicSystem)
       } else if (proof.type === 'true-false') {
         question_snapshot = buildTrueFalseSnapshot(proof, editValue, existing)
       } else if (proof.type === 'evaluate-truth') {
-        question_snapshot = buildEvaluateTruthSnapshot(proof, editValue, existing)
+        question_snapshot = buildEvaluateTruthSnapshot(proof, editValue, existing, activeLogicSystem)
       } else if (proof.type === 'symbolic-translation') {
-        question_snapshot = buildSymbolicTranslationSnapshot(proof, editValue, existing)
+        question_snapshot = buildSymbolicTranslationSnapshot(proof, editValue, existing, activeLogicSystem)
       } else if (proof.type === 'single-row-truth-table') {
-        question_snapshot = buildSingleRowTruthTableSnapshot(proof, editValue, existing)
+        question_snapshot = buildSingleRowTruthTableSnapshot(proof, editValue, existing, activeLogicSystem)
       } else if (proof.type === 'partial-truth-table') {
-        question_snapshot = buildPartialTruthTableSnapshot(proof, editValue, existing)
+        question_snapshot = buildPartialTruthTableSnapshot(proof, editValue, existing, activeLogicSystem)
       } else if (proof.type === 'combo-translation-truth-table') {
-        question_snapshot = buildComboSnapshot(proof, editValue, existing, 'comboTranslationTruthTable')
+        question_snapshot = buildComboSnapshot(proof, editValue, existing, 'comboTranslationTruthTable', activeLogicSystem)
       } else if (proof.type === 'combo-translation-derivation') {
-        question_snapshot = buildComboSnapshot(proof, editValue, existing, 'comboTranslationDerivation')
+        question_snapshot = buildComboSnapshot(proof, editValue, existing, 'comboTranslationDerivation', activeLogicSystem)
       } else {
         setSaving(false)
         return
@@ -1221,6 +1473,21 @@ function InstructorQuestionEditorInner({
       let mergedSnapshot = deepMerge(existing, question_snapshot)
       if (proof.type === 'single-row-truth-table') {
         delete mergedSnapshot.singleRowTruthTable
+      }
+      if (isDerivationProblemType(proof.type)) {
+        const rulesetLogicSystem = proof.type === 'derivation-hurley' ? 'hurley' : activeLogicSystem
+        const rulesetError = validateDerivationRuleset(editValue.ruleset ?? question_snapshot.ruleset, rulesetLogicSystem)
+        if (rulesetError) {
+          setError(rulesetError)
+          setSaving(false)
+          return
+        }
+      }
+      const formulaError = validateQuestionSnapshotFormulas(mergedSnapshot, activeLogicSystem)
+      if (formulaError) {
+        setError(`Invalid formula: ${formulaError}`)
+        setSaving(false)
+        return
       }
       const attemptLimit = editValue.attemptLimit
 
@@ -1325,34 +1592,34 @@ function InstructorQuestionEditorInner({
               <McEditorForm proof={proof} value={editValue} onChange={setEditValue} />
             )}
             {proof.type === 'truth-table' && (
-              <TruthTableEditorForm proof={proof} value={editValue} onChange={setEditValue} />
+              <TruthTableEditorForm proof={proof} value={editValue} onChange={setEditValue} logicSystem={activeLogicSystem} />
             )}
             {proof.type === 'indirect-truth-table' && (
-              <IndirectTruthTableEditorForm proof={proof} value={editValue} onChange={setEditValue} />
+              <IndirectTruthTableEditorForm proof={proof} value={editValue} onChange={setEditValue} logicSystem={activeLogicSystem} />
             )}
             {proof.type === 'nonclassical-truth-table' && (
-              <NonClassicalTruthTableEditorForm proof={proof} value={editValue} onChange={setEditValue} />
+              <NonClassicalTruthTableEditorForm proof={proof} value={editValue} onChange={setEditValue} logicSystem={activeLogicSystem} />
             )}
-            {(proof.type === 'derivation' || proof.type === 'derivation-hurley') && (
-              <DerivationEditorForm proof={proof} value={editValue} onChange={setEditValue} />
+            {isDerivationProblemType(proof.type) && (
+              <DerivationEditorForm proof={proof} value={editValue} onChange={setEditValue} logicSystem={activeLogicSystem} />
             )}
             {proof.type === 'true-false' && (
               <TrueFalseEditorForm proof={proof} value={editValue} onChange={setEditValue} />
             )}
             {proof.type === 'evaluate-truth' && (
-              <EvaluateTruthEditorForm proof={proof} value={editValue} onChange={setEditValue} />
+              <EvaluateTruthEditorForm proof={proof} value={editValue} onChange={setEditValue} logicSystem={activeLogicSystem} />
             )}
             {proof.type === 'symbolic-translation' && (
-              <SymbolicTranslationEditorForm proof={proof} value={editValue} onChange={setEditValue} />
+              <SymbolicTranslationEditorForm proof={proof} value={editValue} onChange={setEditValue} logicSystem={activeLogicSystem} />
             )}
             {proof.type === 'single-row-truth-table' && (
-              <SingleRowTruthTableEditorForm proof={proof} value={editValue} onChange={setEditValue} />
+              <SingleRowTruthTableEditorForm proof={proof} value={editValue} onChange={setEditValue} logicSystem={activeLogicSystem} />
             )}
             {proof.type === 'partial-truth-table' && (
-              <PartialTruthTableEditorForm proof={proof} value={editValue} onChange={setEditValue} />
+              <PartialTruthTableEditorForm proof={proof} value={editValue} onChange={setEditValue} logicSystem={activeLogicSystem} />
             )}
             {proof.type === 'combo-translation-truth-table' && (
-              <ComboTruthTableEditorForm proof={proof} value={editValue} onChange={setEditValue} />
+              <ComboTruthTableEditorForm proof={proof} value={editValue} onChange={setEditValue} logicSystem={activeLogicSystem} />
             )}
             {proof.type === 'combo-translation-derivation' && (
               <ComboPromptEditorForm proof={proof} value={editValue} onChange={setEditValue} label="Prompt" />
@@ -1371,7 +1638,7 @@ function InstructorQuestionEditorInner({
 }
 
 const InstructorQuestionEditor = React.forwardRef(function InstructorQuestionEditor(
-  { proof, isInstructorView, onSaved, onCreated, assignmentId, orderIndex, mode = 'edit', trigger = 'button' },
+  { proof, isInstructorView, onSaved, onCreated, assignmentId, orderIndex, mode = 'edit', trigger = 'button', logicSystem },
   ref
 ) {
   return (
@@ -1384,6 +1651,7 @@ const InstructorQuestionEditor = React.forwardRef(function InstructorQuestionEdi
       orderIndex={orderIndex}
       mode={mode}
       trigger={trigger}
+      logicSystem={logicSystem}
       forwardedRef={ref}
     />
   )

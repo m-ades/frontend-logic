@@ -15,6 +15,10 @@ import {
   Divider,
 } from "@mui/material";
 import { useState } from "react";
+import {
+  DEFAULT_LOGIC_SYSTEM,
+  getLogicSystemOptions,
+} from "../../../lib/logicSystems.js";
 
 const SEMESTER_TERMS = ["Spring", "Summer", "Fall", "Winter"];
 
@@ -30,6 +34,7 @@ const COURSE_COLORS = [
 ];
 
 const DEFAULT_YEAR = new Date().getFullYear();
+const LOGIC_SYSTEM_OPTIONS = getLogicSystemOptions();
 
 
 export default function CreateCourseDialog({ open, onClose, onSubmit }) {
@@ -38,6 +43,7 @@ export default function CreateCourseDialog({ open, onClose, onSubmit }) {
     code: "",
     term: "Spring",
     year: DEFAULT_YEAR.toString(),
+    logicSystem: DEFAULT_LOGIC_SYSTEM,
     color: "#1976d2",
   });
 
@@ -90,6 +96,7 @@ export default function CreateCourseDialog({ open, onClose, onSubmit }) {
       name: formData.name.trim(),
       code: formData.code.trim().toUpperCase(),
       term: `${formData.term} ${formData.year}`,
+      logicSystem: formData.logicSystem,
       status: "current",
       color: formData.color,
     };
@@ -104,6 +111,7 @@ export default function CreateCourseDialog({ open, onClose, onSubmit }) {
       code: "",
       term: "Spring",
       year: DEFAULT_YEAR.toString(),
+      logicSystem: DEFAULT_LOGIC_SYSTEM,
       color: "#536DFE",
     });
     setErrors({});
@@ -169,6 +177,21 @@ export default function CreateCourseDialog({ open, onClose, onSubmit }) {
               sx={{ width: 140 }}
             />
           </Box>
+
+          <FormControl fullWidth>
+            <InputLabel>Logic System</InputLabel>
+            <Select
+              value={formData.logicSystem}
+              onChange={handleChange("logicSystem")}
+              label="Logic System"
+            >
+              {LOGIC_SYSTEM_OPTIONS.map((system) => (
+                <MenuItem key={system.id} value={system.id}>
+                  {system.label}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
 
           <Box>
             <Typography variant="body2" color="text.secondary" sx={{ mb: 1.5 }}>

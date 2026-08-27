@@ -124,7 +124,7 @@ export function tokenizeTruthTableHeader(statement, syntax) {
   return Array.from(statement.replace(/\s/g, '').matchAll(regex)).map((match) => match[0])
 }
 
-export function deriveTruthTableSolutionClassification(kind, solution, statements, Formula) {
+export function deriveTruthTableSolutionClassification(kind, solution, statements, Formula, notation) {
   if (kind === 'formula') {
     if (solution?.taut) return ['tautology']
     if (solution?.contra) return ['self-contradiction']
@@ -132,7 +132,7 @@ export function deriveTruthTableSolutionClassification(kind, solution, statement
     if (statements.length === 0) return []
     try {
       const wff = Formula.from(statements[0])
-      const { taut, contra } = formulaTable(wff)
+      const { taut, contra } = formulaTable(wff, notation)
       if (taut) return ['tautology']
       if (contra) return ['self-contradiction']
       return ['contingent']
@@ -148,7 +148,7 @@ export function deriveTruthTableSolutionClassification(kind, solution, statement
     try {
       const leftWffs = statements.slice(0, -1).map((statement) => Formula.from(statement))
       const rightWff = Formula.from(statements[statements.length - 1])
-      const { valid } = argumentTables(leftWffs, rightWff)
+      const { valid } = argumentTables(leftWffs, rightWff, notation)
       return valid ? ['valid'] : ['invalid']
     } catch {
       return []
@@ -161,7 +161,7 @@ export function deriveTruthTableSolutionClassification(kind, solution, statement
     try {
       const fa = Formula.from(statements[0])
       const fb = Formula.from(statements[1])
-      const { equiv, A, B } = equivTables(fa, fb)
+      const { equiv, A, B } = equivTables(fa, fb, notation)
       if (equiv) return ['equivalent']
       const toBool = (value) => value === true || value === 'T'
       let contra = true

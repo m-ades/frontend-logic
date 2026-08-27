@@ -10,9 +10,9 @@
 import getSyntax from './libsyntax.js';
 import { arrayUnion } from '../misc.js';
 
-let cachedFormulaClass = null;
+const formulaClasses = {};
 
-function generateFormulaClass() {
+function generateFormulaClass(notationname = 'hurley') {
     class Formula {
 
         // start by recording what string got parsed
@@ -28,7 +28,7 @@ function generateFormulaClass() {
         // having to redo work that was already done
         static repository = {};
 
-        static syntax = getSyntax();
+        static syntax = getSyntax(notationname);
 
         // main function for fetching from the repository or adding to it
         // if necessary
@@ -809,10 +809,10 @@ function generateFormulaClass() {
 
 // main function, either retrieves a Formula class from those
 // already generated, or generates a new one and returns it
-export default function getFormulaClass() {
-    if (cachedFormulaClass) {
-        return cachedFormulaClass;
+export default function getFormulaClass(notationname = 'hurley') {
+    if (formulaClasses[notationname]) {
+        return formulaClasses[notationname];
     }
-    cachedFormulaClass = generateFormulaClass();
-    return cachedFormulaClass;
+    formulaClasses[notationname] = generateFormulaClass(notationname);
+    return formulaClasses[notationname];
 }

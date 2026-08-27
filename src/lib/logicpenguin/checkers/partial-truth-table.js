@@ -34,7 +34,7 @@ function computeExpected(question, options) {
     }
     const Formula = getFormulaClass(options?.notation);
     const wff = Formula.from(statement);
-    const tables = multiTables([wff]);
+    const tables = multiTables([wff], options?.notation);
     const tokens = tables?.tables?.[0]?.tokens ?? [];
     const rows = tables?.tables?.[0]?.rows ?? [];
 

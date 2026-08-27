@@ -136,7 +136,7 @@ export default async function(
         const conclusion = given.conclusion;
         const pwffs = premises.map((p)=> Formula.from(p));
         const cwff = Formula.from(conclusion);
-        const tablesShouldBe = argumentTables(pwffs, cwff);
+        const tablesShouldBe = argumentTables(pwffs, cwff, notation);
         const tcQ = {
             prems: premises,
             conc: conclusion

@@ -71,6 +71,7 @@ export default function SandboxTruthTable({
   defaultToggleValues = DEFAULT_TOGGLE,
   tokenTextTransform = 'uppercase',
   problemLabel,
+  logicSystem,
 }) {
   const instanceId = useId()
   const editorRef = useRef(null)
@@ -337,6 +338,7 @@ export default function SandboxTruthTable({
           isInstructorView
           onSaved={onQuestionSaved}
           trigger="none"
+          logicSystem={logicSystem}
         />
       ) : null}
     >

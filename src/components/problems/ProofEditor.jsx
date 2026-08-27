@@ -23,6 +23,7 @@ export default function ProofEditor({
   isInstructorView = false,
   onQuestionSaved,
   problemLabel,
+  logicSystem,
 }) {
   const theme = useTheme()
   const editorRef = useRef(null)
@@ -144,6 +145,7 @@ export default function ProofEditor({
         isInstructorView={isInstructorView}
         onEditQuestion={openEdit}
         problemLabel={problemLabel}
+        logicSystem={logicSystem}
       />
     </Box>,
     document.body
@@ -180,6 +182,7 @@ export default function ProofEditor({
             isInstructorView={isInstructorView}
             onEditQuestion={openEdit}
             problemLabel={problemLabel}
+            logicSystem={logicSystem}
           />
         )}
 
@@ -190,6 +193,7 @@ export default function ProofEditor({
           isInstructorView
           onSaved={onQuestionSaved}
           trigger="none"
+          logicSystem={logicSystem}
         />
       )}
 
