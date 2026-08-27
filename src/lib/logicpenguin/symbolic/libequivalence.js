@@ -523,14 +523,15 @@ function priorityOf(s, mode, Formula) {
 function tree(sprouts, mode, Formula) {
     const syntax = Formula.syntax;
     const cRegEx = syntax.cRegEx;
-    const ncRegEx = syntax.ncRegEx;
     const constCP = syntax.notation.constantsRange.codePointAt(0);
     let terms = [];
     const termsleft = [];
     if (mode != 'abbreviatedtt') {
         for (const sprout of sprouts) {
             for (const a of sprout) {
-                terms = arrayUnion(terms, a.replace(ncRegEx,'').split(''));
+                const constants = (a.match(syntax.termsRegEx) ?? [])
+                    .filter((term) => cRegEx.test(term));
+                terms = arrayUnion(terms, constants);
             }
         }
         if (mode == 'small') {

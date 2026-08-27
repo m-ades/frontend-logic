@@ -34,7 +34,7 @@ const notations = {
         FALSUM  : '✖',
         constantsRange: 'a-w',
         predicatesRange: '=≠A-Z',
-        quantifierForm: 'Qx',
+        quantifierForm: '(Qx)',
         schematicLetters: '𝒜𝒜𝓍𝒶𝓃',
         useTermParensCommas: false,
         variableRange: 'x-z'

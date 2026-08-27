@@ -10,6 +10,10 @@ import {
   equivTables,
   formulaTable,
 } from '../../../lib/logicpenguin/symbolic/libsemantics.js'
+import {
+  displayIndexedSymbolsForNotation,
+  isPropositionalSymbol,
+} from '../../../lib/indexedSymbols.js'
 
 
 export function buildClassificationState(selection = []) {
@@ -118,10 +122,23 @@ export function tokenizeTruthTableHeader(statement, syntax) {
   for (const operator in syntax.operators) {
     rstr += operator
   }
-  rstr += `][${syntax.notation.constantsRange}${syntax.notation.variableRange}]*`
+  const indexedRange = syntax.notationname === 'calgary' ? '_0-9' : ''
+  rstr += `][${syntax.notation.constantsRange}${syntax.notation.variableRange}${indexedRange}]*`
   rstr += '[)\\]}]*'
   const regex = new RegExp(rstr, 'g')
-  return Array.from(statement.replace(/\s/g, '').matchAll(regex)).map((match) => match[0])
+  const normalizedStatement = syntax.inputfix(statement).replace(/\s/g, '')
+  return Array.from(normalizedStatement.matchAll(regex)).map((match) => (
+    displayIndexedSymbolsForNotation(match[0], syntax.notationname)
+  ))
+}
+
+export function isAtomicTruthTableToken(token, operatorSet, syntax) {
+  if (!token) return false
+  const stripped = token.replace(/[()\[\]{}]/g, '')
+  if (syntax?.notationname === 'calgary' && isPropositionalSymbol(stripped)) {
+    return true
+  }
+  return stripped.length === 1 && !operatorSet.has(stripped)
 }
 
 export function deriveTruthTableSolutionClassification(kind, solution, statements, Formula, notation) {

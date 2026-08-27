@@ -298,16 +298,6 @@ function generateFormulaClass(notationname = 'hurley') {
             if ("_opspot" in this) {
                 return this._opspot;
             }
-            // set whether parentheses around quantifiers
-            // Check both the notation definition and if the actual string has parentheses
-            const parensinqs = (Formula.syntax.notation
-                .quantifierForm.indexOf('(') != -1);
-            // Also check if the parsed string actually starts with a parenthesized quantifier
-            const actualParensinqs = (() => {
-                const qMatch = this.parsedstr.match(Formula.syntax.qaRegEx);
-                return qMatch && qMatch[0].startsWith('(') && qMatch[0].endsWith(')');
-            })();
-
             // -1 means no operator found so far
             this._opspot = -1;
             let currdepth = 0;
@@ -346,20 +336,23 @@ function generateFormulaClass(notationname = 'hurley') {
                 // if we're at the start of a quantifier
                 let isop = Formula.syntax.isop(c);
                 let startswithq = remainder.match(Formula.syntax.qaRegEx);
+                const quantifierHasParens = startswithq &&
+                    startswithq[0].startsWith('(') &&
+                    startswithq[0].endsWith(')');
                 // don't count ∃ as an operator if matching (∃x) at the
                 // parenthesis as well
-                if ((parensinqs || actualParensinqs) && c == Formula.syntax.symbols.EXISTS &&
+                if (quantifierHasParens && c == Formula.syntax.symbols.EXISTS &&
                     !startswithq) { isop = false; }
                 // quantifiers starting with parentheses really have
                 // one less depth
                 const realdepth = (
-                    (startswithq && (parensinqs || actualParensinqs)) ? currdepth -1 : currdepth
+                    quantifierHasParens ? currdepth -1 : currdepth
                 );
                 // determine operator, either the symbol, or the quantifier
                 let thisop = c;
                 if (startswithq) {
                     let m = startswithq[0];
-                    // check if it's just (x) without a quantifier symbol, treat as (∀x)
+                    // Hurley allows (x) without a quantifier symbol as (∀x).
                     const varOnlyMatch = m.match(new RegExp('^\\(' + '[' + Formula.syntax.notation.variableRange + ']' + '\\)$'));
                     if (varOnlyMatch) {
                         thisop = Formula.syntax.symbols.FORALL;
@@ -420,7 +413,8 @@ function generateFormulaClass(notationname = 'hurley') {
                 this._pletter = false;
                 return this._pletter;
             }
-            // look for first character which is a predicate
+            // Look for the predicate/propositional symbol, including any
+            // canonical numeric index (for example, E_1).
             const match = this.parsedstr.match(Formula.syntax.pletterRegEx);
             // has no pletter, which is not ok
             if (!match) {
@@ -430,21 +424,24 @@ function generateFormulaClass(notationname = 'hurley') {
                     + 'predicates are not accepted.');
                 return this._pletter;
             }
-            // position should be 0, or 2 in the case of =; may need to
-            // change this to accommodate complex terms
+            // Ordinary predicates begin the atomic formula. Identity is
+            // infix and must have one complete term on each side.
             this._pletter = match[0];
             const pos = match.index;
             if (pos != 0 && this._pletter != '=' && this._pletter != '≠') {
                 this.syntaxError('unexpected characters appear before the ' +
                     'letter ' + this._pletter);
             }
-            if (pos != 2 && this._pletter == '=') {
-                this.syntaxError('the identity relation symbol = occurs ' +
-                    'in an unexpected place');
-            }
-            if (pos != 2 && this._pletter == '≠') {
-                this.syntaxError('the nonidentity symbol ≠ occurs ' +
-                    'in an unexpected place');
+            if (this._pletter == '=' || this._pletter == '≠') {
+                const leftTerm = this.parsedstr.slice(0, pos).trim();
+                const rightTerm = this.parsedstr.slice(pos + 1).trim();
+                if (!Formula.syntax.termaRegEx.test(leftTerm) ||
+                    !Formula.syntax.termaRegEx.test(rightTerm)) {
+                    this.syntaxError('the ' +
+                        ((this._pletter == '=') ? 'identity' : 'nonidentity') +
+                        ' relation symbol ' + this._pletter +
+                        ' must occur between two complete terms');
+                }
             }
 
             return this._pletter;
@@ -528,9 +525,14 @@ function generateFormulaClass(notationname = 'hurley') {
                 this._termshadcommas = true;
             }
 
-            
-            this._terms = nocommas.match(Formula.syntax.termsRegEx);
-            if (!this._terms) { this._terms = []; }
+            // Parse complete term tokens so indexed names/variables such as
+            // a_1 and x_2 remain indivisible terms. For atomic formulas,
+            // reject rather than silently discard any unmatched characters.
+            this._terms = nocommas.match(Formula.syntax.termsRegEx) ?? [];
+            if ((!this.op) && (this._terms.join('') != nocommas)) {
+                this.syntaxError('unexpected symbols occur within an ' +
+                    'atomic (sub)formula');
+            }
             return this._terms;
         }
 
@@ -815,4 +817,12 @@ export default function getFormulaClass(notationname = 'hurley') {
     }
     formulaClasses[notationname] = generateFormulaClass(notationname);
     return formulaClasses[notationname];
+}
+
+export function canonicalizeFormula(value, notationname = 'hurley') {
+    const Formula = getFormulaClass(notationname);
+    const normalized = Formula.syntax.inputfix(String(value ?? '')).replace(/\s+/g, ' ').trim();
+    if (!normalized) { return normalized; }
+    const formula = Formula.from(normalized);
+    return formula.wellformed ? formula.normal : normalized;
 }

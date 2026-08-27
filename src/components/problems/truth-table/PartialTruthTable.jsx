@@ -11,6 +11,7 @@ import InstructorQuestionEditor from '../InstructorQuestionEditor.jsx'
 import { useTheme } from '@mui/material/styles'
 import getFormulaClass from '../../../lib/logicpenguin/symbolic/formula.js'
 import { multiTables } from '../../../lib/logicpenguin/symbolic/libsemantics.js'
+import { displayIndexedSymbolsForNotation } from '../../../lib/indexedSymbols.js'
 import ProblemSetButtons from '../mui/frame/ProblemSetButtons.jsx'
 import ProblemFrame from '../mui/frame/ProblemFrame.jsx'
 import TruthTableGrid from './TruthTableGrid.jsx'
@@ -139,10 +140,10 @@ export default function PartialTruthTable({
   const tables = useMemo(
     () => [{
       tokens,
-      headerTokens: tokens,
+      headerTokens: tokens.map((token) => displayIndexedSymbolsForNotation(token, notation)),
       rows: [rowInputs],
     }],
-    [rowInputs, tokens]
+    [notation, rowInputs, tokens]
   )
   const selectedGridColumns = useMemo(
     () => selectedColumns.map((colIndex) => ({ tableIndex: 0, colIndex })),
@@ -178,7 +179,7 @@ export default function PartialTruthTable({
     >
       {statement && (
         <Typography sx={{ fontSize: '1.1rem' }}>
-          {statement}
+          {displayIndexedSymbolsForNotation(statement, notation)}
         </Typography>
       )}
       <TruthTableGrid

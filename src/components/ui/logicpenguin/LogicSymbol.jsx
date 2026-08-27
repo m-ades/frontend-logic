@@ -8,9 +8,13 @@ const SYMBOL_SPEECH = {
   '≡': 'triple bar',
   '∀': 'universal quantifier',
   '∃': 'existential quantifier',
+  '⊥': 'contradiction',
+  '✖': 'contradiction',
 }
 
 const EXPR_SPEECH = {
+  '∀x': 'universal quantifier x',
+  '∃x': 'existential quantifier x',
   '(∀x)': 'universal quantifier x',
   '(∃x)': 'existential quantifier x',
   '()': 'parentheses',
@@ -25,6 +29,7 @@ const PUNCT_SPEECH = {
   '{': 'left brace',
   '}': 'right brace',
   '/': 'slash',
+  '_': 'subscript',
 }
 
 const getSymbolSpeech = (symbol) => {

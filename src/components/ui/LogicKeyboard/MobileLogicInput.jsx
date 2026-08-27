@@ -8,6 +8,7 @@ import LogicInput from './LogicInput.jsx'
 import SymbolButtonRow, { symbolRowButtonSx } from '../logicpenguin/SymbolButtonRow.jsx'
 import getSyntax from '../../../lib/logicpenguin/symbolic/libsyntax.js'
 import { getNotation } from '../../../lib/logicSystems.js'
+import { displayIndexedSymbolsForNotation } from '../../../lib/indexedSymbols.js'
 
 const DEFAULT_LETTERS = ['P', 'Q', 'R', 'S', 'T']
 const DESKTOP_KEYBOARD_ON_MOBILE_KEY = 'logicapp_desktop_keyboard_on_mobile'
@@ -102,6 +103,14 @@ export default function MobileLogicInput({
   const [isClosing, setIsClosing] = useState(false)
   const [slideIn, setSlideIn] = useState(false)
   const desktopInputRef = useRef(null)
+  const notation = getNotation(logicSystem)
+  const syntax = getSyntax(notation)
+  const symbols = syntax?.symbols || {}
+  const symbolcat = syntax?.symbolcat || {}
+  const formatForDisplay = useCallback(
+    (nextValue) => displayIndexedSymbolsForNotation(nextValue, notation),
+    [notation]
+  )
 
   const onChangeRef = useRef(onChange)
   const setCursorRef = useRef(setCursorPosition)
@@ -112,9 +121,6 @@ export default function MobileLogicInput({
   valueRef.current = value ?? ''
   cursorRef.current = cursorPosition
 
-  const syntax = getSyntax(getNotation(logicSystem))
-  const symbols = syntax?.symbols || {}
-  const symbolcat = syntax?.symbolcat || {}
   const usePredicateLayout = Array.isArray(predicateLetters) && Array.isArray(constantLetters) && Array.isArray(variableLettersProp)
   const variableLettersFromKey = useMemo(() => getVariableLettersOnly(symbolizationKey), [symbolizationKey])
   const variableLetters = usePredicateLayout ? variableLettersProp : variableLettersFromKey
@@ -130,8 +136,10 @@ export default function MobileLogicInput({
       focus() {},
       setRangeText(text, start, end, _selectMode) {
         const val = this.value
-        const newVal = val.slice(0, start) + text + val.slice(end)
-        const newPos = start + text.length
+        const rawValue = val.slice(0, start) + text + val.slice(end)
+        const rawPosition = start + text.length
+        const newVal = this.formatForDisplay(rawValue)
+        const newPos = this.formatForDisplay(rawValue.slice(0, rawPosition)).length
         this.value = newVal
         this.selectionStart = newPos
         this.selectionEnd = newPos
@@ -140,6 +148,7 @@ export default function MobileLogicInput({
         setCursorRef.current(newPos)
         onChangeRef.current?.(newVal)
       },
+      formatForDisplay,
       setSelectionRange(s, e) {
         this.selectionStart = s
         this.selectionEnd = e ?? s
@@ -163,6 +172,7 @@ export default function MobileLogicInput({
   facade.selectionEnd = cursorPosition
   facade.symbols = symbols
   facade.symbolcat = symbolcat
+  facade.formatForDisplay = formatForDisplay
 
   useEffect(() => {
     if (!inputRef) return
@@ -208,18 +218,9 @@ export default function MobileLogicInput({
       if (!f) return
       const start = f.selectionStart ?? 0
       const end = f.selectionEnd ?? start
-      const val = f.value ?? ''
-      const newVal = val.slice(0, start) + letter + val.slice(end)
-      const newPos = start + letter.length
-      f.value = newVal
-      f.selectionStart = newPos
-      f.selectionEnd = newPos
-      valueRef.current = newVal
-      cursorRef.current = newPos
-      setCursorPosition(newPos)
-      onChange?.(newVal)
+      f.setRangeText(letter, start, end, 'end')
     },
-    [onChange]
+    []
   )
 
   useEffect(() => {
@@ -259,8 +260,9 @@ export default function MobileLogicInput({
 
   if (!mobileLogicKeyboardEnabled) {
     const syncDesktopValue = (nextValue) => {
-      valueRef.current = nextValue
-      onChangeRef.current?.(nextValue)
+      const formatted = formatForDisplay(nextValue)
+      valueRef.current = formatted
+      onChangeRef.current?.(formatted)
     }
 
     const setDesktopInputRef = (node) => {
@@ -290,7 +292,7 @@ export default function MobileLogicInput({
         <TextField
           fullWidth
           value={value ?? ''}
-          onChange={(event) => onChange?.(event.target.value)}
+          onChange={(event) => syncDesktopValue(event.target.value)}
           onKeyDown={(event) => {
             const input = desktopInputRef.current
             if (!input) return
@@ -345,7 +347,7 @@ export default function MobileLogicInput({
     <>
       <LogicInput
         value={value ?? ''}
-        onChange={onChange}
+        onChange={(nextValue) => onChangeRef.current?.(formatForDisplay(nextValue))}
         onFocus={handleFocus}
         onBlur={handleBlur}
         cursorPosition={cursorPosition}

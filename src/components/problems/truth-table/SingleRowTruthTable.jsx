@@ -9,7 +9,7 @@ import ProblemSetButtons from '../mui/frame/ProblemSetButtons.jsx'
 import ProblemFrame from '../mui/frame/ProblemFrame.jsx'
 import TruthTableGrid from './TruthTableGrid.jsx'
 import TruthTableSection from './TruthTableSection.jsx'
-import { tokenizeTruthTableHeader } from './truthTableUi.js'
+import { isAtomicTruthTableToken, tokenizeTruthTableHeader } from './truthTableUi.js'
 import { useProblemChecker } from '../../../hooks/useProblemChecker.js'
 import { rowsEqual, clearDebounce, scheduleDebouncedChange } from '../../../utils/tablePerf.js'
 import { getNotation } from '../../../lib/logicSystems.js'
@@ -90,11 +90,8 @@ export default function SingleRowTruthTable({
   }), [evaluation])
 
   const isAtomicToken = useCallback((token) => {
-    if (!token) return false
-    const stripped = token.replace(/[()\[\]{}]/g, '')
-    if (stripped.length !== 1) return false
-    return !operatorSet.has(stripped)
-  }, [operatorSet])
+    return isAtomicTruthTableToken(token, operatorSet, syntax)
+  }, [operatorSet, syntax])
 
   const initialRow = useMemo(
     () =>

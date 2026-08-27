@@ -14,6 +14,7 @@ import getFormulaClass from '../../../../lib/logicpenguin/symbolic/formula.js'
 import { useProblemChecker } from '../../../../hooks/useProblemChecker.js'
 import PromptText from '../../../ui/PromptText.jsx'
 import { getNotation, getSymbols } from '../../../../lib/logicSystems.js'
+import { normalizeIndexedSymbols } from '../../../../lib/indexedSymbols.js'
 
 /** Extract symbolization key lines from prompt text (e.g. "E = ...\\nL = ..."). Used for mobile keyboard variable letters. */
 function parseSymbolizationKeyFromPrompt(promptText) {
@@ -113,6 +114,7 @@ export default function ComboTranslationTruthTable({
   const editorRef = useRef(null)
   const openEdit = () => editorRef.current?.open?.()
   const notation = getNotation(logicSystem)
+  const allowIndexedSymbols = notation === 'calgary'
   const symbols = getSymbols(logicSystem)
   const Formula = useMemo(() => getFormulaClass(notation), [notation])
   const syntax = useMemo(() => getSyntax(notation), [notation])
@@ -144,7 +146,7 @@ export default function ComboTranslationTruthTable({
       color: theme.palette.text.primary,
     })
     container.appendChild(inp)
-    inp.value = argumentLine ?? ''
+    inp.value = inp.inputfix(argumentLine ?? '')
     const onInput = () => {
       setArgumentLine(inp.value)
       setTableState(null)
@@ -165,7 +167,7 @@ export default function ComboTranslationTruthTable({
     const inp = inputRef.current
     if (!inp || argumentLine === undefined || inp.value === argumentLine) return
     if (document.activeElement === inp) return
-    inp.value = argumentLine
+    inp.value = inp.inputfix(argumentLine)
   }, [argumentLine, isPhone])
 
   useEffect(() => {
@@ -176,7 +178,12 @@ export default function ComboTranslationTruthTable({
 
   const updateState = (updates) => {
     const state = { argumentLine, tableState, ...updates }
-    onStateChange?.(state)
+    onStateChange?.({
+      ...state,
+      argumentLine: allowIndexedSymbols
+        ? normalizeIndexedSymbols(state.argumentLine)
+        : state.argumentLine,
+    })
   }
 
   const parseStatus = useMemo(() => {

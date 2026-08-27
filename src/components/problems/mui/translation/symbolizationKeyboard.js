@@ -1,22 +1,35 @@
+import {
+  getIndexedLowerSymbols,
+  getIndexedUpperSymbols,
+  getLeadingIndexedUpperSymbol,
+  isPropositionalSymbol,
+  normalizeIndexedSymbols,
+} from '../../../../lib/indexedSymbols.js'
+
 // Predicate / propositional helpers for symbolization keys.
 // Key can use "=" or ":" (e.g. "Mx: x is a musician", "a = Alice", "P = It is raining").
-// Propositional keys: single uppercase letters only (P, Q, R). Predicate keys: constants (a, b)
-// and/or predicate-plus-variables (Mx, Pxy).
+// Fitch propositional keys may use numeric indices (P, E_1, E₁).
+// Other systems retain the legacy single-letter propositional grammar.
+// Predicate keys: constants (a, b) and/or predicate-plus-variables (Mx, Pxy).
 export function getLeftPart(line) {
   const s = typeof line === 'string' ? line : String(line ?? '')
   const idx = s.search(/[=:]/)
   return idx === -1 ? s.trim() : s.slice(0, idx).trim()
 }
 
-export function isPredicateLogicKey(symbolizationKey) {
+export function isPredicateLogicKey(symbolizationKey, allowIndexedSymbols = false) {
   if (!Array.isArray(symbolizationKey) || symbolizationKey.length === 0) return false
   return symbolizationKey.some((line) => {
     const left = getLeftPart(line)
     // Constant: single lowercase a–w (e.g. "a = Alice")
-    const isConstantStyle =
-      left.length === 1 && /^[a-z]$/.test(left) && !['x', 'y', 'z'].includes(left)
-    // Predicate form: starts with uppercase and has more than one char (e.g. Mx, Pxy), not single P/Q/R
-    const isPredicateStyle = left.length > 1 && /^[A-Z]/.test(left)
+    const normalizedLeft = normalizeIndexedSymbols(left)
+    const isConstantStyle = allowIndexedSymbols
+      ? /^[a-r](?:_[1-9][0-9]*)?$/.test(normalizedLeft)
+      : left.length === 1 && /^[a-z]$/.test(left) && !['x', 'y', 'z'].includes(left)
+    // Indexed sentence letters such as E_1/E₁ are still propositional atoms.
+    const isPredicateStyle = /^[A-Z]/.test(left) && !(
+      allowIndexedSymbols && isPropositionalSymbol(left)
+    ) && (left.length > 1)
     return isConstantStyle || isPredicateStyle
   })
 }
@@ -27,12 +40,13 @@ export function promptImpliesPredicateLogic(promptText) {
   return /\bpredicate logic\b/.test(text)
 }
 
-export function getPredicateLettersFromKey(symbolizationKey) {
+export function getPredicateLettersFromKey(symbolizationKey, allowIndexedSymbols = false) {
   if (!Array.isArray(symbolizationKey) || symbolizationKey.length === 0) return []
   const seen = new Set()
   return symbolizationKey
     .map((line) => {
       const left = getLeftPart(line)
+      if (allowIndexedSymbols) return getLeadingIndexedUpperSymbol(left)
       const match = left.match(/^[A-Z]+/)
       return match ? match[0] : null
     })
@@ -40,20 +54,19 @@ export function getPredicateLettersFromKey(symbolizationKey) {
 }
 
 /** Constants from key: lines whose left part is a single lowercase letter (a–w, not x,y,z). */
-export function getConstantLettersFromKey(symbolizationKey) {
+export function getConstantLettersFromKey(symbolizationKey, allowIndexedSymbols = false) {
   if (!Array.isArray(symbolizationKey) || symbolizationKey.length === 0) return []
   const result = []
   const seen = new Set()
   for (const line of symbolizationKey) {
     const left = getLeftPart(line)
-    if (
-      left.length === 1 &&
-      /^[a-z]$/.test(left) &&
-      !['x', 'y', 'z'].includes(left) &&
-      !seen.has(left)
-    ) {
-      seen.add(left)
-      result.push(left)
+    const normalizedLeft = normalizeIndexedSymbols(left)
+    const isConstant = allowIndexedSymbols
+      ? /^[a-r](?:_[1-9][0-9]*)?$/.test(normalizedLeft)
+      : left.length === 1 && /^[a-z]$/.test(left) && !['x', 'y', 'z'].includes(left)
+    if (isConstant && !seen.has(normalizedLeft)) {
+      seen.add(normalizedLeft)
+      result.push(normalizedLeft)
     }
   }
   return result
@@ -83,12 +96,19 @@ export function getConstantLettersFromPromptAndKey(promptText, symbolizationKey,
 
 const unique = (items) => Array.from(new Set(items.filter(Boolean)))
 
-export function getFormulaKeyboardConfig(formulas) {
+export function getFormulaKeyboardConfig(formulas, allowIndexedSymbols = false) {
   const formulaText = (Array.isArray(formulas) ? formulas : []).map(String).join(' ')
   if (!formulaText.trim()) return null
-  const predicateLetters = unique(formulaText.match(/[A-Z]/g) || [])
-  const constantLetters = unique(formulaText.match(/[a-w]/g) || [])
-  const variableLetters = unique(formulaText.match(/[x-z]/g) || [])
+  const predicateLetters = allowIndexedSymbols
+    ? getIndexedUpperSymbols(formulaText)
+    : unique(formulaText.match(/[A-Z]/g) || [])
+  const indexedTerms = allowIndexedSymbols ? getIndexedLowerSymbols(formulaText) : []
+  const constantLetters = allowIndexedSymbols
+    ? indexedTerms.filter((term) => /^[a-r]/.test(term))
+    : unique(formulaText.match(/[a-w]/g) || [])
+  const variableLetters = allowIndexedSymbols
+    ? indexedTerms.filter((term) => /^[s-z]/.test(term))
+    : unique(formulaText.match(/[x-z]/g) || [])
   const isPredicate =
     constantLetters.length > 0 ||
     variableLetters.length > 0 ||
@@ -108,7 +128,7 @@ export function getFormulaKeyboardConfig(formulas) {
       }
 }
 
-export function parseSymbolizationKeyFromPrompt(promptText) {
+export function parseSymbolizationKeyFromPrompt(promptText, allowIndexedSymbols = false) {
   if (!promptText || typeof promptText !== 'string') return []
   const text = promptText
     .replace(/<br\s*\/?>/gi, '\n')
@@ -116,5 +136,13 @@ export function parseSymbolizationKeyFromPrompt(promptText) {
     .replace(/&nbsp;/gi, ' ')
   const keyMatch = text.match(/symbolization key\s*:?\s*([\s\S]*)/i)
   if (!keyMatch) return []
-  return Array.from(keyMatch[1].matchAll(/\b[A-Za-z]+\s*[=:]/g)).map((match) => match[0])
+  if (!allowIndexedSymbols) {
+    return Array.from(keyMatch[1].matchAll(/\b[A-Za-z]+\s*[=:]/g))
+      .map((match) => match[0])
+  }
+  return Array.from(
+    keyMatch[1].matchAll(
+      /\b[A-Za-z](?:_[1-9][0-9]*|[₁-₉][₀-₉]*)?(?:\([^)]*\))?\s*[=:]/g
+    )
+  ).map((match) => normalizeIndexedSymbols(match[0]))
 }

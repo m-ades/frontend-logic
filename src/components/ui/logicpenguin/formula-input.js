@@ -9,8 +9,31 @@
 
 import getSyntax from '../../../lib/logicpenguin/symbolic/libsyntax.js';
 import { addelem, htmlEscape } from '../../../lib/logicpenguin/common.js';
+import { displayIndexedSymbolsForNotation } from '../../../lib/indexedSymbols.js';
 
 export default class FormulaInput {
+
+    static formatForDisplay(value) {
+        return displayIndexedSymbolsForNotation(this.syntax.inputfix(value),
+            this.notation);
+    }
+
+    static input() {
+        const raw = this.value;
+        const start = this.selectionStart ?? raw.length;
+        const end = this.selectionEnd ?? start;
+        const formatted = displayIndexedSymbolsForNotation(raw, this.notation);
+        if (formatted !== raw) {
+            const displayLength = (value) =>
+                displayIndexedSymbolsForNotation(value, this.notation).length;
+            this.value = formatted;
+            this.setSelectionRange(
+                displayLength(raw.slice(0, start)),
+                displayLength(raw.slice(0, end))
+            );
+        }
+        this.myline?.mysubderiv?.myprob.makeChanged?.(false, true);
+    }
 
     // generic function for making changes, used by other functions
     static autoChange(findbefore, repbefore, ins, findafter, repafter) {
@@ -139,11 +162,7 @@ export default class FormulaInput {
         elem.addEventListener("focus", FormulaInput.focus);
         elem.addEventListener("keydown", FormulaInput.keydown);
         // input always make the problem changed
-        elem.addEventListener("input", () => {
-            if (this?.myline?.mysubderiv?.myprob.makeChanged) {
-                this?.myline?.mysubderiv?.myprob.makeChanged(false, true);
-            }
-        });
+        elem.addEventListener("input", FormulaInput.input);
         elem.addEventListener("change", () => {
             if (this?.myline?.mysubderiv?.myprob.makeChanged) {
                 this?.myline?.mysubderiv?.myprob.makeChanged();
@@ -158,8 +177,9 @@ export default class FormulaInput {
         // attach syntax, symbols and inputfix
         const syntax = getSyntax(options.notation);
         elem.syntax = syntax;
+        elem.notation = syntax.notationname;
         elem.symbols = syntax.symbols;
-        elem.inputfix = syntax.inputfix;
+        elem.inputfix = FormulaInput.formatForDisplay;
 
         // attach a symbolwidget
         elem.symbolwidget = makeSymbolWidget();
@@ -371,7 +391,11 @@ export default class FormulaInput {
         }
 
         // falsums
-        if (e.key == '#' || e.key == '✖' || e.key == '×' || e.key == '_' ||
+        const underscoreStartsIndex = e.key == '_' &&
+            (this.notation ?? this.syntax?.notationname) == 'calgary' &&
+            /[A-Za-z]$/.test(this.value.substr(0, this.selectionStart));
+        if (e.key == '#' || e.key == '✖' || e.key == '×' ||
+            (e.key == '_' && !underscoreStartsIndex) ||
             e.key == '⊥' || e.key == '⨳' || e.key == '↯') {
             e.preventDefault();
             this.insOp('FALSUM');

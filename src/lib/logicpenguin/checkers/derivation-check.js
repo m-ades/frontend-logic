@@ -254,6 +254,18 @@ export default class DerivationCheck {
         }
         // parse it
         const { nums, ranges, citedrules } = justParse(line.j);
+        if (!this.flatAssumptions && (nums.length > 0 || ranges.length > 0)) {
+            const rawJustification = String(line.j).trim();
+            const firstReferenceIndex = rawJustification.search(/[0-9?]/);
+            const firstRuleIndex = rawJustification.search(/[^\s,0-9?–—−-]/);
+            if (firstRuleIndex < 0 || firstRuleIndex > firstReferenceIndex) {
+                this.adderror(line.n, 'justification', 'high',
+                    'must put the rule before the cited line number(s)');
+            } else if (!/\s/.test(rawJustification[firstReferenceIndex - 1])) {
+                this.adderror(line.n, 'justification', 'high',
+                    'must include a space between the rule and cited line number(s)');
+            }
+        }
         // ensure availability of nums and ranges
         for (const num of nums) {
             if (num == '?') {

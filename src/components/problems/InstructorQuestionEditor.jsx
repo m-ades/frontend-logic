@@ -38,6 +38,7 @@ import {
   getDerivationRuleLookup,
   getDerivationRules,
 } from '../../lib/derivationRules.js'
+import { displayIndexedSymbolsForNotation } from '../../lib/indexedSymbols.js'
 
 // deep merge. source overwrites. arrays replace.
 function deepMerge(target, source) {
@@ -60,6 +61,14 @@ function typeKey(existing) {
 
 function normalizeFormulaInput(value, logicSystem = DEFAULT_LOGIC_SYSTEM) {
   return getSyntax(getNotation(logicSystem)).inputfix(String(value ?? '')).trim()
+}
+
+function displayFormulaInput(value, logicSystem = DEFAULT_LOGIC_SYSTEM) {
+  const notation = getNotation(logicSystem)
+  return displayIndexedSymbolsForNotation(
+    getSyntax(notation).inputfix(String(value ?? '')),
+    notation
+  ).trim()
 }
 
 function normalizeFormulaInputs(values, logicSystem = DEFAULT_LOGIC_SYSTEM) {
@@ -682,7 +691,7 @@ function TruthTableEditorForm({ proof, value, onChange, logicSystem = DEFAULT_LO
         <TextField
           label="Statement"
           value={statement}
-          onChange={(e) => update({ statement: normalizeFormulaInput(e.target.value, logicSystem) })}
+          onChange={(e) => update({ statement: displayFormulaInput(e.target.value, logicSystem) })}
           fullWidth
           variant="outlined"
           placeholder="e.g. (P & Q) → R"
@@ -693,14 +702,14 @@ function TruthTableEditorForm({ proof, value, onChange, logicSystem = DEFAULT_LO
           <TextField
             label="Left statement"
             value={left}
-            onChange={(e) => update({ left: normalizeFormulaInput(e.target.value, logicSystem) })}
+            onChange={(e) => update({ left: displayFormulaInput(e.target.value, logicSystem) })}
             fullWidth
             variant="outlined"
           />
           <TextField
             label="Right statement"
             value={right}
-            onChange={(e) => update({ right: normalizeFormulaInput(e.target.value, logicSystem) })}
+            onChange={(e) => update({ right: displayFormulaInput(e.target.value, logicSystem) })}
             fullWidth
             variant="outlined"
           />
@@ -717,7 +726,7 @@ function TruthTableEditorForm({ proof, value, onChange, logicSystem = DEFAULT_LO
                   value={line}
                   onChange={(e) => {
                     const next = [...(lefts.length ? lefts : [''])]
-                    next[idx] = normalizeFormulaInput(e.target.value, logicSystem)
+                    next[idx] = displayFormulaInput(e.target.value, logicSystem)
                     update({ lefts: next })
                   }}
                   fullWidth
@@ -746,7 +755,7 @@ function TruthTableEditorForm({ proof, value, onChange, logicSystem = DEFAULT_LO
           <TextField
             label="Conclusion"
             value={right}
-            onChange={(e) => update({ right: normalizeFormulaInput(e.target.value, logicSystem) })}
+            onChange={(e) => update({ right: displayFormulaInput(e.target.value, logicSystem) })}
             fullWidth
             variant="outlined"
           />
@@ -817,7 +826,7 @@ function IndirectTruthTableEditorForm({ proof, value, onChange, logicSystem = DE
               value={line}
               onChange={(e) => {
                 const next = [...(premises.length ? premises : [''])]
-                next[idx] = normalizeFormulaInput(e.target.value, logicSystem)
+                next[idx] = displayFormulaInput(e.target.value, logicSystem)
                 setPremises(next)
               }}
               fullWidth
@@ -835,7 +844,7 @@ function IndirectTruthTableEditorForm({ proof, value, onChange, logicSystem = DE
       <TextField
         label="Conclusion"
         value={conclusion}
-        onChange={(e) => setArgument({ conclusion: normalizeFormulaInput(e.target.value, logicSystem) })}
+        onChange={(e) => setArgument({ conclusion: displayFormulaInput(e.target.value, logicSystem) })}
         fullWidth
         variant="outlined"
       />
@@ -1003,7 +1012,7 @@ function DerivationEditorForm({ proof, value, onChange, logicSystem = DEFAULT_LO
               value={line}
               onChange={(e) => {
                 const next = [...(premsList.length ? premsList : [''])]
-                next[idx] = normalizeFormulaInput(e.target.value, activeLogicSystem)
+                next[idx] = displayFormulaInput(e.target.value, activeLogicSystem)
                 update({ premises: next })
               }}
               fullWidth
@@ -1021,7 +1030,7 @@ function DerivationEditorForm({ proof, value, onChange, logicSystem = DEFAULT_LO
       <TextField
         label="Conclusion"
         value={conclusion}
-        onChange={(e) => update({ conclusion: normalizeFormulaInput(e.target.value, activeLogicSystem) })}
+        onChange={(e) => update({ conclusion: displayFormulaInput(e.target.value, activeLogicSystem) })}
         fullWidth
         variant="outlined"
       />
@@ -1164,7 +1173,7 @@ function EvaluateTruthEditorForm({ proof, value, onChange, logicSystem = DEFAULT
   const symbols = getSymbols(logicSystem)
   return (
     <Stack spacing={2}>
-      <TextField label="Statement" multiline minRows={1} value={statement} onChange={(e) => onChange({ ...value, statement: normalizeFormulaInput(e.target.value, logicSystem) })} fullWidth variant="outlined" placeholder={`e.g. P ${symbols.and} Q`} />
+      <TextField label="Statement" multiline minRows={1} value={statement} onChange={(e) => onChange({ ...value, statement: displayFormulaInput(e.target.value, logicSystem) })} fullWidth variant="outlined" placeholder={`e.g. P ${symbols.and} Q`} />
       <FormControl>
         <Typography variant="subtitle2" sx={{ mb: 1 }}>Correct answer</Typography>
         <RadioGroup row value={answer ? 'true' : 'false'} onChange={(e) => onChange({ ...value, answer: e.target.value === 'true' })}>
@@ -1186,7 +1195,7 @@ function SymbolicTranslationEditorForm({ proof, value, onChange, logicSystem = D
   const keyList = Array.isArray(symbolizationKey) && symbolizationKey.length > 0 ? symbolizationKey : ['']
   const updateKey = (idx, str) => {
     const next = [...keyList]
-    next[idx] = str
+    next[idx] = displayIndexedSymbolsForNotation(str, getNotation(logicSystem))
     onChange({ ...value, symbolizationKey: next.filter(Boolean) })
   }
   return (
@@ -1203,7 +1212,7 @@ function SymbolicTranslationEditorForm({ proof, value, onChange, logicSystem = D
         ))}
         <Button size="small" startIcon={<AddIcon />} onClick={() => onChange({ ...value, symbolizationKey: [...keyList, ''] })}>Add line</Button>
       </Box>
-      <TextField label="Correct answer" value={answer} onChange={(e) => onChange({ ...value, answer: normalizeFormulaInput(e.target.value, logicSystem) })} fullWidth variant="outlined" placeholder={`e.g. P ${symbols.and} Q`} />
+      <TextField label="Correct answer" value={answer} onChange={(e) => onChange({ ...value, answer: displayFormulaInput(e.target.value, logicSystem) })} fullWidth variant="outlined" placeholder={`e.g. P ${symbols.and} Q`} />
     </Stack>
   )
 }
@@ -1214,7 +1223,7 @@ function SingleRowTruthTableEditorForm({ proof, value, onChange, logicSystem = D
   const prompt = value.prompt ?? sr.prompt ?? proof?.description ?? ''
   return (
     <Stack spacing={2}>
-      <TextField label="Statement" value={statement} onChange={(e) => onChange({ ...value, statement: normalizeFormulaInput(e.target.value, logicSystem) })} fullWidth variant="outlined" />
+      <TextField label="Statement" value={statement} onChange={(e) => onChange({ ...value, statement: displayFormulaInput(e.target.value, logicSystem) })} fullWidth variant="outlined" />
       <TextField label="Prompt" multiline minRows={1} value={prompt} onChange={(e) => onChange({ ...value, prompt: e.target.value })} fullWidth variant="outlined" />
     </Stack>
   )
@@ -1231,7 +1240,7 @@ function PartialTruthTableEditorForm({ proof, value, onChange, logicSystem = DEF
   }
   return (
     <Stack spacing={2}>
-      <TextField label="Statement" value={statement} onChange={(e) => onChange({ ...value, statement: normalizeFormulaInput(e.target.value, logicSystem) })} fullWidth variant="outlined" />
+      <TextField label="Statement" value={statement} onChange={(e) => onChange({ ...value, statement: displayFormulaInput(e.target.value, logicSystem) })} fullWidth variant="outlined" />
       <TextField label="Prompt" value={prompt} onChange={(e) => onChange({ ...value, prompt: e.target.value })} fullWidth variant="outlined" />
       <TextField label="Given row" value={rowStr} onChange={(e) => setRow(e.target.value)} fullWidth variant="outlined" placeholder="T, F, , T" />
     </Stack>
@@ -1260,7 +1269,7 @@ function ComboTruthTableEditorForm({ proof, value, onChange, logicSystem = DEFAU
       <TextField
         label="Expected argument"
         value={argumentLine}
-        onChange={(e) => onChange({ ...value, argumentLine: normalizeFormulaInput(e.target.value, logicSystem) })}
+        onChange={(e) => onChange({ ...value, argumentLine: displayFormulaInput(e.target.value, logicSystem) })}
         fullWidth
         variant="outlined"
         placeholder={`P ${symbols.conditional} Q / P // Q`}

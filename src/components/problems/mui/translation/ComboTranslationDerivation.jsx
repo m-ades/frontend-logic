@@ -17,6 +17,10 @@ import { useProblemChecker } from '../../../../hooks/useProblemChecker.js'
 import PromptText from '../../../ui/PromptText.jsx'
 import { getNotation, getSymbols } from '../../../../lib/logicSystems.js'
 import {
+  displayIndexedSymbolsForNotation,
+  normalizeIndexedSymbols,
+} from '../../../../lib/indexedSymbols.js'
+import {
   ST_PREDICATE_VARIABLES,
   getConstantLettersFromKey,
   getFormulaKeyboardConfig,
@@ -26,7 +30,7 @@ import {
   promptImpliesPredicateLogic,
 } from './symbolizationKeyboard.js'
 
-function FormulaInputField({ value, onValueChange, formulaInputRef, notation }) {
+function FormulaInputField({ value, onValueChange, onBlur, formulaInputRef, notation }) {
   const theme = useTheme()
   const containerRef = useRef(null)
   const changeHandlerRef = useRef(null)
@@ -98,6 +102,7 @@ function FormulaInputField({ value, onValueChange, formulaInputRef, notation }) 
   return (
     <Box
       ref={containerRef}
+      onBlur={onBlur}
       sx={{
         width: '100%',
         minHeight: '56px',
@@ -163,17 +168,23 @@ function firstWithFormulas(...candidates) {
   return null
 }
 
-function getArgumentKeyboardConfig(answer, symbolizationKey, prompt, argumentLine) {
+function getArgumentKeyboardConfig(
+  answer,
+  symbolizationKey,
+  prompt,
+  argumentLine,
+  allowIndexedSymbols
+) {
   const answerFormulas = getAnswerFormulas(answer)
   const formulas = answerFormulas.length > 0
     ? answerFormulas
     : getAnswerFormulas(argumentLine)
-  const formulaKeyboardConfig = getFormulaKeyboardConfig(formulas)
+  const formulaKeyboardConfig = getFormulaKeyboardConfig(formulas, allowIndexedSymbols)
   if (formulaKeyboardConfig) return formulaKeyboardConfig
   if (symbolizationKey.length > 0) {
-    const isPredicate = isPredicateLogicKey(symbolizationKey) || promptImpliesPredicateLogic(prompt)
-    const predicateLetters = getPredicateLettersFromKey(symbolizationKey)
-    const constantsFromKey = getConstantLettersFromKey(symbolizationKey)
+    const isPredicate = isPredicateLogicKey(symbolizationKey, allowIndexedSymbols) || promptImpliesPredicateLogic(prompt)
+    const predicateLetters = getPredicateLettersFromKey(symbolizationKey, allowIndexedSymbols)
+    const constantsFromKey = getConstantLettersFromKey(symbolizationKey, allowIndexedSymbols)
     const constantLetters = isPredicate
       ? (constantsFromKey.length > 0 ? constantsFromKey : [])
       : []
@@ -238,12 +249,24 @@ export default function ComboTranslationDerivation({
   const openEdit = () => editorRef.current?.open?.()
   const notation = getNotation(logicSystem)
   const symbols = getSymbols(logicSystem)
+  const allowIndexedSymbols = notation === 'calgary'
   const Formula = useMemo(() => getFormulaClass(notation), [notation])
+  const canonicalizeArgumentLine = useCallback((value) => {
+    const parsed = parseArgumentLine(value)
+    if (parsed.error) return value
+    const premises = parsed.premises.map((premise) => Formula.from(premise))
+    const conclusion = Formula.from(parsed.conclusion)
+    if (premises.some((formula) => !formula.wellformed) || !conclusion.wellformed) {
+      return value
+    }
+    const canonical = `${premises.map((formula) => formula.normal).join(' / ')} // ${conclusion.normal}`
+    return displayIndexedSymbolsForNotation(canonical, notation)
+  }, [Formula, notation])
   const snapshot = proof?.comboTranslationDerivation || proof?.snapshot || proof?.questionSnapshot || proof?.question_snapshot || proof || {}
   const promptText = snapshot?.prompt || proof?.description || ''
   const symbolizationKey = useMemo(
-    () => parseSymbolizationKeyFromPrompt(promptText),
-    [promptText]
+    () => parseSymbolizationKeyFromPrompt(promptText, allowIndexedSymbols),
+    [allowIndexedSymbols, promptText]
   )
   const answer = firstWithFormulas(
     proof?.answer,
@@ -252,7 +275,9 @@ export default function ComboTranslationDerivation({
     proof?.question_snapshot?.answer,
     snapshot
   ) ?? proof?.answer ?? snapshot?.answer
-  const [argumentLine, setArgumentLine] = useState(savedState?.argumentLine ?? '')
+  const [argumentLine, setArgumentLine] = useState(
+    () => canonicalizeArgumentLine(savedState?.argumentLine ?? '')
+  )
   const [derivationState, setDerivationState] = useState(savedState?.derivationState ?? null)
   const inputRef = useRef(null)
   const [fullScreenOpen, setFullScreenOpen] = useState(false)
@@ -260,9 +285,9 @@ export default function ComboTranslationDerivation({
 
   useEffect(() => {
     if (savedState?.argumentLine !== undefined) {
-      setArgumentLine(savedState.argumentLine)
+      setArgumentLine(canonicalizeArgumentLine(savedState.argumentLine))
     }
-  }, [savedState?.argumentLine])
+  }, [canonicalizeArgumentLine, savedState?.argumentLine])
 
   useEffect(() => {
     setDerivationState(savedState?.derivationState ?? null)
@@ -270,7 +295,12 @@ export default function ComboTranslationDerivation({
 
   const updateState = (updates) => {
     const state = { argumentLine, derivationState, ...updates }
-    onStateChange?.(state)
+    onStateChange?.({
+      ...state,
+      argumentLine: allowIndexedSymbols
+        ? normalizeIndexedSymbols(state.argumentLine)
+        : state.argumentLine,
+    })
   }
 
   const parseStatus = useMemo(() => {
@@ -282,8 +312,11 @@ export default function ComboTranslationDerivation({
       return { ok: false, reason: parsed.error, parsed: null }
     }
     try {
-      parsed.premises.forEach((premise) => Formula.from(premise))
-      Formula.from(parsed.conclusion)
+      const formulas = parsed.premises.map((premise) => Formula.from(premise))
+      formulas.push(Formula.from(parsed.conclusion))
+      if (formulas.some((formula) => !formula.wellformed)) {
+        return { ok: false, reason: 'Fix the argument line before starting the derivation.', parsed: null }
+      }
       return { ok: true, reason: '', parsed }
     } catch {
       return { ok: false, reason: 'Fix the argument line before starting the derivation.', parsed: null }
@@ -295,9 +328,10 @@ export default function ComboTranslationDerivation({
       answer,
       symbolizationKey,
       promptText,
-      argumentLine
+      argumentLine,
+      allowIndexedSymbols
     ),
-    [answer, argumentLine, promptText, symbolizationKey]
+    [allowIndexedSymbols, answer, argumentLine, promptText, symbolizationKey]
   )
 
   const derivationProof = useMemo(() => {
@@ -347,6 +381,10 @@ export default function ComboTranslationDerivation({
     setArgumentLine(value)
     setDerivationState(null)
     updateState({ argumentLine: value, derivationState: null })
+  }
+  const handleArgumentBlur = () => {
+    const canonical = canonicalizeArgumentLine(argumentLine)
+    if (canonical !== argumentLine) handleArgumentChange(canonical)
   }
 
   const handleDerivationChange = (state) => {
@@ -459,6 +497,7 @@ export default function ComboTranslationDerivation({
                 <MobileLogicInput
                   value={argumentLine}
                   onChange={handleArgumentChange}
+                  onBlur={handleArgumentBlur}
                   placeholder={`e.g. A ${symbols.conditional} B / A // B`}
                   aria-label="Argument line"
                   includeQuantifiers
@@ -474,6 +513,7 @@ export default function ComboTranslationDerivation({
                   <FormulaInputField
                     value={argumentLine}
                     onValueChange={handleArgumentChange}
+                    onBlur={handleArgumentBlur}
                     formulaInputRef={inputRef}
                     notation={notation}
                   />

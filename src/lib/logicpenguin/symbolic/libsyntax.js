@@ -12,6 +12,11 @@ import notations from './notations.js';
 const DEFAULT_NOTATION = 'hurley';
 const syntaxes = {};
 
+const subscriptDigits = {
+    '₀': '0', '₁': '1', '₂': '2', '₃': '3', '₄': '4',
+    '₅': '5', '₆': '6', '₇': '7', '₈': '8', '₉': '9'
+};
+
 // adicities for operators
 const symbolcat = {
     OR      : 2,
@@ -53,7 +58,7 @@ function isop(c) {
 
 // tests if a given character is a variable
 function isvar(c) {
-    return this.varRegEx.test(c);
+    return this.varaRegEx.test(c);
 }
 
 // this: make quantifier with proper notation
@@ -85,8 +90,20 @@ function mkexistential(v) {
     return this.mkquantifier(v, this.symbols.EXISTS);
 }
 
+// Carnap-style canonicalization: indexed symbols are stored as E_1, while
+// pasted/displayed Unicode forms such as E₁ and E₁₂ remain valid input.
+function normalizeSubscriptIndices(s) {
+    return String(s ?? '').replace(/([A-Za-z])_?([₀-₉]+)/g,
+        (_match, letter, digits) => letter + '_' + Array.from(digits)
+            .map((digit) => subscriptDigits[digit])
+            .join(''));
+}
+
 function symbolfix(s) {
     let rv = String(s ?? '');
+    if (this.notationname === 'calgary') {
+        rv = normalizeSubscriptIndices(rv);
+    }
 
     rv = rv.replace(/-->/g, this.symbols.IFTHEN);
     rv = rv.replace(/<->/g, this.symbols.IFF);
@@ -114,7 +131,8 @@ function inputfix(s) {
     let rv = this.symbolfix(String(s ?? '').replace(/\s/g,''));
 
     // accept lowercase "v" as a disjunction when used infix (e.g., CvM -> C∨M)
-    rv = rv.replace(/([A-Za-z)\]\}])v([A-Za-z(\[\{])/g, `$1${this.symbols.OR}$2`);
+    rv = rv.replace(/([A-Za-z0-9_)\]\}])v([A-Za-z(\[\{])/g,
+        `$1${this.symbols.OR}$2`);
     rv = rv.replace(/\ball\b/gi, this.symbols.FORALL); // 'all' becomes ∀
     rv = rv.replace(/\bsome\b/gi, this.symbols.EXISTS); // 'some' becomes ∃ 
     rv = rv.replace(/==/g, this.symbols.IFF); // '==' becomes ≡
@@ -135,7 +153,10 @@ function inputfix(s) {
 function stripmatching(s) {
     if (s.length < 2) { return s; }
 
-    const qMatch = s.match(/^(?:[∃∀][x-z]|\([∃∀][x-z]\)|\([x-z]\))/);
+    // A leading quantifier is part of the formula, not a removable pair of
+    // grouping parentheses. In Calgary, however, an atomic term list such as
+    // the `(x)` in F(x) must be stripped normally.
+    const qMatch = s.match(this.qaRegEx);
     if (qMatch) { return s;}
     
     const openBrackets = { '(': ')', '[': ']', '{': '}' };
@@ -187,22 +208,28 @@ function generateSyntax(notationname = DEFAULT_NOTATION) {
     // Syntax Regular Expressions (RegExp)
     //
 
-    // generate regex description for quantifiers from
-    // quantifierForm
-    // allow parentheses around quantifiers
-    let baseForm = syntax.notation.quantifierForm
-        .replaceAll('(',"\\(").replaceAll(')',"\\)")
+    // Accept both explicit quantifier styles in every notation, then render
+    // with quantifierForm. The variable-only universal abbreviation `(x)` is
+    // Hurley-specific; treating it as a quantifier in Calgary breaks F(x).
+    const indexedSuffix = syntax.notationname === 'calgary'
+        ? '(?:_[1-9][0-9]*)?'
+        : '';
+    const variablePattern = '[' + syntax.notation.variableRange + ']' +
+        indexedSuffix;
+    const constantPattern = '[' + syntax.notation.constantsRange + ']' +
+        indexedSuffix;
+    const termPattern = '[' + syntax.notation.variableRange +
+        syntax.notation.constantsRange + ']' + indexedSuffix;
+    const baseForm = syntax.notation.quantifierForm
+        .replaceAll('(', '').replaceAll(')', '')
         .replaceAll('Q?',symbols.EXISTS + '?')
         .replaceAll('Q','[' + symbols.EXISTS + symbols.FORALL + ']')
-        .replaceAll('x','[' + syntax.notation.variableRange + ']');
-
-    if (!syntax.notation.quantifierForm.includes('(')) {
-        // Also allow (x) as a valid quantifier (equivalent to (∀x) in Hurley's notation)
-        const varOnlyForm = '\\(' + '[' + syntax.notation.variableRange + ']' + '\\)';
-        syntax.qRegExStr = '(?:\\(' + baseForm + '\\)|' + baseForm + '|' + varOnlyForm + ')';
-    } else {
-        syntax.qRegExStr = baseForm;
+        .replaceAll('x', variablePattern);
+    const acceptedForms = ['\\(' + baseForm + '\\)', baseForm];
+    if (syntax.notationname === 'hurley') {
+        acceptedForms.push('\\([' + syntax.notation.variableRange + ']\\)');
     }
+    syntax.qRegExStr = '(?:' + acceptedForms.join('|') + ')';
 
     // regular quantifier regex
     syntax.qRegEx = new RegExp(syntax.qRegExStr);
@@ -211,21 +238,25 @@ function generateSyntax(notationname = DEFAULT_NOTATION) {
     // anchored to start
     syntax.qaRegEx = new RegExp('^' + syntax.qRegExStr);
     // variable regex
-    syntax.varRegEx = new RegExp('[' + syntax.notation.variableRange + ']');
+    syntax.varRegEx = new RegExp(variablePattern);
     // variable regex, anchored
-    syntax.varaRegEx = new RegExp('^[' + syntax.notation.variableRange + ']$');
+    syntax.varaRegEx = new RegExp('^' + variablePattern + '$');
     // terms regex
-    syntax.termsRegEx = new RegExp('[' + syntax.notation.variableRange +
-        syntax.notation.constantsRange + ']', 'g');
-    // predicate letter/ propositional letter regEx
-    syntax.pletterRegEx = new RegExp ('[' + syntax.notation
-        .predicatesRange + ']');
-    // constants and nonconstants regexex
-    syntax.cRegEx = new RegExp('^[' + syntax.notation.constantsRange + ']$');
-    syntax.ncRegEx = new RegExp( '[^' + syntax.notation.constantsRange + ']', 'g');
+    syntax.termsRegEx = new RegExp(termPattern, 'g');
+    syntax.termaRegEx = new RegExp('^' + termPattern + '$');
+    // Fitch/Calgary predicate and propositional symbols may carry a numeric
+    // index. Other course notations retain their original atomic grammar.
+    const indexedPredicateRange = syntax.notation.predicatesRange
+        .replaceAll('=', '').replaceAll('≠', '');
+    syntax.pletterRegEx = new RegExp(
+        '(?:[=≠]|[' + indexedPredicateRange + ']' + indexedSuffix + ')'
+    );
+    // constants regex
+    syntax.cRegEx = new RegExp('^' + constantPattern + '$');
 
     // BIND SYNTAX FUNCTIONS TO THIS SYNTAX
     syntax.symbolfix = symbolfix;
+    syntax.normalizeSubscriptIndices = normalizeSubscriptIndices;
     syntax.inputfix = inputfix;
     syntax.isbinaryop = isbinaryop;
     syntax.ismonop = ismonop;
