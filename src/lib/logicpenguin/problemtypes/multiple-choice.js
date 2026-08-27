@@ -9,6 +9,7 @@
 import LogicPenguinProblem from '../problem-class.js';
 import { addelem, byid } from '../common.js';
 import { randomString } from '../misc.js';
+import { sanitizeRichHtml } from '../../../utils/sanitizeRichHtml.js';
 
 export default class MultipleChoiceExercise extends LogicPenguinProblem {
 
@@ -18,9 +19,9 @@ export default class MultipleChoiceExercise extends LogicPenguinProblem {
 
     makeProblem(problem, options, checksave) {
 
-        // question prompt
+        // question prompt (instructor authored; sanitize before injecting as HTML)
         this.promptdiv = addelem('div', this, {
-            innerHTML: problem.prompt
+            innerHTML: sanitizeRichHtml(problem.prompt)
         });
 
         // radio inputs with choices
@@ -48,7 +49,7 @@ export default class MultipleChoiceExercise extends LogicPenguinProblem {
             });
             this.radios.push(i);
             const l = addelem('label', d, {
-                innerHTML: choice,
+                innerHTML: sanitizeRichHtml(choice),
                 htmlFor: idbase + '-' + choice
             });
         }

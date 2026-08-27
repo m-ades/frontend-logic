@@ -7,17 +7,18 @@
 ///////////////////////////////////////////////////////////////////////
 
 import { addelem } from '../../../lib/logicpenguin/common.js';
+import { sanitizeRichHtml } from '../../../utils/sanitizeRichHtml.js';
 
 export function argumentBox(prems, conc) {
         const box = document.createElement("table");
         box.classList.add("nlargument");
-        // argument box
+        // argument box (premises/conclusion are instructor authored; sanitize before HTML injection)
         const tbody = addelem('tbody', box, {});
         for (const prem of prems) {
             const tr = addelem('tr', tbody, {});
-            const td = addelem('td', tr, { innerHTML: prem });
+            const td = addelem('td', tr, { innerHTML: sanitizeRichHtml(prem) });
         }
         const ctr = addelem('tr', tbody, {});
-        const ctd = addelem('td', ctr, { innerHTML: '∴ ' + conc });
+        const ctd = addelem('td', ctr, { innerHTML: '∴ ' + sanitizeRichHtml(conc) });
         return box;
 }

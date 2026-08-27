@@ -12,6 +12,7 @@ import { addelem, byid, htmlEscape } from '../common.js';
 import tr from '../translate.js';
 import { randomString } from '../misc.js';
 import FormulaInput from '../../../components/ui/logicpenguin/formula-input.js';
+import { sanitizeRichHtml } from '../../../utils/sanitizeRichHtml.js';
 
 export default class TranslationExercise extends LogicPenguinProblem {
 
@@ -21,9 +22,9 @@ export default class TranslationExercise extends LogicPenguinProblem {
 
     makeProblem(problem, options, checksave) {
         this.options = options;
-        // question prompt
+        // question prompt (instructor authored; sanitize before injecting as HTML)
         this.origdiv = addelem('div', this, {
-            innerHTML: problem
+            innerHTML: sanitizeRichHtml(problem)
         });
         // answer area
         this.anscontainer = addelem('div', this, {});
