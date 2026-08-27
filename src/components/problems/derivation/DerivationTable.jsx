@@ -32,6 +32,7 @@ import {
 import { getRulesetRestrictions } from '../../../lib/logicpenguin/checkers/derivation-rule-restrictions.js'
 import { justParse } from '../../ui/logicpenguin/justification-parse.js'
 import { displayIndexedSymbolsForNotation } from '../../../lib/indexedSymbols.js'
+import { logicStatementsToTex } from '../../../lib/logicTex.js'
 import { buildPersistedSubmissionState, shouldUseApiValidation, submitApiValidation } from '../../../utils/submissionRuntime.js'
 import {
   FITCH_ASSUMPTION_RULES,
@@ -177,9 +178,15 @@ export default function DerivationTable({
   const conclusionTargetText = normalizedConclusion
     ? `// ${normalizedConclusion}`
     : ''
-  const argumentTargetText = !isFixedProof && usesNestedSubderivations && normalizedConclusion
-    ? `${premises.map((premise) => normalizeFormulaForDisplay(normalizeFormulaForCheck(premise))).join(', ')}${premises.length ? ' ' : ''}∴ ${normalizedConclusion}`
-    : ''
+  const normalizedPremises = premises.map((premise) => (
+    normalizeFormulaForDisplay(normalizeFormulaForCheck(premise))
+  ))
+  const argumentTarget = !isFixedProof && usesNestedSubderivations && normalizedConclusion
+    ? {
+        text: `${normalizedPremises.join(', ')}${normalizedPremises.length ? ' ' : ''}∴ ${normalizedConclusion}`,
+        tex: logicStatementsToTex([...normalizedPremises, normalizedConclusion], true),
+      }
+    : null
   const buildFreshLines = useCallback((restoredLines = []) => {
     const premiseLines = premises.map((premise) => ({
       formula: normalizeFormulaForDisplay(normalizeFormulaForCheck(premise)),
@@ -1168,9 +1175,8 @@ export default function DerivationTable({
         <>
         <DerivationHeader
           allowedRules={allowedRules}
-          argument={argumentTargetText}
+          argument={argumentTarget}
           isFullScreen={isFullScreen}
-          onInsert={(insert) => handleSymbolInsert({ insert })}
           onRuleInputModeChange={handleRuleInputModeChange}
           ruleInputMode={ruleInputMode}
           usesNestedSubderivations={usesNestedSubderivations}

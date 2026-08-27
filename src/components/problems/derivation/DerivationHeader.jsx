@@ -1,18 +1,22 @@
 import { Box, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material'
-import DerivationFormulaText from './DerivationFormulaText.jsx'
+import MathJaxFormula from '../../ui/MathJaxFormula.jsx'
+import { DERIVATION_LINE_FONT_SIZE } from './derivationTableConfig.js'
 
+/**
+ * renders the argument and rule controls above a derivation table
+ * argument contains matching plain text and tex representations
+ */
 export default function DerivationHeader({
   allowedRules,
   argument,
   isFullScreen,
-  onInsert,
   onRuleInputModeChange,
   ruleInputMode,
   usesNestedSubderivations,
 }) {
   return (
     <>
-      {argument && (
+      {argument?.text && (
         <Box sx={{ mb: 2, ...(isFullScreen && { pl: 2 }) }}>
           <Typography
             component="h3"
@@ -21,8 +25,13 @@ export default function DerivationHeader({
           >
             Argument
           </Typography>
-          <Box sx={{ overflowX: 'auto', whiteSpace: 'nowrap' }}>
-            <DerivationFormulaText text={argument} id="argument-target" onInsert={onInsert} />
+          <Box sx={{ overflowX: 'auto', whiteSpace: 'nowrap', fontSize: DERIVATION_LINE_FONT_SIZE, lineHeight: 1.6 }}>
+            <MathJaxFormula
+              tex={argument.tex}
+              fallback={argument.text}
+              display={false}
+              block
+            />
           </Box>
         </Box>
       )}
