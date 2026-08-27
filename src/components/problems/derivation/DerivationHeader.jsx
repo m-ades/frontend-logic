@@ -37,18 +37,18 @@ export default function DerivationHeader({
       )}
 
       {(usesNestedSubderivations || allowedRules.length > 0) && (
-        <Box sx={{ mb: 1.5, display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap', ...(isFullScreen && { pl: 2 }) }}>
+        <Box sx={{ mb: 1.5, ...(isFullScreen && { pl: 2 }) }}>
           {usesNestedSubderivations && (
             <Typography
               component="h3"
               variant="overline"
-              sx={{ mr: 0.5, color: 'text.secondary', fontWeight: 700, lineHeight: 1.2 }}
+              sx={{ mb: allowedRules.length > 0 ? 0.5 : 0, color: 'text.secondary', fontWeight: 700, lineHeight: 1.2 }}
             >
               Derivation
             </Typography>
           )}
           {allowedRules.length > 0 && (
-            <>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
               <Typography variant="body2" sx={{ color: 'text.secondary' }}>
                 Rule input:
               </Typography>
@@ -77,7 +77,7 @@ export default function DerivationHeader({
                   SELECT FROM LIST
                 </ToggleButton>
               </ToggleButtonGroup>
-            </>
+            </Box>
           )}
         </Box>
       )}

@@ -1093,6 +1093,9 @@ export default function DerivationTable({
       ? { p: 0, position: 'relative', width: '100%' }
       : {
           p: { xs: 1.25, md: 2.5 },
+          width: 'fit-content',
+          maxWidth: '100%',
+          boxSizing: 'border-box',
           borderRadius: 3,
           border: (theme) => `1px solid ${theme.palette.divider}`,
           position: 'relative',
