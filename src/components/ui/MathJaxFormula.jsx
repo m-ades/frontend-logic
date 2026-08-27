@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import mathJaxUrl from 'mathjax/es5/tex-svg.js?url'
+import './MathJaxFormula.css'
 
 let mathJaxReady
 let typesetQueue = Promise.resolve()
@@ -24,7 +25,11 @@ function loadMathJax() {
   return mathJaxReady
 }
 
-export default function MathJaxFormula({ tex, fallback }) {
+// renders tex with a plain text fallback while mathjax loads
+// display mode selects block or inline math delimiters
+// block controls layout independently from delimiter mode
+// block formulas use intrinsic svg height without baseline overflow
+export default function MathJaxFormula({ tex, fallback, display = true, block = display }) {
   const containerRef = useRef(null)
   const [ready, setReady] = useState(Boolean(window.MathJax?.typesetPromise))
 
@@ -43,13 +48,21 @@ export default function MathJaxFormula({ tex, fallback }) {
     typesetQueue = typesetQueue.catch(() => {}).then(async () => {
       if (cancelled || !element.isConnected) return
       window.MathJax.typesetClear?.([element])
-      element.textContent = `\\[${tex}\\]`
+      element.textContent = display ? `\\[${tex}\\]` : `\\(${tex}\\)`
       await window.MathJax.typesetPromise([element])
     }).catch(() => {
       if (!cancelled && element.isConnected) element.textContent = fallback
     })
     return () => { cancelled = true }
-  }, [fallback, ready, tex])
+  }, [display, fallback, ready, tex])
 
-  return <span ref={containerRef} aria-label={fallback}>{fallback}</span>
+  return (
+    <span
+      ref={containerRef}
+      aria-label={fallback}
+      className={block ? 'mathjax-formula-block' : undefined}
+    >
+      {fallback}
+    </span>
+  )
 }

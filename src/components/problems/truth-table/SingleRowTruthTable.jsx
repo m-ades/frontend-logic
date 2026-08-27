@@ -246,7 +246,7 @@ export default function SingleRowTruthTable({
       problemLabel={problemLabel}
       prompt={prompt}
       minHeight="260px"
-      cardMaxWidth="1060px"
+      contentSized
       isInstructorView={isInstructorView && !!proof}
       onEditQuestion={proof ? openEdit : undefined}
       status={status}
@@ -268,7 +268,24 @@ export default function SingleRowTruthTable({
         <InstructorQuestionEditor ref={editorRef} proof={proof} isInstructorView onSaved={onQuestionSaved} trigger="none" logicSystem={logicSystem} />
       ) : null}
     >
-      {renderTableSet(gridInputs, false)}
+      <Box sx={{ width: '100%' }}>
+        {renderTableSet(gridInputs, false)}
+        <Typography
+          variant="body2"
+          sx={{
+            m: 0,
+            color: 'primary.main',
+            fontFamily: 'inherit',
+            fontWeight: 400,
+          }}
+        >
+          {status === 'correct' || isCurrentlyCorrect
+            ? 'Truth table looks good.'
+            : tableFilled
+              ? 'Recheck your truth values.'
+              : 'Click editable cells to toggle truth values - fill in every blank cell to finish.'}
+        </Typography>
+      </Box>
       <Box sx={{ mt: 2 }}>
         <FormControl component="fieldset" variant="standard" sx={{ width: '100%' }}>
           <FormLabel component="legend">Truth value of compound statement:</FormLabel>
@@ -306,20 +323,6 @@ export default function SingleRowTruthTable({
           </Box>
         </TruthTableSection>
       )}
-      <Typography
-        variant="body2"
-        sx={{
-          color: 'primary.main',
-          fontFamily: 'inherit',
-          fontWeight: 400,
-        }}
-      >
-        {status === 'correct' || isCurrentlyCorrect
-          ? 'Truth table looks good.'
-          : tableFilled
-            ? 'Recheck your truth values.'
-            : 'Click editable cells to toggle truth values - fill in every blank cell to finish.'}
-      </Typography>
     </ProblemFrame>
   )
 }
