@@ -1,8 +1,7 @@
-import { Box, Button, Stack } from '@mui/material'
-import { alpha } from '@mui/material/styles'
 import getSyntax from '../../../lib/logicpenguin/symbolic/libsyntax.js'
 import { getNotation } from '../../../lib/logicSystems.js'
 import LogicSymbol, { getInsertSymbolLabel } from './LogicSymbol.jsx'
+import LogicSymbolKeyRow, { getLogicSymbolKeySx } from './LogicSymbolKeyRow.jsx'
 
 const FALLBACK_SYMBOLS = {
   NOT: '~',
@@ -27,29 +26,7 @@ const BUTTONS = [
   { backspace: true },
 ]
 
-/** Shared sx for symbol, variable, and navigation keyboard buttons. */
-export const symbolRowButtonSx = {
-  minWidth: 34,
-  height: 34,
-  px: 1,
-  py: 0,
-  fontSize: '1rem',
-  lineHeight: 1.1,
-  minHeight: 34,
-  fontWeight: 600,
-  textTransform: 'none',
-  boxShadow: 'none',
-  border: 'none',
-  display: 'inline-flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  '& .MuiButton-label': { fontSize: '1rem' },
-  '&:hover': (theme) => ({
-    boxShadow: 'none',
-    border: 'none',
-    backgroundColor: alpha(theme.palette.primary.main, theme.palette.action.hoverOpacity),
-  }),
-}
+export const symbolRowButtonSx = getLogicSymbolKeySx()
 
 export default function SymbolButtonRow({
   inputRef,
@@ -184,41 +161,28 @@ export default function SymbolButtonRow({
   const visibleButtons = baseButtons.length > 0 && baseButtons[baseButtons.length - 1].backspace
     ? [...baseButtons.slice(0, -1), ...(extraInsertButtons || []), { backspace: true }]
     : [...baseButtons, ...(extraInsertButtons || [])]
+  const rowButtons = visibleButtons.map(({ op, quantifier, insert, pair, backspace, label }) => {
+    const payload = { op, quantifier, insert, pair, backspace }
+    const visualSymbol = resolveLabel({ ...payload, label })
+    const ariaLabel = backspace ? 'Backspace' : getInsertSymbolLabel({
+      insert: pair ? null : insert || visualSymbol,
+      pair,
+    })
+    return {
+      key: backspace ? 'backspace' : (op || insert || pair),
+      label: visualSymbol,
+      content: <LogicSymbol symbol={visualSymbol} />,
+      ariaLabel,
+      payload,
+    }
+  })
 
   return (
-    <Box aria-label="Symbol shortcuts">
-      <Stack
-        direction="row"
-        spacing={0.5}
-        flexWrap="wrap"
-        useFlexGap
-        sx={centerButtons ? { justifyContent: 'center' } : undefined}
-      >
-        {visibleButtons.map(({ op, quantifier, insert, pair, backspace, label }) => {
-          const visualSymbol = resolveLabel({ op, quantifier, insert, pair, backspace, label })
-          const a11yLabel = backspace ? 'Backspace' : getInsertSymbolLabel({
-            insert: pair ? null : insert || visualSymbol,
-            pair,
-          })
-          return (
-            <Button
-              key={backspace ? 'backspace' : (op || insert || pair)}
-              type="button"
-              size="medium"
-              variant="outlined"
-              onMouseDown={(e) => e.preventDefault()}
-              onClick={() => handleInsert({ op, quantifier, insert, pair, backspace })}
-              disabled={disabled}
-              aria-disabled={disabled}
-              aria-label={a11yLabel}
-              title={a11yLabel}
-              sx={symbolRowButtonSx}
-            >
-              <LogicSymbol symbol={visualSymbol} />
-            </Button>
-          )
-        })}
-      </Stack>
-    </Box>
+    <LogicSymbolKeyRow
+      buttons={rowButtons}
+      onSelect={handleInsert}
+      disabled={disabled}
+      center={centerButtons}
+    />
   )
 }

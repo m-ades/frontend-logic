@@ -10,6 +10,7 @@ const SYMBOL_SPEECH = {
   '∃': 'existential quantifier',
   '⊥': 'contradiction',
   '✖': 'contradiction',
+  '∴': 'therefore',
 }
 
 const EXPR_SPEECH = {
@@ -29,6 +30,7 @@ const PUNCT_SPEECH = {
   '{': 'left brace',
   '}': 'right brace',
   '/': 'slash',
+  ',': 'comma',
   '_': 'subscript',
 }
 

@@ -1,10 +1,10 @@
-import { Box, Button, IconButton, Stack, TableCell, TableRow, Tooltip } from '@mui/material'
+import { Box, IconButton, Stack, TableCell, TableRow, Tooltip } from '@mui/material'
 import SubdirectoryArrowRightIcon from '@mui/icons-material/SubdirectoryArrowRight'
 import { getInsertSymbolLabel } from '../../ui/logicpenguin/LogicSymbol.jsx'
+import LogicSymbolKeyRow from '../../ui/logicpenguin/LogicSymbolKeyRow.jsx'
 import {
   DERIVATION_NUMBER_CELL_WIDTH_DESKTOP,
   DERIVATION_NUMBER_CELL_WIDTH_MOBILE,
-  symbolButtonSx,
 } from './derivationTableConfig.js'
 
 export default function DerivationKeyboardRow({
@@ -21,6 +21,13 @@ export default function DerivationKeyboardRow({
   const numberWidth = isFullScreen || isMobile
     ? DERIVATION_NUMBER_CELL_WIDTH_MOBILE
     : DERIVATION_NUMBER_CELL_WIDTH_DESKTOP
+  const density = isPhone && isFullScreen ? 'touch' : isFullScreen ? 'compact' : 'standard'
+  const rowButtons = symbolButtons.map(({ label, insert, pair }) => ({
+    key: label,
+    label,
+    ariaLabel: getInsertSymbolLabel({ insert, pair }),
+    payload: { insert, pair },
+  }))
 
   return (
     <TableRow sx={{ '& td': { verticalAlign: 'middle', py: isMobile ? 0.25 : 0.5 } }}>
@@ -47,23 +54,14 @@ export default function DerivationKeyboardRow({
             }}
           >
             {!compactMobileKeyboard && (
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: isFullScreen ? 0.5 : 0.75, flexWrap: isFullScreen ? 'wrap' : 'nowrap', minWidth: 0, flex: 1 }}>
-                {symbolButtons.map(({ label, insert, pair }) => (
-                  <Button
-                    key={label}
-                    type="button"
-                    size="small"
-                    variant="outlined"
-                    onMouseDown={(event) => event.preventDefault()}
-                    onClick={() => onInsert({ insert, pair })}
-                    aria-label={getInsertSymbolLabel({ insert, pair })}
-                    title={getInsertSymbolLabel({ insert, pair })}
-                    sx={symbolButtonSx(isFullScreen, isPhone)}
-                  >
-                    {label}
-                  </Button>
-                ))}
-              </Box>
+              <LogicSymbolKeyRow
+                buttons={rowButtons}
+                onSelect={onInsert}
+                density={density}
+                wrap={isFullScreen}
+                gap={isFullScreen ? 0.5 : 0.75}
+                sx={{ minWidth: 0, flex: 1 }}
+              />
             )}
           </Box>
         </Stack>

@@ -358,6 +358,14 @@ export default class FormulaInput {
             // }
         }
 
+        // colon and period become the fitch therefore sign
+        if (e.key == '.' && this.allowTherefore && this.notation == 'calgary' &&
+            /:\s*$/.test(this.value.substr(0, this.selectionStart))) {
+            e.preventDefault();
+            this.autoChange(/\s*:\s*$/, '', ' ∴ ', /^\s*/, '');
+            return;
+        }
+
         // double ampersands = conjunction
         if (e.key == '&') {
             if (/&\s*/.test(this.value.substr(0, this.selectionStart))) {

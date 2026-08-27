@@ -300,7 +300,10 @@ export default function RulesReference({ logicSystem }) {
       ? [{ symbol: symbols.falsum, shortcuts: ['#', 'XX'], meaning: 'Contradiction' }]
       : []),
     ...(isFitch
-      ? [{ symbol: 'x₂', shortcuts: ['_'], meaning: 'Numeric subscript' }]
+      ? [
+          { symbol: '∴', shortcuts: [':.'], meaning: 'Therefore' },
+          { symbol: 'x₂', shortcuts: ['_'], meaning: 'Numeric subscript' },
+        ]
       : []),
   ]
   

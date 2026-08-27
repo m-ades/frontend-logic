@@ -101,11 +101,128 @@ function checkTranslation(ansstr, givenstr, pred = true,
     return { correct, determinate, message, ptfrac: maxfrac }
 }
 
+function splitTopLevel(value, separator) {
+    const parts = [];
+    let start = 0;
+    let depth = 0;
+    const brackets = { '(': 1, '[': 1, '{': 1, ')': -1, ']': -1, '}': -1 };
+    for (let index = 0; index < value.length; index++) {
+        depth = Math.max(0, depth + (brackets[value[index]] ?? 0));
+        if (depth === 0 && value.startsWith(separator, index)) {
+            parts.push(value.slice(start, index).trim());
+            index += separator.length - 1;
+            start = index + 1;
+        }
+    }
+    parts.push(value.slice(start).trim());
+    return parts;
+}
+
+// parses one answer into unordered statements and an optional final conclusion
+
+function parseTranslationAnswer(value, notationname) {
+    if (typeof value !== 'string') return null;
+    const fitch = notationname === 'calgary';
+    const source = fitch ? value.replaceAll(':.', '∴') : value;
+    const statementSeparator = fitch ? ',' : '/';
+    const conclusionSeparator = fitch ? '∴' : '//';
+    const conclusionParts = splitTopLevel(source.trim(), conclusionSeparator);
+    if (conclusionParts.length > 2) return null;
+    const statements = splitTopLevel(conclusionParts[0] ?? '', statementSeparator);
+    const conclusion = conclusionParts.length === 2
+        ? conclusionParts[1].trim()
+        : null;
+    if (statements.length === 0 || statements.some((statement) => !statement) ||
+        (conclusionParts.length === 2 && !conclusion)) return null;
+    return { statements, conclusion };
+}
+
+function matchStatements(answers, given, pred, notationname) {
+    const unused = new Set(given.map((_statement, index) => index));
+    let determinate = true;
+    for (const answer of answers) {
+        let match = null;
+        let unresolved = false;
+        for (const index of unused) {
+            const result = checkTranslation(
+                answer, given[index], pred, notationname);
+            if (result.correct) {
+                match = index;
+                break;
+            }
+            if (!result.determinate) unresolved = true;
+        }
+        if (match === null) {
+            return { correct: false, determinate: determinate && !unresolved };
+        }
+        unused.delete(match);
+        determinate = determinate && !unresolved;
+    }
+    return { correct: true, determinate };
+}
+
+// checks every statement as one answer while allowing premise reordering
+function checkTranslationAnswer(ansstr, givenstr, pred = true,
+    notationname = defaultnotation) {
+    const answer = parseTranslationAnswer(ansstr, notationname);
+    if (!answer) {
+        return {
+            correct: false,
+            determinate: false,
+            message: tr('the intended translation answer is invalid'),
+            ptfrac: 0
+        };
+    }
+    const given = parseTranslationAnswer(givenstr, notationname);
+    if (!given) {
+        return {
+            correct: false,
+            determinate: true,
+            message: tr('the translation answer is incomplete'),
+            ptfrac: 0
+        };
+    }
+    if (answer.statements.length !== given.statements.length ||
+        Boolean(answer.conclusion) !== Boolean(given.conclusion)) {
+        return {
+            correct: false,
+            determinate: true,
+            message: tr('the answer does not have the expected structure'),
+            ptfrac: 0
+        };
+    }
+    const statementResult = matchStatements(
+        answer.statements, given.statements, pred, notationname);
+    if (!statementResult.correct) {
+        return {
+            correct: false,
+            determinate: statementResult.determinate,
+            message: tr(answer.conclusion
+                ? 'one or more premises are not equivalent to the intended translation'
+                : 'one or more statements are not equivalent to the intended translation'),
+            ptfrac: 0
+        };
+    }
+    if (answer.conclusion) {
+        const conclusionResult = checkTranslation(
+            answer.conclusion, given.conclusion, pred, notationname);
+        if (!conclusionResult.correct) {
+            return {
+                ...conclusionResult,
+                message: conclusionResult.message
+                    ? tr('conclusion: ') + conclusionResult.message
+                    : tr('the conclusion is not equivalent to the intended translation')
+            };
+        }
+    }
+    return { correct: true, determinate: true, message: '', ptfrac: 1 };
+}
+
 export default async function(
     question, answer, givenans, partialcredit, points, cheat, options
 ) {
     // call function above
-    const result = checkTranslation(answer, givenans,
+    const result = checkTranslationAnswer(answer, givenans,
         (options?.pred ?? true), (options?.notation ?? defaultnotation));
     // all-or-nothing; no partial credit for symbolic translation
     const awarded = (result.correct) ? points : 0;
