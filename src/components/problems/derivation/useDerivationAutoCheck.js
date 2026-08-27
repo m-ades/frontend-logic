@@ -13,6 +13,13 @@ import { AUTO_CHECK_STORAGE_KEY } from './derivationTableConfig.js'
 const EMPTY_AUTO_CHECK = { perLine: {}, rows: [] }
 const EMPTY_NOTICE = { index: null, message: '', tone: 'error' }
 
+const getRequiredRuleError = (line, rule) => {
+  if (!rule || !Array.isArray(line?.requiredRules) || line.requiredRules.includes(rule)) {
+    return ''
+  }
+  return `must use ${line.requiredRules.join(' or ')} on this line`
+}
+
 export default function useDerivationAutoCheck({
   activeAssumptionRules,
   checkDerivation,
@@ -25,6 +32,7 @@ export default function useDerivationAutoCheck({
   premises,
   proof,
   setLines,
+  usesFixedScopeNesting,
   usesNestedSubderivations,
 }) {
   const [enabled, setEnabled] = useState(() => {
@@ -39,6 +47,14 @@ export default function useDerivationAutoCheck({
   const showError = useCallback((index, message) => {
     setNotice({ index, message, tone: 'error' })
   }, [])
+  const getEffectiveAssumptionDepths = useCallback((linesSnapshot) => (
+    usesFixedScopeNesting
+      ? linesSnapshot.map((line) => line.scopeDepth ?? 0)
+      : getOpenAssumptionDepths(linesSnapshot, {
+          mode: usesNestedSubderivations ? 'nested' : 'flat',
+          assumptionRules: activeAssumptionRules,
+        })
+  ), [activeAssumptionRules, usesFixedScopeNesting, usesNestedSubderivations])
 
   const runCheck = useCallback(async (linesSnapshot) => {
     const submission = buildSubmission(
@@ -47,7 +63,11 @@ export default function useDerivationAutoCheck({
       premises,
       normalizeFormula,
       normalizeJustification,
-      { nestedSubderivations: usesNestedSubderivations, assumptionRules: activeAssumptionRules }
+      {
+        nestedSubderivations: usesNestedSubderivations,
+        assumptionRules: activeAssumptionRules,
+        canonicalScopes: usesFixedScopeNesting,
+      }
     )
     const result = await checkDerivation(
       { prems: premises, conc: proof?.conclusion, ruleset: proof?.ruleset },
@@ -67,10 +87,7 @@ export default function useDerivationAutoCheck({
       .map(({ index }) => index)
     const lastFilledIndex = filledIndices.at(-1) ?? -1
     const lastFilled = linesSnapshot[lastFilledIndex]
-    const openAssumptionDepths = getOpenAssumptionDepths(linesSnapshot, {
-      mode: usesNestedSubderivations ? 'nested' : 'flat',
-      assumptionRules: activeAssumptionRules,
-    })
+    const openAssumptionDepths = getEffectiveAssumptionDepths(linesSnapshot)
     const lastFilledResolvesConclusion = isResolvedConclusionLine({
       line: lastFilled,
       index: lastFilledIndex,
@@ -94,9 +111,12 @@ export default function useDerivationAutoCheck({
       if (lineNumber !== '??') {
         const index = Number(lineNumber) - 1
         if (Number.isFinite(index)) {
-          rule = getRuleFromJustification(linesSnapshot[index]?.justification || '').toUpperCase()
+          const line = linesSnapshot[index]
+          rule = getRuleFromJustification(line?.justification || '').toUpperCase()
           isAssumption = activeAssumptionRules.has(rule)
-          if (!lineIsComplete(index) && !isAssumption) {
+          const fixedRuleEntered = line?.formulaReadOnly
+            && getJustificationMeta(line.justification).hasRule
+          if (!lineIsComplete(index) && !isAssumption && !fixedRuleEntered) {
             if (usesNestedSubderivations || !INDENT_END_RULES.has(rule)) return
           }
         }
@@ -110,6 +130,24 @@ export default function useDerivationAutoCheck({
       )
       if (Object.keys(visibleCategories).length > 0) {
         filteredErrors[lineNumber] = visibleCategories
+      }
+    })
+
+    linesSnapshot.forEach((line, index) => {
+      const rule = getRuleFromJustification(line?.justification || '').toUpperCase()
+      const requiredRuleError = getRequiredRuleError(line, rule)
+      if (!requiredRuleError) return
+      const lineNumber = String(index + 1)
+      const existing = filteredErrors[lineNumber] || {}
+      filteredErrors[lineNumber] = {
+        ...existing,
+        rule: {
+          ...(existing.rule || {}),
+          high: {
+            ...(existing.rule?.high || {}),
+            [requiredRuleError]: 1,
+          },
+        },
       }
     })
 
@@ -128,11 +166,23 @@ export default function useDerivationAutoCheck({
         return
       }
       const { hasRule } = getJustificationMeta(line.justification)
-      if (!hasRule || !isLineComplete(line)) {
+      if (hasRule && getRequiredRuleError(line, rule)) {
+        perLine[index] = 'error'
+        return
+      }
+      if (!hasRule) {
         perLine[index] = null
         return
       }
       const hasError = Object.keys(lineErrors).some((category) => category !== 'dependency')
+      if (line.formulaReadOnly && hasError) {
+        perLine[index] = 'error'
+        return
+      }
+      if (!isLineComplete(line)) {
+        perLine[index] = null
+        return
+      }
       perLine[index] = hasError ? 'error' : 'ok'
     })
 
@@ -162,6 +212,7 @@ export default function useDerivationAutoCheck({
   }, [
     activeAssumptionRules,
     checkDerivation,
+    getEffectiveAssumptionDepths,
     isLineComplete,
     normalizeFormula,
     normalizeJustification,
@@ -170,6 +221,7 @@ export default function useDerivationAutoCheck({
     proof?.conclusion,
     proof?.options,
     proof?.ruleset,
+    usesFixedScopeNesting,
     usesNestedSubderivations,
   ])
 
@@ -188,10 +240,7 @@ export default function useDerivationAutoCheck({
           if (previous.length !== lines.length) return previous
           const last = previous.at(-1)
           if (!last || last.readOnly || !isLineComplete(last) || !proof?.conclusion) return previous
-          const openAssumptionDepths = getOpenAssumptionDepths(previous, {
-            mode: usesNestedSubderivations ? 'nested' : 'flat',
-            assumptionRules: activeAssumptionRules,
-          })
+          const openAssumptionDepths = getEffectiveAssumptionDepths(previous)
           if (isResolvedConclusionLine({
             line: last,
             index: previous.length - 1,
@@ -215,8 +264,8 @@ export default function useDerivationAutoCheck({
     }, 250)
     return () => clearTimeout(timerRef.current)
   }, [
-    activeAssumptionRules,
     enabled,
+    getEffectiveAssumptionDepths,
     isLineComplete,
     lines,
     normalizeFormula,
@@ -225,7 +274,6 @@ export default function useDerivationAutoCheck({
     proof?.conclusion,
     runCheck,
     setLines,
-    usesNestedSubderivations,
   ])
 
   useEffect(() => {
@@ -250,10 +298,7 @@ export default function useDerivationAutoCheck({
       return { ok: false, index: null }
     }
     if (state.perLine[lastFilledIndex] !== 'ok') return { ok: false, index: null }
-    const openAssumptionDepths = getOpenAssumptionDepths(lines, {
-      mode: usesNestedSubderivations ? 'nested' : 'flat',
-      assumptionRules: activeAssumptionRules,
-    })
+    const openAssumptionDepths = getEffectiveAssumptionDepths(lines)
     const resolved = isResolvedConclusionLine({
       line: lastFilled,
       index: lastFilledIndex,
@@ -264,8 +309,8 @@ export default function useDerivationAutoCheck({
     })
     return { ok: resolved, index: resolved ? lastFilledIndex : null }
   }, [
-    activeAssumptionRules,
     enabled,
+    getEffectiveAssumptionDepths,
     isLineComplete,
     lines,
     normalizeFormula,
@@ -273,7 +318,6 @@ export default function useDerivationAutoCheck({
     premises.length,
     proof?.conclusion,
     state.perLine,
-    usesNestedSubderivations,
   ])
 
   useEffect(() => {

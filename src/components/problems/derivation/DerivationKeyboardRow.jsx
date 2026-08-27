@@ -1,5 +1,4 @@
 import { Box, Button, IconButton, Stack, TableCell, TableRow, Tooltip } from '@mui/material'
-import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome'
 import SubdirectoryArrowRightIcon from '@mui/icons-material/SubdirectoryArrowRight'
 import { getInsertSymbolLabel } from '../../ui/logicpenguin/LogicSymbol.jsx'
 import {
@@ -9,7 +8,6 @@ import {
 } from './derivationTableConfig.js'
 
 export default function DerivationKeyboardRow({
-  autoCheckEnabled,
   canAddLine,
   isFullScreen,
   isMobile,
@@ -17,7 +15,6 @@ export default function DerivationKeyboardRow({
   mobileLogicKeyboardEnabled,
   onAddLine,
   onInsert,
-  onToggleAutoCheck,
   symbolButtons,
 }) {
   const compactMobileKeyboard = isPhone && isFullScreen && mobileLogicKeyboardEnabled
@@ -49,16 +46,6 @@ export default function DerivationKeyboardRow({
               ...(compactMobileKeyboard && { flexDirection: 'column', alignItems: 'flex-start' }),
             }}
           >
-            <Tooltip title={`${autoCheckEnabled ? 'Turn off' : 'Turn on'} autochecker`}>
-              <IconButton
-                onClick={onToggleAutoCheck}
-                size="small"
-                aria-label="Toggle autochecker"
-                sx={{ color: autoCheckEnabled ? 'primary.main' : 'text.disabled', position: 'relative' }}
-              >
-                <AutoAwesomeIcon />
-              </IconButton>
-            </Tooltip>
             {!compactMobileKeyboard && (
               <Box sx={{ display: 'flex', alignItems: 'center', gap: isFullScreen ? 0.5 : 0.75, flexWrap: isFullScreen ? 'wrap' : 'nowrap', minWidth: 0, flex: 1 }}>
                 {symbolButtons.map(({ label, insert, pair }) => (

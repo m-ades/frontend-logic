@@ -10,6 +10,7 @@ import ComboTranslationDerivation from './mui/translation/ComboTranslationDeriva
 import IndirectTruthTable from './truth-table/IndirectTruthTable.jsx'
 import PartialTruthTable from './truth-table/PartialTruthTable.jsx'
 import NonClassicalTruthTable from './truth-table/NonClassicalTruthTable.jsx'
+import ProofArgumentExtraction from './derivation/ProofArgumentExtraction.jsx'
 
 export default function LogicPenguinProblem({ 
   proof, 
@@ -205,6 +206,22 @@ export default function LogicPenguinProblem({
   } else if (proof.type === 'combo-translation-derivation') {
     return (
       <ComboTranslationDerivation
+        proof={proof}
+        attemptLimit={proof.attemptLimit}
+        assignmentQuestionId={proof.questionId}
+        onStateChange={handleStateChange}
+        onComplete={handleComplete}
+        savedState={localState}
+        isAssignmentLocked={isAssignmentLocked}
+        isInstructorView={isInstructorView}
+        onQuestionSaved={onQuestionSaved}
+        problemLabel={problemLabel}
+        logicSystem={logicSystem}
+      />
+    )
+  } else if (proof.type === 'proof-argument-extraction') {
+    return (
+      <ProofArgumentExtraction
         proof={proof}
         attemptLimit={proof.attemptLimit}
         assignmentQuestionId={proof.questionId}

@@ -204,6 +204,13 @@ function ProofTabs({
         answer: '',
       }
     }
+    if (type === 'proof-argument-extraction') {
+      return {
+        ...base,
+        premises: [''],
+        lines: [''],
+      }
+    }
     return base
   }, [])
 
@@ -469,6 +476,7 @@ function ProofTabs({
                   <MenuItem onClick={() => handleCreateStart('evaluate-truth')}>Evaluate truth</MenuItem>
                   <MenuItem onClick={() => handleCreateStart('combo-translation-truth-table')}>Combo translation + truth table</MenuItem>
                   <MenuItem onClick={() => handleCreateStart('combo-translation-derivation')}>Combo translation + derivation</MenuItem>
+                  <MenuItem onClick={() => handleCreateStart('proof-argument-extraction')}>Proof and argument extraction</MenuItem>
                 </Menu>
                 {createProof && (
                   <InstructorQuestionEditor
