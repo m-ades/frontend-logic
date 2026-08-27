@@ -133,8 +133,10 @@ function validateQuestionSnapshotFormulas(snapshot, logicSystem = DEFAULT_LOGIC_
   if (type === 'truth-table') {
     const tt = snapshot.truthTable || snapshot.truth_table || {}
     if (tt.kind === 'equivalence') {
-      return validateFormulaInput(tt.left, logicSystem, 'Left statement')
-        || validateFormulaInput(tt.right, logicSystem, 'Right statement')
+      const statements = Array.isArray(tt.statements)
+        ? tt.statements
+        : [tt.left, tt.right]
+      return validateFormulaInputs(statements, logicSystem, 'Statement')
     }
     if (tt.kind === 'argument') {
       return validateFormulaInputs(tt.lefts, logicSystem, 'Premise')
@@ -365,6 +367,10 @@ function buildTruthTableSnapshot(proof, edited, existing, logicSystem = DEFAULT_
     ...(edited.partialCredit !== undefined ? { partialCredit: edited.partialCredit } : {}),
     ...(edited.classificationQuestion !== undefined ? { question: edited.classificationQuestion } : {}),
   }
+  const equivalenceStatements = Array.isArray(edited.statements)
+    ? [...edited.statements]
+    : (Array.isArray(tt.statements) ? [...tt.statements] : [tt.left ?? '', tt.right ?? ''])
+  while (equivalenceStatements.length < 2) equivalenceStatements.push('')
   const truthTableData = {
     kind,
     options,
@@ -372,8 +378,7 @@ function buildTruthTableSnapshot(proof, edited, existing, logicSystem = DEFAULT_
       statement: normalizeFormulaInput(edited.statement ?? tt.statement ?? tt.formula ?? '', logicSystem),
     }),
     ...(kind === 'equivalence' && {
-      left: normalizeFormulaInput(edited.left ?? tt.left ?? '', logicSystem),
-      right: normalizeFormulaInput(edited.right ?? tt.right ?? '', logicSystem),
+      statements: normalizeFormulaInputs(equivalenceStatements, logicSystem),
     }),
     ...(kind === 'argument' && {
       lefts: normalizeFormulaInputs(Array.isArray(edited.lefts) ? edited.lefts : (tt.lefts || []), logicSystem),
@@ -383,6 +388,10 @@ function buildTruthTableSnapshot(proof, edited, existing, logicSystem = DEFAULT_
   const patch = { [typeKey(e)]: 'truth-table', prompt }
   const ttKey = e.truth_table !== undefined ? 'truth_table' : 'truthTable'
   patch[ttKey] = deepMerge(e[ttKey], truthTableData)
+  if (kind === 'equivalence') {
+    delete patch[ttKey].left
+    delete patch[ttKey].right
+  }
   return patch
 }
 
@@ -687,9 +696,14 @@ function TruthTableEditorForm({ proof, value, onChange, logicSystem = DEFAULT_LO
   const kind = value.kind ?? tt.kind ?? 'formula'
   const prompt = value.prompt ?? tt.prompt ?? proof?.description ?? ''
   const statement = value.statement ?? tt.statement ?? tt.formula ?? ''
-  const left = value.left ?? tt.left ?? ''
   const right = value.right ?? tt.right ?? ''
   const lefts = Array.isArray(value.lefts) ? value.lefts : (tt.lefts || [''])
+  const statementValues = Array.isArray(value.statements)
+    ? value.statements
+    : (Array.isArray(tt.statements) ? tt.statements : [tt.left ?? '', tt.right ?? ''])
+  const statements = statementValues.length >= 2
+    ? statementValues
+    : [...statementValues, ...Array(2 - statementValues.length).fill('')]
   const opts = tt.options || proof?.options || {}
   const partialCredit = value.partialCredit ?? opts.partialCredit ?? opts.partialcredit ?? opts.partial_credit ?? proof?.partialCredit ?? false
   const classificationQuestion = value.classificationQuestion ?? opts.question ?? false
@@ -715,9 +729,9 @@ function TruthTableEditorForm({ proof, value, onChange, logicSystem = DEFAULT_LO
           label="Question type"
           onChange={(e) => update({ kind: e.target.value })}
         >
-          <MenuItem value="formula">Single statement</MenuItem>
-          <MenuItem value="equivalence">Equivalence</MenuItem>
-          <MenuItem value="argument">Argument</MenuItem>
+          <MenuItem value="formula">Single sentence</MenuItem>
+          <MenuItem value="argument">Multiple sentences</MenuItem>
+          <MenuItem value="equivalence">Statement comparison</MenuItem>
         </Select>
       </FormControl>
 
@@ -732,22 +746,39 @@ function TruthTableEditorForm({ proof, value, onChange, logicSystem = DEFAULT_LO
         />
       )}
       {kind === 'equivalence' && (
-        <>
-          <TextField
-            label="Left statement"
-            value={left}
-            onChange={(e) => update({ left: displayFormulaInput(e.target.value, logicSystem) })}
-            fullWidth
-            variant="outlined"
-          />
-          <TextField
-            label="Right statement"
-            value={right}
-            onChange={(e) => update({ right: displayFormulaInput(e.target.value, logicSystem) })}
-            fullWidth
-            variant="outlined"
-          />
-        </>
+        <Box>
+          <Typography variant="subtitle2" sx={{ mb: 1 }}>Statements</Typography>
+          {statements.map((line, idx) => (
+            <Stack key={idx} direction="row" alignItems="center" spacing={1} sx={{ mb: 1 }}>
+              <TextField
+                size="small"
+                label={`Statement ${idx + 1}`}
+                value={line}
+                onChange={(e) => {
+                  const next = [...statements]
+                  next[idx] = displayFormulaInput(e.target.value, logicSystem)
+                  update({ statements: next })
+                }}
+                fullWidth
+              />
+              <IconButton
+                size="small"
+                disabled={statements.length <= 2}
+                onClick={() => update({ statements: statements.filter((_, i) => i !== idx) })}
+                aria-label={`Remove statement ${idx + 1}`}
+              >
+                <DeleteOutlineIcon />
+              </IconButton>
+            </Stack>
+          ))}
+          <Button
+            size="small"
+            startIcon={<AddIcon />}
+            onClick={() => update({ statements: [...statements, ''] })}
+          >
+            Add statement
+          </Button>
+        </Box>
       )}
       {kind === 'argument' && (
         <>
@@ -1540,9 +1571,15 @@ function InstructorQuestionEditorInner({
       base.prompt = tt.prompt ?? proof.description ?? ''
       base.kind = tt.kind ?? 'formula'
       base.statement = tt.statement ?? tt.formula ?? ''
-      base.left = tt.left ?? ''
       base.right = tt.right ?? ''
       base.lefts = Array.isArray(tt.lefts) ? [...tt.lefts] : []
+      if (base.kind === 'equivalence') {
+        const statements = Array.isArray(tt.statements)
+          ? [...tt.statements]
+          : [tt.left ?? '', tt.right ?? '']
+        while (statements.length < 2) statements.push('')
+        base.statements = statements
+      }
       base.partialCredit = opts.partialCredit ?? opts.partialcredit ?? opts.partial_credit ?? Boolean(proof.partialCredit)
       base.classificationQuestion = opts.question ?? false
     }

@@ -155,7 +155,7 @@ export default function PartialTruthTable({
       problemLabel={problemLabel}
       prompt={prompt}
       minHeight="200px"
-      cardMaxWidth="1060px"
+      contentSized
       isInstructorView={isInstructorView && !!proof}
       onEditQuestion={proof ? openEdit : undefined}
       status={status}

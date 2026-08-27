@@ -88,26 +88,27 @@ export function formulaTable(fml, notation = undefined) {
     return { taut, contra, opspot, rows };
 }
 
-// fills in truth table for two formulas and checks their
-// equivalence
-export function equivTables(fmlA, fmlB, notation = undefined) {
-    const interps = libtf.allinterps([fmlA,fmlB]);
-    let equiv = true;
-    const A = {};
-    const B = {};
-    A.opspot = 0;
-    B.opspot = 0;
-    A.rows = [];
-    B.rows = [];
+// fills shared truth tables and checks mutual equivalence
+export function equivTablesMany(wffs, notation = undefined) {
+    const interps = libtf.allinterps(wffs);
+    let equiv = wffs.length >= 2;
+    const tables = wffs.map(() => ({ opspot: 0, rows: [] }));
     for (const interp of interps) {
-        const ea = libtf.evaluate(fmlA, interp, notation);
-        const eb = libtf.evaluate(fmlB, interp, notation);
-        A.opspot = ea.opspot;
-        B.opspot = eb.opspot;
-        A.rows.push(ea.row);
-        B.rows.push(eb.row);
-        equiv = (equiv && (ea.tv == eb.tv));
+        const values = wffs.map((wff, index) => {
+            const result = libtf.evaluate(wff, interp, notation);
+            tables[index].opspot = result.opspot;
+            tables[index].rows.push(result.row);
+            return result.tv;
+        });
+        equiv = equiv && values.every((value) => value === values[0]);
     }
+    return { equiv, tables }
+}
+
+// preserves the pairwise logicpenguin interface
+export function equivTables(fmlA, fmlB, notation = undefined) {
+    const { equiv, tables } = equivTablesMany([fmlA, fmlB], notation);
+    const [A, B] = tables;
     return { equiv, A, B }
 }
 

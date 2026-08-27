@@ -1,0 +1,16 @@
+.mathjax-formula-block {
+  display: block;
+}
+
+.mathjax-formula-block > mjx-container {
+  display: block !important;
+  margin: 0 !important;
+}
+
+.mathjax-formula-block > mjx-container > svg {
+  display: block;
+}
+
+.mathjax-formula-block > mjx-container[display='true'] > svg {
+  margin-inline: auto;
+}

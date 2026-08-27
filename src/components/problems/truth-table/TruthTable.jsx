@@ -3,13 +3,6 @@ import {
   Box,
   Stack,
   Typography,
-  FormControl,
-  FormGroup,
-  FormControlLabel,
-  FormLabel,
-  Checkbox,
-  RadioGroup,
-  Radio,
 } from '@mui/material'
 import getFormulaClass from '../../../lib/logicpenguin/symbolic/formula.js'
 import getSyntax from '../../../lib/logicpenguin/symbolic/libsyntax.js'
@@ -26,15 +19,25 @@ import {
   buildTruthTableStatePayload,
   buildTruthTableSubmissionData,
   deriveTruthTableSolutionClassification,
+  formatTruthTableStatements,
   isAtomicTruthTableToken,
   normalizeSavedClassification,
   submitTruthTableAnswer,
   tokenizeTruthTableHeader,
 } from './truthTableUi.js'
+import {
+  getTruthTableClassification,
+  isTruthTableClassificationComplete,
+  truthTableClassificationsMatch,
+} from './truthTableClassification.js'
 import PromptText from '../../ui/PromptText.jsx'
 import { tablesEqual, clearDebounce, scheduleDebouncedChange } from '../../../utils/tablePerf.js'
 import { getNotation } from '../../../lib/logicSystems.js'
 import { displayIndexedSymbolsForNotation } from '../../../lib/indexedSymbols.js'
+import { logicStatementsToTex } from '../../../lib/logicTex.js'
+import MathJaxFormula from '../../ui/MathJaxFormula.jsx'
+import TruthTableClassification from './TruthTableClassification.jsx'
+import TruthTableFeedback from './TruthTableFeedback.jsx'
 
 const KIND_BY_PROOF_TYPE = {
   'formula-truth-table': 'formula',
@@ -59,6 +62,7 @@ export default function TruthTable({
   const kind = truthTable.kind
     ?? KIND_BY_PROOF_TYPE[proof?.type]
     ?? (truthTable.lefts && truthTable.right ? 'argument' : null)
+    ?? (truthTable.statements?.length > 1 ? 'equivalence' : null)
     ?? (truthTable.left && truthTable.right ? 'equivalence' : 'formula')
   const tableConfig = React.useMemo(() => {
     const base = { ...truthTable, kind }
@@ -71,11 +75,15 @@ export default function TruthTable({
       }
     }
     if (kind === 'equivalence') {
-      if (base.left === undefined || base.left === '') {
-        base.left = proof?.left ?? proof?.leftFormula ?? proof?.formulaLeft ?? ''
-      }
-      if (base.right === undefined || base.right === '') {
-        base.right = proof?.right ?? proof?.rightFormula ?? proof?.formulaRight ?? proof?.conclusion ?? proof?.conc ?? ''
+      if (!Array.isArray(base.statements) || base.statements.length === 0) {
+        const proofStatements = proof?.statements ?? proof?.formulas
+        if (Array.isArray(proofStatements) && proofStatements.length > 0) {
+          base.statements = proofStatements
+        } else {
+          const left = base.left ?? proof?.left ?? proof?.leftFormula ?? proof?.formulaLeft ?? ''
+          const right = base.right ?? proof?.right ?? proof?.rightFormula ?? proof?.formulaRight ?? proof?.conclusion ?? proof?.conc ?? ''
+          base.statements = [left, right]
+        }
       }
     }
     if (kind === 'argument') {
@@ -98,31 +106,6 @@ export default function TruthTable({
       false
     )
   }, [proof?.options?.question, tableConfig?.options?.question])
-  const classificationOptions = React.useMemo(() => {
-    if (!classificationEnabled) { return []; }
-    if (kind === 'formula') {
-      return [
-        { value: 'tautology', label: 'Tautology' },
-        { value: 'contingent', label: 'Contingent' },
-        { value: 'self-contradiction', label: 'Self-contradiction' },
-      ];
-    }
-    if (kind === 'equivalence') {
-      return [
-        { value: 'equivalent', label: 'Logically equivalent' },
-        { value: 'contradictory', label: 'Contradictory' },
-        { value: 'consistent', label: 'Consistent' },
-        { value: 'inconsistent', label: 'Inconsistent' },
-      ];
-    }
-    if (kind === 'argument') {
-      return [
-        { value: 'valid', label: 'Valid' },
-        { value: 'invalid', label: 'Invalid' },
-      ];
-    }
-    return [];
-  }, [classificationEnabled, kind])
   const operatorSet = React.useMemo(() => new Set(Object.keys(syntax.operators)), [syntax])
   const statements = React.useMemo(() => {
     if (Array.isArray(tableConfig.statements) && tableConfig.statements.length > 0) {
@@ -134,14 +117,19 @@ export default function TruthTable({
     if (kind === 'argument' && tableConfig.lefts && tableConfig.right) {
       return [...tableConfig.lefts, tableConfig.right]
     }
-    if (kind === 'equivalence' && tableConfig.left && tableConfig.right) {
-      return [tableConfig.left, tableConfig.right]
-    }
     if (tableConfig.statement || tableConfig.formula) {
       return [tableConfig.statement ?? tableConfig.formula]
     }
     return []
   }, [kind, tableConfig])
+  const classification = React.useMemo(
+    () => getTruthTableClassification(kind, statements.length),
+    [kind, statements.length]
+  )
+  const classificationOptions = React.useMemo(
+    () => (classificationEnabled ? classification.options : []),
+    [classification, classificationEnabled]
+  )
 
   const tables = React.useMemo(() => {
     if (statements.length === 0) return []
@@ -162,6 +150,13 @@ export default function TruthTable({
     (token) => isAtomicTruthTableToken(token, operatorSet, syntax),
     [operatorSet, syntax]
   )
+  const statementText = statements.length > 1 && notation === 'calgary'
+    ? formatTruthTableStatements(statements, notation, kind === 'argument')
+    : ''
+  const statementTex = statementText
+    ? logicStatementsToTex(statements, kind === 'argument')
+    : ''
+  const showHurleySeparators = kind === 'argument' && notation === 'hurley'
 
   const expectedTables = React.useMemo(
     () =>
@@ -247,6 +242,13 @@ export default function TruthTable({
     setTableInputs((prev) => (tablesEqual(prev, derivedInitialTables) ? prev : derivedInitialTables))
     setMcSelection(normalizeSavedClassification(kind, savedState))
   }, [derivedInitialTables, kind, proof?.id, savedState?.mcans, savedState?.taut, savedState?.contra, savedState?.valid, savedState?.equiv])
+  React.useEffect(() => {
+    const allowedValues = new Set(classificationOptions.map((option) => option.value))
+    setMcSelection((previous) => {
+      const next = previous.filter((value) => allowedValues.has(value))
+      return next.length === previous.length ? previous : next
+    })
+  }, [classificationOptions])
 
   const handleCellChange = (tableIndex, rowIndex, colIndex, value) => {
     const nextTables = tableInputs.map((tableRows, tIdx) =>
@@ -301,13 +303,18 @@ export default function TruthTable({
           row.every((cell) => cell !== '')
       )
     )
-  const tableFilled =
-    tableFilledOnly && (!classificationEnabled || mcSelection.length > 0)
+  const classificationComplete = !classificationEnabled || isTruthTableClassificationComplete(kind, mcSelection)
+  const tableFilled = tableFilledOnly && classificationComplete
 
   const tableCorrect =
     hasTruthTable &&
     tableChecks.length > 0 &&
     tableChecks.every((res) => res.rowdiff === 0 && res.offcells.length === 0)
+  const solutionMcValues = React.useMemo(
+    () => deriveTruthTableSolutionClassification(kind, proof?.solution, statements, Formula, notation),
+    [Formula, kind, notation, proof?.solution, statements]
+  )
+  const classificationCorrect = !classificationEnabled || truthTableClassificationsMatch(mcSelection, solutionMcValues)
 
   if (!hasTruthTable) {
     return (
@@ -323,7 +330,7 @@ export default function TruthTable({
     if (isChecking || attemptCount >= attemptLimit) return
     if (!tableFilled) {
       setStatus('unanswered')
-      setMessage(classificationEnabled && mcSelection.length === 0
+      setMessage(classificationEnabled && !classificationComplete
         ? 'Select a classification before submitting.'
         : 'Complete the table before submitting.'
       )
@@ -334,7 +341,7 @@ export default function TruthTable({
       const result = await submitTruthTableAnswer({
         assignmentQuestionId,
         submissionData: buildTruthTableSubmissionData(kind, tableInputs, mcSelection, classificationEnabled),
-        localIsCorrect: tableCorrect && (!classificationEnabled || mcSelection.length > 0),
+        localIsCorrect: tableCorrect && classificationCorrect,
         attemptLimit,
         classificationEnabled,
         selection: mcSelection,
@@ -417,87 +424,50 @@ export default function TruthTable({
   const showSolution =
     attemptCount >= attemptLimit && status !== 'correct' && displaySolutionTables.length > 0
 
-  // Correct multiple-choice answer for solution reveal (from proof.solution or derived from problem)
-  const solutionMcValues = React.useMemo(
-    () => deriveTruthTableSolutionClassification(kind, proof?.solution, statements, Formula, notation),
-    [Formula, kind, notation, proof?.solution, statements]
-  )
-
-  const promptContent = embedded && (proof.description || tableConfig.prompt)
+  const promptContent = (proof.description || tableConfig.prompt)
     ? (
         <PromptText content={tableConfig.prompt || proof.description} />
       )
     : null
 
   const tableCard = (
-    <Box
-      sx={{
-        mt: embedded ? 0 : 1,
-      }}
-    >
-      <Stack spacing={1.5} sx={{ p: { xs: embedded ? 0 : 2, md: embedded ? 0 : 2 } }}>
-        {promptContent}
-        <TruthTableGrid
-          tables={tables}
-          tableInputs={tableInputs}
-          combined={useCombinedTable}
-          readOnly={false}
-          onCellChange={handleCellChange}
-          showConclusionMarker={kind === 'argument'}
-          withSelectors
-          selectedColumns={selectedColumns}
-          selectedRows={selectedRows}
-          onToggleColumn={toggleColumn}
-          onToggleRow={toggleRow}
-          isCellReadOnly={isPrefilledCell}
-        />
+    <Box sx={{ width: 'fit-content', maxWidth: '100%' }}>
+      <Stack spacing={2}>
+        {(promptContent || statementText) && (
+          <Stack spacing={1}>
+            {promptContent}
+            {statementText && (
+              <Box sx={{ fontSize: '1.2rem', lineHeight: 1.6, overflowX: 'auto', overflowY: 'clip' }}>
+                <MathJaxFormula tex={statementTex} fallback={statementText} display={false} block />
+              </Box>
+            )}
+          </Stack>
+        )}
+        <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+          <TruthTableGrid
+            tables={tables}
+            tableInputs={tableInputs}
+            combined={useCombinedTable}
+            readOnly={false}
+            onCellChange={handleCellChange}
+            showHurleySeparators={showHurleySeparators}
+            withSelectors
+            selectedColumns={selectedColumns}
+            selectedRows={selectedRows}
+            onToggleColumn={toggleColumn}
+            onToggleRow={toggleRow}
+            isCellReadOnly={isPrefilledCell}
+          />
+          <TruthTableFeedback
+            state={tableFilledOnly ? (tableCorrect ? 'complete' : 'incorrect') : 'incomplete'}
+          />
+        </Box>
         {classificationEnabled && classificationOptions.length > 0 && (
-          <Box sx={{ width: '100%' }}>
-            <FormControl component="fieldset" variant="standard">
-              <FormLabel component="legend">
-                {kind === 'argument' ? 'Is this argument valid or invalid?' : 'Select all that apply'}
-              </FormLabel>
-              {kind === 'argument' || kind === 'formula' ? (
-                <RadioGroup
-                  value={mcSelection[0] || ''}
-                  onChange={(event) => {
-                    const next = event.target.value ? [event.target.value] : []
-                    updateClassificationSelection(next)
-                  }}
-                >
-                  {classificationOptions.map((option) => (
-                    <FormControlLabel
-                      key={option.value}
-                      value={option.value}
-                      control={<Radio />}
-                      label={option.label}
-                    />
-                  ))}
-                </RadioGroup>
-              ) : (
-                <FormGroup>
-                  {classificationOptions.map((option) => (
-                    <FormControlLabel
-                      key={option.value}
-                      control={
-                        <Checkbox
-                          checked={mcSelection.includes(option.value)}
-                          onChange={(event) => {
-                            const checked = event.target.checked
-                            const next = checked
-                              ? [...mcSelection, option.value]
-                              : mcSelection.filter((v) => v !== option.value)
-                            updateClassificationSelection(next)
-                          }}
-                        />
-                      }
-                      label={option.label}
-                    />
-                  ))}
-                </FormGroup>
-              )}
-            </FormControl>
-          </Box>
+          <TruthTableClassification
+            classification={classification}
+            selection={mcSelection}
+            onChange={updateClassificationSelection}
+          />
         )}
         {!hideActions && !suppressReveal && showSolution && (
           <>
@@ -507,7 +477,7 @@ export default function TruthTable({
                 tableInputs={displaySolutionTables.map((table) => table.rows)}
                 combined={displaySolutionTables.length > 1}
                 readOnly
-                showConclusionMarker={kind === 'argument'}
+                showHurleySeparators={showHurleySeparators}
                 withSelectors={false}
               />
             </TruthTableSection>
@@ -533,26 +503,11 @@ export default function TruthTable({
     embedded ? (
       <Stack spacing={2} sx={{ px: 0, width: '100%', alignItems: 'stretch', flexGrow: 1 }}>
         {tableCard}
-        <Typography
-          variant="body2"
-          sx={{
-            color: 'primary.main',
-            fontFamily: 'inherit',
-            fontWeight: 400,
-          }}
-        >
-          {tableFilledOnly && tableCorrect
-            ? 'Truth table looks good.'
-            : tableFilledOnly
-              ? 'Recheck your rows.'
-              : 'Click editable cells to toggle truth values - fill in every blank cell to finish.'}
-        </Typography>
       </Stack>
     ) : (
       <ProblemFrame
-        prompt={tableConfig.prompt || proof.description}
         minHeight="auto"
-        cardMaxWidth="1060px"
+        contentSized
         status={status}
         message={message}
         onCloseStatus={() => setMessage('')}
@@ -565,24 +520,12 @@ export default function TruthTable({
             align="flex-start"
             attemptCount={attemptCount}
             attemptLimit={attemptLimit}
+            navigationPlacement="separate"
+            sx={{ mt: 0 }}
           />
         ) : null}
       >
         {tableCard}
-        <Typography
-          variant="body2"
-          sx={{
-            color: 'primary.main',
-            fontFamily: 'inherit',
-            fontWeight: 400,
-          }}
-        >
-          {tableFilledOnly && tableCorrect
-            ? 'Truth table looks good.'
-            : tableFilledOnly
-              ? 'Recheck your rows.'
-              : 'Click editable cells to toggle truth values - fill in every blank cell to finish.'}
-        </Typography>
       </ProblemFrame>
     )
   )
