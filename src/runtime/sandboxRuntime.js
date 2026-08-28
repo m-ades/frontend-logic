@@ -58,10 +58,17 @@ export function buildRuntimePaths(routeKind, routePrefix = getRoutePrefix(routeK
   };
 }
 
+/**
+ * builds a breadcrumb label and target for a route
+ *
+ * the return target identifies practice assignment routes
+ * invalid return targets retain the default breadcrumb
+ */
 export function buildBreadcrumbInfo(pathname, {
   routeKind,
   routePrefix = getRoutePrefix(routeKind),
   stripPrefix = routePrefix,
+  returnTo,
 }) {
   const normalizedPath = pathname === stripPrefix
     ? "/dashboard"
@@ -70,9 +77,12 @@ export function buildBreadcrumbInfo(pathname, {
     : pathname;
 
   if (normalizedPath.startsWith("/assignment/") || normalizedPath.startsWith("/assignment-builder")) {
+    const isPracticeAssignment = normalizedPath.startsWith("/assignment/")
+      && returnTo === `${routePrefix}/practice`;
+
     return {
-      label: "Assignments",
-      path: `${routePrefix}/assignments`,
+      label: isPracticeAssignment ? "Practice" : "Assignments",
+      path: isPracticeAssignment ? returnTo : `${routePrefix}/assignments`,
     };
   }
 

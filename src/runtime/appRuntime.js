@@ -273,9 +273,10 @@ export function createAppRuntime({ coursesDispatch, coursesState, routeKind, use
     ...runtimePaths,
     isSandbox: false,
     remapStudentPath: (path) => remapStudentPath(path, runtimePaths.routePrefix),
-    getBreadcrumbInfo: (pathname) => buildBreadcrumbInfo(pathname, {
+    getBreadcrumbInfo: (pathname, returnTo) => buildBreadcrumbInfo(pathname, {
       routeKind,
       routePrefix: runtimePaths.routePrefix,
+      returnTo,
     }),
     storageScope: "local",
     user,
