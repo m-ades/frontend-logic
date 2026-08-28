@@ -383,7 +383,13 @@ function buildMcSnapshot(proof, edited, existing) {
     )
   } else {
     patch.choices = choices
-    patch.answerIndex = Number(answerIndex)
+    if (Array.isArray(edited.answerIndices) && edited.answerIndices.length > 1) {
+      patch.multiSelect = true
+      patch.answerIndices = edited.answerIndices
+      patch.answerIndex = undefined
+    } else {
+      patch.answerIndex = Number(edited.answerIndices?.[0] ?? answerIndex)
+    }
   }
   return patch
 }
@@ -535,10 +541,10 @@ function McEditorForm({ proof, value, onChange }) {
   const choices = value.choices ?? mc.choices ?? []
   const prompt = value.prompt ?? mc.prompt ?? proof?.description ?? ''
   const answerIndex = value.answerIndex ?? proof?.answer ?? 0
+  const answerIndices = Array.isArray(value.answerIndices) ? value.answerIndices : [Number(answerIndex)]
 
   const setChoices = (next) => onChange({ ...value, choices: next })
   const setPrompt = (v) => onChange({ ...value, prompt: v })
-  const setAnswerIndex = (v) => onChange({ ...value, answerIndex: Number(v) })
   const setSubquestions = (next) => onChange({ ...value, subquestions: next })
 
   const addSubquestion = () => {
@@ -689,20 +695,30 @@ function McEditorForm({ proof, value, onChange }) {
           Add choice
         </Button>
       </Box>
-      <FormControl fullWidth size="small">
-        <InputLabel>Correct answer</InputLabel>
-        <Select
-          value={String(answerIndex)}
-          label="Correct answer"
-          onChange={(e) => setAnswerIndex(Number(e.target.value))}
-        >
-          {choices.map((_, idx) => (
-            <MenuItem key={idx} value={String(idx)}>
-              Choice {idx + 1}{choices[idx] ? `: ${String(choices[idx]).slice(0, 40)}…` : ''}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
+      {answerIndices.map((selectedAnswer, answerNumber) => (
+        <FormControl key={answerNumber} fullWidth size="small">
+          <InputLabel>Correct answer</InputLabel>
+          <Select
+            value={String(selectedAnswer)}
+            label="Correct answer"
+            onChange={(e) => onChange({
+              ...value,
+              answerIndices: answerIndices.map((answer, index) => (
+                index === answerNumber ? Number(e.target.value) : answer
+              )),
+            })}
+          >
+            {choices.map((_, idx) => (
+              <MenuItem key={idx} value={String(idx)}>
+                Choice {idx + 1}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      ))}
+      <Button size="small" onClick={() => onChange({ ...value, answerIndices: [...answerIndices, 0] })}>
+        Add answer
+      </Button>
       <Box>
         <Button
           startIcon={<AddIcon />}
@@ -1589,9 +1605,14 @@ function InstructorQuestionEditorInner({
     const base = { attemptLimit: proof?.attemptLimit ?? 3 }
     if (proof?.type === 'multiple-choice') {
       const mc = proof.multipleChoice || {}
+      const snapshot = proof.questionSnapshot || {}
       base.prompt = mc.prompt ?? proof.description ?? ''
       base.choices = Array.isArray(mc.choices) ? [...mc.choices] : []
-      base.answerIndex = proof.answer ?? 0
+      const savedAnswerIndices = Array.isArray(mc.answerIndices)
+        ? [...mc.answerIndices]
+        : (Array.isArray(snapshot.answerIndices) ? [...snapshot.answerIndices] : (Array.isArray(proof.answer) ? [...proof.answer] : []))
+      if (savedAnswerIndices.length > 1) base.answerIndices = savedAnswerIndices
+      base.answerIndex = Array.isArray(proof.answer) ? proof.answer[0] ?? 0 : proof.answer ?? 0
       if (Array.isArray(mc.subquestions) && mc.subquestions.length > 0) {
         base.subquestions = mc.subquestions.map((subq) => ({
           ...(subq && typeof subq === 'object' ? subq : {}),
