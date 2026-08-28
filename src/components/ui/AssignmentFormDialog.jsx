@@ -190,6 +190,31 @@ export default function AssignmentFormDialog({
             </>
           )}
 
+          <Box>
+            <Typography
+              variant="subtitle2"
+              color="text.secondary"
+              sx={{ mb: 1 }}
+            >
+              Presentation
+            </Typography>
+            <FormControlLabel
+              sx={{ ml: 0 }}
+              control={
+                <Switch
+                  checked={formData.groupQuestionsByType ?? false}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      groupQuestionsByType: e.target.checked,
+                    })
+                  }
+                />
+              }
+              label="Group questions by type"
+            />
+          </Box>
+
           <FormControlLabel
             control={
               <Switch

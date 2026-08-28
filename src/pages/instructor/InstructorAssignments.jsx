@@ -44,6 +44,7 @@ const INITIAL_FORM_DATA = {
   chapter: 1,
   subchapter: "",
   isLocked: false,
+  groupQuestionsByType: false,
 };
 
 export default function InstructorAssignments() {
@@ -135,6 +136,7 @@ export default function InstructorAssignments() {
       chapter: assignment.chapter || 1,
       subchapter: assignment.subchapter || "",
       isLocked: assignment.isLocked ?? false,
+      groupQuestionsByType: assignment.groupQuestionsByType ?? false,
     });
 
     setEditDialogOpen(true);

@@ -62,6 +62,32 @@ function a11yProps(index) {
   };
 }
 
+const problemTypeLabels = {
+  'multiple-choice': 'Multiple choice',
+  'symbolic-translation': 'Translation',
+  'combo-translation-truth-table': 'Translation and truth tables',
+  'combo-translation-derivation': 'Translation and derivations',
+  'truth-table': 'Truth tables',
+  'partial-truth-table': 'Partial truth tables',
+  'indirect-truth-table': 'Indirect truth tables',
+  'nonclassical-truth-table': 'Nonclassical truth tables',
+  'single-row-truth-table': 'Single-row truth tables',
+  'derivation': 'Derivations',
+  'derivation-calgary': 'Derivations',
+  'derivation-hurley': 'Derivations',
+  'true-false': 'True or false',
+  'evaluate-truth': 'Evaluate truth',
+  'valid-correct-sound': 'Validity and soundness',
+}
+
+function problemTypeLabel(type) {
+  const normalizedType = type || 'derivation'
+  if (problemTypeLabels[normalizedType]) return problemTypeLabels[normalizedType]
+  return normalizedType
+    .replace(/-/g, ' ')
+    .replace(/\b\w/g, (character) => character.toUpperCase())
+}
+
 function ProofTabs({
   proofs,
   currentProofIndex, 
@@ -82,6 +108,7 @@ function ProofTabs({
   onQuestionCreated,
   assignmentId,
   logicSystem,
+  groupQuestionsByType = false,
 }) {
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
@@ -332,6 +359,9 @@ function ProofTabs({
             const maxLabel = pointsPerQuestion % 1 === 0
               ? String(Math.round(pointsPerQuestion))
               : pointsPerQuestion.toFixed(1)
+            const sectionLabel = problemTypeLabel(proof.type)
+            const startsSection = groupQuestionsByType
+              && (idx === 0 || problemTypeLabel(proofs[idx - 1]?.type) !== sectionLabel)
             return (
             <Tab
               key={proof.id}
@@ -346,6 +376,27 @@ function ProofTabs({
                     width: '100%',
                   }}
                 >
+                  {startsSection && (
+                    <Box
+                      component="span"
+                      sx={{
+                        alignSelf: 'stretch',
+                        borderBottom: '1px solid',
+                        borderColor: 'divider',
+                        color: 'text.secondary',
+                        fontSize: '0.7rem',
+                        fontWeight: 700,
+                        letterSpacing: '0.06em',
+                        lineHeight: 1.4,
+                        mb: 0.5,
+                        pb: 0.5,
+                        textAlign: 'left',
+                        textTransform: 'uppercase',
+                      }}
+                    >
+                      {sectionLabel}
+                    </Box>
+                  )}
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                     <span>Problem {idx + 1}</span>
                     {(() => {
