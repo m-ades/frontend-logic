@@ -125,7 +125,9 @@ export async function fetchJson(path, options = {}) {
     } catch {
       // text was not json keep raw message
     }
-    throw new Error(message || `Request failed: ${res.status}`);
+    const requestError = new Error(message || `Request failed: ${res.status}`);
+    requestError.status = res.status;
+    throw requestError;
   }
   return normalizeLogicTextData(await res.json());
 }

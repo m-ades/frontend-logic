@@ -23,7 +23,7 @@ const INITIAL_FORM_DATA = {
   publishTime: "00:00",
   chapter: 1,
   subchapter: "A",
-  isLocked: false,
+  isLocked: true,
   groupQuestionsByType: false,
   allowRetakes: true,
   showSolutions: true,

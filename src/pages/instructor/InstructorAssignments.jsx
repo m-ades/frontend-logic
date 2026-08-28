@@ -43,7 +43,7 @@ const INITIAL_FORM_DATA = {
   dueTime: "23:59",
   chapter: 1,
   subchapter: "",
-  isLocked: false,
+  isLocked: true,
   groupQuestionsByType: false,
 };
 
