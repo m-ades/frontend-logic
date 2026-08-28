@@ -85,3 +85,24 @@ export function logicStatementsToTex(statements, isArgument = false) {
   }
   return formulas.join(String.raw`,\quad `)
 }
+
+const TEX_TEXT_ESCAPES = {
+  '\\': String.raw`\textbackslash{}`,
+  '{': String.raw`\{`,
+  '}': String.raw`\}`,
+  '$': String.raw`\$`,
+  '&': String.raw`\&`,
+  '#': String.raw`\#`,
+  '%': String.raw`\%`,
+  '_': String.raw`\_`,
+  '^': String.raw`\textasciicircum{}`,
+  '~': String.raw`\textasciitilde{}`,
+}
+
+// wraps a plain-language sentence (not logic notation) in tex text mode
+export function plainTextToTex(text) {
+  const source = String(text ?? '').trim()
+  if (!source) return ''
+  const escaped = [...source].map((character) => TEX_TEXT_ESCAPES[character] ?? character).join('')
+  return String.raw`\text{${escaped}}`
+}

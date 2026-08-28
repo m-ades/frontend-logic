@@ -121,7 +121,7 @@ export default function TruthTableEditor({
     (token) => isAtomicTruthTableToken(token, operatorSet, syntax),
     [operatorSet, syntax]
   )
-  const statementText = statements.length > 1 && notation === 'calgary'
+  const statementText = statements.length > 0 && notation === 'calgary'
     ? formatTruthTableStatements(statements, notation, kind === 'argument')
     : ''
   const statementTex = statementText
@@ -485,6 +485,7 @@ export default function TruthTableEditor({
             onSelectMainOperator={mainOperatorHighlight ? selectMainOperator : undefined}
             onClearMainOperator={mainOperatorHighlight ? clearMainOperator : undefined}
             isCellReadOnly={isPrefilledCell}
+            showLabels={!statementText}
           />
           {!embedded && (
             <TruthTableFeedback

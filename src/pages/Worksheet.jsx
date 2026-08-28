@@ -225,6 +225,7 @@ const mapQuestionToProof = (question, assignment, index, logicSystem = DEFAULT_L
       translation: {
         legend: snapshot.legend || '',
         prompt: snapshot.prompt || snapshot.statement || snapshot.question || '',
+        sentence: snapshot.sentence || '',
         symbolizationKey: snapshot.symbolizationKey || snapshot.symbolization_key || [],
         options: snapshot.options || {},
       },

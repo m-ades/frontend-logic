@@ -149,7 +149,7 @@ export default function TruthTable({
     (token) => isAtomicTruthTableToken(token, operatorSet, syntax),
     [operatorSet, syntax]
   )
-  const statementText = statements.length > 1 && notation === 'calgary'
+  const statementText = statements.length > 0 && notation === 'calgary'
     ? formatTruthTableStatements(statements, notation, kind === 'argument')
     : ''
   const statementTex = statementText
@@ -455,6 +455,7 @@ export default function TruthTable({
             onToggleColumn={toggleColumn}
             onToggleRow={toggleRow}
             isCellReadOnly={isPrefilledCell}
+            showLabels={!statementText}
           />
           <TruthTableFeedback
             state={tableFilledOnly ? (tableCorrect ? 'complete' : 'incorrect') : 'incomplete'}

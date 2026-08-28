@@ -12,7 +12,9 @@ import SolutionReveal from '../../SolutionReveal.jsx'
 import StatusBanner, { isTerminalStatus } from '../../../ui/StatusBanner.jsx'
 import PromptText from '../../../ui/PromptText.jsx'
 import RichText from '../../../ui/RichText.jsx'
+import MathJaxFormula from '../../../ui/MathJaxFormula.jsx'
 import { canonicalizeFormula } from '../../../../lib/logicpenguin/symbolic/formula.js'
+import { plainTextToTex } from '../../../../lib/logicTex.js'
 import {
   ST_PREDICATE_VARIABLES,
   getConstantLettersFromKey,
@@ -193,6 +195,8 @@ export default function SymbolicTranslation({
   const lastSavedValueRef = useRef(null)
   const legend = problem?.legend || problem?.question_snapshot?.legend
   const prompt = problem?.prompt || ''
+  const sentence = problem?.sentence || problem?.question_snapshot?.sentence || ''
+  const sentenceTex = sentence ? plainTextToTex(sentence) : ''
   const symbolizationKeyRaw = problem?.symbolizationKey
     ?? problem?.symbolization_key
     ?? problem?.question_snapshot?.symbolizationKey
@@ -308,6 +312,11 @@ export default function SymbolicTranslation({
               {prompt && (
                 <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 0.5 }}>
                   <PromptText content={prompt} sx={{ mb: 1 }} />
+                </Box>
+              )}
+              {sentence && (
+                <Box sx={{ fontSize: '1.171875rem', lineHeight: 1.6, mb: 1, overflowX: 'auto', overflowY: 'clip' }}>
+                  <MathJaxFormula tex={sentenceTex} fallback={sentence} display={false} block />
                 </Box>
               )}
               {symbolizationKey.length > 0 && (

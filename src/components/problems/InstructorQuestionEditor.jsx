@@ -1382,7 +1382,8 @@ function buildSymbolicTranslationSnapshot(proof, edited, existing, logicSystem =
   const symbolizationKey = rawKey.filter((x) => x != null && String(x).trim() !== '')
   const answer = normalizeTranslationAnswerInput(edited.answer ?? proof.answer ?? tr.answer ?? '', logicSystem)
   const patch = { [typeKey(e)]: 'symbolic-translation', prompt, symbolizationKey, answer }
-  if (e.legend !== undefined) patch.legend = edited.legend ?? tr.legend ?? proof.legend ?? ''
+  patch.sentence = edited.sentence ?? tr.sentence ?? ''
+  patch.legend = edited.legend ?? tr.legend ?? proof.legend ?? ''
   return patch
 }
 
@@ -1470,6 +1471,7 @@ function SymbolicTranslationEditorForm({ proof, value, onChange, logicSystem = D
   const symbols = getSymbols(logicSystem)
   const prompt = value.prompt ?? tr.prompt ?? proof?.description ?? ''
   const legend = value.legend ?? tr.legend ?? proof?.legend ?? ''
+  const sentence = value.sentence ?? tr.sentence ?? ''
   const symbolizationKey = Array.isArray(value.symbolizationKey) ? value.symbolizationKey : (tr.symbolizationKey || [])
   const answer = value.answer ?? proof?.answer ?? tr?.answer ?? proof?.solution ?? ''
   const keyList = Array.isArray(symbolizationKey) && symbolizationKey.length > 0 ? symbolizationKey : ['']
@@ -1480,7 +1482,8 @@ function SymbolicTranslationEditorForm({ proof, value, onChange, logicSystem = D
   }
   return (
     <Stack spacing={2}>
-      <TextField label="Prompt" multiline minRows={2} value={prompt} onChange={(e) => onChange({ ...value, prompt: e.target.value })} fullWidth variant="outlined" />
+      <TextField label="Prompt / instructions" multiline minRows={2} value={prompt} onChange={(e) => onChange({ ...value, prompt: e.target.value })} fullWidth variant="outlined" />
+      <TextField label="Sentence" multiline minRows={2} value={sentence} onChange={(e) => onChange({ ...value, sentence: e.target.value })} fullWidth variant="outlined" placeholder="e.g. The zoo has lions or tigers and bears." helperText="The sentence to symbolize, rendered separately from the prompt." />
       <TextField label="Legend" multiline minRows={2} value={typeof legend === 'string' ? legend : ''} onChange={(e) => onChange({ ...value, legend: e.target.value })} fullWidth variant="outlined" placeholder="e.g. P = it is raining" />
       <Box>
         <Typography variant="subtitle2" sx={{ mb: 1 }}>Symbolization key</Typography>
@@ -1625,6 +1628,7 @@ function InstructorQuestionEditorInner({
     if (proof?.type === 'symbolic-translation') {
       const tr = proof.translation || {}
       base.prompt = proof.description ?? tr.prompt ?? ''
+      base.sentence = tr.sentence ?? ''
       base.legend = tr.legend ?? proof.legend ?? ''
       base.symbolizationKey = Array.isArray(tr.symbolizationKey) ? [...tr.symbolizationKey] : []
       base.answer = tr.answer ?? proof.answer ?? ''
