@@ -68,10 +68,11 @@ export default function SandboxLayout({ children }) {
     ...runtimePaths,
     isSandbox: true,
     remapStudentPath: (path) => remapStudentPath(path, STUDENT_SANDBOX_PREFIX),
-    getBreadcrumbInfo: (pathname) => buildBreadcrumbInfo(pathname, {
+    getBreadcrumbInfo: (pathname, returnTo) => buildBreadcrumbInfo(pathname, {
       routeKind: "student",
       routePrefix: runtimePaths.routePrefix,
       stripPrefix: runtimePaths.routePrefix,
+      returnTo,
     }),
     storageScope: "session",
     user: sandbox.user,
@@ -121,10 +122,11 @@ export function InstructorSandboxLayout({ children }) {
     ...runtimePaths,
     isSandbox: true,
     remapStudentPath: remapInstructorPath,
-    getBreadcrumbInfo: (pathname) => buildBreadcrumbInfo(pathname, {
+    getBreadcrumbInfo: (pathname, returnTo) => buildBreadcrumbInfo(pathname, {
       routeKind: "instructor",
       routePrefix: runtimePaths.routePrefix,
       stripPrefix: runtimePaths.routePrefix,
+      returnTo,
     }),
     storageScope: "session",
     user: sandbox.user,

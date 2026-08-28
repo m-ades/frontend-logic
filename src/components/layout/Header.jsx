@@ -35,7 +35,7 @@ export default function Header({ onSignOut }) {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const activeCourse = courses.find((c) => c.id === activeCourseId);
-  const pageInfo = getBreadcrumbInfo(location.pathname);
+  const pageInfo = getBreadcrumbInfo(location.pathname, location.state?.returnTo);
 
   return (
     <AppBar
