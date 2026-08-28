@@ -17,6 +17,40 @@ import { useTheme } from '@mui/material/styles'
 import { getDisplayedColumnCount, getTruthTableDensity } from './truthTableUi.js'
 import { TruthTableSelectorButton, TruthValueButton } from './TruthTableControls.jsx'
 
+// a header cell click cycles through none -> highlighted -> main operator (graded) highlight
+
+function TokenHeaderButton({ token, ariaLabel, isHighlighted, isMainOperator, mainOperatorMode, onToggleHighlight, onMarkMainOperator, onClearMainOperator }) {
+  const handleClick = () => {
+    if (!mainOperatorMode) {
+      onToggleHighlight()
+      return
+    }
+    if (isMainOperator) {
+      onClearMainOperator?.()
+      return
+    }
+    if (isHighlighted) {
+      onToggleHighlight()
+      onMarkMainOperator()
+      return
+    }
+    onToggleHighlight()
+  }
+
+  return (
+    <Tooltip title="highlight column">
+      <ButtonBase
+        aria-label={ariaLabel}
+        aria-pressed={isHighlighted || isMainOperator}
+        onClick={handleClick}
+        sx={{ position: 'absolute', inset: 0, font: 'inherit', color: 'inherit' }}
+      >
+        {token}
+      </ButtonBase>
+    </Tooltip>
+  )
+}
+
 // renders one or more truth tables in a shared grid
 // show hurley separators adds slash columns and marks the final table as the conclusion
 export default function TruthTableGrid({
@@ -27,10 +61,14 @@ export default function TruthTableGrid({
   onCellChange,
   showHurleySeparators = false,
   withSelectors = true,
+  allowRowSelection = withSelectors,
   selectedColumns = [],
   selectedRows = [],
   onToggleColumn,
   onToggleRow,
+  mainOperatorColumn,
+  onSelectMainOperator,
+  onClearMainOperator,
   toggleValues,
   shrinkWrap = false,
   renderCell,
@@ -47,6 +85,20 @@ export default function TruthTableGrid({
     ? alpha(theme.palette.common.white, 0.04)
     : alpha(theme.palette.common.black, 0.028)
   const highlightStyle = { backgroundColor: alpha(theme.palette.primary.main, 0.14) }
+  const mainOperatorMode = typeof onSelectMainOperator === 'function'
+  const mainOpBorderWidth = 3
+
+  const mainOpBorderStyle = ({ top = false, bottom = false } = {}) => ({
+    borderLeft: `${mainOpBorderWidth}px solid ${theme.palette.primary.main}`,
+    borderRight: `${mainOpBorderWidth}px solid ${theme.palette.primary.main}`,
+    ...(top ? { borderTop: `${mainOpBorderWidth}px solid ${theme.palette.primary.main}` } : {}),
+    ...(bottom ? { borderBottom: `${mainOpBorderWidth}px solid ${theme.palette.primary.main}` } : {}),
+  })
+  const isMainOperatorColumn = (tableIndex, colIndex) => (
+    mainOperatorMode
+    && mainOperatorColumn?.tableIndex === tableIndex
+    && mainOperatorColumn?.colIndex === colIndex
+  )
   const tableDensity = React.useMemo(() => {
     const columnCount = getDisplayedColumnCount(tables, combined)
     return getTruthTableDensity(columnCount)
@@ -124,18 +176,18 @@ export default function TruthTableGrid({
       <TruthTableSelectorButton selected={selected} onClick={onClick} ariaLabel={ariaLabel} tooltip={tooltip} label={label} />
     </Box>
   )
-  const renderHeaderToken = (token, selected, onClick, ariaLabel) => (
+  const renderHeaderToken = (token, selected, isMainOp, tableIndex, colIndex, ariaLabel) => (
     withSelectors ? (
-      <Tooltip title="highlight column">
-        <ButtonBase
-          aria-label={ariaLabel}
-          aria-pressed={selected}
-          onClick={onClick}
-          sx={{ position: 'absolute', inset: 0, font: 'inherit', color: 'inherit' }}
-        >
-          {token}
-        </ButtonBase>
-      </Tooltip>
+      <TokenHeaderButton
+        token={token}
+        isHighlighted={selected}
+        isMainOperator={isMainOp}
+        ariaLabel={ariaLabel}
+        onToggleHighlight={() => onToggleColumn?.(tableIndex, colIndex)}
+        mainOperatorMode={mainOperatorMode}
+        onMarkMainOperator={() => onSelectMainOperator?.(tableIndex, colIndex)}
+        onClearMainOperator={onClearMainOperator}
+      />
     ) : token
   )
   const getCellAriaLabel = (table, rowIndex, colIndex) => {
@@ -169,6 +221,7 @@ export default function TruthTableGrid({
                     )}
                     {headerTokens.map((token, tokenIndex) => {
                       const selected = selectedColumns.some((col) => col.tableIndex === tableIndex && col.colIndex === tokenIndex)
+                      const isMainOp = isMainOperatorColumn(tableIndex, tokenIndex)
                       return (
                         <TableCell
                           key={`combined-header-${tableIndex}-${tokenIndex}`}
@@ -178,13 +231,16 @@ export default function TruthTableGrid({
                             !showHurleySeparators && tableIndex > 0 && tokenIndex === 0 ? 'tt-statement-start' : '',
                           ].filter(Boolean).join(' ')}
                           align="center"
-                          data-tt-highlight={selected ? 'true' : undefined}
-                          sx={compactHeaderCellSx}
+                          data-tt-highlight={selected && !isMainOp ? 'true' : undefined}
+                          sx={isMainOp ? { ...compactHeaderCellSx, ...highlightStyle } : compactHeaderCellSx}
+                          style={isMainOp ? mainOpBorderStyle({ top: true, bottom: rowCount === 0 }) : undefined}
                         >
                           {renderHeaderToken(
                             token,
                             selected,
-                            () => onToggleColumn?.(tableIndex, tokenIndex),
+                            isMainOp,
+                            tableIndex,
+                            tokenIndex,
                             `Highlight column ${tokenIndex + 1} token ${token}`
                           )}
                         </TableCell>
@@ -193,7 +249,7 @@ export default function TruthTableGrid({
                   </React.Fragment>
                 )
               })}
-              {withSelectors && (
+              {allowRowSelection && (
                 <TableCell aria-label="Row highlight controls" className="tt-selector-corner" align="center" sx={{ ...selectorLaneSx, p: 0, color: 'text.secondary', fontSize: '0.75rem' }}>
                   #
                 </TableCell>
@@ -215,6 +271,7 @@ export default function TruthTableGrid({
                       {headerTokens.map((_, colIndex) => {
                         const colMatch = selectedColumns.some((col) => col.tableIndex === tableIndex && col.colIndex === colIndex)
                         const rowMatch = selectedRows.includes(rowIndex)
+                        const isMainOp = isMainOperatorColumn(tableIndex, colIndex)
                         const cellValue = tableInputs[tableIndex]?.[rowIndex]?.[colIndex]
                         const cellReadOnly = readOnly || Boolean(isCellReadOnly?.({
                           table,
@@ -229,7 +286,7 @@ export default function TruthTableGrid({
                             rowIndex,
                             colIndex,
                             cellValue,
-                            isHighlighted: withSelectors && (colMatch || rowMatch),
+                            isHighlighted: withSelectors && (isMainOp || colMatch || (allowRowSelection && rowMatch)),
                             cellSx: compactCellSx,
                           })
                         }
@@ -242,8 +299,15 @@ export default function TruthTableGrid({
                               !showHurleySeparators && tableIndex > 0 && colIndex === 0 ? 'tt-statement-start' : '',
                             ].filter(Boolean).join(' ')}
                             align="center"
-                            data-tt-highlight={withSelectors && (colMatch || rowMatch) ? 'true' : undefined}
-                            sx={withSelectors && (colMatch || rowMatch) ? { ...compactCellSx, ...highlightStyle } : compactCellSx}
+                            data-tt-highlight={withSelectors && !isMainOp && (colMatch || (allowRowSelection && rowMatch)) ? 'true' : undefined}
+                            sx={
+                              withSelectors && isMainOp
+                                ? { ...compactCellSx, ...highlightStyle }
+                                : withSelectors && (colMatch || (allowRowSelection && rowMatch))
+                                  ? { ...compactCellSx, ...highlightStyle }
+                                  : compactCellSx
+                            }
+                            style={withSelectors && isMainOp ? mainOpBorderStyle({ bottom: rowIndex === rowCount - 1 }) : undefined}
                           >
                             <TruthValueButton
                               value={cellValue}
@@ -259,7 +323,7 @@ export default function TruthTableGrid({
                     </React.Fragment>
                   )
                 })}
-                {withSelectors && (
+                {allowRowSelection && (
                   <TableCell className="tt-row-selector-cell" align="center" sx={{ ...selectorLaneSx, pl: 0.75, pr: 0, pt: 0.25, pb: 0.25, verticalAlign: 'middle' }}>
                     {renderSelector(selectedRows.includes(rowIndex), () => onToggleRow?.(rowIndex), `Highlight row ${rowIndex + 1}`, 'highlight row', rowIndex + 1)}
                   </TableCell>
@@ -294,24 +358,28 @@ export default function TruthTableGrid({
                 <TableRow className="tt-token-row">
                   {headerTokens.map((token, tokenIndex) => {
                     const selected = selectedColumns.some((col) => col.tableIndex === tableIndex && col.colIndex === tokenIndex)
+                    const isMainOp = isMainOperatorColumn(tableIndex, tokenIndex)
                     return (
                       <TableCell
                         key={`header-${tableIndex}-${tokenIndex}`}
                         className="tt-token"
                         align="center"
-                        data-tt-highlight={selected ? 'true' : undefined}
-                        sx={compactHeaderCellSx}
+                        data-tt-highlight={selected && !isMainOp ? 'true' : undefined}
+                        sx={isMainOp ? { ...compactHeaderCellSx, ...highlightStyle } : compactHeaderCellSx}
+                        style={isMainOp ? mainOpBorderStyle({ top: true, bottom: table.rows.length === 0 }) : undefined}
                       >
                         {renderHeaderToken(
                           token,
                           selected,
-                          () => onToggleColumn?.(tableIndex, tokenIndex),
+                          isMainOp,
+                          tableIndex,
+                          tokenIndex,
                           `Highlight column ${tokenIndex + 1} token ${token}`
                         )}
                       </TableCell>
                     )
                   })}
-                  {withSelectors && (
+                  {allowRowSelection && (
                     <TableCell aria-label="Row highlight controls" className="tt-selector-corner" align="center" sx={{ ...selectorLaneSx, p: 0, color: 'text.secondary', fontSize: '0.75rem' }}>
                       #
                     </TableCell>
@@ -324,6 +392,7 @@ export default function TruthTableGrid({
                     {row.map((_, colIndex) => {
                       const colMatch = selectedColumns.some((col) => col.tableIndex === tableIndex && col.colIndex === colIndex)
                       const rowMatch = selectedRows.includes(rowIndex)
+                      const isMainOp = isMainOperatorColumn(tableIndex, colIndex)
                       const cellValue = tableInputs[tableIndex]?.[rowIndex]?.[colIndex]
                       const cellReadOnly = readOnly || Boolean(isCellReadOnly?.({
                         table,
@@ -338,7 +407,7 @@ export default function TruthTableGrid({
                           rowIndex,
                           colIndex,
                           cellValue,
-                          isHighlighted: withSelectors && (colMatch || rowMatch),
+                          isHighlighted: withSelectors && (isMainOp || colMatch || (allowRowSelection && rowMatch)),
                           cellSx: compactCellSx,
                         })
                       }
@@ -347,8 +416,15 @@ export default function TruthTableGrid({
                           key={`cell-${tableIndex}-${rowIndex}-${colIndex}`}
                           className="tt-cell"
                           align="center"
-                          data-tt-highlight={withSelectors && (colMatch || rowMatch) ? 'true' : undefined}
-                          sx={withSelectors && (colMatch || rowMatch) ? { ...compactCellSx, ...highlightStyle } : compactCellSx}
+                          data-tt-highlight={withSelectors && !isMainOp && (colMatch || (allowRowSelection && rowMatch)) ? 'true' : undefined}
+                          sx={
+                            withSelectors && isMainOp
+                              ? { ...compactCellSx, ...highlightStyle }
+                              : withSelectors && (colMatch || (allowRowSelection && rowMatch))
+                                ? { ...compactCellSx, ...highlightStyle }
+                                : compactCellSx
+                          }
+                          style={withSelectors && isMainOp ? mainOpBorderStyle({ bottom: rowIndex === table.rows.length - 1 }) : undefined}
                         >
                           <TruthValueButton
                             value={cellValue}
@@ -361,7 +437,7 @@ export default function TruthTableGrid({
                         </TableCell>
                       )
                     })}
-                    {withSelectors && (
+                    {allowRowSelection && (
                       <TableCell className="tt-row-selector-cell" align="center" sx={{ ...selectorLaneSx, pl: 0.75, pr: 0, pt: 0.25, pb: 0.25, verticalAlign: 'middle', border: 'none' }}>
                         {renderSelector(selectedRows.includes(rowIndex), () => onToggleRow?.(rowIndex), `Highlight row ${rowIndex + 1}`, 'highlight row', rowIndex + 1)}
                       </TableCell>

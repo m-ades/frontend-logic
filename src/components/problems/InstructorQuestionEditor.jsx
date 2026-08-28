@@ -397,6 +397,7 @@ function buildTruthTableSnapshot(proof, edited, existing, logicSystem = DEFAULT_
     ...(tt.options || {}),
     ...(edited.partialCredit !== undefined ? { partialCredit: edited.partialCredit } : {}),
     ...(edited.classificationQuestion !== undefined ? { question: edited.classificationQuestion } : {}),
+    ...(edited.mainOperatorHighlight !== undefined ? { highlightMainOperator: edited.mainOperatorHighlight } : {}),
   }
   const equivalenceStatements = Array.isArray(edited.statements)
     ? [...edited.statements]
@@ -738,6 +739,7 @@ function TruthTableEditorForm({ proof, value, onChange, logicSystem = DEFAULT_LO
   const opts = tt.options || proof?.options || {}
   const partialCredit = value.partialCredit ?? opts.partialCredit ?? opts.partialcredit ?? opts.partial_credit ?? proof?.partialCredit ?? false
   const classificationQuestion = value.classificationQuestion ?? opts.question ?? false
+  const mainOperatorHighlight = value.mainOperatorHighlight ?? opts.highlightMainOperator ?? false
 
   const update = (updates) => onChange({ ...value, ...updates })
 
@@ -876,6 +878,17 @@ function TruthTableEditorForm({ proof, value, onChange, logicSystem = DEFAULT_LO
         }
         label="Ask classification"
       />
+      {kind === 'formula' && (
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={mainOperatorHighlight}
+              onChange={(e) => update({ mainOperatorHighlight: e.target.checked })}
+            />
+          }
+          label="Require main operator highlight"
+        />
+      )}
     </Stack>
   )
 }
@@ -1613,6 +1626,7 @@ function InstructorQuestionEditorInner({
       }
       base.partialCredit = opts.partialCredit ?? opts.partialcredit ?? opts.partial_credit ?? Boolean(proof.partialCredit)
       base.classificationQuestion = opts.question ?? false
+      base.mainOperatorHighlight = opts.highlightMainOperator ?? false
     }
     if (proof?.type === 'indirect-truth-table') {
       const itt = proof.indirectTruthTable || {}
