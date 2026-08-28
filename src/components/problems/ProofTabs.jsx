@@ -11,6 +11,7 @@ import { ProblemNavigationContext } from './ProblemNavigationContext.jsx'
 import { allowPartialForProof, displayScoreForProof } from '../../utils/problemHelpers.js'
 import InstructorQuestionEditor from './InstructorQuestionEditor.jsx'
 import { getDerivationProblemType, isDerivationProblemType } from '../../lib/logicSystems.js'
+import { instructorProblemTypes } from '../../lib/instructorProblemTypes.js'
 
 function TabPanel(props) {
   const { children, value, index, direction, isMobile, ...other } = props;
@@ -515,19 +516,9 @@ function ProofTabs({
                   onClose={handleCreateMenuClose}
                   anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
                 >
-                  <MenuItem onClick={() => handleCreateStart('derivation')}>Derivation</MenuItem>
-                  <MenuItem onClick={() => handleCreateStart('truth-table')}>Truth table</MenuItem>
-                  <MenuItem onClick={() => handleCreateStart('partial-truth-table')}>Partial truth table</MenuItem>
-                  <MenuItem onClick={() => handleCreateStart('single-row-truth-table')}>Single-row truth table</MenuItem>
-                  <MenuItem onClick={() => handleCreateStart('indirect-truth-table')}>Indirect truth table</MenuItem>
-                  <MenuItem onClick={() => handleCreateStart('nonclassical-truth-table')}>Nonclassical truth table</MenuItem>
-                  <MenuItem onClick={() => handleCreateStart('symbolic-translation')}>Symbolic translation</MenuItem>
-                  <MenuItem onClick={() => handleCreateStart('multiple-choice')}>Multiple choice</MenuItem>
-                  <MenuItem onClick={() => handleCreateStart('true-false')}>True/false</MenuItem>
-                  <MenuItem onClick={() => handleCreateStart('evaluate-truth')}>Evaluate truth</MenuItem>
-                  <MenuItem onClick={() => handleCreateStart('combo-translation-truth-table')}>Combo translation + truth table</MenuItem>
-                  <MenuItem onClick={() => handleCreateStart('combo-translation-derivation')}>Combo translation + derivation</MenuItem>
-                  <MenuItem onClick={() => handleCreateStart('proof-argument-extraction')}>Proof and argument extraction</MenuItem>
+                  {instructorProblemTypes.map(({ type, label }) => (
+                    <MenuItem key={type} onClick={() => handleCreateStart(type)}>{label}</MenuItem>
+                  ))}
                 </Menu>
                 {createProof && (
                   <InstructorQuestionEditor

@@ -310,16 +310,6 @@ export default function TruthTableEditor({
     && mainOperatorColumn?.colIndex === tables[0]?.opspot
   )
 
-  if (!hasTruthTable) {
-    return (
-      <Stack spacing={2} sx={{ px: 0, width: '100%' }}>
-        <Typography color="text.secondary">
-          No truth-table metadata is available for this problem.
-        </Typography>
-      </Stack>
-    )
-  }
-
   const handleCheck = async () => {
     if (isChecking || attemptCount >= attemptLimit) return
     if (!tableFilled) {
@@ -436,6 +426,33 @@ export default function TruthTableEditor({
     () => buildDisplaySolutionTables(proof?.solution, solutionTablesFromProblem, proof?.description || 'Answer'),
     [proof?.description, proof?.solution, solutionTablesFromProblem]
   )
+
+  if (!hasTruthTable) {
+    return (
+      <ProblemFrame
+        problemLabel={problemLabel}
+        minHeight="auto"
+        cardMaxWidth="760px"
+        isInstructorView={isInstructorView}
+        onEditQuestion={openEdit}
+        editorNode={isInstructorView ? (
+          <InstructorQuestionEditor
+            ref={editorRef}
+            proof={proof}
+            isInstructorView
+            onSaved={onQuestionSaved}
+            trigger="none"
+            logicSystem={logicSystem}
+          />
+        ) : null}
+      >
+        <Typography color="text.secondary">
+          Truth-table data is missing for this question.
+        </Typography>
+      </ProblemFrame>
+    )
+  }
+
   const effectiveStatus = embedded && parentStatus != null ? parentStatus : status
   const effectiveAttemptCount = embedded && parentAttemptCount != null ? parentAttemptCount : attemptCount
   const effectiveAttemptLimit = embedded && parentAttemptLimit != null ? parentAttemptLimit : attemptLimit

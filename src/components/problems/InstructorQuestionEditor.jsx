@@ -51,6 +51,10 @@ import {
   mapTranslationAnswer,
   parseTranslationAnswer,
 } from '../../lib/logicpenguin/translation-answer.js'
+import {
+  assignmentQuestionDeletedEvent,
+  isInstructorProblemType,
+} from '../../lib/instructorProblemTypes.js'
 
 // deep merge. source overwrites. arrays replace.
 function deepMerge(target, source) {
@@ -778,8 +782,8 @@ function TruthTableEditorForm({ proof, value, onChange, logicSystem = DEFAULT_LO
           label="Question type"
           onChange={(e) => update({ kind: e.target.value })}
         >
-          <MenuItem value="formula">Single sentence</MenuItem>
-          <MenuItem value="argument">Multiple sentences</MenuItem>
+          <MenuItem value="formula">Statement</MenuItem>
+          <MenuItem value="argument">Argument</MenuItem>
           <MenuItem value="equivalence">Statement comparison</MenuItem>
         </Select>
       </FormControl>
@@ -1561,24 +1565,6 @@ function ComboTruthTableEditorForm({ proof, value, onChange, logicSystem = DEFAU
   )
 }
 
-const SUPPORTED_TYPES = new Set([
-  'multiple-choice',
-  'truth-table',
-  'indirect-truth-table',
-  'nonclassical-truth-table',
-  'derivation',
-  'derivation-hurley',
-  'derivation-calgary',
-  'true-false',
-  'evaluate-truth',
-  'symbolic-translation',
-  'single-row-truth-table',
-  'partial-truth-table',
-  'combo-translation-truth-table',
-  'combo-translation-derivation',
-  'proof-argument-extraction',
-])
-
 function InstructorQuestionEditorInner({
   proof,
   isInstructorView,
@@ -1598,7 +1584,7 @@ function InstructorQuestionEditorInner({
   const initialEditValueRef = React.useRef(null)
 
   const questionId = proof?.questionId
-  const supported = proof?.type && SUPPORTED_TYPES.has(proof.type)
+  const supported = proof?.type && isInstructorProblemType(proof.type)
   const isCreate = mode === 'create'
   const activeLogicSystem = proof?.type === 'derivation-hurley'
     ? 'hurley'
@@ -1910,6 +1896,30 @@ function InstructorQuestionEditorInner({
     }
   }
 
+  const handleDelete = async () => {
+    if (isCreate || !questionId || saving) return
+    if (!window.confirm('Delete this question This cannot be undone')) return
+    setSaving(true)
+    setError('')
+    try {
+      const assignmentId = proof?.assignmentId
+      if (!assignmentId) throw new Error('Assignment id required')
+      await fetchJson('/api/assignment-questions', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ assignment_id: assignmentId, ids: [questionId] }),
+      })
+      setOpen(false)
+      window.dispatchEvent(new CustomEvent(assignmentQuestionDeletedEvent, {
+        detail: { assignmentId, questionId },
+      }))
+    } catch (err) {
+      setError(err?.message || 'Failed to delete')
+    } finally {
+      setSaving(false)
+    }
+  }
+
   if (!isInstructorView || !supported) return null
 
   const triggerEl =
@@ -1994,6 +2004,11 @@ function InstructorQuestionEditorInner({
           </Stack>
         </DialogContent>
         <DialogActions>
+          {!isCreate && (
+            <Button color="error" onClick={handleDelete} disabled={saving} sx={{ mr: 'auto' }}>
+              Delete
+            </Button>
+          )}
           <Button onClick={() => setOpen(false)}>Cancel</Button>
           <Button variant="contained" onClick={handleSave} disabled={saving}>
             {saving ? 'Saving…' : isCreate ? 'Create' : 'Save'}

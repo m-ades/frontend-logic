@@ -15,6 +15,7 @@ import { displayScoreForProof } from '../utils/problemHelpers.js'
 import { useCoursesState } from '../context/CoursesContext.jsx'
 import { useAppRuntime } from '../hooks/useAppRuntime.js'
 import { DEFAULT_LOGIC_SYSTEM, LEGACY_LOGIC_SYSTEM, isDerivationProblemType, normalizeLogicSystem } from '../lib/logicSystems.js'
+import { assignmentQuestionDeletedEvent } from '../lib/instructorProblemTypes.js'
 
 function SandboxWorksheetContent() {
   const { assignmentId } = useParams()
@@ -164,6 +165,7 @@ const mapQuestionToProof = (question, assignment, index, logicSystem = DEFAULT_L
   const proofBase = {
     id: proofId,
     questionId,
+    assignmentId: assignment?.id ?? null,
     description,
     solution,
     attemptLimit,
@@ -541,6 +543,35 @@ function RealWorksheetContent() {
   useEffect(() => {
     currentWorksheetIdRef.current = currentWorksheet?.id ?? null
   }, [currentWorksheet?.id])
+
+  useEffect(() => {
+    const removeDeletedQuestion = (event) => {
+      const assignmentId = Number(event?.detail?.assignmentId)
+      const questionId = Number(event?.detail?.questionId)
+      if (!Number.isFinite(assignmentId) || !Number.isFinite(questionId)) return
+      setWorksheets((previous) => previous.map((worksheet) => {
+        if (Number(worksheet.id) !== assignmentId) return worksheet
+        return {
+          ...worksheet,
+          proofs: worksheet.proofs.filter((proof) => Number(proof.questionId) !== questionId),
+        }
+      }))
+      setQuestionScores((previous) => {
+        const next = { ...previous }
+        delete next[questionId]
+        return next
+      })
+      setCurrentProofIndex((previous) => {
+        const worksheet = worksheetsRef.current.find((item) => Number(item.id) === assignmentId)
+        const removedIndex = worksheet?.proofs.findIndex((proof) => Number(proof.questionId) === questionId) ?? -1
+        const remaining = Math.max(0, (worksheet?.proofs.length ?? 0) - 1)
+        if (removedIndex >= 0 && removedIndex < previous) return previous - 1
+        return Math.min(previous, Math.max(0, remaining - 1))
+      })
+    }
+    window.addEventListener(assignmentQuestionDeletedEvent, removeDeletedQuestion)
+    return () => window.removeEventListener(assignmentQuestionDeletedEvent, removeDeletedQuestion)
+  }, [])
 
   useEffect(() => {
     // course data can arrive after proofs are mapped
