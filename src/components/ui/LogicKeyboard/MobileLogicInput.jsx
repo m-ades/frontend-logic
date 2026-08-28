@@ -124,6 +124,10 @@ export default function MobileLogicInput({
   const usePredicateLayout = Array.isArray(predicateLetters) && Array.isArray(constantLetters) && Array.isArray(variableLettersProp)
   const variableLettersFromKey = useMemo(() => getVariableLettersOnly(symbolizationKey), [symbolizationKey])
   const variableLetters = usePredicateLayout ? variableLettersProp : variableLettersFromKey
+  const formatKeyboardLetter = useCallback(
+    (letter) => displayIndexedSymbolsForNotation(letter, notation),
+    [notation]
+  )
 
   const facadeRef = useRef(null)
   if (!facadeRef.current) {
@@ -432,11 +436,11 @@ export default function MobileLogicInput({
                       aria-disabled={disabled}
                       onClick={() => handleLetterInsert(letter)}
                       onMouseDown={(e) => e.preventDefault()}
-                      aria-label={`Insert predicate ${letter}`}
-                      title={`Insert ${letter}`}
+                      aria-label={`Insert predicate ${formatKeyboardLetter(letter)}`}
+                      title={`Insert ${formatKeyboardLetter(letter)}`}
                       sx={symbolRowButtonSx}
                     >
-                      {letter}
+                      {formatKeyboardLetter(letter)}
                     </Button>
                   ))}
                   {constantLetters.map((letter) => (
@@ -449,11 +453,11 @@ export default function MobileLogicInput({
                       aria-disabled={disabled}
                       onClick={() => handleLetterInsert(letter)}
                       onMouseDown={(e) => e.preventDefault()}
-                      aria-label={`Insert constant ${letter}`}
-                      title={`Insert ${letter}`}
+                      aria-label={`Insert constant ${formatKeyboardLetter(letter)}`}
+                      title={`Insert ${formatKeyboardLetter(letter)}`}
                       sx={symbolRowButtonSx}
                     >
-                      {letter}
+                      {formatKeyboardLetter(letter)}
                     </Button>
                   ))}
                   {variableLettersProp.map((letter) => (
@@ -466,11 +470,11 @@ export default function MobileLogicInput({
                       aria-disabled={disabled}
                       onClick={() => handleLetterInsert(letter)}
                       onMouseDown={(e) => e.preventDefault()}
-                      aria-label={`Insert variable ${letter}`}
-                      title={`Insert ${letter}`}
+                      aria-label={`Insert variable ${formatKeyboardLetter(letter)}`}
+                      title={`Insert ${formatKeyboardLetter(letter)}`}
                       sx={symbolRowButtonSx}
                     >
-                      {letter}
+                      {formatKeyboardLetter(letter)}
                     </Button>
                   ))}
                 </Stack>
@@ -494,11 +498,11 @@ export default function MobileLogicInput({
                       aria-disabled={disabled}
                       onClick={() => handleLetterInsert(letter)}
                       onMouseDown={(e) => e.preventDefault()}
-                      aria-label={`Insert ${letter}`}
-                      title={`Insert ${letter}`}
+                      aria-label={`Insert ${formatKeyboardLetter(letter)}`}
+                      title={`Insert ${formatKeyboardLetter(letter)}`}
                       sx={symbolRowButtonSx}
                     >
-                      {letter}
+                      {formatKeyboardLetter(letter)}
                     </Button>
                   ))}
                 </Stack>
