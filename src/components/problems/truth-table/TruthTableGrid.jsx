@@ -73,6 +73,7 @@ export default function TruthTableGrid({
   shrinkWrap = false,
   renderCell,
   isCellReadOnly,
+  showLabels = true,
 }) {
   const theme = useTheme()
   const cellBorderColor = theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.12)' : 'var(--lpgray6)'
@@ -348,7 +349,7 @@ export default function TruthTableGrid({
             elevation={0}
             sx={shrinkWrap ? { ...tableContainerSx, width: 'max-content' } : tableContainerSx}
           >
-            {table.label && (
+            {table.label && showLabels && (
               <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 1 }}>
                 {table.label}
               </Typography>
