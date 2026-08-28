@@ -16,10 +16,10 @@ export function getTruthTableClassification(kind, statementCount = 0) {
   if (kind === 'argument') {
     return {
       selectionMode: 'single',
-      prompt: 'Use this truth table to determine whether the following set of sentences is jointly satisfiable or jointly unsatisfiable.',
+      prompt: 'Use this truth table to determine whether the argument is valid or invalid.',
       options: [
-        { value: 'valid', label: 'Jointly satisfiable' },
-        { value: 'invalid', label: 'Jointly unsatisfiable' },
+        { value: 'valid', label: 'Valid' },
+        { value: 'invalid', label: 'Invalid' },
       ],
     }
   }
