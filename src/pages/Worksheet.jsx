@@ -433,6 +433,8 @@ function RealWorksheetContent() {
   const location = useLocation()
   const [currentProofIndex, setCurrentProofIndex] = useState(0)
   const [worksheets, setWorksheets] = useState([])
+  const worksheetsRef = useRef(worksheets)
+  worksheetsRef.current = worksheets
   const [isLoading, setIsLoading] = useState(true)
   const [loadError, setLoadError] = useState('')
   const [currentDueAt, setCurrentDueAt] = useState(null)
@@ -1170,11 +1172,12 @@ function RealWorksheetContent() {
       try {
         if (!courseIdForApi) return
         const targetAssignmentId = Number.isFinite(worksheetIdNum) ? worksheetIdNum : null
+        const currentWorksheets = worksheetsRef.current
 
-        if (worksheets.length && targetAssignmentId) {
-          const existingIndex = worksheets.findIndex((worksheet) => worksheet.id === targetAssignmentId)
+        if (currentWorksheets.length && targetAssignmentId) {
+          const existingIndex = currentWorksheets.findIndex((worksheet) => worksheet.id === targetAssignmentId)
           if (existingIndex !== -1) {
-            const existing = worksheets[existingIndex]
+            const existing = currentWorksheets[existingIndex]
             if (existing.hasLoadedDetails || existing.proofs.length) {
               if (isMounted) {
                 setIsLoading(false)
@@ -1220,7 +1223,10 @@ function RealWorksheetContent() {
       } catch (error) {
         if (isMounted) {
           console.warn('Failed to load worksheets', error)
-          setLoadError('Failed to load assignments.')
+          const notAvailable = error?.status === 403 || error?.status === 404
+          setLoadError(notAvailable
+            ? 'This assignment is not available.'
+            : 'Failed to load assignments.')
           setWorksheets([])
         }
       } finally {
@@ -1235,7 +1241,7 @@ function RealWorksheetContent() {
     return () => {
       isMounted = false
     }
-  }, [activeUserId, courseId, courseLogicSystem, worksheetIdNum, worksheets])
+  }, [activeUserId, courseId, courseLogicSystem, worksheetIdNum])
 
   const handleWorksheetChange = (newIndex) => {
     const newWorksheet = worksheets[newIndex]
