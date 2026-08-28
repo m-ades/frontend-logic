@@ -17,6 +17,7 @@ html, body {
 #root {
   height: 100%;
   overflow: auto;
+  font-variant-emoji: text;
 }
 
 body[data-theme='dark'] .logicpenguin {
@@ -69,4 +70,3 @@ body[data-theme='dark'] .logicpenguin .tt-row:nth-child(even) {
 body[data-theme='dark'] .logicpenguin .tt-row-ok {
   background: #203226;
 }
-
