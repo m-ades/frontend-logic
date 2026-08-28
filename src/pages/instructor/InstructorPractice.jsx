@@ -24,6 +24,7 @@ const INITIAL_FORM_DATA = {
   chapter: 1,
   subchapter: "A",
   isLocked: false,
+  groupQuestionsByType: false,
   allowRetakes: true,
   showSolutions: true,
 };
@@ -95,6 +96,7 @@ export default function InstructorPractice() {
       chapter: practice.chapter || 1,
       subchapter: practice.subchapter || "A",
       isLocked: practice.isLocked ?? false,
+      groupQuestionsByType: practice.groupQuestionsByType ?? false,
       allowRetakes: practice.allowRetakes ?? true,
       showSolutions: practice.showSolutions ?? true,
     });

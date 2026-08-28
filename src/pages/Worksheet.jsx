@@ -1142,6 +1142,7 @@ function RealWorksheetContent() {
       original_due_at: originalDueAt,
       policy,
       isLocked: assignmentInfo.is_locked ?? false,
+      groupQuestionsByType: assignmentInfo.group_questions_by_type ?? false,
       hasLoadedDetails: true,
       proofs: questions.map((question, idx) =>
         mapQuestionToProof(question, assignmentInfo, idx, courseLogicSystem)

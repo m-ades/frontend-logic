@@ -73,6 +73,7 @@ export default function WorksheetTabs({
             onQuestionCreated={onQuestionCreated}
             assignmentId={worksheet.id}
             logicSystem={logicSystem}
+            groupQuestionsByType={worksheet.groupQuestionsByType ?? false}
           />
         </WorksheetTabPanel>
       ))}

@@ -139,6 +139,7 @@ const mapAssignmentRecord = (assignment) => {
     latePenaltyPercent: assignment.late_penalty_percent,
     isPublished: !assignment.is_locked,
     isLocked: assignment.is_locked,
+    groupQuestionsByType: assignment.group_questions_by_type ?? false,
   };
 };
 
