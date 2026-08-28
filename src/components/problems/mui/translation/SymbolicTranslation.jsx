@@ -178,6 +178,9 @@ export default function SymbolicTranslation({
   const separatorButtons = notation === 'calgary'
     ? [{ insert: ' ∴ ', label: '∴' }]
     : [{ insert: '/' }, { insert: '//' }]
+  const mobileSeparatorButtons = notation === 'calgary' && hasMultipleStatements
+    ? [...separatorButtons, { insert: ',', label: ',' }]
+    : separatorButtons
   const allowIndexedSymbols = notation === 'calgary'
   const openEdit = () => editorRef.current?.open?.()
   const [inputValue, setInputValue] = useState(
@@ -359,7 +362,7 @@ export default function SymbolicTranslation({
                   constantLetters={isPredicate ? constantLetters : undefined}
                   variableLetters={isPredicate ? variableLetters : undefined}
                   logicSystem={logicSystem}
-                  extraInsertButtons={separatorButtons}
+                  extraInsertButtons={mobileSeparatorButtons}
                 />
               ) : (
                 <>
