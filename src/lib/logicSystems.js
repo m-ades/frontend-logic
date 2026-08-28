@@ -13,7 +13,7 @@ export const LOGIC_SYSTEMS = {
       and: '∧',
       or: '∨',
       conditional: '→',
-      biconditional: '↔',
+      biconditional: '↔︎',
       forall: '∀',
       exists: '∃',
       falsum: '⊥',

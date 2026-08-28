@@ -1,5 +1,7 @@
 // default to same origin api so production auth cookies are issued for
 // hunterlogic org via the frontend rewrite proxy instead of railway directly
+import { normalizeLogicTextData } from '../lib/logicText.js';
+
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
 const USER_STORAGE_KEY = 'logicapp_current_user';
 let unauthorizedHandler = null;
@@ -125,5 +127,5 @@ export async function fetchJson(path, options = {}) {
     }
     throw new Error(message || `Request failed: ${res.status}`);
   }
-  return res.json();
+  return normalizeLogicTextData(await res.json());
 }

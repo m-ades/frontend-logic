@@ -101,6 +101,7 @@ function normalizeSubscriptIndices(s) {
 
 function symbolfix(s) {
     let rv = String(s ?? '');
+    rv = rv.replace(/[\uFE0E\uFE0F]/g, '');
     if (this.notationname === 'calgary') {
         rv = normalizeSubscriptIndices(rv);
     }
