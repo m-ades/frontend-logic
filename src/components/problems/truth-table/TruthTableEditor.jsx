@@ -7,6 +7,7 @@ import {
 import getFormulaClass from '../../../lib/logicpenguin/symbolic/formula.js'
 import getSyntax from '../../../lib/logicpenguin/symbolic/libsyntax.js'
 import {
+  formulaTable,
   multiTables,
 } from '../../../lib/logicpenguin/symbolic/libsemantics.js'
 import { fullTableMatch } from '../../../lib/logicpenguin/checkers/truth-tables.js'
@@ -74,6 +75,7 @@ export default function TruthTableEditor({
       false
     )
   }, [proof?.options?.question, truthTable?.options?.question])
+  const mainOperatorHighlight = kind === 'formula' && truthTable?.options?.highlightMainOperator === true
   const operatorSet = React.useMemo(() => new Set(Object.keys(syntax.operators)), [syntax])
   const statements = React.useMemo(() => {
     if (Array.isArray(truthTable.statements) && truthTable.statements.length > 0) {
@@ -97,10 +99,7 @@ export default function TruthTableEditor({
     () => getTruthTableClassification(kind, statements.length),
     [kind, statements.length]
   )
-  const classificationOptions = React.useMemo(
-    () => (classificationEnabled ? classification.options : []),
-    [classification, classificationEnabled]
-  )
+  const classificationOptions = classificationEnabled ? classification.options : []
 
   const tables = React.useMemo(() => {
     if (statements.length === 0) return []
@@ -111,6 +110,7 @@ export default function TruthTableEditor({
       return {
         label: displayIndexedSymbolsForNotation(label, syntax.notationname),
         tokens: res.tables[idx]?.tokens ?? [],
+        opspot: formulaTable(wffs[idx], notation).opspot,
         rows: res.tables[idx]?.rows ?? [],
         headerTokens: tokenizeTruthTableHeader(statement, syntax),
       }
@@ -175,6 +175,7 @@ export default function TruthTableEditor({
   const [mcSelection, setMcSelection] = React.useState([])
   const [selectedColumns, setSelectedColumns] = React.useState([]) // [{ tableIndex, colIndex }, ...]
   const [selectedRows, setSelectedRows] = React.useState([]) // [rowIndex, ...]
+  const [mainOperatorColumn, setMainOperatorColumn] = React.useState(null)
   const toggleColumn = (tableIndex, colIndex) => {
     setSelectedColumns((prev) => {
       const has = prev.some((c) => c.tableIndex === tableIndex && c.colIndex === colIndex)
@@ -197,28 +198,46 @@ export default function TruthTableEditor({
   const scheduleStateChange = React.useCallback((nextState) => {
     scheduleDebouncedChange(onStateChangeTimerRef, onStateChange, nextState)
   }, [onStateChange])
-  const updateClassificationSelection = React.useCallback((next) => {
-    setMcSelection(next)
-    onStateChange?.(buildTruthTableStatePayload(tableInputs, next))
+  const selectMainOperator = React.useCallback((tableIndex, colIndex) => {
+    const next = { tableIndex, colIndex }
+    setMainOperatorColumn(next)
+    scheduleStateChange(buildTruthTableStatePayload(tableInputs, mcSelection, next))
     if (status !== 'unanswered') {
       setStatus('unanswered')
       setMessage('')
     }
-  }, [onStateChange, status, tableInputs])
+  }, [mcSelection, scheduleStateChange, status, tableInputs])
+  const clearMainOperator = React.useCallback(() => {
+    setMainOperatorColumn(null)
+    scheduleStateChange(buildTruthTableStatePayload(tableInputs, mcSelection, null))
+    if (status !== 'unanswered') {
+      setStatus('unanswered')
+      setMessage('')
+    }
+  }, [mcSelection, scheduleStateChange, status, tableInputs])
+  const updateClassificationSelection = React.useCallback((next) => {
+    setMcSelection(next)
+    onStateChange?.(buildTruthTableStatePayload(tableInputs, next, mainOperatorColumn))
+    if (status !== 'unanswered') {
+      setStatus('unanswered')
+      setMessage('')
+    }
+  }, [mainOperatorColumn, onStateChange, status, tableInputs])
 
   React.useEffect(() => {
     if (proof?.id === lastRestoredProofIdRef.current) return
     lastRestoredProofIdRef.current = proof?.id
     setTableInputs((prev) => (tablesEqual(prev, derivedInitialTables) ? prev : derivedInitialTables))
     setMcSelection(normalizeSavedClassification(kind, savedState))
-  }, [derivedInitialTables, kind, proof?.id, savedState?.mcans, savedState?.taut, savedState?.contra, savedState?.valid, savedState?.equiv])
-  React.useEffect(() => {
-    const allowedValues = new Set(classificationOptions.map((option) => option.value))
-    setMcSelection((previous) => {
-      const next = previous.filter((value) => allowedValues.has(value))
-      return next.length === previous.length ? previous : next
+    setMainOperatorColumn(() => {
+      const savedColumn = savedState?.mainOperatorColumn
+      return mainOperatorHighlight
+        && savedColumn?.tableIndex === 0
+        && Number.isInteger(savedColumn?.colIndex)
+        ? { tableIndex: 0, colIndex: savedColumn.colIndex }
+        : null
     })
-  }, [classificationOptions])
+  }, [derivedInitialTables, kind, mainOperatorHighlight, proof?.id, savedState?.mainOperatorColumn, savedState?.mcans, savedState?.taut, savedState?.contra, savedState?.valid, savedState?.equiv])
 
   const handleCellChange = (tableIndex, rowIndex, colIndex, value) => {
     const nextTables = tableInputs.map((tableRows, tIdx) =>
@@ -231,7 +250,7 @@ export default function TruthTableEditor({
         : tableRows
     )
     setTableInputs(nextTables)
-    scheduleStateChange(buildTruthTableStatePayload(nextTables, mcSelection))
+    scheduleStateChange(buildTruthTableStatePayload(nextTables, mcSelection, mainOperatorColumn))
     if (status !== 'unanswered') {
       setStatus('unanswered')
       setMessage('')
@@ -274,7 +293,8 @@ export default function TruthTableEditor({
       )
     )
   const classificationComplete = !classificationEnabled || isTruthTableClassificationComplete(kind, mcSelection)
-  const tableFilled = tableFilledOnly && classificationComplete
+  const mainOperatorComplete = !mainOperatorHighlight || mainOperatorColumn != null
+  const tableFilled = tableFilledOnly && classificationComplete && mainOperatorComplete
 
   const tableCorrect =
     hasTruthTable &&
@@ -285,6 +305,10 @@ export default function TruthTableEditor({
     [Formula, kind, notation, proof?.solution, statements]
   )
   const classificationCorrect = !classificationEnabled || truthTableClassificationsMatch(mcSelection, solutionMcValues)
+  const mainOperatorCorrect = !mainOperatorHighlight || (
+    mainOperatorColumn?.tableIndex === 0
+    && mainOperatorColumn?.colIndex === tables[0]?.opspot
+  )
 
   if (!hasTruthTable) {
     return (
@@ -300,9 +324,12 @@ export default function TruthTableEditor({
     if (isChecking || attemptCount >= attemptLimit) return
     if (!tableFilled) {
       setStatus('unanswered')
-      setMessage(classificationEnabled && !classificationComplete
-        ? 'Select a classification before submitting.'
-        : 'Complete the table before submitting.'
+      setMessage(
+        !tableFilledOnly
+          ? 'Complete the table before submitting.'
+          : classificationEnabled && mcSelection.length === 0
+            ? 'Select a classification before submitting.'
+            : 'Click the main operator column header twice before submitting.'
       )
       return
     }
@@ -310,8 +337,8 @@ export default function TruthTableEditor({
     try {
       const result = await submitTruthTableAnswer({
         assignmentQuestionId,
-        submissionData: buildTruthTableSubmissionData(kind, tableInputs, mcSelection, classificationEnabled),
-        localIsCorrect: tableCorrect && classificationCorrect,
+        submissionData: buildTruthTableSubmissionData(kind, tableInputs, mcSelection, classificationEnabled, mainOperatorColumn),
+        localIsCorrect: tableCorrect && classificationCorrect && mainOperatorCorrect,
         attemptLimit,
         classificationEnabled,
         selection: mcSelection,
@@ -324,7 +351,7 @@ export default function TruthTableEditor({
         const nextAttempt = resp?.submission?.attempt ?? Math.min(attemptCount + 1, attemptLimit)
         setAttemptCount((prev) => resp?.submission?.attempt ?? Math.min(prev + 1, attemptLimit))
         onStateChange?.({
-          ...buildTruthTableStatePayload(tableInputs, mcSelection),
+          ...buildTruthTableStatePayload(tableInputs, mcSelection, mainOperatorColumn),
           attemptCount: nextAttempt,
           lastSubmissionAt: Date.now(),
           lastStatus: result.nextStatus,
@@ -356,7 +383,7 @@ export default function TruthTableEditor({
         const nextAttempt = Math.min(attemptCount + 1, attemptLimit)
         setAttemptCount((prev) => Math.min(prev + 1, attemptLimit))
         onStateChange?.({
-          ...buildTruthTableStatePayload(tableInputs, mcSelection),
+          ...buildTruthTableStatePayload(tableInputs, mcSelection, mainOperatorColumn),
           attemptCount: nextAttempt,
           lastSubmissionAt: Date.now(),
           lastStatus: result.nextStatus,
@@ -382,8 +409,10 @@ export default function TruthTableEditor({
   const handleStartOver = () => {
     if (attemptCount >= attemptLimit) return
     setTableInputs(resetTables)
-    onStateChange?.(buildTruthTableStatePayload(resetTables, []))
+    onStateChange?.(buildTruthTableStatePayload(resetTables, [], null))
     setMcSelection([])
+    setSelectedColumns([])
+    setMainOperatorColumn(null)
     setStatus('unanswered')
     setMessage('')
   }
@@ -422,7 +451,7 @@ export default function TruthTableEditor({
     : null
 
   const tableCard = (
-    <Box sx={{ width: 'fit-content', maxWidth: '100%' }}>
+    <Box>
       <Stack spacing={2}>
         {(promptContent || statementText) && (
           <Stack spacing={1}>
@@ -433,6 +462,11 @@ export default function TruthTableEditor({
               </Box>
             )}
           </Stack>
+        )}
+        {mainOperatorHighlight && (
+          <Typography variant="body2" color="text.secondary">
+            Double click the operator above the column that represents the possible truth values for the whole sentence.
+          </Typography>
         )}
         <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
           <TruthTableGrid
@@ -447,16 +481,21 @@ export default function TruthTableEditor({
             selectedRows={selectedRows}
             onToggleColumn={toggleColumn}
             onToggleRow={toggleRow}
+            mainOperatorColumn={mainOperatorHighlight ? mainOperatorColumn : undefined}
+            onSelectMainOperator={mainOperatorHighlight ? selectMainOperator : undefined}
+            onClearMainOperator={mainOperatorHighlight ? clearMainOperator : undefined}
             isCellReadOnly={isPrefilledCell}
           />
           {!embedded && (
             <TruthTableFeedback
               state={tableFilledOnly ? (tableCorrect ? 'complete' : 'incorrect') : 'incomplete'}
+              classificationRequired={classificationEnabled && !classificationComplete}
             />
           )}
         </Box>
         {classificationEnabled && classificationOptions.length > 0 && (
           <TruthTableClassification
+            kind={kind}
             classification={classification}
             selection={mcSelection}
             onChange={updateClassificationSelection}
@@ -528,7 +567,7 @@ export default function TruthTableEditor({
       <ProblemFrame
         problemLabel={problemLabel}
         minHeight="auto"
-        contentSized
+        cardMaxWidth="760px"
         isInstructorView={isInstructorView}
         onEditQuestion={openEdit}
         status={status}
@@ -544,7 +583,8 @@ export default function TruthTableEditor({
             attemptCount={attemptCount}
             attemptLimit={attemptLimit}
             isInstructorView={isInstructorView}
-            sx={{ mt: 0 }}
+            navigationPlacement="separate"
+            sx={{ mt: 0, maxWidth: '760px' }}
           />
         ) : null}
         editorNode={isInstructorView ? (

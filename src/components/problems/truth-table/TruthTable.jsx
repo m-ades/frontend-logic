@@ -130,7 +130,6 @@ export default function TruthTable({
     () => (classificationEnabled ? classification.options : []),
     [classification, classificationEnabled]
   )
-
   const tables = React.useMemo(() => {
     if (statements.length === 0) return []
     const wffs = statements.map((statement) => Formula.from(statement))
@@ -315,7 +314,6 @@ export default function TruthTable({
     [Formula, kind, notation, proof?.solution, statements]
   )
   const classificationCorrect = !classificationEnabled || truthTableClassificationsMatch(mcSelection, solutionMcValues)
-
   if (!hasTruthTable) {
     return (
       <Stack spacing={2} sx={{ px: 0, width: '100%' }}>

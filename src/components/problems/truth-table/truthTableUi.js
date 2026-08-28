@@ -31,18 +31,31 @@ export function buildClassificationState(selection = []) {
   }
 }
 
-export function buildTruthTableStatePayload(rows, selection = []) {
+export function buildTruthTableStatePayload(rows, selection = [], mainOperatorColumn = null) {
   return {
     tables: rows.map((tableRows) => ({ rows: tableRows })),
+    mainOperatorColumn,
     ...buildClassificationState(selection),
   }
 }
 
-export function buildTruthTableSubmissionData(kind, rows, selection = [], classificationEnabled = false) {
+export function buildTruthTableSubmissionData(
+  kind,
+  rows,
+  selection = [],
+  classificationEnabled = false,
+  mainOperatorColumn = null
+) {
   const tableData = rows.map((tableRows) => ({
     rows: tableRows.map((row) => row.map((cell) => cell === 'T')),
     colhls: tableRows.length > 0 ? Array(tableRows[0].length).fill(false) : [],
   }))
+
+  if (kind === 'formula') {
+    if (Number.isInteger(mainOperatorColumn?.colIndex) && tableData[0]?.colhls[mainOperatorColumn.colIndex] !== undefined) {
+      tableData[0].colhls[mainOperatorColumn.colIndex] = true
+    }
+  }
 
   if (tableData.length === 0) {
     return { lefts: [], right: { rows: [] }, rowhls: [] }
