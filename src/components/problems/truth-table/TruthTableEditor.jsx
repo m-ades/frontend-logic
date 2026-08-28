@@ -465,7 +465,7 @@ export default function TruthTableEditor({
         )}
         {mainOperatorHighlight && (
           <Typography variant="body2" color="text.secondary">
-            Double click the operator that gives the truth value of the whole sentence.
+            Double click the operator above the column that represents the possible truth values for the whole sentence.
           </Typography>
         )}
         <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
