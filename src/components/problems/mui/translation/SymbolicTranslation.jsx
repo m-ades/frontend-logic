@@ -1,16 +1,14 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
-import { Box, Stack, Typography, Alert, Tooltip } from '@mui/material'
-import EditIcon from '@mui/icons-material/Edit'
+import { Box, Typography } from '@mui/material'
 import InstructorQuestionEditor from '../../InstructorQuestionEditor.jsx'
 import { useTheme, useMediaQuery } from '@mui/material'
+import ProblemFrame from '../frame/ProblemFrame.jsx'
 import ProblemSetButtons from '../frame/ProblemSetButtons.jsx'
 import FormulaInput from '../../../ui/logicpenguin/formula-input.js'
 import SymbolButtonRow from '../../../ui/logicpenguin/SymbolButtonRow.jsx'
 import { MobileLogicInput } from '../../../ui/LogicKeyboard/index.js'
 import { useProblemChecker } from '../../../../hooks/useProblemChecker.js'
 import SolutionReveal from '../../SolutionReveal.jsx'
-import StatusBanner, { isTerminalStatus } from '../../../ui/StatusBanner.jsx'
-import PromptText from '../../../ui/PromptText.jsx'
 import RichText from '../../../ui/RichText.jsx'
 import MathJaxFormula from '../../../ui/MathJaxFormula.jsx'
 import { canonicalizeFormula } from '../../../../lib/logicpenguin/symbolic/formula.js'
@@ -151,6 +149,7 @@ export default function SymbolicTranslation({
   isAssignmentLocked = false,
   isInstructorView = false,
   onQuestionSaved,
+  problemLabel,
   logicSystem,
 }) {
   const theme = useTheme()
@@ -285,153 +284,17 @@ export default function SymbolicTranslation({
     }
   }, [])
 
-
   return (
-    <Stack spacing={3} sx={{ px: 0, width: '100%', alignItems: 'stretch', flexGrow: 1 }}>
-      <Box className="logicpenguin" sx={{ width: '100%', flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
-        <Box
-          sx={{
-            overflow: 'visible',
-            minHeight: '150px',
-            flexGrow: 1,
-            alignSelf: { xs: 'stretch', md: 'flex-start' },
-          }}
-          className="lp-problem-card"
-        >
-          <Stack spacing={3} sx={{ p: { xs: 2, md: 2 } }}>
-            {isInstructorView && proof && (
-              <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-                <Tooltip title="Edit question">
-                  <Box component="span" onClick={openEdit} role="button" aria-label="Edit question" sx={{ display: 'inline-flex', alignItems: 'center', cursor: 'pointer', color: 'text.secondary', '&:hover': { opacity: 0.8 } }}>
-                    <EditIcon fontSize="small" />
-                  </Box>
-                </Tooltip>
-              </Box>
-            )}
-            <Box>
-              {prompt && (
-                <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 0.5 }}>
-                  <PromptText content={prompt} sx={{ mb: 1 }} />
-                </Box>
-              )}
-              {sentence && (
-                <Box sx={{ fontSize: '1.171875rem', lineHeight: 1.6, mb: 1, overflowX: 'auto', overflowY: 'clip' }}>
-                  <MathJaxFormula tex={sentenceTex} fallback={sentence} display={false} block />
-                </Box>
-              )}
-              {symbolizationKey.length > 0 && (
-                <Box sx={{ mb: 1, mt: 2.5 }}>
-                  <Typography variant="body2" sx={{ mb: 0.5, fontWeight: 600 }}>
-                    Symbolization key
-                  </Typography>
-                  <Box component="ul" sx={{ pl: 3, m: 0, color: 'text.secondary' }}>
-                    {symbolizationKey.map((line, index) => (
-                      <Typography
-                        key={`${line}-${index}`}
-                        component="li"
-                        variant="body2"
-                        sx={{ mb: 0.5 }}
-                      >
-                        {displayIndexedSymbolsForNotation(line, notation)}
-                      </Typography>
-                    ))}
-                  </Box>
-                </Box>
-              )}
-              {legend && (
-                <RichText content={legend} variant="body2" sx={{ mb: 1, color: 'text.secondary' }} />
-              )}
-              <Typography variant="body2" sx={{ mb: 1, mt: 2.5, color: 'text.secondary' }}>
-                Your translation:
-              </Typography>
-              {isPhone ? (
-                <MobileLogicInput
-                  value={inputValue}
-                  onChange={(value) => {
-                    if (readOnly) return
-                    setInputValue(value)
-                    scheduleStateSave(value)
-                  }}
-                  onBlur={() => applyCanonicalValue(inputValue)}
-                  disabled={readOnly}
-                  placeholder={hasMultipleStatements
-                    ? (hasConclusion
-                        ? (notation === 'calgary'
-                            ? 'e.g. P, Q ∴ R'
-                            : 'e.g. P / Q // R')
-                        : (notation === 'calgary'
-                            ? `e.g. P ${symbols.and} Q, ${symbols.not}R`
-                            : `e.g. P ${symbols.and} Q / ${symbols.not}R`))
-                    : `e.g. P ${symbols.and} Q`}
-                  aria-label="Formula translation"
-                  symbolizationKey={symbolizationKey}
-                  includeQuantifiers={isPredicate}
-                  onEnterKey={!readOnly && !hideActions ? handleCheck : undefined}
-                  predicateLetters={isPredicate ? predicateLetters : undefined}
-                  constantLetters={isPredicate ? constantLetters : undefined}
-                  variableLetters={isPredicate ? variableLetters : undefined}
-                  logicSystem={logicSystem}
-                  extraInsertButtons={mobileSeparatorButtons}
-                />
-              ) : (
-                <>
-                  <FormulaInputField
-                    value={inputValue}
-                    onValueChange={(value) => {
-                      if (readOnly) return
-                      setInputValue(value)
-                      scheduleStateSave(value)
-                    }}
-                    onBlur={(event) => applyCanonicalValue(event.target.value)}
-                    fieldReadOnly={readOnly}
-                    formulaInputRef={formulaInputRef}
-                    onEnterKey={!readOnly && !hideActions ? handleCheck : undefined}
-                    ariaLabel="Your translation"
-                    notation={notation}
-                  />
-                  <Box sx={{ mt: 1 }}>
-                    <SymbolButtonRow
-                      inputRef={formulaInputRef}
-                      disabled={readOnly}
-                      includeQuantifiers={isPredicate}
-                      onValueChange={(value) => {
-                        if (readOnly) return
-                        setInputValue(value)
-                        scheduleStateSave(value)
-                      }}
-                      logicSystem={logicSystem}
-                      extraInsertButtons={separatorButtons}
-                    />
-                  </Box>
-                </>
-              )}
-            </Box>
-            {!suppressReveal && (
-              /* show answer in card */
-              <SolutionReveal show={showSolution}>
-                <FormulaInputField
-                  value={displayAnswer(answer ?? '')}
-                  onValueChange={null}
-                  fieldReadOnly
-                  formulaInputRef={solutionInputRef}
-                  ariaLabel="Correct translation"
-                  notation={notation}
-                />
-              </SolutionReveal>
-            )}
-          </Stack>
-        </Box>
-      </Box>
-
-      {isTerminalStatus(status) && (
-        <StatusBanner
-          status={status}
-          message={message}
-          onClose={() => setMessage('')}
-        />
-      )}
-
-      {!hideActions && (
+    <ProblemFrame
+      problemLabel={problemLabel}
+      prompt={prompt}
+      minHeight="150px"
+      isInstructorView={isInstructorView && !!proof}
+      onEditQuestion={proof ? openEdit : undefined}
+      status={status}
+      message={message}
+      onCloseStatus={() => setMessage('')}
+      actionNode={!hideActions ? (
         <ProblemSetButtons
           onCheck={handleCheck}
           onStartOver={handleStartOver}
@@ -442,10 +305,114 @@ export default function SymbolicTranslation({
           attemptLimit={maxAttempts}
           isInstructorView={isInstructorView}
         />
-      )}
-      {isInstructorView && proof && (
+      ) : null}
+      editorNode={isInstructorView && proof ? (
         <InstructorQuestionEditor ref={editorRef} proof={proof} isInstructorView onSaved={onQuestionSaved} trigger="none" logicSystem={logicSystem} />
+      ) : null}
+    >
+      {sentence && (
+        <Box sx={{ fontSize: '1.171875rem', lineHeight: 1.6, mb: 1, overflowX: 'auto', overflowY: 'clip' }}>
+          <MathJaxFormula tex={sentenceTex} fallback={sentence} display={false} block />
+        </Box>
       )}
-    </Stack>
+      {symbolizationKey.length > 0 && (
+        <Box sx={{ mb: 1, mt: 1 }}>
+          <Typography variant="body2" sx={{ mb: 0.5, fontWeight: 600 }}>
+            Symbolization key
+          </Typography>
+          <Box component="ul" sx={{ pl: 3, m: 0, color: 'text.secondary' }}>
+            {symbolizationKey.map((line, index) => (
+              <Typography
+                key={`${line}-${index}`}
+                component="li"
+                variant="body2"
+                sx={{ mb: 0.5 }}
+              >
+                {displayIndexedSymbolsForNotation(line, notation)}
+              </Typography>
+            ))}
+          </Box>
+        </Box>
+      )}
+      {legend && (
+        <RichText content={legend} variant="body2" sx={{ mb: 1, color: 'text.secondary' }} />
+      )}
+      <Typography variant="body2" sx={{ mb: 1, mt: 1, color: 'text.secondary' }}>
+        Your translation:
+      </Typography>
+      {isPhone ? (
+        <MobileLogicInput
+          value={inputValue}
+          onChange={(value) => {
+            if (readOnly) return
+            setInputValue(value)
+            scheduleStateSave(value)
+          }}
+          onBlur={() => applyCanonicalValue(inputValue)}
+          disabled={readOnly}
+          placeholder={hasMultipleStatements
+            ? (hasConclusion
+                ? (notation === 'calgary'
+                    ? 'e.g. P, Q ∴ R'
+                    : 'e.g. P / Q // R')
+                : (notation === 'calgary'
+                    ? `e.g. P ${symbols.and} Q, ${symbols.not}R`
+                    : `e.g. P ${symbols.and} Q / ${symbols.not}R`))
+            : `e.g. P ${symbols.and} Q`}
+          aria-label="Formula translation"
+          symbolizationKey={symbolizationKey}
+          includeQuantifiers={isPredicate}
+          onEnterKey={!readOnly && !hideActions ? handleCheck : undefined}
+          predicateLetters={isPredicate ? predicateLetters : undefined}
+          constantLetters={isPredicate ? constantLetters : undefined}
+          variableLetters={isPredicate ? variableLetters : undefined}
+          logicSystem={logicSystem}
+          extraInsertButtons={mobileSeparatorButtons}
+        />
+      ) : (
+        <>
+          <FormulaInputField
+            value={inputValue}
+            onValueChange={(value) => {
+              if (readOnly) return
+              setInputValue(value)
+              scheduleStateSave(value)
+            }}
+            onBlur={(event) => applyCanonicalValue(event.target.value)}
+            fieldReadOnly={readOnly}
+            formulaInputRef={formulaInputRef}
+            onEnterKey={!readOnly && !hideActions ? handleCheck : undefined}
+            ariaLabel="Your translation"
+            notation={notation}
+          />
+          <Box sx={{ mt: 1 }}>
+            <SymbolButtonRow
+              inputRef={formulaInputRef}
+              disabled={readOnly}
+              includeQuantifiers={isPredicate}
+              onValueChange={(value) => {
+                if (readOnly) return
+                setInputValue(value)
+                scheduleStateSave(value)
+              }}
+              logicSystem={logicSystem}
+              extraInsertButtons={separatorButtons}
+            />
+          </Box>
+        </>
+      )}
+      {!suppressReveal && (
+        <SolutionReveal show={showSolution}>
+          <FormulaInputField
+            value={displayAnswer(answer ?? '')}
+            onValueChange={null}
+            fieldReadOnly
+            formulaInputRef={solutionInputRef}
+            ariaLabel="Correct translation"
+            notation={notation}
+          />
+        </SolutionReveal>
+      )}
+    </ProblemFrame>
   )
 }

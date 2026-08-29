@@ -3,9 +3,10 @@ import StatusBanner, { isTerminalStatus } from '../../../ui/StatusBanner.jsx'
 import PromptText from '../../../ui/PromptText.jsx'
 import EditQuestionButton from './EditQuestionButton.jsx'
 
-// shared shell for migrated problem cards
-// contentsized shrink wraps the card and action region to intrinsic content
-// intrinsic content remains capped at the available parent width
+// problem frame owns shared card prompt feedback action and editor placement
+// callers own only question specific content and checker behavior
+// optional regions render nothing when omitted
+// content sized frames shrink to intrinsic width without exceeding their parent
 export const promptTextSx = { flex: 1 }
 export const choiceLabelSx = {
   '& .MuiFormControlLabel-label': { fontSize: '1rem' },
