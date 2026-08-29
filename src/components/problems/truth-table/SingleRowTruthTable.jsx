@@ -159,6 +159,7 @@ export default function SingleRowTruthTable({
     answer: expectedAnswer,
     problemType: 'single-row-truth-table',
     question: problem,
+    options: { partialCredit: Boolean(proof?.partialCredit ?? problem?.partialCredit) },
     getAnswer: () => ({
       row: rowInputs.map(toSymbol),
       compound: toSymbol(compoundInput),
@@ -236,11 +237,11 @@ export default function SingleRowTruthTable({
     return <Typography color="error">Invalid problem</Typography>
   }
 
-  const tableFilled = rowInputs.length > 0 &&
-    !rowInputs.some((cell, idx) => cell === '' && !isAtomicToken(tokens[idx]))
+  const tableFilled = rowInputs.length > 0 && !isDisabled()
   const isCurrentlyCorrect = tableFilled &&
     rowInputs.length === expectedRow.length &&
-    rowInputs.every((cell, idx) => cell === expectedRow[idx])
+    rowInputs.every((cell, idx) => cell === expectedRow[idx]) &&
+    compoundInput === expectedCompound
 
   return (
     <ProblemFrame

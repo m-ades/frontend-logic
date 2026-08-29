@@ -2,6 +2,8 @@
 // checks a single-row truth table (atoms given) for a formula         //
 /////////////////////////////////////////////////////////////////////////
 
+import { gradeComponents } from '../component-grading.js';
+
 function normalizeCell(value) {
     if (value === true || value === false) {
         return value;
@@ -23,12 +25,10 @@ export default async function(
     const givenRow = Array.isArray(givenans?.row) ? givenans.row : [];
     const givenTv = ("compound" in (givenans || {})) ? givenans.compound : null;
 
-    let correct = true;
     const offcells = [];
     let rowScore = 0;
 
     if (givenRow.length !== expectedRow.length) {
-        correct = false;
         for (let i = 0; i < expectedRow.length; i++) {
             offcells.push(i);
         }
@@ -38,7 +38,6 @@ export default async function(
         for (let i = 0; i < expectedRow.length; i++) {
             const normalized = normalizeCell(givenRow[i]);
             if (normalized === null || normalized !== expectedRow[i]) {
-                correct = false;
                 offcells.push(i);
             } else {
                 correctCells += 1;
@@ -49,31 +48,16 @@ export default async function(
             : 0;
     }
 
-    let compoundScore = 0;
-    if (givenTv !== null && typeof expectedTv !== 'undefined') {
-        if (normalizeCell(givenTv) !== expectedTv) {
-            correct = false;
-        } else {
-            compoundScore = 1;
-        }
-    } else if (typeof expectedTv !== 'undefined') {
-        correct = false;
-    }
+    const compoundScore = givenTv !== null
+        && typeof expectedTv !== 'undefined'
+        && normalizeCell(givenTv) === expectedTv
+        ? 1
+        : 0;
 
     const earnedScores = typeof expectedTv !== 'undefined'
         ? [rowScore, compoundScore]
         : [rowScore];
-    const componentScores = partialcredit || correct
-        ? earnedScores
-        : earnedScores.map(() => 0);
-    const earned = partialcredit
-        ? Math.floor(points * (earnedScores.reduce((sum, score) => sum + score, 0) / earnedScores.length))
-        : (correct ? points : 0);
-    const rv = {
-        successstatus: correct ? "correct" : (earned > 0 ? "partial" : "incorrect"),
-        points: earned,
-        componentScores,
-    };
+    const rv = gradeComponents(earnedScores, partialcredit, points);
 
     if (cheat && offcells.length > 0) {
         rv.offcells = offcells;

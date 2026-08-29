@@ -6,7 +6,12 @@ import ProblemFrame, { choiceLabelWithGapSx } from '../frame/ProblemFrame.jsx'
 import { useProblemChecker } from '../../../../hooks/useProblemChecker.js'
 import SolutionReveal from '../../SolutionReveal.jsx'
 import PromptText from '../../../ui/PromptText.jsx'
-import { hasNonEmptyAnswerIndices, isMultiSelectSubquestion } from '../../../../lib/logicpenguin/multiple-choice-utils.js'
+import {
+  getSingleSelectAnswerIndex,
+  getSubquestionChoices,
+  hasNonEmptyAnswerIndices,
+  isMultiSelectSubquestion,
+} from '../../../../lib/logicpenguin/multiple-choice-utils.js'
 
 const multiSelectLabelSx = { ...choiceLabelWithGapSx, ml: 2 }
 const singleSelectLabelSx = choiceLabelWithGapSx
@@ -146,6 +151,7 @@ export default function MultipleChoice({
     answer,
     problemType: 'multiple-choice',
     question: problem,
+    options: { partialCredit: Boolean(proof?.partialCredit ?? problem?.partialCredit) },
     getAnswer: () => (
       isComposite
         ? { answers: selectedValue }
@@ -274,7 +280,7 @@ export default function MultipleChoice({
       {isComposite ? (
         <Box sx={{ display: 'grid', gap: 3 }}>
           {subquestions.map((subq, subIdx) => {
-            const choices = Array.isArray(subq?.choices) ? subq.choices : []
+            const choices = getSubquestionChoices(subq)
 
             return (
               <Box key={`mc-subq-${subIdx}`}>
@@ -319,16 +325,16 @@ export default function MultipleChoice({
           {isComposite ? (
             <Box sx={{ display: 'grid', gap: 3 }}>
               {subquestions.map((subq, subIdx) => {
-                const choices = Array.isArray(subq?.choices) ? subq.choices : []
+                const choices = getSubquestionChoices(subq)
                 const isMulti = isMultiSelectSubquestion(subq)
                 const expected = isMulti
                   ? (Array.isArray(subq.answerIndices) ? subq.answerIndices : [])
-                  : (Number.isFinite(subq.answerIndex) ? subq.answerIndex : null)
+                  : getSingleSelectAnswerIndex(subq)
 
-                      return (
-                        <Box key={`solution-${subIdx}`}>
-                          <PromptText content={subq?.prompt} sx={{ mb: 1, fontWeight: 500 }} />
-                          <FormControl component="fieldset" sx={{ width: '100%' }}>
+                return (
+                  <Box key={`solution-${subIdx}`}>
+                    <PromptText content={subq?.prompt} sx={{ mb: 1, fontWeight: 500 }} />
+                    <FormControl component="fieldset" sx={{ width: '100%' }}>
                       <ChoiceGroup
                         choices={choices}
                         isMultiSelect={isMulti}

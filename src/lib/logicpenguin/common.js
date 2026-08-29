@@ -157,6 +157,19 @@ export async function localCheck(prob) {
         return false;
     }
     const savestatus = prob.getIndicatorStatus().savestatus;
+    const checkerOptions = prob.options ?? {};
+    const partialcredit = Boolean(
+        checkerOptions.partialCredit
+        ?? checkerOptions.partialcredit
+        ?? checkerOptions.partial_credit
+        ?? question.partialCredit
+        ?? question.partialcredit
+        ?? question.partial_credit
+        ?? question.options?.partialCredit
+        ?? question.options?.partialcredit
+        ?? question.options?.partial_credit
+        ?? false
+    );
     // load checker if need be
     if (!localcheckers[problemtype]) {
         try {
@@ -184,7 +197,7 @@ export async function localCheck(prob) {
     }
     // apply the checker to the problem
     const checkStatus = await localcheckers[problemtype](question, rightans,
-        givenans, false, -1, true, prob.options ?? {});
+        givenans, partialcredit, -1, true, checkerOptions);
     // local checks never confer points
     checkStatus.points = -1;
     // saved status based on previous save status
