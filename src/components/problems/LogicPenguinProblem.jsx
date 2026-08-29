@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import SymbolicTranslation from './mui/translation/SymbolicTranslation.jsx'
 import MultipleChoice from './mui/choice/MultipleChoice.jsx'
-import TrueFalse from './mui/choice/TrueFalse.jsx'
 import EvaluateTruth from './mui/choice/EvaluateTruth.jsx'
 import ValidCorrectSound from './mui/choice/ValidCorrectSound.jsx'
 import SingleRowTruthTable from './truth-table/SingleRowTruthTable.jsx'
@@ -87,27 +86,6 @@ export default function LogicPenguinProblem({
     }
     return (
       <MultipleChoice
-        problem={problemData}
-        proof={proof}
-        answer={proof.answer}
-        attemptLimit={proof.attemptLimit}
-        assignmentQuestionId={proof.questionId}
-        onStateChange={handleStateChange}
-        onComplete={handleComplete}
-        savedState={localState}
-        isAssignmentLocked={isAssignmentLocked}
-        isInstructorView={isInstructorView}
-        onQuestionSaved={onQuestionSaved}
-        problemLabel={problemLabel}
-        logicSystem={logicSystem}
-      />
-    )
-  } else if (proof.type === 'true-false') {
-    problemData = proof.trueFalse || {
-      prompt: proof.description || ''
-    }
-    return (
-      <TrueFalse
         problem={problemData}
         proof={proof}
         answer={proof.answer}

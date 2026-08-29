@@ -361,17 +361,6 @@ const mapQuestionToProof = (question, assignment, index, logicSystem = DEFAULT_L
     }
   }
 
-  if (type === 'true-false') {
-    return {
-      ...proofBase,
-      type: 'true-false',
-      trueFalse: snapshot.trueFalse || {
-        prompt: snapshot.prompt || snapshot.statement || '',
-      },
-      answer: snapshot.answer,
-    }
-  }
-
   if (type === 'evaluate-truth') {
     return {
       ...proofBase,

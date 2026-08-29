@@ -1360,14 +1360,6 @@ function ProofArgumentExtractionEditorForm({ proof, value, onChange, logicSystem
   )
 }
 
-function buildTrueFalseSnapshot(proof, edited, existing) {
-  const tf = proof.trueFalse || {}
-  const e = existing && typeof existing === 'object' ? existing : {}
-  const prompt = edited.prompt ?? tf.prompt ?? proof.description ?? ''
-  const answer = edited.answer !== undefined ? edited.answer : (proof.answer ?? false)
-  return { [typeKey(e)]: 'true-false', prompt, answer: Boolean(answer) }
-}
-
 function buildEvaluateTruthSnapshot(proof, edited, existing, logicSystem = DEFAULT_LOGIC_SYSTEM) {
   const e = existing && typeof existing === 'object' ? existing : {}
   const statement = normalizeFormulaInput(edited.statement ?? proof.evaluateTruth ?? proof.description ?? '', logicSystem)
@@ -1429,24 +1421,6 @@ function buildComboSnapshot(proof, edited, existing, comboTypeKey, logicSystem =
     if (answer != null) patch.answer = answer
   }
   return patch
-}
-
-function TrueFalseEditorForm({ proof, value, onChange }) {
-  const tf = proof?.trueFalse || {}
-  const prompt = value.prompt ?? tf.prompt ?? proof?.description ?? ''
-  const answer = value.answer ?? proof?.answer ?? false
-  return (
-    <Stack spacing={2}>
-      <TextField label="Prompt" multiline minRows={2} value={prompt} onChange={(e) => onChange({ ...value, prompt: e.target.value })} fullWidth variant="outlined" />
-      <FormControl>
-        <Typography variant="subtitle2" sx={{ mb: 1 }}>Correct answer</Typography>
-        <RadioGroup row value={answer ? 'true' : 'false'} onChange={(e) => onChange({ ...value, answer: e.target.value === 'true' })}>
-          <FormControlLabel value="true" control={<Radio />} label="True" />
-          <FormControlLabel value="false" control={<Radio />} label="False" />
-        </RadioGroup>
-      </FormControl>
-    </Stack>
-  )
 }
 
 function EvaluateTruthEditorForm({ proof, value, onChange, logicSystem = DEFAULT_LOGIC_SYSTEM }) {
@@ -1661,11 +1635,6 @@ function InstructorQuestionEditorInner({
         ...(proof.ruleset && typeof proof.ruleset === 'object' ? proof.ruleset : {}),
       }
     }
-    if (proof?.type === 'true-false') {
-      const tf = proof.trueFalse || {}
-      base.prompt = tf.prompt ?? proof.description ?? ''
-      base.answer = proof.answer ?? false
-    }
     if (proof?.type === 'evaluate-truth') {
       base.statement = proof.evaluateTruth ?? proof.description ?? ''
       base.answer = proof.answer ?? false
@@ -1725,7 +1694,6 @@ function InstructorQuestionEditorInner({
     proof?.prems,
     proof?.conclusion,
     proof?.conc,
-    proof?.trueFalse,
     proof?.evaluateTruth,
     proof?.singleRowTruthTable,
     proof?.partialTruthTable,
@@ -1760,8 +1728,6 @@ function InstructorQuestionEditorInner({
         question_snapshot = buildNonClassicalTruthTableSnapshot(proof, editValue, existing, activeLogicSystem)
       } else if (isDerivationProblemType(proof.type)) {
         question_snapshot = buildDerivationSnapshot(proof, editValue, existing, activeLogicSystem)
-      } else if (proof.type === 'true-false') {
-        question_snapshot = buildTrueFalseSnapshot(proof, editValue, existing)
       } else if (proof.type === 'evaluate-truth') {
         question_snapshot = buildEvaluateTruthSnapshot(proof, editValue, existing, activeLogicSystem)
       } else if (proof.type === 'symbolic-translation') {
@@ -1972,9 +1938,6 @@ function InstructorQuestionEditorInner({
             )}
             {isDerivationProblemType(proof.type) && (
               <DerivationEditorForm proof={proof} value={editValue} onChange={setEditValue} logicSystem={activeLogicSystem} />
-            )}
-            {proof.type === 'true-false' && (
-              <TrueFalseEditorForm proof={proof} value={editValue} onChange={setEditValue} />
             )}
             {proof.type === 'evaluate-truth' && (
               <EvaluateTruthEditorForm proof={proof} value={editValue} onChange={setEditValue} logicSystem={activeLogicSystem} />

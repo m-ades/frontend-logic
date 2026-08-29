@@ -8,8 +8,6 @@ import SolutionReveal from '../../SolutionReveal.jsx'
 import PromptText from '../../../ui/PromptText.jsx'
 import { hasNonEmptyAnswerIndices, isMultiSelectSubquestion } from '../../../../lib/logicpenguin/multiple-choice-utils.js'
 
-const defaultTrueFalseChoices = ['True', 'False']
-
 const multiSelectLabelSx = { ...choiceLabelWithGapSx, ml: 2 }
 const singleSelectLabelSx = choiceLabelWithGapSx
 
@@ -277,9 +275,7 @@ export default function MultipleChoice({
       {isComposite ? (
         <Box sx={{ display: 'grid', gap: 3 }}>
           {subquestions.map((subq, subIdx) => {
-            const choices = subq?.type === 'true-false'
-              ? (subq?.choices?.length ? subq.choices : defaultTrueFalseChoices)
-              : (Array.isArray(subq?.choices) ? subq.choices : [])
+            const choices = Array.isArray(subq?.choices) ? subq.choices : []
 
             return (
               <Box key={`mc-subq-${subIdx}`}>
@@ -324,9 +320,7 @@ export default function MultipleChoice({
           {isComposite ? (
             <Box sx={{ display: 'grid', gap: 3 }}>
               {subquestions.map((subq, subIdx) => {
-                const choices = subq?.type === 'true-false'
-                  ? (subq?.choices?.length ? subq.choices : defaultTrueFalseChoices)
-                  : (Array.isArray(subq?.choices) ? subq.choices : [])
+                const choices = Array.isArray(subq?.choices) ? subq.choices : []
                 const isMulti = isMultiSelectSubquestion(subq)
                 const expected = isMulti
                   ? (Array.isArray(subq.answerIndices) ? subq.answerIndices : [])

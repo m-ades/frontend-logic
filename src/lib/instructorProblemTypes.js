@@ -14,7 +14,6 @@ export const instructorProblemTypes = Object.freeze([
   { type: 'nonclassical-truth-table', label: 'Nonclassical truth table' },
   { type: 'symbolic-translation', label: 'Symbolic translation' },
   { type: 'multiple-choice', label: 'Multiple choice' },
-  { type: 'true-false', label: 'True or false' },
   { type: 'evaluate-truth', label: 'Evaluate truth' },
   { type: 'combo-translation-truth-table', label: 'Translation and truth table' },
   { type: 'combo-translation-derivation', label: 'Translation and derivation' },
