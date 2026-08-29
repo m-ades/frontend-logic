@@ -60,12 +60,19 @@ export default async function(
         correct = false;
     }
 
+    const earnedScores = typeof expectedTv !== 'undefined'
+        ? [rowScore, compoundScore]
+        : [rowScore];
+    const componentScores = partialcredit || correct
+        ? earnedScores
+        : earnedScores.map(() => 0);
+    const earned = partialcredit
+        ? Math.floor(points * (earnedScores.reduce((sum, score) => sum + score, 0) / earnedScores.length))
+        : (correct ? points : 0);
     const rv = {
-        successstatus: (correct ? "correct" : "incorrect"),
-        points: (correct ? points : 0),
-        componentScores: typeof expectedTv !== 'undefined'
-            ? [rowScore, compoundScore]
-            : [rowScore],
+        successstatus: correct ? "correct" : (earned > 0 ? "partial" : "incorrect"),
+        points: earned,
+        componentScores,
     };
 
     if (cheat && offcells.length > 0) {

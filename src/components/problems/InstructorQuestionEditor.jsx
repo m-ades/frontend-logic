@@ -1400,6 +1400,12 @@ function buildSingleRowTruthTableSnapshot(proof, edited, existing, logicSystem =
     prompt,
     statement,
     interpretation,
+    partialCredit: Boolean(
+      edited.partialCredit
+      ?? existing?.partialCredit
+      ?? proof?.partialCredit
+      ?? false
+    ),
   }
 }
 
@@ -1488,6 +1494,10 @@ function SingleRowTruthTableEditorForm({ proof, value, onChange, logicSystem = D
   const statement = value.statement ?? sr.statement ?? proof?.description ?? ''
   const prompt = value.prompt ?? sr.prompt ?? proof?.description ?? ''
   const interpretation = value.interpretation ?? sr.interpretation ?? {}
+  const partialCredit = value.partialCredit
+    ?? proof?.questionSnapshot?.partialCredit
+    ?? proof?.partialCredit
+    ?? false
   const Formula = getFormulaClass(getNotation(logicSystem))
   const formula = Formula.from(statement)
   const sentenceLetters = formula.wellformed
@@ -1533,6 +1543,15 @@ function SingleRowTruthTableEditorForm({ proof, value, onChange, logicSystem = D
         )}
       </Box>
       <TextField label="Prompt" multiline minRows={1} value={prompt} onChange={(e) => onChange({ ...value, prompt: e.target.value })} fullWidth variant="outlined" />
+      <FormControlLabel
+        control={(
+          <Checkbox
+            checked={Boolean(partialCredit)}
+            onChange={(event) => onChange({ ...value, partialCredit: event.target.checked })}
+          />
+        )}
+        label="Allow partial credit"
+      />
     </Stack>
   )
 }
@@ -1694,6 +1713,7 @@ function InstructorQuestionEditorInner({
       base.statement = sr.statement ?? sr.formula ?? proof.description ?? ''
       base.prompt = sr.prompt ?? proof.description ?? ''
       base.interpretation = typeof sr.interpretation === 'object' && sr.interpretation !== null ? { ...sr.interpretation } : {}
+      base.partialCredit = proof?.questionSnapshot?.partialCredit ?? Boolean(proof.partialCredit)
     }
     if (proof?.type === 'partial-truth-table') {
       const pt = proof.partialTruthTable || {}
