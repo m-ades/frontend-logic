@@ -1,9 +1,9 @@
 import { useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
-import { Box, Typography, CardContent, Chip, Stack, LinearProgress } from '@mui/material'
-import ThemedCard from '../components/ui/ThemedCard.jsx'
+import { Box, Typography } from '@mui/material'
 import ActivityAccordion from '../components/ui/ActivityAccordion.jsx'
+import ActivityRow from '../components/ui/ActivityRow.jsx'
 import { ACTIVITY_TYPES } from '../placeholder/courseActivities.js'
 import { fetchJson } from '../utils/api.js'
 import { compareSubchapterLabels, sortAssignmentsBySubchapter } from '../utils/assignmentSort.js'
@@ -112,106 +112,34 @@ export default function Practice() {
     }
   }
 
+  const renderActivity = (activity) => {
+    const totalQuestions = Number(activity.questionCount) || 0
+    const completedQuestions = Math.min(Number(activity.answeredCount) || 0, totalQuestions)
+    return (
+      <ActivityRow
+        key={activity.id}
+        title={activity.title}
+        description={activity.description}
+        totalQuestions={totalQuestions}
+        completedQuestions={completedQuestions}
+        progressAriaLabel={`Practice completion: ${completedQuestions} of ${totalQuestions} complete`}
+        chips={[{ label: 'Practice', color: 'primary', variant: 'outlined' }]}
+        onClick={() => handleActivityClick(activity)}
+      />
+    )
+  }
+
   return (
     <Box>
+      <Typography variant="h4" component="h1" sx={{ mb: 3, fontWeight: 600 }}>
+        Practice
+      </Typography>
       <ActivityAccordion
-        title="Practice Problems"
         courseStructure={courseStructure}
         isLoading={isLoadingPractice}
         emptyText="No practice problems available"
         defaultSubchapterExpanded
-        renderActivity={(activity, { chapter, subchapter }) => (
-          (() => {
-            const totalQuestions = Number(activity.questionCount) || 0
-            const completedQuestions = Math.min(Number(activity.answeredCount) || 0, totalQuestions)
-            const completionValue = totalQuestions > 0 ? (completedQuestions / totalQuestions) * 100 : 0
-            return (
-          <ThemedCard
-            key={activity.id}
-            sx={{ cursor: 'pointer', '&:hover': { boxShadow: 4 } }}
-            onClick={() => handleActivityClick(activity)}
-          >
-            <CardContent>
-              <Box
-                sx={{
-                  display: 'grid',
-                  gridTemplateColumns: {
-                    xs: '1fr',
-                    md: 'minmax(0, 1fr) clamp(240px, 28vw, 360px)',
-                  },
-                  columnGap: { xs: 0, md: 4 },
-                  rowGap: 2,
-                  alignItems: 'start',
-                }}
-              >
-                <Box sx={{ flex: 1, minWidth: 0 }}>
-                  <Typography variant="h6" component="h4" sx={{ mb: 1, wordBreak: 'break-word' }}>
-                    {activity.title}
-                  </Typography>
-                  {activity.description && (
-                    <Typography variant="body2" color="text.secondary" sx={{ wordBreak: 'break-word' }}>
-                      {activity.description}
-                    </Typography>
-                  )}
-                  {activity.estimatedTime && (
-                    <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-                      Estimated time: {activity.estimatedTime}
-                    </Typography>
-                  )}
-                </Box>
-                <Stack spacing={0.75} alignItems={{ xs: 'flex-start', md: 'flex-end' }} width="100%">
-                  <Stack
-                    direction="row"
-                    spacing={1}
-                    alignItems="center"
-                    flexWrap={{ xs: 'wrap', md: 'nowrap' }}
-                    justifyContent={{ xs: 'flex-start', md: 'flex-end' }}
-                    sx={{ width: '100%' }}
-                  >
-                    {totalQuestions > 0 && (
-                      <Stack
-                        direction="row"
-                        spacing={0.75}
-                        alignItems="center"
-                        sx={{
-                          minWidth: { xs: '100%', md: 'auto' },
-                          flex: { xs: '1 1 100%', md: '0 0 auto' },
-                          flexShrink: 0,
-                        }}
-                      >
-                        <Box sx={{ width: { xs: '100%', md: 140 } }}>
-                          <LinearProgress
-                            variant="determinate"
-                            value={completionValue}
-                            aria-label={`Practice completion: ${completedQuestions} of ${totalQuestions} complete`}
-                            sx={{
-                              height: 8,
-                              borderRadius: 999,
-                              bgcolor: 'action.hover',
-                              '& .MuiLinearProgress-bar': { borderRadius: 999 },
-                            }}
-                          />
-                        </Box>
-                        <Typography variant="body2" sx={{ color: 'text.primary', fontWeight: 600, whiteSpace: 'nowrap' }}>
-                          {completedQuestions}/{totalQuestions}
-                        </Typography>
-                      </Stack>
-                    )}
-                    <Chip
-                      label="Practice"
-                      size="small"
-                      color="primary"
-                      variant="outlined"
-                      sx={{ alignSelf: { xs: 'flex-start', md: 'flex-end' } }}
-                    />
-                  </Stack>
-                </Stack>
-              </Box>
-            </CardContent>
-          </ThemedCard>
-            )
-          })()
-        )}
+        renderActivity={renderActivity}
       />
     </Box>
   )
