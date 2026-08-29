@@ -41,7 +41,60 @@ import MathJaxFormula from '../../ui/MathJaxFormula.jsx'
 import TruthTableClassification from './TruthTableClassification.jsx'
 import TruthTableFeedback from './TruthTableFeedback.jsx'
 
-export default function TruthTableEditor({
+function hasTruthTableData(proof) {
+  const truthTable = proof?.truthTable ?? {}
+  return Boolean(
+    truthTable.statement
+    || truthTable.formula
+    || (Array.isArray(truthTable.statements) && truthTable.statements.length > 0)
+    || (Array.isArray(truthTable.formulas) && truthTable.formulas.length > 0)
+    || (Array.isArray(truthTable.lefts) && truthTable.lefts.length > 0 && truthTable.right)
+    || (truthTable.left && truthTable.right)
+  )
+}
+
+export default function TruthTableEditor(props) {
+  const {
+    proof,
+    isInstructorView = false,
+    onQuestionSaved,
+    problemLabel,
+    logicSystem,
+  } = props
+  const editorRef = React.useRef(null)
+  const openEdit = () => editorRef.current?.open?.()
+  const editorNode = isInstructorView ? (
+    <InstructorQuestionEditor
+      ref={editorRef}
+      proof={proof}
+      isInstructorView
+      onSaved={onQuestionSaved}
+      trigger="none"
+      logicSystem={logicSystem}
+    />
+  ) : null
+
+  if (!hasTruthTableData(proof)) {
+    return (
+      <ProblemFrame
+        problemLabel={problemLabel}
+        minHeight="auto"
+        cardMaxWidth="760px"
+        isInstructorView={isInstructorView}
+        onEditQuestion={openEdit}
+        editorNode={editorNode}
+      >
+        <Typography color="text.secondary">
+          Truth-table data is missing for this question.
+        </Typography>
+      </ProblemFrame>
+    )
+  }
+
+  return <TruthTableEditorContent {...props} editorNode={editorNode} onEditQuestion={openEdit} />
+}
+
+function TruthTableEditorContent({
   proof,
   savedState,
   onStateChange,
@@ -58,9 +111,9 @@ export default function TruthTableEditor({
   onQuestionSaved,
   problemLabel,
   logicSystem,
+  editorNode,
+  onEditQuestion,
 }) {
-  const editorRef = React.useRef(null)
-  const openEdit = () => editorRef.current?.open?.()
   const truthTable = proof.truthTable ?? {}
   const notation = getNotation(logicSystem)
   const syntax = React.useMemo(() => getSyntax(notation), [notation])
@@ -103,18 +156,23 @@ export default function TruthTableEditor({
 
   const tables = React.useMemo(() => {
     if (statements.length === 0) return []
-    const wffs = statements.map((statement) => Formula.from(statement))
-    const res = multiTables(wffs, notation)
-    return statements.map((label, idx) => {
-      const statement = statements[idx]
-      return {
-        label: displayIndexedSymbolsForNotation(label, syntax.notationname),
-        tokens: res.tables[idx]?.tokens ?? [],
-        opspot: formulaTable(wffs[idx], notation).opspot,
-        rows: res.tables[idx]?.rows ?? [],
-        headerTokens: tokenizeTruthTableHeader(statement, syntax),
-      }
-    })
+    try {
+      const wffs = statements.map((statement) => Formula.from(statement))
+      if (wffs.some((formula) => !formula.wellformed)) return []
+      const res = multiTables(wffs, notation)
+      return statements.map((label, idx) => {
+        const statement = statements[idx]
+        return {
+          label: displayIndexedSymbolsForNotation(label, syntax.notationname),
+          tokens: res.tables[idx]?.tokens ?? [],
+          opspot: formulaTable(wffs[idx], notation).opspot,
+          rows: res.tables[idx]?.rows ?? [],
+          headerTokens: tokenizeTruthTableHeader(statement, syntax),
+        }
+      })
+    } catch {
+      return []
+    }
   }, [Formula, statements, syntax])
 
   const isAtomicToken = React.useCallback(
@@ -434,17 +492,8 @@ export default function TruthTableEditor({
         minHeight="auto"
         cardMaxWidth="760px"
         isInstructorView={isInstructorView}
-        onEditQuestion={openEdit}
-        editorNode={isInstructorView ? (
-          <InstructorQuestionEditor
-            ref={editorRef}
-            proof={proof}
-            isInstructorView
-            onSaved={onQuestionSaved}
-            trigger="none"
-            logicSystem={logicSystem}
-          />
-        ) : null}
+        onEditQuestion={onEditQuestion}
+        editorNode={editorNode}
       >
         <Typography color="text.secondary">
           Truth-table data is missing for this question.
@@ -587,7 +636,7 @@ export default function TruthTableEditor({
         minHeight="auto"
         cardMaxWidth="760px"
         isInstructorView={isInstructorView}
-        onEditQuestion={openEdit}
+        onEditQuestion={onEditQuestion}
         status={status}
         message={message}
         onCloseStatus={() => setMessage('')}
@@ -605,16 +654,7 @@ export default function TruthTableEditor({
             sx={{ mt: 0, maxWidth: '760px' }}
           />
         ) : null}
-        editorNode={isInstructorView ? (
-          <InstructorQuestionEditor
-            ref={editorRef}
-            proof={proof}
-            isInstructorView
-            onSaved={onQuestionSaved}
-            trigger="none"
-            logicSystem={logicSystem}
-          />
-        ) : null}
+        editorNode={editorNode}
       >
         {tableCard}
       </ProblemFrame>

@@ -22,15 +22,11 @@ export const instructorProblemTypes = Object.freeze([
 ])
 
 const instructorProblemTypeSet = new Set(instructorProblemTypes.map(({ type }) => type))
+const legacyInstructorProblemTypeSet = new Set([
+  'derivation-hurley',
+  'derivation-calgary',
+])
 
 export function isInstructorProblemType(type) {
-  return instructorProblemTypeSet.has(type)
+  return instructorProblemTypeSet.has(type) || legacyInstructorProblemTypeSet.has(type)
 }
-
-/*
-purpose identifies a question deletion for the worksheet view
-contract event detail contains the assignment id and question id
-invariant it is dispatched only after the server deletes the question
-error behavior listeners ignore incomplete event details
-*/
-export const assignmentQuestionDeletedEvent = 'assignment-question-deleted'

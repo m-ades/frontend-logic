@@ -51,10 +51,7 @@ import {
   mapTranslationAnswer,
   parseTranslationAnswer,
 } from '../../lib/logicpenguin/translation-answer.js'
-import {
-  assignmentQuestionDeletedEvent,
-  isInstructorProblemType,
-} from '../../lib/instructorProblemTypes.js'
+import { isInstructorProblemType } from '../../lib/instructorProblemTypes.js'
 
 // deep merge. source overwrites. arrays replace.
 function deepMerge(target, source) {
@@ -1584,8 +1581,10 @@ function InstructorQuestionEditorInner({
   const initialEditValueRef = React.useRef(null)
 
   const questionId = proof?.questionId
+  const questionAssignmentId = assignmentId ?? proof?.assignmentId
   const supported = proof?.type && isInstructorProblemType(proof.type)
   const isCreate = mode === 'create'
+  const canDelete = !isCreate && questionId != null && questionAssignmentId != null
   const activeLogicSystem = proof?.type === 'derivation-hurley'
     ? 'hurley'
     : normalizeLogicSystem(logicSystem ?? proof?.logicSystem, DEFAULT_LOGIC_SYSTEM)
@@ -1842,13 +1841,13 @@ function InstructorQuestionEditorInner({
       const attemptLimit = editValue.attemptLimit
 
       if (isCreate) {
-        if (!assignmentId) {
+        if (!questionAssignmentId) {
           setError('Assignment id required')
           setSaving(false)
           return
         }
         const payload = {
-          assignment_id: assignmentId,
+          assignment_id: questionAssignmentId,
           order_index: Number.isFinite(Number(orderIndex)) ? Number(orderIndex) : 0,
           points_value: 100,
           attempt_limit: Number.isFinite(Number(attemptLimit)) ? Number(attemptLimit) : 3,
@@ -1897,22 +1896,19 @@ function InstructorQuestionEditorInner({
   }
 
   const handleDelete = async () => {
-    if (isCreate || !questionId || saving) return
-    if (!window.confirm('Delete this question This cannot be undone')) return
+    if (!canDelete || saving) return
+    if (!window.confirm('Delete this question? This cannot be undone.')) return
     setSaving(true)
     setError('')
     try {
-      const assignmentId = proof?.assignmentId
-      if (!assignmentId) throw new Error('Assignment id required')
+      if (questionAssignmentId == null) throw new Error('Assignment id required')
       await fetchJson('/api/assignment-questions', {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ assignment_id: assignmentId, ids: [questionId] }),
+        body: JSON.stringify({ assignment_id: questionAssignmentId, ids: [questionId] }),
       })
       setOpen(false)
-      window.dispatchEvent(new CustomEvent(assignmentQuestionDeletedEvent, {
-        detail: { assignmentId, questionId },
-      }))
+      onSaved?.(questionId)
     } catch (err) {
       setError(err?.message || 'Failed to delete')
     } finally {
@@ -2004,7 +2000,7 @@ function InstructorQuestionEditorInner({
           </Stack>
         </DialogContent>
         <DialogActions>
-          {!isCreate && (
+          {canDelete && (
             <Button color="error" onClick={handleDelete} disabled={saving} sx={{ mr: 'auto' }}>
               Delete
             </Button>

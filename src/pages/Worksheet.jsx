@@ -15,7 +15,6 @@ import { displayScoreForProof } from '../utils/problemHelpers.js'
 import { useCoursesState } from '../context/CoursesContext.jsx'
 import { useAppRuntime } from '../hooks/useAppRuntime.js'
 import { DEFAULT_LOGIC_SYSTEM, LEGACY_LOGIC_SYSTEM, isDerivationProblemType, normalizeLogicSystem } from '../lib/logicSystems.js'
-import { assignmentQuestionDeletedEvent } from '../lib/instructorProblemTypes.js'
 
 function SandboxWorksheetContent() {
   const { assignmentId } = useParams()
@@ -135,6 +134,10 @@ const logicSystemForQuestionType = (type, fallback = DEFAULT_LOGIC_SYSTEM) => {
   if (type === 'derivation-hurley') return LEGACY_LOGIC_SYSTEM
   if (type === 'derivation-calgary') return DEFAULT_LOGIC_SYSTEM
   return normalizeLogicSystem(fallback, DEFAULT_LOGIC_SYSTEM)
+}
+
+function clampIndex(index, length) {
+  return Math.max(0, Math.min(index, Math.max(0, length - 1)))
 }
 
 const mapQuestionToProof = (question, assignment, index, logicSystem = DEFAULT_LOGIC_SYSTEM) => {
@@ -545,35 +548,6 @@ function RealWorksheetContent() {
   }, [currentWorksheet?.id])
 
   useEffect(() => {
-    const removeDeletedQuestion = (event) => {
-      const assignmentId = Number(event?.detail?.assignmentId)
-      const questionId = Number(event?.detail?.questionId)
-      if (!Number.isFinite(assignmentId) || !Number.isFinite(questionId)) return
-      setWorksheets((previous) => previous.map((worksheet) => {
-        if (Number(worksheet.id) !== assignmentId) return worksheet
-        return {
-          ...worksheet,
-          proofs: worksheet.proofs.filter((proof) => Number(proof.questionId) !== questionId),
-        }
-      }))
-      setQuestionScores((previous) => {
-        const next = { ...previous }
-        delete next[questionId]
-        return next
-      })
-      setCurrentProofIndex((previous) => {
-        const worksheet = worksheetsRef.current.find((item) => Number(item.id) === assignmentId)
-        const removedIndex = worksheet?.proofs.findIndex((proof) => Number(proof.questionId) === questionId) ?? -1
-        const remaining = Math.max(0, (worksheet?.proofs.length ?? 0) - 1)
-        if (removedIndex >= 0 && removedIndex < previous) return previous - 1
-        return Math.min(previous, Math.max(0, remaining - 1))
-      })
-    }
-    window.addEventListener(assignmentQuestionDeletedEvent, removeDeletedQuestion)
-    return () => window.removeEventListener(assignmentQuestionDeletedEvent, removeDeletedQuestion)
-  }, [])
-
-  useEffect(() => {
     // course data can arrive after proofs are mapped
     setWorksheets((prev) => {
       let didChange = false
@@ -606,7 +580,7 @@ function RealWorksheetContent() {
     if (assignmentId == null || !Number.isFinite(proofCount) || proofCount === 0) return
     const saved = getLastQuestionIndex(assignmentId)
     if (saved != null) {
-      const clamped = Math.min(Math.max(0, saved), proofCount - 1)
+      const clamped = clampIndex(saved, proofCount)
       setCurrentProofIndex(clamped)
     }
   }, [currentWorksheet?.id, currentWorksheet?.proofs?.length, getLastQuestionIndex])
@@ -839,7 +813,28 @@ function RealWorksheetContent() {
         Number(question?.id ?? question?.assignment_question_id) === Number(questionId)
       ))
       if (!targetQuestion) {
-        solutionRefreshRef.current.delete(questionId)
+        const worksheet = worksheetsRef.current.find((item) => Number(item.id) === Number(assignmentId))
+        const removedIndex = worksheet?.proofs.findIndex((proof) => Number(proof.questionId) === Number(questionId)) ?? -1
+        if (removedIndex >= 0) {
+          const nextProofs = [
+            ...worksheet.proofs.slice(0, removedIndex),
+            ...worksheet.proofs.slice(removedIndex + 1),
+          ]
+          setWorksheets((previous) => previous.map((current) => (
+            Number(current.id) === Number(assignmentId)
+              ? { ...current, proofs: nextProofs }
+              : current
+          )))
+          setQuestionScores((previous) => {
+            const next = { ...previous }
+            delete next[questionId]
+            return next
+          })
+          setCurrentProofIndex((previous) => {
+            const nextIndex = removedIndex < previous ? previous - 1 : previous
+            return clampIndex(nextIndex, nextProofs.length)
+          })
+        }
         return
       }
       const qIdNum = Number(questionId)
@@ -852,22 +847,20 @@ function RealWorksheetContent() {
           }
         }
       }
-      setWorksheets((prev) => (
-        prev.map((worksheet) => {
-          if (worksheet.id !== assignmentId) return worksheet
-          const nextProofs = worksheet.proofs.map((proof, idx) => {
-            if (Number(proof.questionId) !== Number(questionId)) return proof
-            const updated = mapQuestionToProof(targetQuestion, assignmentInfo, idx, courseLogicSystem)
-            return {
-              ...proof,
-              ...updated,
-              attemptCount: serverAttemptCount ?? proof.attemptCount ?? 0,
-              attemptLimit: updated.attemptLimit ?? proof.attemptLimit,
-            }
-          })
-          return { ...worksheet, proofs: nextProofs }
+      setWorksheets((previous) => previous.map((worksheet) => {
+        if (Number(worksheet.id) !== Number(assignmentId)) return worksheet
+        const proofs = worksheet.proofs.map((proof, idx) => {
+          if (Number(proof.questionId) !== Number(questionId)) return proof
+          const updated = mapQuestionToProof(targetQuestion, assignmentInfo, idx, courseLogicSystem)
+          return {
+            ...proof,
+            ...updated,
+            attemptCount: serverAttemptCount ?? proof.attemptCount ?? 0,
+            attemptLimit: updated.attemptLimit ?? proof.attemptLimit,
+          }
         })
-      ))
+        return { ...worksheet, proofs }
+      }))
     } catch (err) {
       // ignore refresh errors
     } finally {
@@ -877,21 +870,14 @@ function RealWorksheetContent() {
 
   const handleQuestionCreated = useCallback((assignmentId, createdQuestion) => {
     if (!assignmentId || !createdQuestion) return
-    setWorksheets((prev) => (
-      prev.map((worksheet) => {
-        if (worksheet.id !== assignmentId) return worksheet
-        const exists = worksheet.proofs.some(
-          (proof) => Number(proof.questionId) === Number(createdQuestion.id)
-        )
-        if (exists) return worksheet
-        const nextProof = mapQuestionToProof(createdQuestion, worksheet, worksheet.proofs.length, courseLogicSystem)
-        return {
-          ...worksheet,
-          proofs: [...worksheet.proofs, nextProof],
-        }
-      })
-    ))
-    if (currentWorksheet?.id === assignmentId) {
+    setWorksheets((previous) => previous.map((worksheet) => {
+      if (Number(worksheet.id) !== Number(assignmentId)) return worksheet
+      const exists = worksheet.proofs.some((proof) => Number(proof.questionId) === Number(createdQuestion.id))
+      if (exists) return worksheet
+      const nextProof = mapQuestionToProof(createdQuestion, worksheet, worksheet.proofs.length, courseLogicSystem)
+      return { ...worksheet, proofs: [...worksheet.proofs, nextProof] }
+    }))
+    if (Number(currentWorksheet?.id) === Number(assignmentId)) {
       const nextIndex = currentWorksheet?.proofs?.length ?? 0
       setCurrentProofIndex(nextIndex)
     }
