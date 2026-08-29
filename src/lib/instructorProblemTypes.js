@@ -29,3 +29,12 @@ const legacyInstructorProblemTypeSet = new Set([
 export function isInstructorProblemType(type) {
   return instructorProblemTypeSet.has(type) || legacyInstructorProblemTypeSet.has(type)
 }
+
+const instructorProblemTypeLabels = new Map(
+  instructorProblemTypes.map(({ type, label }) => [type, label])
+)
+
+export function getInstructorProblemTypeLabel(type) {
+  if (legacyInstructorProblemTypeSet.has(type)) return 'Derivation'
+  return instructorProblemTypeLabels.get(type) || type
+}

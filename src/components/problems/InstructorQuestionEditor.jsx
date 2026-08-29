@@ -2,6 +2,7 @@ import * as React from 'react'
 import {
   Box,
   Button,
+  Chip,
   Dialog,
   DialogTitle,
   DialogContent,
@@ -51,7 +52,7 @@ import {
   mapTranslationAnswer,
   parseTranslationAnswer,
 } from '../../lib/logicpenguin/translation-answer.js'
-import { isInstructorProblemType } from '../../lib/instructorProblemTypes.js'
+import { getInstructorProblemTypeLabel, isInstructorProblemType } from '../../lib/instructorProblemTypes.js'
 
 // deep merge. source overwrites. arrays replace.
 function deepMerge(target, source) {
@@ -1912,7 +1913,10 @@ function InstructorQuestionEditorInner({
     <>
       {triggerEl}
       <Dialog open={open} onClose={() => setOpen(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>{isCreate ? 'Create question' : 'Edit question'}</DialogTitle>
+        <DialogTitle sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          {isCreate ? 'Create question' : 'Edit question'}
+          <Chip label={getInstructorProblemTypeLabel(proof.type)} size="small" variant="outlined" />
+        </DialogTitle>
         <DialogContent>
           <Stack spacing={2} sx={{ mt: 0.5 }}>
             {error && (
