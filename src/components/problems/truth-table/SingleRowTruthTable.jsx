@@ -1,5 +1,13 @@
 import { useCallback, useEffect, useMemo, useState, useRef } from 'react'
-import { Box, Typography } from '@mui/material'
+import {
+  Box,
+  FormControl,
+  FormControlLabel,
+  FormLabel,
+  Radio,
+  RadioGroup,
+  Typography,
+} from '@mui/material'
 import InstructorQuestionEditor from '../InstructorQuestionEditor.jsx'
 import getFormulaClass from '../../../lib/logicpenguin/symbolic/formula.js'
 import getSyntax from '../../../lib/logicpenguin/symbolic/libsyntax.js'
@@ -83,8 +91,10 @@ export default function SingleRowTruthTable({
     return tokenizeTruthTableHeader(statement, syntax)
   }, [statement, syntax])
   const expectedRow = (evaluation?.row || []).map(toSymbol)
+  const expectedCompound = toSymbol(evaluation?.tv)
   const expectedAnswer = useMemo(() => ({
     row: evaluation?.row || [],
+    tv: evaluation?.tv,
   }), [evaluation])
 
   const isAtomicToken = useCallback((token) => {
@@ -113,6 +123,9 @@ export default function SingleRowTruthTable({
   )
 
   const [rowInputs, setRowInputs] = useState(() => initialRow)
+  const [compoundInput, setCompoundInput] = useState(
+    savedState?.compound !== undefined ? toSymbol(savedState.compound) : ''
+  )
   const [selectedColumns, setSelectedColumns] = useState([])
   const [selectedRows, setSelectedRows] = useState([])
   const onStateChangeTimerRef = useRef(null)
@@ -121,19 +134,27 @@ export default function SingleRowTruthTable({
     setRowInputs((prev) => (rowsEqual(prev, initialRow) ? prev : initialRow))
   }, [initialRow])
 
+  useEffect(() => {
+    setCompoundInput(
+      savedState?.compound !== undefined ? toSymbol(savedState.compound) : ''
+    )
+  }, [savedState?.compound])
+
   useEffect(() => () => clearDebounce(onStateChangeTimerRef), [])
 
   const scheduleStateChange = useCallback((next) => {
     scheduleDebouncedChange(onStateChangeTimerRef, onStateChange, next)
   }, [onStateChange])
-  const buildDraftState = useCallback((nextRow) => ({
+  const buildDraftState = useCallback((nextRow, nextCompound) => ({
     row: nextRow.map(toSymbol),
+    compound: toSymbol(nextCompound),
   }), [])
 
   const isDisabled = useCallback(() =>
     rowInputs.length === 0 ||
-    rowInputs.some((cell, idx) => cell === '' && !isAtomicToken(tokens[idx])),
-  [isAtomicToken, rowInputs, tokens])
+    rowInputs.some((cell, idx) => cell === '' && !isAtomicToken(tokens[idx])) ||
+    compoundInput === '',
+  [compoundInput, isAtomicToken, rowInputs, tokens])
 
   const { status, message, isChecking, handleCheck, handleStartOver, setStatus, setMessage, attemptCount, maxAttempts, isLocked } = useProblemChecker({
     answer: expectedAnswer,
@@ -141,12 +162,14 @@ export default function SingleRowTruthTable({
     question: problem,
     getAnswer: () => ({
       row: rowInputs.map(toSymbol),
+      compound: toSymbol(compoundInput),
     }),
     onComplete,
     isDisabled,
     resetInput: () => {
       setRowInputs(resetRow)
-      onStateChange?.(buildDraftState(resetRow))
+      setCompoundInput('')
+      onStateChange?.(buildDraftState(resetRow, ''))
     },
     onStateChange,
     assignmentQuestionId,
@@ -167,7 +190,16 @@ export default function SingleRowTruthTable({
     setRowInputs(next)
     setStatus('unanswered')
     setMessage('')
-    scheduleStateChange(buildDraftState(next))
+    scheduleStateChange(buildDraftState(next, compoundInput))
+  }
+
+  const handleCompoundChange = (value) => {
+    if (readOnly || isLocked) return
+    const next = value || ''
+    setCompoundInput(next)
+    setStatus('unanswered')
+    setMessage('')
+    scheduleStateChange(buildDraftState(rowInputs, next))
   }
 
   const toggleColumn = (_tableIndex, colIndex) => {
@@ -211,7 +243,8 @@ export default function SingleRowTruthTable({
     return <Typography color="error">Invalid problem</Typography>
   }
 
-  const tableFilled = rowInputs.length > 0 && !isDisabled()
+  const tableFilled = rowInputs.length > 0 &&
+    !rowInputs.some((cell, idx) => cell === '' && !isAtomicToken(tokens[idx]))
   const isCurrentlyCorrect = tableFilled &&
     rowInputs.length === expectedRow.length &&
     rowInputs.every((cell, idx) => cell === expectedRow[idx])
@@ -260,9 +293,33 @@ export default function SingleRowTruthTable({
               : 'Click editable cells to toggle truth values - fill in every blank cell to finish.'}
         </Typography>
       </Box>
+      <Box sx={{ mt: 2 }}>
+        <FormControl component="fieldset" variant="standard" sx={{ width: '100%' }}>
+          <FormLabel component="legend">Truth value of compound statement</FormLabel>
+          <RadioGroup
+            value={compoundInput}
+            onChange={(event) => handleCompoundChange(event.target.value)}
+            name={`single-row-truth-value-${assignmentQuestionId ?? 'local'}`}
+          >
+            <FormControlLabel value="T" control={<Radio disabled={readOnly || isLocked} />} label="True" />
+            <FormControlLabel value="F" control={<Radio disabled={readOnly || isLocked} />} label="False" />
+          </RadioGroup>
+        </FormControl>
+      </Box>
       {isLocked && status !== 'correct' && expectedRow.length > 0 && (
         <TruthTableSection title="Correct Answer">
-          {renderTableSet([[expectedRow]], true)}
+          <Box sx={{ display: 'grid', gap: 2 }}>
+            {renderTableSet([[expectedRow]], true)}
+            <FormControl component="fieldset" sx={{ width: '100%' }}>
+              <RadioGroup
+                value={expectedCompound}
+                name={`single-row-truth-value-answer-${assignmentQuestionId ?? 'local'}`}
+              >
+                <FormControlLabel value="T" control={<Radio disabled />} label="True" />
+                <FormControlLabel value="F" control={<Radio disabled />} label="False" />
+              </RadioGroup>
+            </FormControl>
+          </Box>
         </TruthTableSection>
       )}
     </ProblemFrame>
