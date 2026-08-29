@@ -639,7 +639,6 @@ function TruthTableEditorContent({
             attemptCount={attemptCount}
             attemptLimit={attemptLimit}
             isInstructorView={isInstructorView}
-            navigationPlacement="separate"
             sx={{ mt: 0 }}
           />
         ) : null}
