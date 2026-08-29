@@ -488,6 +488,7 @@ function RealWorksheetContent() {
   const worksheetsRef = useRef(worksheets)
   worksheetsRef.current = worksheets
   const [isLoading, setIsLoading] = useState(true)
+  const [settledRequestKey, setSettledRequestKey] = useState(null)
   const [loadError, setLoadError] = useState('')
   const [currentDueAt, setCurrentDueAt] = useState(null)
   const [questionScores, setQuestionScores] = useState({})
@@ -519,6 +520,7 @@ function RealWorksheetContent() {
   // assignmentId will be used when backend is implemented
   const id = assignmentId || worksheetId
   const worksheetIdNum = parseInt(id)
+  const worksheetRequestKey = courseIdForApi ? `${courseIdForApi}:${id ?? ''}` : null
 
   const LAST_QUESTION_KEY = 'logic-app:last-question'
   const getLastQuestionIndex = useCallback((assignmentId) => {
@@ -1227,6 +1229,7 @@ function RealWorksheetContent() {
 
     const loadWorksheets = async () => {
       setLoadError('')
+      setIsLoading(true)
       try {
         if (!courseIdForApi) return
         const targetAssignmentId = Number.isFinite(worksheetIdNum) ? worksheetIdNum : null
@@ -1289,6 +1292,7 @@ function RealWorksheetContent() {
         }
       } finally {
         if (isMounted) {
+          setSettledRequestKey(worksheetRequestKey)
           setIsLoading(false)
         }
       }
@@ -1299,7 +1303,7 @@ function RealWorksheetContent() {
     return () => {
       isMounted = false
     }
-  }, [activeUserId, courseId, courseLogicSystem, worksheetIdNum])
+  }, [activeUserId, courseId, courseLogicSystem, worksheetIdNum, worksheetRequestKey])
 
   const handleWorksheetChange = (newIndex) => {
     const newWorksheet = worksheets[newIndex]
@@ -1364,7 +1368,8 @@ function RealWorksheetContent() {
     return lines
   }, [currentWorksheet?.policy, currentWorksheet?.due_at, currentWorksheet?.original_due_at])
 
-  if (isLoading) {
+  // terminal states belong only to the course and worksheet request that produced them
+  if (!worksheetRequestKey || isLoading || settledRequestKey !== worksheetRequestKey) {
     return <LoadingSpinner label="Loading assignment..." />
   }
 
