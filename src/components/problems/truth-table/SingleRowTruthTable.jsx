@@ -127,7 +127,6 @@ export default function SingleRowTruthTable({
     savedState?.compound !== undefined ? toSymbol(savedState.compound) : ''
   )
   const [selectedColumns, setSelectedColumns] = useState([])
-  const [selectedRows, setSelectedRows] = useState([])
   const onStateChangeTimerRef = useRef(null)
 
   useEffect(() => {
@@ -209,11 +208,6 @@ export default function SingleRowTruthTable({
         : [...prev, { tableIndex: 0, colIndex }]
     ))
   }
-  const toggleRow = (rowIndex) => {
-    setSelectedRows((prev) =>
-      prev.includes(rowIndex) ? prev.filter((entry) => entry !== rowIndex) : [...prev, rowIndex]
-    )
-  }
   const columns = useMemo(
     () => (headerTokens.length > 0 ? headerTokens : tokens).map((token) => ({ token, ariaLabel: getTokenSpeechLabel(token) })),
     [headerTokens, tokens]
@@ -231,10 +225,9 @@ export default function SingleRowTruthTable({
       combined={false}
       readOnly={readOnlyTable}
       isCellReadOnly={({ colIndex }) => isAtomicToken(tokens[colIndex])}
+      allowRowSelection={false}
       selectedColumns={selectedColumns}
-      selectedRows={selectedRows}
       onToggleColumn={toggleColumn}
-      onToggleRow={toggleRow}
       onCellChange={(_, __, colIndex, value) => handleCellChange(colIndex, value)}
     />
   )
