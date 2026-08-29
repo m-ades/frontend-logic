@@ -19,6 +19,7 @@ import {
   IconButton,
   Radio,
   RadioGroup,
+  TableCell,
 } from '@mui/material'
 import EditIcon from '@mui/icons-material/Edit'
 import AddIcon from '@mui/icons-material/Add'
@@ -53,6 +54,9 @@ import {
   parseTranslationAnswer,
 } from '../../lib/logicpenguin/translation-answer.js'
 import { getInstructorProblemTypeLabel, isInstructorProblemType } from '../../lib/instructorProblemTypes.js'
+import TruthTableGrid from './truth-table/TruthTableGrid.jsx'
+import { TruthValueButton } from './truth-table/TruthTableControls.jsx'
+import { tokenizeTruthTableHeader } from './truth-table/truthTableUi.js'
 
 // deep merge. source overwrites. arrays replace.
 function deepMerge(target, source) {
@@ -1560,16 +1564,73 @@ function PartialTruthTableEditorForm({ proof, value, onChange, logicSystem = DEF
   const pt = proof?.partialTruthTable || {}
   const statement = value.statement ?? pt.statement ?? pt.formula ?? proof?.description ?? ''
   const prompt = value.prompt ?? pt.prompt ?? proof?.description ?? ''
-  const rowStr = Array.isArray(value.row) ? value.row.map((v) => (v === true || v === 'T' ? 'T' : v === false || v === 'F' ? 'F' : '')).join(',') : (Array.isArray(pt.row) ? pt.row.map((v) => (v === true ? 'T' : v === false ? 'F' : '')).join(',') : '')
-  const setRow = (str) => {
-    const arr = str ? str.split(',').map((c) => (c.trim() === 'T' ? true : c.trim() === 'F' ? false : null)) : []
-    onChange({ ...value, row: arr })
+  const notation = getNotation(logicSystem)
+  const syntax = React.useMemo(() => getSyntax(notation), [notation])
+  const Formula = React.useMemo(() => getFormulaClass(notation), [notation])
+  const headerTokens = React.useMemo(() => {
+    if (!statement) return []
+    const formula = Formula.from(statement)
+    return formula.wellformed ? tokenizeTruthTableHeader(statement, syntax) : []
+  }, [Formula, statement, syntax])
+  const savedRow = Array.isArray(value.row)
+    ? value.row
+    : (Array.isArray(pt.row) ? pt.row : [])
+  const row = headerTokens.map((_, index) => {
+    const cell = savedRow[index]
+    if (cell === true || cell === 'T' || cell === 't') return 'T'
+    if (cell === false || cell === 'F' || cell === 'f') return 'F'
+    return ''
+  })
+  const setCell = (index, cell) => {
+    const nextRow = row.map((current, currentIndex) => {
+      const next = currentIndex === index ? cell : current
+      if (next === 'T') return true
+      if (next === 'F') return false
+      return null
+    })
+    onChange({ ...value, row: nextRow })
   }
+  const tables = [{ tokens: headerTokens, headerTokens, rows: [row] }]
   return (
     <Stack spacing={2}>
-      <TextField label="Statement" value={statement} onChange={(e) => onChange({ ...value, statement: displayFormulaInput(e.target.value, logicSystem) })} fullWidth variant="outlined" />
+      <TextField
+        label="Statement"
+        value={statement}
+        onChange={(e) => onChange({
+          ...value,
+          statement: displayFormulaInput(e.target.value, logicSystem),
+          row: [],
+        })}
+        fullWidth
+        variant="outlined"
+      />
       <TextField label="Prompt" value={prompt} onChange={(e) => onChange({ ...value, prompt: e.target.value })} fullWidth variant="outlined" />
-      <TextField label="Given row" value={rowStr} onChange={(e) => setRow(e.target.value)} fullWidth variant="outlined" placeholder="T, F, , T" />
+      <Box>
+        <Typography variant="subtitle2" sx={{ mb: 0.5 }}>Given row</Typography>
+        {headerTokens.length === 0 ? (
+          <Typography variant="body2" color="text.secondary">Enter a valid statement</Typography>
+        ) : (
+          <TruthTableGrid
+            tables={tables}
+            tableInputs={[[row]]}
+            combined={false}
+            readOnly={false}
+            withSelectors={false}
+            allowRowSelection={false}
+            shrinkWrap
+            renderCell={({ colIndex, cellValue, cellSx }) => (
+              <TableCell key={`partial-editor-cell-${colIndex}`} align="center" sx={cellSx}>
+                <TruthValueButton
+                  value={cellValue ?? ''}
+                  onChange={(nextValue) => setCell(colIndex, nextValue)}
+                  ariaLabel={`Given value for ${headerTokens[colIndex]}`}
+                  emptyLabel="?"
+                />
+              </TableCell>
+            )}
+          />
+        )}
+      </Box>
     </Stack>
   )
 }

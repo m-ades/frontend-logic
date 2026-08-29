@@ -192,6 +192,7 @@ export default function PartialTruthTable({
         selectedColumns={selectedGridColumns}
         onToggleColumn={(_, colIndex) => toggleColumn(colIndex)}
         withSelectors
+        allowRowSelection={false}
         renderCell={({ colIndex, cellValue, isHighlighted, cellSx }) => {
           const isEditable = editableIndices[colIndex]
           const value = cellValue ?? ''

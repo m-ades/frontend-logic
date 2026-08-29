@@ -3,6 +3,12 @@ import { alpha, useTheme } from '@mui/material/styles'
 
 const DEFAULT_TOGGLE_VALUES = ['T', 'F']
 
+/*
+cycles one truth table cell through the configured values
+an unset value renders the empty label
+an empty toggle list uses true and false
+readonly disables input
+*/
 export function TruthValueButton({
   value,
   onChange,
@@ -10,6 +16,7 @@ export function TruthValueButton({
   accent = false,
   readOnly = false,
   toggleValues = DEFAULT_TOGGLE_VALUES,
+  emptyLabel = '-',
 }) {
   const theme = useTheme()
   const isDark = theme.palette.mode === 'dark'
@@ -72,7 +79,7 @@ export function TruthValueButton({
         },
       }}
     >
-      {value || '-'}
+      {value || emptyLabel}
     </ButtonBase>
   )
 }
