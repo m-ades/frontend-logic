@@ -243,7 +243,6 @@ export default function MultipleChoice({
     <ProblemFrame
       problemLabel={problemLabel}
       prompt={prompt}
-      minHeight="200px"
       isInstructorView={isInstructorView && !!proof}
       onEditQuestion={proof ? openEdit : undefined}
       status={status}

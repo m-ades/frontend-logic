@@ -288,7 +288,6 @@ export default function SymbolicTranslation({
     <ProblemFrame
       problemLabel={problemLabel}
       prompt={prompt}
-      minHeight="150px"
       isInstructorView={isInstructorView && !!proof}
       onEditQuestion={proof ? openEdit : undefined}
       status={status}

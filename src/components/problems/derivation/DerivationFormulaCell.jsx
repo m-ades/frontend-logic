@@ -4,6 +4,7 @@ import DerivationFormulaText from './DerivationFormulaText.jsx'
 import { isDerivationFieldReadOnly } from './derivationUtils.js'
 import {
   DERIVATION_FORMULA_WIDTH,
+  DERIVATION_FORMULA_MIN_WIDTH,
   DERIVATION_INDENT_STEP,
   DERIVATION_INDENT_STEP_REM,
   DERIVATION_LINE_FONT_SIZE,
@@ -52,7 +53,11 @@ export default function DerivationFormulaCell({
         transition: 'padding-left 120ms ease',
         ...(isFullScreen
           ? { width: '50%', minWidth: 0 }
-          : { width: 'auto', whiteSpace: 'nowrap' }),
+          : {
+              width: { xs: DERIVATION_FORMULA_MIN_WIDTH, md: DERIVATION_FORMULA_WIDTH },
+              minWidth: { xs: DERIVATION_FORMULA_MIN_WIDTH, md: DERIVATION_FORMULA_WIDTH },
+              whiteSpace: 'nowrap',
+            }),
       }}
     >
       {showsDivider && (

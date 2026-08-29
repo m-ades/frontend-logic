@@ -136,7 +136,6 @@ export default function ValidCorrectSound({
     <ProblemFrame
       problemLabel={problemLabel}
       prompt={problem?.prompt || proof?.description || ''}
-      minHeight="220px"
       isInstructorView={isInstructorView && !!proof}
       onEditQuestion={proof ? openEdit : undefined}
       status={status}

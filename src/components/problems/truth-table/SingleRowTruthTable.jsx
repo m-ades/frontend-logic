@@ -245,8 +245,7 @@ export default function SingleRowTruthTable({
     <ProblemFrame
       problemLabel={problemLabel}
       prompt={prompt}
-      minHeight="260px"
-      contentSized
+      expandForContent
       isInstructorView={isInstructorView && !!proof}
       onEditQuestion={proof ? openEdit : undefined}
       status={status}

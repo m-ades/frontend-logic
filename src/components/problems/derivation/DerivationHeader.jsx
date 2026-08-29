@@ -5,6 +5,7 @@ import { DERIVATION_LINE_FONT_SIZE } from './derivationTableConfig.js'
 /**
  * renders the argument and rule controls above a derivation table
  * argument contains matching plain text and tex representations
+ * show derivation label controls only the section label
  */
 export default function DerivationHeader({
   allowedRules,
@@ -12,7 +13,7 @@ export default function DerivationHeader({
   isFullScreen,
   onRuleInputModeChange,
   ruleInputMode,
-  usesNestedSubderivations,
+  showDerivationLabel,
 }) {
   return (
     <>
@@ -25,7 +26,7 @@ export default function DerivationHeader({
           >
             Argument
           </Typography>
-          <Box sx={{ overflowX: 'auto', whiteSpace: 'nowrap', fontSize: DERIVATION_LINE_FONT_SIZE, lineHeight: 1.6 }}>
+          <Box sx={{ overflowX: 'auto', overflowY: 'clip', whiteSpace: 'nowrap', fontSize: DERIVATION_LINE_FONT_SIZE, lineHeight: 1.6 }}>
             <MathJaxFormula
               tex={argument.tex}
               fallback={argument.text}
@@ -36,9 +37,9 @@ export default function DerivationHeader({
         </Box>
       )}
 
-      {(usesNestedSubderivations || allowedRules.length > 0) && (
+      {(showDerivationLabel || allowedRules.length > 0) && (
         <Box sx={{ mb: 1.5, ...(isFullScreen && { pl: 2 }) }}>
-          {usesNestedSubderivations && (
+          {showDerivationLabel && (
             <Typography
               component="h3"
               variant="overline"
