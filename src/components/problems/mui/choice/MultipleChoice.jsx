@@ -1,8 +1,8 @@
 import { useState, useEffect, useId, useRef } from 'react'
-import { Box, Checkbox, FormControl, FormControlLabel, FormGroup, Radio, RadioGroup, Typography } from '@mui/material'
+import { Box, Checkbox, FormControl, FormControlLabel, FormGroup, Radio, RadioGroup } from '@mui/material'
 import ProblemSetButtons from '../frame/ProblemSetButtons.jsx'
 import InstructorQuestionEditor from '../../InstructorQuestionEditor.jsx'
-import ProblemFrame, { choiceLabelWithGapSx, sectionLabelSx } from '../frame/ProblemFrame.jsx'
+import ProblemFrame, { choiceLabelWithGapSx } from '../frame/ProblemFrame.jsx'
 import { useProblemChecker } from '../../../../hooks/useProblemChecker.js'
 import SolutionReveal from '../../SolutionReveal.jsx'
 import PromptText from '../../../ui/PromptText.jsx'
@@ -306,11 +306,6 @@ export default function MultipleChoice({
         </Box>
       ) : (
         <Box>
-          {isInstructorView && proof && (
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, ...sectionLabelSx }}>
-              <Typography variant="subtitle2" color="text.secondary">Choices</Typography>
-            </Box>
-          )}
           <FormControl component="fieldset" sx={{ width: '100%' }}>
             <ChoiceGroup
               choices={Array.isArray(problem?.choices) ? problem.choices : []}
