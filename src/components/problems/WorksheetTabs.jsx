@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { Box, useTheme, useMediaQuery } from '@mui/material';
 import ProofTabs from './ProofTabs.jsx';
+import { updateRulebookForProblem, useLayoutDispatch } from '../../context/LayoutContext.jsx';
 
 function WorksheetTabPanel({ children, value, index, ...other }) {
   return (
@@ -43,6 +44,16 @@ export default function WorksheetTabs({
 }) {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const layoutDispatch = useLayoutDispatch();
+  const activeProblemType = worksheets[currentWorksheetIndex]?.proofs?.[currentProofIndex]?.type ?? null;
+
+  React.useEffect(() => {
+    updateRulebookForProblem(layoutDispatch, activeProblemType);
+  }, [activeProblemType, layoutDispatch]);
+
+  React.useEffect(() => () => {
+    updateRulebookForProblem(layoutDispatch, null);
+  }, [layoutDispatch]);
 
   const handleWorksheetChange = (e, newValue) => {
     onWorksheetIndexChange(newValue);

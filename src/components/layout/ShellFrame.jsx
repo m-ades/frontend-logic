@@ -26,7 +26,8 @@ export default function ShellFrame({
   const isLargeScreen = useMediaQuery(theme.breakpoints.up("lg"));
   const hasDesktopPointer = useMediaQuery("(hover: hover) and (pointer: fine)");
   const isDesktopRulebookLayout = isLargeScreen && hasDesktopPointer;
-  const shouldShiftShellForRulebook = isDesktopRulebookLayout && isRulesReferenceOpen;
+  const isWorksheetRoute = /\/assignment\/[^/]+\/?$/.test(location.pathname);
+  const shouldShiftShellForRulebook = isWorksheetRoute && isDesktopRulebookLayout && isRulesReferenceOpen;
   const isDashboardRoute = /\/dashboard$/.test(location.pathname);
 
   useEffect(() => {
@@ -85,7 +86,7 @@ export default function ShellFrame({
           onOpenSettings={onOpenSettings}
         />
         <Box sx={{ display: "flex", flexDirection: "column", flexGrow: 1, minWidth: 0 }}>
-          <Header onSignOut={onSignOut} />
+          <Header onSignOut={onSignOut} showRulesReference={isWorksheetRoute} />
           <Box
             component="main"
             id="main-content"
@@ -115,7 +116,7 @@ export default function ShellFrame({
           onTextSizeChange={onTextSizeChange}
         />
       )}
-      <RulesReference logicSystem={logicSystem} />
+      {isWorksheetRoute && <RulesReference logicSystem={logicSystem} />}
     </Box>
   );
 }

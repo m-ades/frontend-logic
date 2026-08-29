@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import {
   AppBar,
   Toolbar,
@@ -7,6 +8,7 @@ import {
   Link,
   IconButton,
   Button,
+  Tooltip,
   useMediaQuery,
   useTheme,
 } from "@mui/material";
@@ -22,20 +24,29 @@ import {
   useLayoutDispatch,
   useLayoutState,
   toggleSidebar,
-  closeRulesReference,
-  openRulesReference,
+  dismissRulesReferenceHint,
+  setRulesReferenceOpen,
 } from "../../context/LayoutContext.jsx";
 import { useAppRuntime } from "../../hooks/useAppRuntime.js";
 
-export default function Header({ onSignOut }) {
+// rulebook availability is owned by the containing route and is independent of question type
+export default function Header({ onSignOut, showRulesReference = false }) {
   const location = useLocation();
   const { courses, activeCourseId, coursesPath, getBreadcrumbInfo, isSandbox: sandbox } = useAppRuntime();
   const layoutDispatch = useLayoutDispatch();
-  const { isRulesReferenceOpen } = useLayoutState();
+  const { isRulesReferenceOpen, showRulesReferenceHint } = useLayoutState();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const activeCourse = courses.find((c) => c.id === activeCourseId);
   const pageInfo = getBreadcrumbInfo(location.pathname, location.state?.returnTo);
+
+  useEffect(() => {
+    if (!showRulesReferenceHint) return undefined;
+    const timer = window.setTimeout(() => {
+      dismissRulesReferenceHint(layoutDispatch);
+    }, 8000);
+    return () => window.clearTimeout(timer);
+  }, [layoutDispatch, showRulesReferenceHint]);
 
   return (
     <AppBar
@@ -121,28 +132,36 @@ export default function Header({ onSignOut }) {
           )}
         </Box>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <Button
-            id="rules-reference-trigger"
-            onClick={() => {
-              if (isRulesReferenceOpen) {
-                closeRulesReference(layoutDispatch);
-                return;
-              }
-              openRulesReference(layoutDispatch);
-            }}
-            startIcon={<MenuBookIcon />}
-            aria-expanded={isRulesReferenceOpen}
-            aria-controls="rules-reference"
-            sx={{ 
-              textTransform: 'none',
-              color: 'primary.main',
-              '&:hover': {
-                backgroundColor: 'rgba(47, 107, 255, 0.08)',
-              }
-            }}
-          >
-            Rulebook
-          </Button>
+          {showRulesReference && (
+            <Tooltip
+              title={isRulesReferenceOpen ? "Close rulebook" : "Need rules or keyboard shortcuts?"}
+              open={showRulesReferenceHint || undefined}
+              onClose={() => dismissRulesReferenceHint(layoutDispatch)}
+              placement="bottom"
+              arrow
+            >
+              <Button
+                id="rules-reference-trigger"
+                onClick={() => setRulesReferenceOpen(layoutDispatch, !isRulesReferenceOpen)}
+                startIcon={isRulesReferenceOpen ? undefined : <MenuBookIcon />}
+                aria-label={isRulesReferenceOpen ? "Close rulebook" : undefined}
+                aria-expanded={isRulesReferenceOpen}
+                aria-controls="rules-reference"
+                sx={{
+                  textTransform: 'none',
+                  color: 'primary.main',
+                  minWidth: isRulesReferenceOpen ? 40 : undefined,
+                  px: isRulesReferenceOpen ? 1 : undefined,
+                  backgroundColor: showRulesReferenceHint ? 'action.selected' : 'transparent',
+                  '&:hover': {
+                    backgroundColor: 'rgba(47, 107, 255, 0.08)',
+                  }
+                }}
+              >
+                {isRulesReferenceOpen ? <MenuBookIcon /> : 'Rulebook'}
+              </Button>
+            </Tooltip>
+          )}
           <ThemeToggle />
         </Box>
       </Toolbar>
