@@ -1385,14 +1385,21 @@ function buildSingleRowTruthTableSnapshot(proof, edited, existing, logicSystem =
   const sr = proof.singleRowTruthTable || {}
   const statement = normalizeFormulaInput(edited.statement ?? sr.statement ?? sr.formula ?? proof.description ?? '', logicSystem)
   const prompt = edited.prompt ?? sr.prompt ?? proof.description ?? ''
-  const editedInterp = edited.interpretation ?? sr.interpretation ?? {}
-  const hasEditedInterp = editedInterp && typeof editedInterp === 'object' && Object.keys(editedInterp).length > 0
-  const interp = hasEditedInterp ? editedInterp : (existing?.interpretation && typeof existing.interpretation === 'object' ? existing.interpretation : {})
+  const sourceInterpretation = edited.interpretation
+    ?? sr.interpretation
+    ?? existing?.interpretation
+    ?? {}
+  const Formula = getFormulaClass(getNotation(logicSystem))
+  const formula = Formula.from(statement)
+  const letters = formula.wellformed ? formula.allpletters : []
+  const interpretation = Object.fromEntries(
+    letters.map((letter) => [letter, sourceInterpretation[letter] ?? false])
+  )
   return {
     [typeKey(existing)]: 'single-row-truth-table',
     prompt,
     statement,
-    interpretation: interp,
+    interpretation,
   }
 }
 
@@ -1480,9 +1487,51 @@ function SingleRowTruthTableEditorForm({ proof, value, onChange, logicSystem = D
   const sr = proof?.singleRowTruthTable || {}
   const statement = value.statement ?? sr.statement ?? proof?.description ?? ''
   const prompt = value.prompt ?? sr.prompt ?? proof?.description ?? ''
+  const interpretation = value.interpretation ?? sr.interpretation ?? {}
+  const Formula = getFormulaClass(getNotation(logicSystem))
+  const formula = Formula.from(statement)
+  const sentenceLetters = formula.wellformed
+    ? [...formula.allpletters].sort((left, right) => left.localeCompare(right))
+    : []
+  const setAssignment = (letter, truthValue) => {
+    onChange({
+      ...value,
+      interpretation: {
+        ...interpretation,
+        [letter]: truthValue,
+      },
+    })
+  }
   return (
     <Stack spacing={2}>
       <TextField label="Statement" value={statement} onChange={(e) => onChange({ ...value, statement: displayFormulaInput(e.target.value, logicSystem) })} fullWidth variant="outlined" />
+      <Box>
+        <Typography variant="subtitle2" sx={{ mb: 0.5 }}>Truth values</Typography>
+        {sentenceLetters.length === 0 ? (
+          <Typography variant="body2" color="text.secondary">Enter a valid statement</Typography>
+        ) : (
+          <Stack spacing={0.5}>
+            {sentenceLetters.map((letter) => (
+              <FormControl key={letter}>
+                <Stack direction="row" alignItems="center" spacing={2}>
+                  <Typography sx={{ minWidth: 32 }}>
+                    {displayFormulaInput(letter, logicSystem)}
+                  </Typography>
+                  <RadioGroup
+                    row
+                    aria-label={`${letter} truth value`}
+                    value={String(interpretation[letter] ?? false)}
+                    onChange={(event) => setAssignment(letter, event.target.value === 'true')}
+                  >
+                    <FormControlLabel value="true" control={<Radio size="small" />} label="T" />
+                    <FormControlLabel value="false" control={<Radio size="small" />} label="F" />
+                  </RadioGroup>
+                </Stack>
+              </FormControl>
+            ))}
+          </Stack>
+        )}
+      </Box>
       <TextField label="Prompt" multiline minRows={1} value={prompt} onChange={(e) => onChange({ ...value, prompt: e.target.value })} fullWidth variant="outlined" />
     </Stack>
   )

@@ -19,9 +19,7 @@ export default async function(
     question, answer, givenans, partialcredit, points, cheat, options
 ) {
     const expectedRow = answer?.row || [];
-    const expectedTv = answer?.tv;
     const givenRow = Array.isArray(givenans?.row) ? givenans.row : [];
-    const givenTv = ("compound" in (givenans || {})) ? givenans.compound : null;
 
     let correct = true;
     const offcells = [];
@@ -49,24 +47,10 @@ export default async function(
             : 0;
     }
 
-    let compoundScore = 0;
-    if (givenTv !== null && typeof expectedTv !== 'undefined') {
-        if (normalizeCell(givenTv) !== expectedTv) {
-            correct = false;
-            compoundScore = 0;
-        } else {
-            compoundScore = 1;
-        }
-    } else if (typeof expectedTv !== 'undefined') {
-        compoundScore = 0;
-    }
-
     const rv = {
         successstatus: (correct ? "correct" : "incorrect"),
         points: (correct ? points : 0),
-        componentScores: typeof expectedTv !== 'undefined'
-            ? [rowScore, compoundScore]
-            : [rowScore],
+        componentScores: [rowScore],
     };
 
     if (cheat && offcells.length > 0) {
