@@ -15,7 +15,7 @@ const createAppTheme = (isDark) => {
 
 export function ThemeProvider({ children }) {
   const [theme, setTheme] = useState(() => {
-    const savedTheme = localStorage.getItem('theme') || 'default'
+    const savedTheme = localStorage.getItem('theme') || 'dark'
     return createAppTheme(savedTheme === 'dark')
   })
 
