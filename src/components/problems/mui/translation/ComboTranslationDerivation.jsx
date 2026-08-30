@@ -6,7 +6,7 @@ import CloseIcon from '@mui/icons-material/Close'
 import InstructorQuestionEditor from '../../InstructorQuestionEditor.jsx'
 import StatusBanner, { isTerminalStatus } from '../../../ui/StatusBanner.jsx'
 import { useTheme, useMediaQuery } from '@mui/material'
-import { ProblemCard } from '../frame/ProblemFrame.jsx'
+import DerivationCard from '../../derivation/DerivationCard.jsx'
 import ProblemSetButtons from '../frame/ProblemSetButtons.jsx'
 import FormulaInput from '../../../ui/logicpenguin/formula-input.js'
 import SymbolButtonRow from '../../../ui/logicpenguin/SymbolButtonRow.jsx'
@@ -469,7 +469,7 @@ export default function ComboTranslationDerivation({
     <>
       {fullScreenOverlay}
       <Stack spacing={3} sx={{ px: 0, width: '100%' }}>
-        <ProblemCard minHeight="auto" cardSx={{ p: { xs: 2, md: 2 } }}>
+        <DerivationCard>
           <Stack spacing={3}>
             {isInstructorView && proof && (
               <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
@@ -536,7 +536,7 @@ export default function ComboTranslationDerivation({
               />
             )}
           </Stack>
-        </ProblemCard>
+        </DerivationCard>
 
         {!parseStatus.ok && parseStatus.reason && (
           <Alert severity="info">{parseStatus.reason}</Alert>

@@ -76,7 +76,6 @@ const problemTypeLabels = {
   'derivation': 'Derivations',
   'derivation-calgary': 'Derivations',
   'derivation-hurley': 'Derivations',
-  'true-false': 'True or false',
   'evaluate-truth': 'Evaluate truth',
   'valid-correct-sound': 'Validity and soundness',
 }
@@ -183,13 +182,6 @@ function ProofTabs({
         ...base,
         premises: [],
         conclusion: '',
-      }
-    }
-    if (type === 'true-false') {
-      return {
-        ...base,
-        trueFalse: { prompt: '' },
-        answer: false,
       }
     }
     if (type === 'evaluate-truth') {

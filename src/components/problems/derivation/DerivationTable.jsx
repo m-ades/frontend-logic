@@ -13,7 +13,6 @@ import {
 import EditIcon from '@mui/icons-material/Edit'
 import { alpha } from '@mui/material/styles'
 import PromptText from '../../ui/PromptText.jsx'
-import ThemedCard from '../../ui/ThemedCard.jsx'
 import ProblemSetButtons from '../mui/frame/ProblemSetButtons.jsx'
 import { useMobileLogicKeyboardEnabled } from '../../ui/LogicKeyboard/index.js'
 import { getDerivationCheckerForLogicSystem } from '../../../lib/logicpenguin/checkers/derivation-by-logic-system.js'
@@ -77,6 +76,7 @@ import DerivationFormulaCell from './DerivationFormulaCell.jsx'
 import DerivationHeader from './DerivationHeader.jsx'
 import DerivationJustificationCell from './DerivationJustificationCell.jsx'
 import DerivationKeyboardRow from './DerivationKeyboardRow.jsx'
+import DerivationCard from './DerivationCard.jsx'
 import useDerivationAutoCheck from './useDerivationAutoCheck.js'
 
 function applyLineChange(lines, index, field, value) {
@@ -1071,7 +1071,7 @@ export default function DerivationTable({
     [canOpenFullScreen, onOpenFullScreen]
   )
 
-  const Wrapper = isFullScreen || hideActions ? Box : ThemedCard
+  const Wrapper = isFullScreen || hideActions ? Box : DerivationCard
   const wrapperSx = isFullScreen
     ? {
         py: 2,
@@ -1091,15 +1091,7 @@ export default function DerivationTable({
       }
     : hideActions
       ? { p: 0, position: 'relative', width: '100%' }
-      : {
-          p: { xs: 1.25, md: 2.5 },
-          width: 'fit-content',
-          maxWidth: '100%',
-          boxSizing: 'border-box',
-          borderRadius: 3,
-          border: (theme) => `1px solid ${theme.palette.divider}`,
-          position: 'relative',
-        }
+      : undefined
   const scoreLabel = isPhone && isFullScreen
     ? getDerivationScoreLabel({
         attemptCount,
@@ -1182,7 +1174,7 @@ export default function DerivationTable({
           isFullScreen={isFullScreen}
           onRuleInputModeChange={handleRuleInputModeChange}
           ruleInputMode={ruleInputMode}
-          usesNestedSubderivations={usesNestedSubderivations}
+          showDerivationLabel={usesNestedSubderivations && !isFixedProof}
         />
         <TableContainer
           component={Box}

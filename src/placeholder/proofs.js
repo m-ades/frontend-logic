@@ -169,21 +169,6 @@ const WORKSHEET_MULTIPLE_CHOICE = [
   }),
 ]
 
-const WORKSHEET_TRUE_FALSE = [
-  createProof(22, 'A', [], '', 'Is P • Q logically equivalent to Q • P?', {
-    type: 'true-false',
-    trueFalse: {
-      prompt: 'P • Q is logically equivalent to Q • P.',
-    },
-  }),
-  createProof(22, 'B', [], '', 'Is P ⊃ Q equivalent to ~P ∨ Q?', {
-    type: 'true-false',
-    trueFalse: {
-      prompt: 'P ⊃ Q is logically equivalent to ~P ∨ Q.',
-    },
-  }),
-]
-
 const WORKSHEET_EVALUATE_TRUTH = [
   createProof(23, 'A', [], '', 'Evaluate: P • Q when P is true and Q is false.', {
     type: 'evaluate-truth',
@@ -217,7 +202,6 @@ export const WORKSHEETS = [
   { id: 19, title: 'Test: Truth Tables', proofs: WORKSHEET_TRUTH_TABLES },
   { id: 20, title: 'Test: Symbolic Translation', proofs: WORKSHEET_SYMBOLIC_TRANSLATION },
   { id: 21, title: 'Test: Multiple Choice', proofs: WORKSHEET_MULTIPLE_CHOICE },
-  { id: 22, title: 'Test: True/False', proofs: WORKSHEET_TRUE_FALSE },
   { id: 23, title: 'Test: Evaluate Truth', proofs: WORKSHEET_EVALUATE_TRUTH },
   /* { id: 25, title: 'Test: Valid/Correct/Sound', proofs: WORKSHEET_VALID_CORRECT_SOUND }, */
 ]

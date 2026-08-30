@@ -2,6 +2,8 @@
 // checks a single-row truth table (atoms given) for a formula         //
 /////////////////////////////////////////////////////////////////////////
 
+import { gradeComponents } from '../component-grading.js';
+
 function normalizeCell(value) {
     if (value === true || value === false) {
         return value;
@@ -23,12 +25,10 @@ export default async function(
     const givenRow = Array.isArray(givenans?.row) ? givenans.row : [];
     const givenTv = ("compound" in (givenans || {})) ? givenans.compound : null;
 
-    let correct = true;
     const offcells = [];
     let rowScore = 0;
 
     if (givenRow.length !== expectedRow.length) {
-        correct = false;
         for (let i = 0; i < expectedRow.length; i++) {
             offcells.push(i);
         }
@@ -38,7 +38,6 @@ export default async function(
         for (let i = 0; i < expectedRow.length; i++) {
             const normalized = normalizeCell(givenRow[i]);
             if (normalized === null || normalized !== expectedRow[i]) {
-                correct = false;
                 offcells.push(i);
             } else {
                 correctCells += 1;
@@ -49,25 +48,16 @@ export default async function(
             : 0;
     }
 
-    let compoundScore = 0;
-    if (givenTv !== null && typeof expectedTv !== 'undefined') {
-        if (normalizeCell(givenTv) !== expectedTv) {
-            correct = false;
-            compoundScore = 0;
-        } else {
-            compoundScore = 1;
-        }
-    } else if (typeof expectedTv !== 'undefined') {
-        compoundScore = 0;
-    }
+    const compoundScore = givenTv !== null
+        && typeof expectedTv !== 'undefined'
+        && normalizeCell(givenTv) === expectedTv
+        ? 1
+        : 0;
 
-    const rv = {
-        successstatus: (correct ? "correct" : "incorrect"),
-        points: (correct ? points : 0),
-        componentScores: typeof expectedTv !== 'undefined'
-            ? [rowScore, compoundScore]
-            : [rowScore],
-    };
+    const earnedScores = typeof expectedTv !== 'undefined'
+        ? [rowScore, compoundScore]
+        : [rowScore];
+    const rv = gradeComponents(earnedScores, partialcredit, points);
 
     if (cheat && offcells.length > 0) {
         rv.offcells = offcells;

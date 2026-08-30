@@ -44,7 +44,7 @@ export default function Login() {
       if (isInstructorRole(user.role)) {
         navigate('/instructor/dashboard', { replace: true });
       } else {
-        navigate('/student/courses', { replace: true });
+        navigate('/student/dashboard', { replace: true });
       }
     }
   }, [authLoading, isAuthenticated, user, navigate]);
@@ -82,7 +82,7 @@ export default function Login() {
       const userWithRole = { ...data?.user, role };
       setStoredUser(userWithRole);
       login(dispatch, userWithRole);
-      navigate(role === 'instructor' ? '/instructor/dashboard' : '/student/courses');
+      navigate(role === 'instructor' ? '/instructor/dashboard' : '/student/dashboard');
     } catch (err) {
       setError(err?.message || 'Login failed.');
     } finally {

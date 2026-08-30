@@ -5,6 +5,7 @@ import MenuBookIcon from '@mui/icons-material/MenuBook'
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
 import AccessTimeIcon from '@mui/icons-material/AccessTime'
 import AssignmentIcon from '@mui/icons-material/Assignment'
+import PsychologyIcon from '@mui/icons-material/Psychology'
 import { HelpOutline as QuizIcon } from '@mui/icons-material'
 import SchoolIcon from '@mui/icons-material/School'
 import { ACTIVITY_TYPES } from '../../placeholder/courseActivities.js'
@@ -14,6 +15,8 @@ import { parseDueDateAsEastern } from '../../utils/easternTime.js'
 export default function ActivityCard({ activity, onClick, completedProofs }) {
   const getActivityIcon = () => {
     switch (activity.type) {
+      case ACTIVITY_TYPES.PRACTICE:
+        return <PsychologyIcon sx={{ fontSize: 22, color: 'primary.main' }} />
       case ACTIVITY_TYPES.READING:
         return <MenuBookIcon sx={{ fontSize: 22, color: 'primary.main' }} />
       case ACTIVITY_TYPES.HOMEWORK:

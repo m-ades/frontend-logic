@@ -455,7 +455,11 @@ function coursesReducer(state, action) {
       return { ...initialState };
 
     case "SET_LOADING":
-      return { ...state, loading: action.payload };
+      return {
+        ...state,
+        loading: action.payload,
+        error: action.payload ? null : state.error,
+      };
 
     case "SET_ERROR":
       return { ...state, error: action.payload, loading: false };
@@ -467,6 +471,13 @@ function coursesReducer(state, action) {
       return {
         ...state,
         courses: action.payload,
+      };
+
+    // initialized means the initial course graph has fully loaded
+    // consumers may treat missing collections as empty only after this point
+    case "FINISH_INITIALIZATION":
+      return {
+        ...state,
         loading: false,
         initialized: true,
       };
@@ -856,6 +867,7 @@ export async function initializeCourses(dispatch) {
           })
         );
       }
+      dispatch({ type: "FINISH_INITIALIZATION" });
     } catch (error) {
       dispatch({ type: "SET_ERROR", payload: error.message });
       console.error("Failed to initialize courses:", error);

@@ -5,6 +5,7 @@ import InstructorQuestionEditor from '../../InstructorQuestionEditor.jsx'
 import StatusBanner, { isTerminalStatus } from '../../../ui/StatusBanner.jsx'
 import { useTheme, useMediaQuery } from '@mui/material'
 import getSyntax from '../../../../lib/logicpenguin/symbolic/libsyntax.js'
+import { DEFAULT_QUESTION_CARD_MIN_HEIGHT } from '../frame/ProblemFrame.jsx'
 import ProblemSetButtons from '../frame/ProblemSetButtons.jsx'
 import FormulaInput from '../../../ui/logicpenguin/formula-input.js'
 import SymbolButtonRow from '../../../ui/logicpenguin/SymbolButtonRow.jsx'
@@ -299,7 +300,7 @@ export default function ComboTranslationTruthTable({
   return (
     <Stack spacing={3} sx={{ px: 0, width: '100%' }}>
       <Box className="logicpenguin" sx={{ width: '100%' }}>
-        <Box className="lp-problem-card">
+        <Box className="lp-problem-card" sx={{ minHeight: DEFAULT_QUESTION_CARD_MIN_HEIGHT }}>
           <Stack spacing={3} sx={{ p: { xs: 2, md: 2 } }}>
             {isInstructorView && proof && (
               <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>

@@ -4,6 +4,7 @@
  */
 import { useState, useEffect } from 'react'
 import { localCheck } from '../lib/logicpenguin/common.js'
+import { componentScorePercent } from '../lib/logicpenguin/component-grading.js'
 import { buildPersistedSubmissionState, shouldUseApiValidation, submitApiValidation } from '../utils/submissionRuntime.js'
 
 export function useProblemChecker({
@@ -100,10 +101,11 @@ export function useProblemChecker({
           setMessage('Error checking answer')
           return
         }
+        const partialScore = componentScorePercent(result.componentScores)
         const rawScore = result.successstatus === 'correct'
           ? 100
           : result.successstatus === 'partial'
-            ? 50
+            ? (partialScore ?? 50)
             : 0
         const nextAttempt = Math.min(attemptCount + 1, maxAttempts)
         setAttemptCount((prev) => Math.min(prev + 1, maxAttempts))

@@ -14,7 +14,6 @@ export const instructorProblemTypes = Object.freeze([
   { type: 'nonclassical-truth-table', label: 'Nonclassical truth table' },
   { type: 'symbolic-translation', label: 'Symbolic translation' },
   { type: 'multiple-choice', label: 'Multiple choice' },
-  { type: 'true-false', label: 'True or false' },
   { type: 'evaluate-truth', label: 'Evaluate truth' },
   { type: 'combo-translation-truth-table', label: 'Translation and truth table' },
   { type: 'combo-translation-derivation', label: 'Translation and derivation' },
@@ -29,4 +28,13 @@ const legacyInstructorProblemTypeSet = new Set([
 
 export function isInstructorProblemType(type) {
   return instructorProblemTypeSet.has(type) || legacyInstructorProblemTypeSet.has(type)
+}
+
+const instructorProblemTypeLabels = new Map(
+  instructorProblemTypes.map(({ type, label }) => [type, label])
+)
+
+export function getInstructorProblemTypeLabel(type) {
+  if (legacyInstructorProblemTypeSet.has(type)) return 'Derivation'
+  return instructorProblemTypeLabels.get(type) || type
 }

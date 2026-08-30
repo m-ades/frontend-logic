@@ -2,6 +2,7 @@ import * as React from 'react'
 import {
   Box,
   Button,
+  Chip,
   Dialog,
   DialogTitle,
   DialogContent,
@@ -18,6 +19,7 @@ import {
   IconButton,
   Radio,
   RadioGroup,
+  TableCell,
 } from '@mui/material'
 import EditIcon from '@mui/icons-material/Edit'
 import AddIcon from '@mui/icons-material/Add'
@@ -51,7 +53,10 @@ import {
   mapTranslationAnswer,
   parseTranslationAnswer,
 } from '../../lib/logicpenguin/translation-answer.js'
-import { isInstructorProblemType } from '../../lib/instructorProblemTypes.js'
+import { getInstructorProblemTypeLabel, isInstructorProblemType } from '../../lib/instructorProblemTypes.js'
+import TruthTableGrid from './truth-table/TruthTableGrid.jsx'
+import { TruthValueButton } from './truth-table/TruthTableControls.jsx'
+import { tokenizeTruthTableHeader } from './truth-table/truthTableUi.js'
 
 // deep merge. source overwrites. arrays replace.
 function deepMerge(target, source) {
@@ -1360,14 +1365,6 @@ function ProofArgumentExtractionEditorForm({ proof, value, onChange, logicSystem
   )
 }
 
-function buildTrueFalseSnapshot(proof, edited, existing) {
-  const tf = proof.trueFalse || {}
-  const e = existing && typeof existing === 'object' ? existing : {}
-  const prompt = edited.prompt ?? tf.prompt ?? proof.description ?? ''
-  const answer = edited.answer !== undefined ? edited.answer : (proof.answer ?? false)
-  return { [typeKey(e)]: 'true-false', prompt, answer: Boolean(answer) }
-}
-
 function buildEvaluateTruthSnapshot(proof, edited, existing, logicSystem = DEFAULT_LOGIC_SYSTEM) {
   const e = existing && typeof existing === 'object' ? existing : {}
   const statement = normalizeFormulaInput(edited.statement ?? proof.evaluateTruth ?? proof.description ?? '', logicSystem)
@@ -1392,14 +1389,27 @@ function buildSingleRowTruthTableSnapshot(proof, edited, existing, logicSystem =
   const sr = proof.singleRowTruthTable || {}
   const statement = normalizeFormulaInput(edited.statement ?? sr.statement ?? sr.formula ?? proof.description ?? '', logicSystem)
   const prompt = edited.prompt ?? sr.prompt ?? proof.description ?? ''
-  const editedInterp = edited.interpretation ?? sr.interpretation ?? {}
-  const hasEditedInterp = editedInterp && typeof editedInterp === 'object' && Object.keys(editedInterp).length > 0
-  const interp = hasEditedInterp ? editedInterp : (existing?.interpretation && typeof existing.interpretation === 'object' ? existing.interpretation : {})
+  const sourceInterpretation = edited.interpretation
+    ?? sr.interpretation
+    ?? existing?.interpretation
+    ?? {}
+  const Formula = getFormulaClass(getNotation(logicSystem))
+  const formula = Formula.from(statement)
+  const letters = formula.wellformed ? formula.allpletters : []
+  const interpretation = Object.fromEntries(
+    letters.map((letter) => [letter, sourceInterpretation[letter] ?? false])
+  )
   return {
     [typeKey(existing)]: 'single-row-truth-table',
     prompt,
     statement,
-    interpretation: interp,
+    interpretation,
+    partialCredit: Boolean(
+      edited.partialCredit
+      ?? existing?.partialCredit
+      ?? proof?.partialCredit
+      ?? false
+    ),
   }
 }
 
@@ -1429,24 +1439,6 @@ function buildComboSnapshot(proof, edited, existing, comboTypeKey, logicSystem =
     if (answer != null) patch.answer = answer
   }
   return patch
-}
-
-function TrueFalseEditorForm({ proof, value, onChange }) {
-  const tf = proof?.trueFalse || {}
-  const prompt = value.prompt ?? tf.prompt ?? proof?.description ?? ''
-  const answer = value.answer ?? proof?.answer ?? false
-  return (
-    <Stack spacing={2}>
-      <TextField label="Prompt" multiline minRows={2} value={prompt} onChange={(e) => onChange({ ...value, prompt: e.target.value })} fullWidth variant="outlined" />
-      <FormControl>
-        <Typography variant="subtitle2" sx={{ mb: 1 }}>Correct answer</Typography>
-        <RadioGroup row value={answer ? 'true' : 'false'} onChange={(e) => onChange({ ...value, answer: e.target.value === 'true' })}>
-          <FormControlLabel value="true" control={<Radio />} label="True" />
-          <FormControlLabel value="false" control={<Radio />} label="False" />
-        </RadioGroup>
-      </FormControl>
-    </Stack>
-  )
 }
 
 function EvaluateTruthEditorForm({ proof, value, onChange, logicSystem = DEFAULT_LOGIC_SYSTEM }) {
@@ -1505,10 +1497,65 @@ function SingleRowTruthTableEditorForm({ proof, value, onChange, logicSystem = D
   const sr = proof?.singleRowTruthTable || {}
   const statement = value.statement ?? sr.statement ?? proof?.description ?? ''
   const prompt = value.prompt ?? sr.prompt ?? proof?.description ?? ''
+  const interpretation = value.interpretation ?? sr.interpretation ?? {}
+  const partialCredit = value.partialCredit
+    ?? proof?.questionSnapshot?.partialCredit
+    ?? proof?.partialCredit
+    ?? false
+  const Formula = getFormulaClass(getNotation(logicSystem))
+  const formula = Formula.from(statement)
+  const sentenceLetters = formula.wellformed
+    ? [...formula.allpletters].sort((left, right) => left.localeCompare(right))
+    : []
+  const setAssignment = (letter, truthValue) => {
+    onChange({
+      ...value,
+      interpretation: {
+        ...interpretation,
+        [letter]: truthValue,
+      },
+    })
+  }
   return (
     <Stack spacing={2}>
       <TextField label="Statement" value={statement} onChange={(e) => onChange({ ...value, statement: displayFormulaInput(e.target.value, logicSystem) })} fullWidth variant="outlined" />
+      <Box>
+        <Typography variant="subtitle2" sx={{ mb: 0.5 }}>Truth values</Typography>
+        {sentenceLetters.length === 0 ? (
+          <Typography variant="body2" color="text.secondary">Enter a valid statement</Typography>
+        ) : (
+          <Stack spacing={0.5}>
+            {sentenceLetters.map((letter) => (
+              <FormControl key={letter}>
+                <Stack direction="row" alignItems="center" spacing={2}>
+                  <Typography sx={{ minWidth: 32 }}>
+                    {displayFormulaInput(letter, logicSystem)}
+                  </Typography>
+                  <RadioGroup
+                    row
+                    aria-label={`${letter} truth value`}
+                    value={String(interpretation[letter] ?? false)}
+                    onChange={(event) => setAssignment(letter, event.target.value === 'true')}
+                  >
+                    <FormControlLabel value="true" control={<Radio size="small" />} label="T" />
+                    <FormControlLabel value="false" control={<Radio size="small" />} label="F" />
+                  </RadioGroup>
+                </Stack>
+              </FormControl>
+            ))}
+          </Stack>
+        )}
+      </Box>
       <TextField label="Prompt" multiline minRows={1} value={prompt} onChange={(e) => onChange({ ...value, prompt: e.target.value })} fullWidth variant="outlined" />
+      <FormControlLabel
+        control={(
+          <Checkbox
+            checked={Boolean(partialCredit)}
+            onChange={(event) => onChange({ ...value, partialCredit: event.target.checked })}
+          />
+        )}
+        label="Allow partial credit"
+      />
     </Stack>
   )
 }
@@ -1517,16 +1564,73 @@ function PartialTruthTableEditorForm({ proof, value, onChange, logicSystem = DEF
   const pt = proof?.partialTruthTable || {}
   const statement = value.statement ?? pt.statement ?? pt.formula ?? proof?.description ?? ''
   const prompt = value.prompt ?? pt.prompt ?? proof?.description ?? ''
-  const rowStr = Array.isArray(value.row) ? value.row.map((v) => (v === true || v === 'T' ? 'T' : v === false || v === 'F' ? 'F' : '')).join(',') : (Array.isArray(pt.row) ? pt.row.map((v) => (v === true ? 'T' : v === false ? 'F' : '')).join(',') : '')
-  const setRow = (str) => {
-    const arr = str ? str.split(',').map((c) => (c.trim() === 'T' ? true : c.trim() === 'F' ? false : null)) : []
-    onChange({ ...value, row: arr })
+  const notation = getNotation(logicSystem)
+  const syntax = React.useMemo(() => getSyntax(notation), [notation])
+  const Formula = React.useMemo(() => getFormulaClass(notation), [notation])
+  const headerTokens = React.useMemo(() => {
+    if (!statement) return []
+    const formula = Formula.from(statement)
+    return formula.wellformed ? tokenizeTruthTableHeader(statement, syntax) : []
+  }, [Formula, statement, syntax])
+  const savedRow = Array.isArray(value.row)
+    ? value.row
+    : (Array.isArray(pt.row) ? pt.row : [])
+  const row = headerTokens.map((_, index) => {
+    const cell = savedRow[index]
+    if (cell === true || cell === 'T' || cell === 't') return 'T'
+    if (cell === false || cell === 'F' || cell === 'f') return 'F'
+    return ''
+  })
+  const setCell = (index, cell) => {
+    const nextRow = row.map((current, currentIndex) => {
+      const next = currentIndex === index ? cell : current
+      if (next === 'T') return true
+      if (next === 'F') return false
+      return null
+    })
+    onChange({ ...value, row: nextRow })
   }
+  const tables = [{ tokens: headerTokens, headerTokens, rows: [row] }]
   return (
     <Stack spacing={2}>
-      <TextField label="Statement" value={statement} onChange={(e) => onChange({ ...value, statement: displayFormulaInput(e.target.value, logicSystem) })} fullWidth variant="outlined" />
+      <TextField
+        label="Statement"
+        value={statement}
+        onChange={(e) => onChange({
+          ...value,
+          statement: displayFormulaInput(e.target.value, logicSystem),
+          row: [],
+        })}
+        fullWidth
+        variant="outlined"
+      />
       <TextField label="Prompt" value={prompt} onChange={(e) => onChange({ ...value, prompt: e.target.value })} fullWidth variant="outlined" />
-      <TextField label="Given row" value={rowStr} onChange={(e) => setRow(e.target.value)} fullWidth variant="outlined" placeholder="T, F, , T" />
+      <Box>
+        <Typography variant="subtitle2" sx={{ mb: 0.5 }}>Given row</Typography>
+        {headerTokens.length === 0 ? (
+          <Typography variant="body2" color="text.secondary">Enter a valid statement</Typography>
+        ) : (
+          <TruthTableGrid
+            tables={tables}
+            tableInputs={[[row]]}
+            combined={false}
+            readOnly={false}
+            withSelectors={false}
+            allowRowSelection={false}
+            shrinkWrap
+            renderCell={({ colIndex, cellValue, cellSx }) => (
+              <TableCell key={`partial-editor-cell-${colIndex}`} align="center" sx={cellSx}>
+                <TruthValueButton
+                  value={cellValue ?? ''}
+                  onChange={(nextValue) => setCell(colIndex, nextValue)}
+                  ariaLabel={`Given value for ${headerTokens[colIndex]}`}
+                  emptyLabel="?"
+                />
+              </TableCell>
+            )}
+          />
+        )}
+      </Box>
     </Stack>
   )
 }
@@ -1661,11 +1765,6 @@ function InstructorQuestionEditorInner({
         ...(proof.ruleset && typeof proof.ruleset === 'object' ? proof.ruleset : {}),
       }
     }
-    if (proof?.type === 'true-false') {
-      const tf = proof.trueFalse || {}
-      base.prompt = tf.prompt ?? proof.description ?? ''
-      base.answer = proof.answer ?? false
-    }
     if (proof?.type === 'evaluate-truth') {
       base.statement = proof.evaluateTruth ?? proof.description ?? ''
       base.answer = proof.answer ?? false
@@ -1675,6 +1774,7 @@ function InstructorQuestionEditorInner({
       base.statement = sr.statement ?? sr.formula ?? proof.description ?? ''
       base.prompt = sr.prompt ?? proof.description ?? ''
       base.interpretation = typeof sr.interpretation === 'object' && sr.interpretation !== null ? { ...sr.interpretation } : {}
+      base.partialCredit = proof?.questionSnapshot?.partialCredit ?? Boolean(proof.partialCredit)
     }
     if (proof?.type === 'partial-truth-table') {
       const pt = proof.partialTruthTable || {}
@@ -1725,7 +1825,6 @@ function InstructorQuestionEditorInner({
     proof?.prems,
     proof?.conclusion,
     proof?.conc,
-    proof?.trueFalse,
     proof?.evaluateTruth,
     proof?.singleRowTruthTable,
     proof?.partialTruthTable,
@@ -1760,8 +1859,6 @@ function InstructorQuestionEditorInner({
         question_snapshot = buildNonClassicalTruthTableSnapshot(proof, editValue, existing, activeLogicSystem)
       } else if (isDerivationProblemType(proof.type)) {
         question_snapshot = buildDerivationSnapshot(proof, editValue, existing, activeLogicSystem)
-      } else if (proof.type === 'true-false') {
-        question_snapshot = buildTrueFalseSnapshot(proof, editValue, existing)
       } else if (proof.type === 'evaluate-truth') {
         question_snapshot = buildEvaluateTruthSnapshot(proof, editValue, existing, activeLogicSystem)
       } else if (proof.type === 'symbolic-translation') {
@@ -1946,7 +2043,10 @@ function InstructorQuestionEditorInner({
     <>
       {triggerEl}
       <Dialog open={open} onClose={() => setOpen(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>{isCreate ? 'Create question' : 'Edit question'}</DialogTitle>
+        <DialogTitle sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          {isCreate ? 'Create question' : 'Edit question'}
+          <Chip label={getInstructorProblemTypeLabel(proof.type)} size="small" variant="outlined" />
+        </DialogTitle>
         <DialogContent>
           <Stack spacing={2} sx={{ mt: 0.5 }}>
             {error && (
@@ -1972,9 +2072,6 @@ function InstructorQuestionEditorInner({
             )}
             {isDerivationProblemType(proof.type) && (
               <DerivationEditorForm proof={proof} value={editValue} onChange={setEditValue} logicSystem={activeLogicSystem} />
-            )}
-            {proof.type === 'true-false' && (
-              <TrueFalseEditorForm proof={proof} value={editValue} onChange={setEditValue} />
             )}
             {proof.type === 'evaluate-truth' && (
               <EvaluateTruthEditorForm proof={proof} value={editValue} onChange={setEditValue} logicSystem={activeLogicSystem} />

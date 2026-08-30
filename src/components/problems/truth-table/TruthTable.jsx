@@ -505,8 +505,7 @@ export default function TruthTable({
       </Stack>
     ) : (
       <ProblemFrame
-        minHeight="auto"
-        contentSized
+        expandForContent
         status={status}
         message={message}
         onCloseStatus={() => setMessage('')}

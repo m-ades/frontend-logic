@@ -483,8 +483,6 @@ function TruthTableEditorContent({
     return (
       <ProblemFrame
         problemLabel={problemLabel}
-        minHeight="auto"
-        cardMaxWidth="760px"
         isInstructorView={isInstructorView}
         onEditQuestion={onEditQuestion}
         editorNode={editorNode}
@@ -509,7 +507,7 @@ function TruthTableEditorContent({
     : null
 
   const tableCard = (
-    <Box>
+    <Box sx={{ width: 'fit-content', maxWidth: '100%' }}>
       <Stack spacing={2}>
         {(promptContent || statementText) && (
           <Stack spacing={1}>
@@ -625,8 +623,7 @@ function TruthTableEditorContent({
     ) : (
       <ProblemFrame
         problemLabel={problemLabel}
-        minHeight="auto"
-        cardMaxWidth="760px"
+        expandForContent
         isInstructorView={isInstructorView}
         onEditQuestion={onEditQuestion}
         status={status}
@@ -642,8 +639,7 @@ function TruthTableEditorContent({
             attemptCount={attemptCount}
             attemptLimit={attemptLimit}
             isInstructorView={isInstructorView}
-            navigationPlacement="separate"
-            sx={{ mt: 0, maxWidth: '760px' }}
+            sx={{ mt: 0 }}
           />
         ) : null}
         editorNode={editorNode}

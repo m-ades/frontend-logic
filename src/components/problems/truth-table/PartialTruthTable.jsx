@@ -10,6 +10,7 @@ import {
 import InstructorQuestionEditor from '../InstructorQuestionEditor.jsx'
 import { useTheme } from '@mui/material/styles'
 import getFormulaClass from '../../../lib/logicpenguin/symbolic/formula.js'
+import getSyntax from '../../../lib/logicpenguin/symbolic/libsyntax.js'
 import { multiTables } from '../../../lib/logicpenguin/symbolic/libsemantics.js'
 import { displayIndexedSymbolsForNotation } from '../../../lib/indexedSymbols.js'
 import ProblemSetButtons from '../mui/frame/ProblemSetButtons.jsx'
@@ -18,6 +19,7 @@ import TruthTableGrid from './TruthTableGrid.jsx'
 import { useProblemChecker } from '../../../hooks/useProblemChecker.js'
 import { rowsEqual, clearDebounce, scheduleDebouncedChange } from '../../../utils/tablePerf.js'
 import { getNotation } from '../../../lib/logicSystems.js'
+import { tokenizeTruthTableHeader } from './truthTableUi.js'
 
 const toTruth = (value) => {
   if (value === true || value === 'T' || value === 't' || value === 1) return true
@@ -52,6 +54,7 @@ export default function PartialTruthTable({
   const editorRef = useRef(null)
   const openEdit = () => editorRef.current?.open?.()
   const notation = getNotation(logicSystem)
+  const syntax = useMemo(() => getSyntax(notation), [notation])
   const Formula = useMemo(() => getFormulaClass(notation), [notation])
   const statement = problem?.statement || problem?.formula || ''
   const prompt = problem?.prompt || ''
@@ -140,10 +143,10 @@ export default function PartialTruthTable({
   const tables = useMemo(
     () => [{
       tokens,
-      headerTokens: tokens.map((token) => displayIndexedSymbolsForNotation(token, notation)),
+      headerTokens: tokenizeTruthTableHeader(statement, syntax),
       rows: [rowInputs],
     }],
-    [notation, rowInputs, tokens]
+    [rowInputs, statement, syntax, tokens]
   )
   const selectedGridColumns = useMemo(
     () => selectedColumns.map((colIndex) => ({ tableIndex: 0, colIndex })),
@@ -154,8 +157,7 @@ export default function PartialTruthTable({
     <ProblemFrame
       problemLabel={problemLabel}
       prompt={prompt}
-      minHeight="200px"
-      contentSized
+      expandForContent
       isInstructorView={isInstructorView && !!proof}
       onEditQuestion={proof ? openEdit : undefined}
       status={status}
@@ -190,6 +192,7 @@ export default function PartialTruthTable({
         selectedColumns={selectedGridColumns}
         onToggleColumn={(_, colIndex) => toggleColumn(colIndex)}
         withSelectors
+        allowRowSelection={false}
         renderCell={({ colIndex, cellValue, isHighlighted, cellSx }) => {
           const isEditable = editableIndices[colIndex]
           const value = cellValue ?? ''

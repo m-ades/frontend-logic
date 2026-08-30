@@ -16,7 +16,7 @@ import {
   useMediaQuery,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
-import { Edit as EditIcon } from "@mui/icons-material";
+import { Edit as EditIcon, Psychology as PracticeIcon } from "@mui/icons-material";
 import {
   Lock,
   Unlock,
@@ -24,7 +24,6 @@ import {
   FileEdit,
   CheckCircle,
   Plus,
-  Brain,
 } from "lucide-react";
 import { formatEasternDateTime } from "../../utils/easternTime.js";
 
@@ -54,7 +53,7 @@ export default function AssignmentTable({
       <Paper elevation={2} sx={{ width: "100%", overflow: "hidden" }}>
         <Box sx={{ textAlign: "center", py: 8 }}>
           {isPractice && (
-            <Brain size={48} color="#999" style={{ marginBottom: 16 }} />
+            <PracticeIcon sx={{ fontSize: 48, color: "text.disabled", mb: 2 }} />
           )}
           <Typography variant="h6" component="h2" color="text.secondary" gutterBottom>
             {emptyMessage.title}
@@ -114,7 +113,7 @@ export default function AssignmentTable({
                       spacing={1}
                       sx={{ minWidth: 0 }}
                     >
-                      {isPractice && <Brain size={16} color="#666" />}
+                      {isPractice && <PracticeIcon sx={{ fontSize: 16, color: "text.secondary" }} />}
                       <Typography
                         variant="body2"
                         fontWeight={500}
@@ -302,7 +301,7 @@ export default function AssignmentTable({
                 <TableRow key={item.id} hover>
                   <TableCell sx={{ width: "25%", overflow: "hidden" }}>
                     <Box sx={{ display: "flex", alignItems: "center", gap: 1, minWidth: 0, overflow: "hidden" }}>
-                      {isPractice && <Brain size={16} color="#666" />}
+                      {isPractice && <PracticeIcon sx={{ fontSize: 16, color: "text.secondary" }} />}
                       <Typography
                         variant="body2"
                         fontWeight={500}

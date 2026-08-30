@@ -1,5 +1,13 @@
 import { useCallback, useEffect, useMemo, useState, useRef } from 'react'
-import { Box, FormControl, FormControlLabel, FormLabel, Radio, RadioGroup, Typography } from '@mui/material'
+import {
+  Box,
+  FormControl,
+  FormControlLabel,
+  FormLabel,
+  Radio,
+  RadioGroup,
+  Typography,
+} from '@mui/material'
 import InstructorQuestionEditor from '../InstructorQuestionEditor.jsx'
 import getFormulaClass from '../../../lib/logicpenguin/symbolic/formula.js'
 import getSyntax from '../../../lib/logicpenguin/symbolic/libsyntax.js'
@@ -119,7 +127,6 @@ export default function SingleRowTruthTable({
     savedState?.compound !== undefined ? toSymbol(savedState.compound) : ''
   )
   const [selectedColumns, setSelectedColumns] = useState([])
-  const [selectedRows, setSelectedRows] = useState([])
   const onStateChangeTimerRef = useRef(null)
 
   useEffect(() => {
@@ -152,6 +159,7 @@ export default function SingleRowTruthTable({
     answer: expectedAnswer,
     problemType: 'single-row-truth-table',
     question: problem,
+    options: { partialCredit: Boolean(proof?.partialCredit ?? problem?.partialCredit) },
     getAnswer: () => ({
       row: rowInputs.map(toSymbol),
       compound: toSymbol(compoundInput),
@@ -187,11 +195,11 @@ export default function SingleRowTruthTable({
 
   const handleCompoundChange = (value) => {
     if (readOnly || isLocked) return
-    const nextValue = value || ''
-    setCompoundInput(nextValue)
-    scheduleStateChange(buildDraftState(rowInputs, nextValue))
+    const next = value || ''
+    setCompoundInput(next)
     setStatus('unanswered')
     setMessage('')
+    scheduleStateChange(buildDraftState(rowInputs, next))
   }
 
   const toggleColumn = (_tableIndex, colIndex) => {
@@ -200,11 +208,6 @@ export default function SingleRowTruthTable({
         ? prev.filter((entry) => !(entry.tableIndex === 0 && entry.colIndex === colIndex))
         : [...prev, { tableIndex: 0, colIndex }]
     ))
-  }
-  const toggleRow = (rowIndex) => {
-    setSelectedRows((prev) =>
-      prev.includes(rowIndex) ? prev.filter((entry) => entry !== rowIndex) : [...prev, rowIndex]
-    )
   }
   const columns = useMemo(
     () => (headerTokens.length > 0 ? headerTokens : tokens).map((token) => ({ token, ariaLabel: getTokenSpeechLabel(token) })),
@@ -223,10 +226,9 @@ export default function SingleRowTruthTable({
       combined={false}
       readOnly={readOnlyTable}
       isCellReadOnly={({ colIndex }) => isAtomicToken(tokens[colIndex])}
+      allowRowSelection={false}
       selectedColumns={selectedColumns}
-      selectedRows={selectedRows}
       onToggleColumn={toggleColumn}
-      onToggleRow={toggleRow}
       onCellChange={(_, __, colIndex, value) => handleCellChange(colIndex, value)}
     />
   )
@@ -245,8 +247,7 @@ export default function SingleRowTruthTable({
     <ProblemFrame
       problemLabel={problemLabel}
       prompt={prompt}
-      minHeight="260px"
-      contentSized
+      expandForContent
       isInstructorView={isInstructorView && !!proof}
       onEditQuestion={proof ? openEdit : undefined}
       status={status}
@@ -288,22 +289,14 @@ export default function SingleRowTruthTable({
       </Box>
       <Box sx={{ mt: 2 }}>
         <FormControl component="fieldset" variant="standard" sx={{ width: '100%' }}>
-          <FormLabel component="legend">Truth value of compound statement:</FormLabel>
+          <FormLabel component="legend">Truth value of compound statement</FormLabel>
           <RadioGroup
-            value={compoundInput === 'T' ? 'true' : compoundInput === 'F' ? 'false' : ''}
-            onChange={(event) => handleCompoundChange(event.target.value === 'true' ? 'T' : 'F')}
+            value={compoundInput}
+            onChange={(event) => handleCompoundChange(event.target.value)}
             name={`single-row-truth-value-${assignmentQuestionId ?? 'local'}`}
           >
-            <FormControlLabel
-              value="true"
-              control={<Radio disabled={readOnly || isLocked} />}
-              label="True"
-            />
-            <FormControlLabel
-              value="false"
-              control={<Radio disabled={readOnly || isLocked} />}
-              label="False"
-            />
+            <FormControlLabel value="T" control={<Radio disabled={readOnly || isLocked} />} label="True" />
+            <FormControlLabel value="F" control={<Radio disabled={readOnly || isLocked} />} label="False" />
           </RadioGroup>
         </FormControl>
       </Box>
@@ -313,11 +306,11 @@ export default function SingleRowTruthTable({
             {renderTableSet([[expectedRow]], true)}
             <FormControl component="fieldset" sx={{ width: '100%' }}>
               <RadioGroup
-                value={expectedCompound === 'T' ? 'true' : 'false'}
+                value={expectedCompound}
                 name={`single-row-truth-value-answer-${assignmentQuestionId ?? 'local'}`}
               >
-                <FormControlLabel value="true" control={<Radio disabled />} label="True" />
-                <FormControlLabel value="false" control={<Radio disabled />} label="False" />
+                <FormControlLabel value="T" control={<Radio disabled />} label="True" />
+                <FormControlLabel value="F" control={<Radio disabled />} label="False" />
               </RadioGroup>
             </FormControl>
           </Box>

@@ -14,6 +14,7 @@ import { isInstructorRole } from "../../utils/auth.js";
 import { AppRuntimeProvider } from "../../context/AppRuntimeContext.jsx";
 import { createAppRuntime } from "../../runtime/appRuntime.js";
 import ShellFrame from "./ShellFrame.jsx";
+import LoadingSpinner from "../ui/LoadingSpinner.jsx";
 
 const TEXT_SIZE_STORAGE_KEY = "logicapp_text_size";
 const TEXT_SIZE_OPTIONS = {
@@ -50,7 +51,7 @@ function AppShell({ children }) {
   const authDispatch = useAuthDispatch();
   const coursesDispatch = useCoursesDispatch();
   const coursesState = useCoursesState();
-  const { initialized } = coursesState;
+  const { error: coursesError, initialized } = coursesState;
   const [isAccountSettingsOpen, setIsAccountSettingsOpen] = useState(false);
   const [textSize, setTextSize] = useState(readTextSize);
 
@@ -92,6 +93,9 @@ function AppShell({ children }) {
     routeKind,
     user,
   });
+  const pageContent = !initialized && !coursesError
+    ? <LoadingSpinner label="Loading course..." />
+    : children;
 
   const handleSignOut = async () => {
     try {
@@ -120,7 +124,7 @@ function AppShell({ children }) {
         onTextSizeChange={setTextSize}
         logicSystem={logicSystem}
       >
-        {children}
+        {pageContent}
       </ShellFrame>
     </AppRuntimeProvider>
   );

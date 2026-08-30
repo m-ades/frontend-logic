@@ -1,15 +1,14 @@
 import { useEffect, useMemo, useCallback, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
-import { Box, Tabs, Tab, Typography, CardContent, Chip, Stack, LinearProgress } from '@mui/material'
-import LockIcon from '@mui/icons-material/Lock'
-import ThemedCard from '../components/ui/ThemedCard.jsx'
+import { Box, Tabs, Tab, Typography } from '@mui/material'
 import ActivityAccordion from '../components/ui/ActivityAccordion.jsx'
+import ActivityRow from '../components/ui/ActivityRow.jsx'
 import { ACTIVITY_TYPES } from '../placeholder/courseActivities.js'
 import { formatDateTime } from '../utils/formatting.js'
 import { parseDueDateAsEastern } from '../utils/easternTime.js'
 import { compareSubchapterLabels, sortAssignmentsBySubchapter } from '../utils/assignmentSort.js'
-import { API_CONFIG, fetchJson, getActiveUserId } from '../utils/api.js'
+import { fetchJson, getActiveUserId } from '../utils/api.js'
 import { useAppRuntime } from '../hooks/useAppRuntime.js'
 
 const buildCourseStructure = (assignments, sectionTitle) => {
@@ -25,7 +24,6 @@ const buildCourseStructure = (assignments, sectionTitle) => {
       title: assignment.title,
       description: assignment.description || '',
       dueDate: assignment.due_at ?? assignment.due_date,
-      originalDueDate: assignment.due_at ?? assignment.due_date ?? null,
       policy: assignment.policy ?? null,
       type: ACTIVITY_TYPES.HOMEWORK,
       worksheet: { id: assignment.id, proofs: [] },
@@ -83,7 +81,6 @@ export default function Assignments() {
     user,
     activeCourseId,
   } = useAppRuntime()
-  const courseId = activeCourseId ?? API_CONFIG.courseId
   const navigate = useNavigate()
   const courseIdForApi = sandbox ? null : (activeCourseId ?? null)
   const userId = sandbox ? user.id : getActiveUserId()
@@ -126,15 +123,8 @@ export default function Assignments() {
     enabled: !sandbox && !!courseIdForApi,
   })
 
-  const gradesQuery = useQuery({
-    queryKey: ['user-grades', userId],
-    queryFn: () => fetchJson(`/api/users/${userId}/grades`),
-    enabled: !sandbox && !!userId,
-  })
-
   const assignments = sandbox ? sandboxData.assignments : (assignmentsQuery.data ?? [])
-  const grades = sandbox ? sandboxData.grades : (gradesQuery.data ?? [])
-  const isLoadingAssignments = sandbox ? false : (assignmentsQuery.isPending || gradesQuery.isPending)
+  const isLoadingAssignments = sandbox ? false : assignmentsQuery.isPending
 
   const gradedAssignments = useMemo(
     () =>
@@ -166,12 +156,6 @@ export default function Assignments() {
       .filter(Boolean)
     return new Set(ids)
   }, [gradedAssignments])
-
-  const averagePercent = useMemo(() => {
-    const totalPoints = (grades || []).reduce((sum, g) => sum + (g.max_score || 0), 0)
-    const earnedPoints = (grades || []).reduce((sum, g) => sum + (g.final_score || 0), 0)
-    return totalPoints > 0 ? (earnedPoints / totalPoints) * 100 : null
-  }, [grades])
 
   const getCompletionStatus = useCallback(
     (activityId) => completedAssignments.has(activityId),
@@ -234,7 +218,7 @@ export default function Assignments() {
     }
   }
 
-  const renderActivity = (activity, { chapter, subchapter }, datePrefix, showCompletionChip) => {
+  const renderActivity = (activity, datePrefix, showCompletionChip) => {
     const policy = activity.policy
     const extensionDueLabel = policy?.extension_due_at
       ? formatDateTime(policy.extension_due_at)
@@ -244,149 +228,82 @@ export default function Assignments() {
       : null
     const totalQuestions = Number(activity.questionCount) || 0
     const completedQuestions = Math.min(Number(activity.answeredCount) || 0, totalQuestions)
-    const completionValue = totalQuestions > 0 ? (completedQuestions / totalQuestions) * 100 : 0
+    const isCompleted = getCompletionStatus(activity.id)
+    const isPastDue = Boolean(
+      activity.dueDate && !isCompleted && parseDueDateAsEastern(activity.dueDate, activity.dueTime) < new Date()
+    )
+    const typeLabel =
+      activity.type === ACTIVITY_TYPES.HOMEWORK ? 'Homework' : activity.type === ACTIVITY_TYPES.QUIZ ? 'Quiz' : 'Exam'
+    const noteLines = [
+      extensionDueLabel && `Extension: ${extensionDueLabel}`,
+      accommodationDueLabel && `Accommodation: ${accommodationDueLabel}`,
+      policy?.late_penalty_waived && 'Late penalty waived',
+    ].filter(Boolean)
+    const chips = [
+      isPastDue && { label: 'Past due', color: 'error' },
+      showCompletionChip && isCompleted && { label: 'Completed', color: 'success' },
+      { label: typeLabel, color: 'primary', variant: 'outlined' },
+    ].filter(Boolean)
+
     return (
-    <ThemedCard
-      key={activity.id}
-      sx={{ cursor: 'pointer', '&:hover': { boxShadow: 4 } }}
-      onClick={() => handleActivityClick(activity)}
-    >
-      <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
-        <Box
-          sx={{
-            display: 'grid',
-            gridTemplateColumns: {
-              xs: '1fr',
-              md: 'minmax(0, 1fr) clamp(240px, 28vw, 360px)',
-            },
-            columnGap: { xs: 0, md: 4 },
-            rowGap: 2,
-            alignItems: 'start',
-          }}
-        >
-          <Box sx={{ flex: 1, minWidth: 0 }}>
-            <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 1 }}>
-              <Typography variant="h6" component="h4" sx={{ wordBreak: 'break-word' }}>
-                {activity.title}
-              </Typography>
-              {activity.isLocked && (
-                <LockIcon sx={{ fontSize: '1.25rem', color: 'text.secondary', flexShrink: 0 }} />
-              )}
-            </Stack>
-            {activity.description && (
-              <Typography variant="body2" color="text.secondary" sx={{ wordBreak: 'break-word' }}>
-                {activity.description}
-              </Typography>
-            )}
-          </Box>
-          <Stack spacing={0.75} alignItems={{ xs: 'flex-start', md: 'flex-end' }} width="100%">
-            <Stack
-              direction="row"
-              spacing={1}
-              alignItems="center"
-              flexWrap={{ xs: 'wrap', md: 'nowrap' }}
-              justifyContent={{ xs: 'flex-start', md: 'flex-end' }}
-              sx={{ width: '100%' }}
-            >
-              {totalQuestions > 0 && (
-                <Stack
-                  direction="row"
-                  spacing={0.75}
-                  alignItems="center"
-                  sx={{
-                    minWidth: { xs: '100%', md: 'auto' },
-                    flex: { xs: '1 1 100%', md: '0 0 auto' },
-                    flexShrink: 0,
-                  }}
-                >
-                  <Box sx={{ width: { xs: '100%', md: 140 } }}>
-                    <LinearProgress
-                      variant="determinate"
-                      value={completionValue}
-                      aria-label={`Assignment completion: ${completedQuestions} of ${totalQuestions} complete`}
-                      sx={{
-                        height: 8,
-                        borderRadius: 999,
-                        bgcolor: 'action.hover',
-                        '& .MuiLinearProgress-bar': { borderRadius: 999 },
-                      }}
-                    />
-                  </Box>
-                  <Typography variant="body2" sx={{ color: 'text.primary', fontWeight: 600, whiteSpace: 'nowrap' }}>
-                    {completedQuestions}/{totalQuestions}
-                  </Typography>
-                </Stack>
-              )}
-              <Chip
-                label={activity.type === ACTIVITY_TYPES.HOMEWORK ? 'Homework' : activity.type === ACTIVITY_TYPES.QUIZ ? 'Quiz' : 'Exam'}
-                size="small"
-                color="primary"
-                variant="outlined"
-              />
-              {activity.dueDate && !getCompletionStatus(activity.id) && parseDueDateAsEastern(activity.dueDate, activity.dueTime) < new Date() && (
-                <Chip label="Past due" size="small" color="error" />
-              )}
-              {showCompletionChip && getCompletionStatus(activity.id) && (
-                <Chip label="Completed" size="small" color="success" />
-              )}
-            </Stack>
-            <Typography variant="body2" color="text.secondary" sx={{ width: '100%', textAlign: { xs: 'left', md: 'right' } }}>
-              {datePrefix}{formatDateTime(activity.dueDate) || 'No due date'}
-            </Typography>
-            {(extensionDueLabel || accommodationDueLabel) && (
-              <Stack spacing={0.25} alignItems={{ xs: 'flex-start', md: 'flex-end' }} sx={{ width: '100%' }}>
-                {extensionDueLabel && (
-                  <Typography variant="caption" color="text.secondary" align="right">
-                    Extension: {extensionDueLabel}
-                  </Typography>
-                )}
-                {accommodationDueLabel && (
-                  <Typography variant="caption" color="text.secondary" align="right">
-                    Accommodation: {accommodationDueLabel}
-                  </Typography>
-                )}
-              </Stack>
-            )}
-            {policy?.late_penalty_waived && (
-              <Typography variant="caption" color="text.secondary" align="right" sx={{ width: '100%', textAlign: { xs: 'left', md: 'right' } }}>
-                Late penalty waived
-              </Typography>
-            )}
-          </Stack>
-        </Box>
-      </CardContent>
-    </ThemedCard>
+      <ActivityRow
+        key={activity.id}
+        title={activity.title}
+        description={activity.description}
+        isLocked={activity.isLocked}
+        totalQuestions={totalQuestions}
+        completedQuestions={completedQuestions}
+        progressAriaLabel={`Assignment completion: ${completedQuestions} of ${totalQuestions} complete`}
+        chips={chips}
+        dateLabel={`${datePrefix}${formatDateTime(activity.dueDate) || 'No due date'}`}
+        noteLines={noteLines}
+        onClick={() => handleActivityClick(activity)}
+      />
     )
   }
 
-  const renderAssignmentsAccordion = (emptyText, datePrefix, showCompletionChip, defaultExpanded = true, showExpandAll = false, showCollapseAll = true, showExpandCollapseToggle = false) => (
+  const renderAssignmentsAccordion = (emptyText, datePrefix, showCompletionChip, defaultExpanded = true) => (
     <ActivityAccordion
-      title="Assignments"
       courseStructure={filteredStructure}
       isLoading={isLoadingAssignments}
       emptyText={emptyText}
       defaultExpanded={defaultExpanded}
-      showExpandAll={showExpandAll}
-      showCollapseAll={showCollapseAll}
-      showExpandCollapseToggle={showExpandCollapseToggle}
+      showExpandCollapseToggle
       defaultSubchapterExpanded
       persistKey={accordionStorageKey}
       storage={storageScope}
-      renderActivity={(activity, context) =>
-        renderActivity(activity, context, datePrefix, showCompletionChip)
-      }
+      renderActivity={(activity) => renderActivity(activity, datePrefix, showCompletionChip)}
     />
   )
 
   return (
     <Box>
+      <Typography variant="h4" component="h1" sx={{ mb: 3, fontWeight: 600 }}>
+        Assignments
+      </Typography>
       <Tabs
         value={tabValue}
         onChange={handleTabChange}
         variant="scrollable"
         scrollButtons="auto"
         allowScrollButtonsMobile
-        sx={{ borderBottom: 1, borderColor: 'divider', mb: 3, maxWidth: '100%' }}
+        sx={{
+          borderBottom: 1,
+          borderColor: 'divider',
+          mb: 3,
+          maxWidth: '100%',
+          minHeight: 44,
+          '& .MuiTab-root': {
+            textTransform: 'none',
+            fontWeight: 600,
+            fontSize: '0.95rem',
+            minHeight: 44,
+          },
+          '& .MuiTabs-indicator': {
+            height: 3,
+            borderRadius: '3px 3px 0 0',
+          },
+        }}
       >
         <Tab label="Upcoming" />
         <Tab label="All Assignments" />
@@ -394,15 +311,15 @@ export default function Assignments() {
       </Tabs>
 
       <TabPanel value={tabValue} index={0}>
-        {renderAssignmentsAccordion('No upcoming assignments', 'Due: ', false, true, false, false, true)}
+        {renderAssignmentsAccordion('No upcoming assignments', 'Due: ', false, true)}
       </TabPanel>
 
       <TabPanel value={tabValue} index={1}>
-        {renderAssignmentsAccordion('No assignments found', '', true, false, false, false, true)}
+        {renderAssignmentsAccordion('No assignments found', '', true, false)}
       </TabPanel>
 
       <TabPanel value={tabValue} index={2}>
-        {renderAssignmentsAccordion('No submitted assignments', 'Submitted: ', true, true, false, false, true)}
+        {renderAssignmentsAccordion('No submitted assignments', 'Submitted: ', true, true)}
       </TabPanel>
     </Box>
   )

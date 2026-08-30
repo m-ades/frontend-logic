@@ -3,9 +3,14 @@ import StatusBanner, { isTerminalStatus } from '../../../ui/StatusBanner.jsx'
 import PromptText from '../../../ui/PromptText.jsx'
 import EditQuestionButton from './EditQuestionButton.jsx'
 
-// shared shell for migrated problem cards
-// contentsized shrink wraps the card and action region to intrinsic content
-// intrinsic content remains capped at the available parent width
+// problem frame owns shared card prompt feedback action and editor placement
+// callers own only question specific content and checker behavior
+// optional regions render nothing when omitted
+// ordinary frames use the default reading width unless callers provide another limit
+// expanding frames start at that width and grow for intrinsically wide content
+// every card starts at the default minimum height and grows with its content
+export const DEFAULT_QUESTION_CARD_WIDTH = '57.5rem'
+export const DEFAULT_QUESTION_CARD_MIN_HEIGHT = '15rem'
 export const promptTextSx = { flex: 1 }
 export const choiceLabelSx = {
   '& .MuiFormControlLabel-label': { fontSize: '1rem' },
@@ -21,7 +26,7 @@ export const sectionLabelSx = {
   lineHeight: 1.2,
 }
 
-export function ProblemCard({ minHeight = '150px', cardMaxWidth = '100%', cardSx, children, ...props }) {
+export function ProblemCard({ minHeight = DEFAULT_QUESTION_CARD_MIN_HEIGHT, cardMaxWidth = '100%', cardSx, children, ...props }) {
   return (
     <Box sx={{ width: '100%', flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
       <Card
@@ -53,7 +58,7 @@ export default function ProblemFrame({
   problemLabel,
   prompt = '',
   promptSx,
-  minHeight = '150px',
+  minHeight = DEFAULT_QUESTION_CARD_MIN_HEIGHT,
   isInstructorView = false,
   onEditQuestion,
   status,
@@ -64,41 +69,41 @@ export default function ProblemFrame({
   editorNode,
   cardMaxWidth,
   cardSx,
-  contentSized = false,
+  expandForContent = false,
   children,
 }) {
   const resolvedPromptSx = promptSx ? { ...promptTextSx, ...promptSx } : promptTextSx
+  const defaultWidth = cardMaxWidth || DEFAULT_QUESTION_CARD_WIDTH
   const frameSx = {
-    width: contentSized ? 'fit-content' : '100%',
-    maxWidth: cardMaxWidth || '100%',
+    width: expandForContent ? 'fit-content' : `min(100%, ${defaultWidth})`,
+    minWidth: expandForContent ? `min(100%, ${defaultWidth})` : 0,
+    maxWidth: '100%',
     alignSelf: 'flex-start',
   }
-  const resolvedCardSx = contentSized
-    ? { width: 'fit-content', maxWidth: '100%', alignSelf: 'flex-start', ...cardSx }
+  const resolvedCardSx = expandForContent
+    ? { width: 'fit-content', minWidth: '100%', maxWidth: '100%', alignSelf: 'flex-start', ...cardSx }
     : cardSx
 
   return (
-    <Stack spacing={3} sx={{ px: 0, width: '100%', alignItems: contentSized ? 'flex-start' : 'stretch', flexGrow: 1 }}>
-      <Box sx={frameSx}>
-        <ProblemCard minHeight={minHeight} cardMaxWidth="100%" cardSx={resolvedCardSx}>
-            <Stack spacing={1.5} sx={{ px: { xs: 2, md: 2 }, pb: { xs: 2, md: 2 }, pt: { xs: 1.125, md: 1.375 }, position: 'relative' }}>
-              {problemLabel && (
-                <Box sx={{ color: 'text.secondary', fontSize: '0.875rem', lineHeight: 1.2, pr: 4 }}>
-                  {problemLabel}
-                </Box>
-              )}
-              {isInstructorView && onEditQuestion && (
-                <EditQuestionButton onClick={onEditQuestion} />
-              )}
-              {prompt && (
-                <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 0.5 }}>
-                  <PromptText content={prompt} sx={resolvedPromptSx} />
-                </Box>
-              )}
-              {children}
-            </Stack>
-        </ProblemCard>
-      </Box>
+    <Stack spacing={3} sx={{ ...frameSx, px: 0, alignItems: 'stretch' }}>
+      <ProblemCard minHeight={minHeight} cardMaxWidth="100%" cardSx={resolvedCardSx}>
+          <Stack spacing={1.5} sx={{ px: { xs: 2, md: 2 }, pb: { xs: 2, md: 2 }, pt: { xs: 1.125, md: 1.375 }, position: 'relative' }}>
+            {problemLabel && (
+              <Box sx={{ color: 'text.secondary', fontSize: '0.875rem', lineHeight: 1.2, pr: 4 }}>
+                {problemLabel}
+              </Box>
+            )}
+            {isInstructorView && onEditQuestion && (
+              <EditQuestionButton onClick={onEditQuestion} />
+            )}
+            {prompt && (
+              <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 0.5 }}>
+                <PromptText content={prompt} sx={resolvedPromptSx} />
+              </Box>
+            )}
+            {children}
+          </Stack>
+      </ProblemCard>
 
       {statusNode ?? (
         isTerminalStatus(status) && (

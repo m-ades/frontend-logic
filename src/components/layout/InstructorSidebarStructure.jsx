@@ -5,8 +5,8 @@ import {
   AdminPanelSettings as ControlsIcon,
   Assignment as AssignmentIcon,
   FactCheck as RosterIcon,
+  Psychology as PracticeIcon,
 } from "@mui/icons-material";
-import { Brain } from "lucide-react";
 
 export default [
   {
@@ -25,7 +25,7 @@ export default [
     id: 2,
     label: "Practice",
     link: "/instructor/practice",
-    icon: <Brain />,
+    icon: <PracticeIcon />,
   },
   {
     id: 3,

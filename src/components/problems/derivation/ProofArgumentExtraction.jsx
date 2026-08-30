@@ -13,7 +13,6 @@ import InstructorQuestionEditor from '../InstructorQuestionEditor.jsx'
 import ProofEditor from '../ProofEditor.jsx'
 import StatusBanner, { isTerminalStatus } from '../../ui/StatusBanner.jsx'
 import PromptText from '../../ui/PromptText.jsx'
-import { ProblemCard } from '../mui/frame/ProblemFrame.jsx'
 import ProblemSetButtons from '../mui/frame/ProblemSetButtons.jsx'
 import FormulaField from '../mui/inputs/FormulaField.jsx'
 import SymbolButtonRow from '../../ui/logicpenguin/SymbolButtonRow.jsx'
@@ -28,6 +27,7 @@ import {
 } from '../../../lib/proofArgumentExtractionScopes.js'
 import { extractLines } from './derivationUtils.js'
 import { getFormulaKeyboardConfig } from '../mui/translation/symbolizationKeyboard.js'
+import DerivationCard from './DerivationCard.jsx'
 
 const ARGUMENT_SEPARATOR_BUTTONS = [
   { insert: ' ∴ ', label: '∴' },
@@ -204,7 +204,7 @@ export default function ProofArgumentExtraction({
 
   return (
     <Stack spacing={3} sx={{ width: '100%' }}>
-      <ProblemCard minHeight="auto" cardSx={{ p: { xs: 2, md: 2 } }}>
+      <DerivationCard>
         <Stack spacing={2.5}>
           <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
             <Box sx={{ flex: 1 }}>
@@ -274,7 +274,7 @@ export default function ProofArgumentExtraction({
             )}
           </Box>
         </Stack>
-      </ProblemCard>
+      </DerivationCard>
 
       {isTerminalStatus(status) && (
         <StatusBanner status={status} message={message} onClose={() => setMessage('')} />

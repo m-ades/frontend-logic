@@ -157,7 +157,7 @@ function AppRoutes() {
           path="/student"
           element={
             <ProtectedRoute allowedRoles={["student"]}>
-              <Navigate to="/student/courses" replace />
+              <Navigate to="/student/dashboard" replace />
             </ProtectedRoute>
           }
         />

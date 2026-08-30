@@ -4,7 +4,7 @@ import ArrowForwardIcon from '@mui/icons-material/ArrowForward'
 import { useProblemNavigation } from '../../ProblemNavigationContext.jsx'
 
 // shared answer actions with optional problem navigation
-// separate navigation placement keeps answer actions and movement in distinct rows
+// navigation and answer actions always share one row
 export default function ProblemSetButtons({ 
   onCheck, 
   onStartOver, 
@@ -18,7 +18,6 @@ export default function ProblemSetButtons({
   sx = {},
   scoreLabel,
   isInstructorView = false,
-  navigationPlacement = 'inline',
 }) {
   const navigation = useProblemNavigation()
   const showPrev = Boolean(navigation?.onPrev)
@@ -101,34 +100,6 @@ export default function ProblemSetButtons({
       <ArrowForwardIcon />
     </IconButton>
   )
-  const separateNavigation = navigationPlacement === 'separate' && (showPrev || showNext) && (
-    <Stack
-      direction="row"
-      justifyContent={showPrev && showNext ? 'space-between' : showPrev ? 'flex-start' : 'flex-end'}
-      sx={{ width: '100%', pt: 1 }}
-    >
-      {showPrev && (
-        <Button
-          variant="text"
-          startIcon={<ArrowBackIcon />}
-        onClick={navigation?.onPrev}
-        disabled={isChecking || isPrevDisabled}
-        >
-          Previous
-        </Button>
-      )}
-      {showNext && (
-        <Button
-          variant="text"
-          endIcon={<ArrowForwardIcon />}
-        onClick={navigation?.onNext}
-        disabled={isChecking || isNextDisabled}
-        >
-          Next
-        </Button>
-      )}
-    </Stack>
-  )
   return (
     <Stack spacing={0.75} sx={{ mt: 3, ...sx }}>
       <Stack
@@ -138,9 +109,9 @@ export default function ProblemSetButtons({
         alignItems="center"
         sx={{ width: '100%', flexWrap: 'nowrap', minWidth: 0 }}
       >
-        {navigationPlacement === 'inline' && inlinePrevious}
+        {inlinePrevious}
         {answerActions}
-        {navigationPlacement === 'inline' && inlineNext}
+        {inlineNext}
       </Stack>
       {showAttempts && hasAttempts && (
         <Stack direction="row" alignItems="center" spacing={0.5} sx={{ flexWrap: 'wrap' }}>
@@ -152,7 +123,6 @@ export default function ProblemSetButtons({
           </Typography>
         </Stack>
       )}
-      {separateNavigation}
     </Stack>
   )
 }

@@ -1,19 +1,16 @@
 import { IconButton, Tooltip } from '@mui/material'
 import DarkModeIcon from '@mui/icons-material/DarkMode'
 import LightModeIcon from '@mui/icons-material/LightMode'
-import { useThemeDispatch } from '../../context/ThemeContext.jsx'
+import { useThemeDispatch, useThemeState } from '../../context/ThemeContext.jsx'
 
 export default function ThemeToggle() {
   const themeDispatch = useThemeDispatch()
+  const theme = useThemeState()
+  const isDark = theme.palette.mode === 'dark'
 
   const toggleDarkTheme = () => {
-    const currentTheme = localStorage.getItem('theme') || 'default'
-    const newTheme = currentTheme === 'dark' ? 'default' : 'dark'
-    localStorage.setItem('theme', newTheme)
-    themeDispatch(newTheme)
+    themeDispatch(isDark ? 'default' : 'dark')
   }
-
-  const isDark = localStorage.getItem('theme') === 'dark'
 
   return (
     <Tooltip title={isDark ? 'Switch to light mode' : 'Switch to dark mode'}>

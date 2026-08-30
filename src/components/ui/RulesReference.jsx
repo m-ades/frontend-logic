@@ -3,7 +3,7 @@ import { Box, Typography, IconButton, Drawer, alpha, useMediaQuery, useTheme } f
 import CloseIcon from '@mui/icons-material/Close'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import ExpandLessIcon from '@mui/icons-material/ExpandLess'
-import { useLayoutState, useLayoutDispatch, closeRulesReference } from '../../context/LayoutContext.jsx'
+import { useLayoutState, useLayoutDispatch, setRulesReferenceOpen } from '../../context/LayoutContext.jsx'
 import { getSymbols, normalizeLogicSystem } from '../../lib/logicSystems.js'
 import {
   FITCH_DEFINITIONS,
@@ -308,7 +308,7 @@ export default function RulesReference({ logicSystem }) {
   ]
   
   const handleClose = useCallback(() => {
-    closeRulesReference(dispatch)
+    setRulesReferenceOpen(dispatch, false)
     window.requestAnimationFrame(() => {
       document.getElementById('rules-reference-trigger')?.focus()
     })

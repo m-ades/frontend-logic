@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Box, Typography, Button, Alert } from "@mui/material";
-import { Plus, Brain } from "lucide-react";
+import PsychologyIcon from "@mui/icons-material/Psychology";
+import { Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import AssignmentTable from "../../components/ui/AssignmentTable";
 import AssignmentFormDialog from "../../components/ui/AssignmentFormDialog";
@@ -196,7 +197,7 @@ export default function InstructorPractice() {
             fontWeight={600}
             sx={{ display: "flex", alignItems: "center", gap: 1 }}
           >
-            <Brain size={32} />
+            <PsychologyIcon sx={{ fontSize: 32 }} />
             Practice
           </Typography>
           <Typography variant="body2" color="text.secondary">
