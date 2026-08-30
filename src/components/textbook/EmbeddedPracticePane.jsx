@@ -17,7 +17,7 @@ import { fetchJson, getActiveUserId } from '@/utils/api.js'
 
 /**
  * Renders a practice problem set inline (no navigate-to-workspace hop).
- * Used as the Learn chapter right pane.
+ * textbook chapter practice pane
  */
 export default function EmbeddedPracticePane({
   links = [],

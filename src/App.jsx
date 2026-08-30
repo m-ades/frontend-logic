@@ -1,6 +1,6 @@
 import { ThemeProvider as MuiThemeProvider } from "@mui/material/styles";
 import { CssBaseline } from "@mui/material";
-import { BrowserRouter, Routes, Route, Navigate, Outlet, useParams } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, Outlet } from "react-router-dom";
 import { ThemeProvider } from "./context/ThemeContext.jsx";
 import { useThemeState } from "./context/ThemeContext.jsx";
 import { LayoutProvider } from "./context/LayoutContext.jsx";
@@ -31,14 +31,9 @@ import Profile from "./pages/Profile.jsx";
 import InstructorPractice from "./pages/instructor/InstructorPractice.jsx";
 import InstructorRoster from "./pages/instructor/InstructorRoster.jsx";
 import InstructorContact from "./pages/instructor/Contact.jsx";
-import LearnHubPage from "./pages/LearnHubPage.jsx";
-import LearnChapterPage from "./pages/LearnChapterPage.jsx";
+import TextbookHubPage from "./pages/TextbookHubPage.jsx";
+import TextbookChapterPage from "./pages/TextbookChapterPage.jsx";
 import InstructorTextbookLinks from "./pages/instructor/InstructorTextbookLinks.jsx";
-
-function RedirectToLearnChapter({ basePath }) {
-  const { chapter } = useParams();
-  return <Navigate to={`${basePath}/${chapter || "Ch1"}`} replace />;
-}
 
 const withLayout = (LayoutComponent, PageComponent) => (
   <LayoutComponent>
@@ -126,22 +121,6 @@ function AppRoutes() {
           )}
         />
         <Route
-          path="/sandbox/student/learn"
-          element={(
-            <SandboxLayout>
-              <LearnHubPage />
-            </SandboxLayout>
-          )}
-        />
-        <Route
-          path="/sandbox/student/learn/:chapter"
-          element={(
-            <SandboxLayout>
-              <LearnChapterPage />
-            </SandboxLayout>
-          )}
-        />
-        <Route
           path="/sandbox/student/practice"
           element={(
             <SandboxLayout>
@@ -151,11 +130,19 @@ function AppRoutes() {
         />
         <Route
           path="/sandbox/student/textbook"
-          element={<Navigate to="/sandbox/student/learn" replace />}
+          element={(
+            <SandboxLayout>
+              <TextbookHubPage />
+            </SandboxLayout>
+          )}
         />
         <Route
           path="/sandbox/student/textbook/:chapter"
-          element={<RedirectToLearnChapter basePath="/sandbox/student/learn" />}
+          element={(
+            <SandboxLayout>
+              <TextbookChapterPage />
+            </SandboxLayout>
+          )}
         />
         <Route
           path="/sandbox/student/grades"
@@ -225,26 +212,6 @@ function AppRoutes() {
           }
         />
         <Route
-          path="/student/learn"
-          element={
-            <ProtectedRoute allowedRoles={["student"]}>
-              <AppLayout>
-                <LearnHubPage />
-              </AppLayout>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/student/learn/:chapter"
-          element={
-            <ProtectedRoute allowedRoles={["student"]}>
-              <AppLayout>
-                <LearnChapterPage />
-              </AppLayout>
-            </ProtectedRoute>
-          }
-        />
-        <Route
           path="/student/practice"
           element={
             <ProtectedRoute allowedRoles={["student"]}>
@@ -258,7 +225,9 @@ function AppRoutes() {
           path="/student/textbook"
           element={
             <ProtectedRoute allowedRoles={["student"]}>
-              <Navigate to="/student/learn" replace />
+              <AppLayout>
+                <TextbookHubPage />
+              </AppLayout>
             </ProtectedRoute>
           }
         />
@@ -266,7 +235,9 @@ function AppRoutes() {
           path="/student/textbook/:chapter"
           element={
             <ProtectedRoute allowedRoles={["student"]}>
-              <RedirectToLearnChapter basePath="/student/learn" />
+              <AppLayout>
+                <TextbookChapterPage />
+              </AppLayout>
             </ProtectedRoute>
           }
         />

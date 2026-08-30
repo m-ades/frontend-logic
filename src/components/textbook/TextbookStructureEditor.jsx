@@ -147,7 +147,7 @@ function StructureRow({
         {node.file || 'no file'}
       </Typography>
 
-      <Tooltip title={node.hidden ? 'Show in Learn' : 'Hide from Learn'}>
+      <Tooltip title={node.hidden ? 'Show in Textbook' : 'Hide from Textbook'}>
         <IconButton
           size="small"
           onClick={() => onToggleHidden(node.id)}

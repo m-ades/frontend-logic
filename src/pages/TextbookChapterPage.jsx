@@ -31,17 +31,17 @@ import { useTextbookStructure } from '@/hooks/useTextbookStructure.js'
 import { linksForTextbookSlug } from '@/components/textbook/textbookPracticeLinks.js'
 
 /**
- * Learn chapter — hierarchical TOC + reader; split embeds practice when linked.
- * Route: `/student/learn/:chapter`
+ * textbook chapter reader with linked practice
+ * route student textbook chapter
  */
-export default function LearnChapterPage() {
+export default function TextbookChapterPage() {
   const { chapter } = useParams()
   const location = useLocation()
   const navigate = useNavigate()
   const theme = useTheme()
   const isMdUp = useMediaQuery(theme.breakpoints.up('md'))
 
-  const { learnPath, learnChapterPath } = useAppRuntime()
+  const { textbookPath, textbookChapterPath } = useAppRuntime()
   const slug = normalizeTextbookSlug(chapter)
   const entry = getTextbookEntry(slug)
   const { getNeighbors, studentFlat, resolveSlug, nodes } = useTextbookStructure()
@@ -51,16 +51,16 @@ export default function LearnChapterPage() {
     const target = resolveSlug(slug)
     if (target === slug) return
     if (target) {
-      const path = learnChapterPath?.(target) || `${learnPath || '/student/learn'}/${target}`
+      const path = textbookChapterPath?.(target) || `${textbookPath || '/student/textbook'}/${target}`
       navigate(path, { replace: true })
       return
     }
     // Known divider with no children, or empty resolve → hub
     const node = nodes.find((item) => item.slug === slug)
     if (node && node.navigable === false) {
-      navigate(learnPath || '/student/learn', { replace: true })
+      navigate(textbookPath || '/student/textbook', { replace: true })
     }
-  }, [slug, resolveSlug, nodes, navigate, learnChapterPath, learnPath])
+  }, [slug, resolveSlug, nodes, navigate, textbookChapterPath, textbookPath])
 
   const neighbors = useMemo(() => getNeighbors(slug), [getNeighbors, slug])
   const prev = neighbors.prev
@@ -75,7 +75,7 @@ export default function LearnChapterPage() {
   const [tocCollapsed, setTocCollapsed] = useState(() => {
     if (typeof window === 'undefined') return false
     try {
-      return window.localStorage.getItem('hula_learn_toc_width_collapsed') === 'true'
+      return window.localStorage.getItem('hula_textbook_toc_width_collapsed') === 'true'
     } catch {
       return false
     }
@@ -103,16 +103,16 @@ export default function LearnChapterPage() {
   }, [slug, chapterLinks])
 
   const linkBase = useMemo(() => {
-    if (learnChapterPath) {
-      return learnChapterPath('').replace(/\/$/, '')
+    if (textbookChapterPath) {
+      return textbookChapterPath('').replace(/\/$/, '')
     }
     if (location.pathname.startsWith('/sandbox/student')) {
-      return '/sandbox/student/learn'
+      return '/sandbox/student/textbook'
     }
-    return '/student/learn'
-  }, [learnChapterPath, location.pathname])
+    return '/student/textbook'
+  }, [textbookChapterPath, location.pathname])
 
-  const hubPath = learnPath || linkBase
+  const hubPath = textbookPath || linkBase
 
   const goChapter = useCallback(
     (targetSlug) => {
@@ -159,11 +159,11 @@ export default function LearnChapterPage() {
         spacing={0.75}
         sx={{ flexShrink: 0, flexWrap: 'wrap', gap: 0.5 }}
       >
-        <Tooltip title="Back to Learn">
+        <Tooltip title="Back to Textbook">
           <IconButton
             size="small"
             onClick={() => navigate(hubPath)}
-            aria-label="Back to Learn table of contents"
+            aria-label="Back to Textbook table of contents"
             sx={{
               '&:focus-visible': {
                 outline: '2px solid',
@@ -299,7 +299,7 @@ export default function LearnChapterPage() {
       >
         {isMdUp && (
           <ResizableRail
-            storageKey="hula_learn_toc_width"
+            storageKey="hula_textbook_toc_width"
             collapsible
             collapsed={tocCollapsed}
             onCollapsedChange={setTocCollapsed}

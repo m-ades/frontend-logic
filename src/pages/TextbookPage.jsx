@@ -1,4 +1,4 @@
 /**
- * @deprecated Use LearnChapterPage — kept as a thin alias for any leftover imports.
+ * compatibility export for the textbook chapter page
  */
-export { default } from './LearnChapterPage.jsx'
+export { default } from './TextbookChapterPage.jsx'

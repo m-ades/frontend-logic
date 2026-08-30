@@ -22,12 +22,12 @@ import { linksForTextbookSlug } from '@/components/textbook/textbookPracticeLink
 import { isDividerKind, isNavigableNode } from '@/components/textbook/textbookStructure.js'
 
 /**
- * Learn hub — TOC-first entry to textbook + linked practice.
- * Route: `/student/learn`
+ * textbook hub for the table of contents and linked practice
+ * route student textbook
  */
-export default function LearnHubPage() {
+export default function TextbookHubPage() {
   const navigate = useNavigate()
-  const { learnChapterPath, learnPath } = useAppRuntime()
+  const { textbookChapterPath, textbookPath } = useAppRuntime()
   const { resolvedLinks } = useTextbookPracticeLinks()
   const { numberedTree: tree } = useTextbookStructure()
   const manifest = getTextbookManifest()
@@ -57,7 +57,7 @@ export default function LearnHubPage() {
   }, [tree])
 
   const go = (slug) => {
-    const path = learnChapterPath?.(slug) || `${learnPath || '/student/learn'}/${slug}`
+    const path = textbookChapterPath?.(slug) || `${textbookPath || '/student/textbook'}/${slug}`
     navigate(path)
   }
 
@@ -136,7 +136,7 @@ export default function LearnHubPage() {
       <Stack direction="row" spacing={1.5} alignItems="flex-start" sx={{ mb: 1 }}>
         <Box>
           <Typography variant="h4" component="h1" sx={{ fontWeight: 600, fontSize: '1.75rem' }}>
-            Learn
+            Textbook
           </Typography>
           <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5, maxWidth: 40 * 16 }}>
             {manifest.bookTitle} - read the chapter, then work linked practice in the same place.

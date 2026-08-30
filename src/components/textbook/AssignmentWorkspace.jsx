@@ -13,7 +13,7 @@ export default function AssignmentWorkspace({
   textbookSlug = null,
 }) {
   const navigate = useNavigate()
-  const { assignmentPath, practicePath, learnPath, learnChapterPath } = useAppRuntime()
+  const { assignmentPath, practicePath, textbookPath, textbookChapterPath } = useAppRuntime()
 
   return (
     <Box
@@ -59,16 +59,16 @@ export default function AssignmentWorkspace({
             <Typography sx={{ fontSize: '0.9375rem', color: 'text.secondary', lineHeight: 1.6 }}>
               Instructors can connect forall x chapters to HuLA practice sets from
               <strong> Textbook</strong>. Until then, use this pane as reading
-              space and browse chapters from Learn.
+              space and browse chapters from Textbook.
             </Typography>
-            {(learnPath || practicePath) && (
+            {(textbookPath || practicePath) && (
               <Button
                 sx={{ mt: 2 }}
                 size="small"
                 variant="outlined"
-                onClick={() => navigate(learnPath || practicePath)}
+                onClick={() => navigate(textbookPath || practicePath)}
               >
-                Back to Learn
+                Back to Textbook
               </Button>
             )}
           </Box>
@@ -106,10 +106,10 @@ export default function AssignmentWorkspace({
                     navigate(path, {
                       state: {
                         returnTo:
-                          (textbookSlug && learnChapterPath?.(textbookSlug)) ||
-                          learnPath ||
+                          (textbookSlug && textbookChapterPath?.(textbookSlug)) ||
+                          textbookPath ||
                           practicePath ||
-                          '/student/learn',
+                          '/student/textbook',
                         textbookSlug: textbookSlug || link.textbookSlug,
                         textbookSectionId: link.sectionId || undefined,
                       },

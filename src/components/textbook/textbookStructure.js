@@ -3,7 +3,7 @@
  * Slugs stay tied to HTML filenames; numbering is computed at render time.
  *
  * Part / backmatter nodes are TOC dividers only (navigable: false). BookML may
- * still ship Pt*.html on disk, but HuLA never treats them as Learn destinations.
+ * legacy part files remain on disk but are not textbook destinations
  */
 
 import textbookInventory from './textbookInventory.json'
@@ -335,7 +335,7 @@ function findTreeNodeBySlug(tree, slug) {
 
 /**
  * Resolve a route slug to a navigable chapter.
- * Dividers (parts) map to their first navigable child; returns null → Learn hub.
+ * dividers map to their first navigable child or the textbook hub
  */
 export function resolveNavigableSlug(nodes, slug) {
   if (!slug) return null

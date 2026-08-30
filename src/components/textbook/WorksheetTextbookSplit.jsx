@@ -21,7 +21,7 @@ export default function WorksheetTextbookSplit({
   children,
 }) {
   const location = useLocation()
-  const { routePrefix, learnChapterPath } = useAppRuntime()
+  const { routePrefix, textbookChapterPath } = useAppRuntime()
   const { resolvedLinks } = useTextbookPracticeLinks()
   const { resolveSlug } = useTextbookStructure()
 
@@ -39,9 +39,9 @@ export default function WorksheetTextbookSplit({
     return children
   }
 
-  const linkBase = learnChapterPath
-    ? learnChapterPath('').replace(/\/$/, '')
-    : `${routePrefix || '/student'}/learn`
+  const linkBase = textbookChapterPath
+    ? textbookChapterPath('').replace(/\/$/, '')
+    : `${routePrefix || '/student'}/textbook`
   const chapterLinks = practiceLinks.filter((link) => link.textbookSlug === linkedSlug)
 
   return (

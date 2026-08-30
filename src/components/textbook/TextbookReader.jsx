@@ -75,7 +75,7 @@ function createReplaceOptions(linkByWidgetId = new Map()) {
  */
 export default function TextbookReader({
   slug: rawSlug,
-  linkBase = '/student/learn',
+  linkBase = '/student/textbook',
   linkedPractices = [],
   scrollToId = null,
   onMetaChange,
