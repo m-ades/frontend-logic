@@ -91,7 +91,6 @@ export default function SingleRowTruthTable({
     return tokenizeTruthTableHeader(statement, syntax)
   }, [statement, syntax])
   const expectedRow = (evaluation?.row || []).map(toSymbol)
-  const expectedCompound = toSymbol(evaluation?.tv)
   const expectedAnswer = useMemo(() => ({
     row: evaluation?.row || [],
     tv: evaluation?.tv,
@@ -101,25 +100,37 @@ export default function SingleRowTruthTable({
     return isAtomicTruthTableToken(token, operatorSet, syntax)
   }, [operatorSet, syntax])
 
+  const configuredRow = useMemo(
+    () => Array.isArray(problem?.row) ? problem.row.map(toSymbol) : null,
+    [problem?.row]
+  )
+  const givenRow = useMemo(
+    () => tokens.map((token, index) => (
+      configuredRow
+        ? (configuredRow[index] ?? '')
+        : (isAtomicToken(token) ? toSymbol(interpretation?.[token]) : '')
+    )),
+    [configuredRow, interpretation, isAtomicToken, tokens]
+  )
+  const isGivenCell = useCallback(
+    (index) => Boolean(givenRow[index]),
+    [givenRow]
+  )
+
   const initialRow = useMemo(
     () =>
       tokens.map((token, idx) => {
-        if (isAtomicToken(token)) {
-          return toSymbol(interpretation?.[token])
-        }
+        if (isGivenCell(idx)) return givenRow[idx]
         if (savedState?.row?.[idx] !== undefined) {
           return toSymbol(savedState.row[idx])
         }
         return ''
       }),
-    [interpretation, isAtomicToken, savedState?.row, tokens]
+    [givenRow, isGivenCell, savedState?.row, tokens]
   )
   const resetRow = useMemo(
-    () =>
-      tokens.map((token) =>
-        isAtomicToken(token) ? toSymbol(interpretation?.[token]) : ''
-      ),
-    [interpretation, isAtomicToken, tokens]
+    () => tokens.map((_, index) => givenRow[index] || ''),
+    [givenRow, tokens]
   )
 
   const [rowInputs, setRowInputs] = useState(() => initialRow)
@@ -151,15 +162,18 @@ export default function SingleRowTruthTable({
 
   const isDisabled = useCallback(() =>
     rowInputs.length === 0 ||
-    rowInputs.some((cell, idx) => cell === '' && !isAtomicToken(tokens[idx])) ||
+    rowInputs.some((cell, idx) => cell === '' && !isGivenCell(idx)) ||
     compoundInput === '',
-  [compoundInput, isAtomicToken, rowInputs, tokens])
+  [compoundInput, isGivenCell, rowInputs])
 
   const { status, message, isChecking, handleCheck, handleStartOver, setStatus, setMessage, attemptCount, maxAttempts, isLocked } = useProblemChecker({
     answer: expectedAnswer,
     problemType: 'single-row-truth-table',
     question: problem,
-    options: { partialCredit: Boolean(proof?.partialCredit ?? problem?.partialCredit) },
+    options: {
+      partialCredit: Boolean(proof?.partialCredit ?? problem?.partialCredit),
+      notation,
+    },
     getAnswer: () => ({
       row: rowInputs.map(toSymbol),
       compound: toSymbol(compoundInput),
@@ -184,7 +198,7 @@ export default function SingleRowTruthTable({
 
   const handleCellChange = (index, value) => {
     if (readOnly || isLocked) return
-    if (isAtomicToken(tokens[index])) return
+    if (isGivenCell(index)) return
     const next = [...rowInputs]
     next[index] = value
     setRowInputs(next)
@@ -225,7 +239,7 @@ export default function SingleRowTruthTable({
       tableInputs={tableInputsToRender}
       combined={false}
       readOnly={readOnlyTable}
-      isCellReadOnly={({ colIndex }) => isAtomicToken(tokens[colIndex])}
+      isCellReadOnly={({ colIndex }) => isGivenCell(colIndex)}
       allowRowSelection={false}
       selectedColumns={selectedColumns}
       onToggleColumn={toggleColumn}
@@ -237,11 +251,12 @@ export default function SingleRowTruthTable({
     return <Typography color="error">Invalid problem</Typography>
   }
 
-  const tableFilled = rowInputs.length > 0 && !isDisabled()
+  const tableFilled = rowInputs.length > 0 &&
+    !rowInputs.some((cell, idx) => cell === '' && !isGivenCell(idx))
+  const answerComplete = tableFilled && compoundInput !== ''
   const isCurrentlyCorrect = tableFilled &&
     rowInputs.length === expectedRow.length &&
-    rowInputs.every((cell, idx) => cell === expectedRow[idx]) &&
-    compoundInput === expectedCompound
+    rowInputs.every((cell, idx) => cell === expectedRow[idx])
 
   return (
     <ProblemFrame
@@ -258,7 +273,7 @@ export default function SingleRowTruthTable({
           onCheck={handleCheckCurrent}
           onStartOver={handleStartOver}
           isChecking={isChecking}
-          isDisabled={!tableFilled || isLocked || isAssignmentLocked}
+          isDisabled={!answerComplete || isLocked || isAssignmentLocked}
           align="flex-start"
           attemptCount={attemptCount}
           attemptLimit={maxAttempts}
@@ -302,18 +317,7 @@ export default function SingleRowTruthTable({
       </Box>
       {isLocked && status !== 'correct' && expectedRow.length > 0 && (
         <TruthTableSection title="Correct Answer">
-          <Box sx={{ display: 'grid', gap: 2 }}>
-            {renderTableSet([[expectedRow]], true)}
-            <FormControl component="fieldset" sx={{ width: '100%' }}>
-              <RadioGroup
-                value={expectedCompound}
-                name={`single-row-truth-value-answer-${assignmentQuestionId ?? 'local'}`}
-              >
-                <FormControlLabel value="T" control={<Radio disabled />} label="True" />
-                <FormControlLabel value="F" control={<Radio disabled />} label="False" />
-              </RadioGroup>
-            </FormControl>
-          </Box>
+          {renderTableSet([[expectedRow]], true)}
         </TruthTableSection>
       )}
     </ProblemFrame>

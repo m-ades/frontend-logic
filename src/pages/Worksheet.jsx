@@ -389,6 +389,7 @@ const mapQuestionToProof = (question, assignment, index, logicSystem = DEFAULT_L
       singleRowTruthTable: {
         statement: snapshot.statement || snapshot.evaluateTruth || snapshot.prompt || '',
         interpretation: snapshot.interpretation || {},
+        row: Array.isArray(snapshot.row) ? snapshot.row : undefined,
         prompt: snapshot.prompt || snapshot.description || '',
       },
     }
@@ -1077,6 +1078,7 @@ function RealWorksheetContent() {
           if (Array.isArray(data.row)) {
             initialStates[proof.id] = {
               row: data.row.map(toSymbol),
+              compound: toSymbol(data.compound),
             }
           }
           return

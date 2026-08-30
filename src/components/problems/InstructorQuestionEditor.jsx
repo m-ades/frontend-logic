@@ -27,6 +27,7 @@ import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
 import { fetchJson } from '../../utils/api.js'
 import getFormulaClass from '../../lib/logicpenguin/symbolic/formula.js'
 import getSyntax from '../../lib/logicpenguin/symbolic/libsyntax.js'
+import { libtf } from '../../lib/logicpenguin/symbolic/libsemantics.js'
 import {
   DEFAULT_LOGIC_SYSTEM,
   getNotation,
@@ -1385,6 +1386,10 @@ function buildSymbolicTranslationSnapshot(proof, edited, existing, logicSystem =
   return patch
 }
 
+/*
+single row questions store the generated answer interpretation separately
+the optional row marks given cells while null cells remain student editable
+*/
 function buildSingleRowTruthTableSnapshot(proof, edited, existing, logicSystem = DEFAULT_LOGIC_SYSTEM) {
   const sr = proof.singleRowTruthTable || {}
   const statement = normalizeFormulaInput(edited.statement ?? sr.statement ?? sr.formula ?? proof.description ?? '', logicSystem)
@@ -1393,17 +1398,36 @@ function buildSingleRowTruthTableSnapshot(proof, edited, existing, logicSystem =
     ?? sr.interpretation
     ?? existing?.interpretation
     ?? {}
-  const Formula = getFormulaClass(getNotation(logicSystem))
+  const notation = getNotation(logicSystem)
+  const syntax = getSyntax(notation)
+  const Formula = getFormulaClass(notation)
   const formula = Formula.from(statement)
   const letters = formula.wellformed ? formula.allpletters : []
   const interpretation = Object.fromEntries(
     letters.map((letter) => [letter, sourceInterpretation[letter] ?? false])
   )
+  const sourceRow = edited.row ?? sr.row ?? existing?.row
+  const headerTokens = formula.wellformed ? tokenizeTruthTableHeader(statement, syntax) : []
+  const rowLength = formula.wellformed
+    ? libtf.evaluate(formula, interpretation, notation).row.length
+    : 0
+  const row = Array.from({ length: rowLength }, (_, index) => {
+    if (!Array.isArray(sourceRow)) {
+      const token = headerTokens[index] ?? ''
+      const atom = syntax.symbolfix(String(token).replace(/[()\[\]{}]/g, ''))
+      return letters.includes(atom) ? Boolean(interpretation[atom]) : null
+    }
+    const cell = sourceRow[index]
+    if (cell === true || cell === 'T' || cell === 't') return true
+    if (cell === false || cell === 'F' || cell === 'f') return false
+    return null
+  })
   return {
     [typeKey(existing)]: 'single-row-truth-table',
     prompt,
     statement,
     interpretation,
+    row,
     partialCredit: Boolean(
       edited.partialCredit
       ?? existing?.partialCredit
@@ -1502,47 +1526,105 @@ function SingleRowTruthTableEditorForm({ proof, value, onChange, logicSystem = D
     ?? proof?.questionSnapshot?.partialCredit
     ?? proof?.partialCredit
     ?? false
-  const Formula = getFormulaClass(getNotation(logicSystem))
-  const formula = Formula.from(statement)
+  const notation = getNotation(logicSystem)
+  const syntax = React.useMemo(() => getSyntax(notation), [notation])
+  const Formula = React.useMemo(() => getFormulaClass(notation), [notation])
+  const formula = React.useMemo(() => Formula.from(statement), [Formula, statement])
   const sentenceLetters = formula.wellformed
     ? [...formula.allpletters].sort((left, right) => left.localeCompare(right))
     : []
-  const setAssignment = (letter, truthValue) => {
+  const headerTokens = React.useMemo(
+    () => formula.wellformed ? tokenizeTruthTableHeader(statement, syntax) : [],
+    [formula.wellformed, statement, syntax]
+  )
+  const computedRow = React.useMemo(() => {
+    if (!formula.wellformed) return []
+    return libtf.evaluate(formula, interpretation, notation).row.map((cell) => (
+      cell ? 'T' : 'F'
+    ))
+  }, [formula, interpretation, notation])
+  const atomForColumn = React.useCallback((index) => {
+    const stripped = String(headerTokens[index] ?? '').replace(/[()\[\]{}]/g, '')
+    const atom = syntax.symbolfix(stripped)
+    return sentenceLetters.includes(atom) ? atom : null
+  }, [headerTokens, sentenceLetters, syntax])
+  const sourceRow = Array.isArray(value.row)
+    ? value.row
+    : (Array.isArray(sr.row) ? sr.row : null)
+  const givenRow = headerTokens.map((_, index) => {
+    if (!sourceRow) return atomForColumn(index) ? computedRow[index] : ''
+    const cell = sourceRow[index]
+    if (cell === true || cell === 'T' || cell === 't') return 'T'
+    if (cell === false || cell === 'F' || cell === 'f') return 'F'
+    return ''
+  })
+  const matchingInterpretation = (index, truthValue) => {
+    let bestInterpretation = null
+    let fewestChanges = Infinity
+    for (const candidate of libtf.allinterps([formula])) {
+      const candidateRow = libtf.evaluate(formula, candidate, notation).row
+      if (Boolean(candidateRow[index]) !== truthValue) continue
+      const changes = sentenceLetters.reduce((count, letter) => (
+        count + (Boolean(candidate[letter]) === Boolean(interpretation[letter]) ? 0 : 1)
+      ), 0)
+      if (changes < fewestChanges) {
+        bestInterpretation = candidate
+        fewestChanges = changes
+      }
+    }
+    return bestInterpretation
+  }
+  const setCell = (index, nextValue) => {
+    const atom = atomForColumn(index)
+    let nextInterpretation = interpretation
+    if (atom && nextValue) {
+      nextInterpretation = { ...interpretation, [atom]: nextValue === 'T' }
+    } else if (!atom && nextValue) {
+      const matching = matchingInterpretation(index, nextValue === 'T')
+      if (matching) nextInterpretation = { ...interpretation, ...matching }
+    }
+    const nextRow = givenRow.map((cell, currentIndex) => {
+      const next = currentIndex === index ? nextValue : cell
+      if (next === 'T') return true
+      if (next === 'F') return false
+      return null
+    })
     onChange({
       ...value,
-      interpretation: {
-        ...interpretation,
-        [letter]: truthValue,
-      },
+      row: nextRow,
+      interpretation: nextInterpretation,
     })
   }
   return (
     <Stack spacing={2}>
-      <TextField label="Statement" value={statement} onChange={(e) => onChange({ ...value, statement: displayFormulaInput(e.target.value, logicSystem) })} fullWidth variant="outlined" />
+      <TextField label="Statement" value={statement} onChange={(e) => onChange({ ...value, statement: displayFormulaInput(e.target.value, logicSystem), row: [], interpretation: {} })} fullWidth variant="outlined" />
       <Box>
         <Typography variant="subtitle2" sx={{ mb: 0.5 }}>Truth values</Typography>
-        {sentenceLetters.length === 0 ? (
+        {headerTokens.length === 0 ? (
           <Typography variant="body2" color="text.secondary">Enter a valid statement</Typography>
         ) : (
-          <Stack spacing={0.5}>
-            {sentenceLetters.map((letter) => (
-              <FormControl key={letter}>
-                <Stack direction="row" alignItems="center" spacing={2}>
-                  <Typography sx={{ minWidth: 32 }}>
-                    {displayFormulaInput(letter, logicSystem)}
-                  </Typography>
-                  <RadioGroup
-                    row
-                    aria-label={`${letter} truth value`}
-                    value={String(interpretation[letter] ?? false)}
-                    onChange={(event) => setAssignment(letter, event.target.value === 'true')}
-                  >
-                    <FormControlLabel value="true" control={<Radio size="small" />} label="T" />
-                    <FormControlLabel value="false" control={<Radio size="small" />} label="F" />
-                  </RadioGroup>
-                </Stack>
-              </FormControl>
-            ))}
+          <Stack spacing={0.5} alignItems="flex-start">
+            <TruthTableGrid
+              tables={[{ tokens: headerTokens, headerTokens, rows: [givenRow] }]}
+              tableInputs={[[givenRow]]}
+              combined={false}
+              readOnly={false}
+              withSelectors={false}
+              allowRowSelection={false}
+              shrinkWrap
+              renderCell={({ colIndex, cellValue, cellSx }) => {
+                return (
+                  <TableCell key={`single-row-editor-cell-${colIndex}`} align="center" sx={cellSx}>
+                    <TruthValueButton
+                      value={cellValue ?? ''}
+                      onChange={(nextValue) => setCell(colIndex, nextValue)}
+                      ariaLabel={`Given value for ${headerTokens[colIndex]}`}
+                      emptyLabel="?"
+                    />
+                  </TableCell>
+                )
+              }}
+            />
           </Stack>
         )}
       </Box>
@@ -1774,6 +1856,7 @@ function InstructorQuestionEditorInner({
       base.statement = sr.statement ?? sr.formula ?? proof.description ?? ''
       base.prompt = sr.prompt ?? proof.description ?? ''
       base.interpretation = typeof sr.interpretation === 'object' && sr.interpretation !== null ? { ...sr.interpretation } : {}
+      base.row = Array.isArray(sr.row) ? [...sr.row] : undefined
       base.partialCredit = proof?.questionSnapshot?.partialCredit ?? Boolean(proof.partialCredit)
     }
     if (proof?.type === 'partial-truth-table') {
