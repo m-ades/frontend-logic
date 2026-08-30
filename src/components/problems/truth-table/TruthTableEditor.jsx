@@ -41,18 +41,6 @@ import MathJaxFormula from '../../ui/MathJaxFormula.jsx'
 import TruthTableClassification from './TruthTableClassification.jsx'
 import TruthTableFeedback from './TruthTableFeedback.jsx'
 
-function hasTruthTableData(proof) {
-  const truthTable = proof?.truthTable ?? {}
-  return Boolean(
-    truthTable.statement
-    || truthTable.formula
-    || (Array.isArray(truthTable.statements) && truthTable.statements.length > 0)
-    || (Array.isArray(truthTable.formulas) && truthTable.formulas.length > 0)
-    || (Array.isArray(truthTable.lefts) && truthTable.lefts.length > 0 && truthTable.right)
-    || (truthTable.left && truthTable.right)
-  )
-}
-
 export default function TruthTableEditor(props) {
   const {
     proof,
@@ -74,23 +62,6 @@ export default function TruthTableEditor(props) {
     />
   ) : null
 
-  if (!hasTruthTableData(proof)) {
-    return (
-      <ProblemFrame
-        problemLabel={problemLabel}
-        minHeight="auto"
-        cardMaxWidth="760px"
-        isInstructorView={isInstructorView}
-        onEditQuestion={openEdit}
-        editorNode={editorNode}
-      >
-        <Typography color="text.secondary">
-          Truth-table data is missing for this question.
-        </Typography>
-      </ProblemFrame>
-    )
-  }
-
   return <TruthTableEditorContent {...props} editorNode={editorNode} onEditQuestion={openEdit} />
 }
 
@@ -108,13 +79,12 @@ function TruthTableEditorContent({
   parentAttemptLimit,
   isAssignmentLocked = false,
   isInstructorView = false,
-  onQuestionSaved,
   problemLabel,
   logicSystem,
   editorNode,
   onEditQuestion,
 }) {
-  const truthTable = proof.truthTable ?? {}
+  const truthTable = proof?.truthTable ?? {}
   const notation = getNotation(logicSystem)
   const syntax = React.useMemo(() => getSyntax(notation), [notation])
   const Formula = React.useMemo(() => getFormulaClass(notation), [notation])
@@ -154,26 +124,33 @@ function TruthTableEditorContent({
   )
   const classificationOptions = classificationEnabled ? classification.options : []
 
-  const tables = React.useMemo(() => {
-    if (statements.length === 0) return []
+  const tableBuild = React.useMemo(() => {
+    if (statements.length === 0) return { tables: [], error: 'missing' }
     try {
       const wffs = statements.map((statement) => Formula.from(statement))
-      if (wffs.some((formula) => !formula.wellformed)) return []
+      if (wffs.some((formula) => !formula.wellformed)) {
+        return { tables: [], error: 'invalid' }
+      }
       const res = multiTables(wffs, notation)
-      return statements.map((label, idx) => {
-        const statement = statements[idx]
-        return {
-          label: displayIndexedSymbolsForNotation(label, syntax.notationname),
-          tokens: res.tables[idx]?.tokens ?? [],
-          opspot: formulaTable(wffs[idx], notation).opspot,
-          rows: res.tables[idx]?.rows ?? [],
-          headerTokens: tokenizeTruthTableHeader(statement, syntax),
-        }
-      })
-    } catch {
-      return []
+      return {
+        tables: statements.map((label, idx) => {
+          const statement = statements[idx]
+          return {
+            label: displayIndexedSymbolsForNotation(label, syntax.notationname),
+            tokens: res.tables[idx]?.tokens ?? [],
+            opspot: formulaTable(wffs[idx], notation).opspot,
+            rows: res.tables[idx]?.rows ?? [],
+            headerTokens: tokenizeTruthTableHeader(statement, syntax),
+          }
+        }),
+        error: null,
+      }
+    } catch (error) {
+      console.error('failed to build truth table', error)
+      return { tables: [], error: 'malfunction' }
     }
   }, [Formula, statements, syntax])
+  const tables = tableBuild.tables
 
   const isAtomicToken = React.useCallback(
     (token) => isAtomicTruthTableToken(token, operatorSet, syntax),
@@ -247,7 +224,11 @@ function TruthTableEditorContent({
       prev.includes(rowIndex) ? prev.filter((r) => r !== rowIndex) : [...prev, rowIndex]
     )
   }
-  const lastRestoredProofIdRef = React.useRef(undefined)
+  const restorationKey = React.useMemo(
+    () => `${proof?.id ?? ''}:${notation}:${JSON.stringify(statements)}`,
+    [notation, proof?.id, statements]
+  )
+  const lastRestorationKeyRef = React.useRef(undefined)
   const onStateChangeTimerRef = React.useRef(null)
   React.useEffect(() => {
     setAttemptLimit(proof?.attemptLimit ?? 3)
@@ -283,8 +264,8 @@ function TruthTableEditorContent({
   }, [mainOperatorColumn, onStateChange, status, tableInputs])
 
   React.useEffect(() => {
-    if (proof?.id === lastRestoredProofIdRef.current) return
-    lastRestoredProofIdRef.current = proof?.id
+    if (restorationKey === lastRestorationKeyRef.current) return
+    lastRestorationKeyRef.current = restorationKey
     setTableInputs((prev) => (tablesEqual(prev, derivedInitialTables) ? prev : derivedInitialTables))
     setMcSelection(normalizeSavedClassification(kind, savedState))
     setMainOperatorColumn(() => {
@@ -295,7 +276,7 @@ function TruthTableEditorContent({
         ? { tableIndex: 0, colIndex: savedColumn.colIndex }
         : null
     })
-  }, [derivedInitialTables, kind, mainOperatorHighlight, proof?.id, savedState?.mainOperatorColumn, savedState?.mcans, savedState?.taut, savedState?.contra, savedState?.valid, savedState?.equiv])
+  }, [derivedInitialTables, kind, mainOperatorHighlight, restorationKey, savedState?.mainOperatorColumn, savedState?.mcans, savedState?.taut, savedState?.contra, savedState?.valid, savedState?.equiv])
 
   const handleCellChange = (tableIndex, rowIndex, colIndex, value) => {
     const nextTables = tableInputs.map((tableRows, tIdx) =>
@@ -486,6 +467,19 @@ function TruthTableEditorContent({
   )
 
   if (!hasTruthTable) {
+    const diagnosticMessage = tableBuild.error === 'missing'
+      ? 'Truth-table data is missing for this question.'
+      : tableBuild.error === 'invalid'
+        ? 'Truth-table formula data is invalid.'
+        : 'Truth table could not be built.'
+    const diagnostic = (
+      <Typography color="text.secondary">
+        {diagnosticMessage}
+      </Typography>
+    )
+    if (embedded) {
+      return <Stack spacing={2} sx={{ px: 0, width: '100%' }}>{diagnostic}</Stack>
+    }
     return (
       <ProblemFrame
         problemLabel={problemLabel}
@@ -495,9 +489,7 @@ function TruthTableEditorContent({
         onEditQuestion={onEditQuestion}
         editorNode={editorNode}
       >
-        <Typography color="text.secondary">
-          Truth-table data is missing for this question.
-        </Typography>
+        {diagnostic}
       </ProblemFrame>
     )
   }

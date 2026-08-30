@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'react'
 import { useParams, useNavigate, useLocation } from 'react-router-dom'
 import { Box } from '@mui/material'
 import LoadingSpinner from '../components/ui/LoadingSpinner.jsx'
@@ -138,6 +138,49 @@ const logicSystemForQuestionType = (type, fallback = DEFAULT_LOGIC_SYSTEM) => {
 
 function clampIndex(index, length) {
   return Math.max(0, Math.min(index, Math.max(0, length - 1)))
+}
+
+/*
+purpose keeps worksheet data and question selection consistent
+contract worksheet updates preserve the selected proof when it still exists
+invariant the selected index is valid for the active worksheet after data changes
+error behavior a missing selected proof falls back to the nearest valid index
+*/
+function worksheetViewReducer(state, action) {
+  if (action.type === 'set-proof-index') {
+    const nextIndex = typeof action.update === 'function'
+      ? action.update(state.currentProofIndex)
+      : action.update
+    return nextIndex === state.currentProofIndex
+      ? state
+      : { ...state, currentProofIndex: nextIndex }
+  }
+
+  if (action.type === 'set-worksheets') {
+    const nextWorksheets = typeof action.update === 'function'
+      ? action.update(state.worksheets)
+      : action.update
+    if (nextWorksheets === state.worksheets) return state
+
+    const activeWorksheetId = action.activeWorksheetId
+    const previousWorksheet = state.worksheets.find(
+      (worksheet) => Number(worksheet.id) === Number(activeWorksheetId)
+    )
+    const selectedProofId = previousWorksheet?.proofs?.[state.currentProofIndex]?.id
+    const nextWorksheet = nextWorksheets.find(
+      (worksheet) => Number(worksheet.id) === Number(activeWorksheetId)
+    )
+    const selectedIndex = selectedProofId == null
+      ? -1
+      : nextWorksheet?.proofs?.findIndex((proof) => proof.id === selectedProofId) ?? -1
+    const currentProofIndex = selectedIndex >= 0
+      ? selectedIndex
+      : clampIndex(state.currentProofIndex, nextWorksheet?.proofs?.length ?? 0)
+
+    return { worksheets: nextWorksheets, currentProofIndex }
+  }
+
+  return state
 }
 
 const mapQuestionToProof = (question, assignment, index, logicSystem = DEFAULT_LOGIC_SYSTEM) => {
@@ -437,8 +480,22 @@ function RealWorksheetContent() {
   const { worksheetId, assignmentId } = useParams()
   const navigate = useNavigate()
   const location = useLocation()
-  const [currentProofIndex, setCurrentProofIndex] = useState(0)
-  const [worksheets, setWorksheets] = useState([])
+  const currentWorksheetIdRef = useRef(null)
+  const restoredQuestionIndexForAssignmentRef = useRef(null)
+  const [{ currentProofIndex, worksheets }, dispatchWorksheetView] = useReducer(
+    worksheetViewReducer,
+    { currentProofIndex: 0, worksheets: [] }
+  )
+  const setCurrentProofIndex = useCallback((update) => {
+    dispatchWorksheetView({ type: 'set-proof-index', update })
+  }, [])
+  const setWorksheets = useCallback((update) => {
+    dispatchWorksheetView({
+      type: 'set-worksheets',
+      update,
+      activeWorksheetId: currentWorksheetIdRef.current,
+    })
+  }, [])
   const worksheetsRef = useRef(worksheets)
   worksheetsRef.current = worksheets
   const [isLoading, setIsLoading] = useState(true)
@@ -467,7 +524,6 @@ function RealWorksheetContent() {
   const scheduleIdleTimeoutRef = useRef(() => {})
   const activeUserId = getActiveUserId()
   const isMountedRef = useRef(true)
-  const currentWorksheetIdRef = useRef(null)
   const solutionRefreshRef = useRef(new Set())
   
   // support both /assignment/:id and /worksheet/:id routes
@@ -503,6 +559,7 @@ function RealWorksheetContent() {
     [worksheets, worksheetIdNum]
   )
   const currentWorksheet = worksheets[currentWorksheetIndex]
+  currentWorksheetIdRef.current = currentWorksheet?.id ?? null
   const currentProof = currentWorksheet?.proofs[currentProofIndex]
   const total = currentWorksheet?.proofs.length || 0
   const worksheetDueAt = currentWorksheet?.due_at
@@ -544,10 +601,6 @@ function RealWorksheetContent() {
   }, [])
 
   useEffect(() => {
-    currentWorksheetIdRef.current = currentWorksheet?.id ?? null
-  }, [currentWorksheet?.id])
-
-  useEffect(() => {
     // course data can arrive after proofs are mapped
     setWorksheets((prev) => {
       let didChange = false
@@ -570,6 +623,7 @@ function RealWorksheetContent() {
 
   useEffect(() => {
     // reset to first problem on assignment change (restored from localStorage when worksheet loads)
+    restoredQuestionIndexForAssignmentRef.current = null
     setCurrentProofIndex(0)
   }, [worksheetIdNum])
 
@@ -578,6 +632,8 @@ function RealWorksheetContent() {
     const assignmentId = currentWorksheet?.id
     const proofCount = currentWorksheet?.proofs?.length
     if (assignmentId == null || !Number.isFinite(proofCount) || proofCount === 0) return
+    if (Number(restoredQuestionIndexForAssignmentRef.current) === Number(assignmentId)) return
+    restoredQuestionIndexForAssignmentRef.current = assignmentId
     const saved = getLastQuestionIndex(assignmentId)
     if (saved != null) {
       const clamped = clampIndex(saved, proofCount)
@@ -813,28 +869,20 @@ function RealWorksheetContent() {
         Number(question?.id ?? question?.assignment_question_id) === Number(questionId)
       ))
       if (!targetQuestion) {
-        const worksheet = worksheetsRef.current.find((item) => Number(item.id) === Number(assignmentId))
-        const removedIndex = worksheet?.proofs.findIndex((proof) => Number(proof.questionId) === Number(questionId)) ?? -1
-        if (removedIndex >= 0) {
-          const nextProofs = [
-            ...worksheet.proofs.slice(0, removedIndex),
-            ...worksheet.proofs.slice(removedIndex + 1),
-          ]
-          setWorksheets((previous) => previous.map((current) => (
-            Number(current.id) === Number(assignmentId)
-              ? { ...current, proofs: nextProofs }
-              : current
-          )))
-          setQuestionScores((previous) => {
-            const next = { ...previous }
-            delete next[questionId]
-            return next
-          })
-          setCurrentProofIndex((previous) => {
-            const nextIndex = removedIndex < previous ? previous - 1 : previous
-            return clampIndex(nextIndex, nextProofs.length)
-          })
-        }
+        setWorksheets((previous) => previous.map((worksheet) => {
+          if (Number(worksheet.id) !== Number(assignmentId)) return worksheet
+          const proofs = worksheet.proofs.filter(
+            (proof) => Number(proof.questionId) !== Number(questionId)
+          )
+          return proofs.length === worksheet.proofs.length
+            ? worksheet
+            : { ...worksheet, proofs }
+        }))
+        setQuestionScores((previous) => {
+          const next = { ...previous }
+          delete next[questionId]
+          return next
+        })
         return
       }
       const qIdNum = Number(questionId)
@@ -877,11 +925,14 @@ function RealWorksheetContent() {
       const nextProof = mapQuestionToProof(createdQuestion, worksheet, worksheet.proofs.length, courseLogicSystem)
       return { ...worksheet, proofs: [...worksheet.proofs, nextProof] }
     }))
-    if (Number(currentWorksheet?.id) === Number(assignmentId)) {
-      const nextIndex = currentWorksheet?.proofs?.length ?? 0
+    if (Number(currentWorksheetIdRef.current) === Number(assignmentId)) {
+      const worksheet = worksheetsRef.current.find(
+        (item) => Number(item.id) === Number(assignmentId)
+      )
+      const nextIndex = worksheet?.proofs?.length ?? 0
       setCurrentProofIndex(nextIndex)
     }
-  }, [courseLogicSystem, currentWorksheet?.id, currentWorksheet?.proofs?.length, setCurrentProofIndex])
+  }, [courseLogicSystem, setCurrentProofIndex])
 
   useEffect(() => {
     setCurrentDueAt(currentWorksheet?.due_at ?? currentWorksheet?.due_date ?? null)
