@@ -16,6 +16,7 @@ import SandboxLayout, { InstructorSandboxLayout } from "./components/layout/Sand
 import Dashboard from "./pages/Dashboard.jsx";
 import Worksheet from "./pages/Worksheet.jsx";
 import Assignments from "./pages/Assignments.jsx";
+import Practice from "./pages/Practice.jsx";
 import Grades from "./pages/Grades.jsx";
 import ContactStudent from "./pages/ContactStudent.jsx";
 import InstructorDashboard from "./pages/instructor/InstructorDashboard.jsx";
@@ -142,7 +143,11 @@ function AppRoutes() {
         />
         <Route
           path="/sandbox/student/practice"
-          element={<Navigate to="/sandbox/student/learn" replace />}
+          element={(
+            <SandboxLayout>
+              <Practice />
+            </SandboxLayout>
+          )}
         />
         <Route
           path="/sandbox/student/textbook"
@@ -243,7 +248,9 @@ function AppRoutes() {
           path="/student/practice"
           element={
             <ProtectedRoute allowedRoles={["student"]}>
-              <Navigate to="/student/learn" replace />
+              <AppLayout>
+                <Practice />
+              </AppLayout>
             </ProtectedRoute>
           }
         />

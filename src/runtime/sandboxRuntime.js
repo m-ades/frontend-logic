@@ -4,7 +4,7 @@ const studentSectionLabels = {
   assignments: "Assignments",
   grades: "Grades",
   learn: "Learn",
-  practice: "Learn",
+  practice: "Practice",
   textbook: "Learn",
   contact: "Contact",
   profile: "Profile & Preferences",
@@ -51,7 +51,7 @@ export function buildRuntimePaths(routeKind, routePrefix = getRoutePrefix(routeK
     assignmentsPath: `${routePrefix}/assignments`,
     gradesPath,
     gradebookPath: isInstructor ? `${routePrefix}/gradebook` : undefined,
-    practicePath: isInstructor ? `${routePrefix}/practice` : `${routePrefix}/learn`,
+    practicePath: `${routePrefix}/practice`,
     learnPath: isInstructor ? undefined : `${routePrefix}/learn`,
     learnChapterPath: isInstructor
       ? undefined
