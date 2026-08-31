@@ -27,7 +27,7 @@ import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
 import { fetchJson } from '../../utils/api.js'
 import getFormulaClass from '../../lib/logicpenguin/symbolic/formula.js'
 import getSyntax from '../../lib/logicpenguin/symbolic/libsyntax.js'
-import { libtf } from '../../lib/logicpenguin/symbolic/libsemantics.js'
+import { evaluateWithTokens } from '../../lib/logicpenguin/symbolic/libsemantics.js'
 import {
   DEFAULT_LOGIC_SYSTEM,
   getNotation,
@@ -58,6 +58,7 @@ import { getInstructorProblemTypeLabel, isInstructorProblemType } from '../../li
 import TruthTableGrid from './truth-table/TruthTableGrid.jsx'
 import { TruthValueButton } from './truth-table/TruthTableControls.jsx'
 import {
+  buildAlignedTruthTableHeader,
   normalizeTruthTableCellValue,
   tokenizeTruthTableHeader,
 } from './truth-table/truthTableUi.js'
@@ -1412,13 +1413,14 @@ function buildSingleRowTruthTableSnapshot(proof, edited, existing, logicSystem =
   )
   const hasEditedRow = Object.prototype.hasOwnProperty.call(edited, 'row')
   const sourceRow = hasEditedRow ? edited.row : (sr.row ?? existing?.row)
-  const headerTokens = formula.wellformed ? tokenizeTruthTableHeader(statement, syntax) : []
-  const rowLength = formula.wellformed
-    ? libtf.evaluate(formula, interpretation, notation).row.length
-    : 0
+  const evaluation = formula.wellformed
+    ? evaluateWithTokens(formula, interpretation, notation)
+    : null
+  const tokens = evaluation?.tokens ?? []
+  const rowLength = evaluation?.row.length ?? 0
   const row = Array.from({ length: rowLength }, (_, index) => {
     if (!Array.isArray(sourceRow)) {
-      const token = headerTokens[index] ?? ''
+      const token = tokens[index] ?? ''
       const atom = syntax.symbolfix(String(token).replace(/[()\[\]{}]/g, ''))
       return letters.includes(atom) ? Boolean(interpretation[atom]) : null
     }
@@ -1538,21 +1540,26 @@ function SingleRowTruthTableEditorForm({ proof, value, onChange, logicSystem = D
   const sentenceLetters = formula.wellformed
     ? [...formula.allpletters].sort((left, right) => left.localeCompare(right))
     : []
-  const headerTokens = React.useMemo(
-    () => formula.wellformed ? tokenizeTruthTableHeader(statement, syntax) : [],
-    [formula.wellformed, statement, syntax]
+  const evaluation = React.useMemo(
+    () => formula.wellformed
+      ? evaluateWithTokens(formula, interpretation, notation)
+      : null,
+    [formula, interpretation, notation]
   )
-  const computedRow = React.useMemo(() => {
-    if (!formula.wellformed) return []
-    return libtf.evaluate(formula, interpretation, notation).row.map((cell) => (
+  const tokens = evaluation?.tokens ?? []
+  const headerTokens = React.useMemo(() => (
+    buildAlignedTruthTableHeader(statement, syntax, tokens)
+  ), [statement, syntax, tokens])
+  const computedRow = React.useMemo(() => (
+    (evaluation?.row ?? []).map((cell) => (
       cell ? 'T' : 'F'
     ))
-  }, [formula, interpretation, notation])
+  ), [evaluation])
   const atomForColumn = React.useCallback((index) => {
-    const stripped = String(headerTokens[index] ?? '').replace(/[()\[\]{}]/g, '')
+    const stripped = String(tokens[index] ?? '').replace(/[()\[\]{}]/g, '')
     const atom = syntax.symbolfix(stripped)
     return sentenceLetters.includes(atom) ? atom : null
-  }, [headerTokens, sentenceLetters, syntax])
+  }, [tokens, sentenceLetters, syntax])
 
   const toggleValuesByColumn = React.useMemo(() => headerTokens.map((_, index) => (
     atomForColumn(index) ? ['T', 'F'] : [computedRow[index]]
@@ -1571,7 +1578,7 @@ function SingleRowTruthTableEditorForm({ proof, value, onChange, logicSystem = D
     const nextInterpretation = atom && nextValue
       ? { ...interpretation, [atom]: nextValue === 'T' }
       : interpretation
-    const evaluatedRow = libtf.evaluate(formula, nextInterpretation, notation).row
+    const evaluatedRow = evaluateWithTokens(formula, nextInterpretation, notation).row
     const nextRow = givenRow.map((cell, currentIndex) => {
       const isGiven = currentIndex === index ? Boolean(nextValue) : Boolean(cell)
       return isGiven ? Boolean(evaluatedRow[currentIndex]) : null

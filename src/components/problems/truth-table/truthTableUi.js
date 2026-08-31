@@ -13,6 +13,7 @@ import {
 import {
   displayIndexedSymbolsForNotation,
   isPropositionalSymbol,
+  normalizeIndexedSymbols,
 } from '../../../lib/indexedSymbols.js'
 
 
@@ -143,6 +144,24 @@ export function tokenizeTruthTableHeader(statement, syntax) {
   return Array.from(normalizedStatement.matchAll(regex)).map((match) => (
     displayIndexedSymbolsForNotation(match[0], syntax.notationname)
   ))
+}
+
+// formats semantic tokens without changing verified column order
+export function buildAlignedTruthTableHeader(statement, syntax, semanticTokens) {
+  const tokens = Array.isArray(semanticTokens) ? semanticTokens : []
+  const fallback = tokens.map((token) => (
+    displayIndexedSymbolsForNotation(token, syntax.notationname)
+  ))
+  const displayTokens = tokenizeTruthTableHeader(statement, syntax)
+  if (displayTokens.length !== tokens.length) return fallback
+
+  const normalizeToken = (token) => syntax.symbolfix(
+    normalizeIndexedSymbols(String(token ?? '').replace(/[()\[\]{}]/g, ''))
+  )
+  const isAligned = displayTokens.every((token, index) => (
+    normalizeToken(token) === normalizeToken(tokens[index])
+  ))
+  return isAligned ? displayTokens : fallback
 }
 
 export function isAtomicTruthTableToken(token, operatorSet, syntax) {

@@ -11,14 +11,14 @@ import {
 import InstructorQuestionEditor from '../InstructorQuestionEditor.jsx'
 import getFormulaClass from '../../../lib/logicpenguin/symbolic/formula.js'
 import getSyntax from '../../../lib/logicpenguin/symbolic/libsyntax.js'
-import { libtf } from '../../../lib/logicpenguin/symbolic/libsemantics.js'
+import { evaluateWithTokens } from '../../../lib/logicpenguin/symbolic/libsemantics.js'
 import { getTokenSpeechLabel } from '../../ui/logicpenguin/LogicSymbol.jsx'
 import ProblemSetButtons from '../mui/frame/ProblemSetButtons.jsx'
 import ProblemFrame from '../mui/frame/ProblemFrame.jsx'
 import TruthTableFeedback from './TruthTableFeedback.jsx'
 import TruthTableGrid from './TruthTableGrid.jsx'
 import TruthTableSection from './TruthTableSection.jsx'
-import { isAtomicTruthTableToken, tokenizeTruthTableHeader } from './truthTableUi.js'
+import { buildAlignedTruthTableHeader, isAtomicTruthTableToken } from './truthTableUi.js'
 import { useProblemChecker } from '../../../hooks/useProblemChecker.js'
 import { rowsEqual, clearDebounce, scheduleDebouncedChange } from '../../../utils/tablePerf.js'
 import { getNotation } from '../../../lib/logicSystems.js'
@@ -58,39 +58,14 @@ export default function SingleRowTruthTable({
   const evaluation = useMemo(() => {
     if (!statement) return null
     const wff = Formula.from(statement)
-    const evalWithTokens = (formula, interp) => {
-      const tfn = formula.op ? libtf.tfns[syntax.operators[formula.op]] : false
-      const isBinary = syntax.isbinaryop(formula.op)
-      const isMono = syntax.ismonop(formula.op)
-
-      if (!isBinary && !isMono) {
-        const tv = formula.op ? tfn() : (interp[formula.pletter] ?? false)
-        return { tv, row: [tv], tokens: [formula.normal] }
-      }
-
-      if (isBinary) {
-        const lres = evalWithTokens(formula.left, interp)
-        const rres = evalWithTokens(formula.right, interp)
-        const tv = tfn(lres.tv, rres.tv)
-        return {
-          tv,
-          row: [...lres.row, tv, ...rres.row],
-          tokens: [...lres.tokens, formula.op, ...rres.tokens],
-        }
-      }
-
-      const rres = evalWithTokens(formula.right, interp)
-      const tv = tfn(rres.tv)
-      return { tv, row: [tv, ...rres.row], tokens: [formula.op, ...rres.tokens] }
-    }
-
-    return evalWithTokens(wff, interpretation)
-  }, [Formula, interpretation, statement, syntax])
+    return evaluateWithTokens(wff, interpretation, notation)
+  }, [Formula, interpretation, notation, statement])
 
   const tokens = evaluation?.tokens || []
-  const headerTokens = useMemo(() => {
-    return tokenizeTruthTableHeader(statement, syntax)
-  }, [statement, syntax])
+  const headerTokens = useMemo(
+    () => buildAlignedTruthTableHeader(statement, syntax, tokens),
+    [statement, syntax, tokens]
+  )
   const expectedRow = (evaluation?.row || []).map(toSymbol)
   const expectedCompound = toSymbol(evaluation?.tv)
   const expectedAnswer = useMemo(() => ({
