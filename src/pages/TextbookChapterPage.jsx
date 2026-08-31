@@ -106,6 +106,8 @@ export default function TextbookChapterPage({
     () => linksForTextbookSlug(resolvedLinks, slug),
     [resolvedLinks, slug],
   )
+  const firstPracticeId = chapterLinks[0]?.practiceId ?? null
+  const chapterPracticeIdsKey = JSON.stringify(chapterLinks.map((link) => link.practiceId))
   const linkedSlugs = useMemo(
     () => [...new Set(resolvedLinks.map((link) => link.textbookSlug))],
     [resolvedLinks],
@@ -116,10 +118,9 @@ export default function TextbookChapterPage({
     setPageTitle(structureTitle || entry?.pageTitle || entry?.title || slug)
   }, [slug, structureTitle, entry])
 
-  // Reset selected practice when chapter (or its links) change
   useEffect(() => {
-    setActivePracticeId(chapterLinks[0]?.practiceId ?? null)
-  }, [slug, chapterLinks])
+    setActivePracticeId(firstPracticeId)
+  }, [slug, chapterPracticeIdsKey, firstPracticeId])
 
   const linkBase = useMemo(() => {
     if (textbookChapterPath) {
