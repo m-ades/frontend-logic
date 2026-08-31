@@ -8,11 +8,6 @@ import { ACTIVITY_TYPES } from '../placeholder/courseActivities.js'
 import { fetchJson } from '../utils/api.js'
 import { compareSubchapterLabels, sortAssignmentsBySubchapter } from '../utils/assignmentSort.js'
 import { useAppRuntime } from '../hooks/useAppRuntime.js'
-import { useTextbookPracticeLinks } from '../hooks/useTextbookPracticeLinks.js'
-import {
-  primarySectionIdForPractice,
-  primaryTextbookSlugForPractice,
-} from '../components/textbook/textbookPracticeLinks.js'
 
 const buildCourseStructure = (assignments, sectionTitle) => {
   const chapters = new Map()
@@ -73,7 +68,6 @@ export default function Practice() {
     sandbox: sandboxData,
     activeCourseId,
   } = useAppRuntime()
-  const { resolvedLinks } = useTextbookPracticeLinks()
   const courseIdForApi = isSandbox ? null : (activeCourseId ?? null)
 
   const practiceQuery = useQuery({
@@ -112,13 +106,8 @@ export default function Practice() {
 
   const handleActivityClick = (activity) => {
     if (activity.worksheet) {
-      const practiceId = activity.worksheet.id
-      navigate(assignmentPath(practiceId), {
-        state: {
-          returnTo: practicePath,
-          textbookSlug: primaryTextbookSlugForPractice(resolvedLinks, practiceId) || undefined,
-          textbookSectionId: primarySectionIdForPractice(resolvedLinks, practiceId) || undefined,
-        },
+      navigate(assignmentPath(activity.worksheet.id), {
+        state: { returnTo: practicePath }
       })
     }
   }
@@ -126,7 +115,6 @@ export default function Practice() {
   const renderActivity = (activity) => {
     const totalQuestions = Number(activity.questionCount) || 0
     const completedQuestions = Math.min(Number(activity.answeredCount) || 0, totalQuestions)
-    const textbookSlug = primaryTextbookSlugForPractice(resolvedLinks, activity.id)
     return (
       <ActivityRow
         key={activity.id}
@@ -135,12 +123,7 @@ export default function Practice() {
         totalQuestions={totalQuestions}
         completedQuestions={completedQuestions}
         progressAriaLabel={`Practice completion: ${completedQuestions} of ${totalQuestions} complete`}
-        chips={[
-          ...(textbookSlug
-            ? [{ label: textbookSlug, color: 'secondary', variant: 'outlined' }]
-            : []),
-          { label: 'Practice', color: 'primary', variant: 'outlined' },
-        ]}
+        chips={[{ label: 'Practice', color: 'primary', variant: 'outlined' }]}
         onClick={() => handleActivityClick(activity)}
       />
     )

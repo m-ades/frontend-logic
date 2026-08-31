@@ -23,7 +23,7 @@ export default function WorksheetTextbookSplit({
   children,
 }) {
   const location = useLocation()
-  const { routePrefix, textbookChapterPath } = useAppRuntime()
+  const { routePrefix, textbookChapterPath, isInstructor } = useAppRuntime()
   const { resolvedLinks } = useTextbookPracticeLinks()
   const { resolveSlug } = useTextbookStructure()
 
@@ -32,10 +32,11 @@ export default function WorksheetTextbookSplit({
     String(activityKind || '').toLowerCase() === 'practice' || practiceLinks.length > 0
 
   const linkedSlug =
-    location.state?.textbookSlug || primaryTextbookSlugForPractice(resolvedLinks, practiceId)
+    location.state?.textbookSlug ||
+    (isInstructor ? primaryTextbookSlugForPractice(resolvedLinks, practiceId) : null)
   const sectionId =
     location.state?.textbookSectionId ||
-    primarySectionIdForPractice(resolvedLinks, practiceId)
+    (isInstructor ? primarySectionIdForPractice(resolvedLinks, practiceId) : null)
   const [openChapter, setOpenChapter] = useState(linkedSlug)
 
   useEffect(() => {
