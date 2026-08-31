@@ -27,8 +27,9 @@ export default function WorksheetTextbookSplit({
   const isPractice =
     String(activityKind || '').toLowerCase() === 'practice' || practiceLinks.length > 0
 
-  const linkedSlug = location.state?.textbookSlug || null
-  const sectionId = location.state?.textbookSectionId || null
+  const linkedSlug = location.state?.textbookSlug || practiceLinks[0]?.textbookSlug || null
+  const linkedPractice = practiceLinks.find((link) => link.textbookSlug === linkedSlug)
+  const sectionId = location.state?.textbookSectionId || linkedPractice?.sectionId || null
   const [openChapter, setOpenChapter] = useState(linkedSlug)
 
   useEffect(() => {

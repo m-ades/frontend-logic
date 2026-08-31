@@ -1,7 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 
-// provides bounded resizing for a vertical separator
-
 export function useHorizontalResize({
   initialValue,
   minValue,

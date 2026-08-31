@@ -48,7 +48,7 @@ export function createCourseScopedTextbookResource({
       if (migratedRef.current.has(migrationKey)) return
 
       const localValues = readOverrides(courseIdForApi, 'local')
-      if (localValues == null) {
+      if (!localValues?.length) {
         migratedRef.current.add(migrationKey)
         return
       }
