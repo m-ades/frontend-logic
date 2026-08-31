@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useId, useRef, useState } from 'react'
+import { useId, useState } from 'react'
 import {
   Box,
   IconButton,
@@ -13,10 +13,16 @@ import {
   ChevronRight as CollapseRightIcon,
   ViewColumn as SplitIcon,
 } from '@mui/icons-material'
+import { useHorizontalResize } from '@/hooks/useHorizontalResize.js'
 
 const MIN_LEFT_PCT = 25
 const MAX_LEFT_PCT = 75
 const DEFAULT_LEFT_PCT = 48
+
+function percentFromClientX(clientX, bounds) {
+  if (bounds.width <= 0) return Number.NaN
+  return ((clientX - bounds.left) / bounds.width) * 100
+}
 
 /**
  * Resizable split layout: textbook (left) + workspace (right).
@@ -33,81 +39,22 @@ export default function SplitViewLayout({
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
   const splitterId = useId()
 
-  const containerRef = useRef(null)
-  const draggingRef = useRef(false)
-
-  const [leftPercent, setLeftPercent] = useState(defaultLeftPercent)
   const [leftCollapsed, setLeftCollapsed] = useState(false)
   const [rightCollapsed, setRightCollapsed] = useState(false)
   const [mobileTab, setMobileTab] = useState(0)
-
-  const clampPercent = useCallback((value) => {
-    return Math.min(MAX_LEFT_PCT, Math.max(MIN_LEFT_PCT, value))
-  }, [])
-
-  const updateFromClientX = useCallback(
-    (clientX) => {
-      const el = containerRef.current
-      if (!el) return
-      const rect = el.getBoundingClientRect()
-      if (rect.width <= 0) return
-      const next = ((clientX - rect.left) / rect.width) * 100
-      setLeftPercent(clampPercent(next))
-    },
-    [clampPercent],
-  )
-
-  useEffect(() => {
-    const onPointerMove = (event) => {
-      if (!draggingRef.current) return
-      event.preventDefault()
-      updateFromClientX(event.clientX)
-    }
-
-    const onPointerUp = () => {
-      if (!draggingRef.current) return
-      draggingRef.current = false
-      document.body.style.cursor = ''
-      document.body.style.userSelect = ''
-    }
-
-    window.addEventListener('pointermove', onPointerMove)
-    window.addEventListener('pointerup', onPointerUp)
-    window.addEventListener('pointercancel', onPointerUp)
-
-    return () => {
-      window.removeEventListener('pointermove', onPointerMove)
-      window.removeEventListener('pointerup', onPointerUp)
-      window.removeEventListener('pointercancel', onPointerUp)
-    }
-  }, [updateFromClientX])
-
-  const startDrag = (event) => {
-    if (leftCollapsed || rightCollapsed) return
-    event.preventDefault()
-    draggingRef.current = true
-    document.body.style.cursor = 'col-resize'
-    document.body.style.userSelect = 'none'
-    updateFromClientX(event.clientX)
-  }
-
-  const onSplitterKeyDown = (event) => {
-    if (leftCollapsed || rightCollapsed) return
-    const step = event.shiftKey ? 5 : 2
-    if (event.key === 'ArrowLeft') {
-      event.preventDefault()
-      setLeftPercent((prev) => clampPercent(prev - step))
-    } else if (event.key === 'ArrowRight') {
-      event.preventDefault()
-      setLeftPercent((prev) => clampPercent(prev + step))
-    } else if (event.key === 'Home') {
-      event.preventDefault()
-      setLeftPercent(MIN_LEFT_PCT)
-    } else if (event.key === 'End') {
-      event.preventDefault()
-      setLeftPercent(MAX_LEFT_PCT)
-    }
-  }
+  const {
+    value: leftPercent,
+    targetRef: containerRef,
+    separatorProps,
+  } = useHorizontalResize({
+    initialValue: defaultLeftPercent,
+    minValue: MIN_LEFT_PCT,
+    maxValue: MAX_LEFT_PCT,
+    step: 2,
+    largeStep: 5,
+    valueFromClientX: percentFromClientX,
+    disabled: leftCollapsed || rightCollapsed,
+  })
 
   const expandBoth = () => {
     setLeftCollapsed(false)
@@ -310,15 +257,8 @@ export default function SplitViewLayout({
 
         {showSplitter && (
           <Box
-            role="separator"
-            aria-orientation="vertical"
+            {...separatorProps}
             aria-label="Resize textbook and assignment panes"
-            aria-valuenow={Math.round(leftPercent)}
-            aria-valuemin={MIN_LEFT_PCT}
-            aria-valuemax={MAX_LEFT_PCT}
-            tabIndex={0}
-            onPointerDown={startDrag}
-            onKeyDown={onSplitterKeyDown}
             sx={{
               width: '0.5rem',
               flexShrink: 0,
