@@ -437,7 +437,12 @@ const mapQuestionToProof = (question, assignment, index, logicSystem = DEFAULT_L
   }
 }
 
-const toSymbol = (value) => (value === true ? 'T' : value === false ? 'F' : '')
+const toSymbol = (value) => {
+  if (value === true || value === 'T' || value === 't' || value === 1 || value === '1') return 'T'
+  if (value === false || value === 'F' || value === 'f' || value === 0 || value === '0') return 'F'
+  if (value === 'U' || value === 'u' || value === '?') return 'U'
+  return ''
+}
 const buildTruthTableState = (lefts, right, data) => {
   const mapRows = (rows = []) => rows.map((row) => row.map(toSymbol))
   const state = ({
