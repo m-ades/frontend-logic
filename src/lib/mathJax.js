@@ -67,10 +67,15 @@ export function ensureMathJax() {
   return readyPromise
 }
 
-function queueTypeset(elements, prepare) {
+/*
+disconnected elements and aborted requests are skipped before mutation
+active mathjax work finishes before the next queued request
+*/
+function queueTypeset(elements, prepare, signal) {
   const requested = (elements || []).filter(Boolean)
   typesetQueue = typesetQueue.catch(() => {}).then(async () => {
     const mathJax = await ensureMathJax()
+    if (signal?.aborted) return
     const connected = requested.filter((element) => element.isConnected)
     if (!connected.length) return
 
@@ -85,8 +90,8 @@ export function typesetMath(elements) {
   return queueTypeset(elements)
 }
 
-export function typesetTex(element, tex, display = true) {
+export function typesetTex(element, tex, display = true, { signal } = {}) {
   return queueTypeset([element], () => {
     element.textContent = display ? `\\[${tex}\\]` : `\\(${tex}\\)`
-  })
+  }, signal)
 }

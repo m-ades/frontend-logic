@@ -83,6 +83,8 @@ function AppRoutes() {
     { path: "/sandbox/instructor/dashboard", PageComponent: InstructorDashboard },
     { path: "/sandbox/instructor/assignments", PageComponent: InstructorAssignments },
     { path: "/sandbox/instructor/practice", PageComponent: InstructorPractice },
+    { path: "/sandbox/instructor/textbook", PageComponent: TextbookHubPage },
+    { path: "/sandbox/instructor/textbook/:chapter", PageComponent: TextbookChapterPage },
     { path: "/sandbox/instructor/textbook-links", PageComponent: InstructorTextbookLinks },
     { path: "/sandbox/instructor/gradebook", PageComponent: InstructorGradebook },
     { path: "/sandbox/instructor/roster", PageComponent: InstructorRoster },
@@ -377,6 +379,26 @@ function AppRoutes() {
             <ProtectedRoute allowedRoles={["instructor"]}>
               <AppLayout>
                 <InstructorTextbookLinks />
+              </AppLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/instructor/textbook"
+          element={
+            <ProtectedRoute allowedRoles={["instructor"]}>
+              <AppLayout>
+                <TextbookHubPage />
+              </AppLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/instructor/textbook/:chapter"
+          element={
+            <ProtectedRoute allowedRoles={["instructor"]}>
+              <AppLayout>
+                <TextbookChapterPage />
               </AppLayout>
             </ProtectedRoute>
           }

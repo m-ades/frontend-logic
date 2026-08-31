@@ -189,7 +189,10 @@ export default function TextbookReader({
           return
         }
         const targetSlug = href.slice(linkBase.length + 1).split(/[?#]/)[0]
-        const resolved = resolveInternalSlug?.(decodeURIComponent(targetSlug)) || targetSlug
+        const decodedTargetSlug = decodeURIComponent(targetSlug)
+        const resolved = resolveInternalSlug
+          ? resolveInternalSlug(decodedTargetSlug)
+          : decodedTargetSlug
         if (!resolved) {
           if (onChapterNavigate) {
             onChapterNavigate(null)

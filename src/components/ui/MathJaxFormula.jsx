@@ -8,12 +8,12 @@ export default function MathJaxFormula({ tex, fallback, display = true, block = 
   useEffect(() => {
     if (!containerRef.current) return undefined
     const element = containerRef.current
-    let cancelled = false
+    const controller = new AbortController()
 
-    typesetTex(element, tex, display).catch(() => {
-      if (!cancelled && element.isConnected) element.textContent = fallback
+    typesetTex(element, tex, display, { signal: controller.signal }).catch(() => {
+      if (!controller.signal.aborted && element.isConnected) element.textContent = fallback
     })
-    return () => { cancelled = true }
+    return () => controller.abort()
   }, [display, fallback, tex])
 
   return (

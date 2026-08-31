@@ -83,7 +83,11 @@ export const mapQuestionToProof = (question, assignment, index, logicSystem = DE
     const ttSnapshot = snapshot.truthTable || snapshot.truth_table || {}
     const ttKind = ttSnapshot.kind || snapshot.truthTable?.kind || snapshot.truth_table?.kind || 'formula'
     const hasClassification = ttOptions.question === true || ttOptions.question === 'true'
-    const ttPartialCredit = ttOptions.partialCredit ?? ttOptions.partialcredit ?? ttOptions.partial_credit ?? hasClassification ?? snapshotPartial
+    const ttPartialCredit =
+      ttOptions.partialCredit ??
+      ttOptions.partialcredit ??
+      ttOptions.partial_credit ??
+      snapshotPartial
     return {
       ...proofBase,
       partialCredit: Boolean(ttPartialCredit || hasClassification),

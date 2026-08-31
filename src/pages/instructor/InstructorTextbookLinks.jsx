@@ -31,6 +31,7 @@ import {
   RestartAlt as ResetIcon,
   Sync as SyncIcon,
 } from '@mui/icons-material'
+import { useSearchParams } from 'react-router-dom'
 import { useAppRuntime } from '@/hooks/useAppRuntime.js'
 import { useTextbookPracticeLinks } from '@/hooks/useTextbookPracticeLinks.js'
 import { useTextbookStructure } from '@/hooks/useTextbookStructure.js'
@@ -54,6 +55,8 @@ const actionButtonSx = {
     outlineOffset: 2,
   },
 }
+
+const TEXTBOOK_TABS = ['structure', 'links', 'preview']
 
 function useFlash(duration = 3500) {
   const [flash, setFlash] = useState(null)
@@ -426,6 +429,7 @@ function TextbookPreviewPanel() {
  * Route: `/instructor/textbook-links`
  */
 export default function InstructorTextbookLinks() {
+  const [searchParams, setSearchParams] = useSearchParams()
   const { courseState } = useAppRuntime()
   const { courses, activeCourseId } = courseState || {}
   const activeCourse = courses?.find((course) => course.id === activeCourseId)
@@ -439,8 +443,18 @@ export default function InstructorTextbookLinks() {
     syncFiles,
   } = useTextbookStructure()
 
-  const [tab, setTab] = useState(0)
+  const tab = Math.max(0, TEXTBOOK_TABS.indexOf(searchParams.get('tab')))
   const [flash, showFlash] = useFlash()
+
+  const handleTabChange = (_event, value) => {
+    const next = new URLSearchParams(searchParams)
+    if (value === 0) {
+      next.delete('tab')
+    } else {
+      next.set('tab', TEXTBOOK_TABS[value])
+    }
+    setSearchParams(next, { replace: true })
+  }
 
   const chapters = useMemo(
     () =>
@@ -514,7 +528,7 @@ export default function InstructorTextbookLinks() {
 
       <Tabs
         value={tab}
-        onChange={(_event, value) => setTab(value)}
+        onChange={handleTabChange}
         aria-label="Textbook management tabs"
         sx={{ mb: 2, borderBottom: 1, borderColor: 'divider' }}
       >
