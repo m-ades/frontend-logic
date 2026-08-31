@@ -13,6 +13,7 @@ import WorksheetTabs from '@/components/problems/WorksheetTabs.jsx'
 import { useProofState } from '@/hooks/useproofstate.js'
 import { useScoring } from '@/hooks/usescoring.js'
 import { useWorksheetMetrics } from '@/hooks/useWorksheetMetrics.js'
+import { useAssignmentSession } from '@/hooks/useAssignmentSession.js'
 import { useAppRuntime } from '@/hooks/useAppRuntime.js'
 import { DEFAULT_LOGIC_SYSTEM, normalizeLogicSystem } from '@/lib/logicSystems.js'
 import { mapQuestionToProof } from '@/lib/mapQuestionToProof.js'
@@ -52,6 +53,7 @@ export default function EmbeddedPracticePane({
   )
 
   const selectedId = activePracticeId ?? practiceOptions[0]?.id ?? null
+  const activeUserId = getActiveUserId()
   const [currentProofIndex, setCurrentProofIndex] = useState(0)
   const [liveAssignment, setLiveAssignment] = useState(null)
   const [liveError, setLiveError] = useState(null)
@@ -82,6 +84,8 @@ export default function EmbeddedPracticePane({
   const currentWorksheet = worksheets[0]
   const total = currentWorksheet?.proofs?.length || 0
 
+  useAssignmentSession(isSandbox ? null : currentWorksheet?.id, activeUserId)
+
   const {
     completedProofs,
     score,
@@ -105,7 +109,7 @@ export default function EmbeddedPracticePane({
       setLiveError(null)
       setCompletedProofs(new Set())
       try {
-        const userId = getActiveUserId()
+        const userId = activeUserId
         const [detail, drafts, submissions] = await Promise.all([
           fetchJson(
             `/api/assignments/${selectedId}?userId=${encodeURIComponent(userId || '')}`,
@@ -127,6 +131,12 @@ export default function EmbeddedPracticePane({
         if (cancelled) return
 
         const assignment = detail?.assignment || detail
+        const policy = detail?.policy || null
+        const originalDueAt = assignment.due_at ?? assignment.due_date ?? null
+        const effectiveDueAt =
+          policy?.extension_due_at ??
+          policy?.due_at ??
+          originalDueAt
         const questions = detail?.questions || []
         const proofs = questions.map((question, index) =>
           mapQuestionToProof(question, assignment, index, courseLogicSystem),
@@ -164,6 +174,9 @@ export default function EmbeddedPracticePane({
         setLiveAssignment({
           ...assignment,
           title: assignment.title || assignment.name,
+          due_at: effectiveDueAt,
+          original_due_at: originalDueAt,
+          policy,
           proofs: proofs.map((proof) => ({
             ...proof,
             attemptCount: attemptCountByQuestionId.get(String(proof.questionId)) ?? 0,
@@ -183,7 +196,7 @@ export default function EmbeddedPracticePane({
       cancelled = true
       controller.abort()
     }
-  }, [isSandbox, selectedId, courseLogicSystem])
+  }, [isSandbox, selectedId, courseLogicSystem, activeUserId])
 
   const getQuestionState = isSandbox
     ? worksheetStore?.getQuestionState ?? (() => null)
@@ -229,7 +242,7 @@ export default function EmbeddedPracticePane({
     return (score / total) * 100
   }, [score, total])
 
-  const { completionPercent, gradeLabel } = useWorksheetMetrics({
+  const { completionPercent, gradeLabel, isOverdue } = useWorksheetMetrics({
     score,
     total,
     calculatedGradePercent,
@@ -316,6 +329,7 @@ export default function EmbeddedPracticePane({
             total={total}
             completionPercent={completionPercent}
             gradeLabel={gradeLabel}
+            isOverdue={isOverdue}
           />
         )}
       </Box>

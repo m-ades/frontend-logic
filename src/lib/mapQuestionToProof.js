@@ -108,6 +108,7 @@ export const mapQuestionToProof = (question, assignment, index, logicSystem = DE
       ttOptions.partialCredit ??
       ttOptions.partialcredit ??
       ttOptions.partial_credit ??
+      hasClassification ??
       snapshotPartial
     return {
       ...proofBase,

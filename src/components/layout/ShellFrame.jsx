@@ -32,7 +32,7 @@ export default function ShellFrame({
   const isTextbookRoute = /\/textbook\/[^/]+$/.test(location.pathname);
   const isImmersiveSplitRoute =
     isTextbookRoute ||
-    /\/assignment\/[^/]+$/.test(location.pathname);
+    isWorksheetRoute;
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -100,7 +100,7 @@ export default function ShellFrame({
               flexGrow: 1,
               p: isImmersiveSplitRoute ? 2 : 3,
               pb: isDashboardRoute ? 0 : isImmersiveSplitRoute ? 2 : 3,
-              pt: /\/assignment\/[^/]+$/.test(location.pathname) || isImmersiveSplitRoute ? 2 : 3,
+              pt: isWorksheetRoute || isImmersiveSplitRoute ? 2 : 3,
               backgroundColor: "background.default",
               minHeight: { xs: "100vh", md: 0 },
               overflow: isTextbookRoute ? { xs: "auto", md: "hidden" } : "auto",

@@ -8,7 +8,6 @@ import { useScoring } from '../hooks/usescoring.js'
 import { useProofState } from '../hooks/useproofstate.js'
 import { useWorksheetMetrics } from '../hooks/useWorksheetMetrics.js'
 import { formatEasternFromIso } from '../utils/easternTime.js'
-// import { exportWorksheetPDF } from '../utils/exportPDF.js'
 import { API_CONFIG, fetchJson, getActiveUserId } from '../utils/api.js'
 import { sortAssignmentsBySubchapter } from '../utils/assignmentSort.js'
 import { displayScoreForProof } from '../utils/problemHelpers.js'
@@ -17,6 +16,7 @@ import { useAppRuntime } from '../hooks/useAppRuntime.js'
 import { DEFAULT_LOGIC_SYSTEM, isDerivationProblemType, normalizeLogicSystem } from '../lib/logicSystems.js'
 import { mapQuestionToProof, logicSystemForQuestionType } from '../lib/mapQuestionToProof.js'
 import WorksheetTextbookSplit from '../components/textbook/WorksheetTextbookSplit.jsx'
+import { useAssignmentSession } from '../hooks/useAssignmentSession.js'
 
 function SandboxWorksheetContent() {
   const { assignmentId } = useParams()
@@ -248,7 +248,6 @@ function RealWorksheetContent() {
     activeCourse?.logicSystem ?? activeCourse?.logic_system,
     DEFAULT_LOGIC_SYSTEM
   )
-  const sessionId = useRef(null)
   const questionSessionId = useRef(null)
   const questionSessionQuestionIdRef = useRef(null)
   const desiredQuestionSessionQuestionIdRef = useRef(null)
@@ -302,6 +301,8 @@ function RealWorksheetContent() {
     ?? currentDueAt
   const defaultBackTarget = assignmentsPath
   const backTarget = location?.state?.returnTo || defaultBackTarget
+
+  useAssignmentSession(currentWorksheet?.id, activeUserId)
 
   // total score: sum per-question best (0–100), same as backend
   const calculatedGradePercent = useMemo(() => {
@@ -443,59 +444,6 @@ function RealWorksheetContent() {
 
     return questionSessionSyncRef.current
   }, [activeUserId])
-
-  useEffect(() => {
-    let keepGoing = true
-
-    const startSession = async () => {
-      if (!currentWorksheet?.id || !activeUserId) return
-      try {
-        const session = await fetchJson('/api/assignment-sessions', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            assignment_id: currentWorksheet.id,
-            user_id: activeUserId,
-            started_at: new Date().toISOString(),
-          }),
-        })
-        if (keepGoing) {
-          sessionId.current = session?.id ?? null
-        }
-      } catch (err) {
-        // ignore for now
-      }
-    }
-
-    const endSession = async () => {
-      if (!sessionId.current) return
-      const id = sessionId.current
-      try {
-        await fetchJson(`/api/assignment-sessions/${id}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ ended_at: new Date().toISOString() }),
-        })
-      } catch (err) {
-        // ignore for now
-      } finally {
-        if (sessionId.current === id) {
-          sessionId.current = null
-        }
-      }
-    }
-
-    // start a session when this assignment loads
-    if (currentWorksheet?.id) {
-      startSession()
-    }
-
-    // end it when leaving this assignment
-    return () => {
-      keepGoing = false
-      endSession()
-    }
-  }, [activeUserId, currentWorksheet?.id])
 
   useEffect(() => {
     let keepGoing = true
@@ -945,6 +893,7 @@ function RealWorksheetContent() {
     const worksheet = {
       id: assignmentInfo.id,
       title: assignmentInfo.title,
+      kind: assignmentInfo.kind ?? assignmentMeta?.kind,
       due_at: effectiveDueAt,
       original_due_at: originalDueAt,
       policy,
@@ -1058,42 +1007,6 @@ function RealWorksheetContent() {
       })
     }
   }
-
-  // Temporarily disabled export PDF feature
-  // const handleExport = async () => {
-  //   if (!currentWorksheet) return
-  //   if (!window.confirm('Download your answers as PDF?')) return
-  //   
-  //   try {
-  //     let liveState = null
-  //     try {
-  //       const derivEl = document.querySelector('derivation-hurley')
-  //       if (derivEl?.getState && !derivEl._isRestoring) {
-  //         liveState = derivEl.getState()
-  //       }
-  //     } catch (err) {
-  //     }
-
-  //     const allStates = currentWorksheet.proofs.map((proof) => ({
-  //       id: proof.id,
-  //       questionId: proof.questionId,
-  //       premises: proof.premises,
-  //       conclusion: proof.conclusion,
-  //       savedState: proof.id === currentProof?.id && liveState
-  //         ? liveState
-  //         : getSavedProofState(proof.id)
-  //     }))
-  //     
-  //     await exportWorksheetPDF({
-  //       worksheet: currentWorksheet.title,
-  //       worksheetId: currentWorksheet.id,
-  //       exportedAt: new Date().toISOString(),
-  //       proofs: allStates
-  //     })
-  //   } catch (error) {
-  //     alert(`Export failed: ${error?.message || 'Unknown error'}`)
-  //   }
-  // }
 
   const policySummary = useMemo(() => {
     if (!currentWorksheet?.policy) return []

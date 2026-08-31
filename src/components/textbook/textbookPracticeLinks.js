@@ -183,6 +183,18 @@ function practiceTitle(practice) {
   return practice?.title || practice?.name || 'Practice'
 }
 
+function comparePracticeCandidates(link, left, right) {
+  const label = String(link.label || '').trim().toLowerCase()
+  const leftMatchesLabel = String(practiceTitle(left)).trim().toLowerCase() === label
+  const rightMatchesLabel = String(practiceTitle(right)).trim().toLowerCase() === label
+  if (leftMatchesLabel !== rightMatchesLabel) return leftMatchesLabel ? -1 : 1
+
+  return String(left.id).localeCompare(String(right.id), undefined, {
+    numeric: true,
+    sensitivity: 'base',
+  })
+}
+
 function findPracticeForLink(link, practices = []) {
   if (!Array.isArray(practices) || practices.length === 0) return null
 
@@ -196,10 +208,14 @@ function findPracticeForLink(link, practices = []) {
     const sub = link.match.subchapter
     const candidates = practices.filter((item) => Number(item.chapter) === chapter)
     if (sub) {
-      const exact = candidates.find((item) => String(item.subchapter) === String(sub))
-      if (exact) return exact
+      const exact = candidates
+        .filter((item) => String(item.subchapter) === String(sub))
+        .sort((left, right) => comparePracticeCandidates(link, left, right))
+      if (exact.length) return exact[0]
     }
-    return candidates[0] || null
+    return [...candidates].sort(
+      (left, right) => comparePracticeCandidates(link, left, right),
+    )[0] || null
   }
 
   return null
