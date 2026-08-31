@@ -31,7 +31,7 @@ import { useTextbookStructure } from '@/hooks/useTextbookStructure.js'
 import { linksForTextbookSlug } from '@/components/textbook/textbookPracticeLinks.js'
 
 // textbook chapter reader with linked practice
- default function TextbookChapterPage({
+export default function TextbookChapterPage({
   previewChapter = null,
   onOpenChapter = null,
   onOpenHub = null,
