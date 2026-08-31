@@ -174,7 +174,6 @@ export default function SingleRowTruthTable({
     question: problem,
     options: {
       partialCredit: Boolean(proof?.partialCredit ?? problem?.partialCredit),
-      notation,
     },
     getAnswer: () => ({
       row: rowInputs.map(toSymbol),
