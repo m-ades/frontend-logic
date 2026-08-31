@@ -251,14 +251,3 @@ export function linksForPracticeId(resolvedLinks, practiceId) {
     (link) => String(link.practiceId) === String(practiceId),
   )
 }
-
-/** Prefer the first linked chapter; used when opening textbook beside a practice. */
-export function primaryTextbookSlugForPractice(resolvedLinks, practiceId) {
-  const matches = linksForPracticeId(resolvedLinks, practiceId)
-  return matches[0]?.textbookSlug || null
-}
-
-export function primarySectionIdForPractice(resolvedLinks, practiceId) {
-  const matches = linksForPracticeId(resolvedLinks, practiceId)
-  return matches.find((link) => link.sectionId)?.sectionId || null
-}
