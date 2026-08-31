@@ -47,29 +47,46 @@ libtf.allinterps = function(wffs) {
     return interps;
 }
 
-// evaluates a formula on an interpretation; keeping track of the
-// "full truth table row" and where the main op is in it
-libtf.evaluate = function(wff, interp, notation = undefined) {
-    const syntax = getSyntax(notation);
+function evaluateFormula(wff, interp, syntax, includeTokens) {
     const tfn = (wff.op) ? libtf.tfns[syntax.operators[wff.op]] : false;
     if (syntax.isbinaryop(wff.op)) {
-        const lres = libtf.evaluate(wff.left, interp, notation);
-        const rres = libtf.evaluate(wff.right, interp, notation);
+        const lres = evaluateFormula(wff.left, interp, syntax, includeTokens);
+        const rres = evaluateFormula(wff.right, interp, syntax, includeTokens);
         const tv = tfn(lres.tv, rres.tv);
-        return {
+        const result = {
             tv: tv,
             row: [...lres.row, tv, ...rres.row],
             opspot: lres.row.length
+        };
+        if (includeTokens) {
+            result.tokens = [...lres.tokens, wff.op, ...rres.tokens];
         }
+        return result;
     }
     if (syntax.ismonop(wff.op)) {
-        const rres = libtf.evaluate(wff.right, interp, notation);
-        const tv = tfn(rres.tv)
-        return { tv: tv, row: [tv, ...rres.row], opspot: 0 }
+        const rres = evaluateFormula(wff.right, interp, syntax, includeTokens);
+        const tv = tfn(rres.tv);
+        const result = { tv: tv, row: [tv, ...rres.row], opspot: 0 };
+        if (includeTokens) {
+            result.tokens = [wff.op, ...rres.tokens];
+        }
+        return result;
     }
-    if (tfn) { return { tv: tfn(), row: [tfn()], opspot: 0 }; }
-    const tv = interp[wff.pletter] ?? false
-    return { tv: tv, row:[tv], opspot: 0 }
+    const tv = tfn ? tfn() : (interp[wff.pletter] ?? false);
+    const result = { tv: tv, row: [tv], opspot: 0 };
+    if (includeTokens) {
+        result.tokens = [wff.normal];
+    }
+    return result;
+}
+
+libtf.evaluate = function(wff, interp, notation = undefined) {
+    return evaluateFormula(wff, interp, getSyntax(notation), false);
+}
+
+// returns aligned tokens row values and main operator position for one interpretation
+export function evaluateWithTokens(wff, interp, notation = undefined) {
+    return evaluateFormula(wff, interp, getSyntax(notation), true);
 }
 
 // fills in a truth table for one formula and determines if it
@@ -148,45 +165,11 @@ export function multiTables(wffs, notation = undefined) {
     const interps = libtf.allinterps(wffs);
     const tables = [];
 
-    const syntax = getSyntax(notation);
-
-    // evaluation aligned with column order: left subformula(s), operator, right subformula(s)
-    function evalWithTokens(wff, interp) {
-        const tfn = (wff.op) ? libtf.tfns[syntax.operators[wff.op]] : false;
-        const isBinary = syntax.isbinaryop(wff.op);
-        const isMono = syntax.ismonop(wff.op);
-
-        if (!isBinary && !isMono) {
-            const tv = (wff.op) ? tfn() : (interp[wff.pletter] ?? false);
-            return { tv, row: [tv], tokens: [wff.normal] };
-        }
-
-        if (isBinary) {
-            const lres = evalWithTokens(wff.left, interp);
-            const rres = evalWithTokens(wff.right, interp);
-            const tv = tfn(lres.tv, rres.tv);
-            return {
-                tv,
-                row: [...lres.row, tv, ...rres.row],
-                tokens: [...lres.tokens, wff.op, ...rres.tokens]
-            };
-        }
-
-        // monadic
-        const rres = evalWithTokens(wff.right, interp);
-        const tv = tfn(rres.tv);
-        return {
-            tv,
-            row: [tv, ...rres.row],
-            tokens: [wff.op, ...rres.tokens]
-        };
-    }
-
     for (const wff of wffs) {
         let tokens = [];
         const rows = [];
         for (const interp of interps) {
-            const res = evalWithTokens(wff, interp);
+            const res = evaluateWithTokens(wff, interp, notation);
             if (tokens.length === 0) { tokens = res.tokens; }
             rows.push(res.row);
         }

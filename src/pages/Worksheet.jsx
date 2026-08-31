@@ -389,6 +389,7 @@ const mapQuestionToProof = (question, assignment, index, logicSystem = DEFAULT_L
       singleRowTruthTable: {
         statement: snapshot.statement || snapshot.evaluateTruth || snapshot.prompt || '',
         interpretation: snapshot.interpretation || {},
+        row: Array.isArray(snapshot.row) ? snapshot.row : undefined,
         prompt: snapshot.prompt || snapshot.description || '',
       },
     }
@@ -436,7 +437,12 @@ const mapQuestionToProof = (question, assignment, index, logicSystem = DEFAULT_L
   }
 }
 
-const toSymbol = (value) => (value === true ? 'T' : value === false ? 'F' : '')
+const toSymbol = (value) => {
+  if (value === true || value === 'T' || value === 't' || value === 1 || value === '1') return 'T'
+  if (value === false || value === 'F' || value === 'f' || value === 0 || value === '0') return 'F'
+  if (value === 'U' || value === 'u' || value === '?') return 'U'
+  return ''
+}
 const buildTruthTableState = (lefts, right, data) => {
   const mapRows = (rows = []) => rows.map((row) => row.map(toSymbol))
   const state = ({
@@ -1077,6 +1083,7 @@ function RealWorksheetContent() {
           if (Array.isArray(data.row)) {
             initialStates[proof.id] = {
               row: data.row.map(toSymbol),
+              compound: toSymbol(data.compound),
             }
           }
           return
