@@ -58,7 +58,10 @@ export function createCourseScopedTextbookResource({
         fetchJson(apiPath(courseIdForApi), {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ [responseField]: normalizeValues(localValues) }),
+          body: JSON.stringify({
+            [responseField]: normalizeValues(localValues),
+            updatedAt: resourceQuery.data?.updatedAt ?? null,
+          }),
         }),
       )
         .then((payload) => {
@@ -78,11 +81,14 @@ export function createCourseScopedTextbookResource({
     ])
 
     const saveMutation = useMutation({
-      mutationFn: async (nextValues) =>
+      mutationFn: async ({ nextValues, updatedAt }) =>
         fetchJson(apiPath(courseIdForApi), {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ [responseField]: normalizeValues(nextValues) }),
+          body: JSON.stringify({
+            [responseField]: normalizeValues(nextValues),
+            updatedAt,
+          }),
         }),
       onSuccess: (payload) => {
         queryClient.setQueryData(queryKey(courseIdForApi), payload)
@@ -130,10 +136,24 @@ export function createCourseScopedTextbookResource({
           setSandboxRevision((value) => value + 1)
           return normalized
         }
-        const payload = await enqueueWrite(() => saveMutation.mutateAsync(normalized))
+        const payload = await enqueueWrite(() => {
+          const current = queryClient.getQueryData(queryKey(courseIdForApi))
+          return saveMutation.mutateAsync({
+            nextValues: normalized,
+            updatedAt: current?.updatedAt ?? null,
+          })
+        })
         return payload[responseField]
       },
-      [isSandbox, courseId, storageScope, saveMutation, enqueueWrite],
+      [
+        isSandbox,
+        courseId,
+        courseIdForApi,
+        storageScope,
+        saveMutation,
+        queryClient,
+        enqueueWrite,
+      ],
     )
 
     const reset = useCallback(async () => {

@@ -302,6 +302,7 @@ export default function TextbookStructureEditor({ nodes, onChange }) {
   const queuedTitleDraftsRef = useRef(null)
   const nodesRef = useRef(nodes)
   const titleDraftsRef = useRef(titleDrafts)
+  const flushRenameRef = useRef(() => {})
   nodesRef.current = nodes
 
   const editableNodes = useMemo(
@@ -316,10 +317,6 @@ export default function TextbookStructureEditor({ nodes, onChange }) {
 
   const [openSections, setOpenSections] = useState({})
   const [activeId, setActiveId] = useState(null)
-
-  useEffect(() => () => {
-    if (renameTimerRef.current) window.clearTimeout(renameTimerRef.current)
-  }, [])
 
   useEffect(() => {
     setOpenSections((prev) => {
@@ -386,6 +383,11 @@ export default function TextbookStructureEditor({ nodes, onChange }) {
     const next = applyTitleDrafts(nodesRef.current, drafts)
     queueSave(next, drafts)
   }, [clearRenameTimer, queueSave])
+  flushRenameRef.current = flushRename
+
+  useEffect(() => () => {
+    flushRenameRef.current()
+  }, [])
 
   const saveNow = useCallback((nextNodes) => {
     clearRenameTimer()
