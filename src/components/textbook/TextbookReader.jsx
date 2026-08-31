@@ -7,11 +7,8 @@ import LoadingSpinner from '@/components/ui/LoadingSpinner.jsx'
 import PracticeWidget from '@/components/textbook/PracticeWidget.jsx'
 import TextbookLinkedPractices from '@/components/textbook/TextbookLinkedPractices.jsx'
 import { prepareTextbookHtml } from '@/components/textbook/prepareTextbookHtml.js'
-import {
-  ensureTextbookMathJax,
-  ensureTextbookStyles,
-  typesetTextbookMath,
-} from '@/components/textbook/textbookAssets.js'
+import { ensureTextbookStyles } from '@/components/textbook/textbookAssets.js'
+import { ensureMathJax, typesetMath } from '@/lib/mathJax.js'
 import {
   normalizeTextbookSlug,
   resolveTextbookAssetUrl,
@@ -102,7 +99,7 @@ export default function TextbookReader({
 
   useEffect(() => {
     ensureTextbookStyles()
-    ensureTextbookMathJax()
+    ensureMathJax().catch(() => {})
   }, [])
 
   useEffect(() => {
@@ -172,7 +169,11 @@ export default function TextbookReader({
     let cancelled = false
 
     async function runTypeset() {
-      await typesetTextbookMath(containerRef.current)
+      try {
+        await typesetMath([containerRef.current])
+      } catch (typesetError) {
+        console.warn('MathJax typeset failed', typesetError)
+      }
       if (cancelled || !containerRef.current) return
 
       const hash = scrollToId || window.location.hash?.replace(/^#/, '')
