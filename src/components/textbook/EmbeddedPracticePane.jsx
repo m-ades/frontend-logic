@@ -10,9 +10,13 @@ import {
 } from '@mui/material'
 import LoadingSpinner from '@/components/ui/LoadingSpinner.jsx'
 import WorksheetTabs from '@/components/problems/WorksheetTabs.jsx'
+import { useProofState } from '@/hooks/useproofstate.js'
 import { useScoring } from '@/hooks/usescoring.js'
 import { useWorksheetMetrics } from '@/hooks/useWorksheetMetrics.js'
 import { useAppRuntime } from '@/hooks/useAppRuntime.js'
+import { useCoursesState } from '@/context/CoursesContext.jsx'
+import { DEFAULT_LOGIC_SYSTEM, normalizeLogicSystem } from '@/lib/logicSystems.js'
+import { mapQuestionToProof } from '@/lib/mapQuestionToProof.js'
 import { fetchJson, getActiveUserId } from '@/utils/api.js'
 
 /**
@@ -30,6 +34,15 @@ export default function EmbeddedPracticePane({
     sandbox,
     instructorSandbox,
   } = useAppRuntime()
+  const { activeCourseId, courses } = useCoursesState()
+  const activeCourse = useMemo(
+    () => courses.find((course) => Number(course.id) === Number(activeCourseId)),
+    [courses, activeCourseId],
+  )
+  const courseLogicSystem = normalizeLogicSystem(
+    activeCourse?.logicSystem ?? activeCourse?.logic_system,
+    DEFAULT_LOGIC_SYSTEM,
+  )
 
   const practiceOptions = useMemo(
     () =>
@@ -45,6 +58,11 @@ export default function EmbeddedPracticePane({
   const [liveAssignment, setLiveAssignment] = useState(null)
   const [liveError, setLiveError] = useState(null)
   const [liveLoading, setLiveLoading] = useState(false)
+  const {
+    getSavedProofState,
+    handleProofStateChange,
+    initializeSavedProofStates,
+  } = useProofState()
 
   useEffect(() => {
     setCurrentProofIndex(0)
@@ -74,32 +92,35 @@ export default function EmbeddedPracticePane({
       setLiveError(null)
       try {
         const userId = getActiveUserId()
-        const detail = await fetchJson(
-          `/api/assignments/${selectedId}?userId=${encodeURIComponent(userId || '')}`,
-          { signal: controller.signal },
-        )
+        const [detail, drafts] = await Promise.all([
+          fetchJson(
+            `/api/assignments/${selectedId}?userId=${encodeURIComponent(userId || '')}`,
+            { signal: controller.signal },
+          ),
+          fetchJson('/api/assignment-drafts', { signal: controller.signal })
+            .catch((error) => {
+              if (error?.name === 'AbortError') throw error
+              return []
+            }),
+        ])
         if (cancelled) return
 
         const assignment = detail?.assignment || detail
         const questions = detail?.questions || []
-        const proofs = questions.map((question, index) => {
-          const snapshot = question?.question_snapshot || {}
-          const type =
-            snapshot?.type || snapshot?.problemType || snapshot?.logic_problem_type || 'derivation'
-          const questionId =
-            question?.id ?? question?.assignment_question_id ?? question?.assignmentQuestionId ?? index
-          return {
-            id: `${assignment.id}-${questionId}`,
-            questionId,
-            type,
-            description: snapshot.prompt || snapshot.description || snapshot.text || 'Solve.',
-            solution: snapshot.solution,
-            attemptLimit: question?.attempt_limit ?? 3,
-            legend: snapshot.legend || '',
-            questionSnapshot: snapshot,
-            ...snapshot,
-          }
-        })
+        const proofs = questions.map((question, index) =>
+          mapQuestionToProof(question, assignment, index, courseLogicSystem),
+        )
+
+        const proofIdByQuestionId = new Map(
+          proofs.map((proof) => [String(proof.questionId), proof.id]),
+        )
+        const initialStates = {}
+        for (const draft of drafts || []) {
+          if (userId != null && String(draft.user_id) !== String(userId)) continue
+          const proofId = proofIdByQuestionId.get(String(draft.assignment_question_id))
+          if (proofId) initialStates[proofId] = draft.draft_data
+        }
+        initializeSavedProofStates(initialStates)
 
         setLiveAssignment({
           ...assignment,
@@ -124,9 +145,13 @@ export default function EmbeddedPracticePane({
 
   const assignment = isSandbox ? sandboxAssignment : liveAssignment
 
-  const getQuestionState = worksheetStore?.getQuestionState ?? (() => null)
+  const getQuestionState = isSandbox
+    ? worksheetStore?.getQuestionState ?? (() => null)
+    : getSavedProofState
   const isQuestionComplete = worksheetStore?.isQuestionComplete ?? (() => false)
-  const updateQuestionState = worksheetStore?.updateQuestionState ?? (() => undefined)
+  const updateQuestionState = isSandbox
+    ? worksheetStore?.updateQuestionState ?? (() => undefined)
+    : handleProofStateChange
   const markQuestionComplete = worksheetStore?.markQuestionComplete ?? (() => undefined)
 
   const worksheets = useMemo(
@@ -260,14 +285,8 @@ export default function EmbeddedPracticePane({
               handleProofComplete(proofId)
               if (isSandbox) markQuestionComplete(proofId)
             }}
-            getSavedProofState={
-              isSandbox ? (proofId) => getQuestionState(proofId) : undefined
-            }
-            handleProofStateChange={
-              isSandbox
-                ? (proofId, state) => updateQuestionState(proofId, state)
-                : undefined
-            }
+            getSavedProofState={getQuestionState}
+            handleProofStateChange={updateQuestionState}
             total={total}
             completionPercent={completionPercent}
             gradeLabel={gradeLabel}
