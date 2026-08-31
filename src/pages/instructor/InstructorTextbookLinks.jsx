@@ -199,16 +199,11 @@ function PracticeLinksPanel({ chapters }) {
               ) : (
                 definitions.map((link) => {
                   const resolved = resolvedLinks.find((item) => item.id === link.id)
-                  const practice =
-                    practices.find((item) => String(item.id) === String(link.practiceId)) ||
-                    (link.match
-                      ? practices.find(
-                          (item) =>
-                            Number(item.chapter) === Number(link.match.chapter) &&
-                            (!link.match.subchapter ||
-                              String(item.subchapter) === String(link.match.subchapter)),
-                        )
-                      : null)
+                  const practice = resolved
+                    ? practices.find(
+                        (item) => String(item.id) === String(resolved.practiceId),
+                      )
+                    : null
                   const chapter = chapters.find((item) => item.slug === link.textbookSlug)
 
                   return (
