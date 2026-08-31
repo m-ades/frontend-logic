@@ -46,7 +46,7 @@ export default function TextbookChapterPage({
   const { textbookPath, textbookChapterPath } = useAppRuntime()
   const slug = normalizeTextbookSlug(chapter)
   const entry = getTextbookEntry(slug)
-  const { getNeighbors, studentFlat, resolveSlug, nodes } = useTextbookStructure()
+  const { getNeighbors, studentFlat, numberedTree, resolveSlug, nodes } = useTextbookStructure()
 
   // Part / section dividers are not readable pages — bounce to first chapter or hub.
   useEffect(() => {
@@ -313,6 +313,7 @@ export default function TextbookChapterPage({
       </Stack>
 
       <TextbookTocNav
+        tree={numberedTree}
         variant="drawer"
         drawerOpen={drawerOpen}
         onDrawerClose={() => setDrawerOpen(false)}
@@ -341,6 +342,7 @@ export default function TextbookChapterPage({
             onCollapsedChange={setTocCollapsed}
           >
             <TextbookTocNav
+              tree={numberedTree}
               variant="rail"
               activeSlug={slug}
               onSelect={goChapter}

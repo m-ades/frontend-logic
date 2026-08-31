@@ -9,6 +9,7 @@
 import textbookInventory from './textbookInventory.json'
 import textbookManifest from './textbookManifest.json'
 import { buildTextbookTocTree, listTextbookNavItems } from './textbookCatalog.js'
+import { stripNumberPrefix } from './textbookTitles.js'
 
 export const TEXTBOOK_STRUCTURE_STORAGE_KEY = 'logicapp_textbook_structure_v1'
 
@@ -31,16 +32,6 @@ export function isNavigableNode(node) {
   if (!node) return false
   if (typeof node.navigable === 'boolean') return node.navigable
   return !isDividerKind(node.kind)
-}
-
-function stripNumberPrefix(title) {
-  if (!title) return ''
-  return String(title)
-    .replace(/^Part\s+[IVXLCDM]+\s+/i, '')
-    .replace(/^Chapter\s+\d+\s+/i, '')
-    .replace(/^[IVXLCDM]+\s+/, '')
-    .replace(/^\d+\s+/, '')
-    .trim()
 }
 
 function getStore(storageScope = 'local') {

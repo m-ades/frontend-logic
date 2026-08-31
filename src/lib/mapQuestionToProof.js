@@ -15,6 +15,27 @@ export const logicSystemForQuestionType = (type, fallback = DEFAULT_LOGIC_SYSTEM
   return normalizeLogicSystem(fallback, DEFAULT_LOGIC_SYSTEM)
 }
 
+function normalizeChoiceQuestions(snapshot) {
+  const snapshotQuestions = snapshot.questions || snapshot.subquestions || []
+  const choiceList = Array.isArray(snapshot.choices) ? snapshot.choices : []
+  const questions = Array.isArray(snapshotQuestions) && snapshotQuestions.length > 0
+    ? snapshotQuestions
+    : (choiceList.length > 0
+      ? [{
+          prompt: snapshot.choicePrompt || snapshot.question || '',
+          choices: choiceList,
+          answerIndex: snapshot.answerIndex
+            ?? snapshot.answer
+            ?? (Array.isArray(snapshot.answerIndices) ? snapshot.answerIndices[0] : undefined),
+        }]
+      : [])
+  const derivedAnswer = questions.length
+    ? questions.map((question) => question.answerIndex ?? question.answer ?? question.correctIndex)
+    : (snapshot.answerIndex ?? snapshot.answer ?? snapshot.answerIndices)
+
+  return { questions, choiceList, derivedAnswer }
+}
+
 export const mapQuestionToProof = (question, assignment, index, logicSystem = DEFAULT_LOGIC_SYSTEM) => {
   const snapshot = question?.question_snapshot || {}
   const type = normalizeType(snapshot)
@@ -137,20 +158,7 @@ export const mapQuestionToProof = (question, assignment, index, logicSystem = DE
   }
 
   if (type === 'indirect-truth-table') {
-    const snapshotQuestions = snapshot.questions || snapshot.subquestions || []
-    const choiceList = Array.isArray(snapshot.choices) ? snapshot.choices : []
-    const questions = Array.isArray(snapshotQuestions) && snapshotQuestions.length > 0
-      ? snapshotQuestions
-      : (choiceList.length > 0
-        ? [{
-            prompt: snapshot.choicePrompt || snapshot.question || '',
-            choices: choiceList,
-            answerIndex: snapshot.answerIndex ?? snapshot.answer ?? (Array.isArray(snapshot.answerIndices) ? snapshot.answerIndices[0] : undefined),
-          }]
-        : [])
-    const derivedAnswer = questions.length
-      ? questions.map((q) => q.answerIndex ?? q.answer ?? q.correctIndex)
-      : (snapshot.answerIndex ?? snapshot.answer ?? snapshot.answerIndices)
+    const { questions, choiceList, derivedAnswer } = normalizeChoiceQuestions(snapshot)
     return {
       ...proofBase,
       type: 'indirect-truth-table',
@@ -167,20 +175,7 @@ export const mapQuestionToProof = (question, assignment, index, logicSystem = DE
   }
 
   if (type === 'nonclassical-truth-table') {
-    const snapshotQuestions = snapshot.questions || snapshot.subquestions || []
-    const choiceList = Array.isArray(snapshot.choices) ? snapshot.choices : []
-    const questions = Array.isArray(snapshotQuestions) && snapshotQuestions.length > 0
-      ? snapshotQuestions
-      : (choiceList.length > 0
-        ? [{
-            prompt: snapshot.choicePrompt || snapshot.question || '',
-            choices: choiceList,
-            answerIndex: snapshot.answerIndex ?? snapshot.answer ?? (Array.isArray(snapshot.answerIndices) ? snapshot.answerIndices[0] : undefined),
-          }]
-        : [])
-    const derivedAnswer = questions.length
-      ? questions.map((q) => q.answerIndex ?? q.answer ?? q.correctIndex)
-      : (snapshot.answerIndex ?? snapshot.answer ?? snapshot.answerIndices)
+    const { questions, choiceList, derivedAnswer } = normalizeChoiceQuestions(snapshot)
     return {
       ...proofBase,
       type: 'nonclassical-truth-table',
