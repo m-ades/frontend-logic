@@ -1389,6 +1389,7 @@ function buildSymbolicTranslationSnapshot(proof, edited, existing, logicSystem =
 /*
 single row questions store the generated answer interpretation separately
 the optional row marks given cells while null cells remain student editable
+null row resets to generated atomic givens
 */
 function buildSingleRowTruthTableSnapshot(proof, edited, existing, logicSystem = DEFAULT_LOGIC_SYSTEM) {
   const sr = proof.singleRowTruthTable || {}
@@ -1406,7 +1407,8 @@ function buildSingleRowTruthTableSnapshot(proof, edited, existing, logicSystem =
   const interpretation = Object.fromEntries(
     letters.map((letter) => [letter, sourceInterpretation[letter] ?? false])
   )
-  const sourceRow = edited.row ?? sr.row ?? existing?.row
+  const hasEditedRow = Object.prototype.hasOwnProperty.call(edited, 'row')
+  const sourceRow = hasEditedRow ? edited.row : (sr.row ?? existing?.row)
   const headerTokens = formula.wellformed ? tokenizeTruthTableHeader(statement, syntax) : []
   const rowLength = formula.wellformed
     ? libtf.evaluate(formula, interpretation, notation).row.length
@@ -1561,8 +1563,9 @@ function SingleRowTruthTableEditorForm({ proof, value, onChange, logicSystem = D
     const atom = syntax.symbolfix(stripped)
     return sentenceLetters.includes(atom) ? atom : null
   }, [headerTokens, sentenceLetters, syntax])
-  const sourceRow = Array.isArray(value.row)
-    ? value.row
+  const hasEditedRow = Object.prototype.hasOwnProperty.call(value, 'row')
+  const sourceRow = hasEditedRow
+    ? (Array.isArray(value.row) ? value.row : null)
     : (Array.isArray(sr.row) ? sr.row : null)
   const givenRow = headerTokens.map((_, index) => {
     if (!sourceRow) return atomForColumn(index) ? computedRow[index] : ''
@@ -1609,7 +1612,7 @@ function SingleRowTruthTableEditorForm({ proof, value, onChange, logicSystem = D
   }
   return (
     <Stack spacing={2}>
-      <TextField label="Statement" value={statement} onChange={(e) => onChange({ ...value, statement: displayFormulaInput(e.target.value, logicSystem), row: [], interpretation: {} })} fullWidth variant="outlined" />
+      <TextField label="Statement" value={statement} onChange={(e) => onChange({ ...value, statement: displayFormulaInput(e.target.value, logicSystem), row: null, interpretation: {} })} fullWidth variant="outlined" />
       <Box>
         <Typography variant="subtitle2" sx={{ mb: 0.5 }}>Truth values</Typography>
         {headerTokens.length === 0 ? (
