@@ -1,6 +1,6 @@
 import { Box, Button, Chip, Stack, Typography } from '@mui/material'
 import { Psychology as PracticeIcon } from '@mui/icons-material'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { useAppRuntime } from '@/hooks/useAppRuntime.js'
 
 /**
@@ -13,8 +13,10 @@ export default function PracticeWidget({
   sectionId = null,
   textbookSlug = null,
 }) {
+  const location = useLocation()
   const navigate = useNavigate()
-  const { assignmentPath, practicePath, textbookPath, textbookChapterPath } = useAppRuntime()
+  const { assignmentPath, isInstructor, practicePath, textbookPath, textbookChapterPath } =
+    useAppRuntime()
 
   if (practiceId == null) return null
 
@@ -22,11 +24,12 @@ export default function PracticeWidget({
 
   const openPractice = () => {
     const path = assignmentPath?.(practiceId) || `/student/assignment/${practiceId}`
-    const returnTo =
-      (textbookSlug && textbookChapterPath?.(textbookSlug)) ||
-      textbookPath ||
-      practicePath ||
-      '/student/textbook'
+    const returnTo = isInstructor
+      ? `${location.pathname}${location.search}${location.hash}`
+      : (textbookSlug && textbookChapterPath?.(textbookSlug)) ||
+        textbookPath ||
+        practicePath ||
+        '/student/textbook'
     navigate(path, {
       state: {
         returnTo,
