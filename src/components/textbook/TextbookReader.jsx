@@ -4,7 +4,6 @@ import { Alert, Box, Button } from '@mui/material'
 import DOMPurify from 'dompurify'
 import { useNavigate } from 'react-router-dom'
 import LoadingSpinner from '@/components/ui/LoadingSpinner.jsx'
-import PracticeWidget from '@/components/textbook/PracticeWidget.jsx'
 import TextbookLinkedPractices from '@/components/textbook/TextbookLinkedPractices.jsx'
 import { prepareTextbookHtml } from '@/components/textbook/prepareTextbookHtml.js'
 import { ensureTextbookStyles } from '@/components/textbook/textbookAssets.js'
@@ -37,33 +36,6 @@ const PURIFY_CONFIG = {
 function sanitizeTextbookHtml(html) {
   if (typeof html !== 'string') return ''
   return DOMPurify.sanitize(html, PURIFY_CONFIG)
-}
-
-function createReplaceOptions(linkByWidgetId = new Map()) {
-  return {
-    replace(domNode) {
-      if (domNode.type !== 'tag' || !domNode.attribs) return undefined
-
-      const practiceWidgetId = domNode.attribs['data-practice-widget-id']
-      if (practiceWidgetId) {
-        const linked = linkByWidgetId.get(practiceWidgetId)
-        // Only replace with a live widget when metadata resolves a practice.
-        if (linked?.practiceId != null) {
-          return (
-            <PracticeWidget
-              practiceId={linked.practiceId}
-              practiceTitle={linked.practiceTitle}
-              sectionId={linked.sectionId}
-              textbookSlug={linked.textbookSlug}
-            />
-          )
-        }
-        return <></>
-      }
-
-      return undefined
-    },
-  }
 }
 
 /**
@@ -334,10 +306,10 @@ export default function TextbookReader({
         },
       }}
     >
-      {content ? parse(content, createReplaceOptions()) : null}
+      {content ? parse(content) : null}
       <TextbookLinkedPractices links={linkedPractices} textbookSlug={slug} />
     </Box>
   )
 }
 
-export { sanitizeTextbookHtml, createReplaceOptions }
+export { sanitizeTextbookHtml }
