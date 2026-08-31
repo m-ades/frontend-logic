@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns="http://www.imsglobal.org/xsd/imscp_v1p1" xmlns:adlcp="http://www.adlnet.org/xsd/adlcp_v1p3" xmlns:lom="http://ltsc.ieee.org/xsd/LOM" identifier="com.github.io.vlmantova.bookml.SCORM" version="Fall 2025 (2026-07-18 8642250)">
+  <metadata>
+    <schema>ADL SCORM</schema>
+    <schemaversion>2004 3rd Edition</schemaversion>
+    <lom:lom>
+      <lom:general>
+        <lom:title>
+          <lom:string language="en">forall x: Calgary</lom:string>
+        </lom:title>
+        <lom:language>en</lom:language>
+      </lom:general>
+      <lom:lifeCycle>
+        <lom:contribute>
+          <lom:role>
+            <lom:value>author</lom:value>
+          </lom:role>
+          <lom:entity><![CDATA[BEGIN:VCARD VERSION:2.1
+FN:P. D. Magnus
+LANG:en
+END:VCARD]]></lom:entity>
+        </lom:contribute>
+        <lom:contribute>
+          <lom:role>
+            <lom:value>author</lom:value>
+          </lom:role>
+          <lom:entity><![CDATA[BEGIN:VCARD VERSION:2.1
+FN:Tim Button
+LANG:en
+END:VCARD]]></lom:entity>
+        </lom:contribute>
+        <lom:contribute>
+          <lom:role>
+            <lom:value>author</lom:value>
+          </lom:role>
+          <lom:entity><![CDATA[BEGIN:VCARD VERSION:2.1
+FN:Robert Trueman
+LANG:en
+END:VCARD]]></lom:entity>
+        </lom:contribute>
+        <lom:contribute>
+          <lom:role>
+            <lom:value>author</lom:value>
+          </lom:role>
+          <lom:entity><![CDATA[BEGIN:VCARD VERSION:2.1
+FN:Richard Zach
+LANG:en
+END:VCARD]]></lom:entity>
+        </lom:contribute>
+        <lom:version>
+          <lom:string>Fall 2025 (2026-07-18 8642250)</lom:string>
+        </lom:version>
+      </lom:lifeCycle>
+    </lom:lom>
+  </metadata>
+  <organizations>
+    <organization identifier="org1">
+      <title>forall x: Calgary</title>
+      <item identifier="item1" identifierref="resource1">
+        <title>forall x: Calgary</title>
+      </item>
+    </organization>
+  </organizations>
+  <resources>
+    <resource identifier="resource1" type="webcontent" adlcp:scormType="asset" href="index.html">
+      <file href="index.html"/>
+      <file href="A1.html"/>
+      <file href="A11.html"/>
+      <file href="A12.html"/>
+      <file href="A14.html"/>
+      <file href="A15.html"/>
+      <file href="A17.html"/>
+      <file href="A19.html"/>
+      <file href="A1a.html"/>
+      <file href="A2.html"/>
+      <file href="A20.html"/>
+      <file href="A21.html"/>
+      <file href="A22.html"/>
+      <file href="A24.html"/>
+      <file href="A25.html"/>
+      <file href="A26.html"/>
+      <file href="A27.html"/>
+      <file href="A28.html"/>
+      <file href="A29.html"/>
+      <file href="A2a.html"/>
+      <file href="A3.html"/>
+      <file href="A31.html"/>
+      <file href="A32.html"/>
+      <file href="A33.html"/>
+      <file href="A35.html"/>
+      <file href="A36.html"/>
+      <file href="A38.html"/>
+      <file href="A39.html"/>
+      <file href="A3a.html"/>
+      <file href="A4.html"/>
+      <file href="A40.html"/>
+      <file href="A43.html"/>
+      <file href="A44.html"/>
+      <file href="A45.html"/>
+      <file href="A47.html"/>
+      <file href="A5.html"/>
+      <file href="A6.html"/>
+      <file href="A7.html"/>
+      <file href="Ch1.html"/>
+      <file href="Ch10.html"/>
+      <file href="Ch11.html"/>
+      <file href="Ch12.html"/>
+      <file href="Ch13.html"/>
+      <file href="Ch14.html"/>
+      <file href="Ch15.html"/>
+      <file href="Ch16.html"/>
+      <file href="Ch17.html"/>
+      <file href="Ch18.html"/>
+      <file href="Ch19.html"/>
+      <file href="Ch2.html"/>
+      <file href="Ch20.html"/>
+      <file href="Ch21.html"/>
+      <file href="Ch22.html"/>
+      <file href="Ch23.html"/>
+      <file href="Ch24.html"/>
+      <file href="Ch25.html"/>
+      <file href="Ch26.html"/>
+      <file href="Ch27.html"/>
+      <file href="Ch28.html"/>
+      <file href="Ch29.html"/>
+      <file href="Ch3.html"/>
+      <file href="Ch30.html"/>
+      <file href="Ch31.html"/>
+      <file href="Ch32.html"/>
+      <file href="Ch33.html"/>
+      <file href="Ch34.html"/>
+      <file href="Ch35.html"/>
+      <file href="Ch36.html"/>
+      <file href="Ch37.html"/>
+      <file href="Ch38.html"/>
+      <file href="Ch39.html"/>
+      <file href="Ch4.html"/>
+      <file href="Ch40.html"/>
+      <file href="Ch41.html"/>
+      <file href="Ch42.html"/>
+      <file href="Ch43.html"/>
+      <file href="Ch44.html"/>
+      <file href="Ch45.html"/>
+      <file href="Ch46.html"/>
+      <file href="Ch47.html"/>
+      <file href="Ch48.html"/>
+      <file href="Ch5.html"/>
+      <file href="Ch6.html"/>
+      <file href="Ch7.html"/>
+      <file href="Ch8.html"/>
+      <file href="Ch9.html"/>
+      <file href="Chx1.html"/>
+      <file href="LaTeXML.css"/>
+      <file href="Pt1.html"/>
+      <file href="Pt2.html"/>
+      <file href="Pt3.html"/>
+      <file href="Pt4.html"/>
+      <file href="Pt5.html"/>
+      <file href="Pt6.html"/>
+      <file href="Pt7.html"/>
+      <file href="Pt8.html"/>
+      <file href="Pt9.html"/>
+      <file href="Ptx1.html"/>
+      <file href="Ptx2.html"/>
+      <file href="fitchml.css"/>
+      <file href="forallxyyc-accessible.pdf"/>
+      <file href="forallxyyc.css"/>
+      <file href="forallxyyc.pdf"/>
+      <file href="forallxyyc.png"/>
+      <file href="ltx-book.css"/>
+      <file href="search_index.json"/>
+      <file href="assets/ti-color.png"/>
+      <file href="bmlimages/forallxyyc-html-1.svg"/>
+      <file href="bmlimages/forallxyyc-html-10.svg"/>
+      <file href="bmlimages/forallxyyc-html-11.svg"/>
+      <file href="bmlimages/forallxyyc-html-12.svg"/>
+      <file href="bmlimages/forallxyyc-html-13.svg"/>
+      <file href="bmlimages/forallxyyc-html-14.svg"/>
+      <file href="bmlimages/forallxyyc-html-15.svg"/>
+      <file href="bmlimages/forallxyyc-html-16.svg"/>
+      <file href="bmlimages/forallxyyc-html-17.svg"/>
+      <file href="bmlimages/forallxyyc-html-18.svg"/>
+      <file href="bmlimages/forallxyyc-html-19.svg"/>
+      <file href="bmlimages/forallxyyc-html-2.svg"/>
+      <file href="bmlimages/forallxyyc-html-20.svg"/>
+      <file href="bmlimages/forallxyyc-html-21.svg"/>
+      <file href="bmlimages/forallxyyc-html-22.svg"/>
+      <file href="bmlimages/forallxyyc-html-23.svg"/>
+      <file href="bmlimages/forallxyyc-html-3.svg"/>
+      <file href="bmlimages/forallxyyc-html-4.svg"/>
+      <file href="bmlimages/forallxyyc-html-5.svg"/>
+      <file href="bmlimages/forallxyyc-html-6.svg"/>
+      <file href="bmlimages/forallxyyc-html-7.svg"/>
+      <file href="bmlimages/forallxyyc-html-8.svg"/>
+      <file href="bmlimages/forallxyyc-html-9.svg"/>
+      <file href="bmluser/colors.gitbook-forallxyyc-html.css"/>
+      <file href="bookml/CSS/style.css"/>
+      <file href="bookml/CSS/style.gitbook,plain.css"/>
+      <file href="bookml/CSS/style.gitbook.css"/>
+      <file href="bookml/gitbook/css/plugin-bookdown.css"/>
+      <file href="bookml/gitbook/css/plugin-fontsettings.css"/>
+      <file href="bookml/gitbook/css/plugin-search.css"/>
+      <file href="bookml/gitbook/css/plugin-table.css"/>
+      <file href="bookml/gitbook/css/style.css"/>
+      <file href="bookml/gitbook/css/fontawesome/fontawesome-webfont.woff2"/>
+      <file href="bookml/gitbook/js/app.min.js"/>
+      <file href="bookml/gitbook/js/jquery.highlight.js"/>
+      <file href="bookml/gitbook/js/plugin-bookdown.js"/>
+      <file href="bookml/gitbook/js/plugin-fontsettings.js"/>
+      <file href="bookml/gitbook/js/plugin-search.js"/>
+      <file href="bookml/js/mathjax4.js"/>
+    </resource>
+  </resources>
+</manifest>

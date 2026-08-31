@@ -1,0 +1,608 @@
+<!DOCTYPE html><html style="--bml-ltx-font-size:10;" class="bml_mathjax4" lang="en">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<title>Chapter 33 Using interpretations ‣ Part VI Interpretations ‣ forall x: Calgary</title>
+<!--Generated on Tue Jul 21 20:13:15 2026 by LaTeXML (version 0.8.8) http://dlmf.nist.gov/LaTeXML/.-->
+<!--Document created on Fall 2025 (2026‐07‐18 8642250).-->
+
+<link rel="stylesheet" href="LaTeXML.css" type="text/css">
+<link rel="stylesheet" href="ltx-book.css" type="text/css">
+<link rel="stylesheet" href="bookml/gitbook/css/style.css" type="text/css">
+<link rel="stylesheet" href="bookml/gitbook/css/plugin-table.css" type="text/css">
+<link rel="stylesheet" href="bookml/gitbook/css/plugin-search.css" type="text/css">
+<link rel="stylesheet" href="bookml/gitbook/css/plugin-bookdown.css" type="text/css">
+<link rel="stylesheet" href="bookml/gitbook/css/plugin-fontsettings.css" type="text/css">
+<link rel="stylesheet" href="bookml/CSS/style.css" type="text/css">
+<link rel="stylesheet" href="bookml/CSS/style.gitbook,plain.css" type="text/css">
+<link rel="stylesheet" href="bookml/CSS/style.gitbook.css" type="text/css">
+<link rel="stylesheet" href="bmluser/colors.gitbook-forallxyyc-html.css" type="text/css">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<link rel="stylesheet" href="forallxyyc.css" type="text/css">
+<link rel="stylesheet" href="fitchml.css" type="text/css">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script><script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6"></script>
+<link rel="up" href="Pt6.html" title="Part VI Interpretations ‣ forall x: Calgary">
+<link rel="up up" href="index.html" title="forall x: Calgary">
+<link rel="start" href="index.html" title="forall x: Calgary">
+<link rel="prev" href="Ch32.html" title="Chapter 32 Semantic concepts ‣ Part VI Interpretations ‣ forall x: Calgary">
+<link rel="next" href="Ch34.html" title="Chapter 34 Reasoning about interpretations ‣ Part VI Interpretations ‣ forall x: Calgary">
+<link rel="chapter" href="Ch30.html" title="Chapter 30 Extensionality ‣ Part VI Interpretations ‣ forall x: Calgary">
+<link rel="chapter" href="Ch31.html" title="Chapter 31 Truth in FOL ‣ Part VI Interpretations ‣ forall x: Calgary">
+<link rel="chapter" href="Ch32.html" title="Chapter 32 Semantic concepts ‣ Part VI Interpretations ‣ forall x: Calgary">
+<link rel="chapter" href="Ch34.html" title="Chapter 34 Reasoning about interpretations ‣ Part VI Interpretations ‣ forall x: Calgary">
+<link rel="chapter" href="Ch35.html" title="Chapter 35 Properties of relations ‣ Part VI Interpretations ‣ forall x: Calgary">
+<link rel="chapter" href="Chx1.html" title="Preface ‣ forall x: Calgary">
+<link rel="part" href="Pt1.html" title="Part I Key notions of logic ‣ forall x: Calgary">
+<link rel="part" href="Pt2.html" title="Part II Truth-functional logic ‣ forall x: Calgary">
+<link rel="part" href="Pt3.html" title="Part III Truth tables ‣ forall x: Calgary">
+<link rel="part" href="Pt4.html" title="Part IV Natural deduction for TFL ‣ forall x: Calgary">
+<link rel="part" href="Pt5.html" title="Part V First-order logic ‣ forall x: Calgary">
+<link rel="part" href="Pt6.html" title="Part VI Interpretations ‣ forall x: Calgary">
+<link rel="part" href="Pt7.html" title="Part VII Natural deduction for FOL ‣ forall x: Calgary">
+<link rel="part" href="Pt8.html" title="Part VIII Modal logic ‣ forall x: Calgary">
+<link rel="part" href="Pt9.html" title="Part IX Metatheory ‣ forall x: Calgary">
+<link rel="part" href="Ptx1.html" title="Appendices ‣ forall x: Calgary">
+<link rel="part" href="Ptx2.html" title="Solutions to selected exercices ‣ forall x: Calgary">
+<script src="bookml/js/mathjax4.js" defer></script>
+</head>
+<body class="bml_class_book">
+<div class="book without-animation font-size-2 font-family-1" data-basepath=".">
+<a href="#bml-main-content" tabindex="0" class="bml-skip-to-content">Skip to content.</a>
+<div class="book-summary"><nav class="ltx_page_navbar">
+<ul class="ltx_toclist summary">
+<li>
+<a href="index.html" title="" class="ltx_ref" rel="start">forall x: Calgary</a>
+</li>
+<li class="divider" aria-hidden="true"></li>
+<li data-level="" data-path="Chx1.html" class="ltx_tocentry ltx_tocentry_chapter  chapter "><a href="Chx1.html" title="In forall x: Calgary" class="ltx_ref">Preface</a></li>
+<li data-level="I" data-path="Pt1.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt1.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">I </span></b>Key notions of logic</a></li>
+<li data-level="II" data-path="Pt2.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt2.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">II </span></b>Truth-functional logic</a></li>
+<li data-level="III" data-path="Pt3.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt3.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">III </span></b>Truth tables</a></li>
+<li data-level="IV" data-path="Pt4.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt4.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">IV </span></b>Natural deduction for TFL</a></li>
+<li data-level="V" data-path="Pt5.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt5.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">V </span></b>First-order logic</a></li>
+<li data-level="VI" data-path="Pt6.html" class="ltx_tocentry ltx_tocentry_part  chapter ">
+<a href="Pt6.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">VI </span></b>Interpretations</a>
+<ol class="ltx_toclist ltx_toclist_part">
+<li data-level="30" data-path="Ch30.html" class="ltx_tocentry ltx_tocentry_chapter  chapter "><a href="Ch30.html" title="In Part VI Interpretations ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">30 </span></b>Extensionality</a></li>
+<li data-level="31" data-path="Ch31.html" class="ltx_tocentry ltx_tocentry_chapter  chapter "><a href="Ch31.html" title="In Part VI Interpretations ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">31 </span></b>Truth in FOL</a></li>
+<li data-level="32" data-path="Ch32.html" class="ltx_tocentry ltx_tocentry_chapter  chapter "><a href="Ch32.html" title="In Part VI Interpretations ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">32 </span></b>Semantic concepts</a></li>
+<li data-level="33" data-path="" class="ltx_tocentry ltx_tocentry_chapter ltx_ref_self  chapter active">
+<a href="" title="In Part VI Interpretations ‣ forall x: Calgary" aria-current="page" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">33 </span></b>Using interpretations</a>
+<ol class="ltx_toclist ltx_toclist_chapter">
+<li data-level="33.1" data-path="" class="ltx_tocentry ltx_tocentry_section  chapter "><a href="#S1" title="In Chapter 33 Using interpretations ‣ Part VI Interpretations ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">33.1 </span></b>Validities and contradictions</a></li>
+<li data-level="33.2" data-path="" class="ltx_tocentry ltx_tocentry_section  chapter "><a href="#S2" title="In Chapter 33 Using interpretations ‣ Part VI Interpretations ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">33.2 </span></b>Logical equivalence</a></li>
+<li data-level="33.3" data-path="" class="ltx_tocentry ltx_tocentry_section  chapter "><a href="#S3" title="In Chapter 33 Using interpretations ‣ Part VI Interpretations ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">33.3 </span></b>Validity, entailment and satisfiability</a></li>
+<li data-level="" data-path="" class="ltx_tocentry ltx_tocentry_section  chapter "><a href="#Sx1" title="In Chapter 33 Using interpretations ‣ Part VI Interpretations ‣ forall x: Calgary" class="ltx_ref">Practice exercises</a></li>
+</ol>
+</li>
+<li data-level="34" data-path="Ch34.html" class="ltx_tocentry ltx_tocentry_chapter  chapter "><a href="Ch34.html" title="In Part VI Interpretations ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">34 </span></b>Reasoning about interpretations</a></li>
+<li data-level="35" data-path="Ch35.html" class="ltx_tocentry ltx_tocentry_chapter  chapter "><a href="Ch35.html" title="In Part VI Interpretations ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">35 </span></b>Properties of relations</a></li>
+</ol>
+</li>
+<li data-level="VII" data-path="Pt7.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt7.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">VII </span></b>Natural deduction for FOL</a></li>
+<li data-level="VIII" data-path="Pt8.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt8.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">VIII </span></b>Modal logic</a></li>
+<li data-level="IX" data-path="Pt9.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt9.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">IX </span></b>Metatheory</a></li>
+<li data-level="" data-path="Ptx1.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Ptx1.html" title="In forall x: Calgary" class="ltx_ref">Appendices</a></li>
+<li data-level="" data-path="Ptx2.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Ptx2.html" title="In forall x: Calgary" class="ltx_ref">Solutions to selected exercices</a></li>
+</ul>
+</nav></div>
+
+<div class="ltx_page_main book-body fixed">
+<div class="body-inner">
+<header class="book-header fixed" aria-label="toolbar"><span class="bml-separator"></span></header>
+<div class="page-wrapper" tabindex="-1" role="main">
+<div class="ltx_page_content page-inner" id="bml-main-content">
+<script src="bookml/gitbook/js/app.min.js"></script>
+<script src="bookml/gitbook/js/jquery.highlight.js"></script>
+<script src="bookml/gitbook/js/plugin-search.js"></script>
+<script src="bookml/gitbook/js/plugin-fontsettings.js"></script>
+<script src="bookml/gitbook/js/plugin-bookdown.js"></script>
+<script type="text/javascript">
+                  gitbook.require(["gitbook"], function(gitbook) {
+                  gitbook.start({
+                    "fontsettings": {
+                      "theme": "white",
+                      "family": "sans",
+                      "size": 2
+                    },
+                    "download": [ [ "forallxyyc.pdf", "PDF" ], [ "forallxyyc-accessible.pdf", "PDF (accessible)" ], ],
+                    "search": {
+                      "engine": "fuse"
+                    },
+                    "toc": {
+                      "collapse": "none"
+                    }
+                  });
+                });
+              </script>
+
+<section class="ltx_chapter ltx_authors_1line normal" lang="en">
+<div class="section level1">
+<h1 class="ltx_title ltx_title_chapter">
+<span class="ltx_tag ltx_tag_chapter header-section-number">Chapter 33</span> Using interpretations</h1>
+
+<section id="S1" class="ltx_section normal">
+<div class="section level2">
+<h2 class="ltx_title ltx_title_section">
+<span class="ltx_tag ltx_tag_section header-section-number">33.1</span> Validities and contradictions</h2>
+
+<div id="S1.p1" class="ltx_para">
+<p class="ltx_p">Suppose we want to show that ‘<math id="S1.p1.m1" class="ltx_Math" alttext="\exists x\,A(x,x)\rightarrow B(d)" display="inline"><mrow><mrow><mo rspace="0.167em">∃</mo><mrow><mi>x</mi><mo lspace="0.170em">⁢</mo><mrow><mi>A</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo>,</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow><mo stretchy="false">→</mo><mrow><mi>B</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>d</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math>’ is <span class="ltx_text ltx_font_bold">not</span> a validity. This requires showing that the sentence is not true in every interpretation; i.e., that it is false in some interpretation. If we can provide just one interpretation in which the sentence is false, then we will have shown that the sentence is not a validity.</p>
+</div>
+<div id="S1.p2" class="ltx_para">
+<p class="ltx_p">In order for ‘<math id="S1.p2.m1" class="ltx_Math" alttext="\exists x\,A(x,x)\rightarrow B(d)" display="inline"><mrow><mrow><mo rspace="0.167em">∃</mo><mrow><mi>x</mi><mo lspace="0.170em">⁢</mo><mrow><mi>A</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo>,</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow><mo stretchy="false">→</mo><mrow><mi>B</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>d</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math>’ to be false, the antecedent (‘<math id="S1.p2.m2" class="ltx_Math" alttext="\exists x\,A(x,x)" display="inline"><mrow><mo rspace="0.167em">∃</mo><mrow><mi>x</mi><mo lspace="0.170em">⁢</mo><mrow><mi>A</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo>,</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></math>’) must be true, and the consequent (‘<math id="S1.p2.m3" class="ltx_Math" alttext="B(d)" display="inline"><mrow><mi>B</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>d</mi><mo stretchy="false">)</mo></mrow></mrow></math>’) must be false. To construct such an interpretation, we start by specifying a domain. Keeping the domain small makes it easier to specify what the predicates will be true of, so we will start with a domain that has just one member. For concreteness, let’s say it is <span class="ltx_text ltx_font_bold">just</span> the city of Paris.</p>
+<dl id="S1.I1" class="ltx_description">
+<dt id="S1.I1.ix1" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <span class="ltx_text ltx_markedasmath">domain</span>:</span></dt>
+<dd class="ltx_item">
+<div id="S1.I1.ix1.p1" class="ltx_para">
+<p class="ltx_p">Paris</p>
+</div>
+</dd>
+</dl>
+<p class="ltx_p">The name ‘<math id="S1.p2.m4" class="ltx_Math" alttext="d" display="inline"><mi>d</mi></math>’ must refer to something in the domain, so we have no option but:</p>
+<dl id="S1.I2" class="ltx_description">
+<dt id="S1.I2.ix1" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="S1.I2.ix1.m1" class="ltx_Math" alttext="d" display="inline"><mi>d</mi></math>:</span></dt>
+<dd class="ltx_item">
+<div id="S1.I2.ix1.p1" class="ltx_para">
+<p class="ltx_p">Paris</p>
+</div>
+</dd>
+</dl>
+<p class="ltx_p">Recall that we want ‘<math id="S1.p2.m5" class="ltx_Math" alttext="\exists x\,A(x,x)" display="inline"><mrow><mo rspace="0.167em">∃</mo><mrow><mi>x</mi><mo lspace="0.170em">⁢</mo><mrow><mi>A</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo>,</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></math>’ to be true, so we want all members of the domain to be paired with themselves in the extension of ‘<math id="S1.p2.m6" class="ltx_Math" alttext="A" display="inline"><mi>A</mi></math>’. We can just offer:</p>
+<dl id="S1.I3" class="ltx_description">
+<dt id="S1.I3.ix1" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="S1.I3.ix1.m1" class="ltx_Math" alttext="A(x,y)" display="inline"><mrow><mi>A</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo>,</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow></math>:</span></dt>
+<dd class="ltx_item">
+<div id="S1.I3.ix1.p1" class="ltx_para">
+<p class="ltx_p"><span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span><sub class="ltx_sub"><span class="ltx_text ltx_font_italic">x</span></sub> is identical with <span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span><sub class="ltx_sub"><span class="ltx_text ltx_font_italic">y</span></sub></p>
+</div>
+</dd>
+</dl>
+<p class="ltx_p">Now ‘<math id="S1.p2.m7" class="ltx_Math" alttext="A(d,d)" display="inline"><mrow><mi>A</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>d</mi><mo>,</mo><mi>d</mi><mo stretchy="false">)</mo></mrow></mrow></math>’ is true, so it is surely true that ‘<math id="S1.p2.m8" class="ltx_Math" alttext="\exists x\,A(x,x)" display="inline"><mrow><mo rspace="0.167em">∃</mo><mrow><mi>x</mi><mo lspace="0.170em">⁢</mo><mrow><mi>A</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo>,</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></math>’. Next, we want ‘<math id="S1.p2.m9" class="ltx_Math" alttext="B(d)" display="inline"><mrow><mi>B</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>d</mi><mo stretchy="false">)</mo></mrow></mrow></math>’ to be false, so the referent of ‘<math id="S1.p2.m10" class="ltx_Math" alttext="d" display="inline"><mi>d</mi></math>’ must not be in the extension of ‘<math id="S1.p2.m11" class="ltx_Math" alttext="B" display="inline"><mi>B</mi></math>’. We might simply offer:</p>
+<dl id="S1.I4" class="ltx_description">
+<dt id="S1.I4.ix1" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="S1.I4.ix1.m1" class="ltx_Math" alttext="B(x)" display="inline"><mrow><mi>B</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></math>:</span></dt>
+<dd class="ltx_item">
+<div id="S1.I4.ix1.p1" class="ltx_para">
+<p class="ltx_p"><span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span><sub class="ltx_sub"><span class="ltx_text ltx_font_italic">x</span></sub> is in Germany</p>
+</div>
+</dd>
+</dl>
+<p class="ltx_p">Now we have an interpretation where ‘<math id="S1.p2.m12" class="ltx_Math" alttext="\exists x\,A(x,x)" display="inline"><mrow><mo rspace="0.167em">∃</mo><mrow><mi>x</mi><mo lspace="0.170em">⁢</mo><mrow><mi>A</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo>,</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></math>’ is true, but where ‘<math id="S1.p2.m13" class="ltx_Math" alttext="B(d)" display="inline"><mrow><mi>B</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>d</mi><mo stretchy="false">)</mo></mrow></mrow></math>’ is false. So there is an interpretation where ‘<math id="S1.p2.m14" class="ltx_Math" alttext="\exists x\,A(x,x)\rightarrow B(d)" display="inline"><mrow><mrow><mo rspace="0.167em">∃</mo><mrow><mi>x</mi><mo lspace="0.170em">⁢</mo><mrow><mi>A</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo>,</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow><mo stretchy="false">→</mo><mrow><mi>B</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>d</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math>’ is false. So ‘<math id="S1.p2.m15" class="ltx_Math" alttext="\exists x\,A(x,x)\rightarrow B(d)" display="inline"><mrow><mrow><mo rspace="0.167em">∃</mo><mrow><mi>x</mi><mo lspace="0.170em">⁢</mo><mrow><mi>A</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo>,</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow><mo stretchy="false">→</mo><mrow><mi>B</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>d</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math>’ is not a validity.</p>
+</div>
+<div id="S1.p3" class="ltx_para">
+<p class="ltx_p">We can just as easily show that ‘<math id="S1.p3.m1" class="ltx_Math" alttext="\exists x\,A(x,x)\rightarrow B(d)" display="inline"><mrow><mrow><mo rspace="0.167em">∃</mo><mrow><mi>x</mi><mo lspace="0.170em">⁢</mo><mrow><mi>A</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo>,</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow><mo stretchy="false">→</mo><mrow><mi>B</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>d</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math>’ is not a contradiction. We need only specify an interpretation in which ‘<math id="S1.p3.m2" class="ltx_Math" alttext="\exists x\,A(x,x)\rightarrow B(d)" display="inline"><mrow><mrow><mo rspace="0.167em">∃</mo><mrow><mi>x</mi><mo lspace="0.170em">⁢</mo><mrow><mi>A</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo>,</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow><mo stretchy="false">→</mo><mrow><mi>B</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>d</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math>’ is true; i.e., an interpretation in which either ‘<math id="S1.p3.m3" class="ltx_Math" alttext="\exists x\,A(x,x)" display="inline"><mrow><mo rspace="0.167em">∃</mo><mrow><mi>x</mi><mo lspace="0.170em">⁢</mo><mrow><mi>A</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo>,</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></math>’ is false or ‘<math id="S1.p3.m4" class="ltx_Math" alttext="B(d)" display="inline"><mrow><mi>B</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>d</mi><mo stretchy="false">)</mo></mrow></mrow></math>’ is true. Here is one:</p>
+<dl id="S1.I5" class="ltx_description">
+<dt id="S1.I5.ix1" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <span class="ltx_text ltx_markedasmath">domain</span>:</span></dt>
+<dd class="ltx_item">
+<div id="S1.I5.ix1.p1" class="ltx_para">
+<p class="ltx_p">Paris</p>
+</div>
+</dd>
+<dt id="S1.I5.ix2" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="S1.I5.ix2.m1" class="ltx_Math" alttext="d" display="inline"><mi>d</mi></math>:</span></dt>
+<dd class="ltx_item">
+<div id="S1.I5.ix2.p1" class="ltx_para">
+<p class="ltx_p">Paris</p>
+</div>
+</dd>
+<dt id="S1.I5.ix3" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="S1.I5.ix3.m1" class="ltx_Math" alttext="A(x,y)" display="inline"><mrow><mi>A</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo>,</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow></math>:</span></dt>
+<dd class="ltx_item">
+<div id="S1.I5.ix3.p1" class="ltx_para">
+<p class="ltx_p"><span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span><sub class="ltx_sub"><span class="ltx_text ltx_font_italic">x</span></sub> is identical with <span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span><sub class="ltx_sub"><span class="ltx_text ltx_font_italic">y</span></sub></p>
+</div>
+</dd>
+<dt id="S1.I5.ix4" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="S1.I5.ix4.m1" class="ltx_Math" alttext="B(x)" display="inline"><mrow><mi>B</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></math>:</span></dt>
+<dd class="ltx_item">
+<div id="S1.I5.ix4.p1" class="ltx_para">
+<p class="ltx_p"><span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span><sub class="ltx_sub"><span class="ltx_text ltx_font_italic">x</span></sub> is in France</p>
+</div>
+</dd>
+</dl>
+<p class="ltx_p">This shows that there is an interpretation where ‘<math id="S1.p3.m5" class="ltx_Math" alttext="\exists x\,A(x,x)\rightarrow B(d)" display="inline"><mrow><mrow><mo rspace="0.167em">∃</mo><mrow><mi>x</mi><mo lspace="0.170em">⁢</mo><mrow><mi>A</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo>,</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow><mo stretchy="false">→</mo><mrow><mi>B</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>d</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math>’ is true. So ‘<math id="S1.p3.m6" class="ltx_Math" alttext="\exists x\,A(x,x)\rightarrow B(d)" display="inline"><mrow><mrow><mo rspace="0.167em">∃</mo><mrow><mi>x</mi><mo lspace="0.170em">⁢</mo><mrow><mi>A</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo>,</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow><mo stretchy="false">→</mo><mrow><mi>B</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>d</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math>’ is not a contradiction.</p>
+<div class="ltx_logical-block bml_background-color_FDF4FA bml_background-color_FDF4FA" style="padding:9pt;">
+            
+<div id="S1.p3.p1" class="ltx_para ltx_noindent">
+<ul id="S1.I6" class="ltx_itemize">
+<li id="S1.I6.i1" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">‣</span><div id="S1.I6.i1.p1" class="ltx_para">​<p class="ltx_p">To show that <math id="S1.I6.i1.p1.m1" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math> is not a validity, it suffices to
+find an interpretation where <math id="S1.I6.i1.p1.m2" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math> is false.</p>
+</div>
+</li>
+<li id="S1.I6.i2" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">‣</span><div id="S1.I6.i2.p1" class="ltx_para">​<p class="ltx_p">To show that <math id="S1.I6.i2.p1.m1" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math> is not a contradiction, it
+suffices to find an interpretation where <math id="S1.I6.i2.p1.m2" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math> is true.</p>
+</div>
+</li>
+</ul>
+</div>
+          
+</div>
+</div>
+</div>
+</section>
+<section id="S2" class="ltx_section normal">
+<div class="section level2">
+<h2 class="ltx_title ltx_title_section">
+<span class="ltx_tag ltx_tag_section header-section-number">33.2</span> Logical equivalence</h2>
+
+<div id="S2.p1" class="ltx_para">
+<p class="ltx_p">Suppose we want to show that ‘<math id="S2.p1.m1" class="ltx_Math" alttext="\forall x\,S(x)" display="inline"><mrow><mo rspace="0.167em">∀</mo><mrow><mi>x</mi><mo lspace="0.170em">⁢</mo><mrow><mi>S</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></math>’ and ‘<math id="S2.p1.m2" class="ltx_Math" alttext="\exists x\,S(x)" display="inline"><mrow><mo rspace="0.167em">∃</mo><mrow><mi>x</mi><mo lspace="0.170em">⁢</mo><mrow><mi>S</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></math>’ are not logically equivalent. We need to construct an interpretation in which the two sentences have different truth values; we want one of them to be true and the other to be false. We start by specifying a domain. Again, we make the domain small so that we can specify extensions easily. In this case, we will need at least two objects. (If we chose a domain with only one member, the two sentences would end up with the same truth value. In order to see why, try constructing some partial interpretations with one-member domains.) For concreteness, let’s take:</p>
+<dl id="S2.I1" class="ltx_description">
+<dt id="S2.I1.ix1" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <span class="ltx_text ltx_markedasmath">domain</span>:</span></dt>
+<dd class="ltx_item">
+<div id="S2.I1.ix1.p1" class="ltx_para">
+<p class="ltx_p">Ornette Coleman, Miles Davis</p>
+</div>
+</dd>
+</dl>
+<p class="ltx_p">We can make ‘<math id="S2.p1.m3" class="ltx_Math" alttext="\exists x\,S(x)" display="inline"><mrow><mo rspace="0.167em">∃</mo><mrow><mi>x</mi><mo lspace="0.170em">⁢</mo><mrow><mi>S</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></math>’ true by including something in the extension of ‘<math id="S2.p1.m4" class="ltx_Math" alttext="S" display="inline"><mi>S</mi></math>’, and we can make ‘<math id="S2.p1.m5" class="ltx_Math" alttext="\forall x\,S(x)" display="inline"><mrow><mo rspace="0.167em">∀</mo><mrow><mi>x</mi><mo lspace="0.170em">⁢</mo><mrow><mi>S</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></math>’ false by leaving something out of the extension of ‘<math id="S2.p1.m6" class="ltx_Math" alttext="S" display="inline"><mi>S</mi></math>’. For concreteness, let’s say:</p>
+<dl id="S2.I2" class="ltx_description">
+<dt id="S2.I2.ix1" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="S2.I2.ix1.m1" class="ltx_Math" alttext="S(x)" display="inline"><mrow><mi>S</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></math>:</span></dt>
+<dd class="ltx_item">
+<div id="S2.I2.ix1.p1" class="ltx_para">
+<p class="ltx_p"><span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span><sub class="ltx_sub"><span class="ltx_text ltx_font_italic">x</span></sub> plays saxophone</p>
+</div>
+</dd>
+</dl>
+<p class="ltx_p">Now ‘<math id="S2.p1.m7" class="ltx_Math" alttext="\exists x\,S(x)" display="inline"><mrow><mo rspace="0.167em">∃</mo><mrow><mi>x</mi><mo lspace="0.170em">⁢</mo><mrow><mi>S</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></math>’ is true, because ‘<math id="S2.p1.m8" class="ltx_Math" alttext="S(x)" display="inline"><mrow><mi>S</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></math>’ is true of Ornette Coleman. Slightly more precisely, extend our interpretation by allowing ‘<math id="S2.p1.m9" class="ltx_Math" alttext="c" display="inline"><mi>c</mi></math>’ to name Ornette Coleman. ‘<math id="S2.p1.m10" class="ltx_Math" alttext="S(c)" display="inline"><mrow><mi>S</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>c</mi><mo stretchy="false">)</mo></mrow></mrow></math>’ is true in this extended interpretation, so ‘<math id="S2.p1.m11" class="ltx_Math" alttext="\exists x\,S(x)" display="inline"><mrow><mo rspace="0.167em">∃</mo><mrow><mi>x</mi><mo lspace="0.170em">⁢</mo><mrow><mi>S</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></math>’ was true in the original interpretation. Similarly, ‘<math id="S2.p1.m12" class="ltx_Math" alttext="\forall x\,S(x)" display="inline"><mrow><mo rspace="0.167em">∀</mo><mrow><mi>x</mi><mo lspace="0.170em">⁢</mo><mrow><mi>S</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></math>’ is false, because ‘<math id="S2.p1.m13" class="ltx_Math" alttext="S(x)" display="inline"><mrow><mi>S</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></math>’ is false of Miles Davis. Slightly more precisely, extend our interpretation by allowing ‘<math id="S2.p1.m14" class="ltx_Math" alttext="d" display="inline"><mi>d</mi></math>’ to name Miles Davis, and ‘<math id="S2.p1.m15" class="ltx_Math" alttext="S(d)" display="inline"><mrow><mi>S</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>d</mi><mo stretchy="false">)</mo></mrow></mrow></math>’ is false in this extended interpretation, so ‘<math id="S2.p1.m16" class="ltx_Math" alttext="\forall x\,S(x)" display="inline"><mrow><mo rspace="0.167em">∀</mo><mrow><mi>x</mi><mo lspace="0.170em">⁢</mo><mrow><mi>S</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></math>’ was false in the original interpretation. We have provided a counter-interpretation to the claim that ‘<math id="S2.p1.m17" class="ltx_Math" alttext="\forall x\,S(x)" display="inline"><mrow><mo rspace="0.167em">∀</mo><mrow><mi>x</mi><mo lspace="0.170em">⁢</mo><mrow><mi>S</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></math>’ and ‘<math id="S2.p1.m18" class="ltx_Math" alttext="\exists x\,S(x)" display="inline"><mrow><mo rspace="0.167em">∃</mo><mrow><mi>x</mi><mo lspace="0.170em">⁢</mo><mrow><mi>S</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></math>’ are logically equivalent.</p>
+<div class="ltx_logical-block bml_background-color_FDF4FA bml_background-color_FDF4FA" style="padding:9pt;">
+            
+<div id="S2.p1.p1" class="ltx_para ltx_noindent">
+<p class="ltx_p">To show that <math id="S2.p1.p1.m1" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math> and <math id="S2.p1.p1.m2" class="ltx_Math" alttext="\mathscr{B}" display="inline"><mi class="ltx_font_mathscript">ℬ︁</mi></math> are not logically equivalent, it suffices to find an interpretation where one is true and the other is false.</p>
+</div>
+          
+</div>
+</div>
+</div>
+</section>
+<section id="S3" class="ltx_section normal">
+<div class="section level2">
+<h2 class="ltx_title ltx_title_section">
+<span class="ltx_tag ltx_tag_section header-section-number">33.3</span> Validity, entailment and satisfiability</h2>
+
+<div id="S3.p1" class="ltx_para">
+<p class="ltx_p">To test for validity, entailment, or satisfiability, we typically need to produce interpretations that determine the truth value of several sentences simultaneously.</p>
+</div>
+<div id="S3.p2" class="ltx_para">
+<p class="ltx_p">Consider the following argument in FOL:</p>
+<div id="Ex1" class="ltx_equation bml_equation bml_equation_container ltx_align_baseline">
+<div class="ltx_Math bml_eqn_cell ltx_align_center"><math id="Ex1.m1" class="ltx_Math" alttext="\exists x(G(x)\rightarrow G(a))\therefore\exists x\,G(x)\rightarrow G(a)" display="block"><mrow><mrow><mo rspace="0.167em">∃</mo><mrow><mi>x</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>G</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">→</mo><mrow><mi>G</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow><mo>∴</mo><mrow><mrow><mo rspace="0.167em">∃</mo><mrow><mi>x</mi><mo lspace="0.170em">⁢</mo><mrow><mi>G</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow><mo stretchy="false">→</mo><mrow><mi>G</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></math></div>
+</div>
+<p class="ltx_p">To show that this is invalid, we must make the premise true and the conclusion false. The conclusion is a conditional, so to make it false, the antecedent must be true and the consequent must be false. Clearly, our domain must contain two objects. Let’s try:</p>
+<dl id="S3.I1" class="ltx_description">
+<dt id="S3.I1.ix1" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <span class="ltx_text ltx_markedasmath">domain</span>:</span></dt>
+<dd class="ltx_item">
+<div id="S3.I1.ix1.p1" class="ltx_para">
+<p class="ltx_p">Karl Marx, Ludwig von Mises</p>
+</div>
+</dd>
+<dt id="S3.I1.ix2" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="S3.I1.ix2.m1" class="ltx_Math" alttext="G(x)" display="inline"><mrow><mi>G</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></math>:</span></dt>
+<dd class="ltx_item">
+<div id="S3.I1.ix2.p1" class="ltx_para">
+<p class="ltx_p"><span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span><sub class="ltx_sub"><span class="ltx_text ltx_font_italic">x</span></sub> hated communism</p>
+</div>
+</dd>
+<dt id="S3.I1.ix3" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="S3.I1.ix3.m1" class="ltx_Math" alttext="a" display="inline"><mi>a</mi></math>:</span></dt>
+<dd class="ltx_item">
+<div id="S3.I1.ix3.p1" class="ltx_para">
+<p class="ltx_p">Karl Marx</p>
+</div>
+</dd>
+</dl>
+<p class="ltx_p">Given that Marx wrote <span class="ltx_text ltx_font_bold">The Communist Manifesto</span>, ‘<math id="S3.p2.m1" class="ltx_Math" alttext="G(a)" display="inline"><mrow><mi>G</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mrow></math>’ is plainly false in this interpretation. But von Mises famously hated communism, so ‘<math id="S3.p2.m2" class="ltx_Math" alttext="\exists x\,G(x)" display="inline"><mrow><mo rspace="0.167em">∃</mo><mrow><mi>x</mi><mo lspace="0.170em">⁢</mo><mrow><mi>G</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></math>’ is true in this interpretation. Hence ‘<math id="S3.p2.m3" class="ltx_Math" alttext="\exists x\,G(x)\rightarrow G(a)" display="inline"><mrow><mrow><mo rspace="0.167em">∃</mo><mrow><mi>x</mi><mo lspace="0.170em">⁢</mo><mrow><mi>G</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow><mo stretchy="false">→</mo><mrow><mi>G</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math>’ is false, as required.</p>
+</div>
+<div id="S3.p3" class="ltx_para">
+<p class="ltx_p">Does this interpretation make the premise true? Yes it does! Note that ‘<math id="S3.p3.m1" class="ltx_Math" alttext="G(a)\rightarrow G(a)" display="inline"><mrow><mrow><mi>G</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">→</mo><mrow><mi>G</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math>’ is true. (Indeed, it is a validity.) But then certainly ‘<math id="S3.p3.m2" class="ltx_Math" alttext="\exists x(G(x)\rightarrow G(a))" display="inline"><mrow><mo rspace="0.167em">∃</mo><mrow><mi>x</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>G</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">→</mo><mrow><mi>G</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>’ is true, so the premise is true, and the conclusion is false, in this interpretation. The argument is therefore invalid.</p>
+</div>
+<div id="S3.p4" class="ltx_para">
+<p class="ltx_p">In passing, note that we have also shown that ‘<math id="S3.p4.m1" class="ltx_Math" alttext="\exists x(G(x)\rightarrow G(a))" display="inline"><mrow><mo rspace="0.167em">∃</mo><mrow><mi>x</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>G</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">→</mo><mrow><mi>G</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>’ does <span class="ltx_text ltx_font_bold">not</span> entail ‘<math id="S3.p4.m2" class="ltx_Math" alttext="\exists x\,G(x)\rightarrow G(a)" display="inline"><mrow><mrow><mo rspace="0.167em">∃</mo><mrow><mi>x</mi><mo lspace="0.170em">⁢</mo><mrow><mi>G</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow><mo stretchy="false">→</mo><mrow><mi>G</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math>’, i.e., that <math id="S3.p4.m3" class="ltx_Math" alttext="\exists x(G(x)\rightarrow G(a))\nvDash\exists x\,G(x)\rightarrow G(a)" display="inline"><mrow><mrow><mo rspace="0.167em">∃</mo><mrow><mi>x</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>G</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">→</mo><mrow><mi>G</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow><mo>⊭</mo><mrow><mo rspace="0.167em">∃</mo><mrow><mi>x</mi><mo lspace="0.170em">⁢</mo><mrow><mi>G</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow><mo stretchy="false">→</mo><mrow><mi>G</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math>. Equally, we have shown that the sentences ‘<math id="S3.p4.m4" class="ltx_Math" alttext="\exists x(G(x)\rightarrow G(a))" display="inline"><mrow><mo rspace="0.167em">∃</mo><mrow><mi>x</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>G</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">→</mo><mrow><mi>G</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>’ and ‘<math id="S3.p4.m5" class="ltx_Math" alttext="\neg(\exists x\,G(x)\rightarrow G(a))" display="inline"><mrow><mo>¬</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mo rspace="0.167em">∃</mo><mrow><mi>x</mi><mo lspace="0.170em">⁢</mo><mrow><mi>G</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow><mo stretchy="false">→</mo><mrow><mi>G</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></math>’ are jointly satisfiable.</p>
+</div>
+<div id="S3.p5" class="ltx_para">
+<p class="ltx_p">Let’s consider a second example:</p>
+<div id="Ex2" class="ltx_equation bml_equation bml_equation_container ltx_align_baseline">
+<div class="ltx_Math bml_eqn_cell ltx_align_center"><math id="Ex2.m1" class="ltx_Math" alttext="\forall x\exists y\,L(x,y)\therefore\exists y\forall x\,L(x,y)" display="block"><mrow><mrow><mo rspace="0.167em">∀</mo><mrow><mi>x</mi><mo lspace="0.167em">⁢</mo><mrow><mo rspace="0.167em">∃</mo><mrow><mi>y</mi><mo lspace="0.170em">⁢</mo><mrow><mi>L</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo>,</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></mrow></mrow><mo>∴</mo><mrow><mo rspace="0.167em">∃</mo><mrow><mi>y</mi><mo lspace="0.167em">⁢</mo><mrow><mo rspace="0.167em">∀</mo><mrow><mi>x</mi><mo lspace="0.170em">⁢</mo><mrow><mi>L</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo>,</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></mrow></mrow></mrow></math></div>
+</div>
+<p class="ltx_p">Again, we want to show that this is invalid. To do this, we must make the premises true and the conclusion false. Here is a suggestion:</p>
+<dl id="S3.I2" class="ltx_description">
+<dt id="S3.I2.ix1" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <span class="ltx_text ltx_markedasmath">domain</span>:</span></dt>
+<dd class="ltx_item">
+<div id="S3.I2.ix1.p1" class="ltx_para">
+<p class="ltx_p">Canadian citizens currently in a domestic partnership with another Canadian citizen</p>
+</div>
+</dd>
+<dt id="S3.I2.ix2" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="S3.I2.ix2.m1" class="ltx_Math" alttext="L(x,y)" display="inline"><mrow><mi>L</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo>,</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow></math>:</span></dt>
+<dd class="ltx_item">
+<div id="S3.I2.ix2.p1" class="ltx_para">
+<p class="ltx_p"><span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span><sub class="ltx_sub"><span class="ltx_text ltx_font_italic">x</span></sub> is in a domestic partnership with <span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span><sub class="ltx_sub"><span class="ltx_text ltx_font_italic">y</span></sub></p>
+</div>
+</dd>
+</dl>
+<p class="ltx_p">The premise is clearly true on this interpretation. Anyone in the domain is a Canadian citizen in a domestic partnership with some other Canadian citizen. That other citizen will also, then, be in the domain. So for everyone in the domain, there will be someone (else) in the domain with whom they are in a domestic partnership. Hence ‘<math id="S3.p5.m1" class="ltx_Math" alttext="\forall x\exists y\,L(x,y)" display="inline"><mrow><mo rspace="0.167em">∀</mo><mrow><mi>x</mi><mo lspace="0.167em">⁢</mo><mrow><mo rspace="0.167em">∃</mo><mrow><mi>y</mi><mo lspace="0.170em">⁢</mo><mrow><mi>L</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo>,</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></mrow></mrow></math>’ is true. However, the conclusion is clearly false, for that would require that there is some single person who is in a domestic partnership with everyone in the domain, and there is no such person, so the argument is invalid. We observe immediately that the sentences ‘<math id="S3.p5.m2" class="ltx_Math" alttext="\forall x\exists y\,L(x,y)" display="inline"><mrow><mo rspace="0.167em">∀</mo><mrow><mi>x</mi><mo lspace="0.167em">⁢</mo><mrow><mo rspace="0.167em">∃</mo><mrow><mi>y</mi><mo lspace="0.170em">⁢</mo><mrow><mi>L</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo>,</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></mrow></mrow></math>’ and ‘<math id="S3.p5.m3" class="ltx_Math" alttext="\neg\exists y\forall x\,L(x,y)" display="inline"><mrow><mo rspace="0.167em">¬</mo><mrow><mo rspace="0.167em">∃</mo><mrow><mi>y</mi><mo lspace="0.167em">⁢</mo><mrow><mo rspace="0.167em">∀</mo><mrow><mi>x</mi><mo lspace="0.170em">⁢</mo><mrow><mi>L</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo>,</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></mrow></mrow></mrow></math>’ are jointly satisfiable and that ‘<math id="S3.p5.m4" class="ltx_Math" alttext="\forall x\exists y\,L(x,y)" display="inline"><mrow><mo rspace="0.167em">∀</mo><mrow><mi>x</mi><mo lspace="0.167em">⁢</mo><mrow><mo rspace="0.167em">∃</mo><mrow><mi>y</mi><mo lspace="0.170em">⁢</mo><mrow><mi>L</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo>,</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></mrow></mrow></math>’ does not entail ‘<math id="S3.p5.m5" class="ltx_Math" alttext="\exists y\forall x\,L(x,y)" display="inline"><mrow><mo rspace="0.167em">∃</mo><mrow><mi>y</mi><mo lspace="0.167em">⁢</mo><mrow><mo rspace="0.167em">∀</mo><mrow><mi>x</mi><mo lspace="0.170em">⁢</mo><mrow><mi>L</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo>,</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></mrow></mrow></math>’.</p>
+</div>
+<div id="S3.p6" class="ltx_para">
+<p class="ltx_p">For our third example, we’ll mix things up a bit. In <a href="Ch30.html" title="Chapter 30 Extensionality ‣ Part VI Interpretations ‣ forall x: Calgary" class="ltx_ref"><span class="ltx_text ltx_ref_tag">chapter</span> <span class="ltx_text ltx_ref_tag">30</span></a>, we described how we can present some interpretations using diagrams. For example:</p>
+<div class="bml-overflow-wrapper"><img src="bmlimages/forallxyyc-html-6.svg" alt="The numbers 1, 2, and 3 are connected by arrows. There are arrows from 1 to 2, 3, and to itself, and from 2 to 3. There is no arrow leaving 3." id="S3.p6.g1" class="ltx_graphics ltx_centering ltx_img_square" style="vertical-align:-1px" width="113" height="99"></div>
+<p class="ltx_p">Using the conventions employed in <a href="Ch30.html" title="Chapter 30 Extensionality ‣ Part VI Interpretations ‣ forall x: Calgary" class="ltx_ref"><span class="ltx_text ltx_ref_tag">chapter</span> <span class="ltx_text ltx_ref_tag">30</span></a>, the domain of this interpretation is the first three positive whole numbers, and ‘<math id="S3.p6.m1" class="ltx_Math" alttext="R(x,y)" display="inline"><mrow><mi>R</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo>,</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow></math>’ is true of x and y just in case there is an arrow from x to y in our diagram. Here are some sentences that the interpretation makes true:</p>
+<ul id="S3.I3" class="ltx_itemize">
+<li id="S3.I3.i1" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">‣</span><div id="S3.I3.i1.p1" class="ltx_para">​<p class="ltx_p">‘<math id="S3.I3.i1.p1.m1" class="ltx_Math" alttext="\forall x\exists y\,R(y,x)" display="inline"><mrow><mo rspace="0.167em">∀</mo><mrow><mi>x</mi><mo lspace="0.167em">⁢</mo><mrow><mo rspace="0.167em">∃</mo><mrow><mi>y</mi><mo lspace="0.170em">⁢</mo><mrow><mi>R</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>y</mi><mo>,</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></mrow></mrow></math>’</p>
+</div>
+</li>
+<li id="S3.I3.i2" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">‣</span><div id="S3.I3.i2.p1" class="ltx_para">​<p class="ltx_p">‘<math id="S3.I3.i2.p1.m1" class="ltx_Math" alttext="\exists x\forall y\,R(x,y)" display="inline"><mrow><mo rspace="0.167em">∃</mo><mrow><mi>x</mi><mo lspace="0.167em">⁢</mo><mrow><mo rspace="0.167em">∀</mo><mrow><mi>y</mi><mo lspace="0.170em">⁢</mo><mrow><mi>R</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo>,</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></mrow></mrow></math>’  (witness for
+<math id="S3.I3.i2.p1.m2" class="ltx_Math" alttext="x" display="inline"><mi>x</mi></math>: <math id="S3.I3.i2.p1.m3" class="ltx_Math" alttext="1" display="inline"><mn>1</mn></math>)</p>
+</div>
+</li>
+<li id="S3.I3.i3" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">‣</span><div id="S3.I3.i3.p1" class="ltx_para">​<p class="ltx_p">‘<math id="S3.I3.i3.p1.m1" class="ltx_math_unparsed" alttext="\exists x\forall y(R(y,x)\leftrightarrow x=y)" display="inline"><mrow><mo rspace="0.167em">∃</mo><mi>x</mi><mo lspace="0.167em" rspace="0.167em">∀</mo><mi>y</mi><mrow><mo stretchy="false">(</mo><mi>R</mi><mrow><mo stretchy="false">(</mo><mi>y</mi><mo>,</mo><mi>x</mi><mo stretchy="false">)</mo></mrow><mo stretchy="false">↔</mo><mi>x</mi><mo>=</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow></math>’  (witness for
+<math id="S3.I3.i3.p1.m2" class="ltx_Math" alttext="x" display="inline"><mi>x</mi></math>: <math id="S3.I3.i3.p1.m3" class="ltx_Math" alttext="1" display="inline"><mn>1</mn></math>)</p>
+</div>
+</li>
+<li id="S3.I3.i4" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">‣</span><div id="S3.I3.i4.p1" class="ltx_para">​<p class="ltx_p">‘<math id="S3.I3.i4.p1.m1" class="ltx_Math" alttext="\exists x\exists y\exists z((\neg y=z\wedge R(x,y))\wedge R(z,x))" display="inline"><mrow><mo rspace="0.167em">∃</mo><mrow><mi>x</mi><mo lspace="0.167em">⁢</mo><mrow><mo rspace="0.167em">∃</mo><mrow><mi>y</mi><mo lspace="0.167em">⁢</mo><mrow><mo rspace="0.167em">∃</mo><mrow><mi>z</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mo stretchy="false">(</mo><mrow><mrow><mo rspace="0.167em">¬</mo><mi>y</mi></mrow><mo>=</mo><mrow><mi>z</mi><mo>∧</mo><mrow><mi>R</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo>,</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow><mo>∧</mo><mrow><mi>R</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>z</mi><mo>,</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></mrow></mrow></mrow></math>’  (witness for
+<math id="S3.I3.i4.p1.m2" class="ltx_Math" alttext="x" display="inline"><mi>x</mi></math>: <math id="S3.I3.i4.p1.m3" class="ltx_Math" alttext="2" display="inline"><mn>2</mn></math>)</p>
+</div>
+</li>
+<li id="S3.I3.i5" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">‣</span><div id="S3.I3.i5.p1" class="ltx_para">​<p class="ltx_p">‘<math id="S3.I3.i5.p1.m1" class="ltx_Math" alttext="\exists x\forall y\,\neg R(x,y)" display="inline"><mrow><mo rspace="0.167em">∃</mo><mrow><mi>x</mi><mo lspace="0.167em">⁢</mo><mrow><mo rspace="0.167em">∀</mo><mrow><mi>y</mi><mo lspace="0.337em">⁢</mo><mrow><mo rspace="0.167em">¬</mo><mrow><mi>R</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo>,</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></mrow></mrow></mrow></math>’  (witness for
+<math id="S3.I3.i5.p1.m2" class="ltx_Math" alttext="x" display="inline"><mi>x</mi></math>: <math id="S3.I3.i5.p1.m3" class="ltx_Math" alttext="3" display="inline"><mn>3</mn></math>)</p>
+</div>
+</li>
+<li id="S3.I3.i6" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">‣</span><div id="S3.I3.i6.p1" class="ltx_para">​<p class="ltx_p">‘<math id="S3.I3.i6.p1.m1" class="ltx_Math" alttext="\exists x(\exists y\,R(y,x)\wedge\neg\exists y\,R(x,y))" display="inline"><mrow><mo rspace="0.167em">∃</mo><mrow><mi>x</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mo rspace="0.167em">∃</mo><mrow><mi>y</mi><mo lspace="0.170em">⁢</mo><mrow><mi>R</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>y</mi><mo>,</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow><mo>∧</mo><mrow><mo rspace="0.167em">¬</mo><mrow><mo rspace="0.167em">∃</mo><mrow><mi>y</mi><mo lspace="0.170em">⁢</mo><mrow><mi>R</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo>,</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>’  (witness for
+<math id="S3.I3.i6.p1.m2" class="ltx_Math" alttext="x" display="inline"><mi>x</mi></math>: <math id="S3.I3.i6.p1.m3" class="ltx_Math" alttext="3" display="inline"><mn>3</mn></math>)</p>
+</div>
+</li>
+</ul>
+<p class="ltx_p">This immediately shows that all of the preceding six sentences are jointly satisfiable. We can use this observation to generate <span class="ltx_text ltx_font_bold">invalid</span> arguments, e.g.:</p>
+<div id="A48.S0.EGx19" class="ltx_equationgroup ltx_eqn_align bml_equationgroup bml_equation_container ltx_align_baseline">
+<div id="Ex3" class="ltx_equation bml_equation ltx_align_baseline" role="group" aria-label="equation">
+<div class="ltx_td ltx_align_right bml_eqn_cell"><math id="Ex3.m1" class="ltx_Math" alttext="\displaystyle\forall x\exists y\,R(y,x),\exists x\forall y\,R(x,y)" display="inline"><mrow><mrow><mo rspace="0.167em">∀</mo><mrow><mi>x</mi><mo lspace="0.167em">⁢</mo><mrow><mo rspace="0.167em">∃</mo><mrow><mi>y</mi><mo lspace="0.170em">⁢</mo><mrow><mi>R</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>y</mi><mo>,</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></mrow></mrow><mo>,</mo><mrow><mo rspace="0.167em">∃</mo><mrow><mi>x</mi><mo lspace="0.167em">⁢</mo><mrow><mo rspace="0.167em">∀</mo><mrow><mi>y</mi><mo lspace="0.170em">⁢</mo><mrow><mi>R</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo>,</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></mrow></mrow></mrow></math></div>
+<div class="ltx_td ltx_align_left bml_eqn_cell"><math id="Ex3.m2" class="ltx_Math" alttext="\displaystyle{}\therefore\forall x\exists y\,R(x,y)" display="inline"><mrow><mi></mi><mo>∴</mo><mrow><mo rspace="0.167em">∀</mo><mrow><mi>x</mi><mo lspace="0.167em">⁢</mo><mrow><mo rspace="0.167em">∃</mo><mrow><mi>y</mi><mo lspace="0.170em">⁢</mo><mrow><mi>R</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo>,</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></mrow></mrow></mrow></math></div>
+</div>
+<div id="Ex4" class="ltx_equation bml_equation ltx_align_baseline" role="group" aria-label="equation">
+<div class="ltx_td ltx_align_right bml_eqn_cell"><math id="Ex4.m1" class="ltx_Math" alttext="\displaystyle\exists x\forall y\,R(x,y),\exists x\forall y\neg R(x,y)" display="inline"><mrow><mrow><mo rspace="0.167em">∃</mo><mrow><mi>x</mi><mo lspace="0.167em">⁢</mo><mrow><mo rspace="0.167em">∀</mo><mrow><mi>y</mi><mo lspace="0.170em">⁢</mo><mrow><mi>R</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo>,</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></mrow></mrow><mo>,</mo><mrow><mo rspace="0.167em">∃</mo><mrow><mi>x</mi><mo lspace="0.167em">⁢</mo><mrow><mo rspace="0.167em">∀</mo><mrow><mi>y</mi><mo lspace="0.167em">⁢</mo><mrow><mo rspace="0.167em">¬</mo><mrow><mi>R</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo>,</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></mrow></mrow></mrow></mrow></math></div>
+<div class="ltx_td ltx_align_left bml_eqn_cell"><math id="Ex4.m2" class="ltx_Math" alttext="\displaystyle{}\therefore\neg\exists x\exists y\exists z(\neg y=z\wedge(R(x,y)%
+\wedge R(z,x)))" display="inline"><mrow><mi></mi><mo>∴</mo><mrow><mo rspace="0.167em">¬</mo><mrow><mo rspace="0.167em">∃</mo><mrow><mi>x</mi><mo lspace="0.167em">⁢</mo><mrow><mo rspace="0.167em">∃</mo><mrow><mi>y</mi><mo lspace="0.167em">⁢</mo><mrow><mo rspace="0.167em">∃</mo><mrow><mi>z</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mo rspace="0.167em">¬</mo><mi>y</mi></mrow><mo>=</mo><mrow><mi>z</mi><mo>∧</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>R</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo>,</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow><mo>∧</mo><mrow><mi>R</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>z</mi><mo>,</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></mrow></mrow></mrow></mrow></mrow></math></div>
+</div>
+</div>
+<p class="ltx_p">and many more besides.</p>
+</div>
+<div id="S3.p7" class="ltx_para bml_background-color_FDF4FA ltx_noindent bml_background-color_FDF4FA" style="padding:9pt;">
+<p class="ltx_p">If some interpretation makes all of <math id="S3.p7.m1" class="ltx_Math" alttext="\mathscr{A}_{1},\mathscr{A}_{2},\ldots,\mathscr{A}_{n}" display="inline"><mrow><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mn>1</mn></msub><mo>,</mo><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mn>2</mn></msub><mo>,</mo><mi mathvariant="normal">…</mi><mo>,</mo><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mi>n</mi></msub></mrow></math> true and <math id="S3.p7.m2" class="ltx_Math" alttext="\mathscr{C}" display="inline"><mi class="ltx_font_mathscript">𝒞︁</mi></math> is false, then:</p>
+<ol id="S3.I4" class="ltx_enumerate">
+<li id="S3.I4.i1" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">1.</span><div id="S3.I4.i1.p1" class="ltx_para">​<p class="ltx_p"><math id="S3.I4.i1.p1.m1" class="ltx_Math" alttext="\mathscr{A}_{1},\mathscr{A}_{2},\ldots,\mathscr{A}_{n}\therefore\mathscr{C}" display="inline"><mrow><mrow><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mn>1</mn></msub><mo>,</mo><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mn>2</mn></msub><mo>,</mo><mi mathvariant="normal">…</mi><mo>,</mo><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mi>n</mi></msub></mrow><mo>∴</mo><mi class="ltx_font_mathscript">𝒞︁</mi></mrow></math> is <span class="ltx_text ltx_font_bold">invalid</span>; and</p>
+</div>
+</li>
+<li id="S3.I4.i2" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">2.</span><div id="S3.I4.i2.p1" class="ltx_para">​<p class="ltx_p"><math id="S3.I4.i2.p1.m1" class="ltx_Math" alttext="\mathscr{A}_{1},\mathscr{A}_{2},\ldots,\mathscr{A}_{n}\nvDash\mathscr{C}" display="inline"><mrow><mrow><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mn>1</mn></msub><mo>,</mo><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mn>2</mn></msub><mo>,</mo><mi mathvariant="normal">…</mi><mo>,</mo><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mi>n</mi></msub></mrow><mo>⊭</mo><mi class="ltx_font_mathscript">𝒞︁</mi></mrow></math>; and</p>
+</div>
+</li>
+<li id="S3.I4.i3" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">3.</span><div id="S3.I4.i3.p1" class="ltx_para">​<p class="ltx_p">And <math id="S3.I4.i3.p1.m1" class="ltx_Math" alttext="\mathscr{A}_{1},\mathscr{A}_{2},\ldots,\mathscr{A}_{n},\neg\mathscr{C}" display="inline"><mrow><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mn>1</mn></msub><mo>,</mo><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mn>2</mn></msub><mo>,</mo><mi mathvariant="normal">…</mi><mo>,</mo><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mi>n</mi></msub><mo>,</mo><mrow><mo rspace="0.167em">¬</mo><mi class="ltx_font_mathscript">𝒞︁</mi></mrow></mrow></math> are jointly satisfiable.</p>
+</div>
+</li>
+</ol>
+</div>
+<div id="S3.p8" class="ltx_para">
+<p class="ltx_p">An interpretation which refutes a claim—to logical truth, say, or to entailment—is called a <span class="ltx_text ltx_font_bold">counter-interpretation</span>, or a <span class="ltx_text ltx_font_bold">counter-model</span>.</p>
+</div>
+<div id="S3.p9" class="ltx_para">
+<p class="ltx_p">We’ll close this section, though, with a caution about the relationship between (in)validity and (non)entailment. Recall FOL’s limitations: it is an extensional language; it ignores issues of vagueness; and it cannot handle cases of validity for ‘special reasons’. To take one illustration of these issues, consider this natural-language argument:</p>
+<ul id="S3.I5" class="ltx_itemize">
+<li id="S3.I5.ix1" class="ltx_item" style="list-style-type:none;"><div id="S3.I5.ix1.p1" class="ltx_para">
+<p class="ltx_p">Every fox is cute.</p>
+</div></li>
+<li id="S3.I5.ix2" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">∴</span><div id="S3.I5.ix2.p1" class="ltx_para">​<p class="ltx_p">All vixens are cute.</p>
+</div>
+</li>
+</ul>
+<p class="ltx_p">This is conceptually valid: necessarily every vixen is a fox, so it is impossible for the premise to be true and the conclusion false. Now, we might sensibly symbolize the argument as follows:</p>
+<div id="Ex5" class="ltx_equation bml_equation bml_equation_container ltx_align_baseline">
+<div class="ltx_Math bml_eqn_cell ltx_align_center"><math id="Ex5.m1" class="ltx_Math" alttext="\forall x(F(x)\rightarrow C(x))\therefore\forall x(V(x)\rightarrow C(x))" display="block"><mrow><mrow><mo rspace="0.167em">∀</mo><mrow><mi>x</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>F</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">→</mo><mrow><mi>C</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow><mo>∴</mo><mrow><mo rspace="0.167em">∀</mo><mrow><mi>x</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>V</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">→</mo><mrow><mi>C</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></math></div>
+</div>
+<p class="ltx_p">However, it is easy to find counter-models which show that <math id="S3.p9.m1" class="ltx_Math" alttext="\forall x(F(x)\rightarrow C(x))\nvDash\forall x(V(x)\rightarrow C(x))" display="inline"><mrow><mrow><mo rspace="0.167em">∀</mo><mrow><mi>x</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>F</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">→</mo><mrow><mi>C</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow><mo>⊭</mo><mrow><mo rspace="0.167em">∀</mo><mrow><mi>x</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>V</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">→</mo><mrow><mi>C</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></math>. (<span class="ltx_text ltx_font_bold">Exercise</span>: find one.) So, it would be <span class="ltx_text ltx_font_bold">wrong</span> to infer that the English argument is <span class="ltx_text ltx_font_bold">invalid</span>, just because there is a counter-model to the relevant <span class="ltx_text ltx_font_bold">FOL-entailment</span>.</p>
+</div>
+<div id="S3.p10" class="ltx_para">
+<p class="ltx_p">The general moral is this. If you want to infer from the absence of an entailment in FOL to the invalidity of some English argument, then you need to argue that nothing important is lost in the way you have symbolized the English argument.</p>
+</div>
+</div>
+</section>
+<section id="Sx1" class="ltx_section normal">
+<div class="section level2">
+<h2 class="ltx_title ltx_title_section">Practice exercises</h2>
+
+<div id="Sx1.p1" class="ltx_para ltx_noindent">
+<p class="ltx_p"><span class="ltx_text ltx_font_bold">A. </span>
+Show that each of the following is neither a validity nor a contradiction:</p>
+<ol id="Sx1.I6" class="ltx_enumerate">
+<li id="Sx1.I6.i1" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">1.</span><div id="Sx1.I6.i1.p1" class="ltx_para">​<p class="ltx_p"><span class="ltx_text ltx_align_left ltx_inline-block" style="width:20.0pt;"></span> <math id="Sx1.I6.i1.p1.m1" class="ltx_Math" alttext="D(a)\wedge D(b)" display="inline"><mrow><mrow><mi>D</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mrow><mo>∧</mo><mrow><mi>D</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>b</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math></p>
+</div>
+</li>
+<li id="Sx1.I6.i2" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">2.</span><div id="Sx1.I6.i2.p1" class="ltx_para">​<p class="ltx_p"><span class="ltx_text ltx_align_left ltx_inline-block" style="width:20.0pt;"></span> <math id="Sx1.I6.i2.p1.m1" class="ltx_Math" alttext="\exists x\,T(x,h)" display="inline"><mrow><mo rspace="0.167em">∃</mo><mrow><mi>x</mi><mo lspace="0.170em">⁢</mo><mrow><mi>T</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo>,</mo><mi>h</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></math></p>
+</div>
+</li>
+<li id="Sx1.I6.i3" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">3.</span><div id="Sx1.I6.i3.p1" class="ltx_para">​<p class="ltx_p"><span class="ltx_text ltx_align_left ltx_inline-block" style="width:20.0pt;"></span> <math id="Sx1.I6.i3.p1.m1" class="ltx_Math" alttext="P(m)\wedge\neg\forall x\,P(x)" display="inline"><mrow><mrow><mi>P</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>m</mi><mo stretchy="false">)</mo></mrow></mrow><mo>∧</mo><mrow><mo rspace="0.167em">¬</mo><mrow><mo rspace="0.167em">∀</mo><mrow><mi>x</mi><mo lspace="0.170em">⁢</mo><mrow><mi>P</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></mrow></mrow></math></p>
+</div>
+</li>
+<li id="Sx1.I6.i4" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">4.</span><div id="Sx1.I6.i4.p1" class="ltx_para">​<p class="ltx_p"><math id="Sx1.I6.i4.p1.m1" class="ltx_Math" alttext="\forall zJ(z)\leftrightarrow\exists y\,J(y)" display="inline"><mrow><mrow><mo rspace="0.167em">∀</mo><mrow><mi>z</mi><mo>⁢</mo><mrow><mi>J</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>z</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow><mo stretchy="false">↔</mo><mrow><mo rspace="0.167em">∃</mo><mrow><mi>y</mi><mo lspace="0.170em">⁢</mo><mrow><mi>J</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></mrow></math></p>
+</div>
+</li>
+<li id="Sx1.I6.i5" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">5.</span><div id="Sx1.I6.i5.p1" class="ltx_para">​<p class="ltx_p"><math id="Sx1.I6.i5.p1.m1" class="ltx_Math" alttext="\forall x(W(x,m,n)\vee\exists y\,L(x,y))" display="inline"><mrow><mo rspace="0.167em">∀</mo><mrow><mi>x</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>W</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo>,</mo><mi>m</mi><mo>,</mo><mi>n</mi><mo stretchy="false">)</mo></mrow></mrow><mo>∨</mo><mrow><mo rspace="0.167em">∃</mo><mrow><mi>y</mi><mo lspace="0.170em">⁢</mo><mrow><mi>L</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo>,</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math></p>
+</div>
+</li>
+<li id="Sx1.I6.i6" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">6.</span><div id="Sx1.I6.i6.p1" class="ltx_para">​<p class="ltx_p"><math id="Sx1.I6.i6.p1.m1" class="ltx_Math" alttext="\exists x(G(x)\rightarrow\forall y\,M(y))" display="inline"><mrow><mo rspace="0.167em">∃</mo><mrow><mi>x</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>G</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">→</mo><mrow><mo rspace="0.167em">∀</mo><mrow><mi>y</mi><mo lspace="0.170em">⁢</mo><mrow><mi>M</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math></p>
+</div>
+</li>
+<li id="Sx1.I6.i7" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">7.</span><div id="Sx1.I6.i7.p1" class="ltx_para">​<p class="ltx_p"><math id="Sx1.I6.i7.p1.m1" class="ltx_Math" alttext="\exists x(x=h\wedge x=i)" display="inline"><mrow><mo rspace="0.167em">∃</mo><mrow><mi>x</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mi>x</mi><mo>=</mo><mrow><mi>h</mi><mo>∧</mo><mi>x</mi></mrow><mo>=</mo><mi>i</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math></p>
+</div>
+</li>
+</ol>
+</div>
+<div id="Sx1.p2" class="ltx_para ltx_noindent">
+<p class="ltx_p"><span class="ltx_text ltx_font_bold">B. </span>
+Show that the following pairs of sentences are not logically equivalent.</p>
+<ol id="Sx1.I7" class="ltx_enumerate">
+<li id="Sx1.I7.i1" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">1.</span><div id="Sx1.I7.i1.p1" class="ltx_para">​<p class="ltx_p"><math id="Sx1.I7.i1.p1.m1" class="ltx_Math" alttext="J(a)" display="inline"><mrow><mi>J</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mrow></math>, <math id="Sx1.I7.i1.p1.m2" class="ltx_Math" alttext="K(a)" display="inline"><mrow><mi>K</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mrow></math></p>
+</div>
+</li>
+<li id="Sx1.I7.i2" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">2.</span><div id="Sx1.I7.i2.p1" class="ltx_para">​<p class="ltx_p"><math id="Sx1.I7.i2.p1.m1" class="ltx_Math" alttext="\exists x\,J(x)" display="inline"><mrow><mo rspace="0.167em">∃</mo><mrow><mi>x</mi><mo lspace="0.170em">⁢</mo><mrow><mi>J</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></math>, <math id="Sx1.I7.i2.p1.m2" class="ltx_Math" alttext="J(m)" display="inline"><mrow><mi>J</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>m</mi><mo stretchy="false">)</mo></mrow></mrow></math></p>
+</div>
+</li>
+<li id="Sx1.I7.i3" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">3.</span><div id="Sx1.I7.i3.p1" class="ltx_para">​<p class="ltx_p"><math id="Sx1.I7.i3.p1.m1" class="ltx_Math" alttext="\forall x\,R(x,x)" display="inline"><mrow><mo rspace="0.167em">∀</mo><mrow><mi>x</mi><mo lspace="0.170em">⁢</mo><mrow><mi>R</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo>,</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></math>, <math id="Sx1.I7.i3.p1.m2" class="ltx_Math" alttext="\exists x\,R(x,x)" display="inline"><mrow><mo rspace="0.167em">∃</mo><mrow><mi>x</mi><mo lspace="0.170em">⁢</mo><mrow><mi>R</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo>,</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></math></p>
+</div>
+</li>
+<li id="Sx1.I7.i4" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">4.</span><div id="Sx1.I7.i4.p1" class="ltx_para">​<p class="ltx_p"><math id="Sx1.I7.i4.p1.m1" class="ltx_Math" alttext="\exists x\,P(x)\rightarrow Q(c)" display="inline"><mrow><mrow><mo rspace="0.167em">∃</mo><mrow><mi>x</mi><mo lspace="0.170em">⁢</mo><mrow><mi>P</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow><mo stretchy="false">→</mo><mrow><mi>Q</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>c</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math>, <math id="Sx1.I7.i4.p1.m2" class="ltx_Math" alttext="\exists x(P(x)\rightarrow Q(c))" display="inline"><mrow><mo rspace="0.167em">∃</mo><mrow><mi>x</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>P</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">→</mo><mrow><mi>Q</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>c</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math></p>
+</div>
+</li>
+<li id="Sx1.I7.i5" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">5.</span><div id="Sx1.I7.i5.p1" class="ltx_para">​<p class="ltx_p"><math id="Sx1.I7.i5.p1.m1" class="ltx_Math" alttext="\forall x(P(x)\rightarrow\neg Q(x))" display="inline"><mrow><mo rspace="0.167em">∀</mo><mrow><mi>x</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>P</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">→</mo><mrow><mo rspace="0.167em">¬</mo><mrow><mi>Q</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>, <math id="Sx1.I7.i5.p1.m2" class="ltx_Math" alttext="\exists x(P(x)\wedge\neg Q(x))" display="inline"><mrow><mo rspace="0.167em">∃</mo><mrow><mi>x</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>P</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo>∧</mo><mrow><mo rspace="0.167em">¬</mo><mrow><mi>Q</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math></p>
+</div>
+</li>
+<li id="Sx1.I7.i6" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">6.</span><div id="Sx1.I7.i6.p1" class="ltx_para">​<p class="ltx_p"><math id="Sx1.I7.i6.p1.m1" class="ltx_Math" alttext="\exists x(P(x)\wedge Q(x))" display="inline"><mrow><mo rspace="0.167em">∃</mo><mrow><mi>x</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>P</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo>∧</mo><mrow><mi>Q</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>, <math id="Sx1.I7.i6.p1.m2" class="ltx_Math" alttext="\exists x(P(x)\rightarrow Q(x))" display="inline"><mrow><mo rspace="0.167em">∃</mo><mrow><mi>x</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>P</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">→</mo><mrow><mi>Q</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math></p>
+</div>
+</li>
+<li id="Sx1.I7.i7" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">7.</span><div id="Sx1.I7.i7.p1" class="ltx_para">​<p class="ltx_p"><math id="Sx1.I7.i7.p1.m1" class="ltx_Math" alttext="\forall x(P(x)\rightarrow Q(x))" display="inline"><mrow><mo rspace="0.167em">∀</mo><mrow><mi>x</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>P</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">→</mo><mrow><mi>Q</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>, <math id="Sx1.I7.i7.p1.m2" class="ltx_Math" alttext="\forall x(P(x)\wedge Q(x))" display="inline"><mrow><mo rspace="0.167em">∀</mo><mrow><mi>x</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>P</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo>∧</mo><mrow><mi>Q</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math></p>
+</div>
+</li>
+<li id="Sx1.I7.i8" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">8.</span><div id="Sx1.I7.i8.p1" class="ltx_para">​<p class="ltx_p"><math id="Sx1.I7.i8.p1.m1" class="ltx_Math" alttext="\forall x\exists y\,R(x,y)" display="inline"><mrow><mo rspace="0.167em">∀</mo><mrow><mi>x</mi><mo lspace="0.167em">⁢</mo><mrow><mo rspace="0.167em">∃</mo><mrow><mi>y</mi><mo lspace="0.170em">⁢</mo><mrow><mi>R</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo>,</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></mrow></mrow></math>, <math id="Sx1.I7.i8.p1.m2" class="ltx_Math" alttext="\exists x\forall y\,R(x,y)" display="inline"><mrow><mo rspace="0.167em">∃</mo><mrow><mi>x</mi><mo lspace="0.167em">⁢</mo><mrow><mo rspace="0.167em">∀</mo><mrow><mi>y</mi><mo lspace="0.170em">⁢</mo><mrow><mi>R</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo>,</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></mrow></mrow></math></p>
+</div>
+</li>
+<li id="Sx1.I7.i9" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">9.</span><div id="Sx1.I7.i9.p1" class="ltx_para">​<p class="ltx_p"><math id="Sx1.I7.i9.p1.m1" class="ltx_Math" alttext="\forall x\exists y\,R(x,y)" display="inline"><mrow><mo rspace="0.167em">∀</mo><mrow><mi>x</mi><mo lspace="0.167em">⁢</mo><mrow><mo rspace="0.167em">∃</mo><mrow><mi>y</mi><mo lspace="0.170em">⁢</mo><mrow><mi>R</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo>,</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></mrow></mrow></math>, <math id="Sx1.I7.i9.p1.m2" class="ltx_Math" alttext="\forall x\exists y\,R(y,x)" display="inline"><mrow><mo rspace="0.167em">∀</mo><mrow><mi>x</mi><mo lspace="0.167em">⁢</mo><mrow><mo rspace="0.167em">∃</mo><mrow><mi>y</mi><mo lspace="0.170em">⁢</mo><mrow><mi>R</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>y</mi><mo>,</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></mrow></mrow></math></p>
+</div>
+</li>
+</ol>
+</div>
+<div id="Sx1.p3" class="ltx_para ltx_noindent">
+<p class="ltx_p"><span class="ltx_text ltx_font_bold">C. </span>Show that the following sentences are jointly satisfiable:</p>
+<ol id="Sx1.I8" class="ltx_enumerate">
+<li id="Sx1.I8.i1" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">1.</span><div id="Sx1.I8.i1.p1" class="ltx_para">​<p class="ltx_p"><math id="Sx1.I8.i1.p1.m1" class="ltx_Math" alttext="M(a),\neg N(a),P(a),\neg Q(a)" display="inline"><mrow><mrow><mi>M</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mrow><mo>,</mo><mrow><mo rspace="0.167em">¬</mo><mrow><mi>N</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo>,</mo><mrow><mi>P</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mrow><mo>,</mo><mrow><mo rspace="0.167em">¬</mo><mrow><mi>Q</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></math></p>
+</div>
+</li>
+<li id="Sx1.I8.i2" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">2.</span><div id="Sx1.I8.i2.p1" class="ltx_para">​<p class="ltx_p"><math id="Sx1.I8.i2.p1.m1" class="ltx_Math" alttext="L(e,e),L(e,g),\neg L(g,e),\neg L(g,g)" display="inline"><mrow><mrow><mi>L</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>e</mi><mo>,</mo><mi>e</mi><mo stretchy="false">)</mo></mrow></mrow><mo>,</mo><mrow><mi>L</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>e</mi><mo>,</mo><mi>g</mi><mo stretchy="false">)</mo></mrow></mrow><mo>,</mo><mrow><mo rspace="0.167em">¬</mo><mrow><mi>L</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>g</mi><mo>,</mo><mi>e</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo>,</mo><mrow><mo rspace="0.167em">¬</mo><mrow><mi>L</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>g</mi><mo>,</mo><mi>g</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></math></p>
+</div>
+</li>
+<li id="Sx1.I8.i3" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">3.</span><div id="Sx1.I8.i3.p1" class="ltx_para">​<p class="ltx_p"><math id="Sx1.I8.i3.p1.m1" class="ltx_Math" alttext="\neg(M(a)\wedge\exists x\,A(x)),M(a)\vee F(a),\forall x(F(x)\rightarrow A(x))" display="inline"><mrow><mrow><mo>¬</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>M</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mrow><mo>∧</mo><mrow><mo rspace="0.167em">∃</mo><mrow><mi>x</mi><mo lspace="0.170em">⁢</mo><mrow><mi>A</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow><mo>,</mo><mrow><mrow><mi>M</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mrow><mo>∨</mo><mrow><mi>F</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo>,</mo><mrow><mo rspace="0.167em">∀</mo><mrow><mi>x</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>F</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">→</mo><mrow><mi>A</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></math></p>
+</div>
+</li>
+<li id="Sx1.I8.i4" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">4.</span><div id="Sx1.I8.i4.p1" class="ltx_para">​<p class="ltx_p"><math id="Sx1.I8.i4.p1.m1" class="ltx_Math" alttext="M(a)\vee M(b),M(a)\rightarrow\forall x\neg M(x)" display="inline"><mrow><mrow><mrow><mrow><mi>M</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mrow><mo>∨</mo><mrow><mi>M</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>b</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo>,</mo><mrow><mi>M</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">→</mo><mrow><mo rspace="0.167em">∀</mo><mrow><mi>x</mi><mo lspace="0.167em">⁢</mo><mrow><mo rspace="0.167em">¬</mo><mrow><mi>M</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></mrow></mrow></math></p>
+</div>
+</li>
+<li id="Sx1.I8.i5" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">5.</span><div id="Sx1.I8.i5.p1" class="ltx_para">​<p class="ltx_p"><math id="Sx1.I8.i5.p1.m1" class="ltx_Math" alttext="\forall y\,G(y),\forall x(G(x)\rightarrow H(x)),\exists y\neg I(y)" display="inline"><mrow><mrow><mo rspace="0.167em">∀</mo><mrow><mi>y</mi><mo lspace="0.170em">⁢</mo><mrow><mi>G</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow><mo>,</mo><mrow><mo rspace="0.167em">∀</mo><mrow><mi>x</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>G</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">→</mo><mrow><mi>H</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow><mo>,</mo><mrow><mo rspace="0.167em">∃</mo><mrow><mi>y</mi><mo lspace="0.167em">⁢</mo><mrow><mo rspace="0.167em">¬</mo><mrow><mi>I</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></mrow></mrow></math></p>
+</div>
+</li>
+<li id="Sx1.I8.i6" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">6.</span><div id="Sx1.I8.i6.p1" class="ltx_para">​<p class="ltx_p"><math id="Sx1.I8.i6.p1.m1" class="ltx_Math" alttext="\exists x(B(x)\vee A(x)),\forall x\neg C(x),\forall x\bigl{[}(A(x)\wedge B(x))%
+\rightarrow C(x)\bigr{]}" display="inline"><mrow><mrow><mo rspace="0.167em">∃</mo><mrow><mi>x</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>B</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo>∨</mo><mrow><mi>A</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow><mo>,</mo><mrow><mo rspace="0.167em">∀</mo><mrow><mi>x</mi><mo lspace="0.167em">⁢</mo><mrow><mo rspace="0.167em">¬</mo><mrow><mi>C</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></mrow><mo>,</mo><mrow><mo rspace="0.167em">∀</mo><mrow><mi>x</mi><mo>⁢</mo><mrow><mo maxsize="120%" minsize="120%">[</mo><mrow><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>A</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo>∧</mo><mrow><mi>B</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow><mo stretchy="false">→</mo><mrow><mi>C</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo maxsize="120%" minsize="120%">]</mo></mrow></mrow></mrow></mrow></math></p>
+</div>
+</li>
+<li id="Sx1.I8.i7" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">7.</span><div id="Sx1.I8.i7.p1" class="ltx_para">​<p class="ltx_p"><math id="Sx1.I8.i7.p1.m1" class="ltx_math_unparsed" alttext="\exists x\,X(x),\exists x\,Y(x),\forall x(X(x)\leftrightarrow\neg Y(x))" display="inline"><mrow><mo rspace="0.167em">∃</mo><mi>x</mi><mi>X</mi><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow><mo>,</mo><mo rspace="0.167em">∃</mo><mi>x</mi><mi>Y</mi><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow><mo>,</mo><mo rspace="0.167em">∀</mo><mi>x</mi><mrow><mo stretchy="false">(</mo><mi>X</mi><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow><mo stretchy="false">↔</mo><mo rspace="0.167em">¬</mo><mi>Y</mi><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow><mo stretchy="false">)</mo></mrow></mrow></math></p>
+</div>
+</li>
+<li id="Sx1.I8.i8" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">8.</span><div id="Sx1.I8.i8.p1" class="ltx_para">​<p class="ltx_p"><math id="Sx1.I8.i8.p1.m1" class="ltx_Math" alttext="\forall x(P(x)\vee Q(x)),\exists x\neg(Q(x)\wedge P(x))" display="inline"><mrow><mrow><mo rspace="0.167em">∀</mo><mrow><mi>x</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>P</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo>∨</mo><mrow><mi>Q</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow><mo>,</mo><mrow><mo rspace="0.167em">∃</mo><mrow><mi>x</mi><mo lspace="0.167em">⁢</mo><mrow><mo>¬</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>Q</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo>∧</mo><mrow><mi>P</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></mrow></math></p>
+</div>
+</li>
+<li id="Sx1.I8.i9" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">9.</span><div id="Sx1.I8.i9.p1" class="ltx_para">​<p class="ltx_p"><math id="Sx1.I8.i9.p1.m1" class="ltx_Math" alttext="\exists z(N(z)\wedge O(z,z)),\forall x\forall y(O(x,y)\rightarrow O(y,x))" display="inline"><mrow><mrow><mo rspace="0.167em">∃</mo><mrow><mi>z</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>N</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>z</mi><mo stretchy="false">)</mo></mrow></mrow><mo>∧</mo><mrow><mi>O</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>z</mi><mo>,</mo><mi>z</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow><mo>,</mo><mrow><mo rspace="0.167em">∀</mo><mrow><mi>x</mi><mo lspace="0.167em">⁢</mo><mrow><mo rspace="0.167em">∀</mo><mrow><mi>y</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>O</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo>,</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">→</mo><mrow><mi>O</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>y</mi><mo>,</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></mrow></mrow></math></p>
+</div>
+</li>
+<li id="Sx1.I8.i10" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">10.</span><div id="Sx1.I8.i10.p1" class="ltx_para">​<p class="ltx_p"><math id="Sx1.I8.i10.p1.m1" class="ltx_Math" alttext="\neg\exists x\forall y\,R(x,y),\forall x\exists y\,R(x,y)" display="inline"><mrow><mrow><mo rspace="0.167em">¬</mo><mrow><mo rspace="0.167em">∃</mo><mrow><mi>x</mi><mo lspace="0.167em">⁢</mo><mrow><mo rspace="0.167em">∀</mo><mrow><mi>y</mi><mo lspace="0.170em">⁢</mo><mrow><mi>R</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo>,</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></mrow></mrow></mrow><mo>,</mo><mrow><mo rspace="0.167em">∀</mo><mrow><mi>x</mi><mo lspace="0.167em">⁢</mo><mrow><mo rspace="0.167em">∃</mo><mrow><mi>y</mi><mo lspace="0.170em">⁢</mo><mrow><mi>R</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo>,</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></mrow></mrow></mrow></math></p>
+</div>
+</li>
+<li id="Sx1.I8.i11" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">11.</span><div id="Sx1.I8.i11.p1" class="ltx_para">​<p class="ltx_p"><math id="Sx1.I8.i11.p1.m1" class="ltx_Math" alttext="\neg R(a,a)" display="inline"><mrow><mo rspace="0.167em">¬</mo><mrow><mi>R</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>a</mi><mo>,</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math>, <math id="Sx1.I8.i11.p1.m2" class="ltx_Math" alttext="\forall x(x=a\vee R(x,a))" display="inline"><mrow><mo rspace="0.167em">∀</mo><mrow><mi>x</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mi>x</mi><mo>=</mo><mrow><mi>a</mi><mo>∨</mo><mrow><mi>R</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo>,</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math></p>
+</div>
+</li>
+<li id="Sx1.I8.i12" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">12.</span><div id="Sx1.I8.i12.p1" class="ltx_para">​<p class="ltx_p"><math id="Sx1.I8.i12.p1.m1" class="ltx_Math" alttext="\forall x\forall y\forall z[(x=y\vee y=z)\vee x=z]" display="inline"><mrow><mo rspace="0.167em">∀</mo><mrow><mi>x</mi><mo lspace="0.167em">⁢</mo><mrow><mo rspace="0.167em">∀</mo><mrow><mi>y</mi><mo lspace="0.167em">⁢</mo><mrow><mo rspace="0.167em">∀</mo><mrow><mi>z</mi><mo>⁢</mo><mrow><mo stretchy="false">[</mo><mrow><mrow><mrow><mo stretchy="false">(</mo><mrow><mi>x</mi><mo>=</mo><mrow><mi>y</mi><mo>∨</mo><mi>y</mi></mrow><mo>=</mo><mi>z</mi></mrow><mo stretchy="false">)</mo></mrow><mo>∨</mo><mi>x</mi></mrow><mo>=</mo><mi>z</mi></mrow><mo stretchy="false">]</mo></mrow></mrow></mrow></mrow></mrow></mrow></mrow></math>, <math id="Sx1.I8.i12.p1.m2" class="ltx_Math" alttext="\exists x\exists y\ \neg x=y" display="inline"><mrow><mrow><mo rspace="0.167em">∃</mo><mrow><mi>x</mi><mo lspace="0.167em">⁢</mo><mrow><mo rspace="0.167em">∃</mo><mrow><mi>y</mi><mo lspace="0.667em">⁢</mo><mrow><mo rspace="0.167em">¬</mo><mi>x</mi></mrow></mrow></mrow></mrow></mrow><mo>=</mo><mi>y</mi></mrow></math></p>
+</div>
+</li>
+<li id="Sx1.I8.i13" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">13.</span><div id="Sx1.I8.i13.p1" class="ltx_para">​<p class="ltx_p"><math id="Sx1.I8.i13.p1.m1" class="ltx_Math" alttext="\exists x\exists y((Z(x)\wedge Z(y))\wedge x=y)" display="inline"><mrow><mo rspace="0.167em">∃</mo><mrow><mi>x</mi><mo lspace="0.167em">⁢</mo><mrow><mo rspace="0.167em">∃</mo><mrow><mi>y</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>Z</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo>∧</mo><mrow><mi>Z</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow><mo>∧</mo><mi>x</mi></mrow><mo>=</mo><mi>y</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></mrow></math>, <math id="Sx1.I8.i13.p1.m2" class="ltx_Math" alttext="\neg Z(d)" display="inline"><mrow><mo rspace="0.167em">¬</mo><mrow><mi>Z</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>d</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math>, <math id="Sx1.I8.i13.p1.m3" class="ltx_Math" alttext="d=e" display="inline"><mrow><mi>d</mi><mo>=</mo><mi>e</mi></mrow></math></p>
+</div>
+</li>
+</ol>
+</div>
+<div id="Sx1.p4" class="ltx_para ltx_noindent">
+<p class="ltx_p"><span class="ltx_text ltx_font_bold">D. </span>Show that the following arguments are invalid:</p>
+<ol id="Sx1.I9" class="ltx_enumerate">
+<li id="Sx1.I9.i1" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">1.</span><div id="Sx1.I9.i1.p1" class="ltx_para">​<p class="ltx_p"><math id="Sx1.I9.i1.p1.m1" class="ltx_Math" alttext="\forall x(A(x)\rightarrow B(x))\therefore\exists x\,B(x)" display="inline"><mrow><mrow><mo rspace="0.167em">∀</mo><mrow><mi>x</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>A</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">→</mo><mrow><mi>B</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow><mo>∴</mo><mrow><mo rspace="0.167em">∃</mo><mrow><mi>x</mi><mo lspace="0.170em">⁢</mo><mrow><mi>B</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></mrow></math></p>
+</div>
+</li>
+<li id="Sx1.I9.i2" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">2.</span><div id="Sx1.I9.i2.p1" class="ltx_para">​<p class="ltx_p"><math id="Sx1.I9.i2.p1.m1" class="ltx_Math" alttext="\forall x(R(x)\rightarrow D(x)),\forall x(R(x)\rightarrow F(x))\therefore%
+\exists x(D(x)\wedge F(x))" display="inline"><mrow><mrow><mrow><mo rspace="0.167em">∀</mo><mrow><mi>x</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>R</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">→</mo><mrow><mi>D</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow><mo>,</mo><mrow><mo rspace="0.167em">∀</mo><mrow><mi>x</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>R</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">→</mo><mrow><mi>F</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow><mo>∴</mo><mrow><mo rspace="0.167em">∃</mo><mrow><mi>x</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>D</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo>∧</mo><mrow><mi>F</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></math></p>
+</div>
+</li>
+<li id="Sx1.I9.i3" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">3.</span><div id="Sx1.I9.i3.p1" class="ltx_para">​<p class="ltx_p"><math id="Sx1.I9.i3.p1.m1" class="ltx_Math" alttext="\exists x(P(x)\rightarrow Q(x))\therefore\exists x\,P(x)" display="inline"><mrow><mrow><mo rspace="0.167em">∃</mo><mrow><mi>x</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>P</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">→</mo><mrow><mi>Q</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow><mo>∴</mo><mrow><mo rspace="0.167em">∃</mo><mrow><mi>x</mi><mo lspace="0.170em">⁢</mo><mrow><mi>P</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></mrow></math></p>
+</div>
+</li>
+<li id="Sx1.I9.i4" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">4.</span><div id="Sx1.I9.i4.p1" class="ltx_para">​<p class="ltx_p"><math id="Sx1.I9.i4.p1.m1" class="ltx_Math" alttext="N(a)\wedge N(b)\wedge N(c)\therefore\forall x\,N(x)" display="inline"><mrow><mrow><mrow><mi>N</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mrow><mo>∧</mo><mrow><mi>N</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>b</mi><mo stretchy="false">)</mo></mrow></mrow><mo>∧</mo><mrow><mi>N</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>c</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo>∴</mo><mrow><mo rspace="0.167em">∀</mo><mrow><mi>x</mi><mo lspace="0.170em">⁢</mo><mrow><mi>N</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></mrow></math></p>
+</div>
+</li>
+<li id="Sx1.I9.i5" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">5.</span><div id="Sx1.I9.i5.p1" class="ltx_para">​<p class="ltx_p"><math id="Sx1.I9.i5.p1.m1" class="ltx_Math" alttext="R(d,e),\exists x\,R(x,d)\therefore R(e,d)" display="inline"><mrow><mrow><mrow><mi>R</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>d</mi><mo>,</mo><mi>e</mi><mo stretchy="false">)</mo></mrow></mrow><mo>,</mo><mrow><mo rspace="0.167em">∃</mo><mrow><mi>x</mi><mo lspace="0.170em">⁢</mo><mrow><mi>R</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo>,</mo><mi>d</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></mrow><mo>∴</mo><mrow><mi>R</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>e</mi><mo>,</mo><mi>d</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math></p>
+</div>
+</li>
+<li id="Sx1.I9.i6" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">6.</span><div id="Sx1.I9.i6.p1" class="ltx_para">​<p class="ltx_p"><math id="Sx1.I9.i6.p1.m1" class="ltx_Math" alttext="\exists x(E(x)\wedge F(x)),\exists x\,F(x)\rightarrow\exists x\,G(x)\therefore%
+\exists x(E(x)\wedge G(x))" display="inline"><mrow><mrow><mrow><mrow><mo rspace="0.167em">∃</mo><mrow><mi>x</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>E</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo>∧</mo><mrow><mi>F</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow><mo>,</mo><mrow><mo rspace="0.167em">∃</mo><mrow><mi>x</mi><mo lspace="0.170em">⁢</mo><mrow><mi>F</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></mrow><mo stretchy="false">→</mo><mrow><mo rspace="0.167em">∃</mo><mrow><mi>x</mi><mo lspace="0.170em">⁢</mo><mrow><mi>G</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></mrow><mo>∴</mo><mrow><mo rspace="0.167em">∃</mo><mrow><mi>x</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>E</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo>∧</mo><mrow><mi>G</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></math></p>
+</div>
+</li>
+<li id="Sx1.I9.i7" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">7.</span><div id="Sx1.I9.i7.p1" class="ltx_para">​<p class="ltx_p"><math id="Sx1.I9.i7.p1.m1" class="ltx_Math" alttext="\forall x\,O(x,c),\forall x\,O(c,x)\therefore\forall x\,O(x,x)" display="inline"><mrow><mrow><mrow><mo rspace="0.167em">∀</mo><mrow><mi>x</mi><mo lspace="0.170em">⁢</mo><mrow><mi>O</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo>,</mo><mi>c</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow><mo>,</mo><mrow><mo rspace="0.167em">∀</mo><mrow><mi>x</mi><mo lspace="0.170em">⁢</mo><mrow><mi>O</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>c</mi><mo>,</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></mrow><mo>∴</mo><mrow><mo rspace="0.167em">∀</mo><mrow><mi>x</mi><mo lspace="0.170em">⁢</mo><mrow><mi>O</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo>,</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></mrow></math></p>
+</div>
+</li>
+<li id="Sx1.I9.i8" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">8.</span><div id="Sx1.I9.i8.p1" class="ltx_para">​<p class="ltx_p"><math id="Sx1.I9.i8.p1.m1" class="ltx_Math" alttext="\exists x(J(x)\wedge K(x)),\exists x\neg K(x),\exists x\neg J(x)\therefore%
+\exists x(\neg J(x)\wedge\neg K(x))" display="inline"><mrow><mrow><mrow><mo rspace="0.167em">∃</mo><mrow><mi>x</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>J</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo>∧</mo><mrow><mi>K</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow><mo>,</mo><mrow><mo rspace="0.167em">∃</mo><mrow><mi>x</mi><mo lspace="0.167em">⁢</mo><mrow><mo rspace="0.167em">¬</mo><mrow><mi>K</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></mrow><mo>,</mo><mrow><mo rspace="0.167em">∃</mo><mrow><mi>x</mi><mo lspace="0.167em">⁢</mo><mrow><mo rspace="0.167em">¬</mo><mrow><mi>J</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></mrow></mrow><mo>∴</mo><mrow><mo rspace="0.167em">∃</mo><mrow><mi>x</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mo rspace="0.167em">¬</mo><mrow><mi>J</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo>∧</mo><mrow><mo rspace="0.167em">¬</mo><mrow><mi>K</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></math></p>
+</div>
+</li>
+<li id="Sx1.I9.i9" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">9.</span><div id="Sx1.I9.i9.p1" class="ltx_para">​<p class="ltx_p"><math id="Sx1.I9.i9.p1.m1" class="ltx_Math" alttext="L(a,b)\rightarrow\forall x\,L(x,b),\exists x\,L(x,b)\therefore L(b,b)" display="inline"><mrow><mrow><mrow><mi>L</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>a</mi><mo>,</mo><mi>b</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">→</mo><mrow><mrow><mo rspace="0.167em">∀</mo><mrow><mi>x</mi><mo lspace="0.170em">⁢</mo><mrow><mi>L</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo>,</mo><mi>b</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow><mo>,</mo><mrow><mo rspace="0.167em">∃</mo><mrow><mi>x</mi><mo lspace="0.170em">⁢</mo><mrow><mi>L</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo>,</mo><mi>b</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></mrow></mrow><mo>∴</mo><mrow><mi>L</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>b</mi><mo>,</mo><mi>b</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math></p>
+</div>
+</li>
+<li id="Sx1.I9.i10" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">10.</span><div id="Sx1.I9.i10.p1" class="ltx_para">​<p class="ltx_p"><math id="Sx1.I9.i10.p1.m1" class="ltx_Math" alttext="\forall x(D(x)\rightarrow\exists y\,T(y,x))\therefore\exists y\exists z\ \neg y=z" display="inline"><mrow><mrow><mo rspace="0.167em">∀</mo><mrow><mi>x</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>D</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">→</mo><mrow><mo rspace="0.167em">∃</mo><mrow><mi>y</mi><mo lspace="0.170em">⁢</mo><mrow><mi>T</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>y</mi><mo>,</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow><mo>∴</mo><mrow><mrow><mo rspace="0.167em">∃</mo><mrow><mi>y</mi><mo lspace="0.167em">⁢</mo><mrow><mo rspace="0.167em">∃</mo><mrow><mi>z</mi><mo lspace="0.667em">⁢</mo><mrow><mo rspace="0.167em">¬</mo><mi>y</mi></mrow></mrow></mrow></mrow></mrow><mo>=</mo><mi>z</mi></mrow></mrow></math></p>
+</div>
+</li>
+</ol>
+</div>
+</div>
+</section>
+</div>
+</section>
+</div>
+</div>
+</div>
+<a href="Ch32.html" class="navigation navigation-prev" aria-label="Previous page"><i class="fa fa-angle-left"></i></a><a href="Ch34.html" class="navigation navigation-next" aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+</div>
+</div>
+</body>
+
+</html>

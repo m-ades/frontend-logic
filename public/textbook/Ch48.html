@@ -1,0 +1,1315 @@
+<!DOCTYPE html><html style="--bml-ltx-font-size:10;" class="bml_mathjax4" lang="en">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<title>Chapter 48 Soundness ‣ Part IX Metatheory ‣ forall x: Calgary</title>
+<!--Generated on Tue Jul 21 20:13:15 2026 by LaTeXML (version 0.8.8) http://dlmf.nist.gov/LaTeXML/.-->
+<!--Document created on Fall 2025 (2026‐07‐18 8642250).-->
+
+<link rel="stylesheet" href="LaTeXML.css" type="text/css">
+<link rel="stylesheet" href="ltx-book.css" type="text/css">
+<link rel="stylesheet" href="bookml/gitbook/css/style.css" type="text/css">
+<link rel="stylesheet" href="bookml/gitbook/css/plugin-table.css" type="text/css">
+<link rel="stylesheet" href="bookml/gitbook/css/plugin-search.css" type="text/css">
+<link rel="stylesheet" href="bookml/gitbook/css/plugin-bookdown.css" type="text/css">
+<link rel="stylesheet" href="bookml/gitbook/css/plugin-fontsettings.css" type="text/css">
+<link rel="stylesheet" href="bookml/CSS/style.css" type="text/css">
+<link rel="stylesheet" href="bookml/CSS/style.gitbook,plain.css" type="text/css">
+<link rel="stylesheet" href="bookml/CSS/style.gitbook.css" type="text/css">
+<link rel="stylesheet" href="bmluser/colors.gitbook-forallxyyc-html.css" type="text/css">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<link rel="stylesheet" href="forallxyyc.css" type="text/css">
+<link rel="stylesheet" href="fitchml.css" type="text/css">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script><script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6"></script>
+<link rel="up" href="Pt9.html" title="Part IX Metatheory ‣ forall x: Calgary">
+<link rel="up up" href="index.html" title="forall x: Calgary">
+<link rel="start" href="index.html" title="forall x: Calgary">
+<link rel="prev" href="Ch47.html" title="Chapter 47 Proving equivalences ‣ Part IX Metatheory ‣ forall x: Calgary">
+<link rel="next" href="Ptx1.html" title="Appendices ‣ forall x: Calgary">
+<link rel="chapter" href="Ch45.html" title="Chapter 45 Normal forms ‣ Part IX Metatheory ‣ forall x: Calgary">
+<link rel="chapter" href="Ch46.html" title="Chapter 46 Functional completeness ‣ Part IX Metatheory ‣ forall x: Calgary">
+<link rel="chapter" href="Ch47.html" title="Chapter 47 Proving equivalences ‣ Part IX Metatheory ‣ forall x: Calgary">
+<link rel="chapter" href="Chx1.html" title="Preface ‣ forall x: Calgary">
+<link rel="part" href="Pt1.html" title="Part I Key notions of logic ‣ forall x: Calgary">
+<link rel="part" href="Pt2.html" title="Part II Truth-functional logic ‣ forall x: Calgary">
+<link rel="part" href="Pt3.html" title="Part III Truth tables ‣ forall x: Calgary">
+<link rel="part" href="Pt4.html" title="Part IV Natural deduction for TFL ‣ forall x: Calgary">
+<link rel="part" href="Pt5.html" title="Part V First-order logic ‣ forall x: Calgary">
+<link rel="part" href="Pt6.html" title="Part VI Interpretations ‣ forall x: Calgary">
+<link rel="part" href="Pt7.html" title="Part VII Natural deduction for FOL ‣ forall x: Calgary">
+<link rel="part" href="Pt8.html" title="Part VIII Modal logic ‣ forall x: Calgary">
+<link rel="part" href="Pt9.html" title="Part IX Metatheory ‣ forall x: Calgary">
+<link rel="part" href="Ptx1.html" title="Appendices ‣ forall x: Calgary">
+<link rel="part" href="Ptx2.html" title="Solutions to selected exercices ‣ forall x: Calgary">
+<script src="bookml/js/mathjax4.js" defer></script>
+</head>
+<body class="bml_class_book">
+<div class="book without-animation font-size-2 font-family-1" data-basepath=".">
+<a href="#bml-main-content" tabindex="0" class="bml-skip-to-content">Skip to content.</a>
+<div class="book-summary"><nav class="ltx_page_navbar">
+<ul class="ltx_toclist summary">
+<li>
+<a href="index.html" title="" class="ltx_ref" rel="start">forall x: Calgary</a>
+</li>
+<li class="divider" aria-hidden="true"></li>
+<li data-level="" data-path="Chx1.html" class="ltx_tocentry ltx_tocentry_chapter  chapter "><a href="Chx1.html" title="In forall x: Calgary" class="ltx_ref">Preface</a></li>
+<li data-level="I" data-path="Pt1.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt1.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">I </span></b>Key notions of logic</a></li>
+<li data-level="II" data-path="Pt2.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt2.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">II </span></b>Truth-functional logic</a></li>
+<li data-level="III" data-path="Pt3.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt3.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">III </span></b>Truth tables</a></li>
+<li data-level="IV" data-path="Pt4.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt4.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">IV </span></b>Natural deduction for TFL</a></li>
+<li data-level="V" data-path="Pt5.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt5.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">V </span></b>First-order logic</a></li>
+<li data-level="VI" data-path="Pt6.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt6.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">VI </span></b>Interpretations</a></li>
+<li data-level="VII" data-path="Pt7.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt7.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">VII </span></b>Natural deduction for FOL</a></li>
+<li data-level="VIII" data-path="Pt8.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt8.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">VIII </span></b>Modal logic</a></li>
+<li data-level="IX" data-path="Pt9.html" class="ltx_tocentry ltx_tocentry_part  chapter ">
+<a href="Pt9.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">IX </span></b>Metatheory</a>
+<ol class="ltx_toclist ltx_toclist_part">
+<li data-level="45" data-path="Ch45.html" class="ltx_tocentry ltx_tocentry_chapter  chapter "><a href="Ch45.html" title="In Part IX Metatheory ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">45 </span></b>Normal forms</a></li>
+<li data-level="46" data-path="Ch46.html" class="ltx_tocentry ltx_tocentry_chapter  chapter "><a href="Ch46.html" title="In Part IX Metatheory ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">46 </span></b>Functional completeness</a></li>
+<li data-level="47" data-path="Ch47.html" class="ltx_tocentry ltx_tocentry_chapter  chapter "><a href="Ch47.html" title="In Part IX Metatheory ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">47 </span></b>Proving equivalences</a></li>
+<li data-level="48" data-path="" class="ltx_tocentry ltx_tocentry_chapter ltx_ref_self  chapter active">
+<a href="" title="In Part IX Metatheory ‣ forall x: Calgary" aria-current="page" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">48 </span></b>Soundness</a>
+<ol class="ltx_toclist ltx_toclist_chapter">
+<li data-level="" data-path="" class="ltx_tocentry ltx_tocentry_section  chapter "><a href="#Sx1" title="In Chapter 48 Soundness ‣ Part IX Metatheory ‣ forall x: Calgary" class="ltx_ref">Practice exercises</a></li>
+</ol>
+</li>
+</ol>
+</li>
+<li data-level="" data-path="Ptx1.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Ptx1.html" title="In forall x: Calgary" class="ltx_ref">Appendices</a></li>
+<li data-level="" data-path="Ptx2.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Ptx2.html" title="In forall x: Calgary" class="ltx_ref">Solutions to selected exercices</a></li>
+</ul>
+</nav></div>
+
+<div class="ltx_page_main book-body fixed">
+<div class="body-inner">
+<header class="book-header fixed" aria-label="toolbar"><span class="bml-separator"></span></header>
+<div class="page-wrapper" tabindex="-1" role="main">
+<div class="ltx_page_content page-inner" id="bml-main-content">
+<script src="bookml/gitbook/js/app.min.js"></script>
+<script src="bookml/gitbook/js/jquery.highlight.js"></script>
+<script src="bookml/gitbook/js/plugin-search.js"></script>
+<script src="bookml/gitbook/js/plugin-fontsettings.js"></script>
+<script src="bookml/gitbook/js/plugin-bookdown.js"></script>
+<script type="text/javascript">
+                  gitbook.require(["gitbook"], function(gitbook) {
+                  gitbook.start({
+                    "fontsettings": {
+                      "theme": "white",
+                      "family": "sans",
+                      "size": 2
+                    },
+                    "download": [ [ "forallxyyc.pdf", "PDF" ], [ "forallxyyc-accessible.pdf", "PDF (accessible)" ], ],
+                    "search": {
+                      "engine": "fuse"
+                    },
+                    "toc": {
+                      "collapse": "none"
+                    }
+                  });
+                });
+              </script>
+
+<section class="ltx_chapter ltx_authors_1line normal" lang="en">
+<div class="section level1">
+<h1 class="ltx_title ltx_title_chapter">
+<span class="ltx_tag ltx_tag_chapter header-section-number">Chapter 48</span> Soundness</h1>
+
+<div id="p1" class="ltx_para">
+<p class="ltx_p">In this chapter we relate TFL’s semantics to its natural deduction <span class="ltx_text ltx_font_bold">proof system</span> (as defined in <a href="Pt4.html" title="Part IV Natural deduction for TFL ‣ forall x: Calgary" class="ltx_ref"><span class="ltx_text ltx_ref_tag">part</span> <span class="ltx_text ltx_ref_tag">IV</span></a>). We will prove that the formal proof system is safe: you can only prove sentences from premises from which they actually follow.
+Intuitively, a formal proof system is sound if⁠f it does not allow you to prove any invalid arguments. This is obviously a highly desirable property. It tells us that our proof system will never lead us astray. Indeed, if our proof system were not sound, then we would not be able to trust our proofs. The aim of this chapter is to prove that our proof system is sound.</p>
+</div>
+<div id="p2" class="ltx_para">
+<p class="ltx_p">Let’s make the idea more precise. We’ll abbreviate a list of sentences using the Greek letter <math id="p2.m1" class="ltx_Math" alttext="\Gamma" display="inline"><mi mathvariant="normal">Γ</mi></math> (‘gamma’). A formal proof system is <dfn>sound</dfn>
+ (relative to a given semantics) <span class="ltx_text ltx_font_bold">if⁠f</span>, whenever there is a formal proof of <math id="p2.m2" class="ltx_Math" alttext="\mathscr{C}" display="inline"><mi class="ltx_font_mathscript">𝒞︁</mi></math> from assumptions among <math id="p2.m3" class="ltx_Math" alttext="\Gamma" display="inline"><mi mathvariant="normal">Γ</mi></math>, then <math id="p2.m4" class="ltx_Math" alttext="\Gamma" display="inline"><mi mathvariant="normal">Γ</mi></math> genuinely entails <math id="p2.m5" class="ltx_Math" alttext="\mathscr{C}" display="inline"><mi class="ltx_font_mathscript">𝒞︁</mi></math> (given that semantics). Otherwise put, to prove that TFL’s proof system is sound, we need to prove the following</p>
+</div>
+<div id="p3" class="ltx_para bml_background-color_FDF4FA ltx_noindent bml_background-color_FDF4FA" style="padding:9pt;">
+<p class="ltx_p"><span class="ltx_text ltx_font_bold">Soundness Theorem.</span> For any sentences <math id="p3.m1" class="ltx_Math" alttext="\Gamma" display="inline"><mi mathvariant="normal">Γ</mi></math> and <math id="p3.m2" class="ltx_Math" alttext="\mathscr{C}" display="inline"><mi class="ltx_font_mathscript">𝒞︁</mi></math>: if <math id="p3.m3" class="ltx_Math" alttext="\Gamma\vdash\mathscr{C}" display="inline"><mrow><mi mathvariant="normal">Γ</mi><mo>⊢</mo><mi class="ltx_font_mathscript">𝒞︁</mi></mrow></math>, then <math id="p3.m4" class="ltx_Math" alttext="\Gamma\vDash\mathscr{C}" display="inline"><mrow><mi mathvariant="normal">Γ</mi><mo>⊨</mo><mi class="ltx_font_mathscript">𝒞︁</mi></mrow></math></p>
+</div>
+<div id="p4" class="ltx_para">
+<p class="ltx_p">To prove this, we will check each of the rules of TFL’s proof system individually. We want to show that no application of those rules ever leads us astray. Since a proof just involves repeated application of those rules, this will show that no proof ever leads us astray. Or at least, that is the general idea.</p>
+</div>
+<div id="p5" class="ltx_para">
+<p class="ltx_p">To begin with, we must make the idea of ‘leading us astray’ more precise. Say that a line of a proof is <dfn>shiny</dfn>
+ if⁠f the assumptions on which that line depends entail the sentence on that line.<span id="footnote1" class="ltx_note ltx_role_footnote"><sup class="ltx_note_mark">1</sup><span class="ltx_note_outer"><span class="ltx_note_content"><sup class="ltx_note_mark">1</sup>
+              <span class="ltx_tag ltx_tag_note">1</span>
+              
+              
+              
+              
+              
+              
+              
+            The word ‘shiny’ is not standard among logicians.</span></span></span> To illustrate the idea, consider the following:</p>
+</div>
+<div id="p6" class="ltx_para ltx_noindent">
+<table class="fitch">
+          
+          <thead class="fml-sr-only">
+            
+            <tr>
+              <th class="fml-pline">
+                
+                <div>
+                  
+<p class="ltx_p">Line number</p>
+                </div>
+              </th>
+              <th class="fml-subproof">
+                
+                <div>
+                  
+<p class="ltx_p">Subproof level</p>
+                </div>
+              </th>
+              <th class="fml-fmla">
+                
+                <div>
+                  
+<p class="ltx_p">Formula</p>
+                </div>
+              </th>
+              <th class="fml-just">
+                
+                <div>
+                  
+<p class="ltx_p">Justification</p>
+                </div>
+              </th>
+            </tr>
+          </thead>
+          <tr>
+            <th class="fml-pline">
+              
+              
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"><math id="p6.m1.m1" class="ltx_Math" alttext="1" display="inline"><mn>1</mn></math></span></p>
+            </th>
+            <td class="fml-subproof">
+              
+              <div>
+                <span>0</span>
+              </div>
+            </td>
+            <td class="fml-fmla">
+              
+              <div class="fml-scope-start">
+                
+              </div>
+              <div class="fml-as">
+                
+                <span><math id="p6.m2" class="ltx_Math" alttext="F\rightarrow(G\wedge H)" display="inline"><mrow><mi>F</mi><mo stretchy="false">→</mo><mrow><mo stretchy="false">(</mo><mrow><mi>G</mi><mo>∧</mo><mi>H</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math></span>
+              </div>
+            </td>
+            <td class="fml-just">
+              
+              <div class="fml-just">
+                
+                <span><abbr title="Premise">
+PR</abbr>
+</span>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <th class="fml-pline">
+              
+              
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"><math id="p6.m3.m1" class="ltx_Math" alttext="2" display="inline"><mn>2</mn></math></span></p>
+            </th>
+            <td class="fml-subproof">
+              
+              <div>
+                <span>open subproof,
+1</span>
+              </div>
+            </td>
+            <td class="fml-fmla">
+              
+              <div class="fml-scope">
+                
+              </div>
+              <div class="fml-scope-start">
+                
+              </div>
+              <div class="fml-as">
+                
+                <span><math id="p6.m4" class="ltx_Math" alttext="F" display="inline"><mi>F</mi></math></span>
+              </div>
+            </td>
+            <td class="fml-just">
+              
+              <div class="fml-just">
+                
+                <span><abbr title="Assumption">
+AS</abbr>
+</span>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <th class="fml-pline">
+              
+              
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"><math id="p6.m5.m1" class="ltx_Math" alttext="3" display="inline"><mn>3</mn></math></span></p>
+            </th>
+            <td class="fml-subproof">
+              
+              <div>
+                <span>1</span>
+              </div>
+            </td>
+            <td class="fml-fmla">
+              
+              <div class="fml-scope">
+                
+              </div>
+              <div class="fml-scope">
+                
+              </div>
+              <div class="fml-fmla">
+                
+                <span><math id="p6.m6" class="ltx_Math" alttext="G\wedge H" display="inline"><mrow><mi>G</mi><mo>∧</mo><mi>H</mi></mrow></math></span>
+              </div>
+            </td>
+            <td class="fml-just">
+              
+              <div class="fml-just">
+                
+                <span><math id="p6.m7" class="ltx_Math" alttext="\rightarrow" display="inline"><mo stretchy="false">→</mo></math>E <math id="p6.m8" class="ltx_Math" alttext="1" display="inline"><mn>1</mn></math>, <math id="p6.m9" class="ltx_Math" alttext="2" display="inline"><mn>2</mn></math></span>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <th class="fml-pline">
+              
+              
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"><math id="p6.m10.m1" class="ltx_Math" alttext="4" display="inline"><mn>4</mn></math></span></p>
+            </th>
+            <td class="fml-subproof">
+              
+              <div>
+                <span>1</span>
+              </div>
+            </td>
+            <td class="fml-fmla">
+              
+              <div class="fml-scope">
+                
+              </div>
+              <div class="fml-scope">
+                
+              </div>
+              <div class="fml-fmla">
+                
+                <span><math id="p6.m11" class="ltx_Math" alttext="G" display="inline"><mi>G</mi></math></span>
+              </div>
+            </td>
+            <td class="fml-just">
+              
+              <div class="fml-just">
+                
+                <span><math id="p6.m12" class="ltx_Math" alttext="\wedge" display="inline"><mo>∧</mo></math>E <math id="p6.m13" class="ltx_Math" alttext="3" display="inline"><mn>3</mn></math></span>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <th class="fml-pline">
+              
+              
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"><math id="p6.m14.m1" class="ltx_Math" alttext="5" display="inline"><mn>5</mn></math></span></p>
+            </th>
+            <td class="fml-subproof">
+              
+              <div>
+                <span>close subproof,
+0</span>
+              </div>
+            </td>
+            <td class="fml-fmla">
+              
+              <div class="fml-scope">
+                
+              </div>
+              <div class="fml-fmla">
+                
+                <span><math id="p6.m15" class="ltx_Math" alttext="F\rightarrow G" display="inline"><mrow><mi>F</mi><mo stretchy="false">→</mo><mi>G</mi></mrow></math></span>
+              </div>
+            </td>
+            <td class="fml-just">
+              
+              <div class="fml-just">
+                
+                <span><math id="p6.m16" class="ltx_Math" alttext="\rightarrow" display="inline"><mo stretchy="false">→</mo></math>I <math id="p6.m17" class="ltx_Math" alttext="2" display="inline"><mn>2</mn></math>–<math id="p6.m18" class="ltx_Math" alttext="4" display="inline"><mn>4</mn></math></span>
+              </div>
+            </td>
+          </tr>
+        </table>
+</div>
+<div id="p7" class="ltx_para ltx_noindent">
+<p class="ltx_p">Line <math id="p7.m1" class="ltx_Math" alttext="1" display="inline"><mn>1</mn></math> is shiny if⁠f <math id="p7.m2" class="ltx_Math" alttext="F\rightarrow(G\wedge H)\vDash F\rightarrow(G\wedge H)" display="inline"><mrow><mi>F</mi><mo stretchy="false">→</mo><mrow><mo stretchy="false">(</mo><mrow><mi>G</mi><mo>∧</mo><mi>H</mi></mrow><mo stretchy="false">)</mo></mrow><mo>⊨</mo><mi>F</mi><mo stretchy="false">→</mo><mrow><mo stretchy="false">(</mo><mrow><mi>G</mi><mo>∧</mo><mi>H</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math>. You should be easily convinced that line <math id="p7.m3" class="ltx_Math" alttext="1" display="inline"><mn>1</mn></math> is, indeed, shiny! Similarly, line <math id="p7.m4" class="ltx_Math" alttext="4" display="inline"><mn>4</mn></math> is shiny if⁠f <math id="p7.m5" class="ltx_Math" alttext="F\rightarrow(G\wedge H),F\vDash G" display="inline"><mrow><mrow><mi>F</mi><mo stretchy="false">→</mo><mrow><mo stretchy="false">(</mo><mrow><mi>G</mi><mo>∧</mo><mi>H</mi></mrow><mo stretchy="false">)</mo></mrow></mrow><mo>,</mo><mrow><mi>F</mi><mo>⊨</mo><mi>G</mi></mrow></mrow></math>. Again, it is easy to check that line <math id="p7.m6" class="ltx_Math" alttext="4" display="inline"><mn>4</mn></math> is shiny. As is every line in this TFL-proof. We want to show that this is no coincidence. That is, we want to prove:</p>
+<div class="ltx_logical-block bml_background-color_FDF4FA bml_background-color_FDF4FA" style="padding:9pt;">
+          
+<div id="p7.p1" class="ltx_para ltx_noindent">
+<p class="ltx_p"><span class="ltx_text ltx_font_bold">Shininess Lemma.</span>
+Every line of every TFL-proof is shiny.</p>
+</div>
+        
+</div>
+<p class="ltx_p">Then we will know that we have never gone astray, on any line of a proof. Indeed, given the Shininess Lemma, it will be easy to prove the Soundness Theorem:</p>
+</div>
+<div id="p8" class="ltx_para">
+<p class="ltx_p"><span class="ltx_text ltx_font_bold">Proof.</span> Suppose <math id="p8.m1" class="ltx_Math" alttext="\Gamma\vdash\mathscr{C}" display="inline"><mrow><mi mathvariant="normal">Γ</mi><mo>⊢</mo><mi class="ltx_font_mathscript">𝒞︁</mi></mrow></math>. Then there is a TFL-proof, with <math id="p8.m2" class="ltx_Math" alttext="\mathscr{C}" display="inline"><mi class="ltx_font_mathscript">𝒞︁</mi></math> appearing on its last line, whose only undischarged assumptions are among <math id="p8.m3" class="ltx_Math" alttext="\Gamma" display="inline"><mi mathvariant="normal">Γ</mi></math>. The Shininess Lemma tells us that every line on every TFL-proof is shiny. So this last line is shiny, i.e., <math id="p8.m4" class="ltx_Math" alttext="\Gamma\vDash\mathscr{C}" display="inline"><mrow><mi mathvariant="normal">Γ</mi><mo>⊨</mo><mi class="ltx_font_mathscript">𝒞︁</mi></mrow></math>. QED</p>
+</div>
+<div id="p9" class="ltx_para">
+<p class="ltx_p">It remains to prove the Shininess Lemma.</p>
+</div>
+<div id="p10" class="ltx_para">
+<p class="ltx_p">To do this, we observe that every line of any TFL-proof is either a
+premise or an assumption, or it is obtained by applying some rule.
+Premises are automatically shiny: if <math id="p10.m1" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math> is a premise, then it
+is among the sentences in <math id="p10.m2" class="ltx_Math" alttext="\Gamma" display="inline"><mi mathvariant="normal">Γ</mi></math>, and <math id="p10.m3" class="ltx_Math" alttext="\Gamma\vDash\mathscr{A}" display="inline"><mrow><mi mathvariant="normal">Γ</mi><mo>⊨</mo><mi class="ltx_font_mathscript">𝒜︁</mi></mrow></math>
+trivially. Assumptions are also shiny, since the any assumption
+<math id="p10.m4" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math> depends on itself, and <math id="p10.m5" class="ltx_Math" alttext="\mathscr{A}\vDash\mathscr{A}" display="inline"><mrow><mi class="ltx_font_mathscript">𝒜︁</mi><mo>⊨</mo><mi class="ltx_font_mathscript">𝒜︁</mi></mrow></math>. So
+what we want to show is that no application of a rule of TFL’s proof
+system will lead us astray. More precisely, say that a rule of
+inference is <dfn>rule-sound</dfn>
+ <span class="ltx_text ltx_font_bold">if⁠f</span> for all TFL-proofs, if
+we obtain a line on a TFL-proof by applying that rule, and every
+earlier line in the TFL-proof is shiny, then our new line is also
+shiny. What we need to show is that <span class="ltx_text ltx_font_bold">every</span> rule in TFL’s proof
+system is rule-sound.</p>
+</div>
+<div id="p11" class="ltx_para">
+<p class="ltx_p">We will do this below. But having demonstrated the rule-soundness of every rule, the Shininess Lemma will follow immediately:</p>
+</div>
+<div id="p12" class="ltx_para">
+<p class="ltx_p"><span class="ltx_text ltx_font_bold">Proof.</span> Start with line <math id="p12.m1" class="ltx_Math" alttext="1" display="inline"><mn>1</mn></math> of any TFL proof. It must be either
+a premise or an assumption, and those are all shiny, as we’ve seen
+above. Take the next line, <math id="p12.m2" class="ltx_Math" alttext="2" display="inline"><mn>2</mn></math>. If it is a premise or assumption, it
+is shiny. If not, it is obtained from line <math id="p12.m3" class="ltx_Math" alttext="1" display="inline"><mn>1</mn></math> using an inference
+which is rule-sound. Since line <math id="p12.m4" class="ltx_Math" alttext="1" display="inline"><mn>1</mn></math> is shiny, line <math id="p12.m5" class="ltx_Math" alttext="2" display="inline"><mn>2</mn></math> is also shiny.
+Take the next line, <math id="p12.m6" class="ltx_Math" alttext="3" display="inline"><mn>3</mn></math>. If it is a premise or assumption, it
+is shiny. If not, it is obtained from a previous line using an inference
+which is rule-sound, and we’ve established that all previous lines are
+shiny. Thus, line <math id="p12.m7" class="ltx_Math" alttext="3" display="inline"><mn>3</mn></math> is also shiny.
+And so on. In general, the sentence written on line <math id="p12.m8" class="ltx_Math" alttext="n" display="inline"><mi>n</mi></math> must either be
+a premise or assumption (which is shiny) or be obtained using a formal
+inference rule which is rule-sound. Since every earlier line is shiny,
+line <math id="p12.m9" class="ltx_Math" alttext="n" display="inline"><mi>n</mi></math> itself is shiny. We can simply go through this
+reasoning, for any TFL proof, starting with line <math id="p12.m10" class="ltx_Math" alttext="1" display="inline"><mn>1</mn></math> and continuing to
+the last line, and get that every line of every TFL-proof is shiny.
+QED</p>
+</div>
+<div id="p13" class="ltx_para">
+<p class="ltx_p">It remains to show that every rule is rule-sound. This is not
+difficult, but it is time-consuming, since we need to check each rule
+individually, and TFL’s proof system has plenty of rules! To speed up
+the process marginally, we will introduce a convenient abbreviation:
+‘<math id="p13.m1" class="ltx_Math" alttext="\Delta_{i}" display="inline"><msub><mi mathvariant="normal">Δ</mi><mi>i</mi></msub></math>’ (‘delta’) will abbreviate the assumptions (if any) on
+which line <math id="p13.m2" class="ltx_Math" alttext="i" display="inline"><mi>i</mi></math> depends in our TFL-proof (context will indicate which
+TFL-proof we have in mind). This includes all premises of our proof,
+and all assumptions of subproofs which are still open at line <math id="p13.m3" class="ltx_Math" alttext="i" display="inline"><mi>i</mi></math>.
+Let’s first record our observation about premises and assumptions from above.</p>
+</div>
+<div id="p14" class="ltx_para bml_background-color_FDF4FA ltx_noindent bml_background-color_FDF4FA" style="padding:9pt;">
+<p class="ltx_p">Premises and assumptions in TFL proofs are shiny.</p>
+</div>
+<div id="p15" class="ltx_para">
+<p class="ltx_p">If <math id="p15.m1" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math> is a premise on line <math id="p15.m2" class="ltx_Math" alttext="n" display="inline"><mi>n</mi></math>, then it is among <math id="p15.m3" class="ltx_Math" alttext="\Delta_{n}" display="inline"><msub><mi mathvariant="normal">Δ</mi><mi>n</mi></msub></math>
+as that includes all premises of the proof. If it is introduced as an
+assumption of a subproof on line <math id="p15.m4" class="ltx_Math" alttext="n" display="inline"><mi>n</mi></math>, then everything in the subproof
+(including line <math id="p15.m5" class="ltx_Math" alttext="n" display="inline"><mi>n</mi></math>, i.e., <math id="p15.m6" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math> itself) depends on <math id="p15.m7" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math>,
+and so <math id="p15.m8" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math> is among <math id="p15.m9" class="ltx_Math" alttext="\Delta_{n}" display="inline"><msub><mi mathvariant="normal">Δ</mi><mi>n</mi></msub></math>. In either case, <math id="p15.m10" class="ltx_Math" alttext="\Delta_{n}\vDash\mathscr{A}" display="inline"><mrow><msub><mi mathvariant="normal">Δ</mi><mi>n</mi></msub><mo>⊨</mo><mi class="ltx_font_mathscript">𝒜︁</mi></mrow></math>.</p>
+</div>
+<div id="p16" class="ltx_para">
+<p class="ltx_p">Now let’s proceed to show that all the inference rules are rule-sound.</p>
+</div>
+<div id="p17" class="ltx_para bml_background-color_FDF4FA ltx_noindent bml_background-color_FDF4FA" style="padding:9pt;">
+<p class="ltx_p"><math id="p17.m1" class="ltx_Math" alttext="\wedge" display="inline"><mo>∧</mo></math>I is rule-sound.</p>
+</div>
+<div id="p18" class="ltx_para">
+<p class="ltx_p"><span class="ltx_text ltx_font_bold">Proof.</span> Consider any application of <math id="p18.m1" class="ltx_Math" alttext="\wedge" display="inline"><mo>∧</mo></math>I in any TFL-proof, i.e., something like:</p>
+</div>
+<div id="p19" class="ltx_para ltx_noindent">
+<table class="fitch">
+          
+          <thead class="fml-sr-only">
+            
+            <tr>
+              <th class="fml-pline">
+                
+                <div>
+                  
+<p class="ltx_p">Line number</p>
+                </div>
+              </th>
+              <th class="fml-subproof">
+                
+                <div>
+                  
+<p class="ltx_p">Subproof level</p>
+                </div>
+              </th>
+              <th class="fml-fmla">
+                
+                <div>
+                  
+<p class="ltx_p">Formula</p>
+                </div>
+              </th>
+              <th class="fml-just">
+                
+                <div>
+                  
+<p class="ltx_p">Justification</p>
+                </div>
+              </th>
+            </tr>
+          </thead>
+          <tr>
+            <th class="fml-pline">
+              
+              
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"><math id="p19.m1.m1" class="ltx_Math" alttext="i" display="inline"><mi>i</mi></math></span></p>
+            </th>
+            <td class="fml-subproof">
+              
+              <div>
+                <span>0</span>
+              </div>
+            </td>
+            <td class="fml-fmla">
+              
+              <div class="fml-scope-start">
+                
+              </div>
+              <div class="fml-fmla">
+                
+                <span><math id="p19.m2" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math></span>
+              </div>
+            </td>
+            <td class="fml-just">
+              
+              <div class="fml-just">
+                
+                <span></span>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <th class="fml-pline">
+              
+              
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"><math id="p19.m3.m1" class="ltx_Math" alttext="j" display="inline"><mi>j</mi></math></span></p>
+            </th>
+            <td class="fml-subproof">
+              
+              <div>
+                <span>0</span>
+              </div>
+            </td>
+            <td class="fml-fmla">
+              
+              <div class="fml-scope">
+                
+              </div>
+              <div class="fml-fmla">
+                
+                <span><math id="p19.m4" class="ltx_Math" alttext="\mathscr{B}" display="inline"><mi class="ltx_font_mathscript">ℬ︁</mi></math></span>
+              </div>
+            </td>
+            <td class="fml-just">
+              
+              <div class="fml-just">
+                
+                <span></span>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <th class="fml-pline">
+              
+              
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"><math id="p19.m5.m1" class="ltx_Math" alttext="n" display="inline"><mi>n</mi></math></span></p>
+            </th>
+            <td class="fml-subproof">
+              
+              <div>
+                <span>0</span>
+              </div>
+            </td>
+            <td class="fml-fmla">
+              
+              <div class="fml-scope">
+                
+              </div>
+              <div class="fml-fmla">
+                
+                <span><math id="p19.m6" class="ltx_Math" alttext="\mathscr{A}\wedge\mathscr{B}" display="inline"><mrow><mi class="ltx_font_mathscript">𝒜︁</mi><mo>∧</mo><mi class="ltx_font_mathscript">ℬ︁</mi></mrow></math></span>
+              </div>
+            </td>
+            <td class="fml-just">
+              
+              <div class="fml-just">
+                
+                <span><math id="p19.m7" class="ltx_Math" alttext="\wedge" display="inline"><mo>∧</mo></math>I <math id="p19.m8" class="ltx_Math" alttext="i" display="inline"><mi>i</mi></math>, <math id="p19.m9" class="ltx_Math" alttext="j" display="inline"><mi>j</mi></math></span>
+              </div>
+            </td>
+          </tr>
+        </table>
+</div>
+<div id="p20" class="ltx_para ltx_noindent">
+<p class="ltx_p">To show that <math id="p20.m1" class="ltx_Math" alttext="\wedge" display="inline"><mo>∧</mo></math>I is rule-sound, we assume that every line before line <math id="p20.m2" class="ltx_Math" alttext="n" display="inline"><mi>n</mi></math> is shiny; and we aim to show that line <math id="p20.m3" class="ltx_Math" alttext="n" display="inline"><mi>n</mi></math> is shiny, i.e., that <math id="p20.m4" class="ltx_Math" alttext="\Delta_{n}\vDash\mathscr{A}\wedge\mathscr{B}" display="inline"><mrow><msub><mi mathvariant="normal">Δ</mi><mi>n</mi></msub><mo>⊨</mo><mrow><mi class="ltx_font_mathscript">𝒜︁</mi><mo>∧</mo><mi class="ltx_font_mathscript">ℬ︁</mi></mrow></mrow></math>.</p>
+</div>
+<div id="p21" class="ltx_para">
+<p class="ltx_p">So, let <math id="p21.m1" class="ltx_Math" alttext="v" display="inline"><mi>v</mi></math> be any valuation that makes all of <math id="p21.m2" class="ltx_Math" alttext="\Delta_{n}" display="inline"><msub><mi mathvariant="normal">Δ</mi><mi>n</mi></msub></math> true.</p>
+</div>
+<div id="p22" class="ltx_para">
+<p class="ltx_p">We first show that <math id="p22.m1" class="ltx_Math" alttext="v" display="inline"><mi>v</mi></math> makes <math id="p22.m2" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math> true. To prove this, note that all of <math id="p22.m3" class="ltx_Math" alttext="\Delta_{i}" display="inline"><msub><mi mathvariant="normal">Δ</mi><mi>i</mi></msub></math> are among <math id="p22.m4" class="ltx_Math" alttext="\Delta_{n}" display="inline"><msub><mi mathvariant="normal">Δ</mi><mi>n</mi></msub></math>. By hypothesis, line <math id="p22.m5" class="ltx_Math" alttext="i" display="inline"><mi>i</mi></math> is shiny. So any valuation that makes all of <math id="p22.m6" class="ltx_Math" alttext="\Delta_{i}" display="inline"><msub><mi mathvariant="normal">Δ</mi><mi>i</mi></msub></math> true makes <math id="p22.m7" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math> true. Since <math id="p22.m8" class="ltx_Math" alttext="v" display="inline"><mi>v</mi></math> makes all of <math id="p22.m9" class="ltx_Math" alttext="\Delta_{i}" display="inline"><msub><mi mathvariant="normal">Δ</mi><mi>i</mi></msub></math> true, it makes <math id="p22.m10" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math> true too.</p>
+</div>
+<div id="p23" class="ltx_para">
+<p class="ltx_p">We can similarly see that <math id="p23.m1" class="ltx_Math" alttext="v" display="inline"><mi>v</mi></math> makes <math id="p23.m2" class="ltx_Math" alttext="\mathscr{B}" display="inline"><mi class="ltx_font_mathscript">ℬ︁</mi></math> true.</p>
+</div>
+<div id="p24" class="ltx_para">
+<p class="ltx_p">So <math id="p24.m1" class="ltx_Math" alttext="v" display="inline"><mi>v</mi></math> makes <math id="p24.m2" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math> true and <math id="p24.m3" class="ltx_Math" alttext="v" display="inline"><mi>v</mi></math> makes <math id="p24.m4" class="ltx_Math" alttext="\mathscr{B}" display="inline"><mi class="ltx_font_mathscript">ℬ︁</mi></math> true. Consequently, <math id="p24.m5" class="ltx_Math" alttext="v" display="inline"><mi>v</mi></math> makes <math id="p24.m6" class="ltx_Math" alttext="\mathscr{A}\wedge\mathscr{B}" display="inline"><mrow><mi class="ltx_font_mathscript">𝒜︁</mi><mo>∧</mo><mi class="ltx_font_mathscript">ℬ︁</mi></mrow></math> true. So any valuation that makes all sentences among <math id="p24.m7" class="ltx_Math" alttext="\Delta_{n}" display="inline"><msub><mi mathvariant="normal">Δ</mi><mi>n</mi></msub></math> true also makes <math id="p24.m8" class="ltx_Math" alttext="\mathscr{A}\wedge\mathscr{B}" display="inline"><mrow><mi class="ltx_font_mathscript">𝒜︁</mi><mo>∧</mo><mi class="ltx_font_mathscript">ℬ︁</mi></mrow></math> true. That is: line <math id="p24.m9" class="ltx_Math" alttext="n" display="inline"><mi>n</mi></math> is shiny. QED</p>
+</div>
+<div id="p25" class="ltx_para">
+<p class="ltx_p">All of the remaining lemmas establishing rule-soundness will have, essentially, the same structure as this one did.</p>
+</div>
+<div id="p26" class="ltx_para bml_background-color_FDF4FA ltx_noindent bml_background-color_FDF4FA" style="padding:9pt;">
+<p class="ltx_p"><math id="p26.m1" class="ltx_Math" alttext="\wedge" display="inline"><mo>∧</mo></math>E is rule-sound.</p>
+</div>
+<div id="p27" class="ltx_para">
+<p class="ltx_p"><span class="ltx_text ltx_font_bold">Proof.</span>
+Assume that every line before line <math id="p27.m1" class="ltx_Math" alttext="n" display="inline"><mi>n</mi></math> on some TFL-proof is shiny, and that <math id="p27.m2" class="ltx_Math" alttext="\wedge" display="inline"><mo>∧</mo></math>E is used on line <math id="p27.m3" class="ltx_Math" alttext="n" display="inline"><mi>n</mi></math>. So the situation is:</p>
+</div>
+<div id="p28" class="ltx_para ltx_noindent">
+<table class="fitch">
+          
+          <thead class="fml-sr-only">
+            
+            <tr>
+              <th class="fml-pline">
+                
+                <div>
+                  
+<p class="ltx_p">Line number</p>
+                </div>
+              </th>
+              <th class="fml-subproof">
+                
+                <div>
+                  
+<p class="ltx_p">Subproof level</p>
+                </div>
+              </th>
+              <th class="fml-fmla">
+                
+                <div>
+                  
+<p class="ltx_p">Formula</p>
+                </div>
+              </th>
+              <th class="fml-just">
+                
+                <div>
+                  
+<p class="ltx_p">Justification</p>
+                </div>
+              </th>
+            </tr>
+          </thead>
+          <tr>
+            <th class="fml-pline">
+              
+              
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"><math id="p28.m1.m1" class="ltx_Math" alttext="i" display="inline"><mi>i</mi></math></span></p>
+            </th>
+            <td class="fml-subproof">
+              
+              <div>
+                <span>0</span>
+              </div>
+            </td>
+            <td class="fml-fmla">
+              
+              <div class="fml-scope-start">
+                
+              </div>
+              <div class="fml-fmla">
+                
+                <span><math id="p28.m2" class="ltx_Math" alttext="\mathscr{A}\wedge\mathscr{B}" display="inline"><mrow><mi class="ltx_font_mathscript">𝒜︁</mi><mo>∧</mo><mi class="ltx_font_mathscript">ℬ︁</mi></mrow></math></span>
+              </div>
+            </td>
+            <td class="fml-just">
+              
+              <div class="fml-just">
+                
+                <span></span>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <th class="fml-pline">
+              
+              
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"><math id="p28.m3.m1" class="ltx_Math" alttext="n" display="inline"><mi>n</mi></math></span></p>
+            </th>
+            <td class="fml-subproof">
+              
+              <div>
+                <span>0</span>
+              </div>
+            </td>
+            <td class="fml-fmla">
+              
+              <div class="fml-scope">
+                
+              </div>
+              <div class="fml-fmla">
+                
+                <span><math id="p28.m4" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math></span>
+              </div>
+            </td>
+            <td class="fml-just">
+              
+              <div class="fml-just">
+                
+                <span><math id="p28.m5" class="ltx_Math" alttext="\wedge" display="inline"><mo>∧</mo></math>E <math id="p28.m6" class="ltx_Math" alttext="i" display="inline"><mi>i</mi></math></span>
+              </div>
+            </td>
+          </tr>
+        </table>
+</div>
+<div id="p29" class="ltx_para ltx_noindent">
+<p class="ltx_p">(or perhaps with <math id="p29.m1" class="ltx_Math" alttext="\mathscr{B}" display="inline"><mi class="ltx_font_mathscript">ℬ︁</mi></math> on line <math id="p29.m2" class="ltx_Math" alttext="n" display="inline"><mi>n</mi></math> instead; but similar reasoning will apply in that case). Let <math id="p29.m3" class="ltx_Math" alttext="v" display="inline"><mi>v</mi></math> be any valuation that makes all of <math id="p29.m4" class="ltx_Math" alttext="\Delta_{n}" display="inline"><msub><mi mathvariant="normal">Δ</mi><mi>n</mi></msub></math> true. Note that all of <math id="p29.m5" class="ltx_Math" alttext="\Delta_{i}" display="inline"><msub><mi mathvariant="normal">Δ</mi><mi>i</mi></msub></math> are among <math id="p29.m6" class="ltx_Math" alttext="\Delta_{n}" display="inline"><msub><mi mathvariant="normal">Δ</mi><mi>n</mi></msub></math>. By hypothesis, line <math id="p29.m7" class="ltx_Math" alttext="i" display="inline"><mi>i</mi></math> is shiny. So any valuation that makes all of <math id="p29.m8" class="ltx_Math" alttext="\Delta_{i}" display="inline"><msub><mi mathvariant="normal">Δ</mi><mi>i</mi></msub></math> true makes <math id="p29.m9" class="ltx_Math" alttext="\mathscr{A}\wedge\mathscr{B}" display="inline"><mrow><mi class="ltx_font_mathscript">𝒜︁</mi><mo>∧</mo><mi class="ltx_font_mathscript">ℬ︁</mi></mrow></math> true. So <math id="p29.m10" class="ltx_Math" alttext="v" display="inline"><mi>v</mi></math> makes <math id="p29.m11" class="ltx_Math" alttext="\mathscr{A}\wedge\mathscr{B}" display="inline"><mrow><mi class="ltx_font_mathscript">𝒜︁</mi><mo>∧</mo><mi class="ltx_font_mathscript">ℬ︁</mi></mrow></math> true, and hence makes <math id="p29.m12" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math> true. So <math id="p29.m13" class="ltx_Math" alttext="\Delta_{n}\vDash\mathscr{A}" display="inline"><mrow><msub><mi mathvariant="normal">Δ</mi><mi>n</mi></msub><mo>⊨</mo><mi class="ltx_font_mathscript">𝒜︁</mi></mrow></math>. QED</p>
+</div>
+<div id="p30" class="ltx_para bml_background-color_FDF4FA ltx_noindent bml_background-color_FDF4FA" style="padding:9pt;">
+<p class="ltx_p"><math id="p30.m1" class="ltx_Math" alttext="\vee" display="inline"><mo>∨</mo></math>I is rule-sound.</p>
+</div>
+<div id="p31" class="ltx_para">
+<p class="ltx_p">We leave this as an exercise.</p>
+</div>
+<div id="p32" class="ltx_para bml_background-color_FDF4FA ltx_noindent bml_background-color_FDF4FA" style="padding:9pt;">
+<p class="ltx_p"><math id="p32.m1" class="ltx_Math" alttext="\vee" display="inline"><mo>∨</mo></math>E is rule-sound.</p>
+</div>
+<div id="p33" class="ltx_para">
+<p class="ltx_p"><span class="ltx_text ltx_font_bold">Proof.</span>
+Assume that every line before line <math id="p33.m1" class="ltx_Math" alttext="n" display="inline"><mi>n</mi></math> on some TFL-proof is shiny, and that <math id="p33.m2" class="ltx_Math" alttext="\wedge" display="inline"><mo>∧</mo></math>E is used on line <math id="p33.m3" class="ltx_Math" alttext="n" display="inline"><mi>n</mi></math>. So the situation is:</p>
+</div>
+<div id="p34" class="ltx_para ltx_noindent">
+<table class="fitch">
+          
+          <thead class="fml-sr-only">
+            
+            <tr>
+              <th class="fml-pline">
+                
+                <div>
+                  
+<p class="ltx_p">Line number</p>
+                </div>
+              </th>
+              <th class="fml-subproof">
+                
+                <div>
+                  
+<p class="ltx_p">Subproof level</p>
+                </div>
+              </th>
+              <th class="fml-fmla">
+                
+                <div>
+                  
+<p class="ltx_p">Formula</p>
+                </div>
+              </th>
+              <th class="fml-just">
+                
+                <div>
+                  
+<p class="ltx_p">Justification</p>
+                </div>
+              </th>
+            </tr>
+          </thead>
+          <tr>
+            <th class="fml-pline">
+              
+              
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"><math id="p34.m1.m1" class="ltx_Math" alttext="m" display="inline"><mi>m</mi></math></span></p>
+            </th>
+            <td class="fml-subproof">
+              
+              <div>
+                <span>0</span>
+              </div>
+            </td>
+            <td class="fml-fmla">
+              
+              <div class="fml-scope-start">
+                
+              </div>
+              <div class="fml-fmla">
+                
+                <span><math id="p34.m2" class="ltx_Math" alttext="\mathscr{A}\vee\mathscr{B}" display="inline"><mrow><mi class="ltx_font_mathscript">𝒜︁</mi><mo>∨</mo><mi class="ltx_font_mathscript">ℬ︁</mi></mrow></math></span>
+              </div>
+            </td>
+            <td class="fml-just">
+              
+              <div class="fml-just">
+                
+                <span></span>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <th class="fml-pline">
+              
+              
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"><math id="p34.m3.m1" class="ltx_Math" alttext="i" display="inline"><mi>i</mi></math></span></p>
+            </th>
+            <td class="fml-subproof">
+              
+              <div>
+                <span>open subproof,
+1</span>
+              </div>
+            </td>
+            <td class="fml-fmla">
+              
+              <div class="fml-scope">
+                
+              </div>
+              <div class="fml-scope-start">
+                
+              </div>
+              <div class="fml-as">
+                
+                <span><math id="p34.m4" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math></span>
+              </div>
+            </td>
+            <td class="fml-just">
+              
+              <div class="fml-just">
+                
+                <span><abbr title="Assumption">
+AS</abbr>
+</span>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <th class="fml-pline">
+              
+              
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"><math id="p34.m5.m1" class="ltx_Math" alttext="j" display="inline"><mi>j</mi></math></span></p>
+            </th>
+            <td class="fml-subproof">
+              
+              <div>
+                <span>1</span>
+              </div>
+            </td>
+            <td class="fml-fmla">
+              
+              <div class="fml-scope">
+                
+              </div>
+              <div class="fml-scope">
+                
+              </div>
+              <div class="fml-fmla">
+                
+                <span><math id="p34.m6" class="ltx_Math" alttext="\mathscr{C}" display="inline"><mi class="ltx_font_mathscript">𝒞︁</mi></math></span>
+              </div>
+            </td>
+            <td class="fml-just">
+              
+              <div class="fml-just">
+                
+                <span></span>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <th class="fml-pline">
+              
+              
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"><math id="p34.m7.m1" class="ltx_Math" alttext="k" display="inline"><mi>k</mi></math></span></p>
+            </th>
+            <td class="fml-subproof">
+              
+              <div>
+                <span>close subproof,
+open subproof,
+1</span>
+              </div>
+            </td>
+            <td class="fml-fmla">
+              
+              <div class="fml-scope">
+                
+              </div>
+              <div class="fml-scope-start">
+                
+              </div>
+              <div class="fml-as">
+                
+                <span><math id="p34.m8" class="ltx_Math" alttext="\mathscr{B}" display="inline"><mi class="ltx_font_mathscript">ℬ︁</mi></math></span>
+              </div>
+            </td>
+            <td class="fml-just">
+              
+              <div class="fml-just">
+                
+                <span><abbr title="Assumption">
+AS</abbr>
+</span>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <th class="fml-pline">
+              
+              
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"><math id="p34.m9.m1" class="ltx_Math" alttext="l" display="inline"><mi>l</mi></math></span></p>
+            </th>
+            <td class="fml-subproof">
+              
+              <div>
+                <span>1</span>
+              </div>
+            </td>
+            <td class="fml-fmla">
+              
+              <div class="fml-scope">
+                
+              </div>
+              <div class="fml-scope">
+                
+              </div>
+              <div class="fml-fmla">
+                
+                <span><math id="p34.m10" class="ltx_Math" alttext="\mathscr{C}" display="inline"><mi class="ltx_font_mathscript">𝒞︁</mi></math></span>
+              </div>
+            </td>
+            <td class="fml-just">
+              
+              <div class="fml-just">
+                
+                <span></span>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <th class="fml-pline">
+              
+              
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"><math id="p34.m11.m1" class="ltx_Math" alttext="n" display="inline"><mi>n</mi></math></span></p>
+            </th>
+            <td class="fml-subproof">
+              
+              <div>
+                <span>close subproof,
+0</span>
+              </div>
+            </td>
+            <td class="fml-fmla">
+              
+              <div class="fml-scope">
+                
+              </div>
+              <div class="fml-fmla">
+                
+                <span><math id="p34.m12" class="ltx_Math" alttext="\mathscr{C}" display="inline"><mi class="ltx_font_mathscript">𝒞︁</mi></math></span>
+              </div>
+            </td>
+            <td class="fml-just">
+              
+              <div class="fml-just">
+                
+                <span><math id="p34.m13" class="ltx_Math" alttext="\vee" display="inline"><mo>∨</mo></math>E <math id="p34.m14" class="ltx_Math" alttext="m" display="inline"><mi>m</mi></math>, <math id="p34.m15" class="ltx_Math" alttext="i" display="inline"><mi>i</mi></math>–<math id="p34.m16" class="ltx_Math" alttext="j" display="inline"><mi>j</mi></math>, <math id="p34.m17" class="ltx_Math" alttext="k" display="inline"><mi>k</mi></math>–<math id="p34.m18" class="ltx_Math" alttext="l" display="inline"><mi>l</mi></math></span>
+              </div>
+            </td>
+          </tr>
+        </table>
+</div>
+<div id="p35" class="ltx_para ltx_noindent">
+<p class="ltx_p">Let <math id="p35.m1" class="ltx_Math" alttext="v" display="inline"><mi>v</mi></math> be any valuation that makes all of <math id="p35.m2" class="ltx_Math" alttext="\Delta_{n}" display="inline"><msub><mi mathvariant="normal">Δ</mi><mi>n</mi></msub></math> true. Note that all of <math id="p35.m3" class="ltx_Math" alttext="\Delta_{m}" display="inline"><msub><mi mathvariant="normal">Δ</mi><mi>m</mi></msub></math> are among <math id="p35.m4" class="ltx_Math" alttext="\Delta_{n}" display="inline"><msub><mi mathvariant="normal">Δ</mi><mi>n</mi></msub></math>. By hypothesis, line <math id="p35.m5" class="ltx_Math" alttext="m" display="inline"><mi>m</mi></math> is shiny. So any valuation that makes <math id="p35.m6" class="ltx_Math" alttext="\Delta_{n}" display="inline"><msub><mi mathvariant="normal">Δ</mi><mi>n</mi></msub></math> true makes <math id="p35.m7" class="ltx_Math" alttext="\mathscr{A}\vee\mathscr{B}" display="inline"><mrow><mi class="ltx_font_mathscript">𝒜︁</mi><mo>∨</mo><mi class="ltx_font_mathscript">ℬ︁</mi></mrow></math> true. So in particular, <math id="p35.m8" class="ltx_Math" alttext="v" display="inline"><mi>v</mi></math> makes <math id="p35.m9" class="ltx_Math" alttext="\mathscr{A}\vee\mathscr{B}" display="inline"><mrow><mi class="ltx_font_mathscript">𝒜︁</mi><mo>∨</mo><mi class="ltx_font_mathscript">ℬ︁</mi></mrow></math> true, and hence either <math id="p35.m10" class="ltx_Math" alttext="v" display="inline"><mi>v</mi></math> makes <math id="p35.m11" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math> true, or <math id="p35.m12" class="ltx_Math" alttext="v" display="inline"><mi>v</mi></math> makes <math id="p35.m13" class="ltx_Math" alttext="\mathscr{B}" display="inline"><mi class="ltx_font_mathscript">ℬ︁</mi></math> true. We now reason through these two cases:</p>
+<ol id="S0.I1" class="ltx_enumerate">
+<li id="S0.I1.i1" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">1.</span><div id="S0.I1.i1.p1" class="ltx_para">​<p class="ltx_p"><math id="S0.I1.i1.p1.m1" class="ltx_Math" alttext="v" display="inline"><mi>v</mi></math><span class="ltx_text ltx_font_bold"> makes <math id="S0.I1.i1.p1.m2" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math> true.</span> All of <math id="S0.I1.i1.p1.m3" class="ltx_Math" alttext="\Delta_{i}" display="inline"><msub><mi mathvariant="normal">Δ</mi><mi>i</mi></msub></math> are among <math id="S0.I1.i1.p1.m4" class="ltx_Math" alttext="\Delta_{n}" display="inline"><msub><mi mathvariant="normal">Δ</mi><mi>n</mi></msub></math>, with the possible exception of <math id="S0.I1.i1.p1.m5" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math>. Since <math id="S0.I1.i1.p1.m6" class="ltx_Math" alttext="v" display="inline"><mi>v</mi></math> makes all of <math id="S0.I1.i1.p1.m7" class="ltx_Math" alttext="\Delta_{n}" display="inline"><msub><mi mathvariant="normal">Δ</mi><mi>n</mi></msub></math> true, and also makes <math id="S0.I1.i1.p1.m8" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math> true, <math id="S0.I1.i1.p1.m9" class="ltx_Math" alttext="v" display="inline"><mi>v</mi></math> makes all of <math id="S0.I1.i1.p1.m10" class="ltx_Math" alttext="\Delta_{i}" display="inline"><msub><mi mathvariant="normal">Δ</mi><mi>i</mi></msub></math> true. Now, by assumption, line <math id="S0.I1.i1.p1.m11" class="ltx_Math" alttext="j" display="inline"><mi>j</mi></math> is shiny; so <math id="S0.I1.i1.p1.m12" class="ltx_Math" alttext="\Delta_{j}\vDash\mathscr{C}" display="inline"><mrow><msub><mi mathvariant="normal">Δ</mi><mi>j</mi></msub><mo>⊨</mo><mi class="ltx_font_mathscript">𝒞︁</mi></mrow></math>. But the sentences <math id="S0.I1.i1.p1.m13" class="ltx_Math" alttext="\Delta_{i}" display="inline"><msub><mi mathvariant="normal">Δ</mi><mi>i</mi></msub></math> are just the sentences <math id="S0.I1.i1.p1.m14" class="ltx_Math" alttext="\Delta_{j}" display="inline"><msub><mi mathvariant="normal">Δ</mi><mi>j</mi></msub></math>, so <math id="S0.I1.i1.p1.m15" class="ltx_Math" alttext="\Delta_{i}\vDash\mathscr{C}" display="inline"><mrow><msub><mi mathvariant="normal">Δ</mi><mi>i</mi></msub><mo>⊨</mo><mi class="ltx_font_mathscript">𝒞︁</mi></mrow></math>. So, any valuation that makes all of <math id="S0.I1.i1.p1.m16" class="ltx_Math" alttext="\Delta_{i}" display="inline"><msub><mi mathvariant="normal">Δ</mi><mi>i</mi></msub></math> true makes <math id="S0.I1.i1.p1.m17" class="ltx_Math" alttext="\mathscr{C}" display="inline"><mi class="ltx_font_mathscript">𝒞︁</mi></math> true. But <math id="S0.I1.i1.p1.m18" class="ltx_Math" alttext="v" display="inline"><mi>v</mi></math> is just such a valuation. So <math id="S0.I1.i1.p1.m19" class="ltx_Math" alttext="v" display="inline"><mi>v</mi></math> makes <math id="S0.I1.i1.p1.m20" class="ltx_Math" alttext="\mathscr{C}" display="inline"><mi class="ltx_font_mathscript">𝒞︁</mi></math> true.</p>
+</div>
+</li>
+<li id="S0.I1.i2" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">2.</span><div id="S0.I1.i2.p1" class="ltx_para">​<p class="ltx_p"><math id="S0.I1.i2.p1.m1" class="ltx_Math" alttext="v" display="inline"><mi>v</mi></math><span class="ltx_text ltx_font_bold"> makes <math id="S0.I1.i2.p1.m2" class="ltx_Math" alttext="\mathscr{B}" display="inline"><mi class="ltx_font_mathscript">ℬ︁</mi></math> true.</span> Reasoning in exactly the same way, considering lines <math id="S0.I1.i2.p1.m3" class="ltx_Math" alttext="k" display="inline"><mi>k</mi></math> and <math id="S0.I1.i2.p1.m4" class="ltx_Math" alttext="l" display="inline"><mi>l</mi></math>, <math id="S0.I1.i2.p1.m5" class="ltx_Math" alttext="v" display="inline"><mi>v</mi></math> makes <math id="S0.I1.i2.p1.m6" class="ltx_Math" alttext="\mathscr{C}" display="inline"><mi class="ltx_font_mathscript">𝒞︁</mi></math> true.</p>
+</div>
+</li>
+</ol>
+<p class="ltx_p">Either way, <math id="p35.m14" class="ltx_Math" alttext="v" display="inline"><mi>v</mi></math> makes <math id="p35.m15" class="ltx_Math" alttext="\mathscr{C}" display="inline"><mi class="ltx_font_mathscript">𝒞︁</mi></math> true. So <math id="p35.m16" class="ltx_Math" alttext="\Delta_{n}\vDash\mathscr{C}" display="inline"><mrow><msub><mi mathvariant="normal">Δ</mi><mi>n</mi></msub><mo>⊨</mo><mi class="ltx_font_mathscript">𝒞︁</mi></mrow></math>.
+QED</p>
+</div>
+<div id="p36" class="ltx_para bml_background-color_FDF4FA ltx_noindent bml_background-color_FDF4FA" style="padding:9pt;">
+<p class="ltx_p"><math id="p36.m1" class="ltx_Math" alttext="\neg" display="inline"><mo>¬</mo></math>E is rule-sound.</p>
+</div>
+<div id="p37" class="ltx_para">
+<p class="ltx_p"><span class="ltx_text ltx_font_bold">Proof.</span>
+Assume that every line before line <math id="p37.m1" class="ltx_Math" alttext="n" display="inline"><mi>n</mi></math> on some TFL-proof is shiny, and that <math id="p37.m2" class="ltx_Math" alttext="\neg" display="inline"><mo>¬</mo></math>E is used on line <math id="p37.m3" class="ltx_Math" alttext="n" display="inline"><mi>n</mi></math>. So the situation is:</p>
+</div>
+<div id="p38" class="ltx_para ltx_noindent">
+<table class="fitch">
+          
+          <thead class="fml-sr-only">
+            
+            <tr>
+              <th class="fml-pline">
+                
+                <div>
+                  
+<p class="ltx_p">Line number</p>
+                </div>
+              </th>
+              <th class="fml-subproof">
+                
+                <div>
+                  
+<p class="ltx_p">Subproof level</p>
+                </div>
+              </th>
+              <th class="fml-fmla">
+                
+                <div>
+                  
+<p class="ltx_p">Formula</p>
+                </div>
+              </th>
+              <th class="fml-just">
+                
+                <div>
+                  
+<p class="ltx_p">Justification</p>
+                </div>
+              </th>
+            </tr>
+          </thead>
+          <tr>
+            <th class="fml-pline">
+              
+              
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"><math id="p38.m1.m1" class="ltx_Math" alttext="i" display="inline"><mi>i</mi></math></span></p>
+            </th>
+            <td class="fml-subproof">
+              
+              <div>
+                <span>0</span>
+              </div>
+            </td>
+            <td class="fml-fmla">
+              
+              <div class="fml-scope-start">
+                
+              </div>
+              <div class="fml-fmla">
+                
+                <span><math id="p38.m2" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math></span>
+              </div>
+            </td>
+            <td class="fml-just">
+              
+              <div class="fml-just">
+                
+                <span></span>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <th class="fml-pline">
+              
+              
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"><math id="p38.m3.m1" class="ltx_Math" alttext="j" display="inline"><mi>j</mi></math></span></p>
+            </th>
+            <td class="fml-subproof">
+              
+              <div>
+                <span>0</span>
+              </div>
+            </td>
+            <td class="fml-fmla">
+              
+              <div class="fml-scope">
+                
+              </div>
+              <div class="fml-fmla">
+                
+                <span><math id="p38.m4" class="ltx_Math" alttext="\neg\mathscr{A}" display="inline"><mrow><mo rspace="0.167em">¬</mo><mi class="ltx_font_mathscript">𝒜︁</mi></mrow></math></span>
+              </div>
+            </td>
+            <td class="fml-just">
+              
+              <div class="fml-just">
+                
+                <span></span>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <th class="fml-pline">
+              
+              
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"><math id="p38.m5.m1" class="ltx_Math" alttext="n" display="inline"><mi>n</mi></math></span></p>
+            </th>
+            <td class="fml-subproof">
+              
+              <div>
+                <span>0</span>
+              </div>
+            </td>
+            <td class="fml-fmla">
+              
+              <div class="fml-scope">
+                
+              </div>
+              <div class="fml-fmla">
+                
+                <span><math id="p38.m6" class="ltx_Math" alttext="\bot" display="inline"><mo>⊥</mo></math></span>
+              </div>
+            </td>
+            <td class="fml-just">
+              
+              <div class="fml-just">
+                
+                <span><math id="p38.m7" class="ltx_Math" alttext="\neg" display="inline"><mo>¬</mo></math>E <math id="p38.m8" class="ltx_Math" alttext="i" display="inline"><mi>i</mi></math>, <math id="p38.m9" class="ltx_Math" alttext="j" display="inline"><mi>j</mi></math></span>
+              </div>
+            </td>
+          </tr>
+        </table>
+</div>
+<div id="p39" class="ltx_para ltx_noindent">
+<p class="ltx_p">Note that all of <math id="p39.m1" class="ltx_Math" alttext="\Delta_{i}" display="inline"><msub><mi mathvariant="normal">Δ</mi><mi>i</mi></msub></math> and all of <math id="p39.m2" class="ltx_Math" alttext="\Delta_{j}" display="inline"><msub><mi mathvariant="normal">Δ</mi><mi>j</mi></msub></math> are among <math id="p39.m3" class="ltx_Math" alttext="\Delta_{n}" display="inline"><msub><mi mathvariant="normal">Δ</mi><mi>n</mi></msub></math>. By hypothesis, lines <math id="p39.m4" class="ltx_Math" alttext="i" display="inline"><mi>i</mi></math> and <math id="p39.m5" class="ltx_Math" alttext="j" display="inline"><mi>j</mi></math> are shiny. So any valuation which makes all of <math id="p39.m6" class="ltx_Math" alttext="\Delta_{n}" display="inline"><msub><mi mathvariant="normal">Δ</mi><mi>n</mi></msub></math> true would have to make both <math id="p39.m7" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math> and <math id="p39.m8" class="ltx_Math" alttext="\neg\mathscr{A}" display="inline"><mrow><mo rspace="0.167em">¬</mo><mi class="ltx_font_mathscript">𝒜︁</mi></mrow></math> true. But no valuation can do that. So no valuation makes all of <math id="p39.m9" class="ltx_Math" alttext="\Delta_{n}" display="inline"><msub><mi mathvariant="normal">Δ</mi><mi>n</mi></msub></math> true. So <math id="p39.m10" class="ltx_Math" alttext="\Delta_{n}\vDash\bot" display="inline"><mrow><msub><mi mathvariant="normal">Δ</mi><mi>n</mi></msub><mo rspace="0em">⊨</mo><mo lspace="0em">⊥</mo></mrow></math>, vacuously.
+QED</p>
+</div>
+<div id="p40" class="ltx_para bml_background-color_FDF4FA ltx_noindent bml_background-color_FDF4FA" style="padding:9pt;">
+<p class="ltx_p">X is rule-sound.</p>
+</div>
+<div id="p41" class="ltx_para">
+<p class="ltx_p">We leave this as an exercise.</p>
+</div>
+<div id="p42" class="ltx_para bml_background-color_FDF4FA ltx_noindent bml_background-color_FDF4FA" style="padding:9pt;">
+<p class="ltx_p"><math id="p42.m1" class="ltx_Math" alttext="\neg" display="inline"><mo>¬</mo></math>I is rule-sound.</p>
+</div>
+<div id="p43" class="ltx_para">
+<p class="ltx_p"><span class="ltx_text ltx_font_bold">Proof.</span>
+Assume that every line before line <math id="p43.m1" class="ltx_Math" alttext="n" display="inline"><mi>n</mi></math> on some TFL-proof is shiny, and that <math id="p43.m2" class="ltx_Math" alttext="\neg" display="inline"><mo>¬</mo></math>I is used on line <math id="p43.m3" class="ltx_Math" alttext="n" display="inline"><mi>n</mi></math>. So the situation is:</p>
+</div>
+<div id="p44" class="ltx_para ltx_noindent">
+<table class="fitch">
+          
+          <thead class="fml-sr-only">
+            
+            <tr>
+              <th class="fml-pline">
+                
+                <div>
+                  
+<p class="ltx_p">Line number</p>
+                </div>
+              </th>
+              <th class="fml-subproof">
+                
+                <div>
+                  
+<p class="ltx_p">Subproof level</p>
+                </div>
+              </th>
+              <th class="fml-fmla">
+                
+                <div>
+                  
+<p class="ltx_p">Formula</p>
+                </div>
+              </th>
+              <th class="fml-just">
+                
+                <div>
+                  
+<p class="ltx_p">Justification</p>
+                </div>
+              </th>
+            </tr>
+          </thead>
+          <tr>
+            <th class="fml-pline">
+              
+              
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"><math id="p44.m1.m1" class="ltx_Math" alttext="i" display="inline"><mi>i</mi></math></span></p>
+            </th>
+            <td class="fml-subproof">
+              
+              <div>
+                <span>open subproof,
+1</span>
+              </div>
+            </td>
+            <td class="fml-fmla">
+              
+              <div class="fml-scope-start">
+                
+              </div>
+              <div class="fml-scope-start">
+                
+              </div>
+              <div class="fml-as">
+                
+                <span><math id="p44.m2" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math></span>
+              </div>
+            </td>
+            <td class="fml-just">
+              
+              <div class="fml-just">
+                
+                <span><abbr title="Assumption">
+AS</abbr>
+</span>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <th class="fml-pline">
+              
+              
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"><math id="p44.m3.m1" class="ltx_Math" alttext="j" display="inline"><mi>j</mi></math></span></p>
+            </th>
+            <td class="fml-subproof">
+              
+              <div>
+                <span>1</span>
+              </div>
+            </td>
+            <td class="fml-fmla">
+              
+              <div class="fml-scope">
+                
+              </div>
+              <div class="fml-scope">
+                
+              </div>
+              <div class="fml-fmla">
+                
+                <span><math id="p44.m4" class="ltx_Math" alttext="\bot" display="inline"><mo>⊥</mo></math></span>
+              </div>
+            </td>
+            <td class="fml-just">
+              
+              <div class="fml-just">
+                
+                <span></span>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <th class="fml-pline">
+              
+              
+<p class="ltx_p"><span class="ltx_text ltx_markedasmath"><math id="p44.m5.m1" class="ltx_Math" alttext="n" display="inline"><mi>n</mi></math></span></p>
+            </th>
+            <td class="fml-subproof">
+              
+              <div>
+                <span>close subproof,
+0</span>
+              </div>
+            </td>
+            <td class="fml-fmla">
+              
+              <div class="fml-scope">
+                
+              </div>
+              <div class="fml-fmla">
+                
+                <span><math id="p44.m6" class="ltx_Math" alttext="\neg\mathscr{A}" display="inline"><mrow><mo rspace="0.167em">¬</mo><mi class="ltx_font_mathscript">𝒜︁</mi></mrow></math></span>
+              </div>
+            </td>
+            <td class="fml-just">
+              
+              <div class="fml-just">
+                
+                <span><math id="p44.m7" class="ltx_Math" alttext="\neg" display="inline"><mo>¬</mo></math>I <math id="p44.m8" class="ltx_Math" alttext="i" display="inline"><mi>i</mi></math>–<math id="p44.m9" class="ltx_Math" alttext="j" display="inline"><mi>j</mi></math></span>
+              </div>
+            </td>
+          </tr>
+        </table>
+</div>
+<div id="p45" class="ltx_para ltx_noindent">
+<p class="ltx_p">Let <math id="p45.m1" class="ltx_Math" alttext="v" display="inline"><mi>v</mi></math> be any valuation that makes all of <math id="p45.m2" class="ltx_Math" alttext="\Delta_{n}" display="inline"><msub><mi mathvariant="normal">Δ</mi><mi>n</mi></msub></math> true. Note that all of <math id="p45.m3" class="ltx_Math" alttext="\Delta_{n}" display="inline"><msub><mi mathvariant="normal">Δ</mi><mi>n</mi></msub></math> are among <math id="p45.m4" class="ltx_Math" alttext="\Delta_{i}" display="inline"><msub><mi mathvariant="normal">Δ</mi><mi>i</mi></msub></math>, with the possible exception of <math id="p45.m5" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math> itself. By hypothesis, line <math id="p45.m6" class="ltx_Math" alttext="j" display="inline"><mi>j</mi></math> is shiny. But no valuation can make ‘<math id="p45.m7" class="ltx_Math" alttext="\bot" display="inline"><mo>⊥</mo></math>’ true, so no valuation can make all of <math id="p45.m8" class="ltx_Math" alttext="\Delta_{j}" display="inline"><msub><mi mathvariant="normal">Δ</mi><mi>j</mi></msub></math> true. Since the sentences <math id="p45.m9" class="ltx_Math" alttext="\Delta_{i}" display="inline"><msub><mi mathvariant="normal">Δ</mi><mi>i</mi></msub></math> are just the sentences <math id="p45.m10" class="ltx_Math" alttext="\Delta_{j}" display="inline"><msub><mi mathvariant="normal">Δ</mi><mi>j</mi></msub></math>, no valuation can make all of <math id="p45.m11" class="ltx_Math" alttext="\Delta_{i}" display="inline"><msub><mi mathvariant="normal">Δ</mi><mi>i</mi></msub></math> true. Since <math id="p45.m12" class="ltx_Math" alttext="v" display="inline"><mi>v</mi></math> makes all of <math id="p45.m13" class="ltx_Math" alttext="\Delta_{n}" display="inline"><msub><mi mathvariant="normal">Δ</mi><mi>n</mi></msub></math> true, it must therefore make <math id="p45.m14" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math> false, and so make <math id="p45.m15" class="ltx_Math" alttext="\neg\mathscr{A}" display="inline"><mrow><mo rspace="0.167em">¬</mo><mi class="ltx_font_mathscript">𝒜︁</mi></mrow></math> true. So <math id="p45.m16" class="ltx_Math" alttext="\Delta_{n}\vDash\neg\mathscr{A}" display="inline"><mrow><msub><mi mathvariant="normal">Δ</mi><mi>n</mi></msub><mo>⊨</mo><mrow><mo rspace="0.167em">¬</mo><mi class="ltx_font_mathscript">𝒜︁</mi></mrow></mrow></math>.
+QED</p>
+</div>
+<div id="p46" class="ltx_para bml_background-color_FDF4FA ltx_noindent bml_background-color_FDF4FA" style="padding:9pt;">
+<p class="ltx_p">IP, <math id="p46.m1" class="ltx_Math" alttext="\rightarrow" display="inline"><mo stretchy="false">→</mo></math>I, <math id="p46.m2" class="ltx_Math" alttext="\rightarrow" display="inline"><mo stretchy="false">→</mo></math>E, <math id="p46.m3" class="ltx_Math" alttext="\leftrightarrow" display="inline"><mo stretchy="false">↔</mo></math>I, and <math id="p46.m4" class="ltx_Math" alttext="\leftrightarrow" display="inline"><mo stretchy="false">↔</mo></math>E are all rule-sound.</p>
+</div>
+<div id="p47" class="ltx_para">
+<p class="ltx_p">We leave these as exercises.</p>
+</div>
+<div id="p48" class="ltx_para">
+<p class="ltx_p">This establishes that all the basic rules of our proof system are rule-sound. Finally, we show:</p>
+</div>
+<div id="p49" class="ltx_para bml_background-color_FDF4FA ltx_noindent bml_background-color_FDF4FA" style="padding:9pt;">
+<p class="ltx_p">All of the derived rules of our proof system are rule-sound.</p>
+</div>
+<div id="p50" class="ltx_para">
+<p class="ltx_p"><span class="ltx_text ltx_font_bold">Proof.</span>
+Suppose that we used a derived rule to obtain some sentence, <math id="p50.m1" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math>, on line <math id="p50.m2" class="ltx_Math" alttext="n" display="inline"><mi>n</mi></math> of some TFL-proof, and that every earlier line is shiny. Every use of a derived rule can be replaced (at the cost of long-windedness) with multiple uses of basic rules. That is to say, we could have used basic rules to write <math id="p50.m3" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math> on some line <math id="p50.m4" class="ltx_Math" alttext="n+k" display="inline"><mrow><mi>n</mi><mo>+</mo><mi>k</mi></mrow></math>, without introducing any further assumptions. So, applying our individual results that all basic rules are rule-sound several times (<math id="p50.m5" class="ltx_Math" alttext="k+1" display="inline"><mrow><mi>k</mi><mo>+</mo><mn>1</mn></mrow></math> times, in fact), we can see that line <math id="p50.m6" class="ltx_Math" alttext="n+k" display="inline"><mrow><mi>n</mi><mo>+</mo><mi>k</mi></mrow></math> is shiny. Hence the derived rule is rule-sound.
+QED</p>
+</div>
+<div id="p51" class="ltx_para">
+<p class="ltx_p">And that’s that! We have shown that every rule—basic or otherwise—is rule-sound, which is all that we required to establish the Shininess Lemma, and hence the Soundness Theorem.</p>
+</div>
+<div id="p52" class="ltx_para">
+<p class="ltx_p">But it might help to round off this chapter if we repeat my informal
+explanation of what we have done. A formal proof is just a
+sequence—of arbitrary length—of applications of rules. We have
+shown that any application of any rule will not lead you astray. It
+follows that no formal proof will lead you astray.
+That is: our proof system is sound.</p>
+</div>
+<section id="Sx1" class="ltx_section normal">
+<div class="section level2">
+<h2 class="ltx_title ltx_title_section">Practice exercises</h2>
+
+<div id="Sx1.p1" class="ltx_para ltx_noindent">
+<p class="ltx_p"><span class="ltx_text ltx_font_bold">A. </span>
+Complete the Lemmas left as exercises in this chapter. That is, show that the following are rule-sound:</p>
+<ol id="Sx1.I2" class="ltx_enumerate">
+<li id="Sx1.I2.i1" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">1.</span><div id="Sx1.I2.i1.p1" class="ltx_para">​<p class="ltx_p"><math id="Sx1.I2.i1.p1.m1" class="ltx_Math" alttext="\vee" display="inline"><mo>∨</mo></math>I. (<span class="ltx_text ltx_font_bold">Hint</span>: this is similar to the case of <math id="Sx1.I2.i1.p1.m2" class="ltx_Math" alttext="\wedge" display="inline"><mo>∧</mo></math>E.)</p>
+</div>
+</li>
+<li id="Sx1.I2.i2" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">2.</span><div id="Sx1.I2.i2.p1" class="ltx_para">​<p class="ltx_p">X. (<span class="ltx_text ltx_font_bold">Hint</span>: this is similar to the case of <math id="Sx1.I2.i2.p1.m1" class="ltx_Math" alttext="\neg" display="inline"><mo>¬</mo></math>E.)</p>
+</div>
+</li>
+<li id="Sx1.I2.i3" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">3.</span><div id="Sx1.I2.i3.p1" class="ltx_para">​<p class="ltx_p"><math id="Sx1.I2.i3.p1.m1" class="ltx_Math" alttext="\rightarrow" display="inline"><mo stretchy="false">→</mo></math>I. (<span class="ltx_text ltx_font_bold">Hint</span>: this is similar to <math id="Sx1.I2.i3.p1.m2" class="ltx_Math" alttext="\vee" display="inline"><mo>∨</mo></math>E.)</p>
+</div>
+</li>
+<li id="Sx1.I2.i4" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">4.</span><div id="Sx1.I2.i4.p1" class="ltx_para">​<p class="ltx_p"><math id="Sx1.I2.i4.p1.m1" class="ltx_Math" alttext="\rightarrow" display="inline"><mo stretchy="false">→</mo></math>E.</p>
+</div>
+</li>
+<li id="Sx1.I2.i5" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">5.</span><div id="Sx1.I2.i5.p1" class="ltx_para">​<p class="ltx_p">IP. (<span class="ltx_text ltx_font_bold">Hint</span>: this is similar to the case of <math id="Sx1.I2.i5.p1.m1" class="ltx_Math" alttext="\neg" display="inline"><mo>¬</mo></math>I.)</p>
+</div>
+</li>
+</ol>
+</div>
+</div>
+</section>
+</div>
+</section>
+</div>
+</div>
+</div>
+<a href="Ch47.html" class="navigation navigation-prev" aria-label="Previous page"><i class="fa fa-angle-left"></i></a><a href="Ptx1.html" class="navigation navigation-next" aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+</div>
+</div>
+</body>
+
+</html>

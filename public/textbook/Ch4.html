@@ -1,0 +1,373 @@
+<!DOCTYPE html><html style="--bml-ltx-font-size:10;" class="bml_mathjax4" lang="en">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<title>Chapter 4 First steps to symbolization ‣ Part II Truth-functional logic ‣ forall x: Calgary</title>
+<!--Generated on Tue Jul 21 20:13:15 2026 by LaTeXML (version 0.8.8) http://dlmf.nist.gov/LaTeXML/.-->
+<!--Document created on Fall 2025 (2026‐07‐18 8642250).-->
+
+<link rel="stylesheet" href="LaTeXML.css" type="text/css">
+<link rel="stylesheet" href="ltx-book.css" type="text/css">
+<link rel="stylesheet" href="bookml/gitbook/css/style.css" type="text/css">
+<link rel="stylesheet" href="bookml/gitbook/css/plugin-table.css" type="text/css">
+<link rel="stylesheet" href="bookml/gitbook/css/plugin-search.css" type="text/css">
+<link rel="stylesheet" href="bookml/gitbook/css/plugin-bookdown.css" type="text/css">
+<link rel="stylesheet" href="bookml/gitbook/css/plugin-fontsettings.css" type="text/css">
+<link rel="stylesheet" href="bookml/CSS/style.css" type="text/css">
+<link rel="stylesheet" href="bookml/CSS/style.gitbook,plain.css" type="text/css">
+<link rel="stylesheet" href="bookml/CSS/style.gitbook.css" type="text/css">
+<link rel="stylesheet" href="bmluser/colors.gitbook-forallxyyc-html.css" type="text/css">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<link rel="stylesheet" href="forallxyyc.css" type="text/css">
+<link rel="stylesheet" href="fitchml.css" type="text/css">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script><script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6"></script>
+<link rel="up" href="Pt2.html" title="Part II Truth-functional logic ‣ forall x: Calgary">
+<link rel="up up" href="index.html" title="forall x: Calgary">
+<link rel="start" href="index.html" title="forall x: Calgary">
+<link rel="prev" href="Pt2.html" title="Part II Truth-functional logic ‣ forall x: Calgary">
+<link rel="next" href="Ch5.html" title="Chapter 5 Connectives ‣ Part II Truth-functional logic ‣ forall x: Calgary">
+<link rel="chapter" href="Ch5.html" title="Chapter 5 Connectives ‣ Part II Truth-functional logic ‣ forall x: Calgary">
+<link rel="chapter" href="Ch6.html" title="Chapter 6 Sentences of TFL ‣ Part II Truth-functional logic ‣ forall x: Calgary">
+<link rel="chapter" href="Ch7.html" title="Chapter 7 Ambiguity ‣ Part II Truth-functional logic ‣ forall x: Calgary">
+<link rel="chapter" href="Ch8.html" title="Chapter 8 Use and mention ‣ Part II Truth-functional logic ‣ forall x: Calgary">
+<link rel="chapter" href="Chx1.html" title="Preface ‣ forall x: Calgary">
+<link rel="part" href="Pt1.html" title="Part I Key notions of logic ‣ forall x: Calgary">
+<link rel="part" href="Pt2.html" title="Part II Truth-functional logic ‣ forall x: Calgary">
+<link rel="part" href="Pt3.html" title="Part III Truth tables ‣ forall x: Calgary">
+<link rel="part" href="Pt4.html" title="Part IV Natural deduction for TFL ‣ forall x: Calgary">
+<link rel="part" href="Pt5.html" title="Part V First-order logic ‣ forall x: Calgary">
+<link rel="part" href="Pt6.html" title="Part VI Interpretations ‣ forall x: Calgary">
+<link rel="part" href="Pt7.html" title="Part VII Natural deduction for FOL ‣ forall x: Calgary">
+<link rel="part" href="Pt8.html" title="Part VIII Modal logic ‣ forall x: Calgary">
+<link rel="part" href="Pt9.html" title="Part IX Metatheory ‣ forall x: Calgary">
+<link rel="part" href="Ptx1.html" title="Appendices ‣ forall x: Calgary">
+<link rel="part" href="Ptx2.html" title="Solutions to selected exercices ‣ forall x: Calgary">
+<script src="bookml/js/mathjax4.js" defer></script>
+</head>
+<body class="bml_class_book">
+<div class="book without-animation font-size-2 font-family-1" data-basepath=".">
+<a href="#bml-main-content" tabindex="0" class="bml-skip-to-content">Skip to content.</a>
+<div class="book-summary"><nav class="ltx_page_navbar">
+<ul class="ltx_toclist summary">
+<li>
+<a href="index.html" title="" class="ltx_ref" rel="start">forall x: Calgary</a>
+</li>
+<li class="divider" aria-hidden="true"></li>
+<li data-level="" data-path="Chx1.html" class="ltx_tocentry ltx_tocentry_chapter  chapter "><a href="Chx1.html" title="In forall x: Calgary" class="ltx_ref">Preface</a></li>
+<li data-level="I" data-path="Pt1.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt1.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">I </span></b>Key notions of logic</a></li>
+<li data-level="II" data-path="Pt2.html" class="ltx_tocentry ltx_tocentry_part  chapter ">
+<a href="Pt2.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">II </span></b>Truth-functional logic</a>
+<ol class="ltx_toclist ltx_toclist_part">
+<li data-level="4" data-path="" class="ltx_tocentry ltx_tocentry_chapter ltx_ref_self  chapter active">
+<a href="" title="In Part II Truth-functional logic ‣ forall x: Calgary" aria-current="page" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">4 </span></b>First steps to symbolization</a>
+<ol class="ltx_toclist ltx_toclist_chapter">
+<li data-level="4.1" data-path="" class="ltx_tocentry ltx_tocentry_section  chapter "><a href="#S1" title="In Chapter 4 First steps to symbolization ‣ Part II Truth-functional logic ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">4.1 </span></b>Validity in virtue of form</a></li>
+<li data-level="4.2" data-path="" class="ltx_tocentry ltx_tocentry_section  chapter "><a href="#S2" title="In Chapter 4 First steps to symbolization ‣ Part II Truth-functional logic ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">4.2 </span></b>Validity for special reasons</a></li>
+<li data-level="4.3" data-path="" class="ltx_tocentry ltx_tocentry_section  chapter "><a href="#S3" title="In Chapter 4 First steps to symbolization ‣ Part II Truth-functional logic ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">4.3 </span></b>Atomic sentences</a></li>
+</ol>
+</li>
+<li data-level="5" data-path="Ch5.html" class="ltx_tocentry ltx_tocentry_chapter  chapter "><a href="Ch5.html" title="In Part II Truth-functional logic ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">5 </span></b>Connectives</a></li>
+<li data-level="6" data-path="Ch6.html" class="ltx_tocentry ltx_tocentry_chapter  chapter "><a href="Ch6.html" title="In Part II Truth-functional logic ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">6 </span></b>Sentences of TFL</a></li>
+<li data-level="7" data-path="Ch7.html" class="ltx_tocentry ltx_tocentry_chapter  chapter "><a href="Ch7.html" title="In Part II Truth-functional logic ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">7 </span></b>Ambiguity</a></li>
+<li data-level="8" data-path="Ch8.html" class="ltx_tocentry ltx_tocentry_chapter  chapter "><a href="Ch8.html" title="In Part II Truth-functional logic ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">8 </span></b>Use and mention</a></li>
+</ol>
+</li>
+<li data-level="III" data-path="Pt3.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt3.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">III </span></b>Truth tables</a></li>
+<li data-level="IV" data-path="Pt4.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt4.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">IV </span></b>Natural deduction for TFL</a></li>
+<li data-level="V" data-path="Pt5.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt5.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">V </span></b>First-order logic</a></li>
+<li data-level="VI" data-path="Pt6.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt6.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">VI </span></b>Interpretations</a></li>
+<li data-level="VII" data-path="Pt7.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt7.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">VII </span></b>Natural deduction for FOL</a></li>
+<li data-level="VIII" data-path="Pt8.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt8.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">VIII </span></b>Modal logic</a></li>
+<li data-level="IX" data-path="Pt9.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt9.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">IX </span></b>Metatheory</a></li>
+<li data-level="" data-path="Ptx1.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Ptx1.html" title="In forall x: Calgary" class="ltx_ref">Appendices</a></li>
+<li data-level="" data-path="Ptx2.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Ptx2.html" title="In forall x: Calgary" class="ltx_ref">Solutions to selected exercices</a></li>
+</ul>
+</nav></div>
+
+<div class="ltx_page_main book-body fixed">
+<div class="body-inner">
+<header class="book-header fixed" aria-label="toolbar"><span class="bml-separator"></span></header>
+<div class="page-wrapper" tabindex="-1" role="main">
+<div class="ltx_page_content page-inner" id="bml-main-content">
+<script src="bookml/gitbook/js/app.min.js"></script>
+<script src="bookml/gitbook/js/jquery.highlight.js"></script>
+<script src="bookml/gitbook/js/plugin-search.js"></script>
+<script src="bookml/gitbook/js/plugin-fontsettings.js"></script>
+<script src="bookml/gitbook/js/plugin-bookdown.js"></script>
+<script type="text/javascript">
+                  gitbook.require(["gitbook"], function(gitbook) {
+                  gitbook.start({
+                    "fontsettings": {
+                      "theme": "white",
+                      "family": "sans",
+                      "size": 2
+                    },
+                    "download": [ [ "forallxyyc.pdf", "PDF" ], [ "forallxyyc-accessible.pdf", "PDF (accessible)" ], ],
+                    "search": {
+                      "engine": "fuse"
+                    },
+                    "toc": {
+                      "collapse": "none"
+                    }
+                  });
+                });
+              </script>
+
+<section class="ltx_chapter ltx_authors_1line normal" lang="en">
+<div class="section level1">
+<h1 class="ltx_title ltx_title_chapter">
+<span class="ltx_tag ltx_tag_chapter header-section-number">Chapter 4</span> First steps to symbolization</h1>
+
+<section id="S1" class="ltx_section normal">
+<div class="section level2">
+<h2 class="ltx_title ltx_title_section">
+<span class="ltx_tag ltx_tag_section header-section-number">4.1</span> Validity in virtue of form</h2>
+
+<div id="S1.p1" class="ltx_para">
+<p class="ltx_p">Consider this argument:</p>
+<ul id="S1.I1" class="ltx_itemize">
+<li id="S1.I1.ix1" class="ltx_item" style="list-style-type:none;"><div id="S1.I1.ix1.p1" class="ltx_para">
+<p class="ltx_p">It is raining outside.</p>
+</div></li>
+<li id="S1.I1.ix2" class="ltx_item" style="list-style-type:none;"><div id="S1.I1.ix2.p1" class="ltx_para">
+<p class="ltx_p">If it is raining outside, then Jenny is miserable.</p>
+</div></li>
+<li id="S1.I1.ix3" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">∴</span><div id="S1.I1.ix3.p1" class="ltx_para">​<p class="ltx_p">Jenny is miserable.</p>
+</div>
+</li>
+</ul>
+<p class="ltx_p">and another argument:</p>
+<ul id="S1.I2" class="ltx_itemize">
+<li id="S1.I2.ix1" class="ltx_item" style="list-style-type:none;"><div id="S1.I2.ix1.p1" class="ltx_para">
+<p class="ltx_p">Jenny is an anarcho-syndicalist.</p>
+</div></li>
+<li id="S1.I2.ix2" class="ltx_item" style="list-style-type:none;"><div id="S1.I2.ix2.p1" class="ltx_para">
+<p class="ltx_p">If Jenny is an anarcho-syndicalist, then Dipan is an avid reader of Tolstoy.</p>
+</div></li>
+<li id="S1.I2.ix3" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">∴</span><div id="S1.I2.ix3.p1" class="ltx_para">​<p class="ltx_p">Dipan is an avid reader of Tolstoy.</p>
+</div>
+</li>
+</ul>
+<p class="ltx_p">Both arguments are valid, and there is a straightforward sense in which we can say that they share a common structure. We might express the structure thus:</p>
+<ul id="S1.I3" class="ltx_itemize">
+<li id="S1.I3.ix1" class="ltx_item" style="list-style-type:none;"><div id="S1.I3.ix1.p1" class="ltx_para">
+<p class="ltx_p"><math id="S1.I3.ix1.p1.m1" class="ltx_Math" alttext="A" display="inline"><mi>A</mi></math></p>
+</div></li>
+<li id="S1.I3.ix2" class="ltx_item" style="list-style-type:none;"><div id="S1.I3.ix2.p1" class="ltx_para">
+<p class="ltx_p">If <math id="S1.I3.ix2.p1.m1" class="ltx_Math" alttext="A" display="inline"><mi>A</mi></math>, then <math id="S1.I3.ix2.p1.m2" class="ltx_Math" alttext="C" display="inline"><mi>C</mi></math></p>
+</div></li>
+<li id="S1.I3.ix3" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">∴</span><div id="S1.I3.ix3.p1" class="ltx_para">​<p class="ltx_p"><math id="S1.I3.ix3.p1.m1" class="ltx_Math" alttext="C" display="inline"><mi>C</mi></math></p>
+</div>
+</li>
+</ul>
+<p class="ltx_p">This looks like an excellent argument <span class="ltx_text ltx_font_bold">structure</span>. Indeed, surely any argument with this structure will be valid. And this is not the only good argument structure. Consider an argument like:</p>
+<ul id="S1.I4" class="ltx_itemize">
+<li id="S1.I4.ix1" class="ltx_item" style="list-style-type:none;"><div id="S1.I4.ix1.p1" class="ltx_para">
+<p class="ltx_p">Jenny is either happy or sad.</p>
+</div></li>
+<li id="S1.I4.ix2" class="ltx_item" style="list-style-type:none;"><div id="S1.I4.ix2.p1" class="ltx_para">
+<p class="ltx_p">Jenny is not happy.</p>
+</div></li>
+<li id="S1.I4.ix3" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">∴</span><div id="S1.I4.ix3.p1" class="ltx_para">​<p class="ltx_p">Jenny is sad.</p>
+</div>
+</li>
+</ul>
+<p class="ltx_p">Again, this is a valid argument. The structure here is something like:</p>
+<ul id="S1.I5" class="ltx_itemize">
+<li id="S1.I5.ix1" class="ltx_item" style="list-style-type:none;"><div id="S1.I5.ix1.p1" class="ltx_para">
+<p class="ltx_p"><math id="S1.I5.ix1.p1.m1" class="ltx_Math" alttext="A" display="inline"><mi>A</mi></math> or <math id="S1.I5.ix1.p1.m2" class="ltx_Math" alttext="B" display="inline"><mi>B</mi></math></p>
+</div></li>
+<li id="S1.I5.ix2" class="ltx_item" style="list-style-type:none;"><div id="S1.I5.ix2.p1" class="ltx_para">
+<p class="ltx_p">not-<math id="S1.I5.ix2.p1.m1" class="ltx_Math" alttext="A" display="inline"><mi>A</mi></math></p>
+</div></li>
+<li id="S1.I5.ix3" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">∴</span><div id="S1.I5.ix3.p1" class="ltx_para">​<p class="ltx_p"><math id="S1.I5.ix3.p1.m1" class="ltx_Math" alttext="B" display="inline"><mi>B</mi></math></p>
+</div>
+</li>
+</ul>
+<p class="ltx_p">A superb structure! Here is another example:</p>
+<ul id="S1.I6" class="ltx_itemize">
+<li id="S1.I6.ix1" class="ltx_item" style="list-style-type:none;"><div id="S1.I6.ix1.p1" class="ltx_para">
+<p class="ltx_p">It’s not the case that Jim both studied hard and acted in lots of plays.</p>
+</div></li>
+<li id="S1.I6.ix2" class="ltx_item" style="list-style-type:none;"><div id="S1.I6.ix2.p1" class="ltx_para">
+<p class="ltx_p">Jim studied hard.</p>
+</div></li>
+<li id="S1.I6.ix3" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">∴</span><div id="S1.I6.ix3.p1" class="ltx_para">​<p class="ltx_p">Jim did not act in lots of plays.</p>
+</div>
+</li>
+</ul>
+<p class="ltx_p">This valid argument has a structure which we might represent thus:</p>
+<ul id="S1.I7" class="ltx_itemize">
+<li id="S1.I7.ix1" class="ltx_item" style="list-style-type:none;"><div id="S1.I7.ix1.p1" class="ltx_para">
+<p class="ltx_p">not-(<math id="S1.I7.ix1.p1.m1" class="ltx_Math" alttext="A" display="inline"><mi>A</mi></math> and <math id="S1.I7.ix1.p1.m2" class="ltx_Math" alttext="B" display="inline"><mi>B</mi></math>)</p>
+</div></li>
+<li id="S1.I7.ix2" class="ltx_item" style="list-style-type:none;"><div id="S1.I7.ix2.p1" class="ltx_para">
+<p class="ltx_p"><math id="S1.I7.ix2.p1.m1" class="ltx_Math" alttext="A" display="inline"><mi>A</mi></math></p>
+</div></li>
+<li id="S1.I7.ix3" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">∴</span><div id="S1.I7.ix3.p1" class="ltx_para">​<p class="ltx_p">not-<math id="S1.I7.ix3.p1.m1" class="ltx_Math" alttext="B" display="inline"><mi>B</mi></math></p>
+</div>
+</li>
+</ul>
+<p class="ltx_p">These examples illustrate an important idea, which we might describe as <span class="ltx_text ltx_font_bold">validity in virtue of form</span>. The validity of the arguments just considered has nothing very much to do with the meanings of English expressions like ‘Jenny is miserable’, ‘Dipan is an avid reader of Tolstoy’, or ‘Jim acted in lots of plays’. If it has to do with meanings at all, it is with the meanings of phrases like ‘and’, ‘or’, ‘not,’ and ‘if …, then …’.</p>
+</div>
+<div id="S1.p2" class="ltx_para">
+<p class="ltx_p">In <a href="Pt2.html" title="Part II Truth-functional logic ‣ forall x: Calgary" class="ltx_ref"><span class="ltx_text ltx_ref_tag">parts</span> <span class="ltx_text ltx_ref_tag">II</span></a> to <a href="Pt4.html" title="Part IV Natural deduction for TFL ‣ forall x: Calgary" class="ltx_ref"><span class="ltx_text ltx_ref_tag">IV</span></a>, we are going to develop a formal
+language which allows us to symbolize many arguments in such a way as
+to show that they are valid in virtue of their form. This will be the
+language of <span class="ltx_text ltx_font_bold">truth-functional logic</span>, or
+TFL.<span id="footnote1" class="ltx_note ltx_role_footnote"><sup class="ltx_note_mark">1</sup><span class="ltx_note_outer"><span class="ltx_note_content"><sup class="ltx_note_mark">1</sup>
+                <span class="ltx_tag ltx_tag_note">1</span>
+                
+                
+                
+                
+                
+                
+                
+              Truth-functional logic is also often called (classical)
+“propositional” or “sentential” logic.</span></span></span></p>
+</div>
+</div>
+</section>
+<section id="S2" class="ltx_section normal">
+<div class="section level2">
+<h2 class="ltx_title ltx_title_section">
+<span class="ltx_tag ltx_tag_section header-section-number">4.2</span> Validity for special reasons</h2>
+
+<div id="S2.p1" class="ltx_para">
+<p class="ltx_p">In <a href="Ch2.html#S3" title="2.3 Formal validity ‣ Chapter 2 The scope of logic ‣ Part I Key notions of logic ‣ forall x: Calgary" class="ltx_ref"><span class="ltx_text ltx_ref_tag">section</span> <span class="ltx_text ltx_ref_tag">2.3</span></a>, we first introduced the notion of formal
+validity, and contrasted it with other kinds of validity related to
+what kinds of counterexamples we consider. It bears repeating that
+there are plenty of arguments that are valid, but not for reasons
+relating to their form. Take an example:</p>
+<ul id="S2.I1" class="ltx_itemize">
+<li id="S2.I1.ix1" class="ltx_item" style="list-style-type:none;"><div id="S2.I1.ix1.p1" class="ltx_para">
+<p class="ltx_p">Juanita is a vixen.</p>
+</div></li>
+<li id="S2.I1.ix2" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">∴</span><div id="S2.I1.ix2.p1" class="ltx_para">​<p class="ltx_p">Juanita is a fox.</p>
+</div>
+</li>
+</ul>
+<p class="ltx_p">It is impossible for the premise to be true and the conclusion false,
+since ‘vixen’ just means ‘female fox’. So the argument is
+(conceptually) valid. The validity is not explained by the form of the
+argument. To see this, we can give an invalid argument with the same
+form, e.g.:</p>
+<ul id="S2.I2" class="ltx_itemize">
+<li id="S2.I2.ix1" class="ltx_item" style="list-style-type:none;"><div id="S2.I2.ix1.p1" class="ltx_para">
+<p class="ltx_p">Juanita is a vixen.</p>
+</div></li>
+<li id="S2.I2.ix2" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">∴</span><div id="S2.I2.ix2.p1" class="ltx_para">​<p class="ltx_p">Juanita is a cathedral.</p>
+</div>
+</li>
+</ul>
+<p class="ltx_p">Equally, consider the argument:</p>
+<ul id="S2.I3" class="ltx_itemize">
+<li id="S2.I3.ix1" class="ltx_item" style="list-style-type:none;"><div id="S2.I3.ix1.p1" class="ltx_para">
+<p class="ltx_p">The sculpture is green all over.</p>
+</div></li>
+<li id="S2.I3.ix2" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">∴</span><div id="S2.I3.ix2.p1" class="ltx_para">​<p class="ltx_p">The sculpture is not red all over.</p>
+</div>
+</li>
+</ul>
+<p class="ltx_p">Again, it seems there can be no case where the premise is true and the
+conclusion false, for nothing can be both green all over and red all
+over. So the argument is valid, but here is an invalid argument with
+the same form:</p>
+<ul id="S2.I4" class="ltx_itemize">
+<li id="S2.I4.ix1" class="ltx_item" style="list-style-type:none;"><div id="S2.I4.ix1.p1" class="ltx_para">
+<p class="ltx_p">The sculpture is green all over.</p>
+</div></li>
+<li id="S2.I4.ix2" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">∴</span><div id="S2.I4.ix2.p1" class="ltx_para">​<p class="ltx_p">The sculpture is not shiny all over.</p>
+</div>
+</li>
+</ul>
+<p class="ltx_p">This argument is invalid, since it is possible to be green all over
+and shiny all over. (One might paint the sculpture with an elegant
+shiny green varnish.) Plausibly, the validity of the first argument is
+keyed to the way that colours (or colour-words) interact, but, whether
+or not that is right, it is not simply the <span class="ltx_text ltx_font_bold">form</span> of the
+argument alone that makes it valid.</p>
+</div>
+<div id="S2.p2" class="ltx_para">
+<p class="ltx_p">The important moral can be stated as follows. <span class="ltx_text ltx_font_bold">At best, TFL will help us to understand arguments that are valid due to their form.</span></p>
+</div>
+</div>
+</section>
+<section id="S3" class="ltx_section normal">
+<div class="section level2">
+<h2 class="ltx_title ltx_title_section">
+<span class="ltx_tag ltx_tag_section header-section-number">4.3</span> Atomic sentences</h2>
+
+<div id="S3.p1" class="ltx_para">
+<p class="ltx_p">We started isolating the form of an argument, in <a href="#S1" title="4.1 Validity in virtue of form ‣ Chapter 4 First steps to symbolization ‣ Part II Truth-functional logic ‣ forall x: Calgary" class="ltx_ref"><span class="ltx_text ltx_ref_tag">section</span> <span class="ltx_text ltx_ref_tag">4.1</span></a>, by replacing <span class="ltx_text ltx_font_bold">subsentences</span> of sentences with individual letters. Thus in the first example of this section, ‘it is raining outside’ is a subsentence of ‘If it is raining outside, then Jenny is miserable’, and we replaced this subsentence with ‘<math id="S3.p1.m1" class="ltx_Math" alttext="A" display="inline"><mi>A</mi></math>’.</p>
+</div>
+<div id="S3.p2" class="ltx_para">
+<p class="ltx_p">The artificial language of TFL pursues this idea absolutely
+ruthlessly. We start with some <span class="ltx_text ltx_font_bold">sentence letters</span>. These will be
+the basic building blocks out of which more complex sentences are
+built (they are the “atomic” sentences of TFL). We will use single
+uppercase letters as sentence letters of TFL. There are only
+twenty-six letters of the alphabet, but there is no limit to the
+number of sentence letters that we might want to consider. By adding
+subscripts to letters, we obtain new sentence letters. So, here are
+five different sentence letters of TFL:</p>
+<div id="Ex1" class="ltx_equation bml_equation bml_equation_container ltx_align_baseline">
+<div class="ltx_Math bml_eqn_cell ltx_align_center"><math id="Ex1.m1" class="ltx_Math" alttext="A,P,P_{1},P_{2},A_{234}" display="block"><mrow><mi>A</mi><mo>,</mo><mi>P</mi><mo>,</mo><msub><mi>P</mi><mn>1</mn></msub><mo>,</mo><msub><mi>P</mi><mn>2</mn></msub><mo>,</mo><msub><mi>A</mi><mn>234</mn></msub></mrow></math></div>
+</div>
+<p class="ltx_p">We will use sentence letters to represent, or <span class="ltx_text ltx_font_bold">symbolize</span>, certain English sentences. To do this, we provide a <dfn>symbolization key</dfn>
+, such as the following:</p>
+<dl id="S3.I1" class="ltx_description">
+<dt id="S3.I1.ix1" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="S3.I1.ix1.m1" class="ltx_Math" alttext="A" display="inline"><mi>A</mi></math>:</span></dt>
+<dd class="ltx_item">
+<div id="S3.I1.ix1.p1" class="ltx_para">
+<p class="ltx_p">It is raining outside</p>
+</div>
+</dd>
+<dt id="S3.I1.ix2" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="S3.I1.ix2.m1" class="ltx_Math" alttext="C" display="inline"><mi>C</mi></math>:</span></dt>
+<dd class="ltx_item">
+<div id="S3.I1.ix2.p1" class="ltx_para">
+<p class="ltx_p">Jenny is miserable</p>
+</div>
+</dd>
+</dl>
+<p class="ltx_p">In doing this, we are not fixing this symbolization <span class="ltx_text ltx_font_bold">once and for all</span>. We are just saying that, for the time being, we will think of the sentence letter of TFL, ‘<math id="S3.p2.m1" class="ltx_Math" alttext="A" display="inline"><mi>A</mi></math>’, as symbolizing the English sentence ‘It is raining outside’, and the sentence letter of TFL, ‘<math id="S3.p2.m2" class="ltx_Math" alttext="C" display="inline"><mi>C</mi></math>’, as symbolizing the English sentence ‘Jenny is miserable’. Later, when we are dealing with different sentences or different arguments, we can provide a new symbolization key; as it might be:</p>
+<dl id="S3.I2" class="ltx_description">
+<dt id="S3.I2.ix1" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="S3.I2.ix1.m1" class="ltx_Math" alttext="A" display="inline"><mi>A</mi></math>:</span></dt>
+<dd class="ltx_item">
+<div id="S3.I2.ix1.p1" class="ltx_para">
+<p class="ltx_p">Jenny is an anarcho-syndicalist</p>
+</div>
+</dd>
+<dt id="S3.I2.ix2" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="S3.I2.ix2.m1" class="ltx_Math" alttext="C" display="inline"><mi>C</mi></math>:</span></dt>
+<dd class="ltx_item">
+<div id="S3.I2.ix2.p1" class="ltx_para">
+<p class="ltx_p">Dipan is an avid reader of Tolstoy</p>
+</div>
+</dd>
+</dl>
+<p class="ltx_p">It is important to understand that whatever structure an English sentence might have is lost when it is symbolized by a sentence letter of TFL. From the point of view of TFL, a sentence letter is just a letter. It can be used to build more complex sentences, but it cannot be taken apart.</p>
+</div>
+</div>
+</section>
+</div>
+</section>
+</div>
+</div>
+</div>
+<a href="Pt2.html" class="navigation navigation-prev" aria-label="Previous page"><i class="fa fa-angle-left"></i></a><a href="Ch5.html" class="navigation navigation-next" aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+</div>
+</div>
+</body>
+
+</html>

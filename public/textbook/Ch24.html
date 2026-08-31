@@ -1,0 +1,926 @@
+<!DOCTYPE html><html style="--bml-ltx-font-size:10;" class="bml_mathjax4" lang="en">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<title>Chapter 24 Sentences with one quantifier ‣ Part V First-order logic ‣ forall x: Calgary</title>
+<!--Generated on Tue Jul 21 20:13:15 2026 by LaTeXML (version 0.8.8) http://dlmf.nist.gov/LaTeXML/.-->
+<!--Document created on Fall 2025 (2026‐07‐18 8642250).-->
+
+<link rel="stylesheet" href="LaTeXML.css" type="text/css">
+<link rel="stylesheet" href="ltx-book.css" type="text/css">
+<link rel="stylesheet" href="bookml/gitbook/css/style.css" type="text/css">
+<link rel="stylesheet" href="bookml/gitbook/css/plugin-table.css" type="text/css">
+<link rel="stylesheet" href="bookml/gitbook/css/plugin-search.css" type="text/css">
+<link rel="stylesheet" href="bookml/gitbook/css/plugin-bookdown.css" type="text/css">
+<link rel="stylesheet" href="bookml/gitbook/css/plugin-fontsettings.css" type="text/css">
+<link rel="stylesheet" href="bookml/CSS/style.css" type="text/css">
+<link rel="stylesheet" href="bookml/CSS/style.gitbook,plain.css" type="text/css">
+<link rel="stylesheet" href="bookml/CSS/style.gitbook.css" type="text/css">
+<link rel="stylesheet" href="bmluser/colors.gitbook-forallxyyc-html.css" type="text/css">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<link rel="stylesheet" href="forallxyyc.css" type="text/css">
+<link rel="stylesheet" href="fitchml.css" type="text/css">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script><script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6"></script>
+<link rel="up" href="Pt5.html" title="Part V First-order logic ‣ forall x: Calgary">
+<link rel="up up" href="index.html" title="forall x: Calgary">
+<link rel="start" href="index.html" title="forall x: Calgary">
+<link rel="prev" href="Ch23.html" title="Chapter 23 Building blocks of FOL ‣ Part V First-order logic ‣ forall x: Calgary">
+<link rel="next" href="Ch25.html" title="Chapter 25 Multiple generality ‣ Part V First-order logic ‣ forall x: Calgary">
+<link rel="chapter" href="Ch23.html" title="Chapter 23 Building blocks of FOL ‣ Part V First-order logic ‣ forall x: Calgary">
+<link rel="chapter" href="Ch25.html" title="Chapter 25 Multiple generality ‣ Part V First-order logic ‣ forall x: Calgary">
+<link rel="chapter" href="Ch26.html" title="Chapter 26 Identity ‣ Part V First-order logic ‣ forall x: Calgary">
+<link rel="chapter" href="Ch27.html" title="Chapter 27 Sentences of FOL ‣ Part V First-order logic ‣ forall x: Calgary">
+<link rel="chapter" href="Ch28.html" title="Chapter 28 Definite descriptions ‣ Part V First-order logic ‣ forall x: Calgary">
+<link rel="chapter" href="Ch29.html" title="Chapter 29 Ambiguity ‣ Part V First-order logic ‣ forall x: Calgary">
+<link rel="chapter" href="Chx1.html" title="Preface ‣ forall x: Calgary">
+<link rel="part" href="Pt1.html" title="Part I Key notions of logic ‣ forall x: Calgary">
+<link rel="part" href="Pt2.html" title="Part II Truth-functional logic ‣ forall x: Calgary">
+<link rel="part" href="Pt3.html" title="Part III Truth tables ‣ forall x: Calgary">
+<link rel="part" href="Pt4.html" title="Part IV Natural deduction for TFL ‣ forall x: Calgary">
+<link rel="part" href="Pt5.html" title="Part V First-order logic ‣ forall x: Calgary">
+<link rel="part" href="Pt6.html" title="Part VI Interpretations ‣ forall x: Calgary">
+<link rel="part" href="Pt7.html" title="Part VII Natural deduction for FOL ‣ forall x: Calgary">
+<link rel="part" href="Pt8.html" title="Part VIII Modal logic ‣ forall x: Calgary">
+<link rel="part" href="Pt9.html" title="Part IX Metatheory ‣ forall x: Calgary">
+<link rel="part" href="Ptx1.html" title="Appendices ‣ forall x: Calgary">
+<link rel="part" href="Ptx2.html" title="Solutions to selected exercices ‣ forall x: Calgary">
+<script src="bookml/js/mathjax4.js" defer></script>
+</head>
+<body class="bml_class_book">
+<div class="book without-animation font-size-2 font-family-1" data-basepath=".">
+<a href="#bml-main-content" tabindex="0" class="bml-skip-to-content">Skip to content.</a>
+<div class="book-summary"><nav class="ltx_page_navbar">
+<ul class="ltx_toclist summary">
+<li>
+<a href="index.html" title="" class="ltx_ref" rel="start">forall x: Calgary</a>
+</li>
+<li class="divider" aria-hidden="true"></li>
+<li data-level="" data-path="Chx1.html" class="ltx_tocentry ltx_tocentry_chapter  chapter "><a href="Chx1.html" title="In forall x: Calgary" class="ltx_ref">Preface</a></li>
+<li data-level="I" data-path="Pt1.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt1.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">I </span></b>Key notions of logic</a></li>
+<li data-level="II" data-path="Pt2.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt2.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">II </span></b>Truth-functional logic</a></li>
+<li data-level="III" data-path="Pt3.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt3.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">III </span></b>Truth tables</a></li>
+<li data-level="IV" data-path="Pt4.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt4.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">IV </span></b>Natural deduction for TFL</a></li>
+<li data-level="V" data-path="Pt5.html" class="ltx_tocentry ltx_tocentry_part  chapter ">
+<a href="Pt5.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">V </span></b>First-order logic</a>
+<ol class="ltx_toclist ltx_toclist_part">
+<li data-level="23" data-path="Ch23.html" class="ltx_tocentry ltx_tocentry_chapter  chapter "><a href="Ch23.html" title="In Part V First-order logic ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">23 </span></b>Building blocks of FOL</a></li>
+<li data-level="24" data-path="" class="ltx_tocentry ltx_tocentry_chapter ltx_ref_self  chapter active">
+<a href="" title="In Part V First-order logic ‣ forall x: Calgary" aria-current="page" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">24 </span></b>Sentences with one quantifier</a>
+<ol class="ltx_toclist ltx_toclist_chapter">
+<li data-level="24.1" data-path="" class="ltx_tocentry ltx_tocentry_section  chapter "><a href="#S1" title="In Chapter 24 Sentences with one quantifier ‣ Part V First-order logic ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">24.1 </span></b>Common quantifier phrases</a></li>
+<li data-level="24.2" data-path="" class="ltx_tocentry ltx_tocentry_section  chapter "><a href="#S2" title="In Chapter 24 Sentences with one quantifier ‣ Part V First-order logic ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">24.2 </span></b>Empty predicates</a></li>
+<li data-level="24.3" data-path="" class="ltx_tocentry ltx_tocentry_section  chapter "><a href="#S3" title="In Chapter 24 Sentences with one quantifier ‣ Part V First-order logic ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">24.3 </span></b>Picking a domain</a></li>
+<li data-level="24.4" data-path="" class="ltx_tocentry ltx_tocentry_section  chapter "><a href="#S4" title="In Chapter 24 Sentences with one quantifier ‣ Part V First-order logic ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">24.4 </span></b>The utility of paraphrase</a></li>
+<li data-level="24.5" data-path="" class="ltx_tocentry ltx_tocentry_section  chapter "><a href="#S5" title="In Chapter 24 Sentences with one quantifier ‣ Part V First-order logic ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">24.5 </span></b>Quantifiers and scope</a></li>
+<li data-level="24.6" data-path="" class="ltx_tocentry ltx_tocentry_section  chapter "><a href="#S6" title="In Chapter 24 Sentences with one quantifier ‣ Part V First-order logic ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">24.6 </span></b>Ambiguous predicates</a></li>
+<li data-level="" data-path="" class="ltx_tocentry ltx_tocentry_section  chapter "><a href="#Sx1" title="In Chapter 24 Sentences with one quantifier ‣ Part V First-order logic ‣ forall x: Calgary" class="ltx_ref">Practice exercises</a></li>
+</ol>
+</li>
+<li data-level="25" data-path="Ch25.html" class="ltx_tocentry ltx_tocentry_chapter  chapter "><a href="Ch25.html" title="In Part V First-order logic ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">25 </span></b>Multiple generality</a></li>
+<li data-level="26" data-path="Ch26.html" class="ltx_tocentry ltx_tocentry_chapter  chapter "><a href="Ch26.html" title="In Part V First-order logic ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">26 </span></b>Identity</a></li>
+<li data-level="27" data-path="Ch27.html" class="ltx_tocentry ltx_tocentry_chapter  chapter "><a href="Ch27.html" title="In Part V First-order logic ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">27 </span></b>Sentences of FOL</a></li>
+<li data-level="28" data-path="Ch28.html" class="ltx_tocentry ltx_tocentry_chapter  chapter "><a href="Ch28.html" title="In Part V First-order logic ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">28 </span></b>Definite descriptions</a></li>
+<li data-level="29" data-path="Ch29.html" class="ltx_tocentry ltx_tocentry_chapter  chapter "><a href="Ch29.html" title="In Part V First-order logic ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">29 </span></b>Ambiguity</a></li>
+</ol>
+</li>
+<li data-level="VI" data-path="Pt6.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt6.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">VI </span></b>Interpretations</a></li>
+<li data-level="VII" data-path="Pt7.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt7.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">VII </span></b>Natural deduction for FOL</a></li>
+<li data-level="VIII" data-path="Pt8.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt8.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">VIII </span></b>Modal logic</a></li>
+<li data-level="IX" data-path="Pt9.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt9.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">IX </span></b>Metatheory</a></li>
+<li data-level="" data-path="Ptx1.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Ptx1.html" title="In forall x: Calgary" class="ltx_ref">Appendices</a></li>
+<li data-level="" data-path="Ptx2.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Ptx2.html" title="In forall x: Calgary" class="ltx_ref">Solutions to selected exercices</a></li>
+</ul>
+</nav></div>
+
+<div class="ltx_page_main book-body fixed">
+<div class="body-inner">
+<header class="book-header fixed" aria-label="toolbar"><span class="bml-separator"></span></header>
+<div class="page-wrapper" tabindex="-1" role="main">
+<div class="ltx_page_content page-inner" id="bml-main-content">
+<script src="bookml/gitbook/js/app.min.js"></script>
+<script src="bookml/gitbook/js/jquery.highlight.js"></script>
+<script src="bookml/gitbook/js/plugin-search.js"></script>
+<script src="bookml/gitbook/js/plugin-fontsettings.js"></script>
+<script src="bookml/gitbook/js/plugin-bookdown.js"></script>
+<script type="text/javascript">
+                  gitbook.require(["gitbook"], function(gitbook) {
+                  gitbook.start({
+                    "fontsettings": {
+                      "theme": "white",
+                      "family": "sans",
+                      "size": 2
+                    },
+                    "download": [ [ "forallxyyc.pdf", "PDF" ], [ "forallxyyc-accessible.pdf", "PDF (accessible)" ], ],
+                    "search": {
+                      "engine": "fuse"
+                    },
+                    "toc": {
+                      "collapse": "none"
+                    }
+                  });
+                });
+              </script>
+
+<section class="ltx_chapter ltx_authors_1line normal" lang="en">
+<div class="section level1">
+<h1 class="ltx_title ltx_title_chapter">
+<span class="ltx_tag ltx_tag_chapter header-section-number">Chapter 24</span> Sentences with one quantifier</h1>
+
+<div id="p1" class="ltx_para">
+<p class="ltx_p">We now have all of the pieces of FOL. Symbolizing more complicated sentences is just a matter of knowing how to combine predicates, names, quantifiers, and connectives. There is a knack to this, and there is no substitute for practice.</p>
+</div>
+<section id="S1" class="ltx_section normal">
+<div class="section level2">
+<h2 class="ltx_title ltx_title_section">
+<span class="ltx_tag ltx_tag_section header-section-number">24.1</span> Common quantifier phrases</h2>
+
+<div id="S1.p1" class="ltx_para">
+<p class="ltx_p">Consider these sentences:</p>
+<ol id="S1.I1" class="ltx_enumerate">
+<li id="S1.I1.i1" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">1.</span><div id="S1.I1.i1.p1" class="ltx_para">​<p class="ltx_p">Every coin in my pocket is a quarter.</p>
+</div>
+</li>
+<li id="S1.I1.i2" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">2.</span><div id="S1.I1.i2.p1" class="ltx_para">​<p class="ltx_p">Some coin on the table is a dime.</p>
+</div>
+</li>
+<li id="S1.I1.i3" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">3.</span><div id="S1.I1.i3.p1" class="ltx_para">​<p class="ltx_p">Not all the coins on the table are dimes.</p>
+</div>
+</li>
+<li id="S1.I1.i4" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">4.</span><div id="S1.I1.i4.p1" class="ltx_para">​<p class="ltx_p">None of the coins in my pocket are dimes.</p>
+</div>
+</li>
+</ol>
+<p class="ltx_p">In providing a symbolization key, we need to specify a domain. Since we are talking about coins in my pocket and on the table, the domain must at least contain all of those coins. Since we are not talking about anything besides coins, we let the domain be all coins. Since we are not talking about any specific coins, we do not need to deal with any names. So here is our key:</p>
+<dl id="S1.I2" class="ltx_description">
+<dt id="S1.I2.ix1" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <span class="ltx_text ltx_markedasmath">domain</span>:</span></dt>
+<dd class="ltx_item">
+<div id="S1.I2.ix1.p1" class="ltx_para">
+<p class="ltx_p">all coins</p>
+</div>
+</dd>
+<dt id="S1.I2.ix2" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="S1.I2.ix2.m1" class="ltx_Math" alttext="P(x)" display="inline"><mrow><mi>P</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></math>:</span></dt>
+<dd class="ltx_item">
+<div id="S1.I2.ix2.p1" class="ltx_para">
+<p class="ltx_p"><span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span><sub class="ltx_sub"><span class="ltx_text ltx_font_italic">x</span></sub> is in my pocket</p>
+</div>
+</dd>
+<dt id="S1.I2.ix3" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="S1.I2.ix3.m1" class="ltx_Math" alttext="T(x)" display="inline"><mrow><mi>T</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></math>:</span></dt>
+<dd class="ltx_item">
+<div id="S1.I2.ix3.p1" class="ltx_para">
+<p class="ltx_p"><span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span><sub class="ltx_sub"><span class="ltx_text ltx_font_italic">x</span></sub> is on the table</p>
+</div>
+</dd>
+<dt id="S1.I2.ix4" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="S1.I2.ix4.m1" class="ltx_Math" alttext="Q(x)" display="inline"><mrow><mi>Q</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></math>:</span></dt>
+<dd class="ltx_item">
+<div id="S1.I2.ix4.p1" class="ltx_para">
+<p class="ltx_p"><span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span><sub class="ltx_sub"><span class="ltx_text ltx_font_italic">x</span></sub> is a quarter</p>
+</div>
+</dd>
+<dt id="S1.I2.ix5" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="S1.I2.ix5.m1" class="ltx_Math" alttext="D(x)" display="inline"><mrow><mi>D</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></math>:</span></dt>
+<dd class="ltx_item">
+<div id="S1.I2.ix5.p1" class="ltx_para">
+<p class="ltx_p"><span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span><sub class="ltx_sub"><span class="ltx_text ltx_font_italic">x</span></sub> is a dime</p>
+</div>
+</dd>
+</dl>
+<p class="ltx_p"><span class="ltx_ref ltx_nolink ltx_ref_self"><span class="ltx_text ltx_ref_tag">Sentence</span> <span class="ltx_text ltx_ref_tag">1</span></span> is most naturally symbolized using a universal quantifier. The universal quantifier says something about everything in the domain, not just about the coins in my pocket. <a href="#S1.I1.i1" title="In 24.1 Common quantifier phrases ‣ Chapter 24 Sentences with one quantifier ‣ Part V First-order logic ‣ forall x: Calgary" class="ltx_ref"><span class="ltx_text ltx_ref_tag">Sentence</span> <span class="ltx_text ltx_ref_tag">1</span></a> can be paraphrased as ‘for any coin, <span class="ltx_text ltx_font_bold">if</span> that coin is in my pocket <span class="ltx_text ltx_font_bold">then</span> it is a quarter’. So we can symbolize it as ‘<math id="S1.p1.m1" class="ltx_Math" alttext="\forall x(P(x)\rightarrow Q(x))" display="inline"><mrow><mo rspace="0.167em">∀</mo><mrow><mi>x</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>P</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">→</mo><mrow><mi>Q</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>’.</p>
+</div>
+<div id="S1.p2" class="ltx_para">
+<p class="ltx_p">Since <span class="ltx_ref ltx_nolink ltx_ref_self"><span class="ltx_text ltx_ref_tag">sentence</span> <span class="ltx_text ltx_ref_tag">1</span></span> is about coins that are both in my pocket <span class="ltx_text ltx_font_bold">and</span> that are quarters, it might be tempting to symbolize it using a conjunction. However, the sentence ‘<math id="S1.p2.m1" class="ltx_Math" alttext="\forall x(P(x)\wedge Q(x))" display="inline"><mrow><mo rspace="0.167em">∀</mo><mrow><mi>x</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>P</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo>∧</mo><mrow><mi>Q</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>’ would symbolize the sentence ‘every coin is both a quarter and in my pocket’. This obviously means something very different than <span class="ltx_ref ltx_nolink ltx_ref_self"><span class="ltx_text ltx_ref_tag">sentence</span> <span class="ltx_text ltx_ref_tag">1</span></span>. And so we see:</p>
+<div class="ltx_logical-block bml_background-color_FDF4FA bml_background-color_FDF4FA" style="padding:9pt;">
+            
+<div id="S1.p2.p1" class="ltx_para ltx_noindent">
+<p class="ltx_p">A sentence can be symbolized as <math id="S1.p2.p1.m1" class="ltx_Math" alttext="\forall x(\mathscr{F}(x)\rightarrow\mathscr{G}(x))" display="inline"><mrow><mo rspace="0.167em">∀</mo><mrow><mi>x</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi class="ltx_font_mathscript">ℱ︁</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">→</mo><mrow><mi class="ltx_font_mathscript">𝒢︁</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math> if it can be paraphrased in English as ‘every <math id="S1.p2.p1.m2" class="ltx_Math" alttext="F" display="inline"><mi>F</mi></math> is <math id="S1.p2.p1.m3" class="ltx_Math" alttext="G" display="inline"><mi>G</mi></math>’.</p>
+</div>
+          
+</div>
+<p class="ltx_p"><span class="ltx_ref ltx_nolink ltx_ref_self"><span class="ltx_text ltx_ref_tag">Sentence</span> <span class="ltx_text ltx_ref_tag">2</span></span> is most naturally symbolized using an existential quantifier. It can be paraphrased as ‘there is some coin which is both on the table and which is a dime’. So we can symbolize it as ‘<math id="S1.p2.m2" class="ltx_Math" alttext="\exists x(T(x)\wedge D(x))" display="inline"><mrow><mo rspace="0.167em">∃</mo><mrow><mi>x</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>T</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo>∧</mo><mrow><mi>D</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>’.</p>
+</div>
+<div id="S1.p3" class="ltx_para">
+<p class="ltx_p">Notice that we needed to use a conditional with the universal quantifier, but we used a conjunction with the existential quantifier. Suppose we had instead written ‘<math id="S1.p3.m1" class="ltx_Math" alttext="\exists x(T(x)\rightarrow D(x))" display="inline"><mrow><mo rspace="0.167em">∃</mo><mrow><mi>x</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>T</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">→</mo><mrow><mi>D</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>’. That would mean that there is some object in the domain of which ‘<math id="S1.p3.m2" class="ltx_Math" alttext="(T(x)\rightarrow D(x))" display="inline"><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>T</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">→</mo><mrow><mi>D</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></math>’ is true. Recall that, in TFL, <math id="S1.p3.m3" class="ltx_Math" alttext="\mathscr{A}\rightarrow\mathscr{B}" display="inline"><mrow><mi class="ltx_font_mathscript">𝒜︁</mi><mo stretchy="false">→</mo><mi class="ltx_font_mathscript">ℬ︁</mi></mrow></math> is logically equivalent (in TFL) to <math id="S1.p3.m4" class="ltx_Math" alttext="\neg\mathscr{A}\vee\mathscr{B}" display="inline"><mrow><mrow><mo rspace="0.167em">¬</mo><mi class="ltx_font_mathscript">𝒜︁</mi></mrow><mo>∨</mo><mi class="ltx_font_mathscript">ℬ︁</mi></mrow></math>. This equivalence will also hold in FOL. So ‘<math id="S1.p3.m5" class="ltx_Math" alttext="\exists x(T(x)\rightarrow D(x))" display="inline"><mrow><mo rspace="0.167em">∃</mo><mrow><mi>x</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>T</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">→</mo><mrow><mi>D</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>’ is true if there is some object in the domain, such that ‘<math id="S1.p3.m6" class="ltx_Math" alttext="(\neg T(x)\vee D(x))" display="inline"><mrow><mo stretchy="false">(</mo><mrow><mrow><mo rspace="0.167em">¬</mo><mrow><mi>T</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo>∨</mo><mrow><mi>D</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></math>’ is true of that object. That is, ‘<math id="S1.p3.m7" class="ltx_Math" alttext="\exists x(T(x)\rightarrow D(x))" display="inline"><mrow><mo rspace="0.167em">∃</mo><mrow><mi>x</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>T</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">→</mo><mrow><mi>D</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>’ is true if some coin is <span class="ltx_text ltx_font_bold">either</span> not on the table <span class="ltx_text ltx_font_bold">or</span> is a dime. Of course there is a coin that is not on the table: there are coins in lots of other places. So it is <span class="ltx_text ltx_font_bold">very easy</span> for ‘<math id="S1.p3.m8" class="ltx_Math" alttext="\exists x(T(x)\rightarrow D(x))" display="inline"><mrow><mo rspace="0.167em">∃</mo><mrow><mi>x</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>T</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">→</mo><mrow><mi>D</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>’ to be true. A conditional will usually be the natural connective to use with a universal quantifier, but a conditional within the scope of an existential quantifier tends to say something very weak indeed. As a general rule of thumb, do not put conditionals in the scope of existential quantifiers unless you are sure that you need one.</p>
+<div class="ltx_logical-block bml_background-color_FDF4FA bml_background-color_FDF4FA" style="padding:9pt;">
+            
+<div id="S1.p3.p1" class="ltx_para ltx_noindent">
+<p class="ltx_p">A sentence can be symbolized as <math id="S1.p3.p1.m1" class="ltx_Math" alttext="\exists x(\mathscr{F}(x)\wedge\mathscr{G}(x))" display="inline"><mrow><mo rspace="0.167em">∃</mo><mrow><mi>x</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi class="ltx_font_mathscript">ℱ︁</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo>∧</mo><mrow><mi class="ltx_font_mathscript">𝒢︁</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math> if it can be paraphrased in English as ‘some <math id="S1.p3.p1.m2" class="ltx_Math" alttext="F" display="inline"><mi>F</mi></math> is <math id="S1.p3.p1.m3" class="ltx_Math" alttext="G" display="inline"><mi>G</mi></math>’.</p>
+</div>
+          
+</div>
+<p class="ltx_p"><a href="#S1.I1.i3" title="In 24.1 Common quantifier phrases ‣ Chapter 24 Sentences with one quantifier ‣ Part V First-order logic ‣ forall x: Calgary" class="ltx_ref"><span class="ltx_text ltx_ref_tag">Sentence</span> <span class="ltx_text ltx_ref_tag">3</span></a> can be paraphrased as, ‘It is not the case that every coin on the table is a dime’. So we can symbolize it by ‘<math id="S1.p3.m9" class="ltx_Math" alttext="\neg\forall x(T(x)\rightarrow D(x))" display="inline"><mrow><mo rspace="0.167em">¬</mo><mrow><mo rspace="0.167em">∀</mo><mrow><mi>x</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>T</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">→</mo><mrow><mi>D</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></math>’. You might look at <span class="ltx_ref ltx_nolink ltx_ref_self"><span class="ltx_text ltx_ref_tag">sentence</span> <span class="ltx_text ltx_ref_tag">3</span></span> and paraphrase it instead as, ‘Some coin on the table is not a dime’. You would then symbolize it by ‘<math id="S1.p3.m10" class="ltx_Math" alttext="\exists x(T(x)\wedge\neg D(x))" display="inline"><mrow><mo rspace="0.167em">∃</mo><mrow><mi>x</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>T</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo>∧</mo><mrow><mo rspace="0.167em">¬</mo><mrow><mi>D</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>’. Although it is probably not immediately obvious yet, these two sentences are logically equivalent. (This is due to the logical equivalence between <math id="S1.p3.m11" class="ltx_Math" alttext="\neg\forall x\,\mathscr{A}" display="inline"><mrow><mo rspace="0.167em">¬</mo><mrow><mo rspace="0.167em">∀</mo><mrow><mi>x</mi><mo lspace="0.170em">⁢</mo><mi class="ltx_font_mathscript">𝒜︁</mi></mrow></mrow></mrow></math> and <math id="S1.p3.m12" class="ltx_Math" alttext="\exists x\,\neg\mathscr{A}" display="inline"><mrow><mo rspace="0.167em">∃</mo><mrow><mi>x</mi><mo lspace="0.337em">⁢</mo><mrow><mo rspace="0.167em">¬</mo><mi class="ltx_font_mathscript">𝒜︁</mi></mrow></mrow></mrow></math>, mentioned in <a href="Ch23.html" title="Chapter 23 Building blocks of FOL ‣ Part V First-order logic ‣ forall x: Calgary" class="ltx_ref"><span class="ltx_text ltx_ref_tag">chapter</span> <span class="ltx_text ltx_ref_tag">23</span></a>, along with the equivalence between <math id="S1.p3.m13" class="ltx_Math" alttext="\neg(\mathscr{A}\rightarrow\mathscr{B})" display="inline"><mrow><mo>¬</mo><mrow><mo stretchy="false">(</mo><mrow><mi class="ltx_font_mathscript">𝒜︁</mi><mo stretchy="false">→</mo><mi class="ltx_font_mathscript">ℬ︁</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math> and <math id="S1.p3.m14" class="ltx_Math" alttext="\mathscr{A}\wedge\neg\mathscr{B}" display="inline"><mrow><mi class="ltx_font_mathscript">𝒜︁</mi><mo>∧</mo><mrow><mo rspace="0.167em">¬</mo><mi class="ltx_font_mathscript">ℬ︁</mi></mrow></mrow></math>.)</p>
+</div>
+<div id="S1.p4" class="ltx_para">
+<p class="ltx_p"><a href="#S1.I1.i4" title="In 24.1 Common quantifier phrases ‣ Chapter 24 Sentences with one quantifier ‣ Part V First-order logic ‣ forall x: Calgary" class="ltx_ref"><span class="ltx_text ltx_ref_tag">Sentence</span> <span class="ltx_text ltx_ref_tag">4</span></a> can be paraphrased as, ‘It is not the case that there is some dime in my pocket’. This can be symbolized by ‘<math id="S1.p4.m1" class="ltx_Math" alttext="\neg\exists x(P(x)\wedge D(x))" display="inline"><mrow><mo rspace="0.167em">¬</mo><mrow><mo rspace="0.167em">∃</mo><mrow><mi>x</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>P</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo>∧</mo><mrow><mi>D</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></math>’. It might also be paraphrased as, ‘Everything in my pocket is a non-dime’, and then could be symbolized by ‘<math id="S1.p4.m2" class="ltx_Math" alttext="\forall x(P(x)\rightarrow\neg D(x))" display="inline"><mrow><mo rspace="0.167em">∀</mo><mrow><mi>x</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>P</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">→</mo><mrow><mo rspace="0.167em">¬</mo><mrow><mi>D</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>’. Again the two symbolizations are logically equivalent; both are correct symbolizations of <span class="ltx_ref ltx_nolink ltx_ref_self"><span class="ltx_text ltx_ref_tag">sentence</span> <span class="ltx_text ltx_ref_tag">4</span></span>.</p>
+</div>
+<div id="S1.p5" class="ltx_para bml_background-color_FDF4FA ltx_noindent bml_background-color_FDF4FA" style="padding:9pt;">
+<p class="ltx_p">A sentence that can be paraphrased as ‘no <math id="S1.p5.m1" class="ltx_Math" alttext="F" display="inline"><mi>F</mi></math> is <math id="S1.p5.m2" class="ltx_Math" alttext="G" display="inline"><mi>G</mi></math>’ can be symbolized as <math id="S1.p5.m3" class="ltx_Math" alttext="\neg\exists x(\mathscr{F}(x)\wedge\mathscr{G}(x))" display="inline"><mrow><mo rspace="0.167em">¬</mo><mrow><mo rspace="0.167em">∃</mo><mrow><mi>x</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi class="ltx_font_mathscript">ℱ︁</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo>∧</mo><mrow><mi class="ltx_font_mathscript">𝒢︁</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></math> and also as <math id="S1.p5.m4" class="ltx_Math" alttext="\forall x(\mathscr{F}(x)\rightarrow\neg\mathscr{G}(x))" display="inline"><mrow><mo rspace="0.167em">∀</mo><mrow><mi>x</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi class="ltx_font_mathscript">ℱ︁</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">→</mo><mrow><mo rspace="0.167em">¬</mo><mrow><mi class="ltx_font_mathscript">𝒢︁</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>.</p>
+</div>
+<div id="S1.p6" class="ltx_para">
+<p class="ltx_p">Finally, consider ‘only’, as in:</p>
+<ol id="S1.I3" class="ltx_enumerate">
+<li id="S1.I3.i5" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">5.</span><div id="S1.I3.i5.p1" class="ltx_para">​<p class="ltx_p">Only dimes are on the table.</p>
+</div>
+</li>
+</ol>
+<p class="ltx_p">How should we symbolize this? A good strategy is to consider when the sentence would be false. If we are saying that only dimes are on the table, we are excluding all the cases where something on the table is a non-dime. So we can symbolize the sentence the same way we would symbolize ‘No non-dimes are on the table.’ Remembering the lesson we just learned, and symbolizing ‘<math id="S1.p6.m1" class="ltx_Math" alttext="x" display="inline"><mi>x</mi></math> is a non-dime’ as ‘<math id="S1.p6.m2" class="ltx_Math" alttext="\neg D(x)" display="inline"><mrow><mo rspace="0.167em">¬</mo><mrow><mi>D</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math>’, the possible symbolizations are: ‘<math id="S1.p6.m3" class="ltx_Math" alttext="\neg\exists x(T(x)\wedge\neg D(x))" display="inline"><mrow><mo rspace="0.167em">¬</mo><mrow><mo rspace="0.167em">∃</mo><mrow><mi>x</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>T</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo>∧</mo><mrow><mo rspace="0.167em">¬</mo><mrow><mi>D</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></math>’, or alternatively: ‘<math id="S1.p6.m4" class="ltx_Math" alttext="\forall x(T(x)\rightarrow\neg\neg D(x))" display="inline"><mrow><mo rspace="0.167em">∀</mo><mrow><mi>x</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>T</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">→</mo><mrow><mo rspace="0.167em">¬</mo><mrow><mo rspace="0.167em">¬</mo><mrow><mi>D</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>’. Since double negations cancel out, the second is just as good as ‘<math id="S1.p6.m5" class="ltx_Math" alttext="\forall x(T(x)\rightarrow D(x))" display="inline"><mrow><mo rspace="0.167em">∀</mo><mrow><mi>x</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>T</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">→</mo><mrow><mi>D</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>’. In other words, ‘Only dimes are on the table’ and ‘Everything on the table is a dime’ are symbolized the same way.</p>
+</div>
+<div id="S1.p7" class="ltx_para bml_background-color_FDF4FA ltx_noindent bml_background-color_FDF4FA" style="padding:9pt;">
+<p class="ltx_p">A sentence that can be paraphrased as ‘only <math id="S1.p7.m1" class="ltx_Math" alttext="F" display="inline"><mi>F</mi></math>s are <math id="S1.p7.m2" class="ltx_Math" alttext="G" display="inline"><mi>G</mi></math>s’ can be symbolized as <math id="S1.p7.m3" class="ltx_Math" alttext="\neg\exists x(\mathscr{G}(x)\wedge\neg\mathscr{F}(x))" display="inline"><mrow><mo rspace="0.167em">¬</mo><mrow><mo rspace="0.167em">∃</mo><mrow><mi>x</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi class="ltx_font_mathscript">𝒢︁</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo>∧</mo><mrow><mo rspace="0.167em">¬</mo><mrow><mi class="ltx_font_mathscript">ℱ︁</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></math> and also as <math id="S1.p7.m4" class="ltx_Math" alttext="\forall x(\mathscr{G}(x)\rightarrow\mathscr{F}(x))" display="inline"><mrow><mo rspace="0.167em">∀</mo><mrow><mi>x</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi class="ltx_font_mathscript">𝒢︁</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">→</mo><mrow><mi class="ltx_font_mathscript">ℱ︁</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>.</p>
+</div>
+</div>
+</section>
+<section id="S2" class="ltx_section normal">
+<div class="section level2">
+<h2 class="ltx_title ltx_title_section">
+<span class="ltx_tag ltx_tag_section header-section-number">24.2</span> Empty predicates</h2>
+
+<div id="S2.p1" class="ltx_para">
+<p class="ltx_p">In <a href="Ch23.html" title="Chapter 23 Building blocks of FOL ‣ Part V First-order logic ‣ forall x: Calgary" class="ltx_ref"><span class="ltx_text ltx_ref_tag">chapter</span> <span class="ltx_text ltx_ref_tag">23</span></a>, we emphasized that a name must pick out exactly one object in the domain. However, a predicate need not apply to anything in the domain. A predicate that applies to nothing in the domain is called an <dfn>empty predicate</dfn>
+. This is worth exploring.</p>
+</div>
+<div id="S2.p2" class="ltx_para">
+<p class="ltx_p">Suppose we want to symbolize these two sentences:</p>
+<ol id="S2.I1" class="ltx_enumerate">
+<li id="S2.I1.i6" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">6.</span><div id="S2.I1.i6.p1" class="ltx_para">​<p class="ltx_p">Every monkey knows sign language.</p>
+</div>
+</li>
+<li id="S2.I1.i7" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">7.</span><div id="S2.I1.i7.p1" class="ltx_para">​<p class="ltx_p">Some monkey knows sign language.</p>
+</div>
+</li>
+</ol>
+<p class="ltx_p">It is possible to write the symbolization key for these sentences in this way:</p>
+<dl id="S2.I2" class="ltx_description">
+<dt id="S2.I2.ix1" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <span class="ltx_text ltx_markedasmath">domain</span>:</span></dt>
+<dd class="ltx_item">
+<div id="S2.I2.ix1.p1" class="ltx_para">
+<p class="ltx_p">animals</p>
+</div>
+</dd>
+<dt id="S2.I2.ix2" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="S2.I2.ix2.m1" class="ltx_Math" alttext="M(x)" display="inline"><mrow><mi>M</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></math>:</span></dt>
+<dd class="ltx_item">
+<div id="S2.I2.ix2.p1" class="ltx_para">
+<p class="ltx_p"><span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span><sub class="ltx_sub"><span class="ltx_text ltx_font_italic">x</span></sub> is a monkey.</p>
+</div>
+</dd>
+<dt id="S2.I2.ix3" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="S2.I2.ix3.m1" class="ltx_Math" alttext="S(x)" display="inline"><mrow><mi>S</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></math>:</span></dt>
+<dd class="ltx_item">
+<div id="S2.I2.ix3.p1" class="ltx_para">
+<p class="ltx_p"><span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span><sub class="ltx_sub"><span class="ltx_text ltx_font_italic">x</span></sub> knows sign language.</p>
+</div>
+</dd>
+</dl>
+<p class="ltx_p"><span class="ltx_ref ltx_nolink ltx_ref_self"><span class="ltx_text ltx_ref_tag">Sentence</span> <span class="ltx_text ltx_ref_tag">6</span></span> can now be symbolized by ‘<math id="S2.p2.m1" class="ltx_Math" alttext="\forall x(M(x)\rightarrow S(x))" display="inline"><mrow><mo rspace="0.167em">∀</mo><mrow><mi>x</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>M</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">→</mo><mrow><mi>S</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>’. <span class="ltx_ref ltx_nolink ltx_ref_self"><span class="ltx_text ltx_ref_tag">Sentence</span> <span class="ltx_text ltx_ref_tag">7</span></span> can be symbolized as ‘<math id="S2.p2.m2" class="ltx_Math" alttext="\exists x(M(x)\wedge S(x))" display="inline"><mrow><mo rspace="0.167em">∃</mo><mrow><mi>x</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>M</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo>∧</mo><mrow><mi>S</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>’.</p>
+</div>
+<div id="S2.p3" class="ltx_para">
+<p class="ltx_p">It is tempting to say that <span class="ltx_ref ltx_nolink ltx_ref_self"><span class="ltx_text ltx_ref_tag">sentence</span> <span class="ltx_text ltx_ref_tag">6</span></span> <span class="ltx_text ltx_font_bold">entails</span> <span class="ltx_ref ltx_nolink ltx_ref_self"><span class="ltx_text ltx_ref_tag">sentence</span> <span class="ltx_text ltx_ref_tag">7</span></span>. That is, we might think that it is impossible that every monkey knows sign language unless some monkey knows sign language. But this would be a mistake. It is possible for the sentence ‘<math id="S2.p3.m1" class="ltx_Math" alttext="\forall x(M(x)\rightarrow S(x))" display="inline"><mrow><mo rspace="0.167em">∀</mo><mrow><mi>x</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>M</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">→</mo><mrow><mi>S</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>’ to be true even though the sentence ‘<math id="S2.p3.m2" class="ltx_Math" alttext="\exists x(M(x)\wedge S(x))" display="inline"><mrow><mo rspace="0.167em">∃</mo><mrow><mi>x</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>M</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo>∧</mo><mrow><mi>S</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>’ is false.</p>
+</div>
+<div id="S2.p4" class="ltx_para">
+<p class="ltx_p">How can this be? The answer comes from considering whether these sentences would be true or false <span class="ltx_text ltx_font_bold">if there were no monkeys</span>. If there were no monkeys at all (in the domain), then ‘<math id="S2.p4.m1" class="ltx_Math" alttext="\forall x(M(x)\rightarrow S(x))" display="inline"><mrow><mo rspace="0.167em">∀</mo><mrow><mi>x</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>M</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">→</mo><mrow><mi>S</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>’ would be <span class="ltx_text ltx_font_bold">vacuously</span> true: take any monkey you like—it knows sign language! But if there were no monkeys at all (in the domain), then ‘<math id="S2.p4.m2" class="ltx_Math" alttext="\exists x(M(x)\wedge S(x))" display="inline"><mrow><mo rspace="0.167em">∃</mo><mrow><mi>x</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>M</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo>∧</mo><mrow><mi>S</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>’ would be false.</p>
+</div>
+<div id="S2.p5" class="ltx_para">
+<p class="ltx_p">Another example will help to bring this home. Suppose we extend the above symbolization key, by adding:</p>
+<dl id="S2.I3" class="ltx_description">
+<dt id="S2.I3.ix1" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="S2.I3.ix1.m1" class="ltx_Math" alttext="R(x)" display="inline"><mrow><mi>R</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></math>:</span></dt>
+<dd class="ltx_item">
+<div id="S2.I3.ix1.p1" class="ltx_para">
+<p class="ltx_p"><span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span><sub class="ltx_sub"><span class="ltx_text ltx_font_italic">x</span></sub> is a refrigerator</p>
+</div>
+</dd>
+</dl>
+<p class="ltx_p">Now consider the sentence ‘<math id="S2.p5.m1" class="ltx_Math" alttext="\forall x(R(x)\rightarrow M(x))" display="inline"><mrow><mo rspace="0.167em">∀</mo><mrow><mi>x</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>R</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">→</mo><mrow><mi>M</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>’. This symbolizes ‘every refrigerator is a monkey’. This sentence is true, given our symbolization key, which is counterintuitive, since we (presumably) do not want to say that there are a whole bunch of refrigerator monkeys. It is important to remember, though, that ‘<math id="S2.p5.m2" class="ltx_Math" alttext="\forall x(R(x)\rightarrow M(x))" display="inline"><mrow><mo rspace="0.167em">∀</mo><mrow><mi>x</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>R</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">→</mo><mrow><mi>M</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>’ is true if⁠f any member of the domain that is a refrigerator is a monkey. Since the domain is <span class="ltx_text ltx_font_bold">animals</span>, there are no refrigerators in the domain. Again, then, the sentence is <span class="ltx_text ltx_font_bold">vacuously</span> true.</p>
+</div>
+<div id="S2.p6" class="ltx_para">
+<p class="ltx_p">If you were actually dealing with the sentence ‘All refrigerators are monkeys’, then you would most likely want to include kitchen appliances in the domain. Then the predicate ‘<math id="S2.p6.m1" class="ltx_Math" alttext="R" display="inline"><mi>R</mi></math>’ would not be empty and the sentence ‘<math id="S2.p6.m2" class="ltx_Math" alttext="\forall x(R(x)\rightarrow M(x))" display="inline"><mrow><mo rspace="0.167em">∀</mo><mrow><mi>x</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>R</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">→</mo><mrow><mi>M</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>’ would be false.</p>
+<div class="ltx_logical-block bml_background-color_FDF4FA bml_background-color_FDF4FA" style="padding:9pt;">
+            
+<div id="S2.p6.p1" class="ltx_para ltx_noindent">
+<p class="ltx_p">When <math id="S2.p6.p1.m1" class="ltx_Math" alttext="\mathscr{F}" display="inline"><mi class="ltx_font_mathscript">ℱ︁</mi></math> is an empty predicate, any sentence <math id="S2.p6.p1.m2" class="ltx_Math" alttext="\forall x(\mathscr{F}(x)\rightarrow\ldots)" display="inline"><mrow><mo rspace="0.167em">∀</mo><mrow><mi>x</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi class="ltx_font_mathscript">ℱ︁</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">→</mo><mi mathvariant="normal">…</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math> is vacuously true.</p>
+</div>
+          
+</div>
+</div>
+</div>
+</section>
+<section id="S3" class="ltx_section normal">
+<div class="section level2">
+<h2 class="ltx_title ltx_title_section">
+<span class="ltx_tag ltx_tag_section header-section-number">24.3</span> Picking a domain</h2>
+
+<div id="S3.p1" class="ltx_para">
+<p class="ltx_p">The appropriate symbolization of an English language sentence in FOL will depend on the symbolization key. Choosing a key can be difficult. Suppose we want to symbolize the English sentence:</p>
+<ol id="S3.I1" class="ltx_enumerate">
+<li id="S3.I1.i8" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">8.</span><div id="S3.I1.i8.p1" class="ltx_para">​<p class="ltx_p">Every rose has a thorn.</p>
+</div>
+</li>
+</ol>
+<p class="ltx_p">We might offer this symbolization key:</p>
+<dl id="S3.I2" class="ltx_description">
+<dt id="S3.I2.ix1" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="S3.I2.ix1.m1" class="ltx_Math" alttext="R(x)" display="inline"><mrow><mi>R</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></math>:</span></dt>
+<dd class="ltx_item">
+<div id="S3.I2.ix1.p1" class="ltx_para">
+<p class="ltx_p"><span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span><sub class="ltx_sub"><span class="ltx_text ltx_font_italic">x</span></sub> is a rose</p>
+</div>
+</dd>
+<dt id="S3.I2.ix2" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="S3.I2.ix2.m1" class="ltx_Math" alttext="T(x)" display="inline"><mrow><mi>T</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></math>:</span></dt>
+<dd class="ltx_item">
+<div id="S3.I2.ix2.p1" class="ltx_para">
+<p class="ltx_p"><span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span><sub class="ltx_sub"><span class="ltx_text ltx_font_italic">x</span></sub> has a thorn</p>
+</div>
+</dd>
+</dl>
+<p class="ltx_p">It is tempting to say that <span class="ltx_ref ltx_nolink ltx_ref_self"><span class="ltx_text ltx_ref_tag">sentence</span> <span class="ltx_text ltx_ref_tag">8</span></span> should be symbolized as ‘<math id="S3.p1.m1" class="ltx_Math" alttext="\forall x(R(x)\rightarrow T(x))" display="inline"><mrow><mo rspace="0.167em">∀</mo><mrow><mi>x</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>R</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">→</mo><mrow><mi>T</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>’, but we have not yet chosen a domain. If the domain contains all roses, this would be a good symbolization. Yet if the domain is merely <span class="ltx_text ltx_font_bold">things on my kitchen table</span>, then ‘<math id="S3.p1.m2" class="ltx_Math" alttext="\forall x(R(x)\rightarrow T(x))" display="inline"><mrow><mo rspace="0.167em">∀</mo><mrow><mi>x</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>R</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">→</mo><mrow><mi>T</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>’ would only come close to covering the fact that every rose <span class="ltx_text ltx_font_bold">on my kitchen table</span> has a thorn. If there are no roses on my kitchen table, the sentence would be trivially true. This is not what we want. To symbolize <span class="ltx_ref ltx_nolink ltx_ref_self"><span class="ltx_text ltx_ref_tag">sentence</span> <span class="ltx_text ltx_ref_tag">8</span></span> adequately, we need to include all the roses in the domain, but now we have two options.</p>
+</div>
+<div id="S3.p2" class="ltx_para">
+<p class="ltx_p">First, we can restrict the domain to include all roses but <span class="ltx_text ltx_font_bold">only</span> roses. Then <span class="ltx_ref ltx_nolink ltx_ref_self"><span class="ltx_text ltx_ref_tag">sentence</span> <span class="ltx_text ltx_ref_tag">8</span></span> can, if we like, be symbolized with ‘<math id="S3.p2.m1" class="ltx_Math" alttext="\forall x\,T(x)" display="inline"><mrow><mo rspace="0.167em">∀</mo><mrow><mi>x</mi><mo lspace="0.170em">⁢</mo><mrow><mi>T</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></math>’. This is true if⁠f everything in the domain has a thorn; since the domain is just the roses, this is true if⁠f every rose has a thorn. By restricting the domain, we have been able to symbolize our English sentence with a very short sentence of FOL. So this approach can save us trouble, if every sentence that we want to deal with is about roses.</p>
+</div>
+<div id="S3.p3" class="ltx_para">
+<p class="ltx_p">Second, we can let the domain contain things besides roses: rhododendrons, rats, rifles, whatevers; and we will certainly need to include a more expansive domain if we simultaneously want to symbolize sentences like:</p>
+<ol id="S3.I3" class="ltx_enumerate">
+<li id="S3.I3.i9" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">9.</span><div id="S3.I3.i9.p1" class="ltx_para">​<p class="ltx_p">Every cowboy sings a sad, sad song.</p>
+</div>
+</li>
+</ol>
+<p class="ltx_p">Our domain must now include both all the roses (so that we can symbolize <span class="ltx_ref ltx_nolink ltx_ref_self"><span class="ltx_text ltx_ref_tag">sentence</span> <span class="ltx_text ltx_ref_tag">8</span></span>) and all the cowboys (so that we can symbolize <span class="ltx_ref ltx_nolink ltx_ref_self"><span class="ltx_text ltx_ref_tag">sentence</span> <span class="ltx_text ltx_ref_tag">9</span></span>). So we might offer the following symbolization key:</p>
+<dl id="S3.I4" class="ltx_description">
+<dt id="S3.I4.ix1" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <span class="ltx_text ltx_markedasmath">domain</span>:</span></dt>
+<dd class="ltx_item">
+<div id="S3.I4.ix1.p1" class="ltx_para">
+<p class="ltx_p">people and plants</p>
+</div>
+</dd>
+<dt id="S3.I4.ix2" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="S3.I4.ix2.m1" class="ltx_Math" alttext="C(x)" display="inline"><mrow><mi>C</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></math>:</span></dt>
+<dd class="ltx_item">
+<div id="S3.I4.ix2.p1" class="ltx_para">
+<p class="ltx_p"><span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span><sub class="ltx_sub"><span class="ltx_text ltx_font_italic">x</span></sub> is a cowboy</p>
+</div>
+</dd>
+<dt id="S3.I4.ix3" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="S3.I4.ix3.m1" class="ltx_Math" alttext="S(x)" display="inline"><mrow><mi>S</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></math>:</span></dt>
+<dd class="ltx_item">
+<div id="S3.I4.ix3.p1" class="ltx_para">
+<p class="ltx_p"><span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span><sub class="ltx_sub"><span class="ltx_text ltx_font_italic">x</span></sub> sings a sad, sad song</p>
+</div>
+</dd>
+<dt id="S3.I4.ix4" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="S3.I4.ix4.m1" class="ltx_Math" alttext="R(x)" display="inline"><mrow><mi>R</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></math>:</span></dt>
+<dd class="ltx_item">
+<div id="S3.I4.ix4.p1" class="ltx_para">
+<p class="ltx_p"><span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span><sub class="ltx_sub"><span class="ltx_text ltx_font_italic">x</span></sub> is a rose</p>
+</div>
+</dd>
+<dt id="S3.I4.ix5" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="S3.I4.ix5.m1" class="ltx_Math" alttext="T(x)" display="inline"><mrow><mi>T</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></math>:</span></dt>
+<dd class="ltx_item">
+<div id="S3.I4.ix5.p1" class="ltx_para">
+<p class="ltx_p"><span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span><sub class="ltx_sub"><span class="ltx_text ltx_font_italic">x</span></sub> has a thorn</p>
+</div>
+</dd>
+</dl>
+<p class="ltx_p">Now we will have to symbolize <span class="ltx_ref ltx_nolink ltx_ref_self"><span class="ltx_text ltx_ref_tag">sentence</span> <span class="ltx_text ltx_ref_tag">8</span></span> with ‘<math id="S3.p3.m1" class="ltx_Math" alttext="\forall x(R(x)\rightarrow T(x))" display="inline"><mrow><mo rspace="0.167em">∀</mo><mrow><mi>x</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>R</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">→</mo><mrow><mi>T</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>’, since ‘<math id="S3.p3.m2" class="ltx_Math" alttext="\forall x\,T(x)" display="inline"><mrow><mo rspace="0.167em">∀</mo><mrow><mi>x</mi><mo lspace="0.170em">⁢</mo><mrow><mi>T</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></math>’ would symbolize the sentence ‘every person or plant has a thorn’. Similarly, we will have to symbolize <span class="ltx_ref ltx_nolink ltx_ref_self"><span class="ltx_text ltx_ref_tag">sentence</span> <span class="ltx_text ltx_ref_tag">9</span></span> with ‘<math id="S3.p3.m3" class="ltx_Math" alttext="\forall x(C(x)\rightarrow S(x))" display="inline"><mrow><mo rspace="0.167em">∀</mo><mrow><mi>x</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>C</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">→</mo><mrow><mi>S</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>’.</p>
+</div>
+<div id="S3.p4" class="ltx_para">
+<p class="ltx_p">In general, the universal quantifier can be used to symbolize the English expression ‘everyone’ if the domain only contains people. If there are people and other things in the domain, then ‘everyone’ must be treated as ‘every person’.</p>
+</div>
+</div>
+</section>
+<section id="S4" class="ltx_section normal">
+<div class="section level2">
+<h2 class="ltx_title ltx_title_section">
+<span class="ltx_tag ltx_tag_section header-section-number">24.4</span> The utility of paraphrase</h2>
+
+<div id="S4.p1" class="ltx_para">
+<p class="ltx_p">When symbolizing English sentences in FOL, it is important to understand the structure of the sentences you want to symbolize. What matters is the final symbolization in FOL, and sometimes you will be able to move from an English language sentence directly to a sentence of FOL. Other times, it helps to paraphrase the sentence one or more times. Each successive paraphrase should move from the original sentence closer to something that you can easily symbolize directly in FOL.</p>
+</div>
+<div id="S4.p2" class="ltx_para">
+<p class="ltx_p">For the next several examples, we will use this symbolization key:</p>
+<dl id="S4.I1" class="ltx_description">
+<dt id="S4.I1.ix1" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <span class="ltx_text ltx_markedasmath">domain</span>:</span></dt>
+<dd class="ltx_item">
+<div id="S4.I1.ix1.p1" class="ltx_para">
+<p class="ltx_p">people</p>
+</div>
+</dd>
+<dt id="S4.I1.ix2" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="S4.I1.ix2.m1" class="ltx_Math" alttext="B(x)" display="inline"><mrow><mi>B</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></math>:</span></dt>
+<dd class="ltx_item">
+<div id="S4.I1.ix2.p1" class="ltx_para">
+<p class="ltx_p"><span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span><sub class="ltx_sub"><span class="ltx_text ltx_font_italic">x</span></sub> is a bassist</p>
+</div>
+</dd>
+<dt id="S4.I1.ix3" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="S4.I1.ix3.m1" class="ltx_Math" alttext="R(x)" display="inline"><mrow><mi>R</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></math>:</span></dt>
+<dd class="ltx_item">
+<div id="S4.I1.ix3.p1" class="ltx_para">
+<p class="ltx_p"><span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span><sub class="ltx_sub"><span class="ltx_text ltx_font_italic">x</span></sub> is a rock star</p>
+</div>
+</dd>
+<dt id="S4.I1.ix4" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="S4.I1.ix4.m1" class="ltx_Math" alttext="k" display="inline"><mi>k</mi></math>:</span></dt>
+<dd class="ltx_item">
+<div id="S4.I1.ix4.p1" class="ltx_para">
+<p class="ltx_p">Kim Deal</p>
+</div>
+</dd>
+</dl>
+<p class="ltx_p">Now consider these sentences:</p>
+<ol id="S4.I2" class="ltx_enumerate">
+<li id="S4.I2.i10" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">10.</span><div id="S4.I2.i10.p1" class="ltx_para">​<p class="ltx_p">If Kim Deal is a bassist, then she is a rock star.</p>
+</div>
+</li>
+<li id="S4.I2.i11" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">11.</span><div id="S4.I2.i11.p1" class="ltx_para">​<p class="ltx_p">If a person is a bassist, then she is a rock star.</p>
+</div>
+</li>
+</ol>
+<p class="ltx_p">The same words appear as the consequent in <span class="ltx_ref ltx_nolink ltx_ref_self"><span class="ltx_text ltx_ref_tag">sentences</span> <span class="ltx_text ltx_ref_tag">10</span></span> and <span class="ltx_ref ltx_nolink ltx_ref_self"><span class="ltx_text ltx_ref_tag">11</span></span> (‘<math id="S4.p2.m1" class="ltx_Math" alttext="\ldots" display="inline"><mi mathvariant="normal">…</mi></math> she is a rock star’), but they mean very different things. To make this clear, it often helps to paraphrase the original sentences, removing pronouns.</p>
+</div>
+<div id="S4.p3" class="ltx_para">
+<p class="ltx_p"><span class="ltx_ref ltx_nolink ltx_ref_self"><span class="ltx_text ltx_ref_tag">Sentence</span> <span class="ltx_text ltx_ref_tag">10</span></span> can be paraphrased as, ‘If Kim Deal is a bassist, then <span class="ltx_text ltx_font_bold">Kim Deal</span> is a rockstar’. This can obviously be symbolized as ‘<math id="S4.p3.m1" class="ltx_Math" alttext="B(k)\rightarrow R(k)" display="inline"><mrow><mrow><mi>B</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>k</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">→</mo><mrow><mi>R</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>k</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math>’.</p>
+</div>
+<div id="S4.p4" class="ltx_para">
+<p class="ltx_p"><span class="ltx_ref ltx_nolink ltx_ref_self"><span class="ltx_text ltx_ref_tag">Sentence</span> <span class="ltx_text ltx_ref_tag">11</span></span> must be paraphrased differently: ‘If a person is a bassist, then <span class="ltx_text ltx_font_bold">that person</span> is a rock star’. This sentence is not about any particular person, so we need a variable. As an intermediate step, we can paraphrase this as, ‘For any person x, if x is a bassist, then x is a rockstar’. Now this can be symbolized as ‘<math id="S4.p4.m1" class="ltx_Math" alttext="\forall x(B(x)\rightarrow R(x))" display="inline"><mrow><mo rspace="0.167em">∀</mo><mrow><mi>x</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>B</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">→</mo><mrow><mi>R</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>’. This is the same sentence we would have used to symbolize ‘Everyone who is a bassist is a rock star’. On reflection, that is surely true if⁠f <span class="ltx_ref ltx_nolink ltx_ref_self"><span class="ltx_text ltx_ref_tag">sentence</span> <span class="ltx_text ltx_ref_tag">11</span></span> is true, as we would hope.</p>
+</div>
+<div id="S4.p5" class="ltx_para">
+<p class="ltx_p">Consider these further sentences:</p>
+<ol id="S4.I3" class="ltx_enumerate">
+<li id="S4.I3.i12" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">12.</span><div id="S4.I3.i12.p1" class="ltx_para">​<p class="ltx_p">If anyone is a bassist, then Kim Deal is a rock star.</p>
+</div>
+</li>
+<li id="S4.I3.i13" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">13.</span><div id="S4.I3.i13.p1" class="ltx_para">​<p class="ltx_p">If anyone is a bassist, then she is a rock star.</p>
+</div>
+</li>
+</ol>
+<p class="ltx_p">The same words appear as the antecedent in <span class="ltx_ref ltx_nolink ltx_ref_self"><span class="ltx_text ltx_ref_tag">sentences</span> <span class="ltx_text ltx_ref_tag">12</span></span> and <span class="ltx_ref ltx_nolink ltx_ref_self"><span class="ltx_text ltx_ref_tag">13</span></span> (‘If anyone is a bassist<math id="S4.p5.m1" class="ltx_Math" alttext="\ldots" display="inline"><mi mathvariant="normal">…</mi></math>’), but it can be tricky to work out how to symbolize these two uses. Again, paraphrase will come to our aid.</p>
+</div>
+<div id="S4.p6" class="ltx_para">
+<p class="ltx_p"><span class="ltx_ref ltx_nolink ltx_ref_self"><span class="ltx_text ltx_ref_tag">Sentence</span> <span class="ltx_text ltx_ref_tag">12</span></span> can be paraphrased, ‘If there is at least one bassist, then Kim Deal is a rock star’. It is now clear that this is a conditional whose antecedent is a quantified expression; so we can symbolize the entire sentence with a conditional as the main logical operator: ‘<math id="S4.p6.m1" class="ltx_Math" alttext="\exists xB(x)\rightarrow R(k)" display="inline"><mrow><mrow><mo rspace="0.167em">∃</mo><mrow><mi>x</mi><mo>⁢</mo><mrow><mi>B</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow><mo stretchy="false">→</mo><mrow><mi>R</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>k</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math>’.</p>
+</div>
+<div id="S4.p7" class="ltx_para">
+<p class="ltx_p"><span class="ltx_ref ltx_nolink ltx_ref_self"><span class="ltx_text ltx_ref_tag">Sentence</span> <span class="ltx_text ltx_ref_tag">13</span></span> can be paraphrased, ‘For all people <math id="S4.p7.m1" class="ltx_Math" alttext="x" display="inline"><mi>x</mi></math>, if <math id="S4.p7.m2" class="ltx_Math" alttext="x" display="inline"><mi>x</mi></math> is a bassist, then <math id="S4.p7.m3" class="ltx_Math" alttext="x" display="inline"><mi>x</mi></math> is a rock star’. Or, in more natural English, it can be paraphrased by ‘All bassists are rock stars’. It is best symbolized as ‘<math id="S4.p7.m4" class="ltx_Math" alttext="\forall x(B(x)\rightarrow R(x))" display="inline"><mrow><mo rspace="0.167em">∀</mo><mrow><mi>x</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>B</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">→</mo><mrow><mi>R</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>’, just like <span class="ltx_ref ltx_nolink ltx_ref_self"><span class="ltx_text ltx_ref_tag">sentence</span> <span class="ltx_text ltx_ref_tag">11</span></span>.</p>
+</div>
+<div id="S4.p8" class="ltx_para">
+<p class="ltx_p">The moral is that the English words ‘any’ and ‘anyone’ should typically be symbolized using quantifiers, and if you are having a hard time determining whether to use an existential or a universal quantifier, try paraphrasing the sentence with an English sentence that uses words <span class="ltx_text ltx_font_bold">besides</span> ‘any’ or ‘anyone’.</p>
+</div>
+</div>
+</section>
+<section id="S5" class="ltx_section normal">
+<div class="section level2">
+<h2 class="ltx_title ltx_title_section">
+<span class="ltx_tag ltx_tag_section header-section-number">24.5</span> Quantifiers and scope</h2>
+
+<div id="S5.p1" class="ltx_para">
+<p class="ltx_p">Continuing the example, suppose we want to symbolize these sentences:</p>
+<ol id="S5.I1" class="ltx_enumerate">
+<li id="S5.I1.i14" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">14.</span><div id="S5.I1.i14.p1" class="ltx_para">​<p class="ltx_p">If everyone is a bassist, then Lars is a bassist.</p>
+</div>
+</li>
+<li id="S5.I1.i15" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">15.</span><div id="S5.I1.i15.p1" class="ltx_para">​<p class="ltx_p">Everyone is such that, if they are a bassist, then Lars is a bassist.</p>
+</div>
+</li>
+</ol>
+<p class="ltx_p">To symbolize these sentences, we will have to add a new name to the symbolization key, namely:</p>
+<dl id="S5.I2" class="ltx_description">
+<dt id="S5.I2.ix1" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="S5.I2.ix1.m1" class="ltx_Math" alttext="l" display="inline"><mi>l</mi></math>:</span></dt>
+<dd class="ltx_item">
+<div id="S5.I2.ix1.p1" class="ltx_para">
+<p class="ltx_p">Lars</p>
+</div>
+</dd>
+</dl>
+<p class="ltx_p"><span class="ltx_ref ltx_nolink ltx_ref_self"><span class="ltx_text ltx_ref_tag">Sentence</span> <span class="ltx_text ltx_ref_tag">14</span></span> is a conditional, whose antecedent is ‘everyone is a bassist’, so we will symbolize it with ‘<math id="S5.p1.m1" class="ltx_Math" alttext="\forall x\,B(x)\rightarrow B(l)" display="inline"><mrow><mrow><mo rspace="0.167em">∀</mo><mrow><mi>x</mi><mo lspace="0.170em">⁢</mo><mrow><mi>B</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow><mo stretchy="false">→</mo><mrow><mi>B</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>l</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math>’. This sentence is <span class="ltx_text ltx_font_bold">necessarily</span> true: if <span class="ltx_text ltx_font_bold">everyone</span> is indeed a bassist, then take anyone you like—for example Lars—and he will be a bassist.</p>
+</div>
+<div id="S5.p2" class="ltx_para">
+<p class="ltx_p"><span class="ltx_ref ltx_nolink ltx_ref_self"><span class="ltx_text ltx_ref_tag">Sentence</span> <span class="ltx_text ltx_ref_tag">15</span></span>, by contrast, might best be paraphrased by ‘every
+person <math id="S5.p2.m1" class="ltx_Math" alttext="x" display="inline"><mi>x</mi></math> is such that, if <math id="S5.p2.m2" class="ltx_Math" alttext="x" display="inline"><mi>x</mi></math> is a bassist, then Lars is a bassist’.
+This is symbolized by ‘<math id="S5.p2.m3" class="ltx_Math" alttext="\forall x(B(x)\rightarrow B(l))" display="inline"><mrow><mo rspace="0.167em">∀</mo><mrow><mi>x</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>B</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">→</mo><mrow><mi>B</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>l</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>’.
+This sentence can well be false. For instance, Kim Deal is a bassist.
+So ‘<math id="S5.p2.m4" class="ltx_Math" alttext="B(k)" display="inline"><mrow><mi>B</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>k</mi><mo stretchy="false">)</mo></mrow></mrow></math>’ is true. Suppose that Lars is not a bassist (say,
+he’s a drummer instead), so ‘<math id="S5.p2.m5" class="ltx_Math" alttext="B(l)" display="inline"><mrow><mi>B</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>l</mi><mo stretchy="false">)</mo></mrow></mrow></math>’ is false. Accordingly,
+‘<math id="S5.p2.m6" class="ltx_Math" alttext="B(k)\rightarrow B(l)" display="inline"><mrow><mrow><mi>B</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>k</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">→</mo><mrow><mi>B</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>l</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math>’ will be false, so ‘<math id="S5.p2.m7" class="ltx_Math" alttext="\forall x(B(x)\rightarrow B(l))" display="inline"><mrow><mo rspace="0.167em">∀</mo><mrow><mi>x</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>B</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">→</mo><mrow><mi>B</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>l</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>’ will be false as well. This example
+shows something else: ‘<math id="S5.p2.m8" class="ltx_Math" alttext="\forall x(B(x)\rightarrow B(l))" display="inline"><mrow><mo rspace="0.167em">∀</mo><mrow><mi>x</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>B</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">→</mo><mrow><mi>B</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>l</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>’ is
+false exactly when <math id="S5.p2.m9" class="ltx_Math" alttext="\exists x\,B(x)\rightarrow B(l)" display="inline"><mrow><mrow><mo rspace="0.167em">∃</mo><mrow><mi>x</mi><mo lspace="0.170em">⁢</mo><mrow><mi>B</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow><mo stretchy="false">→</mo><mrow><mi>B</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>l</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math> is false;
+they are equivalent. Recalling the lesson about how to symbolize ‘any’
+in <a href="#S4.I3.i12" title="In 24.4 The utility of paraphrase ‣ Chapter 24 Sentences with one quantifier ‣ Part V First-order logic ‣ forall x: Calgary" class="ltx_ref"><span class="ltx_text ltx_ref_tag">sentence</span> <span class="ltx_text ltx_ref_tag">12</span></a> from the previous section, we can conclude that
+<span class="ltx_ref ltx_nolink ltx_ref_self"><span class="ltx_text ltx_ref_tag">sentence</span> <span class="ltx_text ltx_ref_tag">15</span></span> is just a convoluted way of saying “Lars is a bassist,
+if anyone is”.</p>
+</div>
+<div id="S5.p3" class="ltx_para">
+<p class="ltx_p">In short, ‘<math id="S5.p3.m1" class="ltx_Math" alttext="\forall xB(x)\rightarrow B(l)" display="inline"><mrow><mrow><mo rspace="0.167em">∀</mo><mrow><mi>x</mi><mo>⁢</mo><mrow><mi>B</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow><mo stretchy="false">→</mo><mrow><mi>B</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>l</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math>’ and ‘<math id="S5.p3.m2" class="ltx_Math" alttext="\forall x(B(x)\rightarrow B(l))" display="inline"><mrow><mo rspace="0.167em">∀</mo><mrow><mi>x</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>B</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">→</mo><mrow><mi>B</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>l</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>’ are very different sentences. We can explain the difference in terms of the <span class="ltx_text ltx_font_bold">scope</span> of the quantifier. The scope of quantification is very much like the scope of negation, which we considered when discussing TFL, and it will help to explain it in this way.</p>
+</div>
+<div id="S5.p4" class="ltx_para">
+<p class="ltx_p">In the sentence ‘<math id="S5.p4.m1" class="ltx_Math" alttext="\neg B(k)\rightarrow B(l)" display="inline"><mrow><mrow><mo rspace="0.167em">¬</mo><mrow><mi>B</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>k</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">→</mo><mrow><mi>B</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>l</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math>’, the scope of ‘<math id="S5.p4.m2" class="ltx_Math" alttext="\neg" display="inline"><mo>¬</mo></math>’ is just the antecedent of the conditional. We are saying something like: if ‘<math id="S5.p4.m3" class="ltx_Math" alttext="B(k)" display="inline"><mrow><mi>B</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>k</mi><mo stretchy="false">)</mo></mrow></mrow></math>’ is false, then ‘<math id="S5.p4.m4" class="ltx_Math" alttext="B(l)" display="inline"><mrow><mi>B</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>l</mi><mo stretchy="false">)</mo></mrow></mrow></math>’ is true. Similarly, in the sentence ‘<math id="S5.p4.m5" class="ltx_Math" alttext="\forall xB(x)\rightarrow B(l)" display="inline"><mrow><mrow><mo rspace="0.167em">∀</mo><mrow><mi>x</mi><mo>⁢</mo><mrow><mi>B</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow><mo stretchy="false">→</mo><mrow><mi>B</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>l</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math>’, the scope of ‘<math id="S5.p4.m6" class="ltx_Math" alttext="\forall x" display="inline"><mrow><mo rspace="0.167em">∀</mo><mi>x</mi></mrow></math>’ is just the antecedent of the conditional. We are saying something like: if ‘<math id="S5.p4.m7" class="ltx_Math" alttext="B(x)" display="inline"><mrow><mi>B</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></math>’ is true of <span class="ltx_text ltx_font_bold">everything</span>, then ‘<math id="S5.p4.m8" class="ltx_Math" alttext="B(l)" display="inline"><mrow><mi>B</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>l</mi><mo stretchy="false">)</mo></mrow></mrow></math>’ is also true.</p>
+</div>
+<div id="S5.p5" class="ltx_para">
+<p class="ltx_p">In the sentence ‘<math id="S5.p5.m1" class="ltx_Math" alttext="\neg(B(k)\rightarrow B(l))" display="inline"><mrow><mo>¬</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>B</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>k</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">→</mo><mrow><mi>B</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>l</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></math>’, the scope of ‘<math id="S5.p5.m2" class="ltx_Math" alttext="\neg" display="inline"><mo>¬</mo></math>’ is the entire sentence. We are saying something like: ‘<math id="S5.p5.m3" class="ltx_Math" alttext="(B(k)\rightarrow B(l))" display="inline"><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>B</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>k</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">→</mo><mrow><mi>B</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>l</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></math>’ is false. Similarly, in the sentence ‘<math id="S5.p5.m4" class="ltx_Math" alttext="\forall x(B(x)\rightarrow B(l))" display="inline"><mrow><mo rspace="0.167em">∀</mo><mrow><mi>x</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>B</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">→</mo><mrow><mi>B</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>l</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>’, the scope of ‘<math id="S5.p5.m5" class="ltx_Math" alttext="\forall x" display="inline"><mrow><mo rspace="0.167em">∀</mo><mi>x</mi></mrow></math>’ is the entire sentence. We are saying something like: ‘<math id="S5.p5.m6" class="ltx_Math" alttext="(B(x)\rightarrow B(l))" display="inline"><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>B</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">→</mo><mrow><mi>B</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>l</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></math>’ is true of <span class="ltx_text ltx_font_bold">everything</span>.</p>
+</div>
+<div id="S5.p6" class="ltx_para">
+<p class="ltx_p">The moral of the story is simple. When you are using conditionals, be very careful to make sure that you have sorted out the scope correctly.</p>
+</div>
+</div>
+</section>
+<section id="S6" class="ltx_section normal">
+<div class="section level2">
+<h2 class="ltx_title ltx_title_section">
+<span class="ltx_tag ltx_tag_section header-section-number">24.6</span> Ambiguous predicates</h2>
+
+<div id="S6.p1" class="ltx_para">
+<p class="ltx_p">Suppose we just want to symbolize this sentence:</p>
+<ol id="S6.I1" class="ltx_enumerate">
+<li id="S6.I1.i16" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">16.</span><div id="S6.I1.i16.p1" class="ltx_para">​<p class="ltx_p">Adina is a skilled surgeon.</p>
+</div>
+</li>
+</ol>
+<p class="ltx_p">Let the domain be people, let <math id="S6.p1.m1" class="ltx_Math" alttext="K(x)" display="inline"><mrow><mi>K</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></math> mean ‘<math id="S6.p1.m2" class="ltx_Math" alttext="x" display="inline"><mi>x</mi></math> is a skilled surgeon’, and let <math id="S6.p1.m3" class="ltx_Math" alttext="a" display="inline"><mi>a</mi></math> mean Adina. <a href="#S6.I1.i16" title="In 24.6 Ambiguous predicates ‣ Chapter 24 Sentences with one quantifier ‣ Part V First-order logic ‣ forall x: Calgary" class="ltx_ref"><span class="ltx_text ltx_ref_tag">Sentence</span> <span class="ltx_text ltx_ref_tag">16</span></a> is simply <math id="S6.p1.m4" class="ltx_Math" alttext="K(a)" display="inline"><mrow><mi>K</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mrow></math>.</p>
+</div>
+<div id="S6.p2" class="ltx_para">
+<p class="ltx_p">Suppose instead that we want to symbolize this argument:</p>
+<ul id="S6.I2" class="ltx_itemize">
+<li id="S6.I2.i1" class="ltx_item" style="list-style-type:none;"><div id="S6.I2.i1.p1" class="ltx_para">
+<p class="ltx_p">The hospital will only hire a skilled surgeon.</p>
+</div></li>
+<li id="S6.I2.i2" class="ltx_item" style="list-style-type:none;"><div id="S6.I2.i2.p1" class="ltx_para">
+<p class="ltx_p">All surgeons are greedy.</p>
+</div></li>
+<li id="S6.I2.i3" class="ltx_item" style="list-style-type:none;"><div id="S6.I2.i3.p1" class="ltx_para">
+<p class="ltx_p">Billy is a surgeon, but is not skilled.</p>
+</div></li>
+<li id="S6.I2.ix1" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">∴</span><div id="S6.I2.ix1.p1" class="ltx_para">​<p class="ltx_p">Billy is greedy, but the hospital will not hire him.</p>
+</div>
+</li>
+</ul>
+<p class="ltx_p">We need to distinguish being a <span class="ltx_text ltx_font_bold">skilled surgeon</span> from merely being a <span class="ltx_text ltx_font_bold">surgeon</span>. So we define this symbolization key:</p>
+<dl id="S6.I3" class="ltx_description">
+<dt id="S6.I3.ix1" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <span class="ltx_text ltx_markedasmath">domain</span>:</span></dt>
+<dd class="ltx_item">
+<div id="S6.I3.ix1.p1" class="ltx_para">
+<p class="ltx_p">people</p>
+</div>
+</dd>
+<dt id="S6.I3.ix2" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="S6.I3.ix2.m1" class="ltx_Math" alttext="G(x)" display="inline"><mrow><mi>G</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></math>:</span></dt>
+<dd class="ltx_item">
+<div id="S6.I3.ix2.p1" class="ltx_para">
+<p class="ltx_p"><span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span><sub class="ltx_sub"><span class="ltx_text ltx_font_italic">x</span></sub> is greedy</p>
+</div>
+</dd>
+<dt id="S6.I3.ix3" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="S6.I3.ix3.m1" class="ltx_Math" alttext="H(x)" display="inline"><mrow><mi>H</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></math>:</span></dt>
+<dd class="ltx_item">
+<div id="S6.I3.ix3.p1" class="ltx_para">
+<p class="ltx_p">The hospital will hire <span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span><sub class="ltx_sub"><span class="ltx_text ltx_font_italic">x</span></sub></p>
+</div>
+</dd>
+<dt id="S6.I3.ix4" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="S6.I3.ix4.m1" class="ltx_Math" alttext="R(x)" display="inline"><mrow><mi>R</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></math>:</span></dt>
+<dd class="ltx_item">
+<div id="S6.I3.ix4.p1" class="ltx_para">
+<p class="ltx_p"><span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span><sub class="ltx_sub"><span class="ltx_text ltx_font_italic">x</span></sub> is a surgeon</p>
+</div>
+</dd>
+<dt id="S6.I3.ix5" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="S6.I3.ix5.m1" class="ltx_Math" alttext="K(x)" display="inline"><mrow><mi>K</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></math>:</span></dt>
+<dd class="ltx_item">
+<div id="S6.I3.ix5.p1" class="ltx_para">
+<p class="ltx_p"><span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span><sub class="ltx_sub"><span class="ltx_text ltx_font_italic">x</span></sub> is skilled</p>
+</div>
+</dd>
+<dt id="S6.I3.ix6" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="S6.I3.ix6.m1" class="ltx_Math" alttext="b" display="inline"><mi>b</mi></math>:</span></dt>
+<dd class="ltx_item">
+<div id="S6.I3.ix6.p1" class="ltx_para">
+<p class="ltx_p">Billy</p>
+</div>
+</dd>
+</dl>
+</div>
+<div id="S6.p3" class="ltx_para">
+<p class="ltx_p">Now the argument can be symbolized in this way:</p>
+<ul id="S6.I4" class="ltx_itemize">
+<li id="S6.I4.ix1" class="ltx_item" style="list-style-type:none;"><div id="S6.I4.ix1.p1" class="ltx_para">
+<p class="ltx_p"><math id="S6.I4.ix1.p1.m1" class="ltx_Math" alttext="\forall x\bigl{[}\neg(R(x)\wedge K(x))\rightarrow\neg H(x)\bigr{]}" display="inline"><mrow><mo rspace="0.167em">∀</mo><mrow><mi>x</mi><mo>⁢</mo><mrow><mo maxsize="120%" minsize="120%">[</mo><mrow><mrow><mo>¬</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>R</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo>∧</mo><mrow><mi>K</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">→</mo><mrow><mo rspace="0.167em">¬</mo><mrow><mi>H</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow><mo maxsize="120%" minsize="120%">]</mo></mrow></mrow></mrow></math></p>
+</div></li>
+<li id="S6.I4.ix2" class="ltx_item" style="list-style-type:none;"><div id="S6.I4.ix2.p1" class="ltx_para">
+<p class="ltx_p"><math id="S6.I4.ix2.p1.m1" class="ltx_Math" alttext="\forall x(R(x)\rightarrow G(x))" display="inline"><mrow><mo rspace="0.167em">∀</mo><mrow><mi>x</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>R</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">→</mo><mrow><mi>G</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math></p>
+</div></li>
+<li id="S6.I4.ix3" class="ltx_item" style="list-style-type:none;"><div id="S6.I4.ix3.p1" class="ltx_para">
+<p class="ltx_p"><math id="S6.I4.ix3.p1.m1" class="ltx_Math" alttext="R(b)\wedge\neg K(b)" display="inline"><mrow><mrow><mi>R</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>b</mi><mo stretchy="false">)</mo></mrow></mrow><mo>∧</mo><mrow><mo rspace="0.167em">¬</mo><mrow><mi>K</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>b</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></math></p>
+</div></li>
+<li id="S6.I4.ix4" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">∴</span><div id="S6.I4.ix4.p1" class="ltx_para">​<p class="ltx_p"><math id="S6.I4.ix4.p1.m1" class="ltx_Math" alttext="G(b)\wedge\neg H(b)" display="inline"><mrow><mrow><mi>G</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>b</mi><mo stretchy="false">)</mo></mrow></mrow><mo>∧</mo><mrow><mo rspace="0.167em">¬</mo><mrow><mi>H</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>b</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></math></p>
+</div>
+</li>
+</ul>
+</div>
+<div id="S6.p4" class="ltx_para">
+<p class="ltx_p">Next suppose that we want to symbolize this argument:</p>
+<ul id="S6.I5" class="ltx_itemize">
+<li id="S6.I5.i1" class="ltx_item" style="list-style-type:none;"><div id="S6.I5.i1.p1" class="ltx_para">
+<p class="ltx_p">Carol is a skilled surgeon and a tennis player.</p>
+</div></li>
+<li id="S6.I5.ix1" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">∴</span><div id="S6.I5.ix1.p1" class="ltx_para">​<p class="ltx_p">Carol is a skilled tennis player.</p>
+</div>
+</li>
+</ul>
+<p class="ltx_p">If we start with the symbolization key we used for the previous
+argument, we could add a predicate (let <math id="S6.p4.m1" class="ltx_Math" alttext="T(x)" display="inline"><mrow><mi>T</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></math> mean ‘<math id="S6.p4.m2" class="ltx_Math" alttext="x" display="inline"><mi>x</mi></math> is a
+tennis player’) and a name (let ‘<math id="S6.p4.m3" class="ltx_Math" alttext="c" display="inline"><mi>c</mi></math>’ be a name for Carol). Then the
+argument becomes:</p>
+<ul id="S6.I6" class="ltx_itemize">
+<li id="S6.I6.ix1" class="ltx_item" style="list-style-type:none;"><div id="S6.I6.ix1.p1" class="ltx_para">
+<p class="ltx_p"><math id="S6.I6.ix1.p1.m1" class="ltx_Math" alttext="(R(c)\wedge K(c))\wedge T(c)" display="inline"><mrow><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>R</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>c</mi><mo stretchy="false">)</mo></mrow></mrow><mo>∧</mo><mrow><mi>K</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>c</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow><mo>∧</mo><mrow><mi>T</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>c</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math></p>
+</div></li>
+<li id="S6.I6.ix2" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">∴</span><div id="S6.I6.ix2.p1" class="ltx_para">​<p class="ltx_p"><math id="S6.I6.ix2.p1.m1" class="ltx_Math" alttext="T(c)\wedge K(c)" display="inline"><mrow><mrow><mi>T</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>c</mi><mo stretchy="false">)</mo></mrow></mrow><mo>∧</mo><mrow><mi>K</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>c</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math></p>
+</div>
+</li>
+</ul>
+<p class="ltx_p">This symbolization is a disaster! It takes what in English is a terrible argument and symbolizes it as a valid argument in FOL. The problem is that there is a difference between being <span class="ltx_text ltx_font_bold">skilled as a surgeon</span> and <span class="ltx_text ltx_font_bold">skilled as a tennis player</span>. Symbolizing this argument correctly requires two separate predicates, one for each type of skill. If we let <math id="S6.p4.m4" class="ltx_Math" alttext="K_{1}(x)" display="inline"><mrow><msub><mi>K</mi><mn>1</mn></msub><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></math> mean ‘<math id="S6.p4.m5" class="ltx_Math" alttext="x" display="inline"><mi>x</mi></math> is skilled as a surgeon’ and <math id="S6.p4.m6" class="ltx_Math" alttext="K_{2}(x)" display="inline"><mrow><msub><mi>K</mi><mn>2</mn></msub><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></math> mean ‘<math id="S6.p4.m7" class="ltx_Math" alttext="x" display="inline"><mi>x</mi></math> is skilled as a tennis player,’ then we can symbolize the argument in this way:</p>
+<ul id="S6.I7" class="ltx_itemize">
+<li id="S6.I7.ix1" class="ltx_item" style="list-style-type:none;"><div id="S6.I7.ix1.p1" class="ltx_para">
+<p class="ltx_p"><math id="S6.I7.ix1.p1.m1" class="ltx_Math" alttext="(R(c)\wedge K_{1}(c))\wedge T(c)" display="inline"><mrow><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>R</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>c</mi><mo stretchy="false">)</mo></mrow></mrow><mo>∧</mo><mrow><msub><mi>K</mi><mn>1</mn></msub><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>c</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow><mo>∧</mo><mrow><mi>T</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>c</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math></p>
+</div></li>
+<li id="S6.I7.ix2" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">∴</span><div id="S6.I7.ix2.p1" class="ltx_para">​<p class="ltx_p"><math id="S6.I7.ix2.p1.m1" class="ltx_Math" alttext="T(c)\wedge K_{2}(c)" display="inline"><mrow><mrow><mi>T</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>c</mi><mo stretchy="false">)</mo></mrow></mrow><mo>∧</mo><mrow><msub><mi>K</mi><mn>2</mn></msub><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>c</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math></p>
+</div>
+</li>
+</ul>
+<p class="ltx_p">Like the English language argument it symbolizes, this is invalid.</p>
+</div>
+<div id="S6.p5" class="ltx_para">
+<p class="ltx_p">The moral of these examples is that you need to be careful of symbolizing predicates in an ambiguous way. Similar problems can arise with predicates like <span class="ltx_text ltx_font_bold">good</span>, <span class="ltx_text ltx_font_bold">bad</span>, <span class="ltx_text ltx_font_bold">big</span>, and <span class="ltx_text ltx_font_bold">small</span>. Just as skilled surgeons and skilled tennis players have different skills, big dogs, big mice, and big problems are big in different ways.</p>
+</div>
+<div id="S6.p6" class="ltx_para">
+<p class="ltx_p">Is it enough to have a predicate that means ‘<math id="S6.p6.m1" class="ltx_Math" alttext="x" display="inline"><mi>x</mi></math> is a skilled surgeon’, rather than two predicates ‘<math id="S6.p6.m2" class="ltx_Math" alttext="x" display="inline"><mi>x</mi></math> is skilled’ and ‘<math id="S6.p6.m3" class="ltx_Math" alttext="x" display="inline"><mi>x</mi></math> is a surgeon’? Sometimes. As <a href="#S6.I1.i16" title="In 24.6 Ambiguous predicates ‣ Chapter 24 Sentences with one quantifier ‣ Part V First-order logic ‣ forall x: Calgary" class="ltx_ref"><span class="ltx_text ltx_ref_tag">sentence</span> <span class="ltx_text ltx_ref_tag">16</span></a> shows, sometimes we do not need to distinguish between skilled surgeons and other surgeons.</p>
+</div>
+<div id="S6.p7" class="ltx_para">
+<p class="ltx_p">Must we always distinguish between different ways of being skilled, good, bad, or big? No. As the argument about Billy shows, sometimes we only need to talk about one kind of skill. If you are symbolizing an argument that is just about dogs, it is fine to define a predicate that means ‘<math id="S6.p7.m1" class="ltx_Math" alttext="x" display="inline"><mi>x</mi></math> is big.’ If the domain includes dogs and mice, however, it is probably best to make the predicate mean ‘<math id="S6.p7.m2" class="ltx_Math" alttext="x" display="inline"><mi>x</mi></math> is big for a dog.’</p>
+</div>
+</div>
+</section>
+<section id="Sx1" class="ltx_section normal">
+<div class="section level2">
+<h2 class="ltx_title ltx_title_section">Practice exercises</h2>
+
+<div id="Sx1.p1" class="ltx_para ltx_noindent">
+<p class="ltx_p"><span class="ltx_text ltx_font_bold">A. </span>
+Here are the syllogistic figures identified by Aristotle and his successors, along with their medieval names:</p>
+<ol id="Sx1.I8" class="ltx_enumerate">
+<li id="Sx1.I8.i1" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">1.</span><div id="Sx1.I8.i1.p1" class="ltx_para">​<p class="ltx_p"><span class="ltx_text ltx_font_bold">Barbara.</span> All G are F. All H are G. So: All H are F.</p>
+</div>
+</li>
+<li id="Sx1.I8.i2" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">2.</span><div id="Sx1.I8.i2.p1" class="ltx_para">​<p class="ltx_p"><span class="ltx_text ltx_font_bold">Celarent.</span> No G are F. All H are G. So: No H are F.</p>
+</div>
+</li>
+<li id="Sx1.I8.i3" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">3.</span><div id="Sx1.I8.i3.p1" class="ltx_para">​<p class="ltx_p"><span class="ltx_text ltx_font_bold">Ferio.</span> No G are F. Some H is G. So: Some H is not F.</p>
+</div>
+</li>
+<li id="Sx1.I8.i4" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">4.</span><div id="Sx1.I8.i4.p1" class="ltx_para">​<p class="ltx_p"><span class="ltx_text ltx_font_bold">Darii.</span> All G are F. Some H is G. So: Some H is F.</p>
+</div>
+</li>
+<li id="Sx1.I8.i5" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">5.</span><div id="Sx1.I8.i5.p1" class="ltx_para">​<p class="ltx_p"><span class="ltx_text ltx_font_bold">Camestres.</span> All F are G. No H are G. So: No H are F.</p>
+</div>
+</li>
+<li id="Sx1.I8.i6" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">6.</span><div id="Sx1.I8.i6.p1" class="ltx_para">​<p class="ltx_p"><span class="ltx_text ltx_font_bold">Cesare.</span> No F are G. All H are G. So: No H are F.</p>
+</div>
+</li>
+<li id="Sx1.I8.i7" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">7.</span><div id="Sx1.I8.i7.p1" class="ltx_para">​<p class="ltx_p"><span class="ltx_text ltx_font_bold">Baroko.</span> All F are G. Some H is not G. So: Some H is not F.</p>
+</div>
+</li>
+<li id="Sx1.I8.i8" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">8.</span><div id="Sx1.I8.i8.p1" class="ltx_para">​<p class="ltx_p"><span class="ltx_text ltx_font_bold">Festino.</span> No F are G. Some H are G. So: Some H is not F.</p>
+</div>
+</li>
+<li id="Sx1.I8.i9" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">9.</span><div id="Sx1.I8.i9.p1" class="ltx_para">​<p class="ltx_p"><span class="ltx_text ltx_font_bold">Datisi.</span> All G are F. Some G is H. So: Some H is F.</p>
+</div>
+</li>
+<li id="Sx1.I8.i10" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">10.</span><div id="Sx1.I8.i10.p1" class="ltx_para">​<p class="ltx_p"><span class="ltx_text ltx_font_bold">Disamis.</span> Some G is F. All G are H. So: Some H is F.</p>
+</div>
+</li>
+<li id="Sx1.I8.i11" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">11.</span><div id="Sx1.I8.i11.p1" class="ltx_para">​<p class="ltx_p"><span class="ltx_text ltx_font_bold">Ferison.</span> No G are F. Some G is H. So: Some H is not F.</p>
+</div>
+</li>
+<li id="Sx1.I8.i12" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">12.</span><div id="Sx1.I8.i12.p1" class="ltx_para">​<p class="ltx_p"><span class="ltx_text ltx_font_bold">Bokardo.</span> Some G is not F. All G are H. So: Some H is not F.</p>
+</div>
+</li>
+<li id="Sx1.I8.i13" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">13.</span><div id="Sx1.I8.i13.p1" class="ltx_para">​<p class="ltx_p"><span class="ltx_text ltx_font_bold">Camenes.</span> All F are G. No G are H. So: No H is F.</p>
+</div>
+</li>
+<li id="Sx1.I8.i14" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">14.</span><div id="Sx1.I8.i14.p1" class="ltx_para">​<p class="ltx_p"><span class="ltx_text ltx_font_bold">Dimaris.</span> Some F is G. All G are H. So: Some H is F.</p>
+</div>
+</li>
+<li id="Sx1.I8.i15" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">15.</span><div id="Sx1.I8.i15.p1" class="ltx_para">​<p class="ltx_p"><span class="ltx_text ltx_font_bold">Fresison.</span> No F are G. Some G is H. So: Some H is not F.</p>
+</div>
+</li>
+</ol>
+<p class="ltx_p">Symbolize each figure in FOL.</p>
+</div>
+<div id="Sx1.p2" class="ltx_para ltx_noindent">
+<p class="ltx_p"><span class="ltx_text ltx_font_bold">B. </span>
+Using the following symbolization key:</p>
+<dl id="Sx1.I9" class="ltx_description">
+<dt id="Sx1.I9.ix1" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <span class="ltx_text ltx_markedasmath">domain</span>:</span></dt>
+<dd class="ltx_item">
+<div id="Sx1.I9.ix1.p1" class="ltx_para">
+<p class="ltx_p">people</p>
+</div>
+</dd>
+<dt id="Sx1.I9.ix2" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="Sx1.I9.ix2.m1" class="ltx_Math" alttext="K(x)" display="inline"><mrow><mi>K</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></math>:</span></dt>
+<dd class="ltx_item">
+<div id="Sx1.I9.ix2.p1" class="ltx_para">
+<p class="ltx_p"><span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span><sub class="ltx_sub"><span class="ltx_text ltx_font_italic">x</span></sub> knows the combination to the safe</p>
+</div>
+</dd>
+<dt id="Sx1.I9.ix3" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="Sx1.I9.ix3.m1" class="ltx_Math" alttext="S(x)" display="inline"><mrow><mi>S</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></math>:</span></dt>
+<dd class="ltx_item">
+<div id="Sx1.I9.ix3.p1" class="ltx_para">
+<p class="ltx_p"><span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span><sub class="ltx_sub"><span class="ltx_text ltx_font_italic">x</span></sub> is a spy</p>
+</div>
+</dd>
+<dt id="Sx1.I9.ix4" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="Sx1.I9.ix4.m1" class="ltx_Math" alttext="V(x)" display="inline"><mrow><mi>V</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></math>:</span></dt>
+<dd class="ltx_item">
+<div id="Sx1.I9.ix4.p1" class="ltx_para">
+<p class="ltx_p"><span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span><sub class="ltx_sub"><span class="ltx_text ltx_font_italic">x</span></sub> is a vegetarian</p>
+</div>
+</dd>
+<dt id="Sx1.I9.ix5" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="Sx1.I9.ix5.m1" class="ltx_Math" alttext="h" display="inline"><mi>h</mi></math>:</span></dt>
+<dd class="ltx_item">
+<div id="Sx1.I9.ix5.p1" class="ltx_para">
+<p class="ltx_p">Hofthor</p>
+</div>
+</dd>
+<dt id="Sx1.I9.ix6" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="Sx1.I9.ix6.m1" class="ltx_Math" alttext="i" display="inline"><mi>i</mi></math>:</span></dt>
+<dd class="ltx_item">
+<div id="Sx1.I9.ix6.p1" class="ltx_para">
+<p class="ltx_p">Ingmar</p>
+</div>
+</dd>
+</dl>
+<p class="ltx_p">symbolize the following sentences in FOL:</p>
+<ol id="Sx1.I10" class="ltx_enumerate">
+<li id="Sx1.I10.i1" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">1.</span><div id="Sx1.I10.i1.p1" class="ltx_para">​<p class="ltx_p">Neither Hofthor nor Ingmar is a vegetarian.</p>
+</div>
+</li>
+<li id="Sx1.I10.i2" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">2.</span><div id="Sx1.I10.i2.p1" class="ltx_para">​<p class="ltx_p">No spy knows the combination to the safe.</p>
+</div>
+</li>
+<li id="Sx1.I10.i3" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">3.</span><div id="Sx1.I10.i3.p1" class="ltx_para">​<p class="ltx_p">No one knows the combination to the safe unless Ingmar does.</p>
+</div>
+</li>
+<li id="Sx1.I10.i4" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">4.</span><div id="Sx1.I10.i4.p1" class="ltx_para">​<p class="ltx_p">Hofthor is a spy, but no vegetarian is a spy.</p>
+</div>
+</li>
+</ol>
+</div>
+<div id="Sx1.p3" class="ltx_para ltx_noindent">
+<p class="ltx_p"><span class="ltx_text ltx_font_bold">C. </span>
+Using this symbolization key:</p>
+<dl id="Sx1.I11" class="ltx_description">
+<dt id="Sx1.I11.ix1" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <span class="ltx_text ltx_markedasmath">domain</span>:</span></dt>
+<dd class="ltx_item">
+<div id="Sx1.I11.ix1.p1" class="ltx_para">
+<p class="ltx_p">all animals</p>
+</div>
+</dd>
+<dt id="Sx1.I11.ix2" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="Sx1.I11.ix2.m1" class="ltx_Math" alttext="A(x)" display="inline"><mrow><mi>A</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></math>:</span></dt>
+<dd class="ltx_item">
+<div id="Sx1.I11.ix2.p1" class="ltx_para">
+<p class="ltx_p"><span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span><sub class="ltx_sub"><span class="ltx_text ltx_font_italic">x</span></sub> is an alligator</p>
+</div>
+</dd>
+<dt id="Sx1.I11.ix3" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="Sx1.I11.ix3.m1" class="ltx_Math" alttext="M(x)" display="inline"><mrow><mi>M</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></math>:</span></dt>
+<dd class="ltx_item">
+<div id="Sx1.I11.ix3.p1" class="ltx_para">
+<p class="ltx_p"><span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span><sub class="ltx_sub"><span class="ltx_text ltx_font_italic">x</span></sub> is a monkey</p>
+</div>
+</dd>
+<dt id="Sx1.I11.ix4" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="Sx1.I11.ix4.m1" class="ltx_Math" alttext="R(x)" display="inline"><mrow><mi>R</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></math>:</span></dt>
+<dd class="ltx_item">
+<div id="Sx1.I11.ix4.p1" class="ltx_para">
+<p class="ltx_p"><span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span><sub class="ltx_sub"><span class="ltx_text ltx_font_italic">x</span></sub> is a reptile</p>
+</div>
+</dd>
+<dt id="Sx1.I11.ix5" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="Sx1.I11.ix5.m1" class="ltx_Math" alttext="Z(x)" display="inline"><mrow><mi>Z</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></math>:</span></dt>
+<dd class="ltx_item">
+<div id="Sx1.I11.ix5.p1" class="ltx_para">
+<p class="ltx_p"><span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span><sub class="ltx_sub"><span class="ltx_text ltx_font_italic">x</span></sub> lives at the zoo</p>
+</div>
+</dd>
+<dt id="Sx1.I11.ix6" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="Sx1.I11.ix6.m1" class="ltx_Math" alttext="a" display="inline"><mi>a</mi></math>:</span></dt>
+<dd class="ltx_item">
+<div id="Sx1.I11.ix6.p1" class="ltx_para">
+<p class="ltx_p">Amos</p>
+</div>
+</dd>
+<dt id="Sx1.I11.ix7" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="Sx1.I11.ix7.m1" class="ltx_Math" alttext="b" display="inline"><mi>b</mi></math>:</span></dt>
+<dd class="ltx_item">
+<div id="Sx1.I11.ix7.p1" class="ltx_para">
+<p class="ltx_p">Bouncer</p>
+</div>
+</dd>
+<dt id="Sx1.I11.ix8" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="Sx1.I11.ix8.m1" class="ltx_Math" alttext="c" display="inline"><mi>c</mi></math>:</span></dt>
+<dd class="ltx_item">
+<div id="Sx1.I11.ix8.p1" class="ltx_para">
+<p class="ltx_p">Cleo</p>
+</div>
+</dd>
+</dl>
+<p class="ltx_p">symbolize each of the following sentences in FOL:</p>
+<ol id="Sx1.I12" class="ltx_enumerate">
+<li id="Sx1.I12.i1" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">1.</span><div id="Sx1.I12.i1.p1" class="ltx_para">​<p class="ltx_p">Amos, Bouncer, and Cleo all live at the zoo.</p>
+</div>
+</li>
+<li id="Sx1.I12.i2" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">2.</span><div id="Sx1.I12.i2.p1" class="ltx_para">​<p class="ltx_p">Bouncer is a reptile, but not an alligator.</p>
+</div>
+</li>
+<li id="Sx1.I12.i3" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">3.</span><div id="Sx1.I12.i3.p1" class="ltx_para">​<p class="ltx_p">Some reptile lives at the zoo.</p>
+</div>
+</li>
+<li id="Sx1.I12.i4" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">4.</span><div id="Sx1.I12.i4.p1" class="ltx_para">​<p class="ltx_p">Every alligator is a reptile.</p>
+</div>
+</li>
+<li id="Sx1.I12.i5" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">5.</span><div id="Sx1.I12.i5.p1" class="ltx_para">​<p class="ltx_p">Any animal that lives at the zoo is either a monkey or an alligator.</p>
+</div>
+</li>
+<li id="Sx1.I12.i6" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">6.</span><div id="Sx1.I12.i6.p1" class="ltx_para">​<p class="ltx_p">There are reptiles that are not alligators.</p>
+</div>
+</li>
+<li id="Sx1.I12.i7" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">7.</span><div id="Sx1.I12.i7.p1" class="ltx_para">​<p class="ltx_p">If any animal is an reptile, then Amos is.</p>
+</div>
+</li>
+<li id="Sx1.I12.i8" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">8.</span><div id="Sx1.I12.i8.p1" class="ltx_para">​<p class="ltx_p">If any animal is an alligator, then it is a reptile.</p>
+</div>
+</li>
+</ol>
+</div>
+<div id="Sx1.p4" class="ltx_para ltx_noindent">
+<p class="ltx_p"><span class="ltx_text ltx_font_bold">D. </span>
+For each argument, write a symbolization key and symbolize the argument in FOL.</p>
+<ol id="Sx1.I13" class="ltx_enumerate">
+<li id="Sx1.I13.i1" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">1.</span><div id="Sx1.I13.i1.p1" class="ltx_para">​<p class="ltx_p">Willard is a logician. All logicians wear funny hats. So Willard wears a funny hat.</p>
+</div>
+</li>
+<li id="Sx1.I13.i2" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">2.</span><div id="Sx1.I13.i2.p1" class="ltx_para">​<p class="ltx_p">Nothing on my desk escapes my attention. There is a computer on my desk. As such, there is a computer that does not escape my attention.</p>
+</div>
+</li>
+<li id="Sx1.I13.i3" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">3.</span><div id="Sx1.I13.i3.p1" class="ltx_para">​<p class="ltx_p">All my dreams are black and white. Old TV shows are in black and white. Therefore, some of my dreams are old TV shows.</p>
+</div>
+</li>
+<li id="Sx1.I13.i4" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">4.</span><div id="Sx1.I13.i4.p1" class="ltx_para">​<p class="ltx_p">Neither Holmes nor Watson has been to Australia. A person could have seen a kangaroo only if they had been to Australia or to a zoo. Although Watson has not seen a kangaroo, Holmes has. Therefore, Holmes has been to a zoo.</p>
+</div>
+</li>
+<li id="Sx1.I13.i5" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">5.</span><div id="Sx1.I13.i5.p1" class="ltx_para">​<p class="ltx_p">No one expects the Spanish Inquisition. No one knows the troubles I’ve seen. Therefore, anyone who expects the Spanish Inquisition knows the troubles I’ve seen.</p>
+</div>
+</li>
+<li id="Sx1.I13.i6" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">6.</span><div id="Sx1.I13.i6.p1" class="ltx_para">​<p class="ltx_p">All babies are illogical. Nobody who is illogical can manage a crocodile. Berthold is a baby. Therefore, Berthold is unable to manage a crocodile.</p>
+</div>
+</li>
+</ol>
+</div>
+</div>
+</section>
+</div>
+</section>
+</div>
+</div>
+</div>
+<a href="Ch23.html" class="navigation navigation-prev" aria-label="Previous page"><i class="fa fa-angle-left"></i></a><a href="Ch25.html" class="navigation navigation-next" aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+</div>
+</div>
+</body>
+
+</html>

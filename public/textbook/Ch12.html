@@ -1,0 +1,760 @@
+<!DOCTYPE html><html style="--bml-ltx-font-size:10;" class="bml_mathjax4" lang="en">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<title>Chapter 12 Semantic concepts ‣ Part III Truth tables ‣ forall x: Calgary</title>
+<!--Generated on Tue Jul 21 20:13:15 2026 by LaTeXML (version 0.8.8) http://dlmf.nist.gov/LaTeXML/.-->
+<!--Document created on Fall 2025 (2026‐07‐18 8642250).-->
+
+<link rel="stylesheet" href="LaTeXML.css" type="text/css">
+<link rel="stylesheet" href="ltx-book.css" type="text/css">
+<link rel="stylesheet" href="bookml/gitbook/css/style.css" type="text/css">
+<link rel="stylesheet" href="bookml/gitbook/css/plugin-table.css" type="text/css">
+<link rel="stylesheet" href="bookml/gitbook/css/plugin-search.css" type="text/css">
+<link rel="stylesheet" href="bookml/gitbook/css/plugin-bookdown.css" type="text/css">
+<link rel="stylesheet" href="bookml/gitbook/css/plugin-fontsettings.css" type="text/css">
+<link rel="stylesheet" href="bookml/CSS/style.css" type="text/css">
+<link rel="stylesheet" href="bookml/CSS/style.gitbook,plain.css" type="text/css">
+<link rel="stylesheet" href="bookml/CSS/style.gitbook.css" type="text/css">
+<link rel="stylesheet" href="bmluser/colors.gitbook-forallxyyc-html.css" type="text/css">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<link rel="stylesheet" href="forallxyyc.css" type="text/css">
+<link rel="stylesheet" href="fitchml.css" type="text/css">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script><script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6"></script>
+<link rel="up" href="Pt3.html" title="Part III Truth tables ‣ forall x: Calgary">
+<link rel="up up" href="index.html" title="forall x: Calgary">
+<link rel="start" href="index.html" title="forall x: Calgary">
+<link rel="prev" href="Ch11.html" title="Chapter 11 Complete truth tables ‣ Part III Truth tables ‣ forall x: Calgary">
+<link rel="next" href="Ch13.html" title="Chapter 13 Limitations of TFL ‣ Part III Truth tables ‣ forall x: Calgary">
+<link rel="chapter" href="Ch9.html" title="Chapter 9 Characteristic truth tables ‣ Part III Truth tables ‣ forall x: Calgary">
+<link rel="chapter" href="Ch10.html" title="Chapter 10 Truth-functional connectives ‣ Part III Truth tables ‣ forall x: Calgary">
+<link rel="chapter" href="Ch11.html" title="Chapter 11 Complete truth tables ‣ Part III Truth tables ‣ forall x: Calgary">
+<link rel="chapter" href="Ch13.html" title="Chapter 13 Limitations of TFL ‣ Part III Truth tables ‣ forall x: Calgary">
+<link rel="chapter" href="Ch14.html" title="Chapter 14 Truth table shortcuts ‣ Part III Truth tables ‣ forall x: Calgary">
+<link rel="chapter" href="Ch15.html" title="Chapter 15 Partial truth tables ‣ Part III Truth tables ‣ forall x: Calgary">
+<link rel="chapter" href="Chx1.html" title="Preface ‣ forall x: Calgary">
+<link rel="part" href="Pt1.html" title="Part I Key notions of logic ‣ forall x: Calgary">
+<link rel="part" href="Pt2.html" title="Part II Truth-functional logic ‣ forall x: Calgary">
+<link rel="part" href="Pt3.html" title="Part III Truth tables ‣ forall x: Calgary">
+<link rel="part" href="Pt4.html" title="Part IV Natural deduction for TFL ‣ forall x: Calgary">
+<link rel="part" href="Pt5.html" title="Part V First-order logic ‣ forall x: Calgary">
+<link rel="part" href="Pt6.html" title="Part VI Interpretations ‣ forall x: Calgary">
+<link rel="part" href="Pt7.html" title="Part VII Natural deduction for FOL ‣ forall x: Calgary">
+<link rel="part" href="Pt8.html" title="Part VIII Modal logic ‣ forall x: Calgary">
+<link rel="part" href="Pt9.html" title="Part IX Metatheory ‣ forall x: Calgary">
+<link rel="part" href="Ptx1.html" title="Appendices ‣ forall x: Calgary">
+<link rel="part" href="Ptx2.html" title="Solutions to selected exercices ‣ forall x: Calgary">
+<script src="bookml/js/mathjax4.js" defer></script>
+</head>
+<body class="bml_class_book">
+<div class="book without-animation font-size-2 font-family-1" data-basepath=".">
+<a href="#bml-main-content" tabindex="0" class="bml-skip-to-content">Skip to content.</a>
+<div class="book-summary"><nav class="ltx_page_navbar">
+<ul class="ltx_toclist summary">
+<li>
+<a href="index.html" title="" class="ltx_ref" rel="start">forall x: Calgary</a>
+</li>
+<li class="divider" aria-hidden="true"></li>
+<li data-level="" data-path="Chx1.html" class="ltx_tocentry ltx_tocentry_chapter  chapter "><a href="Chx1.html" title="In forall x: Calgary" class="ltx_ref">Preface</a></li>
+<li data-level="I" data-path="Pt1.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt1.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">I </span></b>Key notions of logic</a></li>
+<li data-level="II" data-path="Pt2.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt2.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">II </span></b>Truth-functional logic</a></li>
+<li data-level="III" data-path="Pt3.html" class="ltx_tocentry ltx_tocentry_part  chapter ">
+<a href="Pt3.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">III </span></b>Truth tables</a>
+<ol class="ltx_toclist ltx_toclist_part">
+<li data-level="9" data-path="Ch9.html" class="ltx_tocentry ltx_tocentry_chapter  chapter "><a href="Ch9.html" title="In Part III Truth tables ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">9 </span></b>Characteristic truth tables</a></li>
+<li data-level="10" data-path="Ch10.html" class="ltx_tocentry ltx_tocentry_chapter  chapter "><a href="Ch10.html" title="In Part III Truth tables ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">10 </span></b>Truth-functional connectives</a></li>
+<li data-level="11" data-path="Ch11.html" class="ltx_tocentry ltx_tocentry_chapter  chapter "><a href="Ch11.html" title="In Part III Truth tables ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">11 </span></b>Complete truth tables</a></li>
+<li data-level="12" data-path="" class="ltx_tocentry ltx_tocentry_chapter ltx_ref_self  chapter active">
+<a href="" title="In Part III Truth tables ‣ forall x: Calgary" aria-current="page" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">12 </span></b>Semantic concepts</a>
+<ol class="ltx_toclist ltx_toclist_chapter">
+<li data-level="12.1" data-path="" class="ltx_tocentry ltx_tocentry_section  chapter "><a href="#S1" title="In Chapter 12 Semantic concepts ‣ Part III Truth tables ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">12.1 </span></b>Tautologies and contradictions</a></li>
+<li data-level="12.2" data-path="" class="ltx_tocentry ltx_tocentry_section  chapter "><a href="#S2" title="In Chapter 12 Semantic concepts ‣ Part III Truth tables ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">12.2 </span></b>Equivalence</a></li>
+<li data-level="12.3" data-path="" class="ltx_tocentry ltx_tocentry_section  chapter "><a href="#S3" title="In Chapter 12 Semantic concepts ‣ Part III Truth tables ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">12.3 </span></b>Satisfiability</a></li>
+<li data-level="12.4" data-path="" class="ltx_tocentry ltx_tocentry_section  chapter "><a href="#S4" title="In Chapter 12 Semantic concepts ‣ Part III Truth tables ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">12.4 </span></b>Entailment and validity</a></li>
+<li data-level="12.5" data-path="" class="ltx_tocentry ltx_tocentry_section  chapter "><a href="#S5" title="In Chapter 12 Semantic concepts ‣ Part III Truth tables ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">12.5 </span></b>The double turnstile</a></li>
+<li data-level="12.6" data-path="" class="ltx_tocentry ltx_tocentry_section  chapter "><a href="#S6" title="In Chapter 12 Semantic concepts ‣ Part III Truth tables ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">12.6 </span></b>‘<math class="ltx_Math" alttext="\vDash" display="inline"><mo>⊨</mo></math>’ versus ‘<math class="ltx_Math" alttext="\rightarrow" display="inline"><mo stretchy="false">→</mo></math>’</a></li>
+<li data-level="" data-path="" class="ltx_tocentry ltx_tocentry_section  chapter "><a href="#Sx1" title="In Chapter 12 Semantic concepts ‣ Part III Truth tables ‣ forall x: Calgary" class="ltx_ref">Practice exercises</a></li>
+</ol>
+</li>
+<li data-level="13" data-path="Ch13.html" class="ltx_tocentry ltx_tocentry_chapter  chapter "><a href="Ch13.html" title="In Part III Truth tables ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">13 </span></b>Limitations of TFL</a></li>
+<li data-level="14" data-path="Ch14.html" class="ltx_tocentry ltx_tocentry_chapter  chapter "><a href="Ch14.html" title="In Part III Truth tables ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">14 </span></b>Truth table shortcuts</a></li>
+<li data-level="15" data-path="Ch15.html" class="ltx_tocentry ltx_tocentry_chapter  chapter "><a href="Ch15.html" title="In Part III Truth tables ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">15 </span></b>Partial truth tables</a></li>
+</ol>
+</li>
+<li data-level="IV" data-path="Pt4.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt4.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">IV </span></b>Natural deduction for TFL</a></li>
+<li data-level="V" data-path="Pt5.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt5.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">V </span></b>First-order logic</a></li>
+<li data-level="VI" data-path="Pt6.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt6.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">VI </span></b>Interpretations</a></li>
+<li data-level="VII" data-path="Pt7.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt7.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">VII </span></b>Natural deduction for FOL</a></li>
+<li data-level="VIII" data-path="Pt8.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt8.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">VIII </span></b>Modal logic</a></li>
+<li data-level="IX" data-path="Pt9.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt9.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">IX </span></b>Metatheory</a></li>
+<li data-level="" data-path="Ptx1.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Ptx1.html" title="In forall x: Calgary" class="ltx_ref">Appendices</a></li>
+<li data-level="" data-path="Ptx2.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Ptx2.html" title="In forall x: Calgary" class="ltx_ref">Solutions to selected exercices</a></li>
+</ul>
+</nav></div>
+
+<div class="ltx_page_main book-body fixed">
+<div class="body-inner">
+<header class="book-header fixed" aria-label="toolbar"><span class="bml-separator"></span></header>
+<div class="page-wrapper" tabindex="-1" role="main">
+<div class="ltx_page_content page-inner" id="bml-main-content">
+<script src="bookml/gitbook/js/app.min.js"></script>
+<script src="bookml/gitbook/js/jquery.highlight.js"></script>
+<script src="bookml/gitbook/js/plugin-search.js"></script>
+<script src="bookml/gitbook/js/plugin-fontsettings.js"></script>
+<script src="bookml/gitbook/js/plugin-bookdown.js"></script>
+<script type="text/javascript">
+                  gitbook.require(["gitbook"], function(gitbook) {
+                  gitbook.start({
+                    "fontsettings": {
+                      "theme": "white",
+                      "family": "sans",
+                      "size": 2
+                    },
+                    "download": [ [ "forallxyyc.pdf", "PDF" ], [ "forallxyyc-accessible.pdf", "PDF (accessible)" ], ],
+                    "search": {
+                      "engine": "fuse"
+                    },
+                    "toc": {
+                      "collapse": "none"
+                    }
+                  });
+                });
+              </script>
+
+<section class="ltx_chapter ltx_authors_1line normal" lang="en">
+<div class="section level1">
+<h1 class="ltx_title ltx_title_chapter">
+<span class="ltx_tag ltx_tag_chapter header-section-number">Chapter 12</span> Semantic concepts</h1>
+
+<div id="p1" class="ltx_para">
+<p class="ltx_p">In the previous chapter, we introduced the idea of a valuation and showed how to determine the truth value of any TFL sentence, on any valuation, using a truth table. In this chapter, we will introduce some related ideas, and show how to use truth tables to test whether or not they apply.</p>
+</div>
+<section id="S1" class="ltx_section normal">
+<div class="section level2">
+<h2 class="ltx_title ltx_title_section">
+<span class="ltx_tag ltx_tag_section header-section-number">12.1</span> Tautologies and contradictions</h2>
+
+<div id="S1.p1" class="ltx_para">
+<p class="ltx_p">In <a href="Ch3.html" title="Chapter 3 Other logical notions ‣ Part I Key notions of logic ‣ forall x: Calgary" class="ltx_ref"><span class="ltx_text ltx_ref_tag">chapter</span> <span class="ltx_text ltx_ref_tag">3</span></a>, we explained <span class="ltx_text ltx_font_bold">necessary truth</span> and <span class="ltx_text ltx_font_bold">necessary falsity</span>. Both notions have surrogates in TFL. We will start with a surrogate for necessary truth.</p>
+<div class="ltx_logical-block bml_background-color_FDF4FA bml_background-color_FDF4FA" style="padding:9pt;">
+            
+<div id="S1.p1.p1" class="ltx_para ltx_noindent">
+<p class="ltx_p"><math id="S1.p1.p1.m1" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math> is a <dfn>tautology</dfn>
+ if⁠f it is true on every valuation.</p>
+</div>
+          
+</div>
+</div>
+<div id="S1.p2" class="ltx_para">
+<p class="ltx_p">We can use truth tables to decide whether a sentence is a tautology. If the sentence is true on every line of its complete truth table, then it is true on every valuation, so it is a tautology. In the example of <a href="A11.html" title="Solutions to Chapter 11 Complete truth tables ‣ Solutions to selected exercices ‣ forall x: Calgary" class="ltx_ref"><span class="ltx_text ltx_ref_tag">appendix</span> <span class="ltx_text ltx_ref_tag">11</span></a>, ‘<math id="S1.p2.m1" class="ltx_Math" alttext="(H\wedge I)\rightarrow H" display="inline"><mrow><mrow><mo stretchy="false">(</mo><mrow><mi>H</mi><mo>∧</mo><mi>I</mi></mrow><mo stretchy="false">)</mo></mrow><mo stretchy="false">→</mo><mi>H</mi></mrow></math>’ is a tautology.</p>
+</div>
+<div id="S1.p3" class="ltx_para">
+<p class="ltx_p">This is only, though, a <span class="ltx_text ltx_font_bold">surrogate</span> for necessary truth. There are some necessary truths that we cannot adequately symbolize in TFL. One example is ‘<math id="S1.p3.m1" class="ltx_Math" alttext="2+2=4" display="inline"><mrow><mrow><mn>2</mn><mo>+</mo><mn>2</mn></mrow><mo>=</mo><mn>4</mn></mrow></math>’. This <span class="ltx_text ltx_font_bold">must</span> be true, but if we try to symbolize it in TFL, the best we can offer is a sentence letter, and no sentence letter is a tautology. Still, if we can adequately symbolize some English sentence using a TFL sentence which is a tautology, then that English sentence expresses a necessary truth.</p>
+</div>
+<div id="S1.p4" class="ltx_para">
+<p class="ltx_p">We have a similar surrogate for necessary falsity:</p>
+<div class="ltx_logical-block bml_background-color_FDF4FA bml_background-color_FDF4FA" style="padding:9pt;">
+            
+<div id="S1.p4.p1" class="ltx_para ltx_noindent">
+<p class="ltx_p"><math id="S1.p4.p1.m1" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math> is a <dfn>contradiction</dfn>
+ (in TFL) if⁠f it is false on every valuation.</p>
+</div>
+          
+</div>
+</div>
+<div id="S1.p5" class="ltx_para">
+<p class="ltx_p">We can use truth tables to decide whether a sentence is a contradiction. If the sentence is false on every line of its complete truth table, then it is false on every valuation, so it is a contradiction. In the example of <a href="A11.html" title="Solutions to Chapter 11 Complete truth tables ‣ Solutions to selected exercices ‣ forall x: Calgary" class="ltx_ref"><span class="ltx_text ltx_ref_tag">appendix</span> <span class="ltx_text ltx_ref_tag">11</span></a>, ‘<math id="S1.p5.m1" class="ltx_math_unparsed" alttext="[(C\leftrightarrow C)\rightarrow C]\wedge\neg(C\rightarrow C)" display="inline"><mrow><mrow><mo stretchy="false">[</mo><mrow><mo stretchy="false">(</mo><mi>C</mi><mo stretchy="false">↔</mo><mi>C</mi><mo stretchy="false">)</mo></mrow><mo stretchy="false">→</mo><mi>C</mi><mo stretchy="false">]</mo></mrow><mo>∧</mo><mo>¬</mo><mrow><mo stretchy="false">(</mo><mi>C</mi><mo stretchy="false">→</mo><mi>C</mi><mo stretchy="false">)</mo></mrow></mrow></math>’ is a contradiction.</p>
+</div>
+</div>
+</section>
+<section id="S2" class="ltx_section normal">
+<div class="section level2">
+<h2 class="ltx_title ltx_title_section">
+<span class="ltx_tag ltx_tag_section header-section-number">12.2</span> Equivalence</h2>
+
+<div id="S2.p1" class="ltx_para">
+<p class="ltx_p">Here is a similar useful notion:</p>
+<div class="ltx_logical-block bml_background-color_FDF4FA bml_background-color_FDF4FA" style="padding:9pt;">
+            
+<div id="S2.p1.p1" class="ltx_para ltx_noindent">
+<p class="ltx_p"><math id="S2.p1.p1.m1" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math> and <math id="S2.p1.p1.m2" class="ltx_Math" alttext="\mathscr{B}" display="inline"><mi class="ltx_font_mathscript">ℬ︁</mi></math> are <dfn>equivalent</dfn>
+ (in TFL) iff, for every valuation, their truth values agree, i.e., if there is no valuation in which they have opposite truth values.</p>
+</div>
+          
+</div>
+</div>
+<div id="S2.p2" class="ltx_para">
+<p class="ltx_p">We have already made use of this notion, in effect, in <a href="Ch11.html#S3" title="11.3 More about brackets ‣ Chapter 11 Complete truth tables ‣ Part III Truth tables ‣ forall x: Calgary" class="ltx_ref"><span class="ltx_text ltx_ref_tag">section</span> <span class="ltx_text ltx_ref_tag">11.3</span></a>; the point was that ‘<math id="S2.p2.m1" class="ltx_Math" alttext="(A\wedge B)\wedge C" display="inline"><mrow><mrow><mo stretchy="false">(</mo><mrow><mi>A</mi><mo>∧</mo><mi>B</mi></mrow><mo stretchy="false">)</mo></mrow><mo>∧</mo><mi>C</mi></mrow></math>’ and ‘<math id="S2.p2.m2" class="ltx_Math" alttext="A\wedge(B\wedge C)" display="inline"><mrow><mi>A</mi><mo>∧</mo><mrow><mo stretchy="false">(</mo><mrow><mi>B</mi><mo>∧</mo><mi>C</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math>’ are equivalent. Again, it is easy to test for equivalence using truth tables. Consider the sentences ‘<math id="S2.p2.m3" class="ltx_Math" alttext="\neg(P\vee Q)" display="inline"><mrow><mo>¬</mo><mrow><mo stretchy="false">(</mo><mrow><mi>P</mi><mo>∨</mo><mi>Q</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math>’ and ‘<math id="S2.p2.m4" class="ltx_Math" alttext="\neg P\wedge\neg Q" display="inline"><mrow><mrow><mo rspace="0.167em">¬</mo><mi>P</mi></mrow><mo>∧</mo><mrow><mo rspace="0.167em">¬</mo><mi>Q</mi></mrow></mrow></math>’. Are they equivalent? To find out, we construct a truth table.</p>
+<div class="bml-overflow-wrapper">
+<table class="ltx_tabular ltx_centering ltx_align_middle">
+<tr class="ltx_tr">
+<td class="ltx_td ltx_align_center"><math id="S2.p2.m5" class="ltx_Math" alttext="P" display="inline"><mi>P</mi></math></td>
+<td class="ltx_td ltx_align_center ltx_border_r"><math id="S2.p2.m6" class="ltx_Math" alttext="Q" display="inline"><mi>Q</mi></math></td>
+<td class="ltx_td ltx_nopad_r ltx_align_center"><math id="S2.p2.m7" class="ltx_Math" alttext="\neg" display="inline"><mo>¬</mo></math></td>
+<td class="ltx_td ltx_nopad_l ltx_nopad_r ltx_align_center"><math id="S2.p2.m8" class="ltx_math_unparsed" alttext="(P" display="inline"><mrow><mo stretchy="false">(</mo><mi>P</mi></mrow></math></td>
+<td class="ltx_td ltx_nopad_l ltx_nopad_r ltx_align_center"><math id="S2.p2.m9" class="ltx_Math" alttext="\vee" display="inline"><mo>∨</mo></math></td>
+<td class="ltx_td ltx_nopad_l ltx_align_center ltx_border_r"><math id="S2.p2.m10" class="ltx_math_unparsed" alttext="Q)" display="inline"><mrow><mi>Q</mi><mo stretchy="false">)</mo></mrow></math></td>
+<td class="ltx_td ltx_nopad_r ltx_align_center"><math id="S2.p2.m11" class="ltx_Math" alttext="\neg" display="inline"><mo>¬</mo></math></td>
+<td class="ltx_td ltx_nopad_l ltx_nopad_r ltx_align_center"><math id="S2.p2.m12" class="ltx_Math" alttext="P" display="inline"><mi>P</mi></math></td>
+<td class="ltx_td ltx_nopad_l ltx_nopad_r ltx_align_center"><math id="S2.p2.m13" class="ltx_Math" alttext="\wedge" display="inline"><mo>∧</mo></math></td>
+<td class="ltx_td ltx_nopad_l ltx_nopad_r ltx_align_center"><math id="S2.p2.m14" class="ltx_Math" alttext="\neg" display="inline"><mo>¬</mo></math></td>
+<td class="ltx_td ltx_nopad_l ltx_align_center"><math id="S2.p2.m15" class="ltx_Math" alttext="Q" display="inline"><mi>Q</mi></math></td>
+</tr>
+<tr class="ltx_tr">
+<td class="ltx_td ltx_align_center ltx_border_t">T</td>
+<td class="ltx_td ltx_align_center ltx_border_r ltx_border_t">T</td>
+<td class="ltx_td ltx_nopad_r ltx_align_center ltx_border_t"><span class="ltx_text ltx_font_bold">F</span></td>
+<td class="ltx_td ltx_nopad_l ltx_nopad_r ltx_align_center ltx_border_t">T</td>
+<td class="ltx_td ltx_nopad_l ltx_nopad_r ltx_align_center ltx_border_t">T</td>
+<td class="ltx_td ltx_nopad_l ltx_align_center ltx_border_r ltx_border_t">T</td>
+<td class="ltx_td ltx_nopad_r ltx_align_center ltx_border_t">F</td>
+<td class="ltx_td ltx_nopad_l ltx_nopad_r ltx_align_center ltx_border_t">T</td>
+<td class="ltx_td ltx_nopad_l ltx_nopad_r ltx_align_center ltx_border_t"><span class="ltx_text ltx_font_bold">F</span></td>
+<td class="ltx_td ltx_nopad_l ltx_nopad_r ltx_align_center ltx_border_t">F</td>
+<td class="ltx_td ltx_nopad_l ltx_align_center ltx_border_t">T</td>
+</tr>
+<tr class="ltx_tr">
+<td class="ltx_td ltx_align_center">T</td>
+<td class="ltx_td ltx_align_center ltx_border_r">F</td>
+<td class="ltx_td ltx_nopad_r ltx_align_center"><span class="ltx_text ltx_font_bold">F</span></td>
+<td class="ltx_td ltx_nopad_l ltx_nopad_r ltx_align_center">T</td>
+<td class="ltx_td ltx_nopad_l ltx_nopad_r ltx_align_center">T</td>
+<td class="ltx_td ltx_nopad_l ltx_align_center ltx_border_r">F</td>
+<td class="ltx_td ltx_nopad_r ltx_align_center">F</td>
+<td class="ltx_td ltx_nopad_l ltx_nopad_r ltx_align_center">T</td>
+<td class="ltx_td ltx_nopad_l ltx_nopad_r ltx_align_center"><span class="ltx_text ltx_font_bold">F</span></td>
+<td class="ltx_td ltx_nopad_l ltx_nopad_r ltx_align_center">T</td>
+<td class="ltx_td ltx_nopad_l ltx_align_center">F</td>
+</tr>
+<tr class="ltx_tr">
+<td class="ltx_td ltx_align_center">F</td>
+<td class="ltx_td ltx_align_center ltx_border_r">T</td>
+<td class="ltx_td ltx_nopad_r ltx_align_center"><span class="ltx_text ltx_font_bold">F</span></td>
+<td class="ltx_td ltx_nopad_l ltx_nopad_r ltx_align_center">F</td>
+<td class="ltx_td ltx_nopad_l ltx_nopad_r ltx_align_center">T</td>
+<td class="ltx_td ltx_nopad_l ltx_align_center ltx_border_r">T</td>
+<td class="ltx_td ltx_nopad_r ltx_align_center">T</td>
+<td class="ltx_td ltx_nopad_l ltx_nopad_r ltx_align_center">F</td>
+<td class="ltx_td ltx_nopad_l ltx_nopad_r ltx_align_center"><span class="ltx_text ltx_font_bold">F</span></td>
+<td class="ltx_td ltx_nopad_l ltx_nopad_r ltx_align_center">F</td>
+<td class="ltx_td ltx_nopad_l ltx_align_center">T</td>
+</tr>
+<tr class="ltx_tr">
+<td class="ltx_td ltx_align_center">F</td>
+<td class="ltx_td ltx_align_center ltx_border_r">F</td>
+<td class="ltx_td ltx_nopad_r ltx_align_center"><span class="ltx_text ltx_font_bold">T</span></td>
+<td class="ltx_td ltx_nopad_l ltx_nopad_r ltx_align_center">F</td>
+<td class="ltx_td ltx_nopad_l ltx_nopad_r ltx_align_center">F</td>
+<td class="ltx_td ltx_nopad_l ltx_align_center ltx_border_r">F</td>
+<td class="ltx_td ltx_nopad_r ltx_align_center">T</td>
+<td class="ltx_td ltx_nopad_l ltx_nopad_r ltx_align_center">F</td>
+<td class="ltx_td ltx_nopad_l ltx_nopad_r ltx_align_center"><span class="ltx_text ltx_font_bold">T</span></td>
+<td class="ltx_td ltx_nopad_l ltx_nopad_r ltx_align_center">T</td>
+<td class="ltx_td ltx_nopad_l ltx_align_center">F</td>
+</tr>
+</table>
+</div>
+<p class="ltx_p">Look at the columns for the main logical operators; negation for the first sentence, conjunction for the second. Go through the rows in the table one by one and compare the truth values in the columns for the main logical operators. On the first three rows, both are false. On the final row, both are true. Since they match on every row, the two sentences are equivalent.</p>
+</div>
+</div>
+</section>
+<section id="S3" class="ltx_section normal">
+<div class="section level2">
+<h2 class="ltx_title ltx_title_section">
+<span class="ltx_tag ltx_tag_section header-section-number">12.3</span> Satisfiability</h2>
+
+<div id="S3.p1" class="ltx_para">
+<p class="ltx_p">In <a href="Ch3.html" title="Chapter 3 Other logical notions ‣ Part I Key notions of logic ‣ forall x: Calgary" class="ltx_ref"><span class="ltx_text ltx_ref_tag">chapter</span> <span class="ltx_text ltx_ref_tag">3</span></a>, we said that sentences are jointly possible if⁠f it is possible for all of them to be true at once. We can offer a surrogate for this notion too:</p>
+<div class="ltx_logical-block bml_background-color_FDF4FA bml_background-color_FDF4FA" style="padding:9pt;">
+            
+<div id="S3.p1.p1" class="ltx_para ltx_noindent">
+<p class="ltx_p"><math id="S3.p1.p1.m1" class="ltx_Math" alttext="\mathscr{A}_{1},\mathscr{A}_{2},\ldots,\mathscr{A}_{n}" display="inline"><mrow><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mn>1</mn></msub><mo>,</mo><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mn>2</mn></msub><mo>,</mo><mi mathvariant="normal">…</mi><mo>,</mo><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mi>n</mi></msub></mrow></math> are <dfn>jointly satisfiable</dfn>
+ (in TFL) if⁠f there is some valuation which makes them all true.</p>
+</div>
+          
+</div>
+</div>
+<div id="S3.p2" class="ltx_para">
+<p class="ltx_p">Derivatively, sentences are <dfn>jointly unsatisfiable</dfn>
+ if⁠f no valuation makes them all true. Again, it is easy to test for joint satisfiability using truth tables.</p>
+</div>
+</div>
+</section>
+<section id="S4" class="ltx_section normal">
+<div class="section level2">
+<h2 class="ltx_title ltx_title_section">
+<span class="ltx_tag ltx_tag_section header-section-number">12.4</span> Entailment and validity</h2>
+
+<div id="S4.p1" class="ltx_para">
+<p class="ltx_p">The following idea is closely related to that of joint satisfiability:</p>
+<div class="ltx_logical-block bml_background-color_FDF4FA bml_background-color_FDF4FA" style="padding:9pt;">
+            
+<div id="S4.p1.p1" class="ltx_para ltx_noindent">
+<p class="ltx_p">The sentences <math id="S4.p1.p1.m1" class="ltx_Math" alttext="\mathscr{A}_{1},\mathscr{A}_{2},\ldots,\mathscr{A}_{n}" display="inline"><mrow><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mn>1</mn></msub><mo>,</mo><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mn>2</mn></msub><mo>,</mo><mi mathvariant="normal">…</mi><mo>,</mo><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mi>n</mi></msub></mrow></math> <dfn>entail</dfn>
+ (in TFL) the sentence <math id="S4.p1.p1.m2" class="ltx_Math" alttext="\mathscr{C}" display="inline"><mi class="ltx_font_mathscript">𝒞︁</mi></math> if⁠f no valuation of the relevant sentence letters makes all of <math id="S4.p1.p1.m3" class="ltx_Math" alttext="\mathscr{A}_{1},\mathscr{A}_{2},\ldots,\mathscr{A}_{n}" display="inline"><mrow><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mn>1</mn></msub><mo>,</mo><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mn>2</mn></msub><mo>,</mo><mi mathvariant="normal">…</mi><mo>,</mo><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mi>n</mi></msub></mrow></math> true and <math id="S4.p1.p1.m4" class="ltx_Math" alttext="\mathscr{C}" display="inline"><mi class="ltx_font_mathscript">𝒞︁</mi></math> false.</p>
+</div>
+          
+</div>
+</div>
+<div id="S4.p2" class="ltx_para">
+<p class="ltx_p">Again, it is easy to test this with a truth table. To check whether ‘<math id="S4.p2.m1" class="ltx_Math" alttext="\neg L\rightarrow(J\vee L)" display="inline"><mrow><mrow><mo rspace="0.167em">¬</mo><mi>L</mi></mrow><mo stretchy="false">→</mo><mrow><mo stretchy="false">(</mo><mrow><mi>J</mi><mo>∨</mo><mi>L</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math>’ and ‘<math id="S4.p2.m2" class="ltx_Math" alttext="\neg L" display="inline"><mrow><mo rspace="0.167em">¬</mo><mi>L</mi></mrow></math>’ entail ‘<math id="S4.p2.m3" class="ltx_Math" alttext="J" display="inline"><mi>J</mi></math>’, we simply need to check whether there is any valuation which makes both ‘<math id="S4.p2.m4" class="ltx_Math" alttext="\neg L\rightarrow(J\vee L)" display="inline"><mrow><mrow><mo rspace="0.167em">¬</mo><mi>L</mi></mrow><mo stretchy="false">→</mo><mrow><mo stretchy="false">(</mo><mrow><mi>J</mi><mo>∨</mo><mi>L</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math>’ and ‘<math id="S4.p2.m5" class="ltx_Math" alttext="\neg L" display="inline"><mrow><mo rspace="0.167em">¬</mo><mi>L</mi></mrow></math>’ true whilst making ‘<math id="S4.p2.m6" class="ltx_Math" alttext="J" display="inline"><mi>J</mi></math>’ false. So we use a truth table:</p>
+<div class="bml-overflow-wrapper">
+<table class="ltx_tabular ltx_centering ltx_align_middle">
+<tr class="ltx_tr">
+<td class="ltx_td ltx_align_center"><math id="S4.p2.m7" class="ltx_Math" alttext="J" display="inline"><mi>J</mi></math></td>
+<td class="ltx_td ltx_align_center ltx_border_r"><math id="S4.p2.m8" class="ltx_Math" alttext="L" display="inline"><mi>L</mi></math></td>
+<td class="ltx_td ltx_nopad_r ltx_align_center"><math id="S4.p2.m9" class="ltx_Math" alttext="\neg" display="inline"><mo>¬</mo></math></td>
+<td class="ltx_td ltx_nopad_l ltx_nopad_r ltx_align_center"><math id="S4.p2.m10" class="ltx_Math" alttext="L" display="inline"><mi>L</mi></math></td>
+<td class="ltx_td ltx_nopad_l ltx_nopad_r ltx_align_center"><math id="S4.p2.m11" class="ltx_Math" alttext="\rightarrow" display="inline"><mo stretchy="false">→</mo></math></td>
+<td class="ltx_td ltx_nopad_l ltx_nopad_r ltx_align_center"><math id="S4.p2.m12" class="ltx_math_unparsed" alttext="(J" display="inline"><mrow><mo stretchy="false">(</mo><mi>J</mi></mrow></math></td>
+<td class="ltx_td ltx_nopad_l ltx_nopad_r ltx_align_center"><math id="S4.p2.m13" class="ltx_Math" alttext="\vee" display="inline"><mo>∨</mo></math></td>
+<td class="ltx_td ltx_nopad_l ltx_align_center ltx_border_r"><math id="S4.p2.m14" class="ltx_math_unparsed" alttext="L)" display="inline"><mrow><mi>L</mi><mo stretchy="false">)</mo></mrow></math></td>
+<td class="ltx_td ltx_nopad_r ltx_align_center"><math id="S4.p2.m15" class="ltx_Math" alttext="\neg" display="inline"><mo>¬</mo></math></td>
+<td class="ltx_td ltx_nopad_l ltx_align_center ltx_border_r"><math id="S4.p2.m16" class="ltx_Math" alttext="L" display="inline"><mi>L</mi></math></td>
+<td class="ltx_td ltx_align_center"><math id="S4.p2.m17" class="ltx_Math" alttext="J" display="inline"><mi>J</mi></math></td>
+</tr>
+<tr class="ltx_tr">
+<td class="ltx_td ltx_align_center ltx_border_t">T</td>
+<td class="ltx_td ltx_align_center ltx_border_r ltx_border_t">T</td>
+<td class="ltx_td ltx_nopad_r ltx_align_center ltx_border_t">F</td>
+<td class="ltx_td ltx_nopad_l ltx_nopad_r ltx_align_center ltx_border_t">T</td>
+<td class="ltx_td ltx_nopad_l ltx_nopad_r ltx_align_center ltx_border_t"><span class="ltx_text ltx_font_bold">T</span></td>
+<td class="ltx_td ltx_nopad_l ltx_nopad_r ltx_align_center ltx_border_t">T</td>
+<td class="ltx_td ltx_nopad_l ltx_nopad_r ltx_align_center ltx_border_t">T</td>
+<td class="ltx_td ltx_nopad_l ltx_align_center ltx_border_r ltx_border_t">T</td>
+<td class="ltx_td ltx_nopad_r ltx_align_center ltx_border_t"><span class="ltx_text ltx_font_bold">F</span></td>
+<td class="ltx_td ltx_nopad_l ltx_align_center ltx_border_r ltx_border_t">T</td>
+<td class="ltx_td ltx_align_center ltx_border_t"><span class="ltx_text ltx_font_bold">T</span></td>
+</tr>
+<tr class="ltx_tr">
+<td class="ltx_td ltx_align_center">T</td>
+<td class="ltx_td ltx_align_center ltx_border_r">F</td>
+<td class="ltx_td ltx_nopad_r ltx_align_center">T</td>
+<td class="ltx_td ltx_nopad_l ltx_nopad_r ltx_align_center">F</td>
+<td class="ltx_td ltx_nopad_l ltx_nopad_r ltx_align_center"><span class="ltx_text ltx_font_bold">T</span></td>
+<td class="ltx_td ltx_nopad_l ltx_nopad_r ltx_align_center">T</td>
+<td class="ltx_td ltx_nopad_l ltx_nopad_r ltx_align_center">T</td>
+<td class="ltx_td ltx_nopad_l ltx_align_center ltx_border_r">F</td>
+<td class="ltx_td ltx_nopad_r ltx_align_center"><span class="ltx_text ltx_font_bold">T</span></td>
+<td class="ltx_td ltx_nopad_l ltx_align_center ltx_border_r">F</td>
+<td class="ltx_td ltx_align_center"><span class="ltx_text ltx_font_bold">T</span></td>
+</tr>
+<tr class="ltx_tr">
+<td class="ltx_td ltx_align_center">F</td>
+<td class="ltx_td ltx_align_center ltx_border_r">T</td>
+<td class="ltx_td ltx_nopad_r ltx_align_center">F</td>
+<td class="ltx_td ltx_nopad_l ltx_nopad_r ltx_align_center">T</td>
+<td class="ltx_td ltx_nopad_l ltx_nopad_r ltx_align_center"><span class="ltx_text ltx_font_bold">T</span></td>
+<td class="ltx_td ltx_nopad_l ltx_nopad_r ltx_align_center">F</td>
+<td class="ltx_td ltx_nopad_l ltx_nopad_r ltx_align_center">T</td>
+<td class="ltx_td ltx_nopad_l ltx_align_center ltx_border_r">T</td>
+<td class="ltx_td ltx_nopad_r ltx_align_center"><span class="ltx_text ltx_font_bold">F</span></td>
+<td class="ltx_td ltx_nopad_l ltx_align_center ltx_border_r">T</td>
+<td class="ltx_td ltx_align_center"><span class="ltx_text ltx_font_bold">F</span></td>
+</tr>
+<tr class="ltx_tr">
+<td class="ltx_td ltx_align_center">F</td>
+<td class="ltx_td ltx_align_center ltx_border_r">F</td>
+<td class="ltx_td ltx_nopad_r ltx_align_center">T</td>
+<td class="ltx_td ltx_nopad_l ltx_nopad_r ltx_align_center">F</td>
+<td class="ltx_td ltx_nopad_l ltx_nopad_r ltx_align_center"><span class="ltx_text ltx_font_bold">F</span></td>
+<td class="ltx_td ltx_nopad_l ltx_nopad_r ltx_align_center">F</td>
+<td class="ltx_td ltx_nopad_l ltx_nopad_r ltx_align_center">F</td>
+<td class="ltx_td ltx_nopad_l ltx_align_center ltx_border_r">F</td>
+<td class="ltx_td ltx_nopad_r ltx_align_center"><span class="ltx_text ltx_font_bold">T</span></td>
+<td class="ltx_td ltx_nopad_l ltx_align_center ltx_border_r">F</td>
+<td class="ltx_td ltx_align_center"><span class="ltx_text ltx_font_bold">F</span></td>
+</tr>
+</table>
+</div>
+<p class="ltx_p">The only row on which both‘<math id="S4.p2.m18" class="ltx_Math" alttext="\neg L\rightarrow(J\vee L)" display="inline"><mrow><mrow><mo rspace="0.167em">¬</mo><mi>L</mi></mrow><mo stretchy="false">→</mo><mrow><mo stretchy="false">(</mo><mrow><mi>J</mi><mo>∨</mo><mi>L</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math>’ and ‘<math id="S4.p2.m19" class="ltx_Math" alttext="\neg L" display="inline"><mrow><mo rspace="0.167em">¬</mo><mi>L</mi></mrow></math>’ are true is the second row, and that is a row on which ‘<math id="S4.p2.m20" class="ltx_Math" alttext="J" display="inline"><mi>J</mi></math>’ is also true. So ‘<math id="S4.p2.m21" class="ltx_Math" alttext="\neg L\rightarrow(J\vee L)" display="inline"><mrow><mrow><mo rspace="0.167em">¬</mo><mi>L</mi></mrow><mo stretchy="false">→</mo><mrow><mo stretchy="false">(</mo><mrow><mi>J</mi><mo>∨</mo><mi>L</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math>’ and ‘<math id="S4.p2.m22" class="ltx_Math" alttext="\neg L" display="inline"><mrow><mo rspace="0.167em">¬</mo><mi>L</mi></mrow></math>’ entail ‘<math id="S4.p2.m23" class="ltx_Math" alttext="J" display="inline"><mi>J</mi></math>’.</p>
+</div>
+</div>
+</section>
+<section id="S5" class="ltx_section normal">
+<div class="section level2">
+<h2 class="ltx_title ltx_title_section">
+<span class="ltx_tag ltx_tag_section header-section-number">12.5</span> The double turnstile</h2>
+
+<div id="S5.p1" class="ltx_para">
+<p class="ltx_p">In what follow, we will use the notion of entailment rather a lot in this book. It will help us, then, to introduce a symbol that abbreviates it. Rather than saying that the TFL sentences <math id="S5.p1.m1" class="ltx_Math" alttext="\mathscr{A}_{1}" display="inline"><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mn>1</mn></msub></math>, <math id="S5.p1.m2" class="ltx_Math" alttext="\mathscr{A}_{2}" display="inline"><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mn>2</mn></msub></math>, … and <math id="S5.p1.m3" class="ltx_Math" alttext="\mathscr{A}_{n}" display="inline"><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mi>n</mi></msub></math> together entail <math id="S5.p1.m4" class="ltx_Math" alttext="\mathscr{C}" display="inline"><mi class="ltx_font_mathscript">𝒞︁</mi></math>, we will abbreviate this by:</p>
+<div id="Ex1" class="ltx_equation bml_equation bml_equation_container ltx_align_baseline">
+<div class="ltx_Math bml_eqn_cell ltx_align_center"><math id="Ex1.m1" class="ltx_Math" alttext="\mathscr{A}_{1},\mathscr{A}_{2},\dots,\mathscr{A}_{n}\vDash\mathscr{C}" display="block"><mrow><mrow><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mn>1</mn></msub><mo>,</mo><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mn>2</mn></msub><mo>,</mo><mi mathvariant="normal">…</mi><mo>,</mo><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mi>n</mi></msub></mrow><mo>⊨</mo><mi class="ltx_font_mathscript">𝒞︁</mi></mrow></math></div>
+</div>
+<p class="ltx_p">The symbol ‘<math id="S5.p1.m5" class="ltx_Math" alttext="\vDash" display="inline"><mo>⊨</mo></math>’ is known as <span class="ltx_text ltx_font_bold">the double turnstile</span>, since it looks like a turnstile with two horizontal beams.</p>
+</div>
+<div id="S5.p2" class="ltx_para">
+<p class="ltx_p">Let’s be clear. ‘<math id="S5.p2.m1" class="ltx_Math" alttext="\vDash" display="inline"><mo>⊨</mo></math>’ is not a symbol of TFL. Rather, it is a symbol of our metalanguage, augmented English (recall the difference between object language and metalanguage from <a href="Ch8.html" title="Chapter 8 Use and mention ‣ Part II Truth-functional logic ‣ forall x: Calgary" class="ltx_ref"><span class="ltx_text ltx_ref_tag">chapter</span> <span class="ltx_text ltx_ref_tag">8</span></a>). So the metalanguage sentence:</p>
+<div id="Ex2" class="ltx_equation bml_equation bml_equation_container ltx_align_baseline">
+<div class="ltx_Math bml_eqn_cell ltx_align_center"><math id="Ex2.m1" class="ltx_Math" alttext="\mathscr{A},\mathscr{A}\rightarrow\mathscr{B}\vDash\mathscr{B}" display="block"><mrow><mrow><mi class="ltx_font_mathscript">𝒜︁</mi><mo>,</mo><mi class="ltx_font_mathscript">𝒜︁</mi></mrow><mo stretchy="false">→</mo><mi class="ltx_font_mathscript">ℬ︁</mi><mo>⊨</mo><mi class="ltx_font_mathscript">ℬ︁</mi></mrow></math></div>
+</div>
+<p class="ltx_p">is <span class="ltx_text ltx_font_bold">just</span> an abbreviation for this metalanguage sentence:</p>
+<p class="ltx_p ltx_align_center">The TFL sentences <math id="S5.p2.m2" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math> and <math id="S5.p2.m3" class="ltx_Math" alttext="\mathscr{A}\rightarrow\mathscr{B}" display="inline"><mrow><mi class="ltx_font_mathscript">𝒜︁</mi><mo stretchy="false">→</mo><mi class="ltx_font_mathscript">ℬ︁</mi></mrow></math> entail <math id="S5.p2.m4" class="ltx_Math" alttext="\mathscr{B}" display="inline"><mi class="ltx_font_mathscript">ℬ︁</mi></math></p>
+<p class="ltx_p">Note that there is no limit on the number of TFL sentences that can be mentioned before the symbol ‘<math id="S5.p2.m5" class="ltx_Math" alttext="\vDash" display="inline"><mo>⊨</mo></math>’. Indeed, we can even consider the limiting case:</p>
+<div id="Ex3" class="ltx_equation bml_equation bml_equation_container ltx_align_baseline">
+<div class="ltx_Math bml_eqn_cell ltx_align_center"><math id="Ex3.m1" class="ltx_Math" alttext="\vDash\mathscr{C}" display="block"><mrow><mi></mi><mo>⊨</mo><mi class="ltx_font_mathscript">𝒞︁</mi></mrow></math></div>
+</div>
+<p class="ltx_p">This says that there is no valuation which makes all the sentences
+mentioned on the left side of ‘<math id="S5.p2.m6" class="ltx_Math" alttext="\vDash" display="inline"><mo>⊨</mo></math>’ true whilst making all
+sentences on the right side (in this case, <math id="S5.p2.m7" class="ltx_Math" alttext="\mathscr{C}" display="inline"><mi class="ltx_font_mathscript">𝒞︁</mi></math>) false. Since <span class="ltx_text ltx_font_bold">no</span> sentences are mentioned on the left
+side of ‘<math id="S5.p2.m8" class="ltx_Math" alttext="\vDash" display="inline"><mo>⊨</mo></math>’ in this case, this just means that there is no
+valuation which makes <math id="S5.p2.m9" class="ltx_Math" alttext="\mathscr{C}" display="inline"><mi class="ltx_font_mathscript">𝒞︁</mi></math> false. Otherwise put, it says that
+every valuation makes <math id="S5.p2.m10" class="ltx_Math" alttext="\mathscr{C}" display="inline"><mi class="ltx_font_mathscript">𝒞︁</mi></math> true. Otherwise put, it says that
+<math id="S5.p2.m11" class="ltx_Math" alttext="\mathscr{C}" display="inline"><mi class="ltx_font_mathscript">𝒞︁</mi></math> is a tautology. Equally, to say that <math id="S5.p2.m12" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math> is a
+contradiction, we could write:</p>
+<div id="Ex4" class="ltx_equation bml_equation bml_equation_container ltx_align_baseline">
+<div class="ltx_Math bml_eqn_cell ltx_align_center"><math id="Ex4.m1" class="ltx_Math" alttext="\mathscr{A}\vDash\phantom{\mathscr{C}}" display="block"><mrow><mi class="ltx_font_mathscript">𝒜︁</mi><mo rspace="0.998em">⊨</mo><mi></mi></mrow></math></div>
+</div>
+<p class="ltx_p">to mean that no valuation makes <math id="S5.p2.m13" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math> true.</p>
+</div>
+<div id="S5.p3" class="ltx_para">
+<p class="ltx_p">Sometimes, we will want to deny that there is a tautological entailment, and say something of this shape:</p>
+<p class="ltx_p ltx_align_center">it is <span class="ltx_text ltx_font_bold">not</span> the case that <math id="S5.p3.m1" class="ltx_Math" alttext="\mathscr{A}_{1},\ldots,\mathscr{A}_{n}\vDash\mathscr{C}" display="inline"><mrow><mrow><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mn>1</mn></msub><mo>,</mo><mi mathvariant="normal">…</mi><mo>,</mo><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mi>n</mi></msub></mrow><mo>⊨</mo><mi class="ltx_font_mathscript">𝒞︁</mi></mrow></math></p>
+<p class="ltx_p">In that case, we can just slash the turnstile through, and write:</p>
+<div id="Ex5" class="ltx_equation bml_equation bml_equation_container ltx_align_baseline">
+<div class="ltx_Math bml_eqn_cell ltx_align_center"><math id="Ex5.m1" class="ltx_Math" alttext="\mathscr{A}_{1},\mathscr{A}_{2},\ldots,\mathscr{A}_{n}\nvDash\mathscr{C}" display="block"><mrow><mrow><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mn>1</mn></msub><mo>,</mo><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mn>2</mn></msub><mo>,</mo><mi mathvariant="normal">…</mi><mo>,</mo><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mi>n</mi></msub></mrow><mo>⊭</mo><mi class="ltx_font_mathscript">𝒞︁</mi></mrow></math></div>
+</div>
+<p class="ltx_p">This means that <span class="ltx_text ltx_font_bold">some</span> valuation makes all of <math id="S5.p3.m2" class="ltx_Math" alttext="\mathscr{A}_{1},\ldots,\mathscr{A}_{n}" display="inline"><mrow><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mn>1</mn></msub><mo>,</mo><mi mathvariant="normal">…</mi><mo>,</mo><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mi>n</mi></msub></mrow></math> true whilst making <math id="S5.p3.m3" class="ltx_Math" alttext="\mathscr{C}" display="inline"><mi class="ltx_font_mathscript">𝒞︁</mi></math> false. Note that
+it does <span class="ltx_text ltx_font_bold">not</span> follow that <math id="S5.p3.m4" class="ltx_Math" alttext="\mathscr{A}_{1},\ldots,\mathscr{A}_{n}\vDash\neg\mathscr{C}" display="inline"><mrow><mrow><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mn>1</mn></msub><mo>,</mo><mi mathvariant="normal">…</mi><mo>,</mo><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mi>n</mi></msub></mrow><mo>⊨</mo><mrow><mo rspace="0.167em">¬</mo><mi class="ltx_font_mathscript">𝒞︁</mi></mrow></mrow></math>, for it is possible that some <span class="ltx_text ltx_font_bold">other</span>
+valuation makes all of <math id="S5.p3.m5" class="ltx_Math" alttext="\mathscr{A}_{1},\ldots,\mathscr{A}_{n}" display="inline"><mrow><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mn>1</mn></msub><mo>,</mo><mi mathvariant="normal">…</mi><mo>,</mo><msub><mi class="ltx_font_mathscript">𝒜︁</mi><mi>n</mi></msub></mrow></math> true and
+makes <math id="S5.p3.m6" class="ltx_Math" alttext="\mathscr{C}" display="inline"><mi class="ltx_font_mathscript">𝒞︁</mi></math> <span class="ltx_text ltx_font_bold">true</span>. For instance, <math id="S5.p3.m7" class="ltx_Math" alttext="P\nvDash Q" display="inline"><mrow><mi>P</mi><mo>⊭</mo><mi>Q</mi></mrow></math> but also
+<math id="S5.p3.m8" class="ltx_Math" alttext="P\nvDash\neg Q" display="inline"><mrow><mi>P</mi><mo>⊭</mo><mrow><mo rspace="0.167em">¬</mo><mi>Q</mi></mrow></mrow></math>.</p>
+</div>
+</div>
+</section>
+<section id="S6" class="ltx_section normal">
+<div class="section level2">
+<h2 class="ltx_title ltx_title_section">
+<span class="ltx_tag ltx_tag_section header-section-number">12.6</span> ‘<math id="S6.m1" class="ltx_Math" alttext="\vDash" display="inline"><mo>⊨</mo></math>’ versus ‘<math id="S6.m2" class="ltx_Math" alttext="\rightarrow" display="inline"><mo stretchy="false">→</mo></math>’</h2>
+
+<div id="S6.p1" class="ltx_para">
+<p class="ltx_p">We now want to compare and contrast ‘<math id="S6.p1.m1" class="ltx_Math" alttext="\vDash" display="inline"><mo>⊨</mo></math>’ and ‘<math id="S6.p1.m2" class="ltx_Math" alttext="\rightarrow" display="inline"><mo stretchy="false">→</mo></math>’.</p>
+</div>
+<div id="S6.p2" class="ltx_para">
+<p class="ltx_p">Observe: <math id="S6.p2.m1" class="ltx_Math" alttext="\mathscr{A}\vDash\mathscr{C}" display="inline"><mrow><mi class="ltx_font_mathscript">𝒜︁</mi><mo>⊨</mo><mi class="ltx_font_mathscript">𝒞︁</mi></mrow></math> if⁠f no valuation of the sentence letters makes <math id="S6.p2.m2" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math> true and <math id="S6.p2.m3" class="ltx_Math" alttext="\mathscr{C}" display="inline"><mi class="ltx_font_mathscript">𝒞︁</mi></math> false.</p>
+</div>
+<div id="S6.p3" class="ltx_para">
+<p class="ltx_p">Observe: <math id="S6.p3.m1" class="ltx_Math" alttext="\mathscr{A}\rightarrow\mathscr{C}" display="inline"><mrow><mi class="ltx_font_mathscript">𝒜︁</mi><mo stretchy="false">→</mo><mi class="ltx_font_mathscript">𝒞︁</mi></mrow></math> is a tautology if⁠f no valuation of the sentence letters makes <math id="S6.p3.m2" class="ltx_Math" alttext="\mathscr{A}\rightarrow\mathscr{C}" display="inline"><mrow><mi class="ltx_font_mathscript">𝒜︁</mi><mo stretchy="false">→</mo><mi class="ltx_font_mathscript">𝒞︁</mi></mrow></math> false. Since a conditional is true except when its antecedent is true and its consequent false, <math id="S6.p3.m3" class="ltx_Math" alttext="\mathscr{A}\rightarrow\mathscr{C}" display="inline"><mrow><mi class="ltx_font_mathscript">𝒜︁</mi><mo stretchy="false">→</mo><mi class="ltx_font_mathscript">𝒞︁</mi></mrow></math> is a tautology if⁠f no valuation makes <math id="S6.p3.m4" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math> true and <math id="S6.p3.m5" class="ltx_Math" alttext="\mathscr{C}" display="inline"><mi class="ltx_font_mathscript">𝒞︁</mi></math> false.</p>
+</div>
+<div id="S6.p4" class="ltx_para">
+<p class="ltx_p">Combining these two observations, we see that <math id="S6.p4.m1" class="ltx_Math" alttext="\mathscr{A}\rightarrow\mathscr{C}" display="inline"><mrow><mi class="ltx_font_mathscript">𝒜︁</mi><mo stretchy="false">→</mo><mi class="ltx_font_mathscript">𝒞︁</mi></mrow></math> is a tautology if⁠f <math id="S6.p4.m2" class="ltx_Math" alttext="\mathscr{A}\vDash\mathscr{C}" display="inline"><mrow><mi class="ltx_font_mathscript">𝒜︁</mi><mo>⊨</mo><mi class="ltx_font_mathscript">𝒞︁</mi></mrow></math>. But there is a really, really important difference between ‘<math id="S6.p4.m3" class="ltx_Math" alttext="\vDash" display="inline"><mo>⊨</mo></math>’ and ‘<math id="S6.p4.m4" class="ltx_Math" alttext="\rightarrow" display="inline"><mo stretchy="false">→</mo></math>’:</p>
+<div class="ltx_logical-block bml_background-color_FDF4FA bml_background-color_FDF4FA" style="padding:9pt;">
+            
+<div id="S6.p4.p1" class="ltx_para ltx_noindent">
+<ul id="S6.I1" class="ltx_itemize">
+<li id="S6.I1.i1" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">‣</span><div id="S6.I1.i1.p1" class="ltx_para">​<p class="ltx_p">‘<math id="S6.I1.i1.p1.m1" class="ltx_Math" alttext="\rightarrow" display="inline"><mo stretchy="false">→</mo></math>’ is a sentential connective of TFL.</p>
+</div>
+</li>
+<li id="S6.I1.i2" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">‣</span><div id="S6.I1.i2.p1" class="ltx_para">​<p class="ltx_p">‘<math id="S6.I1.i2.p1.m1" class="ltx_Math" alttext="\vDash" display="inline"><mo>⊨</mo></math>’ is a symbol of augmented English.</p>
+</div>
+</li>
+</ul>
+</div>
+          
+</div>
+<p class="ltx_p">Indeed, when ‘<math id="S6.p4.m5" class="ltx_Math" alttext="\rightarrow" display="inline"><mo stretchy="false">→</mo></math>’ is flanked with two TFL sentences, the result is a longer TFL sentence. By contrast, when we use ‘<math id="S6.p4.m6" class="ltx_Math" alttext="\vDash" display="inline"><mo>⊨</mo></math>’, we form a metalinguistic sentence that <span class="ltx_text ltx_font_bold">mentions</span> the surrounding TFL sentences.</p>
+</div>
+<div id="S6.p5" class="ltx_para">
+<p class="ltx_p">The English word ‘implies’ is often used as a synonym for ‘entails’,
+i.e., ‘<math id="S6.p5.m1" class="ltx_Math" alttext="\vDash" display="inline"><mo>⊨</mo></math>’. Some logicians <span class="ltx_text ltx_font_bold">also</span> use it for the
+conditional, i.e., ‘<math id="S6.p5.m2" class="ltx_Math" alttext="\rightarrow" display="inline"><mo stretchy="false">→</mo></math>’. Since this is liable to commit the
+confusion warned about above, we avoid the use of ‘implies’ as much as
+possible. (Whenever it is used, it means ‘entails’.)</p>
+</div>
+</div>
+</section>
+<section id="Sx1" class="ltx_section normal">
+<div class="section level2">
+<h2 class="ltx_title ltx_title_section">Practice exercises</h2>
+
+<div id="Sx1.p1" class="ltx_para ltx_noindent">
+<p class="ltx_p"><span class="ltx_text ltx_font_bold">A. </span>Revisit your answers to
+<a href="A11.html" title="Solutions to Chapter 11 Complete truth tables ‣ Solutions to selected exercices ‣ forall x: Calgary" class="ltx_ref">exercise <span class="ltx_ref ltx_nolink"><span class="ltx_text ltx_ref_tag">11</span></span>A</a>. Determine which
+sentences were tautologies, which were contradictions, and which were
+neither tautologies nor contradictions.</p>
+</div>
+<div id="Sx1.p2" class="ltx_para ltx_noindent">
+<p class="ltx_p"><span class="ltx_text ltx_font_bold">B. </span>
+Use truth tables to determine whether these sentences are jointly satisfiable, or jointly unsatisfiable:</p>
+<ol id="Sx1.I2" class="ltx_enumerate">
+<li id="Sx1.I2.i1" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">1.</span><div id="Sx1.I2.i1.p1" class="ltx_para">​<p class="ltx_p"><math id="Sx1.I2.i1.p1.m1" class="ltx_Math" alttext="A\rightarrow A" display="inline"><mrow><mi>A</mi><mo stretchy="false">→</mo><mi>A</mi></mrow></math>, <math id="Sx1.I2.i1.p1.m2" class="ltx_Math" alttext="\neg A\rightarrow\neg A" display="inline"><mrow><mrow><mo rspace="0.167em">¬</mo><mi>A</mi></mrow><mo stretchy="false">→</mo><mrow><mo rspace="0.167em">¬</mo><mi>A</mi></mrow></mrow></math>, <math id="Sx1.I2.i1.p1.m3" class="ltx_Math" alttext="A\wedge A" display="inline"><mrow><mi>A</mi><mo>∧</mo><mi>A</mi></mrow></math>, <math id="Sx1.I2.i1.p1.m4" class="ltx_Math" alttext="A\vee A" display="inline"><mrow><mi>A</mi><mo>∨</mo><mi>A</mi></mrow></math></p>
+</div>
+</li>
+<li id="Sx1.I2.i2" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">2.</span><div id="Sx1.I2.i2.p1" class="ltx_para">​<p class="ltx_p"><math id="Sx1.I2.i2.p1.m1" class="ltx_Math" alttext="A\vee B" display="inline"><mrow><mi>A</mi><mo>∨</mo><mi>B</mi></mrow></math>, <math id="Sx1.I2.i2.p1.m2" class="ltx_Math" alttext="A\rightarrow C" display="inline"><mrow><mi>A</mi><mo stretchy="false">→</mo><mi>C</mi></mrow></math>, <math id="Sx1.I2.i2.p1.m3" class="ltx_Math" alttext="B\rightarrow C" display="inline"><mrow><mi>B</mi><mo stretchy="false">→</mo><mi>C</mi></mrow></math></p>
+</div>
+</li>
+<li id="Sx1.I2.i3" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">3.</span><div id="Sx1.I2.i3.p1" class="ltx_para">​<p class="ltx_p"><math id="Sx1.I2.i3.p1.m1" class="ltx_Math" alttext="B\wedge(C\vee A)" display="inline"><mrow><mi>B</mi><mo>∧</mo><mrow><mo stretchy="false">(</mo><mrow><mi>C</mi><mo>∨</mo><mi>A</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math>, <math id="Sx1.I2.i3.p1.m2" class="ltx_Math" alttext="A\rightarrow B" display="inline"><mrow><mi>A</mi><mo stretchy="false">→</mo><mi>B</mi></mrow></math>, <math id="Sx1.I2.i3.p1.m3" class="ltx_Math" alttext="\neg(B\vee C)" display="inline"><mrow><mo>¬</mo><mrow><mo stretchy="false">(</mo><mrow><mi>B</mi><mo>∨</mo><mi>C</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math></p>
+</div>
+</li>
+<li id="Sx1.I2.i4" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">4.</span><div id="Sx1.I2.i4.p1" class="ltx_para">​<p class="ltx_p"><math id="Sx1.I2.i4.p1.m1" class="ltx_Math" alttext="A\leftrightarrow(B\vee C)" display="inline"><mrow><mi>A</mi><mo stretchy="false">↔</mo><mrow><mo stretchy="false">(</mo><mrow><mi>B</mi><mo>∨</mo><mi>C</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math>, <math id="Sx1.I2.i4.p1.m2" class="ltx_Math" alttext="C\rightarrow\neg A" display="inline"><mrow><mi>C</mi><mo stretchy="false">→</mo><mrow><mo rspace="0.167em">¬</mo><mi>A</mi></mrow></mrow></math>, <math id="Sx1.I2.i4.p1.m3" class="ltx_Math" alttext="A\rightarrow\neg B" display="inline"><mrow><mi>A</mi><mo stretchy="false">→</mo><mrow><mo rspace="0.167em">¬</mo><mi>B</mi></mrow></mrow></math></p>
+</div>
+</li>
+</ol>
+</div>
+<div id="Sx1.p3" class="ltx_para ltx_noindent">
+<p class="ltx_p"><span class="ltx_text ltx_font_bold">C. </span>
+Use truth tables to determine whether each argument is valid or invalid.</p>
+<ol id="Sx1.I3" class="ltx_enumerate">
+<li id="Sx1.I3.i1" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">1.</span><div id="Sx1.I3.i1.p1" class="ltx_para">​<p class="ltx_p"><math id="Sx1.I3.i1.p1.m1" class="ltx_Math" alttext="A\rightarrow A\therefore A" display="inline"><mrow><mrow><mi>A</mi><mo stretchy="false">→</mo><mi>A</mi></mrow><mo>∴</mo><mi>A</mi></mrow></math></p>
+</div>
+</li>
+<li id="Sx1.I3.i2" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">2.</span><div id="Sx1.I3.i2.p1" class="ltx_para">​<p class="ltx_p"><math id="Sx1.I3.i2.p1.m1" class="ltx_Math" alttext="A\rightarrow(A\wedge\neg A)\therefore\neg A" display="inline"><mrow><mrow><mi>A</mi><mo stretchy="false">→</mo><mrow><mo stretchy="false">(</mo><mrow><mi>A</mi><mo>∧</mo><mrow><mo rspace="0.167em">¬</mo><mi>A</mi></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow><mo>∴</mo><mrow><mo rspace="0.167em">¬</mo><mi>A</mi></mrow></mrow></math></p>
+</div>
+</li>
+<li id="Sx1.I3.i3" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">3.</span><div id="Sx1.I3.i3.p1" class="ltx_para">​<p class="ltx_p"><math id="Sx1.I3.i3.p1.m1" class="ltx_Math" alttext="A\vee(B\rightarrow A)\therefore\neg A\rightarrow\neg B" display="inline"><mrow><mrow><mi>A</mi><mo>∨</mo><mrow><mo stretchy="false">(</mo><mrow><mi>B</mi><mo stretchy="false">→</mo><mi>A</mi></mrow><mo stretchy="false">)</mo></mrow></mrow><mo>∴</mo><mrow><mrow><mo rspace="0.167em">¬</mo><mi>A</mi></mrow><mo stretchy="false">→</mo><mrow><mo rspace="0.167em">¬</mo><mi>B</mi></mrow></mrow></mrow></math></p>
+</div>
+</li>
+<li id="Sx1.I3.i4" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">4.</span><div id="Sx1.I3.i4.p1" class="ltx_para">​<p class="ltx_p"><math id="Sx1.I3.i4.p1.m1" class="ltx_Math" alttext="A\vee B,B\vee C,\neg A\therefore B\wedge C" display="inline"><mrow><mrow><mrow><mi>A</mi><mo>∨</mo><mi>B</mi></mrow><mo>,</mo><mrow><mi>B</mi><mo>∨</mo><mi>C</mi></mrow><mo>,</mo><mrow><mo rspace="0.167em">¬</mo><mi>A</mi></mrow></mrow><mo>∴</mo><mrow><mi>B</mi><mo>∧</mo><mi>C</mi></mrow></mrow></math></p>
+</div>
+</li>
+<li id="Sx1.I3.i5" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">5.</span><div id="Sx1.I3.i5.p1" class="ltx_para">​<p class="ltx_p"><math id="Sx1.I3.i5.p1.m1" class="ltx_Math" alttext="(B\wedge A)\rightarrow C,(C\wedge A)\rightarrow B\therefore(C\wedge B)\rightarrow
+A" display="inline"><mrow><mrow><mrow><mrow><mo stretchy="false">(</mo><mrow><mi>B</mi><mo>∧</mo><mi>A</mi></mrow><mo stretchy="false">)</mo></mrow><mo stretchy="false">→</mo><mi>C</mi></mrow><mo>,</mo><mrow><mrow><mo stretchy="false">(</mo><mrow><mi>C</mi><mo>∧</mo><mi>A</mi></mrow><mo stretchy="false">)</mo></mrow><mo stretchy="false">→</mo><mi>B</mi></mrow></mrow><mo>∴</mo><mrow><mrow><mo stretchy="false">(</mo><mrow><mi>C</mi><mo>∧</mo><mi>B</mi></mrow><mo stretchy="false">)</mo></mrow><mo stretchy="false">→</mo><mi>A</mi></mrow></mrow></math></p>
+</div>
+</li>
+</ol>
+</div>
+<div id="Sx1.p4" class="ltx_para ltx_noindent">
+<p class="ltx_p"><span class="ltx_text ltx_font_bold">D. </span>Determine whether each sentence is a tautology, a contradiction, or a contingent sentence, using a complete truth table.</p>
+<ol id="Sx1.I4" class="ltx_enumerate">
+<li id="Sx1.I4.i1" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">1.</span><div id="Sx1.I4.i1.p1" class="ltx_para">​<p class="ltx_p"><math id="Sx1.I4.i1.p1.m1" class="ltx_Math" alttext="\neg B\wedge B" display="inline"><mrow><mrow><mo rspace="0.167em">¬</mo><mi>B</mi></mrow><mo>∧</mo><mi>B</mi></mrow></math></p>
+</div>
+</li>
+<li id="Sx1.I4.i2" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">2.</span><div id="Sx1.I4.i2.p1" class="ltx_para">​<p class="ltx_p"><math id="Sx1.I4.i2.p1.m1" class="ltx_Math" alttext="\neg D\vee D" display="inline"><mrow><mrow><mo rspace="0.167em">¬</mo><mi>D</mi></mrow><mo>∨</mo><mi>D</mi></mrow></math></p>
+</div>
+</li>
+<li id="Sx1.I4.i3" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">3.</span><div id="Sx1.I4.i3.p1" class="ltx_para">​<p class="ltx_p"><math id="Sx1.I4.i3.p1.m1" class="ltx_Math" alttext="(A\wedge B)\vee(B\wedge A)" display="inline"><mrow><mrow><mo stretchy="false">(</mo><mrow><mi>A</mi><mo>∧</mo><mi>B</mi></mrow><mo stretchy="false">)</mo></mrow><mo>∨</mo><mrow><mo stretchy="false">(</mo><mrow><mi>B</mi><mo>∧</mo><mi>A</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math></p>
+</div>
+</li>
+<li id="Sx1.I4.i4" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">4.</span><div id="Sx1.I4.i4.p1" class="ltx_para">​<p class="ltx_p"><math id="Sx1.I4.i4.p1.m1" class="ltx_Math" alttext="\neg[A\rightarrow(B\rightarrow A)]" display="inline"><mrow><mo>¬</mo><mrow><mo stretchy="false">[</mo><mrow><mi>A</mi><mo stretchy="false">→</mo><mrow><mo stretchy="false">(</mo><mrow><mi>B</mi><mo stretchy="false">→</mo><mi>A</mi></mrow><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">]</mo></mrow></mrow></math></p>
+</div>
+</li>
+<li id="Sx1.I4.i5" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">5.</span><div id="Sx1.I4.i5.p1" class="ltx_para">​<p class="ltx_p"><math id="Sx1.I4.i5.p1.m1" class="ltx_Math" alttext="A\leftrightarrow[A\rightarrow(B\wedge\neg B)]" display="inline"><mrow><mi>A</mi><mo stretchy="false">↔</mo><mrow><mo stretchy="false">[</mo><mrow><mi>A</mi><mo stretchy="false">→</mo><mrow><mo stretchy="false">(</mo><mrow><mi>B</mi><mo>∧</mo><mrow><mo rspace="0.167em">¬</mo><mi>B</mi></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">]</mo></mrow></mrow></math></p>
+</div>
+</li>
+<li id="Sx1.I4.i6" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">6.</span><div id="Sx1.I4.i6.p1" class="ltx_para">​<p class="ltx_p"><math id="Sx1.I4.i6.p1.m1" class="ltx_math_unparsed" alttext="[(A\wedge B)\leftrightarrow B]\rightarrow(A\rightarrow B)" display="inline"><mrow><mrow><mo stretchy="false">[</mo><mrow><mo stretchy="false">(</mo><mi>A</mi><mo>∧</mo><mi>B</mi><mo stretchy="false">)</mo></mrow><mo stretchy="false">↔</mo><mi>B</mi><mo stretchy="false">]</mo></mrow><mo stretchy="false">→</mo><mrow><mo stretchy="false">(</mo><mi>A</mi><mo stretchy="false">→</mo><mi>B</mi><mo stretchy="false">)</mo></mrow></mrow></math></p>
+</div>
+</li>
+</ol>
+</div>
+<div id="Sx1.p6" class="ltx_para ltx_noindent">
+<p class="ltx_p"><span class="ltx_text ltx_font_bold">E. </span>
+Determine whether each the following sentences are logically equivalent using complete truth tables. If the two sentences really are logically equivalent, write “equivalent.” Otherwise write, “Not equivalent.”</p>
+<ol id="Sx1.I5" class="ltx_enumerate">
+<li id="Sx1.I5.i1" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">1.</span><div id="Sx1.I5.i1.p1" class="ltx_para">​<p class="ltx_p"><math id="Sx1.I5.i1.p1.m1" class="ltx_Math" alttext="A" display="inline"><mi>A</mi></math> and <math id="Sx1.I5.i1.p1.m2" class="ltx_Math" alttext="\neg A" display="inline"><mrow><mo rspace="0.167em">¬</mo><mi>A</mi></mrow></math></p>
+</div>
+</li>
+<li id="Sx1.I5.i2" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">2.</span><div id="Sx1.I5.i2.p1" class="ltx_para">​<p class="ltx_p"><math id="Sx1.I5.i2.p1.m1" class="ltx_Math" alttext="A\wedge\neg A" display="inline"><mrow><mi>A</mi><mo>∧</mo><mrow><mo rspace="0.167em">¬</mo><mi>A</mi></mrow></mrow></math> and <math id="Sx1.I5.i2.p1.m2" class="ltx_Math" alttext="\neg B\leftrightarrow B" display="inline"><mrow><mrow><mo rspace="0.167em">¬</mo><mi>B</mi></mrow><mo stretchy="false">↔</mo><mi>B</mi></mrow></math></p>
+</div>
+</li>
+<li id="Sx1.I5.i3" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">3.</span><div id="Sx1.I5.i3.p1" class="ltx_para">​<p class="ltx_p"><math id="Sx1.I5.i3.p1.m1" class="ltx_Math" alttext="[(A\vee B)\vee C]" display="inline"><mrow><mo stretchy="false">[</mo><mrow><mrow><mo stretchy="false">(</mo><mrow><mi>A</mi><mo>∨</mo><mi>B</mi></mrow><mo stretchy="false">)</mo></mrow><mo>∨</mo><mi>C</mi></mrow><mo stretchy="false">]</mo></mrow></math> and <math id="Sx1.I5.i3.p1.m2" class="ltx_Math" alttext="[A\vee(B\vee C)]" display="inline"><mrow><mo stretchy="false">[</mo><mrow><mi>A</mi><mo>∨</mo><mrow><mo stretchy="false">(</mo><mrow><mi>B</mi><mo>∨</mo><mi>C</mi></mrow><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">]</mo></mrow></math></p>
+</div>
+</li>
+<li id="Sx1.I5.i4" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">4.</span><div id="Sx1.I5.i4.p1" class="ltx_para">​<p class="ltx_p"><math id="Sx1.I5.i4.p1.m1" class="ltx_Math" alttext="A\vee(B\wedge C)" display="inline"><mrow><mi>A</mi><mo>∨</mo><mrow><mo stretchy="false">(</mo><mrow><mi>B</mi><mo>∧</mo><mi>C</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math> and <math id="Sx1.I5.i4.p1.m2" class="ltx_Math" alttext="(A\vee B)\wedge(A\vee C)" display="inline"><mrow><mrow><mo stretchy="false">(</mo><mrow><mi>A</mi><mo>∨</mo><mi>B</mi></mrow><mo stretchy="false">)</mo></mrow><mo>∧</mo><mrow><mo stretchy="false">(</mo><mrow><mi>A</mi><mo>∨</mo><mi>C</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math></p>
+</div>
+</li>
+<li id="Sx1.I5.i5" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">5.</span><div id="Sx1.I5.i5.p1" class="ltx_para">​<p class="ltx_p"><math id="Sx1.I5.i5.p1.m1" class="ltx_Math" alttext="[A\wedge(A\vee B)]\rightarrow B" display="inline"><mrow><mrow><mo stretchy="false">[</mo><mrow><mi>A</mi><mo>∧</mo><mrow><mo stretchy="false">(</mo><mrow><mi>A</mi><mo>∨</mo><mi>B</mi></mrow><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">]</mo></mrow><mo stretchy="false">→</mo><mi>B</mi></mrow></math> and <math id="Sx1.I5.i5.p1.m2" class="ltx_Math" alttext="A\rightarrow B" display="inline"><mrow><mi>A</mi><mo stretchy="false">→</mo><mi>B</mi></mrow></math></p>
+</div>
+</li>
+</ol>
+</div>
+<div id="Sx1.p7" class="ltx_para ltx_noindent">
+<p class="ltx_p"><span class="ltx_text ltx_font_bold">F. </span>
+Determine whether each the following sentences are logically equivalent using complete truth tables. If the two sentences really are equivalent, write “equivalent.” Otherwise write, “not equivalent.”</p>
+<ol id="Sx1.I6" class="ltx_enumerate">
+<li id="Sx1.I6.i1" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">1.</span><div id="Sx1.I6.i1.p1" class="ltx_para">​<p class="ltx_p"><math id="Sx1.I6.i1.p1.m1" class="ltx_Math" alttext="A\rightarrow A" display="inline"><mrow><mi>A</mi><mo stretchy="false">→</mo><mi>A</mi></mrow></math> and <math id="Sx1.I6.i1.p1.m2" class="ltx_Math" alttext="A\leftrightarrow A" display="inline"><mrow><mi>A</mi><mo stretchy="false">↔</mo><mi>A</mi></mrow></math></p>
+</div>
+</li>
+<li id="Sx1.I6.i2" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">2.</span><div id="Sx1.I6.i2.p1" class="ltx_para">​<p class="ltx_p"><math id="Sx1.I6.i2.p1.m1" class="ltx_Math" alttext="\neg(A\rightarrow B)" display="inline"><mrow><mo>¬</mo><mrow><mo stretchy="false">(</mo><mrow><mi>A</mi><mo stretchy="false">→</mo><mi>B</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math> and <math id="Sx1.I6.i2.p1.m2" class="ltx_Math" alttext="\neg A\rightarrow\neg B" display="inline"><mrow><mrow><mo rspace="0.167em">¬</mo><mi>A</mi></mrow><mo stretchy="false">→</mo><mrow><mo rspace="0.167em">¬</mo><mi>B</mi></mrow></mrow></math></p>
+</div>
+</li>
+<li id="Sx1.I6.i3" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">3.</span><div id="Sx1.I6.i3.p1" class="ltx_para">​<p class="ltx_p"><math id="Sx1.I6.i3.p1.m1" class="ltx_Math" alttext="A\vee B" display="inline"><mrow><mi>A</mi><mo>∨</mo><mi>B</mi></mrow></math> and <math id="Sx1.I6.i3.p1.m2" class="ltx_Math" alttext="\neg A\rightarrow B" display="inline"><mrow><mrow><mo rspace="0.167em">¬</mo><mi>A</mi></mrow><mo stretchy="false">→</mo><mi>B</mi></mrow></math></p>
+</div>
+</li>
+<li id="Sx1.I6.i4" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">4.</span><div id="Sx1.I6.i4.p1" class="ltx_para">​<p class="ltx_p"><math id="Sx1.I6.i4.p1.m1" class="ltx_Math" alttext="(A\rightarrow B)\rightarrow C" display="inline"><mrow><mrow><mo stretchy="false">(</mo><mrow><mi>A</mi><mo stretchy="false">→</mo><mi>B</mi></mrow><mo stretchy="false">)</mo></mrow><mo stretchy="false">→</mo><mi>C</mi></mrow></math> and <math id="Sx1.I6.i4.p1.m2" class="ltx_Math" alttext="A\rightarrow(B\rightarrow C)" display="inline"><mrow><mi>A</mi><mo stretchy="false">→</mo><mrow><mo stretchy="false">(</mo><mrow><mi>B</mi><mo stretchy="false">→</mo><mi>C</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math></p>
+</div>
+</li>
+<li id="Sx1.I6.i5" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">5.</span><div id="Sx1.I6.i5.p1" class="ltx_para">​<p class="ltx_p"><math id="Sx1.I6.i5.p1.m1" class="ltx_math_unparsed" alttext="A\leftrightarrow(B\leftrightarrow C)" display="inline"><mrow><mi>A</mi><mo stretchy="false">↔</mo><mrow><mo stretchy="false">(</mo><mi>B</mi><mo stretchy="false">↔</mo><mi>C</mi><mo stretchy="false">)</mo></mrow></mrow></math> and <math id="Sx1.I6.i5.p1.m2" class="ltx_Math" alttext="A\wedge(B\wedge C)" display="inline"><mrow><mi>A</mi><mo>∧</mo><mrow><mo stretchy="false">(</mo><mrow><mi>B</mi><mo>∧</mo><mi>C</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math></p>
+</div>
+</li>
+</ol>
+</div>
+<div id="Sx1.p8" class="ltx_para ltx_noindent">
+<p class="ltx_p"><span class="ltx_text ltx_font_bold">G. </span>
+Determine whether each collection of sentences is jointly satisfiable or jointly unsatisfiable using a complete truth table.</p>
+<ol id="Sx1.I7" class="ltx_enumerate">
+<li id="Sx1.I7.i1" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">1.</span><div id="Sx1.I7.i1.p1" class="ltx_para">​<p class="ltx_p"><math id="Sx1.I7.i1.p1.m1" class="ltx_Math" alttext="A\wedge\neg B" display="inline"><mrow><mi>A</mi><mo>∧</mo><mrow><mo rspace="0.167em">¬</mo><mi>B</mi></mrow></mrow></math>, <math id="Sx1.I7.i1.p1.m2" class="ltx_Math" alttext="\neg(A\rightarrow B)" display="inline"><mrow><mo>¬</mo><mrow><mo stretchy="false">(</mo><mrow><mi>A</mi><mo stretchy="false">→</mo><mi>B</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math>, <math id="Sx1.I7.i1.p1.m3" class="ltx_Math" alttext="B\rightarrow A" display="inline"><mrow><mi>B</mi><mo stretchy="false">→</mo><mi>A</mi></mrow></math></p>
+</div>
+</li>
+<li id="Sx1.I7.i2" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">2.</span><div id="Sx1.I7.i2.p1" class="ltx_para">​<p class="ltx_p"><math id="Sx1.I7.i2.p1.m1" class="ltx_Math" alttext="A\vee B" display="inline"><mrow><mi>A</mi><mo>∨</mo><mi>B</mi></mrow></math>, <math id="Sx1.I7.i2.p1.m2" class="ltx_Math" alttext="A\rightarrow\neg A" display="inline"><mrow><mi>A</mi><mo stretchy="false">→</mo><mrow><mo rspace="0.167em">¬</mo><mi>A</mi></mrow></mrow></math>, <math id="Sx1.I7.i2.p1.m3" class="ltx_Math" alttext="B\rightarrow\neg B" display="inline"><mrow><mi>B</mi><mo stretchy="false">→</mo><mrow><mo rspace="0.167em">¬</mo><mi>B</mi></mrow></mrow></math></p>
+</div>
+</li>
+<li id="Sx1.I7.i3" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">3.</span><div id="Sx1.I7.i3.p1" class="ltx_para">​<p class="ltx_p"><math id="Sx1.I7.i3.p1.m1" class="ltx_Math" alttext="\neg(\neg A\vee B)" display="inline"><mrow><mo>¬</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mo rspace="0.167em">¬</mo><mi>A</mi></mrow><mo>∨</mo><mi>B</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math>, <math id="Sx1.I7.i3.p1.m2" class="ltx_Math" alttext="A\rightarrow\neg C" display="inline"><mrow><mi>A</mi><mo stretchy="false">→</mo><mrow><mo rspace="0.167em">¬</mo><mi>C</mi></mrow></mrow></math>, <math id="Sx1.I7.i3.p1.m3" class="ltx_Math" alttext="A\rightarrow(B\rightarrow C)" display="inline"><mrow><mi>A</mi><mo stretchy="false">→</mo><mrow><mo stretchy="false">(</mo><mrow><mi>B</mi><mo stretchy="false">→</mo><mi>C</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math></p>
+</div>
+</li>
+<li id="Sx1.I7.i4" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">4.</span><div id="Sx1.I7.i4.p1" class="ltx_para">​<p class="ltx_p"><math id="Sx1.I7.i4.p1.m1" class="ltx_Math" alttext="A\rightarrow B" display="inline"><mrow><mi>A</mi><mo stretchy="false">→</mo><mi>B</mi></mrow></math>, <math id="Sx1.I7.i4.p1.m2" class="ltx_Math" alttext="A\wedge\neg B" display="inline"><mrow><mi>A</mi><mo>∧</mo><mrow><mo rspace="0.167em">¬</mo><mi>B</mi></mrow></mrow></math></p>
+</div>
+</li>
+<li id="Sx1.I7.i5" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">5.</span><div id="Sx1.I7.i5.p1" class="ltx_para">​<p class="ltx_p"><math id="Sx1.I7.i5.p1.m1" class="ltx_Math" alttext="A\rightarrow(B\rightarrow C)" display="inline"><mrow><mi>A</mi><mo stretchy="false">→</mo><mrow><mo stretchy="false">(</mo><mrow><mi>B</mi><mo stretchy="false">→</mo><mi>C</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math>, <math id="Sx1.I7.i5.p1.m2" class="ltx_Math" alttext="(A\rightarrow B)\rightarrow C" display="inline"><mrow><mrow><mo stretchy="false">(</mo><mrow><mi>A</mi><mo stretchy="false">→</mo><mi>B</mi></mrow><mo stretchy="false">)</mo></mrow><mo stretchy="false">→</mo><mi>C</mi></mrow></math>, <math id="Sx1.I7.i5.p1.m3" class="ltx_Math" alttext="A\rightarrow C" display="inline"><mrow><mi>A</mi><mo stretchy="false">→</mo><mi>C</mi></mrow></math></p>
+</div>
+</li>
+</ol>
+</div>
+<div id="Sx1.p10" class="ltx_para ltx_noindent">
+<p class="ltx_p"><span class="ltx_text ltx_font_bold">H. </span>
+Determine whether each collection of sentences is jointly satisfiable or jointly unsatisfiable, using a complete truth table.</p>
+<ol id="Sx1.I8" class="ltx_enumerate">
+<li id="Sx1.I8.i1" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">1.</span><div id="Sx1.I8.i1.p1" class="ltx_para">​<p class="ltx_p"><math id="Sx1.I8.i1.p1.m1" class="ltx_Math" alttext="\neg B" display="inline"><mrow><mo rspace="0.167em">¬</mo><mi>B</mi></mrow></math>, <math id="Sx1.I8.i1.p1.m2" class="ltx_Math" alttext="A\rightarrow B" display="inline"><mrow><mi>A</mi><mo stretchy="false">→</mo><mi>B</mi></mrow></math>, <math id="Sx1.I8.i1.p1.m3" class="ltx_Math" alttext="A" display="inline"><mi>A</mi></math></p>
+</div>
+</li>
+<li id="Sx1.I8.i2" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">2.</span><div id="Sx1.I8.i2.p1" class="ltx_para">​<p class="ltx_p"><math id="Sx1.I8.i2.p1.m1" class="ltx_Math" alttext="\neg(A\vee B)" display="inline"><mrow><mo>¬</mo><mrow><mo stretchy="false">(</mo><mrow><mi>A</mi><mo>∨</mo><mi>B</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math>, <math id="Sx1.I8.i2.p1.m2" class="ltx_Math" alttext="A\leftrightarrow B" display="inline"><mrow><mi>A</mi><mo stretchy="false">↔</mo><mi>B</mi></mrow></math>, <math id="Sx1.I8.i2.p1.m3" class="ltx_Math" alttext="B\rightarrow A" display="inline"><mrow><mi>B</mi><mo stretchy="false">→</mo><mi>A</mi></mrow></math></p>
+</div>
+</li>
+<li id="Sx1.I8.i3" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">3.</span><div id="Sx1.I8.i3.p1" class="ltx_para">​<p class="ltx_p"><math id="Sx1.I8.i3.p1.m1" class="ltx_Math" alttext="A\vee B" display="inline"><mrow><mi>A</mi><mo>∨</mo><mi>B</mi></mrow></math>, <math id="Sx1.I8.i3.p1.m2" class="ltx_Math" alttext="\neg B" display="inline"><mrow><mo rspace="0.167em">¬</mo><mi>B</mi></mrow></math>, <math id="Sx1.I8.i3.p1.m3" class="ltx_Math" alttext="\neg B\rightarrow\neg A" display="inline"><mrow><mrow><mo rspace="0.167em">¬</mo><mi>B</mi></mrow><mo stretchy="false">→</mo><mrow><mo rspace="0.167em">¬</mo><mi>A</mi></mrow></mrow></math></p>
+</div>
+</li>
+<li id="Sx1.I8.i4" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">4.</span><div id="Sx1.I8.i4.p1" class="ltx_para">​<p class="ltx_p"><math id="Sx1.I8.i4.p1.m1" class="ltx_Math" alttext="A\leftrightarrow B" display="inline"><mrow><mi>A</mi><mo stretchy="false">↔</mo><mi>B</mi></mrow></math>, <math id="Sx1.I8.i4.p1.m2" class="ltx_Math" alttext="\neg B\vee\neg A" display="inline"><mrow><mrow><mo rspace="0.167em">¬</mo><mi>B</mi></mrow><mo>∨</mo><mrow><mo rspace="0.167em">¬</mo><mi>A</mi></mrow></mrow></math>, <math id="Sx1.I8.i4.p1.m3" class="ltx_Math" alttext="A\rightarrow B" display="inline"><mrow><mi>A</mi><mo stretchy="false">→</mo><mi>B</mi></mrow></math></p>
+</div>
+</li>
+<li id="Sx1.I8.i5" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">5.</span><div id="Sx1.I8.i5.p1" class="ltx_para">​<p class="ltx_p"><math id="Sx1.I8.i5.p1.m1" class="ltx_Math" alttext="(A\vee B)\vee C" display="inline"><mrow><mrow><mo stretchy="false">(</mo><mrow><mi>A</mi><mo>∨</mo><mi>B</mi></mrow><mo stretchy="false">)</mo></mrow><mo>∨</mo><mi>C</mi></mrow></math>, <math id="Sx1.I8.i5.p1.m2" class="ltx_Math" alttext="\neg A\vee\neg B" display="inline"><mrow><mrow><mo rspace="0.167em">¬</mo><mi>A</mi></mrow><mo>∨</mo><mrow><mo rspace="0.167em">¬</mo><mi>B</mi></mrow></mrow></math>, <math id="Sx1.I8.i5.p1.m3" class="ltx_Math" alttext="\neg C\vee\neg B" display="inline"><mrow><mrow><mo rspace="0.167em">¬</mo><mi>C</mi></mrow><mo>∨</mo><mrow><mo rspace="0.167em">¬</mo><mi>B</mi></mrow></mrow></math></p>
+</div>
+</li>
+</ol>
+</div>
+<div id="Sx1.p12" class="ltx_para ltx_noindent">
+<p class="ltx_p"><span class="ltx_text ltx_font_bold">I. </span>
+Determine whether each argument is valid or invalid, using a complete truth table.</p>
+<ol id="Sx1.I9" class="ltx_enumerate">
+<li id="Sx1.I9.i1" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">1.</span><div id="Sx1.I9.i1.p1" class="ltx_para">​<p class="ltx_p"><math id="Sx1.I9.i1.p1.m1" class="ltx_Math" alttext="A\rightarrow B" display="inline"><mrow><mi>A</mi><mo stretchy="false">→</mo><mi>B</mi></mrow></math>, <math id="Sx1.I9.i1.p1.m2" class="ltx_Math" alttext="B\therefore A" display="inline"><mrow><mi>B</mi><mo>∴</mo><mi>A</mi></mrow></math></p>
+</div>
+</li>
+<li id="Sx1.I9.i2" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">2.</span><div id="Sx1.I9.i2.p1" class="ltx_para">​<p class="ltx_p"><math id="Sx1.I9.i2.p1.m1" class="ltx_Math" alttext="A\leftrightarrow B" display="inline"><mrow><mi>A</mi><mo stretchy="false">↔</mo><mi>B</mi></mrow></math>, <math id="Sx1.I9.i2.p1.m2" class="ltx_Math" alttext="B\leftrightarrow C\therefore A\leftrightarrow C" display="inline"><mrow><mi>B</mi><mo stretchy="false">↔</mo><mi>C</mi><mo>∴</mo><mi>A</mi><mo stretchy="false">↔</mo><mi>C</mi></mrow></math></p>
+</div>
+</li>
+<li id="Sx1.I9.i3" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">3.</span><div id="Sx1.I9.i3.p1" class="ltx_para">​<p class="ltx_p"><math id="Sx1.I9.i3.p1.m1" class="ltx_Math" alttext="A\rightarrow B" display="inline"><mrow><mi>A</mi><mo stretchy="false">→</mo><mi>B</mi></mrow></math>, <math id="Sx1.I9.i3.p1.m2" class="ltx_Math" alttext="A\rightarrow C\therefore B\rightarrow C" display="inline"><mrow><mrow><mi>A</mi><mo stretchy="false">→</mo><mi>C</mi></mrow><mo>∴</mo><mrow><mi>B</mi><mo stretchy="false">→</mo><mi>C</mi></mrow></mrow></math></p>
+</div>
+</li>
+<li id="Sx1.I9.i4" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">4.</span><div id="Sx1.I9.i4.p1" class="ltx_para">​<p class="ltx_p"><math id="Sx1.I9.i4.p1.m1" class="ltx_Math" alttext="A\rightarrow B" display="inline"><mrow><mi>A</mi><mo stretchy="false">→</mo><mi>B</mi></mrow></math>, <math id="Sx1.I9.i4.p1.m2" class="ltx_Math" alttext="B\rightarrow A\therefore A\leftrightarrow B" display="inline"><mrow><mrow><mi>B</mi><mo stretchy="false">→</mo><mi>A</mi></mrow><mo>∴</mo><mi>A</mi><mo stretchy="false">↔</mo><mi>B</mi></mrow></math></p>
+</div>
+</li>
+</ol>
+</div>
+<div id="Sx1.p14" class="ltx_para ltx_noindent">
+<p class="ltx_p"><span class="ltx_text ltx_font_bold">J. </span>
+Determine whether each argument is valid or invalid, using a complete truth table.</p>
+<ol id="Sx1.I10" class="ltx_enumerate">
+<li id="Sx1.I10.i1" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">1.</span><div id="Sx1.I10.i1.p1" class="ltx_para">​<p class="ltx_p"><math id="Sx1.I10.i1.p1.m1" class="ltx_math_unparsed" alttext="A\vee\bigl{[}A\rightarrow(A\leftrightarrow A)\bigr{]}\therefore A" display="inline"><mrow><mi>A</mi><mo>∨</mo><mrow><mo maxsize="120%" minsize="120%">[</mo><mi>A</mi><mo stretchy="false">→</mo><mrow><mo stretchy="false">(</mo><mi>A</mi><mo stretchy="false">↔</mo><mi>A</mi><mo stretchy="false">)</mo></mrow><mo maxsize="120%" minsize="120%">]</mo></mrow><mo>∴</mo><mi>A</mi></mrow></math></p>
+</div>
+</li>
+<li id="Sx1.I10.i2" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">2.</span><div id="Sx1.I10.i2.p1" class="ltx_para">​<p class="ltx_p"><math id="Sx1.I10.i2.p1.m1" class="ltx_Math" alttext="A\vee B" display="inline"><mrow><mi>A</mi><mo>∨</mo><mi>B</mi></mrow></math>, <math id="Sx1.I10.i2.p1.m2" class="ltx_Math" alttext="B\vee C" display="inline"><mrow><mi>B</mi><mo>∨</mo><mi>C</mi></mrow></math>, <math id="Sx1.I10.i2.p1.m3" class="ltx_Math" alttext="\neg B\therefore A\wedge C" display="inline"><mrow><mrow><mo rspace="0.167em">¬</mo><mi>B</mi></mrow><mo>∴</mo><mrow><mi>A</mi><mo>∧</mo><mi>C</mi></mrow></mrow></math></p>
+</div>
+</li>
+<li id="Sx1.I10.i3" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">3.</span><div id="Sx1.I10.i3.p1" class="ltx_para">​<p class="ltx_p"><math id="Sx1.I10.i3.p1.m1" class="ltx_Math" alttext="A\rightarrow B" display="inline"><mrow><mi>A</mi><mo stretchy="false">→</mo><mi>B</mi></mrow></math>, <math id="Sx1.I10.i3.p1.m2" class="ltx_Math" alttext="\neg A\therefore\neg B" display="inline"><mrow><mrow><mo rspace="0.167em">¬</mo><mi>A</mi></mrow><mo>∴</mo><mrow><mo rspace="0.167em">¬</mo><mi>B</mi></mrow></mrow></math></p>
+</div>
+</li>
+<li id="Sx1.I10.i4" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">4.</span><div id="Sx1.I10.i4.p1" class="ltx_para">​<p class="ltx_p"><math id="Sx1.I10.i4.p1.m1" class="ltx_Math" alttext="A" display="inline"><mi>A</mi></math>, <math id="Sx1.I10.i4.p1.m2" class="ltx_Math" alttext="B\therefore\neg(A\rightarrow\neg B)" display="inline"><mrow><mi>B</mi><mo>∴</mo><mrow><mo>¬</mo><mrow><mo stretchy="false">(</mo><mrow><mi>A</mi><mo stretchy="false">→</mo><mrow><mo rspace="0.167em">¬</mo><mi>B</mi></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math></p>
+</div>
+</li>
+<li id="Sx1.I10.i5" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">5.</span><div id="Sx1.I10.i5.p1" class="ltx_para">​<p class="ltx_p"><math id="Sx1.I10.i5.p1.m1" class="ltx_Math" alttext="\neg(A\wedge B)" display="inline"><mrow><mo>¬</mo><mrow><mo stretchy="false">(</mo><mrow><mi>A</mi><mo>∧</mo><mi>B</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math>, <math id="Sx1.I10.i5.p1.m2" class="ltx_Math" alttext="A\vee B" display="inline"><mrow><mi>A</mi><mo>∨</mo><mi>B</mi></mrow></math>, <math id="Sx1.I10.i5.p1.m3" class="ltx_Math" alttext="A\leftrightarrow B\therefore C" display="inline"><mrow><mi>A</mi><mo stretchy="false">↔</mo><mi>B</mi><mo>∴</mo><mi>C</mi></mrow></math></p>
+</div>
+</li>
+</ol>
+</div>
+<div id="Sx1.p15" class="ltx_para ltx_noindent">
+<p class="ltx_p"><span class="ltx_text ltx_font_bold">K. </span>
+Answer each of the questions below and justify your answer.</p>
+<ol id="Sx1.I11" class="ltx_enumerate">
+<li id="Sx1.I11.i1" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">1.</span><div id="Sx1.I11.i1.p1" class="ltx_para">​<p class="ltx_p">Suppose that <math id="Sx1.I11.i1.p1.m1" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math> and <math id="Sx1.I11.i1.p1.m2" class="ltx_Math" alttext="\mathscr{B}" display="inline"><mi class="ltx_font_mathscript">ℬ︁</mi></math> are logically equivalent. What can you say about <math id="Sx1.I11.i1.p1.m3" class="ltx_Math" alttext="\mathscr{A}\leftrightarrow\mathscr{B}" display="inline"><mrow><mi class="ltx_font_mathscript">𝒜︁</mi><mo stretchy="false">↔</mo><mi class="ltx_font_mathscript">ℬ︁</mi></mrow></math>?</p>
+</div>
+</li>
+<li id="Sx1.I11.i2" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">2.</span><div id="Sx1.I11.i2.p1" class="ltx_para">​<p class="ltx_p">Suppose that <math id="Sx1.I11.i2.p1.m1" class="ltx_Math" alttext="(\mathscr{A}\wedge\mathscr{B})\rightarrow\mathscr{C}" display="inline"><mrow><mrow><mo stretchy="false">(</mo><mrow><mi class="ltx_font_mathscript">𝒜︁</mi><mo>∧</mo><mi class="ltx_font_mathscript">ℬ︁</mi></mrow><mo stretchy="false">)</mo></mrow><mo stretchy="false">→</mo><mi class="ltx_font_mathscript">𝒞︁</mi></mrow></math> is neither a tautology nor a contradiction. What can you say about whether <math id="Sx1.I11.i2.p1.m2" class="ltx_Math" alttext="\mathscr{A},\mathscr{B}\therefore\mathscr{C}" display="inline"><mrow><mrow><mi class="ltx_font_mathscript">𝒜︁</mi><mo>,</mo><mi class="ltx_font_mathscript">ℬ︁</mi></mrow><mo>∴</mo><mi class="ltx_font_mathscript">𝒞︁</mi></mrow></math> is valid?</p>
+</div>
+</li>
+<li id="Sx1.I11.i3" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">3.</span><div id="Sx1.I11.i3.p1" class="ltx_para">​<p class="ltx_p">Suppose that <math id="Sx1.I11.i3.p1.m1" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math>, <math id="Sx1.I11.i3.p1.m2" class="ltx_Math" alttext="\mathscr{B}" display="inline"><mi class="ltx_font_mathscript">ℬ︁</mi></math> and <math id="Sx1.I11.i3.p1.m3" class="ltx_Math" alttext="\mathscr{C}" display="inline"><mi class="ltx_font_mathscript">𝒞︁</mi></math> are jointly unsatisfiable. What can you say about <math id="Sx1.I11.i3.p1.m4" class="ltx_Math" alttext="(\mathscr{A}\wedge\mathscr{B}\wedge\mathscr{C})" display="inline"><mrow><mo stretchy="false">(</mo><mrow><mi class="ltx_font_mathscript">𝒜︁</mi><mo>∧</mo><mi class="ltx_font_mathscript">ℬ︁</mi><mo>∧</mo><mi class="ltx_font_mathscript">𝒞︁</mi></mrow><mo stretchy="false">)</mo></mrow></math>?</p>
+</div>
+</li>
+<li id="Sx1.I11.i4" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">4.</span><div id="Sx1.I11.i4.p1" class="ltx_para">​<p class="ltx_p">Suppose that <math id="Sx1.I11.i4.p1.m1" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math> is a contradiction. What can you say about whether <math id="Sx1.I11.i4.p1.m2" class="ltx_Math" alttext="\mathscr{A},\mathscr{B}\vDash\mathscr{C}" display="inline"><mrow><mrow><mi class="ltx_font_mathscript">𝒜︁</mi><mo>,</mo><mi class="ltx_font_mathscript">ℬ︁</mi></mrow><mo>⊨</mo><mi class="ltx_font_mathscript">𝒞︁</mi></mrow></math>?</p>
+</div>
+</li>
+<li id="Sx1.I11.i5" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">5.</span><div id="Sx1.I11.i5.p1" class="ltx_para">​<p class="ltx_p">Suppose that <math id="Sx1.I11.i5.p1.m1" class="ltx_Math" alttext="\mathscr{C}" display="inline"><mi class="ltx_font_mathscript">𝒞︁</mi></math> is a tautology. What can you say about whether <math id="Sx1.I11.i5.p1.m2" class="ltx_Math" alttext="\mathscr{A},\mathscr{B}\vDash\mathscr{C}" display="inline"><mrow><mrow><mi class="ltx_font_mathscript">𝒜︁</mi><mo>,</mo><mi class="ltx_font_mathscript">ℬ︁</mi></mrow><mo>⊨</mo><mi class="ltx_font_mathscript">𝒞︁</mi></mrow></math>?</p>
+</div>
+</li>
+<li id="Sx1.I11.i6" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">6.</span><div id="Sx1.I11.i6.p1" class="ltx_para">​<p class="ltx_p">Suppose that <math id="Sx1.I11.i6.p1.m1" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math> and <math id="Sx1.I11.i6.p1.m2" class="ltx_Math" alttext="\mathscr{B}" display="inline"><mi class="ltx_font_mathscript">ℬ︁</mi></math> are logically equivalent. What can you say about <math id="Sx1.I11.i6.p1.m3" class="ltx_Math" alttext="(\mathscr{A}\vee\mathscr{B})" display="inline"><mrow><mo stretchy="false">(</mo><mrow><mi class="ltx_font_mathscript">𝒜︁</mi><mo>∨</mo><mi class="ltx_font_mathscript">ℬ︁</mi></mrow><mo stretchy="false">)</mo></mrow></math>?</p>
+</div>
+</li>
+<li id="Sx1.I11.i7" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">7.</span><div id="Sx1.I11.i7.p1" class="ltx_para">​<p class="ltx_p">Suppose that <math id="Sx1.I11.i7.p1.m1" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math> and <math id="Sx1.I11.i7.p1.m2" class="ltx_Math" alttext="\mathscr{B}" display="inline"><mi class="ltx_font_mathscript">ℬ︁</mi></math> are <span class="ltx_text ltx_font_bold">not</span> logically equivalent. What can you say about <math id="Sx1.I11.i7.p1.m3" class="ltx_Math" alttext="(\mathscr{A}\vee\mathscr{B})" display="inline"><mrow><mo stretchy="false">(</mo><mrow><mi class="ltx_font_mathscript">𝒜︁</mi><mo>∨</mo><mi class="ltx_font_mathscript">ℬ︁</mi></mrow><mo stretchy="false">)</mo></mrow></math>?</p>
+</div>
+</li>
+</ol>
+</div>
+<div id="Sx1.p16" class="ltx_para ltx_noindent">
+<p class="ltx_p"><span class="ltx_text ltx_font_bold">L. </span>Consider the following principle:</p>
+<blockquote class="ltx_quote">
+<p class="ltx_p">Suppose <math id="Sx1.p16.m1" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math> and <math id="Sx1.p16.m2" class="ltx_Math" alttext="\mathscr{B}" display="inline"><mi class="ltx_font_mathscript">ℬ︁</mi></math> are logically equivalent. Suppose an argument contains <math id="Sx1.p16.m3" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math> (either as a premise, or as the conclusion). The validity of the argument would be unaffected, if we replaced <math id="Sx1.p16.m4" class="ltx_Math" alttext="\mathscr{A}" display="inline"><mi class="ltx_font_mathscript">𝒜︁</mi></math> with <math id="Sx1.p16.m5" class="ltx_Math" alttext="\mathscr{B}" display="inline"><mi class="ltx_font_mathscript">ℬ︁</mi></math>.</p>
+</blockquote>
+<p class="ltx_p">Is this principle correct? Explain your answer.</p>
+</div>
+</div>
+</section>
+</div>
+</section>
+</div>
+</div>
+</div>
+<a href="Ch11.html" class="navigation navigation-prev" aria-label="Previous page"><i class="fa fa-angle-left"></i></a><a href="Ch13.html" class="navigation navigation-next" aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+</div>
+</div>
+</body>
+
+</html>

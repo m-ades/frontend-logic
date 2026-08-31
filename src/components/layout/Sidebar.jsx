@@ -35,13 +35,22 @@ export default function Sidebar({ structure, location, onSignOut, onOpenSettings
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const { isSidebarOpened, sidebarHoverEnabled } = useLayoutState();
-  const { user: activeUser, isSandbox: sandbox } = useAppRuntime();
+  const { user: activeUser, isSandbox: sandbox, courseState } = useAppRuntime();
   const layoutDispatch = useLayoutDispatch();
   const drawerPaperRef = useRef(null);
   const [isPermanent, setPermanent] = useState(true);
   const [profileMenu, setProfileMenu] = useState(null);
   const [isHovering, setIsHovering] = useState(false);
   const [manuallyOpened, setManuallyOpened] = useState(false);
+  const activeCourse = courseState?.courses?.find(
+    (course) => String(course.id) === String(courseState.activeCourseId)
+  );
+  const textbookAvailable =
+    (activeCourse?.logicSystem ?? activeCourse?.logic_system) === "fitch";
+  const visibleStructure = textbookAvailable
+    ? structure
+    : structure.filter((item) => !/\/textbook(?:-links)?$/.test(item.link));
+
   useEffect(() => {
     const handleResize = () => {
       const isSmallScreen = window.innerWidth < theme.breakpoints.values.md;
@@ -183,7 +192,7 @@ export default function Sidebar({ structure, location, onSignOut, onOpenSettings
         }}
       >
         <List sx={{ mt: 1, px: 1, flexGrow: 1, minHeight: 0, overflowY: "auto" }}>
-          {structure.map((link) => (
+          {visibleStructure.map((link) => (
             <SidebarLink
               key={link.id}
               location={location}

@@ -1,0 +1,792 @@
+<!DOCTYPE html><html style="--bml-ltx-font-size:10;" class="bml_mathjax4" lang="en">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<title>Chapter 28 Definite descriptions ‣ Part V First-order logic ‣ forall x: Calgary</title>
+<!--Generated on Tue Jul 21 20:13:15 2026 by LaTeXML (version 0.8.8) http://dlmf.nist.gov/LaTeXML/.-->
+<!--Document created on Fall 2025 (2026‐07‐18 8642250).-->
+
+<link rel="stylesheet" href="LaTeXML.css" type="text/css">
+<link rel="stylesheet" href="ltx-book.css" type="text/css">
+<link rel="stylesheet" href="bookml/gitbook/css/style.css" type="text/css">
+<link rel="stylesheet" href="bookml/gitbook/css/plugin-table.css" type="text/css">
+<link rel="stylesheet" href="bookml/gitbook/css/plugin-search.css" type="text/css">
+<link rel="stylesheet" href="bookml/gitbook/css/plugin-bookdown.css" type="text/css">
+<link rel="stylesheet" href="bookml/gitbook/css/plugin-fontsettings.css" type="text/css">
+<link rel="stylesheet" href="bookml/CSS/style.css" type="text/css">
+<link rel="stylesheet" href="bookml/CSS/style.gitbook,plain.css" type="text/css">
+<link rel="stylesheet" href="bookml/CSS/style.gitbook.css" type="text/css">
+<link rel="stylesheet" href="bmluser/colors.gitbook-forallxyyc-html.css" type="text/css">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<link rel="stylesheet" href="forallxyyc.css" type="text/css">
+<link rel="stylesheet" href="fitchml.css" type="text/css">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script><script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6"></script>
+<link rel="up" href="Pt5.html" title="Part V First-order logic ‣ forall x: Calgary">
+<link rel="up up" href="index.html" title="forall x: Calgary">
+<link rel="start" href="index.html" title="forall x: Calgary">
+<link rel="prev" href="Ch27.html" title="Chapter 27 Sentences of FOL ‣ Part V First-order logic ‣ forall x: Calgary">
+<link rel="next" href="Ch29.html" title="Chapter 29 Ambiguity ‣ Part V First-order logic ‣ forall x: Calgary">
+<link rel="chapter" href="Ch23.html" title="Chapter 23 Building blocks of FOL ‣ Part V First-order logic ‣ forall x: Calgary">
+<link rel="chapter" href="Ch24.html" title="Chapter 24 Sentences with one quantifier ‣ Part V First-order logic ‣ forall x: Calgary">
+<link rel="chapter" href="Ch25.html" title="Chapter 25 Multiple generality ‣ Part V First-order logic ‣ forall x: Calgary">
+<link rel="chapter" href="Ch26.html" title="Chapter 26 Identity ‣ Part V First-order logic ‣ forall x: Calgary">
+<link rel="chapter" href="Ch27.html" title="Chapter 27 Sentences of FOL ‣ Part V First-order logic ‣ forall x: Calgary">
+<link rel="chapter" href="Ch29.html" title="Chapter 29 Ambiguity ‣ Part V First-order logic ‣ forall x: Calgary">
+<link rel="chapter" href="Chx1.html" title="Preface ‣ forall x: Calgary">
+<link rel="part" href="Pt1.html" title="Part I Key notions of logic ‣ forall x: Calgary">
+<link rel="part" href="Pt2.html" title="Part II Truth-functional logic ‣ forall x: Calgary">
+<link rel="part" href="Pt3.html" title="Part III Truth tables ‣ forall x: Calgary">
+<link rel="part" href="Pt4.html" title="Part IV Natural deduction for TFL ‣ forall x: Calgary">
+<link rel="part" href="Pt5.html" title="Part V First-order logic ‣ forall x: Calgary">
+<link rel="part" href="Pt6.html" title="Part VI Interpretations ‣ forall x: Calgary">
+<link rel="part" href="Pt7.html" title="Part VII Natural deduction for FOL ‣ forall x: Calgary">
+<link rel="part" href="Pt8.html" title="Part VIII Modal logic ‣ forall x: Calgary">
+<link rel="part" href="Pt9.html" title="Part IX Metatheory ‣ forall x: Calgary">
+<link rel="part" href="Ptx1.html" title="Appendices ‣ forall x: Calgary">
+<link rel="part" href="Ptx2.html" title="Solutions to selected exercices ‣ forall x: Calgary">
+<script src="bookml/js/mathjax4.js" defer></script>
+</head>
+<body class="bml_class_book">
+<div class="book without-animation font-size-2 font-family-1" data-basepath=".">
+<a href="#bml-main-content" tabindex="0" class="bml-skip-to-content">Skip to content.</a>
+<div class="book-summary"><nav class="ltx_page_navbar">
+<ul class="ltx_toclist summary">
+<li>
+<a href="index.html" title="" class="ltx_ref" rel="start">forall x: Calgary</a>
+</li>
+<li class="divider" aria-hidden="true"></li>
+<li data-level="" data-path="Chx1.html" class="ltx_tocentry ltx_tocentry_chapter  chapter "><a href="Chx1.html" title="In forall x: Calgary" class="ltx_ref">Preface</a></li>
+<li data-level="I" data-path="Pt1.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt1.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">I </span></b>Key notions of logic</a></li>
+<li data-level="II" data-path="Pt2.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt2.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">II </span></b>Truth-functional logic</a></li>
+<li data-level="III" data-path="Pt3.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt3.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">III </span></b>Truth tables</a></li>
+<li data-level="IV" data-path="Pt4.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt4.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">IV </span></b>Natural deduction for TFL</a></li>
+<li data-level="V" data-path="Pt5.html" class="ltx_tocentry ltx_tocentry_part  chapter ">
+<a href="Pt5.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">V </span></b>First-order logic</a>
+<ol class="ltx_toclist ltx_toclist_part">
+<li data-level="23" data-path="Ch23.html" class="ltx_tocentry ltx_tocentry_chapter  chapter "><a href="Ch23.html" title="In Part V First-order logic ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">23 </span></b>Building blocks of FOL</a></li>
+<li data-level="24" data-path="Ch24.html" class="ltx_tocentry ltx_tocentry_chapter  chapter "><a href="Ch24.html" title="In Part V First-order logic ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">24 </span></b>Sentences with one quantifier</a></li>
+<li data-level="25" data-path="Ch25.html" class="ltx_tocentry ltx_tocentry_chapter  chapter "><a href="Ch25.html" title="In Part V First-order logic ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">25 </span></b>Multiple generality</a></li>
+<li data-level="26" data-path="Ch26.html" class="ltx_tocentry ltx_tocentry_chapter  chapter "><a href="Ch26.html" title="In Part V First-order logic ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">26 </span></b>Identity</a></li>
+<li data-level="27" data-path="Ch27.html" class="ltx_tocentry ltx_tocentry_chapter  chapter "><a href="Ch27.html" title="In Part V First-order logic ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">27 </span></b>Sentences of FOL</a></li>
+<li data-level="28" data-path="" class="ltx_tocentry ltx_tocentry_chapter ltx_ref_self  chapter active">
+<a href="" title="In Part V First-order logic ‣ forall x: Calgary" aria-current="page" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">28 </span></b>Definite descriptions</a>
+<ol class="ltx_toclist ltx_toclist_chapter">
+<li data-level="28.1" data-path="" class="ltx_tocentry ltx_tocentry_section  chapter "><a href="#S1" title="In Chapter 28 Definite descriptions ‣ Part V First-order logic ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">28.1 </span></b>Treating definite descriptions as terms</a></li>
+<li data-level="28.2" data-path="" class="ltx_tocentry ltx_tocentry_section  chapter "><a href="#S2" title="In Chapter 28 Definite descriptions ‣ Part V First-order logic ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">28.2 </span></b>Russell’s analysis</a></li>
+<li data-level="28.3" data-path="" class="ltx_tocentry ltx_tocentry_section  chapter "><a href="#S3" title="In Chapter 28 Definite descriptions ‣ Part V First-order logic ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">28.3 </span></b>Empty definite descriptions</a></li>
+<li data-level="28.4" data-path="" class="ltx_tocentry ltx_tocentry_section  chapter "><a href="#S4" title="In Chapter 28 Definite descriptions ‣ Part V First-order logic ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">28.4 </span></b>Possessives, ‘both’, ‘neither’</a></li>
+<li data-level="28.5" data-path="" class="ltx_tocentry ltx_tocentry_section  chapter "><a href="#S5" title="In Chapter 28 Definite descriptions ‣ Part V First-order logic ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">28.5 </span></b>The adequacy of Russell’s analysis</a></li>
+<li data-level="" data-path="" class="ltx_tocentry ltx_tocentry_section  chapter "><a href="#Sx1" title="In Chapter 28 Definite descriptions ‣ Part V First-order logic ‣ forall x: Calgary" class="ltx_ref">Practice exercises</a></li>
+</ol>
+</li>
+<li data-level="29" data-path="Ch29.html" class="ltx_tocentry ltx_tocentry_chapter  chapter "><a href="Ch29.html" title="In Part V First-order logic ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">29 </span></b>Ambiguity</a></li>
+</ol>
+</li>
+<li data-level="VI" data-path="Pt6.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt6.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">VI </span></b>Interpretations</a></li>
+<li data-level="VII" data-path="Pt7.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt7.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">VII </span></b>Natural deduction for FOL</a></li>
+<li data-level="VIII" data-path="Pt8.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt8.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">VIII </span></b>Modal logic</a></li>
+<li data-level="IX" data-path="Pt9.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt9.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">IX </span></b>Metatheory</a></li>
+<li data-level="" data-path="Ptx1.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Ptx1.html" title="In forall x: Calgary" class="ltx_ref">Appendices</a></li>
+<li data-level="" data-path="Ptx2.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Ptx2.html" title="In forall x: Calgary" class="ltx_ref">Solutions to selected exercices</a></li>
+</ul>
+</nav></div>
+
+<div class="ltx_page_main book-body fixed">
+<div class="body-inner">
+<header class="book-header fixed" aria-label="toolbar"><span class="bml-separator"></span></header>
+<div class="page-wrapper" tabindex="-1" role="main">
+<div class="ltx_page_content page-inner" id="bml-main-content">
+<script src="bookml/gitbook/js/app.min.js"></script>
+<script src="bookml/gitbook/js/jquery.highlight.js"></script>
+<script src="bookml/gitbook/js/plugin-search.js"></script>
+<script src="bookml/gitbook/js/plugin-fontsettings.js"></script>
+<script src="bookml/gitbook/js/plugin-bookdown.js"></script>
+<script type="text/javascript">
+                  gitbook.require(["gitbook"], function(gitbook) {
+                  gitbook.start({
+                    "fontsettings": {
+                      "theme": "white",
+                      "family": "sans",
+                      "size": 2
+                    },
+                    "download": [ [ "forallxyyc.pdf", "PDF" ], [ "forallxyyc-accessible.pdf", "PDF (accessible)" ], ],
+                    "search": {
+                      "engine": "fuse"
+                    },
+                    "toc": {
+                      "collapse": "none"
+                    }
+                  });
+                });
+              </script>
+
+<section class="ltx_chapter ltx_authors_1line normal" lang="en">
+<div class="section level1">
+<h1 class="ltx_title ltx_title_chapter">
+<span class="ltx_tag ltx_tag_chapter header-section-number">Chapter 28</span> Definite descriptions</h1>
+
+<div id="p1" class="ltx_para">
+<p class="ltx_p">Consider sentences like:</p>
+<ol id="S0.I1" class="ltx_enumerate">
+<li id="S0.I1.i1" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">1.</span><div id="S0.I1.i1.p1" class="ltx_para">​<p class="ltx_p">Nick is the traitor.</p>
+</div>
+</li>
+<li id="S0.I1.i2" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">2.</span><div id="S0.I1.i2.p1" class="ltx_para">​<p class="ltx_p">The traitor went to Cambridge.</p>
+</div>
+</li>
+<li id="S0.I1.i3" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">3.</span><div id="S0.I1.i3.p1" class="ltx_para">​<p class="ltx_p">The traitor is the deputy.</p>
+</div>
+</li>
+</ol>
+<p class="ltx_p">These are definite descriptions: they are meant to pick out a <span class="ltx_text ltx_font_bold">unique</span> object. They should be contrasted with <span class="ltx_text ltx_font_bold">indefinite</span> descriptions, such as ‘Nick is <span class="ltx_text ltx_font_bold">a</span> traitor’. They should equally be contrasted with <span class="ltx_text ltx_font_bold">generics</span>, such as ‘<span class="ltx_text ltx_font_bold">The</span> whale is a mammal’ (when it’s inappropriate to ask <span class="ltx_text ltx_font_bold">which</span> whale). The question we face is: How should we deal with definite descriptions in FOL?</p>
+</div>
+<section id="S1" class="ltx_section normal">
+<div class="section level2">
+<h2 class="ltx_title ltx_title_section">
+<span class="ltx_tag ltx_tag_section header-section-number">28.1</span> Treating definite descriptions as terms</h2>
+
+<div id="S1.p1" class="ltx_para">
+<p class="ltx_p">One option would be to introduce new names whenever we come across a definite description. This is probably not a great idea. We know that <span class="ltx_text ltx_font_bold">the</span> traitor—whoever it is—is indeed <span class="ltx_text ltx_font_bold">a</span> traitor. We want to preserve that information in our symbolization.</p>
+</div>
+<div id="S1.p2" class="ltx_para">
+<p class="ltx_p">A second option would be to use a <span class="ltx_text ltx_font_bold">new</span> definite description operator, such as ‘<math id="S1.p2.m1" class="ltx_Math" alttext="\iota" display="inline"><mi>ι</mi></math>’. The idea would be to symbolize ‘the <math id="S1.p2.m2" class="ltx_Math" alttext="F" display="inline"><mi>F</mi></math>’ as ‘<math id="S1.p2.m3" class="ltx_Math" alttext="\iota x\,F(x)" display="inline"><mrow><mi>ι</mi><mo>⁢</mo><mi>x</mi><mo lspace="0.170em">⁢</mo><mrow><mi>F</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math>’ (think ‘the <math id="S1.p2.m4" class="ltx_Math" alttext="x" display="inline"><mi>x</mi></math> such that <math id="S1.p2.m5" class="ltx_Math" alttext="F(x)" display="inline"><mrow><mi>F</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></math>’); or to symbolize ‘the <math id="S1.p2.m6" class="ltx_Math" alttext="G" display="inline"><mi>G</mi></math>’ as ‘<math id="S1.p2.m7" class="ltx_Math" alttext="\iota x\,G(x)" display="inline"><mrow><mi>ι</mi><mo>⁢</mo><mi>x</mi><mo lspace="0.170em">⁢</mo><mrow><mi>G</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math>’, etc. Expressions of the form <math id="S1.p2.m8" class="ltx_Math" alttext="\iota\mathscr{x}\,\mathscr{A}(\mathscr{x})" display="inline"><mrow><mi>ι</mi><mo>⁢</mo><mi class="ltx_font_mathscript">𝓍</mi><mo lspace="0.170em">⁢</mo><mrow><mi class="ltx_font_mathscript">𝒜︁</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi class="ltx_font_mathscript">𝓍</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math> would then behave like names. If we were to follow this path, we could use the following symbolization key:</p>
+<dl id="S1.I1" class="ltx_description">
+<dt id="S1.I1.ix1" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <span class="ltx_text ltx_markedasmath">domain</span>:</span></dt>
+<dd class="ltx_item">
+<div id="S1.I1.ix1.p1" class="ltx_para">
+<p class="ltx_p">people</p>
+</div>
+</dd>
+<dt id="S1.I1.ix2" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="S1.I1.ix2.m1" class="ltx_Math" alttext="T(x)" display="inline"><mrow><mi>T</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></math>:</span></dt>
+<dd class="ltx_item">
+<div id="S1.I1.ix2.p1" class="ltx_para">
+<p class="ltx_p"><span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span><sub class="ltx_sub"><span class="ltx_text ltx_font_italic">x</span></sub> is a traitor</p>
+</div>
+</dd>
+<dt id="S1.I1.ix3" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="S1.I1.ix3.m1" class="ltx_Math" alttext="D(x)" display="inline"><mrow><mi>D</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></math>:</span></dt>
+<dd class="ltx_item">
+<div id="S1.I1.ix3.p1" class="ltx_para">
+<p class="ltx_p"><span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span><sub class="ltx_sub"><span class="ltx_text ltx_font_italic">x</span></sub> is a deputy</p>
+</div>
+</dd>
+<dt id="S1.I1.ix4" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="S1.I1.ix4.m1" class="ltx_Math" alttext="C(x)" display="inline"><mrow><mi>C</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></math>:</span></dt>
+<dd class="ltx_item">
+<div id="S1.I1.ix4.p1" class="ltx_para">
+<p class="ltx_p"><span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span><sub class="ltx_sub"><span class="ltx_text ltx_font_italic">x</span></sub> went to Cambridge</p>
+</div>
+</dd>
+<dt id="S1.I1.ix5" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="S1.I1.ix5.m1" class="ltx_Math" alttext="n" display="inline"><mi>n</mi></math>:</span></dt>
+<dd class="ltx_item">
+<div id="S1.I1.ix5.p1" class="ltx_para">
+<p class="ltx_p">Nick</p>
+</div>
+</dd>
+</dl>
+<p class="ltx_p">Then, we could symbolize <a href="#S0.I1.i1" title="In Chapter 28 Definite descriptions ‣ Part V First-order logic ‣ forall x: Calgary" class="ltx_ref"><span class="ltx_text ltx_ref_tag">sentence</span> <span class="ltx_text ltx_ref_tag">1</span></a> with ‘<math id="S1.p2.m9" class="ltx_Math" alttext="n=\iota x\,T(x)" display="inline"><mrow><mi>n</mi><mo>=</mo><mrow><mi>ι</mi><mo>⁢</mo><mi>x</mi><mo lspace="0.170em">⁢</mo><mrow><mi>T</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></math>’, <a href="#S0.I1.i2" title="In Chapter 28 Definite descriptions ‣ Part V First-order logic ‣ forall x: Calgary" class="ltx_ref"><span class="ltx_text ltx_ref_tag">sentence</span> <span class="ltx_text ltx_ref_tag">2</span></a> with ‘<math id="S1.p2.m10" class="ltx_Math" alttext="C(\iota x\,T(x))" display="inline"><mrow><mi>C</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mrow><mi>ι</mi><mo>⁢</mo><mi>x</mi><mo lspace="0.170em">⁢</mo><mrow><mi>T</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></math>’, and <a href="#S0.I1.i3" title="In Chapter 28 Definite descriptions ‣ Part V First-order logic ‣ forall x: Calgary" class="ltx_ref"><span class="ltx_text ltx_ref_tag">sentence</span> <span class="ltx_text ltx_ref_tag">3</span></a> with ‘<math id="S1.p2.m11" class="ltx_Math" alttext="\iota x\,T(x)=\iota x\,D(x)" display="inline"><mrow><mrow><mi>ι</mi><mo>⁢</mo><mi>x</mi><mo lspace="0.170em">⁢</mo><mrow><mi>T</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo>=</mo><mrow><mi>ι</mi><mo>⁢</mo><mi>x</mi><mo lspace="0.170em">⁢</mo><mrow><mi>D</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></math>’.</p>
+</div>
+<div id="S1.p3" class="ltx_para">
+<p class="ltx_p">However, it would be nice if we didn’t have to add a new symbol to FOL. And we might be able to make do without one.</p>
+</div>
+</div>
+</section>
+<section id="S2" class="ltx_section normal">
+<div class="section level2">
+<h2 class="ltx_title ltx_title_section">
+<span class="ltx_tag ltx_tag_section header-section-number">28.2</span> Russell’s analysis</h2>
+
+<div id="S2.p1" class="ltx_para">
+<p class="ltx_p">Bertrand Russell offered an analysis of definite descriptions. Very
+briefly put, he observed that, when we say ‘the <math id="S2.p1.m1" class="ltx_Math" alttext="F" display="inline"><mi>F</mi></math>’ in the context of
+a definite description, our aim is to pick out the <span class="ltx_text ltx_font_bold">one and only</span>
+thing that is <math id="S2.p1.m2" class="ltx_Math" alttext="F" display="inline"><mi>F</mi></math> (in the appropriate context). Thus Russell analyzed
+the notion of a definite description as follows:<span id="footnote1" class="ltx_note ltx_role_footnote"><sup class="ltx_note_mark">1</sup><span class="ltx_note_outer"><span class="ltx_note_content"><sup class="ltx_note_mark">1</sup>
+                <span class="ltx_tag ltx_tag_note">1</span>
+                
+                
+                
+                
+                
+                
+                
+              Bertrand
+Russell, “On denoting”, <span class="ltx_text ltx_font_bold">Mind</span> 14 (1905), pp. 479–93; also
+Russell, <span class="ltx_text ltx_font_italic">Introduction to Mathematical Philosophy</span>, 1919,
+London: Allen and Unwin, ch. 16.</span></span></span></p>
+<div class="ltx_logical-block bml_background-color_FDF4FA bml_background-color_FDF4FA" style="padding:9pt;">
+            
+<div id="S2.p1.p1" class="ltx_para ltx_noindent">
+<p class="ltx_p">The <math id="S2.p1.p1.m1" class="ltx_Math" alttext="F" display="inline"><mi>F</mi></math> is <math id="S2.p1.p1.m2" class="ltx_Math" alttext="G" display="inline"><mi>G</mi></math> <span class="ltx_text ltx_font_bold">if⁠f</span></p>
+<ul id="S2.I1" class="ltx_itemize">
+<li id="S2.I1.i1" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">‣</span><div id="S2.I1.i1.p1" class="ltx_para">​<p class="ltx_p">there is at least one <math id="S2.I1.i1.p1.m1" class="ltx_Math" alttext="F" display="inline"><mi>F</mi></math>, <span class="ltx_text ltx_font_bold">and</span></p>
+</div>
+</li>
+<li id="S2.I1.i2" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">‣</span><div id="S2.I1.i2.p1" class="ltx_para">​<p class="ltx_p">there is at most one <math id="S2.I1.i2.p1.m1" class="ltx_Math" alttext="F" display="inline"><mi>F</mi></math>, <span class="ltx_text ltx_font_bold">and</span></p>
+</div>
+</li>
+<li id="S2.I1.i3" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">‣</span><div id="S2.I1.i3.p1" class="ltx_para">​<p class="ltx_p">every <math id="S2.I1.i3.p1.m1" class="ltx_Math" alttext="F" display="inline"><mi>F</mi></math> is <math id="S2.I1.i3.p1.m2" class="ltx_Math" alttext="G" display="inline"><mi>G</mi></math>.</p>
+</div>
+</li>
+</ul>
+</div>
+          
+</div>
+<p class="ltx_p">Note a very important feature of this analysis: <span class="ltx_text ltx_font_bold">‘the’ does not appear on the right-side of the equivalence.</span> Russell is aiming to provide an understanding of definite descriptions in terms that do not presuppose them.</p>
+</div>
+<div id="S2.p2" class="ltx_para">
+<p class="ltx_p">Now, one might worry that we can say ‘the table is brown’ without implying that there is one and only one table in the universe. But this is not (yet) a fantastic counterexample to Russell’s analysis. The domain of discourse is likely to be restricted by context (e.g., to salient objects in my vicinity).</p>
+</div>
+<div id="S2.p3" class="ltx_para">
+<p class="ltx_p">If we accept Russell’s analysis of definite descriptions, then we can symbolize sentences of the form ‘the <math id="S2.p3.m1" class="ltx_Math" alttext="F" display="inline"><mi>F</mi></math> is <math id="S2.p3.m2" class="ltx_Math" alttext="G" display="inline"><mi>G</mi></math>’ using our strategy for numerical quantification in FOL. After all, we can deal with the three conjuncts on the right-hand side of Russell’s analysis as follows:</p>
+<div id="Ex1" class="ltx_equation bml_equation bml_equation_container ltx_align_baseline">
+<div class="ltx_Math bml_eqn_cell ltx_align_center"><math id="Ex1.m1" class="ltx_Math" alttext="\exists xF(x)\wedge\forall x\forall y((F(x)\wedge F(y))\rightarrow x=y)\wedge%
+\forall x(F(x)\rightarrow G(x))" display="block"><mrow><mrow><mo rspace="0.167em">∃</mo><mrow><mi>x</mi><mo>⁢</mo><mrow><mi>F</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow><mo>∧</mo><mrow><mo rspace="0.167em">∀</mo><mrow><mi>x</mi><mo lspace="0.167em">⁢</mo><mrow><mo rspace="0.167em">∀</mo><mrow><mi>y</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>F</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo>∧</mo><mrow><mi>F</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow><mo stretchy="false">→</mo><mi>x</mi><mo>=</mo><mi>y</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></mrow><mo>∧</mo><mrow><mo rspace="0.167em">∀</mo><mrow><mi>x</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>F</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">→</mo><mrow><mi>G</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></math></div>
+</div>
+<p class="ltx_p">In fact, we could express the same point rather more crisply, by recognizing that the first two conjuncts just amount to the claim that there is <span class="ltx_text ltx_font_bold">exactly</span> one <math id="S2.p3.m3" class="ltx_Math" alttext="F" display="inline"><mi>F</mi></math>, and that the last conjunct tells us that that object is <math id="S2.p3.m4" class="ltx_Math" alttext="G" display="inline"><mi>G</mi></math>. So, equivalently, we could offer:</p>
+<div id="Ex2" class="ltx_equation bml_equation bml_equation_container ltx_align_baseline">
+<div class="ltx_Math bml_eqn_cell ltx_align_center"><math id="Ex2.m1" class="ltx_Math" alttext="\exists x\bigl{[}(F(x)\wedge\forall y(F(y)\rightarrow x=y))\wedge G(x)\bigr{]}" display="block"><mrow><mo rspace="0.167em">∃</mo><mrow><mi>x</mi><mo>⁢</mo><mrow><mo maxsize="120%" minsize="120%">[</mo><mrow><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>F</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo>∧</mo><mrow><mo rspace="0.167em">∀</mo><mrow><mi>y</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>F</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">→</mo><mi>x</mi><mo>=</mo><mi>y</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow><mo>∧</mo><mrow><mi>G</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo maxsize="120%" minsize="120%">]</mo></mrow></mrow></mrow></math></div>
+</div>
+<p class="ltx_p">Using these sorts of techniques, we can now symbolize <a href="#S0.I1.i1" title="In Chapter 28 Definite descriptions ‣ Part V First-order logic ‣ forall x: Calgary" class="ltx_ref"><span class="ltx_text ltx_ref_tag">sentences</span> <span class="ltx_text ltx_ref_tag">1</span></a> to <a href="#S0.I1.i3" title="Sentence 3 ‣ Chapter 28 Definite descriptions ‣ Part V First-order logic ‣ forall x: Calgary" class="ltx_ref"><span class="ltx_text ltx_ref_tag">3</span></a> without using any new-fangled fancy operator, such as ‘<math id="S2.p3.m5" class="ltx_Math" alttext="\iota" display="inline"><mi>ι</mi></math>’.</p>
+</div>
+<div id="S2.p4" class="ltx_para">
+<p class="ltx_p"><span class="ltx_ref ltx_nolink ltx_ref_self"><span class="ltx_text ltx_ref_tag">Sentence</span> <span class="ltx_text ltx_ref_tag">1</span></span> is exactly like the examples we have just considered. So we would symbolize it by</p>
+<div id="A48.S0.EGx14" class="ltx_equationgroup ltx_eqn_align bml_equationgroup bml_equation_container ltx_align_baseline">
+<div id="Ex3" class="ltx_equation bml_equation ltx_align_baseline" role="group" aria-label="equation">
+<div class="ltx_td ltx_align_right bml_eqn_cell"><math id="Ex3.m1" class="ltx_math_unparsed" alttext="\displaystyle\exists x\bigl{[}T(x)\wedge\forall y(T(y)\rightarrow x=y)" display="inline"><mrow><mo rspace="0.167em">∃</mo><mi>x</mi><mrow><mo maxsize="120%" minsize="120%">[</mo><mi>T</mi><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow><mo>∧</mo><mo rspace="0.167em">∀</mo><mi>y</mi><mrow><mo stretchy="false">(</mo><mi>T</mi><mrow><mo stretchy="false">(</mo><mi>y</mi><mo stretchy="false">)</mo></mrow><mo stretchy="false">→</mo><mi>x</mi><mo>=</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math></div>
+<div class="ltx_td ltx_align_left bml_eqn_cell"><math id="Ex3.m2" class="ltx_math_unparsed" alttext="\displaystyle{}\wedge x=n\bigr{]}." display="inline"><mrow><mi></mi><mo>∧</mo><mi>x</mi><mo>=</mo><mi>n</mi><mo maxsize="120%" minsize="120%">]</mo><mo lspace="0em">.</mo></mrow></math></div>
+</div>
+<span class="bml_intertext ltx_align_baseline"><span class="ltx_ref ltx_nolink ltx_ref_self"><span class="ltx_text ltx_ref_tag">Sentence</span> <span class="ltx_text ltx_ref_tag">2</span></span> poses no problems either:</span>
+<div id="Ex4" class="ltx_equation bml_equation ltx_align_baseline" role="group" aria-label="equation">
+<div class="ltx_td ltx_align_right bml_eqn_cell"><math id="Ex4.m1" class="ltx_math_unparsed" alttext="\displaystyle\exists x\bigl{[}T(x)\wedge\forall y(T(y)\rightarrow x=y)" display="inline"><mrow><mo rspace="0.167em">∃</mo><mi>x</mi><mrow><mo maxsize="120%" minsize="120%">[</mo><mi>T</mi><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow><mo>∧</mo><mo rspace="0.167em">∀</mo><mi>y</mi><mrow><mo stretchy="false">(</mo><mi>T</mi><mrow><mo stretchy="false">(</mo><mi>y</mi><mo stretchy="false">)</mo></mrow><mo stretchy="false">→</mo><mi>x</mi><mo>=</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math></div>
+<div class="ltx_td ltx_align_left bml_eqn_cell"><math id="Ex4.m2" class="ltx_math_unparsed" alttext="\displaystyle{}\wedge C(x)\bigr{]}." display="inline"><mrow><mi></mi><mo>∧</mo><mi>C</mi><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow><mo maxsize="120%" minsize="120%">]</mo><mo lspace="0em">.</mo></mrow></math></div>
+</div>
+</div>
+<p class="ltx_p"><span class="ltx_ref ltx_nolink ltx_ref_self"><span class="ltx_text ltx_ref_tag">Sentence</span> <span class="ltx_text ltx_ref_tag">3</span></span> is a little trickier, because it links two definite
+descriptions. But, deploying Russell’s analysis, it can be
+paraphrased by ‘there is exactly one traitor, <math id="S2.p4.m1" class="ltx_Math" alttext="x" display="inline"><mi>x</mi></math>, and there is
+exactly one deputy, <math id="S2.p4.m2" class="ltx_Math" alttext="y" display="inline"><mi>y</mi></math>, and <math id="S2.p4.m3" class="ltx_Math" alttext="x=y" display="inline"><mrow><mi>x</mi><mo>=</mo><mi>y</mi></mrow></math>’. So we can symbolize it by:</p>
+<div id="Ex5" class="ltx_equation bml_equation bml_equation_container ltx_align_baseline">
+<div class="ltx_Math bml_eqn_cell ltx_align_center"><math id="Ex5.m1" class="ltx_Math" alttext="\exists x\exists y\bigl{(}\bigl{[}T(x)\wedge\forall z(T(z)\rightarrow x=z)%
+\bigr{]}\wedge\bigl{[}D(y)\wedge\forall z(D(z)\rightarrow y=z)\bigr{]}\wedge x%
+=y\bigr{)}" display="block"><mrow><mo rspace="0.167em">∃</mo><mrow><mi>x</mi><mo lspace="0.167em">⁢</mo><mrow><mo rspace="0.167em">∃</mo><mrow><mi>y</mi><mo>⁢</mo><mrow><mo maxsize="120%" minsize="120%">(</mo><mrow><mrow><mrow><mo maxsize="120%" minsize="120%">[</mo><mrow><mrow><mi>T</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo>∧</mo><mrow><mo rspace="0.167em">∀</mo><mrow><mi>z</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>T</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>z</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">→</mo><mi>x</mi><mo>=</mo><mi>z</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow><mo maxsize="120%" minsize="120%">]</mo></mrow><mo>∧</mo><mrow><mo maxsize="120%" minsize="120%">[</mo><mrow><mrow><mi>D</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow><mo>∧</mo><mrow><mo rspace="0.167em">∀</mo><mrow><mi>z</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>D</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>z</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">→</mo><mi>y</mi><mo>=</mo><mi>z</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow><mo maxsize="120%" minsize="120%">]</mo></mrow><mo>∧</mo><mi>x</mi></mrow><mo>=</mo><mi>y</mi></mrow><mo maxsize="120%" minsize="120%">)</mo></mrow></mrow></mrow></mrow></mrow></math></div>
+</div>
+<p class="ltx_p">Note that the formula ‘<math id="S2.p4.m4" class="ltx_Math" alttext="x=y" display="inline"><mrow><mi>x</mi><mo>=</mo><mi>y</mi></mrow></math>’ must fall within the scope of both quantifiers!</p>
+</div>
+</div>
+</section>
+<section id="S3" class="ltx_section normal">
+<div class="section level2">
+<h2 class="ltx_title ltx_title_section">
+<span class="ltx_tag ltx_tag_section header-section-number">28.3</span> Empty definite descriptions</h2>
+
+<div id="S3.p1" class="ltx_para">
+<p class="ltx_p">One of the nice features of Russell’s analysis is that it allows us to handle <span class="ltx_text ltx_font_bold">empty</span> definite descriptions neatly.</p>
+</div>
+<div id="S3.p2" class="ltx_para">
+<p class="ltx_p">France has no king at present. Now, if we were to introduce a name, ‘<math id="S3.p2.m1" class="ltx_Math" alttext="k" display="inline"><mi>k</mi></math>’, to name the present King of France, then everything would go wrong: remember from <a href="Ch23.html" title="Chapter 23 Building blocks of FOL ‣ Part V First-order logic ‣ forall x: Calgary" class="ltx_ref"><span class="ltx_text ltx_ref_tag">chapter</span> <span class="ltx_text ltx_ref_tag">23</span></a> that a name must always pick out some object in the domain, and whatever we choose as our domain, it will contain no present kings of France.</p>
+</div>
+<div id="S3.p3" class="ltx_para">
+<p class="ltx_p">Russell’s analysis neatly avoids this problem. Russell tells us to treat definite descriptions using predicates and quantifiers, instead of names. Since predicates can be empty (see <a href="A24.html" title="Solutions to Chapter 24 Sentences with one quantifier ‣ Solutions to selected exercices ‣ forall x: Calgary" class="ltx_ref"><span class="ltx_text ltx_ref_tag">appendix</span> <span class="ltx_text ltx_ref_tag">24</span></a>), this means that no difficulty now arises when the definite description is empty.</p>
+</div>
+<div id="S3.p4" class="ltx_para">
+<p class="ltx_p">Indeed, Russell’s analysis helpfully highlights two ways to go wrong
+in a claim involving a definite description. To adapt an example from
+Stephen Neale<span id="footnote2" class="ltx_note ltx_role_footnote"><sup class="ltx_note_mark">2</sup><span class="ltx_note_outer"><span class="ltx_note_content"><sup class="ltx_note_mark">2</sup>
+                <span class="ltx_tag ltx_tag_note">2</span>
+                
+                
+                
+                
+                
+                
+                
+              Stephen Neale, <span class="ltx_text ltx_font_italic">Descriptions</span>,
+MIT Press, 1990.</span></span></span> suppose Alex claims:</p>
+<ol id="S3.I1" class="ltx_enumerate">
+<li id="S3.I1.i4" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">4.</span><div id="S3.I1.i4.p1" class="ltx_para">​<p class="ltx_p">I am dating the present king of France.</p>
+</div>
+</li>
+</ol>
+<p class="ltx_p">Using the following symbolization key:</p>
+<dl id="S3.I2" class="ltx_description">
+<dt id="S3.I2.ix1" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="S3.I2.ix1.m1" class="ltx_Math" alttext="a" display="inline"><mi>a</mi></math>:</span></dt>
+<dd class="ltx_item">
+<div id="S3.I2.ix1.p1" class="ltx_para">
+<p class="ltx_p">Alex</p>
+</div>
+</dd>
+<dt id="S3.I2.ix2" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="S3.I2.ix2.m1" class="ltx_Math" alttext="K(x)" display="inline"><mrow><mi>K</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></math>:</span></dt>
+<dd class="ltx_item">
+<div id="S3.I2.ix2.p1" class="ltx_para">
+<p class="ltx_p"><span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span><sub class="ltx_sub"><span class="ltx_text ltx_font_italic">x</span></sub> is a present king of France</p>
+</div>
+</dd>
+<dt id="S3.I2.ix3" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="S3.I2.ix3.m1" class="ltx_Math" alttext="D(x,y)" display="inline"><mrow><mi>D</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo>,</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow></math>:</span></dt>
+<dd class="ltx_item">
+<div id="S3.I2.ix3.p1" class="ltx_para">
+<p class="ltx_p"><span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span><sub class="ltx_sub"><span class="ltx_text ltx_font_italic">x</span></sub> is dating <span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span><sub class="ltx_sub"><span class="ltx_text ltx_font_italic">y</span></sub></p>
+</div>
+</dd>
+</dl>
+<p class="ltx_p">(Note that the symbolization key speaks of <span class="ltx_text ltx_font_bold">a</span> present King of France, not <span class="ltx_text ltx_font_bold">the</span> present King of France; i.e., it employs an indefinite, rather than a definite, description.) <a href="#S3.I1.i4" title="In 28.3 Empty definite descriptions ‣ Chapter 28 Definite descriptions ‣ Part V First-order logic ‣ forall x: Calgary" class="ltx_ref"><span class="ltx_text ltx_ref_tag">Sentence</span> <span class="ltx_text ltx_ref_tag">4</span></a> would be symbolized by ‘<math id="S3.p4.m1" class="ltx_Math" alttext="\exists x\bigl{[}(K(x)\wedge\forall y(K(y)\rightarrow x=y))\wedge D(a,x)\bigr{]}" display="inline"><mrow><mo rspace="0.167em">∃</mo><mrow><mi>x</mi><mo>⁢</mo><mrow><mo maxsize="120%" minsize="120%">[</mo><mrow><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>K</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo>∧</mo><mrow><mo rspace="0.167em">∀</mo><mrow><mi>y</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>K</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">→</mo><mi>x</mi><mo>=</mo><mi>y</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow><mo>∧</mo><mrow><mi>D</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>a</mi><mo>,</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo maxsize="120%" minsize="120%">]</mo></mrow></mrow></mrow></math>’. Now, this can be false in (at least) two ways, corresponding to these two different sentences:</p>
+<ol id="S3.I3" class="ltx_enumerate">
+<li id="S3.I3.i5" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">5.</span><div id="S3.I3.i5.p1" class="ltx_para">​<p class="ltx_p">There is no one who is both the present King of France and such that he and Alex are dating.</p>
+</div>
+</li>
+<li id="S3.I3.i6" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">6.</span><div id="S3.I3.i6.p1" class="ltx_para">​<p class="ltx_p">There is a unique present King of France, but Alex is not dating him.</p>
+</div>
+</li>
+</ol>
+<p class="ltx_p"><span class="ltx_ref ltx_nolink ltx_ref_self"><span class="ltx_text ltx_ref_tag">Sentence</span> <span class="ltx_text ltx_ref_tag">5</span></span> might be paraphrased by ‘It is not the case that: the present King of France and Alex are dating’. It will then be symbolized by ‘<math id="S3.p4.m2" class="ltx_Math" alttext="\neg\exists x\bigl{[}(K(x)\wedge\forall y(K(y)\rightarrow x=y))\wedge D(a,x)%
+\bigr{]}" display="inline"><mrow><mo rspace="0.167em">¬</mo><mrow><mo rspace="0.167em">∃</mo><mrow><mi>x</mi><mo>⁢</mo><mrow><mo maxsize="120%" minsize="120%">[</mo><mrow><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>K</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo>∧</mo><mrow><mo rspace="0.167em">∀</mo><mrow><mi>y</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>K</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">→</mo><mi>x</mi><mo>=</mo><mi>y</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow><mo>∧</mo><mrow><mi>D</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>a</mi><mo>,</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo maxsize="120%" minsize="120%">]</mo></mrow></mrow></mrow></mrow></math>’. We might call this <span class="ltx_text ltx_font_bold">outer</span> negation, since the negation governs the entire sentence. Note that the sentence is true if there is no present King of France.</p>
+</div>
+<div id="S3.p5" class="ltx_para">
+<p class="ltx_p"><span class="ltx_ref ltx_nolink ltx_ref_self"><span class="ltx_text ltx_ref_tag">Sentence</span> <span class="ltx_text ltx_ref_tag">6</span></span> can be symbolized by ‘<math id="S3.p5.m1" class="ltx_Math" alttext="\exists x\bigl{[}(K(x)\wedge\forall y(K(y)\rightarrow x=y))\wedge\neg D(a,x)%
+\bigr{]}" display="inline"><mrow><mo rspace="0.167em">∃</mo><mrow><mi>x</mi><mo>⁢</mo><mrow><mo maxsize="120%" minsize="120%">[</mo><mrow><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>K</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo>∧</mo><mrow><mo rspace="0.167em">∀</mo><mrow><mi>y</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>K</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">→</mo><mi>x</mi><mo>=</mo><mi>y</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow><mo>∧</mo><mrow><mo rspace="0.167em">¬</mo><mrow><mi>D</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>a</mi><mo>,</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow><mo maxsize="120%" minsize="120%">]</mo></mrow></mrow></mrow></math>’. We might call this <span class="ltx_text ltx_font_bold">inner</span> negation, since the negation occurs within the scope of the definite description. Note that its truth requires that there is a present King of France, albeit one who is not dating Alex.
+<span class="ltx_ref ltx_nolink ltx_ref_self"><span class="ltx_text ltx_ref_tag">Sentence</span> <span class="ltx_text ltx_ref_tag">6</span></span> entails <span class="ltx_ref ltx_nolink ltx_ref_self"><span class="ltx_text ltx_ref_tag">sentence</span> <span class="ltx_text ltx_ref_tag">5</span></span> (as do their
+symbolizations), but not vice versa.</p>
+</div>
+</div>
+</section>
+<section id="S4" class="ltx_section normal">
+<div class="section level2">
+<h2 class="ltx_title ltx_title_section">
+<span class="ltx_tag ltx_tag_section header-section-number">28.4</span> Possessives, ‘both’, ‘neither’</h2>
+
+<div id="S4.p1" class="ltx_para">
+<p class="ltx_p">We can use Russell’s analysis of definite descriptions also to deal with singular possessive constructions in English. For instance, ‘Smith’s murderer’ means something like ‘the person who murdered Smith’, i.e., it is a disguised definite description. On Russell’s analysis, the sentence</p>
+<ol id="S4.I1" class="ltx_enumerate">
+<li id="S4.I1.i7" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">7.</span><div id="S4.I1.i7.p1" class="ltx_para">​<p class="ltx_p">Smith’s murderer is insane.</p>
+</div>
+</li>
+</ol>
+<p class="ltx_p">can be false in one of three ways. It can be false because the one person who murdered Smith is not, in fact, insane. But it can also be false if the definite description is empty, namely if either no-one murdered Smith (e.g., if Smith met with an unfortunate accident) or if more than one person murdered Smith.</p>
+</div>
+<div id="S4.p2" class="ltx_para">
+<p class="ltx_p">To symbolize sentences containing singular possessives such as ‘Smith’s murderer’ you should paraphrase them using an explicit definite description, e.g., ‘The person who murdered Smith is insane’ and then symbolize it according to Russell’s analysis. In our case, we would use the symbolization key:</p>
+<dl id="S4.I2" class="ltx_description">
+<dt id="S4.I2.ix1" class="ltx_item"><span class="ltx_tag ltx_tag_item"> Domain:</span></dt>
+<dd class="ltx_item">
+<div id="S4.I2.ix1.p1" class="ltx_para">
+<p class="ltx_p">people</p>
+</div>
+</dd>
+<dt id="S4.I2.ix2" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="S4.I2.ix2.m1" class="ltx_Math" alttext="I(x)" display="inline"><mrow><mi>I</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></math>:</span></dt>
+<dd class="ltx_item">
+<div id="S4.I2.ix2.p1" class="ltx_para">
+<p class="ltx_p"><span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span><sub class="ltx_sub"><span class="ltx_text ltx_font_italic">x</span></sub> is insane</p>
+</div>
+</dd>
+<dt id="S4.I2.ix3" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="S4.I2.ix3.m1" class="ltx_Math" alttext="M(x,y)" display="inline"><mrow><mi>M</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo>,</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow></math>:</span></dt>
+<dd class="ltx_item">
+<div id="S4.I2.ix3.p1" class="ltx_para">
+<p class="ltx_p"><span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span><sub class="ltx_sub"><span class="ltx_text ltx_font_italic">x</span></sub> murdered <span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span><sub class="ltx_sub"><span class="ltx_text ltx_font_italic">y</span></sub></p>
+</div>
+</dd>
+<dt id="S4.I2.ix4" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="S4.I2.ix4.m1" class="ltx_Math" alttext="m" display="inline"><mi>m</mi></math>:</span></dt>
+<dd class="ltx_item">
+<div id="S4.I2.ix4.p1" class="ltx_para">
+<p class="ltx_p">Smith</p>
+</div>
+</dd>
+</dl>
+<p class="ltx_p">Our symbolization then reads, ‘<math id="S4.p2.m1" class="ltx_Math" alttext="\exists x\bigl{[}M(x,m)\wedge\forall y(M(y,m)\rightarrow x=y)\wedge I(x)\bigr{]}" display="inline"><mrow><mo rspace="0.167em">∃</mo><mrow><mi>x</mi><mo>⁢</mo><mrow><mo maxsize="120%" minsize="120%">[</mo><mrow><mrow><mi>M</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo>,</mo><mi>m</mi><mo stretchy="false">)</mo></mrow></mrow><mo>∧</mo><mrow><mo rspace="0.167em">∀</mo><mrow><mi>y</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>M</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>y</mi><mo>,</mo><mi>m</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">→</mo><mi>x</mi><mo>=</mo><mi>y</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow><mo>∧</mo><mrow><mi>I</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo maxsize="120%" minsize="120%">]</mo></mrow></mrow></mrow></math>’.</p>
+</div>
+<div id="S4.p3" class="ltx_para">
+<p class="ltx_p">Two other determiners that we can extend Russell’s analysis to are
+‘both’ and ‘neither’. To say ‘both <math id="S4.p3.m1" class="ltx_Math" alttext="F" display="inline"><mi>F</mi></math>s are <math id="S4.p3.m2" class="ltx_Math" alttext="G" display="inline"><mi>G</mi></math>’ is to say that there
+are exactly two <math id="S4.p3.m3" class="ltx_Math" alttext="F" display="inline"><mi>F</mi></math>s, and each of them is <math id="S4.p3.m4" class="ltx_Math" alttext="G" display="inline"><mi>G</mi></math>. To say that ‘neither
+<math id="S4.p3.m5" class="ltx_Math" alttext="F" display="inline"><mi>F</mi></math> is <math id="S4.p3.m6" class="ltx_Math" alttext="G" display="inline"><mi>G</mi></math>’, is to also say that there are exactly two <math id="S4.p3.m7" class="ltx_Math" alttext="F" display="inline"><mi>F</mi></math>s, and
+neither of them is <math id="S4.p3.m8" class="ltx_Math" alttext="G" display="inline"><mi>G</mi></math>. In FOL, the symbolizations would read,
+respectively,</p>
+<div id="A48.S0.EGx15" class="ltx_equationgroup ltx_eqn_align bml_equationgroup bml_equation_container ltx_align_baseline">
+<div id="Ex6" class="ltx_equation bml_equation ltx_align_baseline" role="group" aria-label="equation">
+<div class="ltx_td ltx_align_left bml_eqn_cell"><math id="Ex6.m1" class="ltx_Math" alttext="\displaystyle{}\exists x\exists y\bigl{[}F(x)\wedge F(y)\wedge\neg\,{x=y}%
+\wedge\forall z(F(z)\rightarrow(x=z\lor y=z))\wedge G(x)\wedge G(y)\bigr{]}" display="inline"><mrow><mo rspace="0.167em">∃</mo><mrow><mi>x</mi><mo lspace="0.167em">⁢</mo><mrow><mo rspace="0.167em">∃</mo><mrow><mi>y</mi><mo>⁢</mo><mrow><mo maxsize="120%" minsize="120%">[</mo><mrow><mrow><mrow><mi>F</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo>∧</mo><mrow><mi>F</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow><mo>∧</mo><mrow><mo rspace="0.337em">¬</mo><mi>x</mi></mrow></mrow><mo>=</mo><mrow><mi>y</mi><mo>∧</mo><mrow><mo rspace="0.167em">∀</mo><mrow><mi>z</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>F</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>z</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">→</mo><mrow><mo stretchy="false">(</mo><mrow><mi>x</mi><mo>=</mo><mrow><mi>z</mi><mo>∨</mo><mi>y</mi></mrow><mo>=</mo><mi>z</mi></mrow><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow><mo>∧</mo><mrow><mi>G</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo>∧</mo><mrow><mi>G</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow><mo maxsize="120%" minsize="120%">]</mo></mrow></mrow></mrow></mrow></mrow></math></div>
+</div>
+<div id="Ex7" class="ltx_equation bml_equation ltx_align_baseline" role="group" aria-label="equation">
+<div class="ltx_td ltx_align_left bml_eqn_cell"><math id="Ex7.m1" class="ltx_Math" alttext="\displaystyle{}\exists x\exists y\bigl{[}F(x)\wedge F(y)\wedge\neg\,{x=y}%
+\wedge\forall z(F(z)\rightarrow(x=z\lor y=z))\wedge\neg G(x)\wedge\neg G(y)%
+\bigr{]}" display="inline"><mrow><mo rspace="0.167em">∃</mo><mrow><mi>x</mi><mo lspace="0.167em">⁢</mo><mrow><mo rspace="0.167em">∃</mo><mrow><mi>y</mi><mo>⁢</mo><mrow><mo maxsize="120%" minsize="120%">[</mo><mrow><mrow><mrow><mi>F</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo>∧</mo><mrow><mi>F</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow><mo>∧</mo><mrow><mo rspace="0.337em">¬</mo><mi>x</mi></mrow></mrow><mo>=</mo><mrow><mi>y</mi><mo>∧</mo><mrow><mo rspace="0.167em">∀</mo><mrow><mi>z</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>F</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>z</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">→</mo><mrow><mo stretchy="false">(</mo><mrow><mi>x</mi><mo>=</mo><mrow><mi>z</mi><mo>∨</mo><mi>y</mi></mrow><mo>=</mo><mi>z</mi></mrow><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow><mo>∧</mo><mrow><mo rspace="0.167em">¬</mo><mrow><mi>G</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo>∧</mo><mrow><mo rspace="0.167em">¬</mo><mrow><mi>G</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></mrow><mo maxsize="120%" minsize="120%">]</mo></mrow></mrow></mrow></mrow></mrow></math></div>
+</div>
+</div>
+<p class="ltx_p">Compare these symbolizations with the symbolizations of ‘exactly two <math id="S4.p3.m9" class="ltx_Math" alttext="F" display="inline"><mi>F</mi></math>s are <math id="S4.p3.m10" class="ltx_Math" alttext="G" display="inline"><mi>G</mi></math>s’ from <a href="Ch26.html#S5" title="26.5 There are exactly… ‣ Chapter 26 Identity ‣ Part V First-order logic ‣ forall x: Calgary" class="ltx_ref"><span class="ltx_text ltx_ref_tag">section</span> <span class="ltx_text ltx_ref_tag">26.5</span></a>, i.e., of ‘there are exactly two things that are both <math id="S4.p3.m11" class="ltx_Math" alttext="F" display="inline"><mi>F</mi></math> and <math id="S4.p3.m12" class="ltx_Math" alttext="G" display="inline"><mi>G</mi></math>’:</p>
+<div id="Ex8" class="ltx_equation bml_equation bml_equation_container ltx_align_baseline">
+<div class="ltx_Math bml_eqn_cell ltx_align_center"><math id="Ex8.m1" class="ltx_Math" alttext="\exists x\exists y\bigl{[}(F(x)\wedge G(x))\wedge(F(y)\wedge G(y))\wedge\neg\,%
+{x=y}\wedge\forall z((F(z)\wedge G(z))\rightarrow(x=z\lor y=z))\bigr{]}" display="block"><mrow><mo rspace="0.167em">∃</mo><mrow><mi>x</mi><mo lspace="0.167em">⁢</mo><mrow><mo rspace="0.167em">∃</mo><mrow><mi>y</mi><mo>⁢</mo><mrow><mo maxsize="120%" minsize="120%">[</mo><mrow><mrow><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>F</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo>∧</mo><mrow><mi>G</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow><mo>∧</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>F</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow><mo>∧</mo><mrow><mi>G</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow><mo>∧</mo><mrow><mo rspace="0.337em">¬</mo><mi>x</mi></mrow></mrow><mo>=</mo><mrow><mi>y</mi><mo>∧</mo><mrow><mo rspace="0.167em">∀</mo><mrow><mi>z</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>F</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>z</mi><mo stretchy="false">)</mo></mrow></mrow><mo>∧</mo><mrow><mi>G</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>z</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow><mo stretchy="false">→</mo><mrow><mo stretchy="false">(</mo><mrow><mi>x</mi><mo>=</mo><mrow><mi>z</mi><mo>∨</mo><mi>y</mi></mrow><mo>=</mo><mi>z</mi></mrow><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></mrow><mo maxsize="120%" minsize="120%">]</mo></mrow></mrow></mrow></mrow></mrow></math></div>
+</div>
+<p class="ltx_p">The difference between the symbolization of this and that of ‘both <math id="S4.p3.m13" class="ltx_Math" alttext="F" display="inline"><mi>F</mi></math>s are <math id="S4.p3.m14" class="ltx_Math" alttext="G" display="inline"><mi>G</mi></math>s’ lies in the antecedent of the conditional. For ‘exactly two <math id="S4.p3.m15" class="ltx_Math" alttext="F" display="inline"><mi>F</mi></math>s are <math id="S4.p3.m16" class="ltx_Math" alttext="G" display="inline"><mi>G</mi></math>s’, we only require that there are no <math id="S4.p3.m17" class="ltx_Math" alttext="F" display="inline"><mi>F</mi></math>s <span class="ltx_text ltx_font_bold">that are also</span> <math id="S4.p3.m18" class="ltx_Math" alttext="G" display="inline"><mi>G</mi></math>s other than <math id="S4.p3.m19" class="ltx_Math" alttext="x" display="inline"><mi>x</mi></math> and <math id="S4.p3.m20" class="ltx_Math" alttext="y" display="inline"><mi>y</mi></math>, whereas for ‘both <math id="S4.p3.m21" class="ltx_Math" alttext="F" display="inline"><mi>F</mi></math>s are <math id="S4.p3.m22" class="ltx_Math" alttext="G" display="inline"><mi>G</mi></math>s’, there cannot be any <math id="S4.p3.m23" class="ltx_Math" alttext="F" display="inline"><mi>F</mi></math>s, whether they are <math id="S4.p3.m24" class="ltx_Math" alttext="G" display="inline"><mi>G</mi></math>s or not, other than <math id="S4.p3.m25" class="ltx_Math" alttext="x" display="inline"><mi>x</mi></math> and <math id="S4.p3.m26" class="ltx_Math" alttext="y" display="inline"><mi>y</mi></math>. In other words, ‘both <math id="S4.p3.m27" class="ltx_Math" alttext="F" display="inline"><mi>F</mi></math>s are <math id="S4.p3.m28" class="ltx_Math" alttext="G" display="inline"><mi>G</mi></math>s’ implies that exactly two <math id="S4.p3.m29" class="ltx_Math" alttext="F" display="inline"><mi>F</mi></math>s are <math id="S4.p3.m30" class="ltx_Math" alttext="G" display="inline"><mi>G</mi></math>s. However, ‘exactly two <math id="S4.p3.m31" class="ltx_Math" alttext="F" display="inline"><mi>F</mi></math>s are <math id="S4.p3.m32" class="ltx_Math" alttext="G" display="inline"><mi>G</mi></math>s’ does not imply that both <math id="S4.p3.m33" class="ltx_Math" alttext="F" display="inline"><mi>F</mi></math>s are <math id="S4.p3.m34" class="ltx_Math" alttext="G" display="inline"><mi>G</mi></math>s (there might be a third <math id="S4.p3.m35" class="ltx_Math" alttext="F" display="inline"><mi>F</mi></math> which isn’t a <math id="S4.p3.m36" class="ltx_Math" alttext="G" display="inline"><mi>G</mi></math>).</p>
+</div>
+</div>
+</section>
+<section id="S5" class="ltx_section normal">
+<div class="section level2">
+<h2 class="ltx_title ltx_title_section">
+<span class="ltx_tag ltx_tag_section header-section-number">28.5</span> The adequacy of Russell’s analysis</h2>
+
+<div id="S5.p1" class="ltx_para">
+<p class="ltx_p">How good is Russell’s analysis of definite descriptions? This question has generated a substantial philosophical literature, but we will restrict ourselves to two observations.</p>
+</div>
+<div id="S5.p2" class="ltx_para">
+<p class="ltx_p">One worry focusses on Russell’s treatment of empty definite
+descriptions. If there are no <math id="S5.p2.m1" class="ltx_Math" alttext="F" display="inline"><mi>F</mi></math>s, then on Russell’s analysis, both
+‘the <math id="S5.p2.m2" class="ltx_Math" alttext="F" display="inline"><mi>F</mi></math> is <math id="S5.p2.m3" class="ltx_Math" alttext="G" display="inline"><mi>G</mi></math>’ and ‘the <math id="S5.p2.m4" class="ltx_Math" alttext="F" display="inline"><mi>F</mi></math> is non-<math id="S5.p2.m5" class="ltx_Math" alttext="G" display="inline"><mi>G</mi></math>’ are false. P. F. Strawson
+suggested that such sentences should not be regarded as false,
+exactly, but involve <span class="ltx_text ltx_font_bold">presupposition failure</span>, and so need to be
+treated as <span class="ltx_text ltx_font_bold">neither</span> true <span class="ltx_text ltx_font_bold">nor</span> false.<span id="footnote3" class="ltx_note ltx_role_footnote"><sup class="ltx_note_mark">3</sup><span class="ltx_note_outer"><span class="ltx_note_content"><sup class="ltx_note_mark">3</sup>
+                <span class="ltx_tag ltx_tag_note">3</span>
+                
+                
+                
+                
+                
+                
+                
+              P. F. Strawson, “On referring”, <span class="ltx_text ltx_font_italic">Mind</span> 59 (1950), pp. 320–34.</span></span></span></p>
+</div>
+<div id="S5.p3" class="ltx_para">
+<p class="ltx_p">If we agree with Strawson here, we will need to revise our logic. For, in our logic, there are only two truth values (True and False), and every sentence is assigned exactly one of these truth values.</p>
+</div>
+<div id="S5.p4" class="ltx_para">
+<p class="ltx_p">But there is room to disagree with Strawson. Strawson is appealing to some linguistic intuitions, but it is not clear that they are very robust. For example: isn’t it just <span class="ltx_text ltx_font_bold">false</span>, not ‘gappy’, that Tim is dating the present King of France?</p>
+</div>
+<div id="S5.p5" class="ltx_para">
+<p class="ltx_p">Keith Donnellan raised a second sort of worry, which (very roughly)
+can be brought out by thinking about a case of mistaken
+identity.<span id="footnote4" class="ltx_note ltx_role_footnote"><sup class="ltx_note_mark">4</sup><span class="ltx_note_outer"><span class="ltx_note_content"><sup class="ltx_note_mark">4</sup>
+                <span class="ltx_tag ltx_tag_note">4</span>
+                
+                
+                
+                
+                
+                
+                
+              Keith Donnellan, “Reference and definite
+descriptions”, <span class="ltx_text ltx_font_italic">Philosophical Review</span> 77 (1966), pp. 281–304.</span></span></span> Two
+men stand in the corner: a very tall man drinking what looks like a
+gin martini; and a very short man drinking what looks like a pint of
+water. Seeing them, Malika says:</p>
+<ol id="S5.I1" class="ltx_enumerate">
+<li id="S5.I1.i8" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">8.</span><div id="S5.I1.i8.p1" class="ltx_para">​<p class="ltx_p">The gin-drinker is very tall!</p>
+</div>
+</li>
+</ol>
+<p class="ltx_p">Russell’s analysis will have us render Malika’s sentence as:</p>
+<ol id="S5.I2" class="ltx_enumerate">
+<li id="S5.I2.ix1" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item"><span class="ltx_ref ltx_nolink ltx_ref_self"><span class="ltx_text ltx_ref_tag">8</span></span><sup class="ltx_sup"><span class="ltx_text ltx_font_italic">′</span></sup>.</span><div id="S5.I2.ix1.p1" class="ltx_para">​<p class="ltx_p">There is exactly one gin-drinker [in the corner], and whoever is a gin-drinker [in the corner] is very tall.</p>
+</div>
+</li>
+</ol>
+<p class="ltx_p">Now suppose that the very tall man is actually drinking <span class="ltx_text ltx_font_bold">water</span> from a martini glass; whereas the very short man is drinking a pint of (neat) gin. By Russell’s analysis, Malika has said something false, but don’t we want to say that Malika has said something <span class="ltx_text ltx_font_bold">true</span>?</p>
+</div>
+<div id="S5.p6" class="ltx_para">
+<p class="ltx_p">Again, one might wonder how clear our intuitions are on this case. We can all agree that Malika intended to pick out a particular man, and say something true of him (that he was tall). On Russell’s analysis, she actually picked out a different man (the short one), and consequently said something false of him. But maybe advocates of Russell’s analysis only need to explain <span class="ltx_text ltx_font_bold">why</span> Malika’s intentions were frustrated, and so why she said something false. This is easy enough to do: Malika said something false because she had false beliefs about the men’s drinks; if Malika’s beliefs about the drinks had been true, then she would have said something true.<span id="footnote5" class="ltx_note ltx_role_footnote"><sup class="ltx_note_mark">5</sup><span class="ltx_note_outer"><span class="ltx_note_content"><sup class="ltx_note_mark">5</sup>
+                <span class="ltx_tag ltx_tag_note">5</span>
+                
+                
+                
+                
+                
+                
+                
+              Interested parties should read Saul Kripke, “Speaker reference and semantic reference”, in: French et al. (eds.), <span class="ltx_text ltx_font_italic">Contemporary Perspectives in the Philosophy of Language</span>, University of Minnesota Press, 1977, pp. 6–27.</span></span></span></p>
+</div>
+<div id="S5.p7" class="ltx_para">
+<p class="ltx_p">To say much more here would lead us into deep philosophical waters. That would be no bad thing, but for now it would distract us from the immediate purpose of learning formal logic. So, for now, we will stick with Russell’s analysis of definite descriptions, when it comes to putting things into FOL. It is certainly the best that we can offer, without significantly revising our logic, and it is quite defensible as an analysis.</p>
+</div>
+</div>
+</section>
+<section id="Sx1" class="ltx_section normal">
+<div class="section level2">
+<h2 class="ltx_title ltx_title_section">Practice exercises</h2>
+
+<div id="Sx1.p1" class="ltx_para ltx_noindent">
+<p class="ltx_p"><span class="ltx_text ltx_font_bold">A. </span>Using the following symbolization key:</p>
+<dl id="Sx1.I3" class="ltx_description">
+<dt id="Sx1.I3.ix1" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <span class="ltx_text ltx_markedasmath">domain</span>:</span></dt>
+<dd class="ltx_item">
+<div id="Sx1.I3.ix1.p1" class="ltx_para">
+<p class="ltx_p">people</p>
+</div>
+</dd>
+<dt id="Sx1.I3.ix2" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="Sx1.I3.ix2.m1" class="ltx_Math" alttext="K(x)" display="inline"><mrow><mi>K</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></math>:</span></dt>
+<dd class="ltx_item">
+<div id="Sx1.I3.ix2.p1" class="ltx_para">
+<p class="ltx_p"><span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span><sub class="ltx_sub"><span class="ltx_text ltx_font_italic">x</span></sub> knows the combination to the safe</p>
+</div>
+</dd>
+<dt id="Sx1.I3.ix3" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="Sx1.I3.ix3.m1" class="ltx_Math" alttext="S(x)" display="inline"><mrow><mi>S</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></math>:</span></dt>
+<dd class="ltx_item">
+<div id="Sx1.I3.ix3.p1" class="ltx_para">
+<p class="ltx_p"><span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span><sub class="ltx_sub"><span class="ltx_text ltx_font_italic">x</span></sub> is a spy</p>
+</div>
+</dd>
+<dt id="Sx1.I3.ix4" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="Sx1.I3.ix4.m1" class="ltx_Math" alttext="V(x)" display="inline"><mrow><mi>V</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></math>:</span></dt>
+<dd class="ltx_item">
+<div id="Sx1.I3.ix4.p1" class="ltx_para">
+<p class="ltx_p"><span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span><sub class="ltx_sub"><span class="ltx_text ltx_font_italic">x</span></sub> is a vegetarian</p>
+</div>
+</dd>
+<dt id="Sx1.I3.ix5" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="Sx1.I3.ix5.m1" class="ltx_Math" alttext="T(x,y)" display="inline"><mrow><mi>T</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo>,</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow></math>:</span></dt>
+<dd class="ltx_item">
+<div id="Sx1.I3.ix5.p1" class="ltx_para">
+<p class="ltx_p"><span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span><sub class="ltx_sub"><span class="ltx_text ltx_font_italic">x</span></sub> trusts <span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span><sub class="ltx_sub"><span class="ltx_text ltx_font_italic">y</span></sub></p>
+</div>
+</dd>
+<dt id="Sx1.I3.ix6" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="Sx1.I3.ix6.m1" class="ltx_Math" alttext="h" display="inline"><mi>h</mi></math>:</span></dt>
+<dd class="ltx_item">
+<div id="Sx1.I3.ix6.p1" class="ltx_para">
+<p class="ltx_p">Hofthor</p>
+</div>
+</dd>
+<dt id="Sx1.I3.ix7" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="Sx1.I3.ix7.m1" class="ltx_Math" alttext="i" display="inline"><mi>i</mi></math>:</span></dt>
+<dd class="ltx_item">
+<div id="Sx1.I3.ix7.p1" class="ltx_para">
+<p class="ltx_p">Ingmar</p>
+</div>
+</dd>
+</dl>
+<p class="ltx_p">symbolize the following sentences in FOL:</p>
+<ol id="Sx1.I4" class="ltx_enumerate">
+<li id="Sx1.I4.i1" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">1.</span><div id="Sx1.I4.i1.p1" class="ltx_para">​<p class="ltx_p">Hofthor trusts a vegetarian.</p>
+</div>
+</li>
+<li id="Sx1.I4.i2" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">2.</span><div id="Sx1.I4.i2.p1" class="ltx_para">​<p class="ltx_p">Everyone who trusts Ingmar trusts a vegetarian.</p>
+</div>
+</li>
+<li id="Sx1.I4.i3" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">3.</span><div id="Sx1.I4.i3.p1" class="ltx_para">​<p class="ltx_p">Everyone who trusts Ingmar trusts someone who trusts a vegetarian.</p>
+</div>
+</li>
+<li id="Sx1.I4.i4" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">4.</span><div id="Sx1.I4.i4.p1" class="ltx_para">​<p class="ltx_p">Only Ingmar knows the combination to the safe.</p>
+</div>
+</li>
+<li id="Sx1.I4.i5" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">5.</span><div id="Sx1.I4.i5.p1" class="ltx_para">​<p class="ltx_p">Ingmar trusts Hofthor, but no one else.</p>
+</div>
+</li>
+<li id="Sx1.I4.i6" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">6.</span><div id="Sx1.I4.i6.p1" class="ltx_para">​<p class="ltx_p">The person who knows the combination to the safe is a vegetarian.</p>
+</div>
+</li>
+<li id="Sx1.I4.i7" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">7.</span><div id="Sx1.I4.i7.p1" class="ltx_para">​<p class="ltx_p">The person who knows the combination to the safe is not a spy.</p>
+</div>
+</li>
+</ol>
+</div>
+<div id="Sx1.p2" class="ltx_para ltx_noindent">
+<p class="ltx_p"><span class="ltx_text ltx_font_bold">B. </span>
+Using the following symbolization key:</p>
+<dl id="Sx1.I5" class="ltx_description">
+<dt id="Sx1.I5.ix1" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <span class="ltx_text ltx_markedasmath">domain</span>:</span></dt>
+<dd class="ltx_item">
+<div id="Sx1.I5.ix1.p1" class="ltx_para">
+<p class="ltx_p">cards in a standard deck</p>
+</div>
+</dd>
+<dt id="Sx1.I5.ix2" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="Sx1.I5.ix2.m1" class="ltx_Math" alttext="B(x)" display="inline"><mrow><mi>B</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></math>:</span></dt>
+<dd class="ltx_item">
+<div id="Sx1.I5.ix2.p1" class="ltx_para">
+<p class="ltx_p"><span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span><sub class="ltx_sub"><span class="ltx_text ltx_font_italic">x</span></sub> is black</p>
+</div>
+</dd>
+<dt id="Sx1.I5.ix3" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="Sx1.I5.ix3.m1" class="ltx_Math" alttext="C(x)" display="inline"><mrow><mi>C</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></math>:</span></dt>
+<dd class="ltx_item">
+<div id="Sx1.I5.ix3.p1" class="ltx_para">
+<p class="ltx_p"><span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span><sub class="ltx_sub"><span class="ltx_text ltx_font_italic">x</span></sub> is a club</p>
+</div>
+</dd>
+<dt id="Sx1.I5.ix4" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="Sx1.I5.ix4.m1" class="ltx_Math" alttext="D(x)" display="inline"><mrow><mi>D</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></math>:</span></dt>
+<dd class="ltx_item">
+<div id="Sx1.I5.ix4.p1" class="ltx_para">
+<p class="ltx_p"><span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span><sub class="ltx_sub"><span class="ltx_text ltx_font_italic">x</span></sub> is a deuce</p>
+</div>
+</dd>
+<dt id="Sx1.I5.ix5" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="Sx1.I5.ix5.m1" class="ltx_Math" alttext="J(x)" display="inline"><mrow><mi>J</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></math>:</span></dt>
+<dd class="ltx_item">
+<div id="Sx1.I5.ix5.p1" class="ltx_para">
+<p class="ltx_p"><span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span><sub class="ltx_sub"><span class="ltx_text ltx_font_italic">x</span></sub> is a jack</p>
+</div>
+</dd>
+<dt id="Sx1.I5.ix6" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="Sx1.I5.ix6.m1" class="ltx_Math" alttext="M(x)" display="inline"><mrow><mi>M</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></math>:</span></dt>
+<dd class="ltx_item">
+<div id="Sx1.I5.ix6.p1" class="ltx_para">
+<p class="ltx_p"><span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span><sub class="ltx_sub"><span class="ltx_text ltx_font_italic">x</span></sub> is a man with an axe</p>
+</div>
+</dd>
+<dt id="Sx1.I5.ix7" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="Sx1.I5.ix7.m1" class="ltx_Math" alttext="O(x)" display="inline"><mrow><mi>O</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></math>:</span></dt>
+<dd class="ltx_item">
+<div id="Sx1.I5.ix7.p1" class="ltx_para">
+<p class="ltx_p"><span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span><sub class="ltx_sub"><span class="ltx_text ltx_font_italic">x</span></sub> is one-eyed</p>
+</div>
+</dd>
+<dt id="Sx1.I5.ix8" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="Sx1.I5.ix8.m1" class="ltx_Math" alttext="W(x)" display="inline"><mrow><mi>W</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></math>:</span></dt>
+<dd class="ltx_item">
+<div id="Sx1.I5.ix8.p1" class="ltx_para">
+<p class="ltx_p"><span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span><sub class="ltx_sub"><span class="ltx_text ltx_font_italic">x</span></sub> is wild</p>
+</div>
+</dd>
+</dl>
+<p class="ltx_p">symbolize each sentence in FOL:</p>
+<ol id="Sx1.I6" class="ltx_enumerate">
+<li id="Sx1.I6.i1" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">1.</span><div id="Sx1.I6.i1.p1" class="ltx_para">​<p class="ltx_p">All clubs are black cards.</p>
+</div>
+</li>
+<li id="Sx1.I6.i2" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">2.</span><div id="Sx1.I6.i2.p1" class="ltx_para">​<p class="ltx_p">There are no wild cards.</p>
+</div>
+</li>
+<li id="Sx1.I6.i3" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">3.</span><div id="Sx1.I6.i3.p1" class="ltx_para">​<p class="ltx_p">There are at least two clubs.</p>
+</div>
+</li>
+<li id="Sx1.I6.i4" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">4.</span><div id="Sx1.I6.i4.p1" class="ltx_para">​<p class="ltx_p">There is more than one one-eyed jack.</p>
+</div>
+</li>
+<li id="Sx1.I6.i5" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">5.</span><div id="Sx1.I6.i5.p1" class="ltx_para">​<p class="ltx_p">There are at most two one-eyed jacks.</p>
+</div>
+</li>
+<li id="Sx1.I6.i6" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">6.</span><div id="Sx1.I6.i6.p1" class="ltx_para">​<p class="ltx_p">There are two black jacks.</p>
+</div>
+</li>
+<li id="Sx1.I6.i7" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">7.</span><div id="Sx1.I6.i7.p1" class="ltx_para">​<p class="ltx_p">There are four deuces.</p>
+</div>
+</li>
+<li id="Sx1.I6.i8" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">8.</span><div id="Sx1.I6.i8.p1" class="ltx_para">​<p class="ltx_p">The deuce of clubs is a black card.</p>
+</div>
+</li>
+<li id="Sx1.I6.i9" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">9.</span><div id="Sx1.I6.i9.p1" class="ltx_para">​<p class="ltx_p">One-eyed jacks and the man with the axe are wild.</p>
+</div>
+</li>
+<li id="Sx1.I6.i10" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">10.</span><div id="Sx1.I6.i10.p1" class="ltx_para">​<p class="ltx_p">If the deuce of clubs is wild, then there is exactly one wild card.</p>
+</div>
+</li>
+<li id="Sx1.I6.i11" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">11.</span><div id="Sx1.I6.i11.p1" class="ltx_para">​<p class="ltx_p">The man with the axe is not a jack.</p>
+</div>
+</li>
+<li id="Sx1.I6.i12" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">12.</span><div id="Sx1.I6.i12.p1" class="ltx_para">​<p class="ltx_p">The deuce of clubs is not the man with the axe.</p>
+</div>
+</li>
+</ol>
+</div>
+<div id="Sx1.p3" class="ltx_para ltx_noindent">
+<p class="ltx_p"><span class="ltx_text ltx_font_bold">C. </span>Using the following symbolization key:</p>
+<dl id="Sx1.I7" class="ltx_description">
+<dt id="Sx1.I7.ix1" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <span class="ltx_text ltx_markedasmath">domain</span>:</span></dt>
+<dd class="ltx_item">
+<div id="Sx1.I7.ix1.p1" class="ltx_para">
+<p class="ltx_p">animals in the world</p>
+</div>
+</dd>
+<dt id="Sx1.I7.ix2" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="Sx1.I7.ix2.m1" class="ltx_Math" alttext="B(x)" display="inline"><mrow><mi>B</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></math>:</span></dt>
+<dd class="ltx_item">
+<div id="Sx1.I7.ix2.p1" class="ltx_para">
+<p class="ltx_p"><span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span><sub class="ltx_sub"><span class="ltx_text ltx_font_italic">x</span></sub> is in Farmer Brown’s field</p>
+</div>
+</dd>
+<dt id="Sx1.I7.ix3" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="Sx1.I7.ix3.m1" class="ltx_Math" alttext="H(x)" display="inline"><mrow><mi>H</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></math>:</span></dt>
+<dd class="ltx_item">
+<div id="Sx1.I7.ix3.p1" class="ltx_para">
+<p class="ltx_p"><span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span><sub class="ltx_sub"><span class="ltx_text ltx_font_italic">x</span></sub> is a horse</p>
+</div>
+</dd>
+<dt id="Sx1.I7.ix4" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="Sx1.I7.ix4.m1" class="ltx_Math" alttext="P(x)" display="inline"><mrow><mi>P</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></math>:</span></dt>
+<dd class="ltx_item">
+<div id="Sx1.I7.ix4.p1" class="ltx_para">
+<p class="ltx_p"><span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span><sub class="ltx_sub"><span class="ltx_text ltx_font_italic">x</span></sub> is a Pegasus</p>
+</div>
+</dd>
+<dt id="Sx1.I7.ix5" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="Sx1.I7.ix5.m1" class="ltx_Math" alttext="W(x)" display="inline"><mrow><mi>W</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></math>:</span></dt>
+<dd class="ltx_item">
+<div id="Sx1.I7.ix5.p1" class="ltx_para">
+<p class="ltx_p"><span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span><sub class="ltx_sub"><span class="ltx_text ltx_font_italic">x</span></sub> has wings</p>
+</div>
+</dd>
+</dl>
+<p class="ltx_p">symbolize the following sentences in FOL:</p>
+<ol id="Sx1.I8" class="ltx_enumerate">
+<li id="Sx1.I8.i1" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">1.</span><div id="Sx1.I8.i1.p1" class="ltx_para">​<p class="ltx_p">There are at least three horses in the world.</p>
+</div>
+</li>
+<li id="Sx1.I8.i2" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">2.</span><div id="Sx1.I8.i2.p1" class="ltx_para">​<p class="ltx_p">There are at least three animals in the world.</p>
+</div>
+</li>
+<li id="Sx1.I8.i3" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">3.</span><div id="Sx1.I8.i3.p1" class="ltx_para">​<p class="ltx_p">There is more than one horse in Farmer Brown’s field.</p>
+</div>
+</li>
+<li id="Sx1.I8.i4" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">4.</span><div id="Sx1.I8.i4.p1" class="ltx_para">​<p class="ltx_p">There are three horses in Farmer Brown’s field.</p>
+</div>
+</li>
+<li id="Sx1.I8.i5" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">5.</span><div id="Sx1.I8.i5.p1" class="ltx_para">​<p class="ltx_p">There is a single winged creature in Farmer Brown’s field; any other creatures in the field must be wingless.</p>
+</div>
+</li>
+<li id="Sx1.I8.i6" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">6.</span><div id="Sx1.I8.i6.p1" class="ltx_para">​<p class="ltx_p">The Pegasus is a winged horse.</p>
+</div>
+</li>
+<li id="Sx1.I8.i7" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">7.</span><div id="Sx1.I8.i7.p1" class="ltx_para">​<p class="ltx_p">The animal in Farmer Brown’s field is not a horse.</p>
+</div>
+</li>
+<li id="Sx1.I8.i8" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">8.</span><div id="Sx1.I8.i8.p1" class="ltx_para">​<p class="ltx_p">The horse in Farmer Brown’s field does not have wings.</p>
+</div>
+</li>
+</ol>
+</div>
+<div id="Sx1.p4" class="ltx_para ltx_noindent">
+<p class="ltx_p"><span class="ltx_text ltx_font_bold">D. </span>In this chapter, we symbolized ‘Nick is the traitor’ by ‘<math id="Sx1.p4.m1" class="ltx_Math" alttext="\exists x(T(x)\wedge\forall y(T(y)\rightarrow x=y)\wedge x=n)" display="inline"><mrow><mo rspace="0.167em">∃</mo><mrow><mi>x</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mrow><mi>T</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo>∧</mo><mrow><mo rspace="0.167em">∀</mo><mrow><mi>y</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>T</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">→</mo><mi>x</mi><mo>=</mo><mi>y</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow><mo>∧</mo><mi>x</mi></mrow><mo>=</mo><mi>n</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>’. Explain why these would be equally good symbolisations:</p>
+<ul id="Sx1.I9" class="ltx_itemize">
+<li id="Sx1.I9.i1" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">‣</span><div id="Sx1.I9.i1.p1" class="ltx_para">​<p class="ltx_p"><math id="Sx1.I9.i1.p1.m1" class="ltx_Math" alttext="T(n)\wedge\forall y(T(y)\rightarrow n=y)" display="inline"><mrow><mrow><mi>T</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo></mrow></mrow><mo>∧</mo><mrow><mo rspace="0.167em">∀</mo><mrow><mi>y</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>T</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">→</mo><mi>n</mi><mo>=</mo><mi>y</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></math></p>
+</div>
+</li>
+<li id="Sx1.I9.i2" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">‣</span><div id="Sx1.I9.i2.p1" class="ltx_para">​<p class="ltx_p"><math id="Sx1.I9.i2.p1.m1" class="ltx_math_unparsed" alttext="\forall y(T(y)\leftrightarrow y=n)" display="inline"><mrow><mo rspace="0.167em">∀</mo><mi>y</mi><mrow><mo stretchy="false">(</mo><mi>T</mi><mrow><mo stretchy="false">(</mo><mi>y</mi><mo stretchy="false">)</mo></mrow><mo stretchy="false">↔</mo><mi>y</mi><mo>=</mo><mi>n</mi><mo stretchy="false">)</mo></mrow></mrow></math></p>
+</div>
+</li>
+</ul>
+</div>
+</div>
+</section>
+</div>
+</section>
+</div>
+</div>
+</div>
+<a href="Ch27.html" class="navigation navigation-prev" aria-label="Previous page"><i class="fa fa-angle-left"></i></a><a href="Ch29.html" class="navigation navigation-next" aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+</div>
+</div>
+</body>
+
+</html>

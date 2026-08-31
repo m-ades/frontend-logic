@@ -31,6 +31,9 @@ import Profile from "./pages/Profile.jsx";
 import InstructorPractice from "./pages/instructor/InstructorPractice.jsx";
 import InstructorRoster from "./pages/instructor/InstructorRoster.jsx";
 import InstructorContact from "./pages/instructor/Contact.jsx";
+import TextbookHubPage from "./pages/TextbookHubPage.jsx";
+import TextbookChapterPage from "./pages/TextbookChapterPage.jsx";
+import InstructorTextbookLinks from "./pages/instructor/InstructorTextbookLinks.jsx";
 
 const withLayout = (LayoutComponent, PageComponent) => (
   <LayoutComponent>
@@ -80,6 +83,7 @@ function AppRoutes() {
     { path: "/sandbox/instructor/dashboard", PageComponent: InstructorDashboard },
     { path: "/sandbox/instructor/assignments", PageComponent: InstructorAssignments },
     { path: "/sandbox/instructor/practice", PageComponent: InstructorPractice },
+    { path: "/sandbox/instructor/textbook-links", PageComponent: InstructorTextbookLinks },
     { path: "/sandbox/instructor/gradebook", PageComponent: InstructorGradebook },
     { path: "/sandbox/instructor/roster", PageComponent: InstructorRoster },
     { path: "/sandbox/instructor/contact", PageComponent: InstructorContact },
@@ -121,6 +125,22 @@ function AppRoutes() {
           element={(
             <SandboxLayout>
               <Practice />
+            </SandboxLayout>
+          )}
+        />
+        <Route
+          path="/sandbox/student/textbook"
+          element={(
+            <SandboxLayout>
+              <TextbookHubPage />
+            </SandboxLayout>
+          )}
+        />
+        <Route
+          path="/sandbox/student/textbook/:chapter"
+          element={(
+            <SandboxLayout>
+              <TextbookChapterPage />
             </SandboxLayout>
           )}
         />
@@ -197,6 +217,26 @@ function AppRoutes() {
             <ProtectedRoute allowedRoles={["student"]}>
               <AppLayout>
                 <Practice />
+              </AppLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/student/textbook"
+          element={
+            <ProtectedRoute allowedRoles={["student"]}>
+              <AppLayout>
+                <TextbookHubPage />
+              </AppLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/student/textbook/:chapter"
+          element={
+            <ProtectedRoute allowedRoles={["student"]}>
+              <AppLayout>
+                <TextbookChapterPage />
               </AppLayout>
             </ProtectedRoute>
           }
@@ -327,6 +367,16 @@ function AppRoutes() {
             <ProtectedRoute allowedRoles={["instructor"]}>
               <AppLayout>
                 <InstructorPractice />
+              </AppLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/instructor/textbook-links"
+          element={
+            <ProtectedRoute allowedRoles={["instructor"]}>
+              <AppLayout>
+                <InstructorTextbookLinks />
               </AppLayout>
             </ProtectedRoute>
           }

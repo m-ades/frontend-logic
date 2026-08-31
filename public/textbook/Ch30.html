@@ -1,0 +1,547 @@
+<!DOCTYPE html><html style="--bml-ltx-font-size:10;" class="bml_mathjax4" lang="en">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<title>Chapter 30 Extensionality ‣ Part VI Interpretations ‣ forall x: Calgary</title>
+<!--Generated on Tue Jul 21 20:13:15 2026 by LaTeXML (version 0.8.8) http://dlmf.nist.gov/LaTeXML/.-->
+<!--Document created on Fall 2025 (2026‐07‐18 8642250).-->
+
+<link rel="stylesheet" href="LaTeXML.css" type="text/css">
+<link rel="stylesheet" href="ltx-book.css" type="text/css">
+<link rel="stylesheet" href="bookml/gitbook/css/style.css" type="text/css">
+<link rel="stylesheet" href="bookml/gitbook/css/plugin-table.css" type="text/css">
+<link rel="stylesheet" href="bookml/gitbook/css/plugin-search.css" type="text/css">
+<link rel="stylesheet" href="bookml/gitbook/css/plugin-bookdown.css" type="text/css">
+<link rel="stylesheet" href="bookml/gitbook/css/plugin-fontsettings.css" type="text/css">
+<link rel="stylesheet" href="bookml/CSS/style.css" type="text/css">
+<link rel="stylesheet" href="bookml/CSS/style.gitbook,plain.css" type="text/css">
+<link rel="stylesheet" href="bookml/CSS/style.gitbook.css" type="text/css">
+<link rel="stylesheet" href="bmluser/colors.gitbook-forallxyyc-html.css" type="text/css">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<link rel="stylesheet" href="forallxyyc.css" type="text/css">
+<link rel="stylesheet" href="fitchml.css" type="text/css">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script><script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6"></script>
+<link rel="up" href="Pt6.html" title="Part VI Interpretations ‣ forall x: Calgary">
+<link rel="up up" href="index.html" title="forall x: Calgary">
+<link rel="start" href="index.html" title="forall x: Calgary">
+<link rel="prev" href="Pt6.html" title="Part VI Interpretations ‣ forall x: Calgary">
+<link rel="next" href="Ch31.html" title="Chapter 31 Truth in FOL ‣ Part VI Interpretations ‣ forall x: Calgary">
+<link rel="chapter" href="Ch31.html" title="Chapter 31 Truth in FOL ‣ Part VI Interpretations ‣ forall x: Calgary">
+<link rel="chapter" href="Ch32.html" title="Chapter 32 Semantic concepts ‣ Part VI Interpretations ‣ forall x: Calgary">
+<link rel="chapter" href="Ch33.html" title="Chapter 33 Using interpretations ‣ Part VI Interpretations ‣ forall x: Calgary">
+<link rel="chapter" href="Ch34.html" title="Chapter 34 Reasoning about interpretations ‣ Part VI Interpretations ‣ forall x: Calgary">
+<link rel="chapter" href="Ch35.html" title="Chapter 35 Properties of relations ‣ Part VI Interpretations ‣ forall x: Calgary">
+<link rel="chapter" href="Chx1.html" title="Preface ‣ forall x: Calgary">
+<link rel="part" href="Pt1.html" title="Part I Key notions of logic ‣ forall x: Calgary">
+<link rel="part" href="Pt2.html" title="Part II Truth-functional logic ‣ forall x: Calgary">
+<link rel="part" href="Pt3.html" title="Part III Truth tables ‣ forall x: Calgary">
+<link rel="part" href="Pt4.html" title="Part IV Natural deduction for TFL ‣ forall x: Calgary">
+<link rel="part" href="Pt5.html" title="Part V First-order logic ‣ forall x: Calgary">
+<link rel="part" href="Pt6.html" title="Part VI Interpretations ‣ forall x: Calgary">
+<link rel="part" href="Pt7.html" title="Part VII Natural deduction for FOL ‣ forall x: Calgary">
+<link rel="part" href="Pt8.html" title="Part VIII Modal logic ‣ forall x: Calgary">
+<link rel="part" href="Pt9.html" title="Part IX Metatheory ‣ forall x: Calgary">
+<link rel="part" href="Ptx1.html" title="Appendices ‣ forall x: Calgary">
+<link rel="part" href="Ptx2.html" title="Solutions to selected exercices ‣ forall x: Calgary">
+<script src="bookml/js/mathjax4.js" defer></script>
+</head>
+<body class="bml_class_book">
+<div class="book without-animation font-size-2 font-family-1" data-basepath=".">
+<a href="#bml-main-content" tabindex="0" class="bml-skip-to-content">Skip to content.</a>
+<div class="book-summary"><nav class="ltx_page_navbar">
+<ul class="ltx_toclist summary">
+<li>
+<a href="index.html" title="" class="ltx_ref" rel="start">forall x: Calgary</a>
+</li>
+<li class="divider" aria-hidden="true"></li>
+<li data-level="" data-path="Chx1.html" class="ltx_tocentry ltx_tocentry_chapter  chapter "><a href="Chx1.html" title="In forall x: Calgary" class="ltx_ref">Preface</a></li>
+<li data-level="I" data-path="Pt1.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt1.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">I </span></b>Key notions of logic</a></li>
+<li data-level="II" data-path="Pt2.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt2.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">II </span></b>Truth-functional logic</a></li>
+<li data-level="III" data-path="Pt3.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt3.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">III </span></b>Truth tables</a></li>
+<li data-level="IV" data-path="Pt4.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt4.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">IV </span></b>Natural deduction for TFL</a></li>
+<li data-level="V" data-path="Pt5.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt5.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">V </span></b>First-order logic</a></li>
+<li data-level="VI" data-path="Pt6.html" class="ltx_tocentry ltx_tocentry_part  chapter ">
+<a href="Pt6.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">VI </span></b>Interpretations</a>
+<ol class="ltx_toclist ltx_toclist_part">
+<li data-level="30" data-path="" class="ltx_tocentry ltx_tocentry_chapter ltx_ref_self  chapter active">
+<a href="" title="In Part VI Interpretations ‣ forall x: Calgary" aria-current="page" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">30 </span></b>Extensionality</a>
+<ol class="ltx_toclist ltx_toclist_chapter">
+<li data-level="30.1" data-path="" class="ltx_tocentry ltx_tocentry_section  chapter "><a href="#S1" title="In Chapter 30 Extensionality ‣ Part VI Interpretations ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">30.1 </span></b>Symbolizing versus translating</a></li>
+<li data-level="30.2" data-path="" class="ltx_tocentry ltx_tocentry_section  chapter "><a href="#S2" title="In Chapter 30 Extensionality ‣ Part VI Interpretations ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">30.2 </span></b>Extensions</a></li>
+<li data-level="30.3" data-path="" class="ltx_tocentry ltx_tocentry_section  chapter "><a href="#S3" title="In Chapter 30 Extensionality ‣ Part VI Interpretations ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">30.3 </span></b>Many-place predicates</a></li>
+<li data-level="30.4" data-path="" class="ltx_tocentry ltx_tocentry_section  chapter "><a href="#S4" title="In Chapter 30 Extensionality ‣ Part VI Interpretations ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">30.4 </span></b>Semantics for identity</a></li>
+<li data-level="30.5" data-path="" class="ltx_tocentry ltx_tocentry_section  chapter "><a href="#S5" title="In Chapter 30 Extensionality ‣ Part VI Interpretations ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">30.5 </span></b>Interpretations</a></li>
+</ol>
+</li>
+<li data-level="31" data-path="Ch31.html" class="ltx_tocentry ltx_tocentry_chapter  chapter "><a href="Ch31.html" title="In Part VI Interpretations ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">31 </span></b>Truth in FOL</a></li>
+<li data-level="32" data-path="Ch32.html" class="ltx_tocentry ltx_tocentry_chapter  chapter "><a href="Ch32.html" title="In Part VI Interpretations ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">32 </span></b>Semantic concepts</a></li>
+<li data-level="33" data-path="Ch33.html" class="ltx_tocentry ltx_tocentry_chapter  chapter "><a href="Ch33.html" title="In Part VI Interpretations ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">33 </span></b>Using interpretations</a></li>
+<li data-level="34" data-path="Ch34.html" class="ltx_tocentry ltx_tocentry_chapter  chapter "><a href="Ch34.html" title="In Part VI Interpretations ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">34 </span></b>Reasoning about interpretations</a></li>
+<li data-level="35" data-path="Ch35.html" class="ltx_tocentry ltx_tocentry_chapter  chapter "><a href="Ch35.html" title="In Part VI Interpretations ‣ forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">35 </span></b>Properties of relations</a></li>
+</ol>
+</li>
+<li data-level="VII" data-path="Pt7.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt7.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">VII </span></b>Natural deduction for FOL</a></li>
+<li data-level="VIII" data-path="Pt8.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt8.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">VIII </span></b>Modal logic</a></li>
+<li data-level="IX" data-path="Pt9.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Pt9.html" title="In forall x: Calgary" class="ltx_ref"><b><span class="ltx_tag ltx_tag_ref">IX </span></b>Metatheory</a></li>
+<li data-level="" data-path="Ptx1.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Ptx1.html" title="In forall x: Calgary" class="ltx_ref">Appendices</a></li>
+<li data-level="" data-path="Ptx2.html" class="ltx_tocentry ltx_tocentry_part  chapter "><a href="Ptx2.html" title="In forall x: Calgary" class="ltx_ref">Solutions to selected exercices</a></li>
+</ul>
+</nav></div>
+
+<div class="ltx_page_main book-body fixed">
+<div class="body-inner">
+<header class="book-header fixed" aria-label="toolbar"><span class="bml-separator"></span></header>
+<div class="page-wrapper" tabindex="-1" role="main">
+<div class="ltx_page_content page-inner" id="bml-main-content">
+<script src="bookml/gitbook/js/app.min.js"></script>
+<script src="bookml/gitbook/js/jquery.highlight.js"></script>
+<script src="bookml/gitbook/js/plugin-search.js"></script>
+<script src="bookml/gitbook/js/plugin-fontsettings.js"></script>
+<script src="bookml/gitbook/js/plugin-bookdown.js"></script>
+<script type="text/javascript">
+                  gitbook.require(["gitbook"], function(gitbook) {
+                  gitbook.start({
+                    "fontsettings": {
+                      "theme": "white",
+                      "family": "sans",
+                      "size": 2
+                    },
+                    "download": [ [ "forallxyyc.pdf", "PDF" ], [ "forallxyyc-accessible.pdf", "PDF (accessible)" ], ],
+                    "search": {
+                      "engine": "fuse"
+                    },
+                    "toc": {
+                      "collapse": "none"
+                    }
+                  });
+                });
+              </script>
+
+<section class="ltx_chapter ltx_authors_1line normal" lang="en">
+<div class="section level1">
+<h1 class="ltx_title ltx_title_chapter">
+<span class="ltx_tag ltx_tag_chapter header-section-number">Chapter 30</span> Extensionality</h1>
+
+<div id="p1" class="ltx_para">
+<p class="ltx_p">Recall that TFL is a truth-functional logic. Its connectives are all truth-functional, and <span class="ltx_text ltx_font_bold">all</span> that we can do with TFL is key sentences to particular truth values. We can do this <span class="ltx_text ltx_font_bold">directly</span>. For example, we might stipulate that the TFL sentence ‘<math id="p1.m1" class="ltx_Math" alttext="P" display="inline"><mi>P</mi></math>’ is to be true. Alternatively, we can do this <span class="ltx_text ltx_font_bold">indirectly</span>, offering a symbolization key, e.g.:</p>
+<dl id="S0.I1" class="ltx_description">
+<dt id="S0.I1.ix1" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="S0.I1.ix1.m1" class="ltx_Math" alttext="P" display="inline"><mi>P</mi></math>:</span></dt>
+<dd class="ltx_item">
+<div id="S0.I1.ix1.p1" class="ltx_para">
+<p class="ltx_p">Big Ben is in London.</p>
+</div>
+</dd>
+</dl>
+<p class="ltx_p">But recall from <a href="Ch10.html" title="Chapter 10 Truth-functional connectives ‣ Part III Truth tables ‣ forall x: Calgary" class="ltx_ref"><span class="ltx_text ltx_ref_tag">chapter</span> <span class="ltx_text ltx_ref_tag">10</span></a> that this is <span class="ltx_text ltx_font_bold">just</span> a means of specifying ‘<math id="p1.m2" class="ltx_Math" alttext="P" display="inline"><mi>P</mi></math>’s truth value; the symbolization key statement amounts to something like the following stipulation:</p>
+<ul id="S0.I2" class="ltx_itemize">
+<li id="S0.I2.i1" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">‣</span><div id="S0.I2.i1.p1" class="ltx_para">​<p class="ltx_p">The TFL sentence ‘<math id="S0.I2.i1.p1.m1" class="ltx_Math" alttext="P" display="inline"><mi>P</mi></math>’ is true if⁠f Big Ben is in London.</p>
+</div>
+</li>
+</ul>
+<p class="ltx_p">And we emphasized in <a href="Ch10.html" title="Chapter 10 Truth-functional connectives ‣ Part III Truth tables ‣ forall x: Calgary" class="ltx_ref"><span class="ltx_text ltx_ref_tag">chapter</span> <span class="ltx_text ltx_ref_tag">10</span></a> that TFL cannot handle differences in meaning that go beyond mere differences in truth value.</p>
+</div>
+<section id="S1" class="ltx_section normal">
+<div class="section level2">
+<h2 class="ltx_title ltx_title_section">
+<span class="ltx_tag ltx_tag_section header-section-number">30.1</span> Symbolizing versus translating</h2>
+
+<div id="S1.p1" class="ltx_para">
+<p class="ltx_p">FOL has some similar limitations. It gets beyond mere truth values,
+since it enables us to split up sentences into terms, predicates and
+quantifiers. This enables us to consider what is <span class="ltx_text ltx_font_bold">true of</span> a
+particular object, or of some or all objects. <span class="ltx_text ltx_font_bold">But that’s it</span>.</p>
+</div>
+<div id="S1.p2" class="ltx_para">
+<p class="ltx_p">To unpack this a bit, consider this symbolization key:</p>
+<dl id="S1.I1" class="ltx_description">
+<dt id="S1.I1.ix1" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="S1.I1.ix1.m1" class="ltx_Math" alttext="C(x)" display="inline"><mrow><mi>C</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></math>:</span></dt>
+<dd class="ltx_item">
+<div id="S1.I1.ix1.p1" class="ltx_para">
+<p class="ltx_p"><span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span><sub class="ltx_sub"><span class="ltx_text ltx_font_italic">x</span></sub> teaches Logic III in Calgary</p>
+</div>
+</dd>
+</dl>
+<p class="ltx_p">This stipulation does not carry the <span class="ltx_text ltx_font_bold">meaning</span> of the English predicate across into our FOL predicate. We are simply stipulating something like this:</p>
+<ul id="S1.I2" class="ltx_itemize">
+<li id="S1.I2.i1" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">‣</span><div id="S1.I2.i1.p1" class="ltx_para">​<p class="ltx_p">‘<math id="S1.I2.i1.p1.m1" class="ltx_Math" alttext="C(x)" display="inline"><mrow><mi>C</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></math>’ and ‘<span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span><sub class="ltx_sub"><span class="ltx_text ltx_font_italic">x</span></sub> teaches Logic III in Calgary’ are to be <span class="ltx_text ltx_font_bold">true of</span> exactly the same things.</p>
+</div>
+</li>
+</ul>
+<p class="ltx_p">So, in particular:</p>
+<ul id="S1.I3" class="ltx_itemize">
+<li id="S1.I3.i1" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">‣</span><div id="S1.I3.i1.p1" class="ltx_para">​<p class="ltx_p">‘<math id="S1.I3.i1.p1.m1" class="ltx_Math" alttext="C(x)" display="inline"><mrow><mi>C</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></math>’ is to be true of exactly those things which teach Logic III in Calgary (whatever those things might be).</p>
+</div>
+</li>
+</ul>
+<p class="ltx_p">This is an indirect way of stipulating which things a predicate is true of.</p>
+</div>
+<div id="S1.p3" class="ltx_para">
+<p class="ltx_p">Alternatively, we can stipulate predicate extensions directly. For example, we can stipulate that ‘<math id="S1.p3.m1" class="ltx_Math" alttext="C(x)" display="inline"><mrow><mi>C</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></math>’ is to be true of Richard Zach, and Richard Zach alone. As it happens, this direct stipulation would have the same effect as the indirect stipulation, since Richard, and Richard alone, teaches Logic III in Calgary. Note, however, that the English predicates ‘<span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span> is Richard Zach’ and ‘<span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span> teaches Logic III in Calgary’ have very different meanings!</p>
+</div>
+<div id="S1.p4" class="ltx_para">
+<p class="ltx_p">The point is that FOL has no resources for dealing with nuances of meaning. When we interpret FOL, all we are considering is what the predicates are true of, regardless of whether we specify these things directly or indirectly. The things a predicate is true of are known as the <dfn>extension</dfn>
+ of that predicate. We say that FOL is an <dfn>extensional language</dfn>
+ because FOL does not represent differences of meaning between predicates that have the same extension.</p>
+</div>
+<div id="S1.p5" class="ltx_para">
+<p class="ltx_p">This is why we speak of <span class="ltx_text ltx_font_bold">symbolizing</span> English sentences in FOL.
+If translation has to preserve meaning, it is clear that we are not <span class="ltx_text ltx_font_bold">translating</span> English into FOL.</p>
+</div>
+</div>
+</section>
+<section id="S2" class="ltx_section normal">
+<div class="section level2">
+<h2 class="ltx_title ltx_title_section">
+<span class="ltx_tag ltx_tag_section header-section-number">30.2</span> Extensions</h2>
+
+<div id="S2.p1" class="ltx_para">
+<p class="ltx_p">We can stipulate directly what predicates are to be true of. And our stipulations can be as arbitrary as we like. For example, we could stipulate that ‘<math id="S2.p1.m1" class="ltx_Math" alttext="H(x)" display="inline"><mrow><mi>H</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></math>’ should be true of, and only of, the following objects:</p>
+<ul id="S2.I1" class="ltx_itemize">
+<li id="S2.I1.i1" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">‣</span><div id="S2.I1.i1.p1" class="ltx_para">​<p class="ltx_p">Aristotle</p>
+</div>
+</li>
+<li id="S2.I1.i2" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">‣</span><div id="S2.I1.i2.p1" class="ltx_para">​<p class="ltx_p">the number <math id="S2.I1.i2.p1.m1" class="ltx_Math" alttext="\pi" display="inline"><mi>π</mi></math></p>
+</div>
+</li>
+<li id="S2.I1.i3" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">‣</span><div id="S2.I1.i3.p1" class="ltx_para">​<p class="ltx_p">every top-F key on every piano ever made</p>
+</div>
+</li>
+</ul>
+<p class="ltx_p">Armed with this interpretation of ‘<math id="S2.p1.m2" class="ltx_Math" alttext="H(x)" display="inline"><mrow><mi>H</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></math>’, suppose we now add to our symbolization key:</p>
+<dl id="S2.I2" class="ltx_description">
+<dt id="S2.I2.ix1" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="S2.I2.ix1.m1" class="ltx_Math" alttext="a" display="inline"><mi>a</mi></math>:</span></dt>
+<dd class="ltx_item">
+<div id="S2.I2.ix1.p1" class="ltx_para">
+<p class="ltx_p">Aristotle</p>
+</div>
+</dd>
+<dt id="S2.I2.ix2" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="S2.I2.ix2.m1" class="ltx_Math" alttext="h" display="inline"><mi>h</mi></math>:</span></dt>
+<dd class="ltx_item">
+<div id="S2.I2.ix2.p1" class="ltx_para">
+<p class="ltx_p">Hypatia</p>
+</div>
+</dd>
+<dt id="S2.I2.ix3" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="S2.I2.ix3.m1" class="ltx_Math" alttext="p" display="inline"><mi>p</mi></math>:</span></dt>
+<dd class="ltx_item">
+<div id="S2.I2.ix3.p1" class="ltx_para">
+<p class="ltx_p">the number <math id="S2.I2.ix3.p1.m1" class="ltx_Math" alttext="\pi" display="inline"><mi>π</mi></math></p>
+</div>
+</dd>
+</dl>
+<p class="ltx_p">Then ‘<math id="S2.p1.m3" class="ltx_Math" alttext="H(a)" display="inline"><mrow><mi>H</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mrow></math>’ and ‘<math id="S2.p1.m4" class="ltx_Math" alttext="H(p)" display="inline"><mrow><mi>H</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>p</mi><mo stretchy="false">)</mo></mrow></mrow></math>’ will both be true, on this interpretation, but ‘<math id="S2.p1.m5" class="ltx_Math" alttext="H(h)" display="inline"><mrow><mi>H</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>h</mi><mo stretchy="false">)</mo></mrow></mrow></math>’ will be false, since Hypatia was not among the stipulated objects.</p>
+</div>
+<div id="S2.p2" class="ltx_para">
+<p class="ltx_p">This process of explicit stipulation is sometimes described as stipulating the <span class="ltx_text ltx_font_bold">extension</span> of a predicate. Note that, in the stipulation we just gave, the objects we listed have nothing particularly in common. This doesn’t matter. Logic doesn’t care about what we humans (at a particular moment) think ‘naturally goes together’; to logic, all objects are on an equal footing.</p>
+</div>
+<div id="S2.p3" class="ltx_para">
+<p class="ltx_p">Any well-defined collection of objects is a potential extension of a one-place predicate. The example above shows one way of stipulating the extension of ‘<math id="S2.p3.m1" class="ltx_Math" alttext="H(x)" display="inline"><mrow><mi>H</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></math>’ by <span class="ltx_text ltx_font_bold">enumeration</span>, i.e., we simply list the objects in the extension of ‘<math id="S2.p3.m2" class="ltx_Math" alttext="H(x)" display="inline"><mrow><mi>H</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></math>’. We can also stipulate the extension, as we have also already seen, by giving an English predicate, such as ‘<span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span><sub class="ltx_sub"><span class="ltx_text ltx_font_italic">x</span></sub> teaches Logic III at Calgary’ or ‘<span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span><sub class="ltx_sub"><span class="ltx_text ltx_font_italic">x</span></sub> is an even integer between <math id="S2.p3.m5" class="ltx_Math" alttext="3" display="inline"><mn>3</mn></math> and <math id="S2.p3.m6" class="ltx_Math" alttext="9" display="inline"><mn>9</mn></math>’. The latter would specify an extension consisting of, and only of, <math id="S2.p3.m7" class="ltx_Math" alttext="4" display="inline"><mn>4</mn></math>, <math id="S2.p3.m8" class="ltx_Math" alttext="6" display="inline"><mn>6</mn></math>, and <math id="S2.p3.m9" class="ltx_Math" alttext="8" display="inline"><mn>8</mn></math>.</p>
+</div>
+<div id="S2.p4" class="ltx_para">
+<p class="ltx_p">Note that some predicates of English, such as ‘<span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span><sub class="ltx_sub"><span class="ltx_text ltx_font_italic">x</span></sub> is a round square’, are not true of anything. In this case we say the extension of the predicate is <span class="ltx_text ltx_font_bold">empty</span>. We do allow empty extensions, and we can stipulate that the extension of ‘<math id="S2.p4.m2" class="ltx_Math" alttext="H(x)" display="inline"><mrow><mi>H</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></math>’ is to be empty simply by not listing any members. (It may be odd to consider collections of no things, but logic is odd this way sometimes.)</p>
+</div>
+</div>
+</section>
+<section id="S3" class="ltx_section normal">
+<div class="section level2">
+<h2 class="ltx_title ltx_title_section">
+<span class="ltx_tag ltx_tag_section header-section-number">30.3</span> Many-place predicates</h2>
+
+<div id="S3.p1" class="ltx_para">
+<p class="ltx_p">All of this is quite easy to understand when it comes to one-place predicates, but it gets messier when we deal with two-place predicates. Consider a symbolization key like:</p>
+<dl id="S3.I1" class="ltx_description">
+<dt id="S3.I1.ix1" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="S3.I1.ix1.m1" class="ltx_Math" alttext="L(x,y)" display="inline"><mrow><mi>L</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo>,</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow></math>:</span></dt>
+<dd class="ltx_item">
+<div id="S3.I1.ix1.p1" class="ltx_para">
+<p class="ltx_p"><span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span><sub class="ltx_sub"><span class="ltx_text ltx_font_italic">x</span></sub> loves <span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span><sub class="ltx_sub"><span class="ltx_text ltx_font_italic">y</span></sub></p>
+</div>
+</dd>
+</dl>
+<p class="ltx_p">Given what we said above, this symbolization key should be read as saying:</p>
+<ul id="S3.I2" class="ltx_itemize">
+<li id="S3.I2.i1" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">‣</span><div id="S3.I2.i1.p1" class="ltx_para">​<p class="ltx_p">‘<math id="S3.I2.i1.p1.m1" class="ltx_Math" alttext="L(x,y)" display="inline"><mrow><mi>L</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo>,</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow></math>’ and ‘<span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span><sub class="ltx_sub"><span class="ltx_text ltx_font_italic">x</span></sub> loves <span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span><sub class="ltx_sub"><span class="ltx_text ltx_font_italic">y</span></sub>’ are to be true of exactly the same things.</p>
+</div>
+</li>
+</ul>
+<p class="ltx_p">So, in particular:</p>
+<ul id="S3.I3" class="ltx_itemize">
+<li id="S3.I3.i1" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">‣</span><div id="S3.I3.i1.p1" class="ltx_para">​<p class="ltx_p">‘<math id="S3.I3.i1.p1.m1" class="ltx_Math" alttext="L(x,y)" display="inline"><mrow><mi>L</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo>,</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow></math>’ is to be true of x and y (in that order) if⁠f x loves y.</p>
+</div>
+</li>
+</ul>
+<p class="ltx_p">It is important that we insist upon the order here, since love—famously—is not always reciprocated. (Note that ‘x’ and ‘y’ on the right here are symbols of augmented English, and that they are being <span class="ltx_text ltx_font_bold">used</span>. By contrast, ‘<math id="S3.p1.m1" class="ltx_Math" alttext="x" display="inline"><mi>x</mi></math>’ and ‘<math id="S3.p1.m2" class="ltx_Math" alttext="y" display="inline"><mi>y</mi></math>’ in ‘<math id="S3.p1.m3" class="ltx_Math" alttext="L(x,y)" display="inline"><mrow><mi>L</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo>,</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow></math>’ are symbols of FOL, and they are being <span class="ltx_text ltx_font_bold">mentioned</span>.)</p>
+</div>
+<div id="S3.p2" class="ltx_para">
+<p class="ltx_p">That is an indirect stipulation. What about a direct stipulation? This is also tricky. If we <span class="ltx_text ltx_font_bold">simply</span> list objects that fall under ‘<math id="S3.p2.m1" class="ltx_Math" alttext="L(x,y)" display="inline"><mrow><mi>L</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo>,</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow></math>’, we will not know whether they are the lover or the beloved (or both). We have to find a way to include the order in our explicit stipulation.</p>
+</div>
+<div id="S3.p3" class="ltx_para">
+<p class="ltx_p">To do this, we can specify that two-place predicates are true of <span class="ltx_text ltx_font_bold">pairs</span> of objects, where the order of the pair is important. Thus we might stipulate that ‘<math id="S3.p3.m1" class="ltx_Math" alttext="B(x,y)" display="inline"><mrow><mi>B</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo>,</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow></math>’ is to be true of, and only of, the following pairs of objects:</p>
+<ul id="S3.I4" class="ltx_itemize">
+<li id="S3.I4.i1" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">‣</span><div id="S3.I4.i1.p1" class="ltx_para">​<p class="ltx_p"><math id="S3.I4.i1.p1.m1" class="ltx_Math" alttext="\mathopen{\langle}" display="inline"><mo stretchy="false">⟨</mo></math>Lenin, Marx<math id="S3.I4.i1.p1.m2" class="ltx_Math" alttext="\mathclose{\rangle}" display="inline"><mo stretchy="false">⟩</mo></math></p>
+</div>
+</li>
+<li id="S3.I4.i2" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">‣</span><div id="S3.I4.i2.p1" class="ltx_para">​<p class="ltx_p"><math id="S3.I4.i2.p1.m1" class="ltx_Math" alttext="\mathopen{\langle}" display="inline"><mo stretchy="false">⟨</mo></math>de Beauvoir, Sartre<math id="S3.I4.i2.p1.m2" class="ltx_Math" alttext="\mathclose{\rangle}" display="inline"><mo stretchy="false">⟩</mo></math></p>
+</div>
+</li>
+<li id="S3.I4.i3" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">‣</span><div id="S3.I4.i3.p1" class="ltx_para">​<p class="ltx_p"><math id="S3.I4.i3.p1.m1" class="ltx_Math" alttext="\mathopen{\langle}" display="inline"><mo stretchy="false">⟨</mo></math>Sartre, de Beauvoir<math id="S3.I4.i3.p1.m2" class="ltx_Math" alttext="\mathclose{\rangle}" display="inline"><mo stretchy="false">⟩</mo></math></p>
+</div>
+</li>
+</ul>
+<p class="ltx_p">Here the angle-brackets keep us informed concerning order. Suppose we now add the following stipulations:</p>
+<dl id="S3.I5" class="ltx_description">
+<dt id="S3.I5.ix1" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="S3.I5.ix1.m1" class="ltx_Math" alttext="l" display="inline"><mi>l</mi></math>:</span></dt>
+<dd class="ltx_item">
+<div id="S3.I5.ix1.p1" class="ltx_para">
+<p class="ltx_p">Lenin</p>
+</div>
+</dd>
+<dt id="S3.I5.ix2" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="S3.I5.ix2.m1" class="ltx_Math" alttext="m" display="inline"><mi>m</mi></math>:</span></dt>
+<dd class="ltx_item">
+<div id="S3.I5.ix2.p1" class="ltx_para">
+<p class="ltx_p">Marx</p>
+</div>
+</dd>
+<dt id="S3.I5.ix3" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="S3.I5.ix3.m1" class="ltx_Math" alttext="b" display="inline"><mi>b</mi></math>:</span></dt>
+<dd class="ltx_item">
+<div id="S3.I5.ix3.p1" class="ltx_para">
+<p class="ltx_p">de Beauvoir</p>
+</div>
+</dd>
+<dt id="S3.I5.ix4" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="S3.I5.ix4.m1" class="ltx_Math" alttext="r" display="inline"><mi>r</mi></math>:</span></dt>
+<dd class="ltx_item">
+<div id="S3.I5.ix4.p1" class="ltx_para">
+<p class="ltx_p">Sartre</p>
+</div>
+</dd>
+</dl>
+<p class="ltx_p">Then ‘<math id="S3.p3.m2" class="ltx_Math" alttext="B(l,m)" display="inline"><mrow><mi>B</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>l</mi><mo>,</mo><mi>m</mi><mo stretchy="false">)</mo></mrow></mrow></math>’ will be true, since <math id="S3.p3.m3" class="ltx_Math" alttext="\mathopen{\langle}" display="inline"><mo stretchy="false">⟨</mo></math>Lenin, Marx<math id="S3.p3.m4" class="ltx_Math" alttext="\mathclose{\rangle}" display="inline"><mo stretchy="false">⟩</mo></math> is in our explicit list, but ‘<math id="S3.p3.m5" class="ltx_Math" alttext="B(m,l)" display="inline"><mrow><mi>B</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>m</mi><mo>,</mo><mi>l</mi><mo stretchy="false">)</mo></mrow></mrow></math>’ will be false, since <math id="S3.p3.m6" class="ltx_Math" alttext="\mathopen{\langle}" display="inline"><mo stretchy="false">⟨</mo></math>Marx, Lenin<math id="S3.p3.m7" class="ltx_Math" alttext="\mathclose{\rangle}" display="inline"><mo stretchy="false">⟩</mo></math> is not in our list. However, both ‘<math id="S3.p3.m8" class="ltx_Math" alttext="B(b,r)" display="inline"><mrow><mi>B</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>b</mi><mo>,</mo><mi>r</mi><mo stretchy="false">)</mo></mrow></mrow></math>’ and ‘<math id="S3.p3.m9" class="ltx_Math" alttext="B(r,b)" display="inline"><mrow><mi>B</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>r</mi><mo>,</mo><mi>b</mi><mo stretchy="false">)</mo></mrow></mrow></math>’ will be true, since both <math id="S3.p3.m10" class="ltx_Math" alttext="\mathopen{\langle}" display="inline"><mo stretchy="false">⟨</mo></math>de Beauvoir, Sartre<math id="S3.p3.m11" class="ltx_Math" alttext="\mathclose{\rangle}" display="inline"><mo stretchy="false">⟩</mo></math> and <math id="S3.p3.m12" class="ltx_Math" alttext="\mathopen{\langle}" display="inline"><mo stretchy="false">⟨</mo></math>Sartre, de Beauvoir<math id="S3.p3.m13" class="ltx_Math" alttext="\mathclose{\rangle}" display="inline"><mo stretchy="false">⟩</mo></math> are in our explicit list.</p>
+</div>
+<div id="S3.p4" class="ltx_para">
+<p class="ltx_p">To make these ideas more precise, we would need to develop some very elementary <span class="ltx_text ltx_font_bold">set theory</span>. Set theory has formal apparatus which allows us to deal with extensions, ordered pairs, and so forth. However, set theory is not covered in this book. So I shall leave these ideas at an imprecise level. Nevertheless, the general idea should be clear.</p>
+</div>
+</div>
+</section>
+<section id="S4" class="ltx_section normal">
+<div class="section level2">
+<h2 class="ltx_title ltx_title_section">
+<span class="ltx_tag ltx_tag_section header-section-number">30.4</span> Semantics for identity</h2>
+
+<div id="S4.p1" class="ltx_para">
+<p class="ltx_p">Identity is a special predicate of FOL. We write it a bit differently than other two-place predicates: ‘<math id="S4.p1.m1" class="ltx_Math" alttext="x=y" display="inline"><mrow><mi>x</mi><mo>=</mo><mi>y</mi></mrow></math>’ instead of ‘<math id="S4.p1.m2" class="ltx_Math" alttext="I(x,y)" display="inline"><mrow><mi>I</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo>,</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow></math>’ (for example). More important, though, is that its interpretation is fixed, once and for all.</p>
+</div>
+<div id="S4.p2" class="ltx_para">
+<p class="ltx_p">If two names refer to the same object, then swapping one name for another will not change the truth value of any sentence. So, in particular, if ‘<math id="S4.p2.m1" class="ltx_Math" alttext="a" display="inline"><mi>a</mi></math>’ and ‘<math id="S4.p2.m2" class="ltx_Math" alttext="b" display="inline"><mi>b</mi></math>’ name the same object, then all of the following will be true:</p>
+<div id="A48.S0.EGx18" class="ltx_equationgroup ltx_eqn_align bml_equationgroup bml_equation_container ltx_align_baseline">
+<div id="Ex1" class="ltx_equation bml_equation ltx_align_baseline" role="group" aria-label="equation">
+<div class="ltx_td ltx_align_right bml_eqn_cell"><math id="Ex1.m1" class="ltx_Math" alttext="\displaystyle A(a)" display="inline"><mrow><mi>A</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mrow></math></div>
+<div class="ltx_td ltx_align_left bml_eqn_cell"><math id="Ex1.m2" class="ltx_Math" alttext="\displaystyle{}\leftrightarrow A(b)" display="inline"><mrow><mi></mi><mo stretchy="false">↔</mo><mrow><mi>A</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>b</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math></div>
+</div>
+<div id="Ex2" class="ltx_equation bml_equation ltx_align_baseline" role="group" aria-label="equation">
+<div class="ltx_td ltx_align_right bml_eqn_cell"><math id="Ex2.m1" class="ltx_Math" alttext="\displaystyle B(a)" display="inline"><mrow><mi>B</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mrow></math></div>
+<div class="ltx_td ltx_align_left bml_eqn_cell"><math id="Ex2.m2" class="ltx_Math" alttext="\displaystyle{}\leftrightarrow B(b)" display="inline"><mrow><mi></mi><mo stretchy="false">↔</mo><mrow><mi>B</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>b</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math></div>
+</div>
+<div id="Ex3" class="ltx_equation bml_equation ltx_align_baseline" role="group" aria-label="equation">
+<div class="ltx_td ltx_align_right bml_eqn_cell"><math id="Ex3.m1" class="ltx_Math" alttext="\displaystyle R(a,a)" display="inline"><mrow><mi>R</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>a</mi><mo>,</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mrow></math></div>
+<div class="ltx_td ltx_align_left bml_eqn_cell"><math id="Ex3.m2" class="ltx_Math" alttext="\displaystyle{}\leftrightarrow R(b,b)" display="inline"><mrow><mi></mi><mo stretchy="false">↔</mo><mrow><mi>R</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>b</mi><mo>,</mo><mi>b</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math></div>
+</div>
+<div id="Ex4" class="ltx_equation bml_equation ltx_align_baseline" role="group" aria-label="equation">
+<div class="ltx_td ltx_align_right bml_eqn_cell"><math id="Ex4.m1" class="ltx_Math" alttext="\displaystyle R(a,a)" display="inline"><mrow><mi>R</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>a</mi><mo>,</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mrow></math></div>
+<div class="ltx_td ltx_align_left bml_eqn_cell"><math id="Ex4.m2" class="ltx_Math" alttext="\displaystyle{}\leftrightarrow R(a,b)" display="inline"><mrow><mi></mi><mo stretchy="false">↔</mo><mrow><mi>R</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>a</mi><mo>,</mo><mi>b</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math></div>
+</div>
+<div id="Ex5" class="ltx_equation bml_equation ltx_align_baseline" role="group" aria-label="equation">
+<div class="ltx_td ltx_align_right bml_eqn_cell"><math id="Ex5.m1" class="ltx_Math" alttext="\displaystyle R(c,a)" display="inline"><mrow><mi>R</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>c</mi><mo>,</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mrow></math></div>
+<div class="ltx_td ltx_align_left bml_eqn_cell"><math id="Ex5.m2" class="ltx_Math" alttext="\displaystyle{}\leftrightarrow R(c,b)" display="inline"><mrow><mi></mi><mo stretchy="false">↔</mo><mrow><mi>R</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>c</mi><mo>,</mo><mi>b</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math></div>
+</div>
+<div id="Ex6" class="ltx_equation bml_equation ltx_align_baseline" role="group" aria-label="equation">
+<div class="ltx_td ltx_align_right bml_eqn_cell"><math id="Ex6.m1" class="ltx_Math" alttext="\displaystyle\forall x\,R(x,a)" display="inline"><mrow><mo rspace="0.167em">∀</mo><mrow><mi>x</mi><mo lspace="0.170em">⁢</mo><mrow><mi>R</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo>,</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></math></div>
+<div class="ltx_td ltx_align_left bml_eqn_cell"><math id="Ex6.m2" class="ltx_Math" alttext="\displaystyle{}\leftrightarrow\forall x\,R(x,b)" display="inline"><mrow><mi></mi><mo stretchy="false">↔</mo><mrow><mo rspace="0.167em">∀</mo><mrow><mi>x</mi><mo lspace="0.170em">⁢</mo><mrow><mi>R</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo>,</mo><mi>b</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></mrow></math></div>
+</div>
+</div>
+<p class="ltx_p">Some philosophers have believed the reverse of this claim. That is, they have believed that when exactly the same sentences (not containing ‘<math id="S4.p2.m3" class="ltx_Math" alttext="=" display="inline"><mo>=</mo></math>’) are true of x and y, then x and y are the very same object. This is a highly controversial philosophical claim—sometimes called the <span class="ltx_text ltx_font_bold">identity of indiscernibles</span>—and our logic will not subscribe to it; we allow that exactly the same things might be true of two <span class="ltx_text ltx_font_bold">distinct</span> objects.</p>
+</div>
+<div id="S4.p3" class="ltx_para">
+<p class="ltx_p">To bring this out, consider the following interpretation:</p>
+<dl id="S4.I1" class="ltx_description">
+<dt id="S4.I1.ix1" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <span class="ltx_text ltx_markedasmath">domain</span>:</span></dt>
+<dd class="ltx_item">
+<div id="S4.I1.ix1.p1" class="ltx_para">
+<p class="ltx_p">P. D. Magnus, Tim Button</p>
+</div>
+</dd>
+<dt id="S4.I1.ix2" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="S4.I1.ix2.m1" class="ltx_Math" alttext="a" display="inline"><mi>a</mi></math>:</span></dt>
+<dd class="ltx_item">
+<div id="S4.I1.ix2.p1" class="ltx_para">
+<p class="ltx_p">P. D. Magnus</p>
+</div>
+</dd>
+<dt id="S4.I1.ix3" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="S4.I1.ix3.m1" class="ltx_Math" alttext="b" display="inline"><mi>b</mi></math>:</span></dt>
+<dd class="ltx_item">
+<div id="S4.I1.ix3.p1" class="ltx_para">
+<p class="ltx_p">Tim Button</p>
+</div>
+</dd>
+<dt id="S4.I1.ix4" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="S4.I1.ix4.m1" class="ltx_Math" alttext="\mathscr{R}(x_{1},\dots,x_{n})" display="inline"><mrow><mi class="ltx_font_mathscript">ℛ︁</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><msub><mi>x</mi><mn>1</mn></msub><mo>,</mo><mi mathvariant="normal">…</mi><mo>,</mo><msub><mi>x</mi><mi>n</mi></msub><mo stretchy="false">)</mo></mrow></mrow></math>:</span></dt>
+<dd class="ltx_item">
+<div id="S4.I1.ix4.p1" class="ltx_para">
+<p class="ltx_p">For every primitive
+predicate <math id="S4.I1.ix4.p1.m1" class="ltx_Math" alttext="\mathscr{R}" display="inline"><mi class="ltx_font_mathscript">ℛ︁</mi></math> we care to consider, that predicate is true of
+<span class="ltx_text ltx_font_bold">nothing</span>.</p>
+</div>
+</dd>
+</dl>
+<p class="ltx_p">Suppose ‘<math id="S4.p3.m1" class="ltx_Math" alttext="A" display="inline"><mi>A</mi></math>’ is a one-place predicate; then ‘<math id="S4.p3.m2" class="ltx_Math" alttext="A(a)" display="inline"><mrow><mi>A</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mrow></math>’ is false and ‘<math id="S4.p3.m3" class="ltx_Math" alttext="A(b)" display="inline"><mrow><mi>A</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>b</mi><mo stretchy="false">)</mo></mrow></mrow></math>’ is false, so ‘<math id="S4.p3.m4" class="ltx_Math" alttext="A(a)\leftrightarrow A(b)" display="inline"><mrow><mrow><mi>A</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">↔</mo><mrow><mi>A</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>b</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math>’ is true. Similarly, if ‘<math id="S4.p3.m5" class="ltx_Math" alttext="R" display="inline"><mi>R</mi></math>’ is a two-place predicate, then ‘<math id="S4.p3.m6" class="ltx_Math" alttext="R(a,a)" display="inline"><mrow><mi>R</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>a</mi><mo>,</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mrow></math>’ is false and ‘<math id="S4.p3.m7" class="ltx_Math" alttext="R(a,b)" display="inline"><mrow><mi>R</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>a</mi><mo>,</mo><mi>b</mi><mo stretchy="false">)</mo></mrow></mrow></math>’ is false, so that ‘<math id="S4.p3.m8" class="ltx_Math" alttext="R(a,a)\leftrightarrow R(a,b)" display="inline"><mrow><mrow><mi>R</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>a</mi><mo>,</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">↔</mo><mrow><mi>R</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>a</mi><mo>,</mo><mi>b</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math>’ is true. And so it goes: every atomic sentence not involving ‘<math id="S4.p3.m9" class="ltx_Math" alttext="=" display="inline"><mo>=</mo></math>’ is false, so every biconditional linking such sentences is true. For all that, Tim Button and P. D. Magnus are two distinct people, not one and the same!</p>
+</div>
+</div>
+</section>
+<section id="S5" class="ltx_section normal">
+<div class="section level2">
+<h2 class="ltx_title ltx_title_section">
+<span class="ltx_tag ltx_tag_section header-section-number">30.5</span> Interpretations</h2>
+
+<div id="S5.p1" class="ltx_para">
+<p class="ltx_p">We defined a <dfn>valuation</dfn>
+ in TFL as any assignment of truth and
+falsity to sentence letters. In FOL, we are going to define an
+<dfn>interpretation</dfn>
+ as consisting of four
+things:<span id="footnote1" class="ltx_note ltx_role_footnote"><sup class="ltx_note_mark">1</sup><span class="ltx_note_outer"><span class="ltx_note_content"><sup class="ltx_note_mark">1</sup>
+                <span class="ltx_tag ltx_tag_note">1</span>
+                
+                
+                
+                
+                
+                
+                
+              Interpretations are also often called “models” or “structures.”</span></span></span></p>
+<ol id="S5.I1" class="ltx_enumerate">
+<li id="S5.I1.i1" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">1.</span><div id="S5.I1.i1.p1" class="ltx_para">​<p class="ltx_p">the specification of a non-empty domain;</p>
+</div>
+</li>
+<li id="S5.I1.i2" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">2.</span><div id="S5.I1.i2.p1" class="ltx_para">​<p class="ltx_p">each sentence letter we care to consider is assigned a truth value;</p>
+</div>
+</li>
+<li id="S5.I1.i3" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">3.</span><div id="S5.I1.i3.p1" class="ltx_para">​<p class="ltx_p">each name that we care to consider is assigned exactly one
+object within the domain (its <dfn>referent</dfn>
+);</p>
+</div>
+</li>
+<li id="S5.I1.i4" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">4.</span><div id="S5.I1.i4.p1" class="ltx_para">​<p class="ltx_p">for each predicate that we care to consider (apart from
+‘<math id="S5.I1.i4.p1.m1" class="ltx_Math" alttext="=" display="inline"><mo>=</mo></math>’), a specification of what things (in what order) the
+predicate is to be true of (its <dfn>extension</dfn>
+).</p>
+</div>
+</li>
+</ol>
+<p class="ltx_p">For one-place predicates, extensions are collections of objects from
+the domain of which the predicate is true, for two-place predicates
+they are ordered pairs of objects, etc.</p>
+</div>
+<div id="S5.p2" class="ltx_para">
+<p class="ltx_p">We don’t need to specify anything for ‘<math id="S5.p2.m1" class="ltx_Math" alttext="=" display="inline"><mo>=</mo></math>’, since it has a
+<span class="ltx_text ltx_font_bold">fixed</span> meaning, namely that of identity. Everything is identical
+to itself, and only to itself.</p>
+</div>
+<div id="S5.p3" class="ltx_para">
+<p class="ltx_p">The symbolization keys that we considered in <a href="Pt5.html" title="Part V First-order logic ‣ forall x: Calgary" class="ltx_ref"><span class="ltx_text ltx_ref_tag">part</span> <span class="ltx_text ltx_ref_tag">V</span></a> consequently give us one very convenient way to present an interpretation. We will continue to use them in this chapter. Following the discussion of <a href="#S2" title="30.2 Extensions ‣ Chapter 30 Extensionality ‣ Part VI Interpretations ‣ forall x: Calgary" class="ltx_ref"><span class="ltx_text ltx_ref_tag">section</span> <span class="ltx_text ltx_ref_tag">30.2</span></a>, we now also allow extensions specified by enumerations on the right side, e.g.,</p>
+<dl id="S5.I2" class="ltx_description">
+<dt id="S5.I2.ix1" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <span class="ltx_text ltx_markedasmath">domain</span>:</span></dt>
+<dd class="ltx_item">
+<div id="S5.I2.ix1.p1" class="ltx_para">
+<p class="ltx_p">philosophers, numbers</p>
+</div>
+</dd>
+<dt id="S5.I2.ix2" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="S5.I2.ix2.m1" class="ltx_Math" alttext="H(x)" display="inline"><mrow><mi>H</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></math>:</span></dt>
+<dd class="ltx_item">
+<div id="S5.I2.ix2.p1" class="ltx_para">
+<p class="ltx_p">Aristotle, Hypatia, <math id="S5.I2.ix2.p1.m1" class="ltx_Math" alttext="\pi" display="inline"><mi>π</mi></math></p>
+</div>
+</dd>
+</dl>
+<p class="ltx_p">is a perfectly good way of specifying an interpretation, as is</p>
+<dl id="S5.I3" class="ltx_description">
+<dt id="S5.I3.ix1" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <span class="ltx_text ltx_markedasmath">domain</span>:</span></dt>
+<dd class="ltx_item">
+<div id="S5.I3.ix1.p1" class="ltx_para">
+<p class="ltx_p"><math id="S5.I3.ix1.p1.m1" class="ltx_Math" alttext="0" display="inline"><mn>0</mn></math>, <math id="S5.I3.ix1.p1.m2" class="ltx_Math" alttext="1" display="inline"><mn>1</mn></math>, <math id="S5.I3.ix1.p1.m3" class="ltx_Math" alttext="2" display="inline"><mn>2</mn></math></p>
+</div>
+</dd>
+<dt id="S5.I3.ix2" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="S5.I3.ix2.m1" class="ltx_Math" alttext="L(x,y)" display="inline"><mrow><mi>L</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo>,</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow></math>:</span></dt>
+<dd class="ltx_item">
+<div id="S5.I3.ix2.p1" class="ltx_para">
+<p class="ltx_p"><math id="S5.I3.ix2.p1.m1" class="ltx_Math" alttext="\mathopen{\langle}" display="inline"><mo stretchy="false">⟨</mo></math><math id="S5.I3.ix2.p1.m2" class="ltx_Math" alttext="0" display="inline"><mn>0</mn></math>,<math id="S5.I3.ix2.p1.m3" class="ltx_Math" alttext="1" display="inline"><mn>1</mn></math><math id="S5.I3.ix2.p1.m4" class="ltx_Math" alttext="\mathclose{\rangle}" display="inline"><mo stretchy="false">⟩</mo></math>, <math id="S5.I3.ix2.p1.m5" class="ltx_Math" alttext="\mathopen{\langle}" display="inline"><mo stretchy="false">⟨</mo></math><math id="S5.I3.ix2.p1.m6" class="ltx_Math" alttext="0" display="inline"><mn>0</mn></math>, <math id="S5.I3.ix2.p1.m7" class="ltx_Math" alttext="2" display="inline"><mn>2</mn></math><math id="S5.I3.ix2.p1.m8" class="ltx_Math" alttext="\mathclose{\rangle}" display="inline"><mo stretchy="false">⟩</mo></math>, <math id="S5.I3.ix2.p1.m9" class="ltx_Math" alttext="\mathopen{\langle}" display="inline"><mo stretchy="false">⟨</mo></math><math id="S5.I3.ix2.p1.m10" class="ltx_Math" alttext="1" display="inline"><mn>1</mn></math>, <math id="S5.I3.ix2.p1.m11" class="ltx_Math" alttext="2" display="inline"><mn>2</mn></math><math id="S5.I3.ix2.p1.m12" class="ltx_Math" alttext="\mathclose{\rangle}" display="inline"><mo stretchy="false">⟩</mo></math></p>
+</div>
+</dd>
+</dl>
+<p class="ltx_p">We could have specified the same extension (on this particular domain) by giving the English predicate ‘<span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span><sub class="ltx_sub"><span class="ltx_text ltx_font_italic">x</span></sub> is less than <span class="ltx_text fxblank ltx_framed ltx_framed_underline">blank </span><sub class="ltx_sub"><span class="ltx_text ltx_font_italic">y</span></sub>’.</p>
+</div>
+<div id="S5.p4" class="ltx_para">
+<p class="ltx_p">However, it is sometimes also convenient to present an interpretation
+<span class="ltx_text ltx_font_bold">diagrammatically</span>. To illustrate (literally): suppose we want to
+consider just a single two-place predicate, ‘<math id="S5.p4.m1" class="ltx_Math" alttext="R(x,y)" display="inline"><mrow><mi>R</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo>,</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow></math>’. Then we
+can represent it just by drawing an arrow between two objects, and
+stipulate that ‘<math id="S5.p4.m2" class="ltx_Math" alttext="R(x,y)" display="inline"><mrow><mi>R</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo>,</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow></math>’ is to hold of x and y if⁠f there is an arrow running from x to y in our diagram. As an
+example, we might offer:</p>
+<div class="bml-overflow-wrapper"><img src="bmlimages/forallxyyc-html-3.svg" alt="The numbers 1, 2, 3, and 4 are connected
+by arrows. There are arrows from 1 to 2 and 3, from 2 to 3, from 3 to
+4, and from 4 to 1." id="S5.p4.g1" class="ltx_graphics ltx_centering ltx_img_square" style="vertical-align:-1px" width="92" height="94"></div>
+<p class="ltx_p">This diagram could be used to describe an interpretation whose domain is the first four positive whole numbers, and which interprets ‘<math id="S5.p4.m3" class="ltx_Math" alttext="R(x,y)" display="inline"><mrow><mi>R</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo>,</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow></math>’ as being true of and only of:</p>
+<p class="ltx_p ltx_align_center"><math id="S5.p4.m4" class="ltx_Math" alttext="\mathopen{\langle}" display="inline"><mo stretchy="false">⟨</mo></math><math id="S5.p4.m5" class="ltx_Math" alttext="1" display="inline"><mn>1</mn></math>, <math id="S5.p4.m6" class="ltx_Math" alttext="2" display="inline"><mn>2</mn></math><math id="S5.p4.m7" class="ltx_Math" alttext="\mathclose{\rangle}" display="inline"><mo stretchy="false">⟩</mo></math>,
+<math id="S5.p4.m8" class="ltx_Math" alttext="\mathopen{\langle}" display="inline"><mo stretchy="false">⟨</mo></math><math id="S5.p4.m9" class="ltx_Math" alttext="2" display="inline"><mn>2</mn></math>, <math id="S5.p4.m10" class="ltx_Math" alttext="3" display="inline"><mn>3</mn></math><math id="S5.p4.m11" class="ltx_Math" alttext="\mathclose{\rangle}" display="inline"><mo stretchy="false">⟩</mo></math>,
+<math id="S5.p4.m12" class="ltx_Math" alttext="\mathopen{\langle}" display="inline"><mo stretchy="false">⟨</mo></math><math id="S5.p4.m13" class="ltx_Math" alttext="3" display="inline"><mn>3</mn></math>, <math id="S5.p4.m14" class="ltx_Math" alttext="4" display="inline"><mn>4</mn></math><math id="S5.p4.m15" class="ltx_Math" alttext="\mathclose{\rangle}" display="inline"><mo stretchy="false">⟩</mo></math>,
+<math id="S5.p4.m16" class="ltx_Math" alttext="\mathopen{\langle}" display="inline"><mo stretchy="false">⟨</mo></math><math id="S5.p4.m17" class="ltx_Math" alttext="4" display="inline"><mn>4</mn></math>, <math id="S5.p4.m18" class="ltx_Math" alttext="1" display="inline"><mn>1</mn></math><math id="S5.p4.m19" class="ltx_Math" alttext="\mathclose{\rangle}" display="inline"><mo stretchy="false">⟩</mo></math>,
+<math id="S5.p4.m20" class="ltx_Math" alttext="\mathopen{\langle}" display="inline"><mo stretchy="false">⟨</mo></math><math id="S5.p4.m21" class="ltx_Math" alttext="1" display="inline"><mn>1</mn></math>, <math id="S5.p4.m22" class="ltx_Math" alttext="3" display="inline"><mn>3</mn></math><math id="S5.p4.m23" class="ltx_Math" alttext="\mathclose{\rangle}" display="inline"><mo stretchy="false">⟩</mo></math></p>
+<p class="ltx_p">Equally we might offer this diagram:</p>
+</div>
+<div id="S5.p5" class="ltx_para">
+<div class="bml-overflow-wrapper"><img src="bmlimages/forallxyyc-html-4.svg" alt="The numbers 1, 3, and 4 are connected by arrows.
+There are arrows from 1 to 3 and to itself, and from 3 to 1, 4 and itself. The number 2 is included but has no arrows coming in or going out." id="S5.g1" class="ltx_graphics ltx_centering ltx_img_landscape" style="vertical-align:-1px" width="134" height="103"></div>
+</div>
+<div id="S5.p6" class="ltx_para">
+<p class="ltx_p">The interpretation specified by this diagram can also be given by listing what’s in the domain and in the extension of ‘<math id="S5.p6.m1" class="ltx_Math" alttext="R(x,y)" display="inline"><mrow><mi>R</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo>,</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow></math>’:</p>
+<dl id="S5.I4" class="ltx_description">
+<dt id="S5.I4.ix1" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <span class="ltx_text ltx_markedasmath">domain</span>:</span></dt>
+<dd class="ltx_item">
+<div id="S5.I4.ix1.p1" class="ltx_para">
+<p class="ltx_p"><math id="S5.I4.ix1.p1.m1" class="ltx_Math" alttext="1" display="inline"><mn>1</mn></math>, <math id="S5.I4.ix1.p1.m2" class="ltx_Math" alttext="2" display="inline"><mn>2</mn></math>, <math id="S5.I4.ix1.p1.m3" class="ltx_Math" alttext="3" display="inline"><mn>3</mn></math>, <math id="S5.I4.ix1.p1.m4" class="ltx_Math" alttext="4" display="inline"><mn>4</mn></math></p>
+</div>
+</dd>
+<dt id="S5.I4.ix2" class="ltx_item"><span class="ltx_tag ltx_tag_item"> <math id="S5.I4.ix2.m1" class="ltx_Math" alttext="R(x,y)" display="inline"><mrow><mi>R</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo>,</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mrow></math>:</span></dt>
+<dd class="ltx_item">
+<div id="S5.I4.ix2.p1" class="ltx_para">
+<p class="ltx_p"><math id="S5.I4.ix2.p1.m1" class="ltx_Math" alttext="\mathopen{\langle}" display="inline"><mo stretchy="false">⟨</mo></math><math id="S5.I4.ix2.p1.m2" class="ltx_Math" alttext="1" display="inline"><mn>1</mn></math>, <math id="S5.I4.ix2.p1.m3" class="ltx_Math" alttext="3" display="inline"><mn>3</mn></math><math id="S5.I4.ix2.p1.m4" class="ltx_Math" alttext="\mathclose{\rangle}" display="inline"><mo stretchy="false">⟩</mo></math>,
+<math id="S5.I4.ix2.p1.m5" class="ltx_Math" alttext="\mathopen{\langle}" display="inline"><mo stretchy="false">⟨</mo></math><math id="S5.I4.ix2.p1.m6" class="ltx_Math" alttext="3" display="inline"><mn>3</mn></math>, <math id="S5.I4.ix2.p1.m7" class="ltx_Math" alttext="1" display="inline"><mn>1</mn></math><math id="S5.I4.ix2.p1.m8" class="ltx_Math" alttext="\mathclose{\rangle}" display="inline"><mo stretchy="false">⟩</mo></math>,
+<math id="S5.I4.ix2.p1.m9" class="ltx_Math" alttext="\mathopen{\langle}" display="inline"><mo stretchy="false">⟨</mo></math><math id="S5.I4.ix2.p1.m10" class="ltx_Math" alttext="3" display="inline"><mn>3</mn></math>, <math id="S5.I4.ix2.p1.m11" class="ltx_Math" alttext="4" display="inline"><mn>4</mn></math><math id="S5.I4.ix2.p1.m12" class="ltx_Math" alttext="\mathclose{\rangle}" display="inline"><mo stretchy="false">⟩</mo></math>,
+<math id="S5.I4.ix2.p1.m13" class="ltx_Math" alttext="\mathopen{\langle}" display="inline"><mo stretchy="false">⟨</mo></math><math id="S5.I4.ix2.p1.m14" class="ltx_Math" alttext="1" display="inline"><mn>1</mn></math>, <math id="S5.I4.ix2.p1.m15" class="ltx_Math" alttext="1" display="inline"><mn>1</mn></math><math id="S5.I4.ix2.p1.m16" class="ltx_Math" alttext="\mathclose{\rangle}" display="inline"><mo stretchy="false">⟩</mo></math>,
+<math id="S5.I4.ix2.p1.m17" class="ltx_Math" alttext="\mathopen{\langle}" display="inline"><mo stretchy="false">⟨</mo></math><math id="S5.I4.ix2.p1.m18" class="ltx_Math" alttext="3" display="inline"><mn>3</mn></math>, <math id="S5.I4.ix2.p1.m19" class="ltx_Math" alttext="3" display="inline"><mn>3</mn></math><math id="S5.I4.ix2.p1.m20" class="ltx_Math" alttext="\mathclose{\rangle}" display="inline"><mo stretchy="false">⟩</mo></math></p>
+</div>
+</dd>
+</dl>
+<p class="ltx_p">If we wanted, we could make our diagrams more complex. For example, we could add names as labels for particular objects. Equally, to symbolize the extension of a one-place predicate, we might simply draw a circle around some particular objects and stipulate that the thus encircled objects (and only them) are to fall under the predicate ‘<math id="S5.p6.m2" class="ltx_Math" alttext="H(x)" display="inline"><mrow><mi>H</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></math>’, say. To specify multiple predicates we could use colored (or dashed, dotted) lines for arrows and circles.</p>
+</div>
+</div>
+</section>
+</div>
+</section>
+</div>
+</div>
+</div>
+<a href="Pt6.html" class="navigation navigation-prev" aria-label="Previous page"><i class="fa fa-angle-left"></i></a><a href="Ch31.html" class="navigation navigation-next" aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+</div>
+</div>
+</body>
+
+</html>
