@@ -15,6 +15,7 @@ import { libtf } from '../../../lib/logicpenguin/symbolic/libsemantics.js'
 import { getTokenSpeechLabel } from '../../ui/logicpenguin/LogicSymbol.jsx'
 import ProblemSetButtons from '../mui/frame/ProblemSetButtons.jsx'
 import ProblemFrame from '../mui/frame/ProblemFrame.jsx'
+import TruthTableFeedback from './TruthTableFeedback.jsx'
 import TruthTableGrid from './TruthTableGrid.jsx'
 import TruthTableSection from './TruthTableSection.jsx'
 import { isAtomicTruthTableToken, tokenizeTruthTableHeader } from './truthTableUi.js'
@@ -91,6 +92,7 @@ export default function SingleRowTruthTable({
     return tokenizeTruthTableHeader(statement, syntax)
   }, [statement, syntax])
   const expectedRow = (evaluation?.row || []).map(toSymbol)
+  const expectedCompound = toSymbol(evaluation?.tv)
   const expectedAnswer = useMemo(() => ({
     row: evaluation?.row || [],
     tv: evaluation?.tv,
@@ -254,7 +256,7 @@ export default function SingleRowTruthTable({
   const tableFilled = rowInputs.length > 0 &&
     !rowInputs.some((cell, idx) => cell === '' && !isGivenCell(idx))
   const answerComplete = tableFilled && compoundInput !== ''
-  const isCurrentlyCorrect = tableFilled &&
+  const isTableCurrentlyCorrect = tableFilled &&
     rowInputs.length === expectedRow.length &&
     rowInputs.every((cell, idx) => cell === expectedRow[idx])
 
@@ -286,21 +288,9 @@ export default function SingleRowTruthTable({
     >
       <Box sx={{ width: '100%' }}>
         {renderTableSet(gridInputs, false)}
-        <Typography
-          variant="body2"
-          sx={{
-            m: 0,
-            color: 'primary.main',
-            fontFamily: 'inherit',
-            fontWeight: 400,
-          }}
-        >
-          {status === 'correct' || isCurrentlyCorrect
-            ? 'Truth table looks good.'
-            : tableFilled
-              ? 'Recheck your truth values.'
-              : 'Click editable cells to toggle truth values - fill in every blank cell to finish.'}
-        </Typography>
+        <TruthTableFeedback
+          state={tableFilled ? (isTableCurrentlyCorrect ? 'complete' : 'incorrect') : 'incomplete'}
+        />
       </Box>
       <Box sx={{ mt: 2 }}>
         <FormControl component="fieldset" variant="standard" sx={{ width: '100%' }}>
@@ -317,7 +307,19 @@ export default function SingleRowTruthTable({
       </Box>
       {isLocked && status !== 'correct' && expectedRow.length > 0 && (
         <TruthTableSection title="Correct Answer">
-          {renderTableSet([[expectedRow]], true)}
+          <Box sx={{ display: 'grid', gap: 2 }}>
+            {renderTableSet([[expectedRow]], true)}
+            <FormControl component="fieldset" variant="standard" sx={{ width: '100%' }}>
+              <FormLabel component="legend">Truth value of compound statement</FormLabel>
+              <RadioGroup
+                value={expectedCompound}
+                name={`single-row-truth-value-answer-${assignmentQuestionId ?? 'local'}`}
+              >
+                <FormControlLabel value="T" control={<Radio disabled />} label="True" />
+                <FormControlLabel value="F" control={<Radio disabled />} label="False" />
+              </RadioGroup>
+            </FormControl>
+          </Box>
         </TruthTableSection>
       )}
     </ProblemFrame>
