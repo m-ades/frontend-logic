@@ -117,11 +117,12 @@ export function useTextbookPracticeLinks() {
 
   const definitions = useMemo(() => {
     if (isSandbox) return sandboxDefinitions || []
+    if (linksQuery.isError) return []
     if (Array.isArray(linksQuery.data?.links)) {
       return linksQuery.data.links.map(normalizeLink)
     }
     return DEFAULT_LINK_TEMPLATES.map(normalizeLink)
-  }, [isSandbox, sandboxDefinitions, linksQuery.data])
+  }, [isSandbox, sandboxDefinitions, linksQuery.data, linksQuery.isError])
 
   const resolvedLinks = useMemo(
     () => resolveTextbookPracticeLinks(definitions, practices),

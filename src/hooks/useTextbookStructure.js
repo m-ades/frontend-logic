@@ -117,11 +117,12 @@ export function useTextbookStructure() {
 
   const nodes = useMemo(() => {
     if (isSandbox) return sandboxNodes || seedStructureFromBundle()
+    if (structureQuery.isError) return []
     if (Array.isArray(structureQuery.data?.nodes)) {
       return structureQuery.data.nodes.map(normalizeStructureNode)
     }
     return seedStructureFromBundle()
-  }, [isSandbox, sandboxNodes, structureQuery.data])
+  }, [isSandbox, sandboxNodes, structureQuery.data, structureQuery.isError])
 
   const tree = useMemo(() => nodesToTree(nodes, { includeHidden: true }), [nodes])
   const visibleTree = useMemo(() => nodesToTree(nodes, { includeHidden: false }), [nodes])
