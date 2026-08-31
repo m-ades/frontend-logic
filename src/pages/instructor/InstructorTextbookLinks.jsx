@@ -530,7 +530,11 @@ export default function InstructorTextbookLinks() {
             </Stack>
           </Stack>
 
-          <TextbookStructureEditor nodes={nodes} onChange={saveStructure} />
+          <TextbookStructureEditor
+            key={activeCourseId}
+            nodes={nodes}
+            onChange={saveStructure}
+          />
         </Box>
       )}
 

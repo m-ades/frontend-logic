@@ -3,15 +3,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useAppRuntime } from '@/hooks/useAppRuntime.js'
 import { fetchJson } from '@/utils/api.js'
 
-/**
- * creates a course scoped textbook resource hook
- *
- * configuration owns the api field normalization defaults and storage operations
- * returned hooks expose normalized values and save reset loading and override state
- * sandbox writes use the configured browser storage scope
- * live writes use the api and migrate each legacy local override once per mount
- * storage and api errors retain their underlying behavior
- */
+/** creates a course scoped textbook resource hook */
 export function createCourseScopedTextbookResource({
   resourceName,
   responseField,
@@ -35,6 +27,12 @@ export function createCourseScopedTextbookResource({
 
     const [sandboxRevision, setSandboxRevision] = useState(0)
     const migratedRef = useRef(new Set())
+    const writeQueueRef = useRef(Promise.resolve())
+    const enqueueWrite = useCallback((write) => {
+      const pending = writeQueueRef.current.catch(() => {}).then(write)
+      writeQueueRef.current = pending
+      return pending
+    }, [])
 
     const resourceQuery = useQuery({
       queryKey: queryKey(courseIdForApi),
@@ -56,11 +54,13 @@ export function createCourseScopedTextbookResource({
       }
 
       migratedRef.current.add(migrationKey)
-      fetchJson(apiPath(courseIdForApi), {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ [responseField]: normalizeValues(localValues) }),
-      })
+      enqueueWrite(() =>
+        fetchJson(apiPath(courseIdForApi), {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ [responseField]: normalizeValues(localValues) }),
+        }),
+      )
         .then((payload) => {
           queryClient.setQueryData(queryKey(courseIdForApi), payload)
           clearOverrides(courseIdForApi, 'local')
@@ -74,6 +74,7 @@ export function createCourseScopedTextbookResource({
       resourceQuery.isLoading,
       resourceQuery.data,
       queryClient,
+      enqueueWrite,
     ])
 
     const saveMutation = useMutation({
@@ -129,10 +130,10 @@ export function createCourseScopedTextbookResource({
           setSandboxRevision((value) => value + 1)
           return normalized
         }
-        const payload = await saveMutation.mutateAsync(normalized)
+        const payload = await enqueueWrite(() => saveMutation.mutateAsync(normalized))
         return payload[responseField]
       },
-      [isSandbox, courseId, storageScope, saveMutation],
+      [isSandbox, courseId, storageScope, saveMutation, enqueueWrite],
     )
 
     const reset = useCallback(async () => {
@@ -141,8 +142,8 @@ export function createCourseScopedTextbookResource({
         setSandboxRevision((value) => value + 1)
         return
       }
-      await resetMutation.mutateAsync()
-    }, [isSandbox, courseId, storageScope, resetMutation])
+      await enqueueWrite(() => resetMutation.mutateAsync())
+    }, [isSandbox, courseId, storageScope, resetMutation, enqueueWrite])
 
     return {
       courseId,

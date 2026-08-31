@@ -1,5 +1,6 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
+  Alert,
   Box,
   Button,
   Chip,
@@ -69,6 +70,7 @@ function StructureRow({
   depth,
   numberPreview,
   onRename,
+  onRenameCommit,
   onToggleHidden,
   onRemove,
   dragHandleProps,
@@ -132,6 +134,7 @@ function StructureRow({
         size="small"
         value={node.displayTitle}
         onChange={(event) => onRename(node.id, event.target.value)}
+        onBlur={onRenameCommit}
         aria-label={`Display title for ${node.slug}`}
         sx={{ flexGrow: 1, minWidth: 0 }}
         inputProps={{ sx: { fontSize: '0.875rem', py: 0.75 } }}
@@ -281,11 +284,31 @@ function insertBeside(tree, overId, active) {
   return result
 }
 
+function applyTitleDrafts(nodes, drafts) {
+  return nodes.map((node) => (
+    Object.prototype.hasOwnProperty.call(drafts, node.id)
+      ? { ...node, displayTitle: drafts[node.id] }
+      : node
+  ))
+}
+
 /**
  * Nested structure editor: accordion sections + drag reorder.
  */
 export default function TextbookStructureEditor({ nodes, onChange }) {
-  const tree = useMemo(() => nodesToTree(nodes, { includeHidden: true }), [nodes])
+  const [titleDrafts, setTitleDrafts] = useState({})
+  const [saveError, setSaveError] = useState('')
+  const renameTimerRef = useRef(null)
+  const queuedTitleDraftsRef = useRef(null)
+  const nodesRef = useRef(nodes)
+  const titleDraftsRef = useRef(titleDrafts)
+  nodesRef.current = nodes
+
+  const editableNodes = useMemo(
+    () => applyTitleDrafts(nodes, titleDrafts),
+    [nodes, titleDrafts],
+  )
+  const tree = useMemo(() => nodesToTree(editableNodes, { includeHidden: true }), [editableNodes])
   const numbered = useMemo(
     () => assignDynamicNumbers(tree, { includeHidden: true }),
     [tree],
@@ -293,6 +316,10 @@ export default function TextbookStructureEditor({ nodes, onChange }) {
 
   const [openSections, setOpenSections] = useState({})
   const [activeId, setActiveId] = useState(null)
+
+  useEffect(() => () => {
+    if (renameTimerRef.current) window.clearTimeout(renameTimerRef.current)
+  }, [])
 
   useEffect(() => {
     setOpenSections((prev) => {
@@ -320,42 +347,92 @@ export default function TextbookStructureEditor({ nodes, onChange }) {
 
   const activeNode = activeId ? findNodeInTree(tree, activeId) : null
 
+  const persist = useCallback(async (nextNodes, savedDrafts) => {
+    try {
+      await onChange(nextNodes)
+      setSaveError('')
+      setTitleDrafts((current) => {
+        const remaining = { ...current }
+        for (const [id, title] of Object.entries(savedDrafts)) {
+          if (current[id] === title) delete remaining[id]
+        }
+        titleDraftsRef.current = remaining
+        return remaining
+      })
+      return true
+    } catch (error) {
+      setSaveError(error?.message || 'Failed to save structure.')
+      return false
+    }
+  }, [onChange])
+
+  const clearRenameTimer = useCallback(() => {
+    if (!renameTimerRef.current) return
+    window.clearTimeout(renameTimerRef.current)
+    renameTimerRef.current = null
+  }, [])
+
+  const queueSave = useCallback((nextNodes, drafts) => {
+    queuedTitleDraftsRef.current = drafts
+    void persist(nextNodes, drafts).finally(() => {
+      if (queuedTitleDraftsRef.current === drafts) queuedTitleDraftsRef.current = null
+    })
+  }, [persist])
+
+  const flushRename = useCallback(() => {
+    clearRenameTimer()
+    const drafts = titleDraftsRef.current
+    if (!Object.keys(drafts).length || queuedTitleDraftsRef.current === drafts) return
+    const next = applyTitleDrafts(nodesRef.current, drafts)
+    queueSave(next, drafts)
+  }, [clearRenameTimer, queueSave])
+
+  const saveNow = useCallback((nextNodes) => {
+    clearRenameTimer()
+    queueSave(nextNodes, titleDraftsRef.current)
+  }, [clearRenameTimer, queueSave])
+
   const commitTree = (nextTree) => {
-    onChange(treeToNodes(nextTree))
+    saveNow(treeToNodes(nextTree))
   }
 
   const handleRename = (id, displayTitle) => {
-    onChange(
-      nodes.map((node) => (node.id === id ? { ...node, displayTitle } : node)),
-    )
+    const next = { ...titleDraftsRef.current, [id]: displayTitle }
+    titleDraftsRef.current = next
+    setTitleDrafts(next)
+    clearRenameTimer()
+    renameTimerRef.current = window.setTimeout(flushRename, 500)
   }
 
   const handleToggleHidden = (id) => {
-    onChange(
-      nodes.map((node) => (node.id === id ? { ...node, hidden: !node.hidden } : node)),
+    const current = applyTitleDrafts(nodesRef.current, titleDraftsRef.current)
+    saveNow(
+      current.map((node) => (node.id === id ? { ...node, hidden: !node.hidden } : node)),
     )
   }
 
   const handleRemove = (id) => {
-    const target = nodes.find((node) => node.id === id)
+    const current = applyTitleDrafts(nodesRef.current, titleDraftsRef.current)
+    const target = current.find((node) => node.id === id)
     if (!target) return
-    const next = nodes
+    const next = current
       .filter((node) => node.id !== id)
       .map((node) =>
         node.parentId === id
           ? { ...node, parentId: target.parentId }
           : node,
       )
-    onChange(next)
+    saveNow(next)
   }
 
   const handleAddSection = () => {
-    const rootCount = nodes.filter((node) => !node.parentId).length
+    const current = applyTitleDrafts(nodesRef.current, titleDraftsRef.current)
+    const rootCount = current.filter((node) => !node.parentId).length
     const section = createSectionDivider({
       displayTitle: 'New section',
       sortIndex: rootCount,
     })
-    onChange([...nodes, section])
+    saveNow([...current, section])
     setOpenSections((prev) => ({ ...prev, [section.id]: true }))
   }
 
@@ -436,6 +513,7 @@ export default function TextbookStructureEditor({ nodes, onChange }) {
               depth={depth}
               numberPreview={node.number}
               onRename={handleRename}
+              onRenameCommit={flushRename}
               onToggleHidden={handleToggleHidden}
               onRemove={handleRemove}
               expandControl={
@@ -475,6 +553,7 @@ export default function TextbookStructureEditor({ nodes, onChange }) {
           depth={depth}
           numberPreview={node.number}
           onRename={handleRename}
+          onRenameCommit={flushRename}
           onToggleHidden={handleToggleHidden}
           onRemove={handleRemove}
           dense
@@ -484,6 +563,8 @@ export default function TextbookStructureEditor({ nodes, onChange }) {
 
   return (
     <Box>
+      {saveError && <Alert severity="error" sx={{ mb: 1.5 }}>{saveError}</Alert>}
+
       <Stack
         direction={{ xs: 'column', sm: 'row' }}
         spacing={1}
@@ -544,6 +625,7 @@ export default function TextbookStructureEditor({ nodes, onChange }) {
                 depth={0}
                 numberPreview={null}
                 onRename={() => {}}
+                onRenameCommit={() => {}}
                 onToggleHidden={() => {}}
                 onRemove={() => {}}
                 dragHandleProps={{}}
