@@ -28,6 +28,7 @@ import {
 import SidebarLink from "./SidebarLink.jsx";
 import CourseSelector from "../ui/CourseSelector.jsx";
 import { useAppRuntime } from "../../hooks/useAppRuntime.js";
+import { isTextbookAvailable } from "../textbook/textbookAvailability.js";
 
 const DRAWER_WIDTH = 240;
 
@@ -45,8 +46,9 @@ export default function Sidebar({ structure, location, onSignOut, onOpenSettings
   const activeCourse = courseState?.courses?.find(
     (course) => String(course.id) === String(courseState.activeCourseId)
   );
-  const textbookAvailable =
-    (activeCourse?.logicSystem ?? activeCourse?.logic_system) === "fitch";
+  const textbookAvailable = isTextbookAvailable(
+    activeCourse?.logicSystem ?? activeCourse?.logic_system
+  );
   const visibleStructure = textbookAvailable
     ? structure
     : structure.filter((item) => !/\/textbook(?:-links)?$/.test(item.link));

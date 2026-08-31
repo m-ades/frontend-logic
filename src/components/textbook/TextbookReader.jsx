@@ -94,6 +94,9 @@ export default function TextbookReader({
         await ensureTextbookStyles()
 
         const url = resolveTextbookAssetUrl(slug)
+        if (!url) {
+          throw new Error('Invalid textbook chapter.')
+        }
         const response = await fetch(url, {
           signal: controller.signal,
           headers: { Accept: 'text/html' },

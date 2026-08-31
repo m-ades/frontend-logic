@@ -12,11 +12,13 @@ export function getTextbookManifest() {
 }
 
 export function normalizeTextbookSlug(rawSlug) {
-  if (!rawSlug || typeof rawSlug !== 'string') {
+  if (rawSlug === undefined) {
     return textbookManifest.defaultSlug || 'Ch1'
   }
+  if (typeof rawSlug !== 'string') return null
 
   const trimmed = rawSlug.trim()
+  if (!trimmed) return null
   if (aliasMap[trimmed]) return aliasMap[trimmed]
   if (aliasMap[trimmed.toLowerCase()]) return aliasMap[trimmed.toLowerCase()]
 
@@ -33,7 +35,7 @@ export function normalizeTextbookSlug(rawSlug) {
     return normalizeTextbookSlug(trimmed.replace(/\.html$/i, ''))
   }
 
-  return trimmed
+  return trimmed === 'index' ? 'index' : null
 }
 
 export function getTextbookEntry(slug) {
@@ -131,6 +133,7 @@ export function buildTextbookTocTree() {
 
 export function resolveTextbookAssetUrl(slug) {
   const normalized = normalizeTextbookSlug(slug)
+  if (!normalized) return null
   if (normalized === 'index') {
     return `${textbookManifest.assetBase}/index.html`
   }

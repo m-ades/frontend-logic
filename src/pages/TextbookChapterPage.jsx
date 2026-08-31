@@ -45,7 +45,7 @@ export default function TextbookChapterPage({
 
   const { textbookPath, textbookChapterPath } = useAppRuntime()
   const slug = normalizeTextbookSlug(chapter)
-  const entry = getTextbookEntry(slug)
+  const entry = slug ? getTextbookEntry(slug) : null
   const { getNeighbors, studentFlat, numberedTree, resolveSlug, nodes } = useTextbookStructure()
 
   // Part / section dividers are not readable pages — bounce to first chapter or hub.

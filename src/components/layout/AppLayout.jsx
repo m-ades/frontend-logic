@@ -1,4 +1,4 @@
-import { useNavigate, useLocation } from "react-router-dom";
+import { Navigate, useNavigate, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import StudentSidebarStructure from "./StudentSidebarStructure.jsx";
 import InstructorSidebarStructure from "./InstructorSidebarStructure.jsx";
@@ -15,6 +15,7 @@ import { AppRuntimeProvider } from "../../context/AppRuntimeContext.jsx";
 import { createAppRuntime } from "../../runtime/appRuntime.js";
 import ShellFrame from "./ShellFrame.jsx";
 import LoadingSpinner from "../ui/LoadingSpinner.jsx";
+import { isTextbookAvailable } from "../textbook/textbookAvailability.js";
 
 const TEXT_SIZE_STORAGE_KEY = "logicapp_text_size";
 const TEXT_SIZE_OPTIONS = {
@@ -93,8 +94,11 @@ function AppShell({ children }) {
     routeKind,
     user,
   });
+  const textbookRoute = /\/textbook(?:-links)?(?:\/|$)/.test(location.pathname);
   const pageContent = !initialized && !coursesError
     ? <LoadingSpinner label="Loading course..." />
+    : textbookRoute && !isTextbookAvailable(logicSystem)
+    ? <Navigate to={`/${routeKind}/dashboard`} replace />
     : children;
 
   const handleSignOut = async () => {

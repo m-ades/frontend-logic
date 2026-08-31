@@ -1,4 +1,4 @@
-import { useLocation, useNavigate } from "react-router-dom";
+import { Navigate, useLocation, useNavigate } from "react-router-dom";
 import { useMemo } from "react";
 import StudentSidebarStructure from "./StudentSidebarStructure.jsx";
 import InstructorSidebarStructure from "./InstructorSidebarStructure.jsx";
@@ -12,6 +12,7 @@ import {
   remapStudentPath,
   remapRoutePath,
 } from "../../runtime/sandboxRuntime.js";
+import { isTextbookAvailable } from "../textbook/textbookAvailability.js";
 
 const STUDENT_SANDBOX_PREFIX = "/sandbox/student";
 const INSTRUCTOR_SANDBOX_PREFIX = "/sandbox/instructor";
@@ -24,6 +25,10 @@ function SandboxFrame({ children, runtimeValue, sidebarStructure, onExit }) {
     (course) => course.id === runtimeValue?.courseState?.activeCourseId
   );
   const logicSystem = activeCourse?.logicSystem ?? activeCourse?.logic_system;
+  const textbookRoute = /\/textbook(?:-links)?(?:\/|$)/.test(location.pathname);
+  const pageContent = textbookRoute && !isTextbookAvailable(logicSystem)
+    ? <Navigate to={`${runtimeValue.routePrefix}/dashboard`} replace />
+    : children;
 
   return (
     <AppRuntimeProvider value={runtimeValue}>
@@ -34,7 +39,7 @@ function SandboxFrame({ children, runtimeValue, sidebarStructure, onExit }) {
         onOpenSettings={undefined}
         logicSystem={logicSystem}
       >
-        {children}
+        {pageContent}
       </ShellFrame>
     </AppRuntimeProvider>
   )
