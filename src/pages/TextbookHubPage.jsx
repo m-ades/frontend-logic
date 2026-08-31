@@ -25,7 +25,7 @@ import { isDividerKind, isNavigableNode } from '@/components/textbook/textbookSt
  * textbook hub for the table of contents and linked practice
  * route student textbook
  */
-export default function TextbookHubPage() {
+export default function TextbookHubPage({ onOpenChapter = null }) {
   const navigate = useNavigate()
   const { textbookChapterPath, textbookPath } = useAppRuntime()
   const { resolvedLinks } = useTextbookPracticeLinks()
@@ -57,6 +57,10 @@ export default function TextbookHubPage() {
   }, [tree])
 
   const go = (slug) => {
+    if (onOpenChapter) {
+      onOpenChapter(slug)
+      return
+    }
     const path = textbookChapterPath?.(slug) || `${textbookPath || '/student/textbook'}/${slug}`
     navigate(path)
   }

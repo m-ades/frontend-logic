@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import {
   Alert,
   Box,
@@ -36,6 +36,8 @@ import { useTextbookStructure } from '@/hooks/useTextbookStructure.js'
 import { createLinkId, normalizeLink } from '@/components/textbook/textbookPracticeLinks.js'
 import TextbookStructureEditor from '@/components/textbook/TextbookStructureEditor.jsx'
 import ThemedCard from '@/components/ui/ThemedCard.jsx'
+import TextbookChapterPage from '@/pages/TextbookChapterPage.jsx'
+import TextbookHubPage from '@/pages/TextbookHubPage.jsx'
 
 const emptyForm = {
   textbookSlug: 'Ch1',
@@ -356,6 +358,28 @@ function PracticeLinksPanel({ chapters }) {
 }
 
 /**
+ * student textbook preview
+ */
+function TextbookPreviewPanel() {
+  const [chapter, setChapter] = useState(null)
+  const openHub = useCallback(() => setChapter(null), [])
+
+  if (!chapter) {
+    return <TextbookHubPage onOpenChapter={setChapter} />
+  }
+
+  return (
+    <Box sx={{ height: { xs: 'auto', md: '72vh' }, minHeight: { xs: '42rem', md: 0 } }}>
+      <TextbookChapterPage
+        previewChapter={chapter}
+        onOpenChapter={setChapter}
+        onOpenHub={openHub}
+      />
+    </Box>
+  )
+}
+
+/**
  * Instructor textbook page: structure editor + practice links.
  * Route: `/instructor/textbook-links`
  */
@@ -463,6 +487,11 @@ export default function InstructorTextbookLinks() {
           id="textbook-tab-links"
           aria-controls="textbook-panel-links"
         />
+        <Tab
+          label="Textbook preview"
+          id="textbook-tab-preview"
+          aria-controls="textbook-panel-preview"
+        />
       </Tabs>
 
       {tab === 0 && (
@@ -513,6 +542,16 @@ export default function InstructorTextbookLinks() {
       {tab === 1 && (
         <Box role="tabpanel" id="textbook-panel-links" aria-labelledby="textbook-tab-links">
           <PracticeLinksPanel chapters={chapters} />
+        </Box>
+      )}
+
+      {tab === 2 && (
+        <Box
+          role="tabpanel"
+          id="textbook-panel-preview"
+          aria-labelledby="textbook-tab-preview"
+        >
+          <TextbookPreviewPanel />
         </Box>
       )}
     </Box>

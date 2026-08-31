@@ -30,12 +30,14 @@ import { useTextbookPracticeLinks } from '@/hooks/useTextbookPracticeLinks.js'
 import { useTextbookStructure } from '@/hooks/useTextbookStructure.js'
 import { linksForTextbookSlug } from '@/components/textbook/textbookPracticeLinks.js'
 
-/**
- * textbook chapter reader with linked practice
- * route student textbook chapter
- */
-export default function TextbookChapterPage() {
-  const { chapter } = useParams()
+// textbook chapter reader with linked practice
+ default function TextbookChapterPage({
+  previewChapter = null,
+  onOpenChapter = null,
+  onOpenHub = null,
+}) {
+  const { chapter: routeChapter } = useParams()
+  const chapter = previewChapter || routeChapter
   const location = useLocation()
   const navigate = useNavigate()
   const theme = useTheme()
@@ -51,6 +53,10 @@ export default function TextbookChapterPage() {
     const target = resolveSlug(slug)
     if (target === slug) return
     if (target) {
+      if (onOpenChapter) {
+        onOpenChapter(target)
+        return
+      }
       const path = textbookChapterPath?.(target) || `${textbookPath || '/student/textbook'}/${target}`
       navigate(path, { replace: true })
       return
@@ -58,9 +64,22 @@ export default function TextbookChapterPage() {
     // Known divider with no children, or empty resolve → hub
     const node = nodes.find((item) => item.slug === slug)
     if (node && node.navigable === false) {
+      if (onOpenHub) {
+        onOpenHub()
+        return
+      }
       navigate(textbookPath || '/student/textbook', { replace: true })
     }
-  }, [slug, resolveSlug, nodes, navigate, textbookChapterPath, textbookPath])
+  }, [
+    slug,
+    resolveSlug,
+    nodes,
+    navigate,
+    textbookChapterPath,
+    textbookPath,
+    onOpenChapter,
+    onOpenHub,
+  ])
 
   const neighbors = useMemo(() => getNeighbors(slug), [getNeighbors, slug])
   const prev = neighbors.prev
@@ -118,10 +137,22 @@ export default function TextbookChapterPage() {
     (targetSlug) => {
       if (!targetSlug) return
       const resolved = resolveSlug(targetSlug) || targetSlug
+      if (onOpenChapter) {
+        onOpenChapter(resolved)
+        return
+      }
       navigate(`${linkBase}/${resolved}`)
     },
-    [navigate, linkBase, resolveSlug],
+    [navigate, linkBase, resolveSlug, onOpenChapter],
   )
+
+  const goHub = useCallback(() => {
+    if (onOpenHub) {
+      onOpenHub()
+      return
+    }
+    navigate(hubPath)
+  }, [hubPath, navigate, onOpenHub])
 
   const handleMetaChange = useCallback((meta) => {
     if (meta?.title) setPageTitle(meta.title)
@@ -139,6 +170,10 @@ export default function TextbookChapterPage() {
       linkBase={linkBase}
       linkedPractices={[]}
       onMetaChange={handleMetaChange}
+      onChapterNavigate={(targetSlug) => {
+        if (targetSlug) goChapter(targetSlug)
+        else goHub()
+      }}
       resolveInternalSlug={resolveSlug}
     />
   )
@@ -162,7 +197,7 @@ export default function TextbookChapterPage() {
         <Tooltip title="Back to Textbook">
           <IconButton
             size="small"
-            onClick={() => navigate(hubPath)}
+            onClick={goHub}
             aria-label="Back to Textbook table of contents"
             sx={{
               '&:focus-visible': {

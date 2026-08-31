@@ -79,6 +79,7 @@ export default function TextbookReader({
   linkedPractices = [],
   scrollToId = null,
   onMetaChange,
+  onChapterNavigate = null,
   resolveInternalSlug = null,
 }) {
   const navigate = useNavigate()
@@ -207,19 +208,31 @@ export default function TextbookReader({
       if (href.startsWith(`${linkBase}/`) || href === linkBase) {
         event.preventDefault()
         if (href === linkBase) {
+          if (onChapterNavigate) {
+            onChapterNavigate(null)
+            return
+          }
           navigate(href)
           return
         }
         const targetSlug = href.slice(linkBase.length + 1).split(/[?#]/)[0]
         const resolved = resolveInternalSlug?.(decodeURIComponent(targetSlug)) || targetSlug
         if (!resolved) {
+          if (onChapterNavigate) {
+            onChapterNavigate(null)
+            return
+          }
           navigate(linkBase)
+          return
+        }
+        if (onChapterNavigate) {
+          onChapterNavigate(resolved)
           return
         }
         navigate(`${linkBase}/${resolved}`)
       }
     },
-    [linkBase, navigate, resolveInternalSlug],
+    [linkBase, navigate, onChapterNavigate, resolveInternalSlug],
   )
 
   if (isLoading) {
