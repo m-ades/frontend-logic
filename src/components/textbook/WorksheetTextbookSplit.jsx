@@ -1,7 +1,9 @@
+import { useCallback, useEffect, useState } from 'react'
 import { Box } from '@mui/material'
 import { useLocation } from 'react-router-dom'
 import SplitViewLayout from '@/components/layout/SplitViewLayout.jsx'
 import TextbookReader from '@/components/textbook/TextbookReader.jsx'
+import TextbookHubPage from '@/pages/TextbookHubPage.jsx'
 import { useAppRuntime } from '@/hooks/useAppRuntime.js'
 import { useTextbookPracticeLinks } from '@/hooks/useTextbookPracticeLinks.js'
 import { useTextbookStructure } from '@/hooks/useTextbookStructure.js'
@@ -34,6 +36,20 @@ export default function WorksheetTextbookSplit({
   const sectionId =
     location.state?.textbookSectionId ||
     primarySectionIdForPractice(resolvedLinks, practiceId)
+  const [openChapter, setOpenChapter] = useState(linkedSlug)
+
+  useEffect(() => {
+    setOpenChapter(linkedSlug)
+  }, [linkedSlug])
+
+  const openHub = useCallback(() => setOpenChapter(null), [])
+  const handleChapterNavigate = useCallback((targetSlug) => {
+    if (targetSlug) {
+      setOpenChapter(targetSlug)
+      return
+    }
+    openHub()
+  }, [openHub])
 
   if (!isPractice || !linkedSlug) {
     return children
@@ -42,7 +58,7 @@ export default function WorksheetTextbookSplit({
   const linkBase = textbookChapterPath
     ? textbookChapterPath('').replace(/\/$/, '')
     : `${routePrefix || '/student'}/textbook`
-  const chapterLinks = practiceLinks.filter((link) => link.textbookSlug === linkedSlug)
+  const chapterLinks = practiceLinks.filter((link) => link.textbookSlug === openChapter)
 
   return (
     <Box
@@ -58,13 +74,20 @@ export default function WorksheetTextbookSplit({
         rightLabel="Practice"
         defaultLeftPercent={42}
         left={
-          <TextbookReader
-            slug={linkedSlug}
-            linkBase={linkBase}
-            linkedPractices={chapterLinks}
-            scrollToId={sectionId}
-            resolveInternalSlug={resolveSlug}
-          />
+          openChapter ? (
+            <TextbookReader
+              slug={openChapter}
+              linkBase={linkBase}
+              linkedPractices={chapterLinks}
+              scrollToId={openChapter === linkedSlug ? sectionId : null}
+              onChapterNavigate={handleChapterNavigate}
+              resolveInternalSlug={resolveSlug}
+            />
+          ) : (
+            <Box sx={{ height: '100%', overflow: 'auto', p: 2 }}>
+              <TextbookHubPage onOpenChapter={setOpenChapter} />
+            </Box>
+          )
         }
         right={
           <Box sx={{ height: '100%', minHeight: 0, overflow: 'auto', p: { xs: 1, md: 1.5 } }}>
