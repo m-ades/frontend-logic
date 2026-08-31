@@ -4,14 +4,10 @@ import { Alert, Box, Button } from '@mui/material'
 import DOMPurify from 'dompurify'
 import { useNavigate } from 'react-router-dom'
 import LoadingSpinner from '@/components/ui/LoadingSpinner.jsx'
-import PracticeWidget from '@/components/textbook/PracticeWidget.jsx'
 import TextbookLinkedPractices from '@/components/textbook/TextbookLinkedPractices.jsx'
 import { prepareTextbookHtml } from '@/components/textbook/prepareTextbookHtml.js'
-import {
-  ensureTextbookMathJax,
-  ensureTextbookStyles,
-  typesetTextbookMath,
-} from '@/components/textbook/textbookAssets.js'
+import { ensureTextbookStyles } from '@/components/textbook/textbookAssets.js'
+import { ensureMathJax, typesetMath } from '@/lib/mathJax.js'
 import {
   normalizeTextbookSlug,
   resolveTextbookAssetUrl,
@@ -40,33 +36,6 @@ const PURIFY_CONFIG = {
 function sanitizeTextbookHtml(html) {
   if (typeof html !== 'string') return ''
   return DOMPurify.sanitize(html, PURIFY_CONFIG)
-}
-
-function createReplaceOptions(linkByWidgetId = new Map()) {
-  return {
-    replace(domNode) {
-      if (domNode.type !== 'tag' || !domNode.attribs) return undefined
-
-      const practiceWidgetId = domNode.attribs['data-practice-widget-id']
-      if (practiceWidgetId) {
-        const linked = linkByWidgetId.get(practiceWidgetId)
-        // Only replace with a live widget when metadata resolves a practice.
-        if (linked?.practiceId != null) {
-          return (
-            <PracticeWidget
-              practiceId={linked.practiceId}
-              practiceTitle={linked.practiceTitle}
-              sectionId={linked.sectionId}
-              textbookSlug={linked.textbookSlug}
-            />
-          )
-        }
-        return <></>
-      }
-
-      return undefined
-    },
-  }
 }
 
 /**
@@ -102,7 +71,7 @@ export default function TextbookReader({
 
   useEffect(() => {
     ensureTextbookStyles()
-    ensureTextbookMathJax()
+    ensureMathJax().catch(() => {})
   }, [])
 
   useEffect(() => {
@@ -125,6 +94,9 @@ export default function TextbookReader({
         await ensureTextbookStyles()
 
         const url = resolveTextbookAssetUrl(slug)
+        if (!url) {
+          throw new Error('Invalid textbook chapter.')
+        }
         const response = await fetch(url, {
           signal: controller.signal,
           headers: { Accept: 'text/html' },
@@ -172,7 +144,11 @@ export default function TextbookReader({
     let cancelled = false
 
     async function runTypeset() {
-      await typesetTextbookMath(containerRef.current)
+      try {
+        await typesetMath([containerRef.current])
+      } catch (typesetError) {
+        console.warn('MathJax typeset failed', typesetError)
+      }
       if (cancelled || !containerRef.current) return
 
       const hash = scrollToId || window.location.hash?.replace(/^#/, '')
@@ -216,7 +192,10 @@ export default function TextbookReader({
           return
         }
         const targetSlug = href.slice(linkBase.length + 1).split(/[?#]/)[0]
-        const resolved = resolveInternalSlug?.(decodeURIComponent(targetSlug)) || targetSlug
+        const decodedTargetSlug = decodeURIComponent(targetSlug)
+        const resolved = resolveInternalSlug
+          ? resolveInternalSlug(decodedTargetSlug)
+          : decodedTargetSlug
         if (!resolved) {
           if (onChapterNavigate) {
             onChapterNavigate(null)
@@ -333,10 +312,10 @@ export default function TextbookReader({
         },
       }}
     >
-      {content ? parse(content, createReplaceOptions()) : null}
+      {content ? parse(content) : null}
       <TextbookLinkedPractices links={linkedPractices} textbookSlug={slug} />
     </Box>
   )
 }
 
-export { sanitizeTextbookHtml, createReplaceOptions }
+export { sanitizeTextbookHtml }

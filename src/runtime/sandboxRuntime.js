@@ -37,6 +37,8 @@ export function remapStudentPath(path, routePrefix = "/student") {
   return remapRoutePath(path, "/student", routePrefix);
 }
 
+// runtime textbook paths are available to students and instructors
+// instructor management remains on the textbook links route
 export function buildRuntimePaths(routeKind, routePrefix = getRoutePrefix(routeKind)) {
   const isInstructor = routeKind === "instructor";
   const gradesPath = isInstructor ? `${routePrefix}/gradebook` : `${routePrefix}/grades`;
@@ -51,10 +53,8 @@ export function buildRuntimePaths(routeKind, routePrefix = getRoutePrefix(routeK
     gradesPath,
     gradebookPath: isInstructor ? `${routePrefix}/gradebook` : undefined,
     practicePath: `${routePrefix}/practice`,
-    textbookPath: isInstructor ? undefined : `${routePrefix}/textbook`,
-    textbookChapterPath: isInstructor
-      ? undefined
-      : (slug) => `${routePrefix}/textbook/${slug}`,
+    textbookPath: `${routePrefix}/textbook`,
+    textbookChapterPath: (slug) => `${routePrefix}/textbook/${slug}`,
     contactPath: `${routePrefix}/contact`,
     profilePath: `${routePrefix}/profile`,
     rosterPath: isInstructor ? `${routePrefix}/roster` : undefined,

@@ -29,9 +29,10 @@ export default function ShellFrame({
   const isWorksheetRoute = /\/assignment\/[^/]+\/?$/.test(location.pathname);
   const shouldShiftShellForRulebook = isWorksheetRoute && isDesktopRulebookLayout && isRulesReferenceOpen;
   const isDashboardRoute = /\/dashboard$/.test(location.pathname);
+  const isTextbookRoute = /\/textbook\/[^/]+$/.test(location.pathname);
   const isImmersiveSplitRoute =
-    /\/textbook\/[^/]+$/.test(location.pathname) ||
-    /\/assignment\/[^/]+$/.test(location.pathname);
+    isTextbookRoute ||
+    isWorksheetRoute;
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -99,10 +100,10 @@ export default function ShellFrame({
               flexGrow: 1,
               p: isImmersiveSplitRoute ? 2 : 3,
               pb: isDashboardRoute ? 0 : isImmersiveSplitRoute ? 2 : 3,
-              pt: /\/assignment\/[^/]+$/.test(location.pathname) || isImmersiveSplitRoute ? 2 : 3,
+              pt: isWorksheetRoute || isImmersiveSplitRoute ? 2 : 3,
               backgroundColor: "background.default",
               minHeight: { xs: "100vh", md: 0 },
-              overflow: isImmersiveSplitRoute ? { xs: "auto", md: "hidden" } : "auto",
+              overflow: isTextbookRoute ? { xs: "auto", md: "hidden" } : "auto",
               overflowX: "hidden",
               minWidth: 0,
               display: isImmersiveSplitRoute ? "flex" : "block",

@@ -13,6 +13,7 @@
 import fs from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
+import { stripNumberPrefix } from '../src/components/textbook/textbookTitles.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const root = path.join(__dirname, '..')
@@ -31,16 +32,6 @@ function inferKind(stem) {
   if (/^A\d+[a-z]?$/i.test(stem)) return 'appendix'
   if (/^Ch\d+$/i.test(stem)) return 'chapter'
   return 'chapter'
-}
-
-function stripNumberPrefix(title) {
-  if (!title) return title
-  return title
-    .replace(/^Part\s+[IVXLCDM]+\s+/i, '')
-    .replace(/^Chapter\s+\d+\s+/i, '')
-    .replace(/^[IVXLCDM]+\s+/, '')
-    .replace(/^\d+\s+/, '')
-    .trim()
 }
 
 const files = fs.readdirSync(publicDir).filter((f) => f.endsWith('.html')).sort()

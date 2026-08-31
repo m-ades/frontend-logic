@@ -13,7 +13,6 @@ import {
   ExpandMore,
   MenuBook as BookIcon,
 } from '@mui/icons-material'
-import { useTextbookStructure } from '@/hooks/useTextbookStructure.js'
 import { isDividerKind, isNavigableNode } from '@/components/textbook/textbookStructure.js'
 
 function TocList({
@@ -177,10 +176,8 @@ function TocList({
   )
 }
 
-/**
- * Hierarchical textbook TOC — rail (desktop) or controlled drawer (mobile).
- */
 export default function TextbookTocNav({
+  tree, // parent owned to avoid duplicate structure work
   activeSlug,
   onSelect,
   linkedSlugs = [],
@@ -188,10 +185,7 @@ export default function TextbookTocNav({
   drawerOpen = false,
   onDrawerClose,
   title = 'Contents',
-  tree: treeProp,
 }) {
-  const { numberedTree } = useTextbookStructure()
-  const tree = treeProp || numberedTree
   const linkedSlugSet = useMemo(() => new Set(linkedSlugs), [linkedSlugs])
 
   const header = (

@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   Alert,
   Box,
@@ -27,9 +27,11 @@ import {
 import {
   Add as AddIcon,
   Delete as DeleteIcon,
+  Edit as EditIcon,
   RestartAlt as ResetIcon,
   Sync as SyncIcon,
 } from '@mui/icons-material'
+import { useSearchParams } from 'react-router-dom'
 import { useAppRuntime } from '@/hooks/useAppRuntime.js'
 import { useTextbookPracticeLinks } from '@/hooks/useTextbookPracticeLinks.js'
 import { useTextbookStructure } from '@/hooks/useTextbookStructure.js'
@@ -46,7 +48,34 @@ const emptyForm = {
   label: '',
 }
 
-function PracticeLinksPanel({ chapters }) {
+const actionButtonSx = {
+  '&:focus-visible': {
+    outline: '2px solid',
+    outlineColor: 'primary.main',
+    outlineOffset: 2,
+  },
+}
+
+const TEXTBOOK_TABS = ['structure', 'links', 'preview']
+
+function useFlash(duration = 3500) {
+  const [flash, setFlash] = useState(null)
+  const timerRef = useRef(null)
+
+  useEffect(() => () => window.clearTimeout(timerRef.current), [])
+
+  const showFlash = useCallback(
+    (message, severity = 'success') => {
+      window.clearTimeout(timerRef.current)
+      setFlash({ message, severity })
+      timerRef.current = window.setTimeout(() => setFlash(null), duration)
+    },
+    [duration],
+  )
+  return [flash, showFlash]
+}
+
+function PracticeLinksPanel({ chapters, showFlash }) {
   const {
     definitions,
     resolvedLinks,
@@ -56,16 +85,12 @@ function PracticeLinksPanel({ chapters }) {
   } = useTextbookPracticeLinks()
 
   const [dialogOpen, setDialogOpen] = useState(false)
+  const [editingLinkId, setEditingLinkId] = useState(null)
   const [form, setForm] = useState(emptyForm)
   const [error, setError] = useState('')
-  const [savedFlash, setSavedFlash] = useState(false)
-
-  const flashSaved = () => {
-    setSavedFlash(true)
-    window.setTimeout(() => setSavedFlash(false), 2500)
-  }
 
   const openCreate = () => {
+    setEditingLinkId(null)
     setForm({
       ...emptyForm,
       textbookSlug: chapters[0]?.slug || 'Ch1',
@@ -73,6 +98,27 @@ function PracticeLinksPanel({ chapters }) {
     })
     setError('')
     setDialogOpen(true)
+  }
+
+  const openEdit = (link) => {
+    const resolved = resolvedLinks.find((item) => item.id === link.id)
+    const linkedPractice = practices.find(
+      (item) => String(item.id) === String(link.practiceId),
+    )
+    setEditingLinkId(link.id)
+    setForm({
+      textbookSlug: link.textbookSlug,
+      sectionId: link.sectionId || '',
+      practiceId: String(resolved?.practiceId ?? linkedPractice?.id ?? ''),
+      label: link.label || '',
+    })
+    setError('')
+    setDialogOpen(true)
+  }
+
+  const closeDialog = () => {
+    setDialogOpen(false)
+    setEditingLinkId(null)
   }
 
   const handleSaveLink = async () => {
@@ -86,24 +132,26 @@ function PracticeLinksPanel({ chapters }) {
     }
 
     const practice = practices.find((item) => String(item.id) === String(form.practiceId))
-    const next = [
-      ...definitions.map(normalizeLink),
-      normalizeLink({
-        id: createLinkId(),
-        textbookSlug: form.textbookSlug,
-        sectionId: form.sectionId.trim() || null,
-        practiceId: form.practiceId,
-        label: form.label.trim() || practice?.title || practice?.name || null,
-        match: practice
-          ? { chapter: practice.chapter, subchapter: practice.subchapter }
-          : null,
-      }),
-    ]
+    const savedLink = normalizeLink({
+      id: editingLinkId || createLinkId(),
+      textbookSlug: form.textbookSlug,
+      sectionId: form.sectionId.trim() || null,
+      practiceId: form.practiceId,
+      label: form.label.trim() || practice?.title || practice?.name || null,
+      match: practice
+        ? { chapter: practice.chapter, subchapter: practice.subchapter }
+        : null,
+    })
+    const next = editingLinkId
+      ? definitions.map((link) =>
+          link.id === editingLinkId ? savedLink : normalizeLink(link),
+        )
+      : [...definitions.map(normalizeLink), savedLink]
 
     try {
       await saveLinks(next)
-      setDialogOpen(false)
-      flashSaved()
+      closeDialog()
+      showFlash('Link saved.')
     } catch (err) {
       setError(err?.message || 'Failed to save link.')
     }
@@ -113,18 +161,18 @@ function PracticeLinksPanel({ chapters }) {
     const next = definitions.filter((link) => link.id !== linkId)
     try {
       await saveLinks(next)
-      flashSaved()
+      showFlash('Link deleted.')
     } catch (err) {
-      setError(err?.message || 'Failed to delete link.')
+      showFlash(err?.message || 'Failed to delete link.', 'error')
     }
   }
 
   const handleReset = async () => {
     try {
       await resetToDefaults()
-      flashSaved()
+      showFlash('Links reset to defaults.')
     } catch (err) {
-      setError(err?.message || 'Failed to reset links.')
+      showFlash(err?.message || 'Failed to reset links.', 'error')
     }
   }
 
@@ -163,12 +211,6 @@ function PracticeLinksPanel({ chapters }) {
         </Stack>
       </Stack>
 
-      {savedFlash && (
-        <Alert severity="success" sx={{ mb: 2 }}>
-          Links saved.
-        </Alert>
-      )}
-
       {!practices.length && (
         <Alert severity="warning" sx={{ mb: 2 }}>
           No practice assignments in this course yet. Add some under Practice, then come back here.
@@ -199,16 +241,11 @@ function PracticeLinksPanel({ chapters }) {
               ) : (
                 definitions.map((link) => {
                   const resolved = resolvedLinks.find((item) => item.id === link.id)
-                  const practice =
-                    practices.find((item) => String(item.id) === String(link.practiceId)) ||
-                    (link.match
-                      ? practices.find(
-                          (item) =>
-                            Number(item.chapter) === Number(link.match.chapter) &&
-                            (!link.match.subchapter ||
-                              String(item.subchapter) === String(link.match.subchapter)),
-                        )
-                      : null)
+                  const practice = resolved
+                    ? practices.find(
+                        (item) => String(item.id) === String(resolved.practiceId),
+                      )
+                    : null
                   const chapter = chapters.find((item) => item.slug === link.textbookSlug)
 
                   return (
@@ -252,20 +289,26 @@ function PracticeLinksPanel({ chapters }) {
                         )}
                       </TableCell>
                       <TableCell align="right">
-                        <IconButton
-                          size="small"
-                          aria-label={`Delete link for ${link.textbookSlug}`}
-                          onClick={() => handleDelete(link.id)}
-                          sx={{
-                            '&:focus-visible': {
-                              outline: '2px solid',
-                              outlineColor: 'primary.main',
-                              outlineOffset: 2,
-                            },
-                          }}
-                        >
-                          <DeleteIcon fontSize="small" />
-                        </IconButton>
+                        <Tooltip title="Edit link">
+                          <IconButton
+                            size="small"
+                            aria-label={`Edit link for ${link.textbookSlug}`}
+                            onClick={() => openEdit(link)}
+                            sx={actionButtonSx}
+                          >
+                            <EditIcon fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
+                        <Tooltip title="Delete link">
+                          <IconButton
+                            size="small"
+                            aria-label={`Delete link for ${link.textbookSlug}`}
+                            onClick={() => handleDelete(link.id)}
+                            sx={actionButtonSx}
+                          >
+                            <DeleteIcon fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
                       </TableCell>
                     </TableRow>
                   )
@@ -278,12 +321,14 @@ function PracticeLinksPanel({ chapters }) {
 
       <Dialog
         open={dialogOpen}
-        onClose={() => setDialogOpen(false)}
+        onClose={closeDialog}
         fullWidth
         maxWidth="sm"
         aria-labelledby="textbook-link-dialog-title"
       >
-        <DialogTitle id="textbook-link-dialog-title">Add textbook link</DialogTitle>
+        <DialogTitle id="textbook-link-dialog-title">
+          {editingLinkId ? 'Edit textbook link' : 'Add textbook link'}
+        </DialogTitle>
         <DialogContent>
           <Stack spacing={2.5} sx={{ mt: 1 }}>
             {error && <Alert severity="error">{error}</Alert>}
@@ -347,7 +392,7 @@ function PracticeLinksPanel({ chapters }) {
           </Stack>
         </DialogContent>
         <DialogActions sx={{ px: 3, pb: 2 }}>
-          <Button onClick={() => setDialogOpen(false)}>Cancel</Button>
+          <Button onClick={closeDialog}>Cancel</Button>
           <Button variant="contained" onClick={handleSaveLink}>
             Save link
           </Button>
@@ -384,6 +429,7 @@ function TextbookPreviewPanel() {
  * Route: `/instructor/textbook-links`
  */
 export default function InstructorTextbookLinks() {
+  const [searchParams, setSearchParams] = useSearchParams()
   const { courseState } = useAppRuntime()
   const { courses, activeCourseId } = courseState || {}
   const activeCourse = courses?.find((course) => course.id === activeCourseId)
@@ -397,8 +443,18 @@ export default function InstructorTextbookLinks() {
     syncFiles,
   } = useTextbookStructure()
 
-  const [tab, setTab] = useState(0)
-  const [flash, setFlash] = useState(null)
+  const tab = Math.max(0, TEXTBOOK_TABS.indexOf(searchParams.get('tab')))
+  const [flash, showFlash] = useFlash()
+
+  const handleTabChange = (_event, value) => {
+    const next = new URLSearchParams(searchParams)
+    if (value === 0) {
+      next.delete('tab')
+    } else {
+      next.set('tab', TEXTBOOK_TABS[value])
+    }
+    setSearchParams(next, { replace: true })
+  }
 
   const chapters = useMemo(
     () =>
@@ -408,11 +464,6 @@ export default function InstructorTextbookLinks() {
       })),
     [navigableFlat],
   )
-
-  const showFlash = (message, severity = 'success') => {
-    setFlash({ message, severity })
-    window.setTimeout(() => setFlash(null), 3500)
-  }
 
   const handleSync = async () => {
     try {
@@ -477,7 +528,7 @@ export default function InstructorTextbookLinks() {
 
       <Tabs
         value={tab}
-        onChange={(_event, value) => setTab(value)}
+        onChange={handleTabChange}
         aria-label="Textbook management tabs"
         sx={{ mb: 2, borderBottom: 1, borderColor: 'divider' }}
       >
@@ -535,13 +586,17 @@ export default function InstructorTextbookLinks() {
             </Stack>
           </Stack>
 
-          <TextbookStructureEditor nodes={nodes} onChange={saveStructure} />
+          <TextbookStructureEditor
+            key={activeCourseId}
+            nodes={nodes}
+            onChange={saveStructure}
+          />
         </Box>
       )}
 
       {tab === 1 && (
         <Box role="tabpanel" id="textbook-panel-links" aria-labelledby="textbook-tab-links">
-          <PracticeLinksPanel chapters={chapters} />
+          <PracticeLinksPanel chapters={chapters} showFlash={showFlash} />
         </Box>
       )}
 

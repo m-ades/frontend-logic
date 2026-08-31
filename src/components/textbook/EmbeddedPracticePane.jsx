@@ -10,9 +10,13 @@ import {
 } from '@mui/material'
 import LoadingSpinner from '@/components/ui/LoadingSpinner.jsx'
 import WorksheetTabs from '@/components/problems/WorksheetTabs.jsx'
+import { useProofState } from '@/hooks/useproofstate.js'
 import { useScoring } from '@/hooks/usescoring.js'
 import { useWorksheetMetrics } from '@/hooks/useWorksheetMetrics.js'
+import { useAssignmentSession } from '@/hooks/useAssignmentSession.js'
 import { useAppRuntime } from '@/hooks/useAppRuntime.js'
+import { DEFAULT_LOGIC_SYSTEM, normalizeLogicSystem } from '@/lib/logicSystems.js'
+import { mapQuestionToProof } from '@/lib/mapQuestionToProof.js'
 import { fetchJson, getActiveUserId } from '@/utils/api.js'
 
 /**
@@ -29,7 +33,15 @@ export default function EmbeddedPracticePane({
     isInstructor,
     sandbox,
     instructorSandbox,
+    courseState,
   } = useAppRuntime()
+  const activeCourse = courseState?.courses?.find(
+    (course) => Number(course.id) === Number(courseState.activeCourseId),
+  )
+  const courseLogicSystem = normalizeLogicSystem(
+    activeCourse?.logicSystem ?? activeCourse?.logic_system,
+    DEFAULT_LOGIC_SYSTEM,
+  )
 
   const practiceOptions = useMemo(
     () =>
@@ -41,10 +53,16 @@ export default function EmbeddedPracticePane({
   )
 
   const selectedId = activePracticeId ?? practiceOptions[0]?.id ?? null
+  const activeUserId = getActiveUserId()
   const [currentProofIndex, setCurrentProofIndex] = useState(0)
   const [liveAssignment, setLiveAssignment] = useState(null)
   const [liveError, setLiveError] = useState(null)
   const [liveLoading, setLiveLoading] = useState(false)
+  const {
+    getSavedProofState,
+    handleProofStateChange,
+    initializeSavedProofStates,
+  } = useProofState()
 
   useEffect(() => {
     setCurrentProofIndex(0)
@@ -57,6 +75,23 @@ export default function EmbeddedPracticePane({
     if (isInstructor) return worksheetStore?.getActivity?.(selectedId) || null
     return worksheetStore?.getAssignment?.(selectedId) || null
   }, [isSandbox, isInstructor, worksheetStore, selectedId])
+
+  const assignment = isSandbox ? sandboxAssignment : liveAssignment
+  const worksheets = useMemo(
+    () => (assignment ? [{ ...assignment, proofs: assignment.proofs || [] }] : []),
+    [assignment],
+  )
+  const currentWorksheet = worksheets[0]
+  const total = currentWorksheet?.proofs?.length || 0
+
+  useAssignmentSession(isSandbox ? null : currentWorksheet?.id, activeUserId)
+
+  const {
+    completedProofs,
+    score,
+    handleProofComplete,
+    setCompletedProofs,
+  } = useScoring(currentWorksheet)
 
   useEffect(() => {
     if (isSandbox || selectedId == null) {
@@ -72,39 +107,80 @@ export default function EmbeddedPracticePane({
     async function load() {
       setLiveLoading(true)
       setLiveError(null)
+      setCompletedProofs(new Set())
       try {
-        const userId = getActiveUserId()
-        const detail = await fetchJson(
-          `/api/assignments/${selectedId}?userId=${encodeURIComponent(userId || '')}`,
-          { signal: controller.signal },
-        )
+        const userId = activeUserId
+        const [detail, drafts, submissions] = await Promise.all([
+          fetchJson(
+            `/api/assignments/${selectedId}?userId=${encodeURIComponent(userId || '')}`,
+            { signal: controller.signal },
+          ),
+          fetchJson('/api/assignment-drafts', { signal: controller.signal })
+            .catch((error) => {
+              if (error?.name === 'AbortError') throw error
+              return []
+            }),
+          fetchJson(
+            `/api/assignments/${selectedId}/submissions?userId=${encodeURIComponent(userId || '')}`,
+            { signal: controller.signal },
+          ).catch((error) => {
+            if (error?.name === 'AbortError') throw error
+            return []
+          }),
+        ])
         if (cancelled) return
 
         const assignment = detail?.assignment || detail
+        const policy = detail?.policy || null
+        const originalDueAt = assignment.due_at ?? assignment.due_date ?? null
+        const effectiveDueAt =
+          policy?.extension_due_at ??
+          policy?.due_at ??
+          originalDueAt
         const questions = detail?.questions || []
-        const proofs = questions.map((question, index) => {
-          const snapshot = question?.question_snapshot || {}
-          const type =
-            snapshot?.type || snapshot?.problemType || snapshot?.logic_problem_type || 'derivation'
-          const questionId =
-            question?.id ?? question?.assignment_question_id ?? question?.assignmentQuestionId ?? index
-          return {
-            id: `${assignment.id}-${questionId}`,
-            questionId,
-            type,
-            description: snapshot.prompt || snapshot.description || snapshot.text || 'Solve.',
-            solution: snapshot.solution,
-            attemptLimit: question?.attempt_limit ?? 3,
-            legend: snapshot.legend || '',
-            questionSnapshot: snapshot,
-            ...snapshot,
+        const proofs = questions.map((question, index) =>
+          mapQuestionToProof(question, assignment, index, courseLogicSystem),
+        )
+
+        const proofIdByQuestionId = new Map(
+          proofs.map((proof) => [String(proof.questionId), proof.id]),
+        )
+        const attemptCountByQuestionId = new Map()
+        const completedProofIds = new Set()
+        for (const submission of submissions || []) {
+          const questionId = String(submission.assignment_question_id)
+          const attempt = Number(submission.attempt)
+          if (
+            Number.isFinite(attempt) &&
+            attempt > (attemptCountByQuestionId.get(questionId) || 0)
+          ) {
+            attemptCountByQuestionId.set(questionId, attempt)
           }
-        })
+          if (submission.is_correct) {
+            const proofId = proofIdByQuestionId.get(questionId)
+            if (proofId) completedProofIds.add(proofId)
+          }
+        }
+
+        const initialStates = {}
+        for (const draft of drafts || []) {
+          if (userId != null && String(draft.user_id) !== String(userId)) continue
+          const proofId = proofIdByQuestionId.get(String(draft.assignment_question_id))
+          if (proofId) initialStates[proofId] = draft.draft_data
+        }
+        initializeSavedProofStates(initialStates)
+        setCompletedProofs(completedProofIds)
 
         setLiveAssignment({
           ...assignment,
           title: assignment.title || assignment.name,
-          proofs,
+          due_at: effectiveDueAt,
+          original_due_at: originalDueAt,
+          policy,
+          proofs: proofs.map((proof) => ({
+            ...proof,
+            attemptCount: attemptCountByQuestionId.get(String(proof.questionId)) ?? 0,
+          })),
         })
       } catch (error) {
         if (cancelled || error?.name === 'AbortError') return
@@ -120,28 +196,16 @@ export default function EmbeddedPracticePane({
       cancelled = true
       controller.abort()
     }
-  }, [isSandbox, selectedId])
+  }, [isSandbox, selectedId, courseLogicSystem, activeUserId])
 
-  const assignment = isSandbox ? sandboxAssignment : liveAssignment
-
-  const getQuestionState = worksheetStore?.getQuestionState ?? (() => null)
+  const getQuestionState = isSandbox
+    ? worksheetStore?.getQuestionState ?? (() => null)
+    : getSavedProofState
   const isQuestionComplete = worksheetStore?.isQuestionComplete ?? (() => false)
-  const updateQuestionState = worksheetStore?.updateQuestionState ?? (() => undefined)
+  const updateQuestionState = isSandbox
+    ? worksheetStore?.updateQuestionState ?? (() => undefined)
+    : handleProofStateChange
   const markQuestionComplete = worksheetStore?.markQuestionComplete ?? (() => undefined)
-
-  const worksheets = useMemo(
-    () => (assignment ? [{ ...assignment, proofs: assignment.proofs || [] }] : []),
-    [assignment],
-  )
-  const currentWorksheet = worksheets[0]
-  const total = currentWorksheet?.proofs?.length || 0
-
-  const {
-    completedProofs,
-    score,
-    handleProofComplete,
-    setCompletedProofs,
-  } = useScoring(currentWorksheet)
 
   useEffect(() => {
     if (!currentWorksheet?.proofs || !isSandbox) return
@@ -178,7 +242,7 @@ export default function EmbeddedPracticePane({
     return (score / total) * 100
   }, [score, total])
 
-  const { completionPercent, gradeLabel } = useWorksheetMetrics({
+  const { completionPercent, gradeLabel, isOverdue } = useWorksheetMetrics({
     score,
     total,
     calculatedGradePercent,
@@ -260,17 +324,12 @@ export default function EmbeddedPracticePane({
               handleProofComplete(proofId)
               if (isSandbox) markQuestionComplete(proofId)
             }}
-            getSavedProofState={
-              isSandbox ? (proofId) => getQuestionState(proofId) : undefined
-            }
-            handleProofStateChange={
-              isSandbox
-                ? (proofId, state) => updateQuestionState(proofId, state)
-                : undefined
-            }
+            getSavedProofState={getQuestionState}
+            handleProofStateChange={updateQuestionState}
             total={total}
             completionPercent={completionPercent}
             gradeLabel={gradeLabel}
+            isOverdue={isOverdue}
           />
         )}
       </Box>

@@ -7,11 +7,8 @@ import TextbookHubPage from '@/pages/TextbookHubPage.jsx'
 import { useAppRuntime } from '@/hooks/useAppRuntime.js'
 import { useTextbookPracticeLinks } from '@/hooks/useTextbookPracticeLinks.js'
 import { useTextbookStructure } from '@/hooks/useTextbookStructure.js'
-import {
-  linksForPracticeId,
-  primarySectionIdForPractice,
-  primaryTextbookSlugForPractice,
-} from '@/components/textbook/textbookPracticeLinks.js'
+import { linksForPracticeId } from '@/components/textbook/textbookPracticeLinks.js'
+import { isTextbookAvailable } from '@/components/textbook/textbookAvailability.js'
 
 /**
  * Wraps a practice worksheet with the linked textbook chapter in a split view.
@@ -23,19 +20,22 @@ export default function WorksheetTextbookSplit({
   children,
 }) {
   const location = useLocation()
-  const { routePrefix, textbookChapterPath } = useAppRuntime()
+  const { routePrefix, textbookChapterPath, courseState } = useAppRuntime()
   const { resolvedLinks } = useTextbookPracticeLinks()
   const { resolveSlug } = useTextbookStructure()
 
   const practiceLinks = linksForPracticeId(resolvedLinks, practiceId)
-  const isPractice =
-    String(activityKind || '').toLowerCase() === 'practice' || practiceLinks.length > 0
+  const activeCourse = courseState?.courses?.find(
+    (course) => String(course.id) === String(courseState.activeCourseId),
+  )
+  const textbookAvailable = isTextbookAvailable(
+    activeCourse?.logicSystem ?? activeCourse?.logic_system,
+  )
+  const isPractice = String(activityKind || '').toLowerCase() === 'practice'
 
-  const linkedSlug =
-    location.state?.textbookSlug || primaryTextbookSlugForPractice(resolvedLinks, practiceId)
-  const sectionId =
-    location.state?.textbookSectionId ||
-    primarySectionIdForPractice(resolvedLinks, practiceId)
+  const linkedSlug = location.state?.textbookSlug || practiceLinks[0]?.textbookSlug || null
+  const linkedPractice = practiceLinks.find((link) => link.textbookSlug === linkedSlug)
+  const sectionId = location.state?.textbookSectionId || linkedPractice?.sectionId || null
   const [openChapter, setOpenChapter] = useState(linkedSlug)
 
   useEffect(() => {
@@ -51,7 +51,7 @@ export default function WorksheetTextbookSplit({
     openHub()
   }, [openHub])
 
-  if (!isPractice || !linkedSlug) {
+  if (!textbookAvailable || !isPractice || !linkedSlug) {
     return children
   }
 
