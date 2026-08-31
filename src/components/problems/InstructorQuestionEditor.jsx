@@ -57,7 +57,10 @@ import {
 import { getInstructorProblemTypeLabel, isInstructorProblemType } from '../../lib/instructorProblemTypes.js'
 import TruthTableGrid from './truth-table/TruthTableGrid.jsx'
 import { TruthValueButton } from './truth-table/TruthTableControls.jsx'
-import { tokenizeTruthTableHeader } from './truth-table/truthTableUi.js'
+import {
+  normalizeTruthTableCellValue,
+  tokenizeTruthTableHeader,
+} from './truth-table/truthTableUi.js'
 
 // deep merge. source overwrites. arrays replace.
 function deepMerge(target, source) {
@@ -1419,9 +1422,9 @@ function buildSingleRowTruthTableSnapshot(proof, edited, existing, logicSystem =
       const atom = syntax.symbolfix(String(token).replace(/[()\[\]{}]/g, ''))
       return letters.includes(atom) ? Boolean(interpretation[atom]) : null
     }
-    const cell = sourceRow[index]
-    if (cell === true || cell === 'T' || cell === 't') return true
-    if (cell === false || cell === 'F' || cell === 'f') return false
+    const cell = normalizeTruthTableCellValue(sourceRow[index])
+    if (cell === 'T') return true
+    if (cell === 'F') return false
     return null
   })
   return {
@@ -1560,10 +1563,8 @@ function SingleRowTruthTableEditorForm({ proof, value, onChange, logicSystem = D
     : (Array.isArray(sr.row) ? sr.row : null)
   const givenRow = headerTokens.map((_, index) => {
     if (!sourceRow) return atomForColumn(index) ? computedRow[index] : ''
-    const cell = sourceRow[index]
-    if (cell === true || cell === 'T' || cell === 't') return 'T'
-    if (cell === false || cell === 'F' || cell === 'f') return 'F'
-    return ''
+    const cell = normalizeTruthTableCellValue(sourceRow[index])
+    return cell === 'T' || cell === 'F' ? cell : ''
   })
   const setCell = (index, nextValue) => {
     const atom = atomForColumn(index)
