@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import {
   Box,
   Typography,
@@ -18,7 +18,10 @@ import {
 import AssignmentTable from "../../components/ui/AssignmentTable";
 import AssignmentFormDialog from "../../components/ui/AssignmentFormDialog";
 import AssignmentContextMenu from "../../components/ui/AssignmentContextMenu";
+import ClasswideExtensionDialog from "../../components/ui/assignments/ClasswideExtensionDialog";
+import AssignmentExtensionsDialog from "../../components/ui/assignments/AssignmentExtensionsDialog";
 import { sortAssignmentsBySubchapter } from "../../utils/assignmentSort.js";
+import { toEasternIso } from "../../utils/easternTime.js";
 import {
   getStatusColor,
   getStatusText,
@@ -68,6 +71,16 @@ export default function InstructorAssignments() {
   const [dueDateDialogOpen, setDueDateDialogOpen] = useState(false);
   const [dueDateEditAssignment, setDueDateEditAssignment] = useState(null);
   const [dueDateForm, setDueDateForm] = useState({ dueDate: "", dueTime: "23:59" });
+  const [extensionAssignment, setExtensionAssignment] = useState(null);
+  const [classwideOpen, setClasswideOpen] = useState(false);
+  const [extensionsListOpen, setExtensionsListOpen] = useState(false);
+  const [classwideForm, setClasswideForm] = useState({
+    dueDate: "",
+    dueTime: "23:59",
+    reason: "",
+  });
+  const [classwideSaving, setClasswideSaving] = useState(false);
+  const [classwideError, setClasswideError] = useState("");
 
   // Get current course data
   const activeCourse = courses.find((c) => c.id === activeCourseId);
@@ -236,6 +249,61 @@ export default function InstructorAssignments() {
     }
   };
 
+  const loadAssignmentExtensions = useCallback(
+    (assignmentId) =>
+      courseActions.getAssignmentExtensions?.(assignmentId) ?? Promise.resolve([]),
+    [courseActions]
+  );
+
+  const handleOpenClasswideExtension = (assignment) => {
+    if (!assignment?.id) return;
+    setExtensionAssignment(assignment);
+    setClasswideForm({
+      dueDate: assignment.dueDate || getCurrentDate(),
+      dueTime: assignment.dueTime || "23:59",
+      reason: "",
+    });
+    setClasswideError("");
+    setClasswideOpen(true);
+  };
+
+  const handleOpenExtensionsList = (assignment) => {
+    if (!assignment?.id) return;
+    setExtensionAssignment(assignment);
+    setExtensionsListOpen(true);
+  };
+
+  const handleClasswideSubmit = async () => {
+    if (classwideSaving || !extensionAssignment?.id || !classwideForm.dueDate) return;
+    const iso = toEasternIso(classwideForm.dueDate, classwideForm.dueTime || "23:59");
+    if (!iso) {
+      setClasswideError("Choose a valid date and time.");
+      return;
+    }
+    if (typeof courseActions.saveClasswideExtension !== "function") {
+      setClasswideError("Classwide extensions are not available.");
+      return;
+    }
+    setClasswideSaving(true);
+    setClasswideError("");
+    try {
+      const result = await courseActions.saveClasswideExtension(extensionAssignment.id, {
+        extendedDueDate: iso,
+        reason: classwideForm.reason?.trim().slice(0, 500) || null,
+      });
+      if ((result?.total ?? 0) === 0) {
+        setClasswideError("No enrolled students to extend.");
+        return;
+      }
+      setClasswideOpen(false);
+      setExtensionsListOpen(true);
+    } catch (error) {
+      setClasswideError(error?.message || "Failed to apply classwide extension.");
+    } finally {
+      setClasswideSaving(false);
+    }
+  };
+
   // Show message if no active course
   if (!activeCourseId) {
     return (
@@ -311,6 +379,8 @@ export default function InstructorAssignments() {
         item={menuAssignment}
         onOpenBuilder={handleOpenBuilder}
         onEdit={handleEditOpen}
+        onClasswideExtension={handleOpenClasswideExtension}
+        onViewExtensions={handleOpenExtensionsList}
         onDuplicate={handleDuplicate}
         onDelete={handleDelete}
       />
@@ -398,6 +468,33 @@ export default function InstructorAssignments() {
           </Button>
         </DialogActions>
       </Dialog>
+      {/* Classwide extension */}
+      <ClasswideExtensionDialog
+        open={classwideOpen}
+        assignment={extensionAssignment}
+        form={classwideForm}
+        onChange={(patch) => setClasswideForm((prev) => ({ ...prev, ...patch }))}
+        onClose={() => {
+          if (classwideSaving) return;
+          setClasswideOpen(false);
+          setClasswideError("");
+        }}
+        onSubmit={handleClasswideSubmit}
+        saving={classwideSaving}
+        error={classwideError}
+      />
+
+      {/* Extension list */}
+      <AssignmentExtensionsDialog
+        open={extensionsListOpen}
+        assignment={extensionAssignment}
+        loadExtensions={loadAssignmentExtensions}
+        onClose={() => setExtensionsListOpen(false)}
+        onClasswide={() => {
+          setExtensionsListOpen(false);
+          if (extensionAssignment) handleOpenClasswideExtension(extensionAssignment);
+        }}
+      />
     </Box>
   );
 }

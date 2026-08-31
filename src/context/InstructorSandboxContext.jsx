@@ -637,7 +637,7 @@ export function InstructorSandboxProvider({ children }) {
       .filter(Boolean)
   }
 
-  const saveDeadline = async (courseId, assignmentId, userId, extendedDueDate) => {
+  const saveDeadline = async (courseId, assignmentId, userId, extendedDueDate, reason = null) => {
     setState((prev) => ({
       ...prev,
       deadlinesByCourse: {
@@ -650,11 +650,84 @@ export function InstructorSandboxProvider({ children }) {
               assignment_id: assignmentId,
               user_id: userId,
               extension_due_at: extendedDueDate,
+              reason: reason || null,
+              created_at: new Date().toISOString(),
             },
           },
         },
       },
     }))
+  }
+
+  const getAssignmentExtensions = async (assignmentId) => {
+    const courseId = courseState.activeCourseId
+    const students = (courseState.gradebookByCourse?.[courseId] || []).filter(
+      (student) => String(student.role || "student").toLowerCase() !== "ta"
+    )
+    const byUser = state.deadlinesByCourse?.[courseId] || {}
+    return students
+      .map((student) => {
+        const ext = byUser[student.id]?.[assignmentId]
+        if (!ext?.extension_due_at) return null
+        return {
+          id: `${student.id}-${assignmentId}`,
+          assignment_id: assignmentId,
+          user_id: student.id,
+          extended_due_date: ext.extension_due_at,
+          reason: ext.reason || null,
+          created_at: ext.created_at || null,
+          User: { id: student.id, username: student.username },
+        }
+      })
+      .filter(Boolean)
+  }
+
+  const saveClasswideExtension = async (assignmentId, { extendedDueDate, reason } = {}) => {
+    if (!extendedDueDate || Number.isNaN(Date.parse(extendedDueDate))) {
+      throw new Error("A valid extended due date is required.")
+    }
+    const classwideMs = Date.parse(extendedDueDate)
+    const courseId = courseState.activeCourseId
+    const students = (courseState.gradebookByCourse?.[courseId] || []).filter(
+      (student) => String(student.role || "student").toLowerCase() !== "ta"
+    )
+    const grantedAt = new Date().toISOString()
+    const trimmedReason = typeof reason === "string" ? reason.trim().slice(0, 500) : null
+    let updated = 0
+    let preserved = 0
+
+    setState((prev) => {
+      const courseDeadlines = { ...(prev.deadlinesByCourse?.[courseId] || {}) }
+      for (const student of students) {
+        const existing = courseDeadlines[student.id]?.[assignmentId]
+        const existingMs = existing?.extension_due_at
+          ? Date.parse(existing.extension_due_at)
+          : NaN
+        if (existing?.extension_due_at && !Number.isNaN(existingMs) && existingMs > classwideMs) {
+          preserved += 1
+          continue
+        }
+        courseDeadlines[student.id] = {
+          ...(courseDeadlines[student.id] || {}),
+          [assignmentId]: {
+            assignment_id: assignmentId,
+            user_id: student.id,
+            extension_due_at: extendedDueDate,
+            reason: trimmedReason || null,
+            created_at: grantedAt,
+          },
+        }
+        updated += 1
+      }
+      return {
+        ...prev,
+        deadlinesByCourse: {
+          ...prev.deadlinesByCourse,
+          [courseId]: courseDeadlines,
+        },
+      }
+    })
+    return { updated, preserved, total: students.length }
   }
 
   const getActivity = (activityId) => {
@@ -742,6 +815,8 @@ export function InstructorSandboxProvider({ children }) {
     saveAccommodations,
     getDeadlines,
     saveDeadline,
+    getAssignmentExtensions,
+    saveClasswideExtension,
     getActivity,
     getQuestionState: (questionId) => state.questionStates?.[questionId] || null,
     isQuestionComplete: (questionId) => completedQuestionIds.has(questionId),
