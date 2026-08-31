@@ -1545,24 +1545,15 @@ function SingleRowTruthTableEditorForm({ proof, value, onChange, logicSystem = D
       cell ? 'T' : 'F'
     ))
   }, [formula, interpretation, notation])
-  const interpretationRows = React.useMemo(() => {
-    if (!formula.wellformed) return []
-    return libtf.allinterps([formula]).map((candidate) => ({
-      interpretation: candidate,
-      row: libtf.evaluate(formula, candidate, notation).row,
-    }))
-  }, [formula, notation])
-  const toggleValuesByColumn = React.useMemo(() => headerTokens.map((_, index) => {
-    const values = new Set(
-      interpretationRows.map(({ row }) => row[index] ? 'T' : 'F')
-    )
-    return ['T', 'F'].filter((value) => values.has(value))
-  }), [headerTokens, interpretationRows])
   const atomForColumn = React.useCallback((index) => {
     const stripped = String(headerTokens[index] ?? '').replace(/[()\[\]{}]/g, '')
     const atom = syntax.symbolfix(stripped)
     return sentenceLetters.includes(atom) ? atom : null
   }, [headerTokens, sentenceLetters, syntax])
+
+  const toggleValuesByColumn = React.useMemo(() => headerTokens.map((_, index) => (
+    atomForColumn(index) ? ['T', 'F'] : [computedRow[index]]
+  )), [headerTokens, atomForColumn, computedRow])
   const hasEditedRow = Object.prototype.hasOwnProperty.call(value, 'row')
   const sourceRow = hasEditedRow
     ? (Array.isArray(value.row) ? value.row : null)
@@ -1574,31 +1565,11 @@ function SingleRowTruthTableEditorForm({ proof, value, onChange, logicSystem = D
     if (cell === false || cell === 'F' || cell === 'f') return 'F'
     return ''
   })
-  const matchingInterpretation = (index, truthValue) => {
-    let bestInterpretation = null
-    let fewestChanges = Infinity
-    for (const candidate of interpretationRows) {
-      if (Boolean(candidate.row[index]) !== truthValue) continue
-      const changes = sentenceLetters.reduce((count, letter) => (
-        count + (Boolean(candidate.interpretation[letter]) === Boolean(interpretation[letter]) ? 0 : 1)
-      ), 0)
-      if (changes < fewestChanges) {
-        bestInterpretation = candidate.interpretation
-        fewestChanges = changes
-      }
-    }
-    return bestInterpretation
-  }
   const setCell = (index, nextValue) => {
     const atom = atomForColumn(index)
-    let nextInterpretation = interpretation
-    if (atom && nextValue) {
-      nextInterpretation = { ...interpretation, [atom]: nextValue === 'T' }
-    } else if (!atom && nextValue) {
-      const matching = matchingInterpretation(index, nextValue === 'T')
-      if (!matching) return
-      nextInterpretation = { ...interpretation, ...matching }
-    }
+    const nextInterpretation = atom && nextValue
+      ? { ...interpretation, [atom]: nextValue === 'T' }
+      : interpretation
     const evaluatedRow = libtf.evaluate(formula, nextInterpretation, notation).row
     const nextRow = givenRow.map((cell, currentIndex) => {
       const isGiven = currentIndex === index ? Boolean(nextValue) : Boolean(cell)
