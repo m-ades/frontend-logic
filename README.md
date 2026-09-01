@@ -26,3 +26,4 @@ npm run dev
 
 This project uses code from LogicPenguin, which is licensed under GNU GPL v3.
 
+The Fitch course text is adapted from [*forall x: Calgary*](https://github.com/rzach/forallx-yyc) by P. D. Magnus, Tim Button, Aaron Thomas-Bolduc, and Richard Zach, under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
