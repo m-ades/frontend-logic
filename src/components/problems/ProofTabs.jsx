@@ -194,7 +194,7 @@ function ProofTabs({
     if (type === 'symbolic-translation') {
       return {
         ...base,
-        translation: { prompt: '', legend: '', symbolizationKey: [] },
+        translation: { prompt: '', symbolizationKey: [] },
         answer: '',
       }
     }

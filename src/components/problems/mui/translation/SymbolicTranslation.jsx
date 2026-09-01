@@ -225,7 +225,6 @@ export default function SymbolicTranslation({
   const hasHydratedRef = useRef(false)
   const saveTimerRef = useRef(null)
   const lastSavedValueRef = useRef(null)
-  const legend = problem?.legend || problem?.question_snapshot?.legend
   const rawPrompt = problem?.prompt || problem?.question_snapshot?.prompt || ''
   const explicitSentence = problem?.sentence || problem?.question_snapshot?.sentence || ''
   const { prompt, sentence } = useMemo(
@@ -243,6 +242,9 @@ export default function SymbolicTranslation({
     : (typeof symbolizationKeyRaw === 'string'
       ? symbolizationKeyRaw.split('\n').map((line) => line.trim()).filter(Boolean)
       : [])
+  const legacyLegend = symbolizationKey.length === 0
+    ? (problem?.legend || problem?.question_snapshot?.legend)
+    : ''
 
   const isPredicate = isPredicateLogicKey(symbolizationKey, allowIndexedSymbols) || promptImpliesPredicateLogic(rawPrompt)
   const predicateLetters = isPredicate
@@ -388,8 +390,8 @@ export default function SymbolicTranslation({
           </Box>
         </Box>
       )}
-      {legend && (
-        <RichText content={legend} variant="body2" sx={{ mb: 1, color: 'text.secondary' }} />
+      {legacyLegend && (
+        <RichText content={legacyLegend} variant="body2" sx={{ mb: 1, color: 'text.secondary' }} />
       )}
       <Typography variant="body2" sx={{ mb: 1, mt: 1, color: 'text.secondary' }}>
         Your translation:
