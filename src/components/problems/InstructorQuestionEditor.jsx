@@ -527,7 +527,9 @@ function buildProofArgumentExtractionSnapshot(proof, edited, existing, logicSyst
 }
 
 function AttemptLimitField({ value, onChange }) {
-  const num = value != null && Number.isFinite(Number(value)) ? Number(value) : 3
+  const num = value != null && Number.isFinite(Number(value))
+    ? Math.max(1, Number(value))
+    : 3
   return (
     <TextField
       type="number"
@@ -535,9 +537,9 @@ function AttemptLimitField({ value, onChange }) {
       value={num}
       onChange={(e) => {
         const v = parseInt(e.target.value, 10)
-        onChange(Number.isFinite(v) && v >= 0 ? v : num)
+        onChange(Number.isFinite(v) && v >= 1 ? v : num)
       }}
-      inputProps={{ min: 0, step: 1 }}
+      inputProps={{ min: 1, step: 1 }}
       size="small"
       fullWidth
     />

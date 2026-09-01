@@ -4,6 +4,7 @@ import { Alert, Box, IconButton, Stack, Typography, Tooltip } from '@mui/materia
 import EditIcon from '@mui/icons-material/Edit'
 import CloseIcon from '@mui/icons-material/Close'
 import InstructorQuestionEditor from '../../InstructorQuestionEditor.jsx'
+import SolutionReveal from '../../SolutionReveal.jsx'
 import StatusBanner, { isTerminalStatus } from '../../../ui/StatusBanner.jsx'
 import { useTheme, useMediaQuery } from '@mui/material'
 import DerivationCard from '../../derivation/DerivationCard.jsx'
@@ -168,6 +169,30 @@ function firstWithFormulas(...candidates) {
   return null
 }
 
+function getAnswerArgumentLine(source) {
+  if (!source) return ''
+  if (typeof source === 'string') {
+    return parseArgumentLine(source).error ? '' : source
+  }
+  const answer = source.answer || source
+  if (answer !== source) return getAnswerArgumentLine(answer)
+  if (answer.argument || answer.argumentLine) {
+    const line = answer.argument ?? answer.argumentLine
+    return parseArgumentLine(line).error ? '' : line
+  }
+  if (Array.isArray(answer.premises) && answer.conclusion != null) {
+    return `${answer.premises.join(' / ')} // ${answer.conclusion}`
+  }
+  if (Array.isArray(answer.translations) && Number.isInteger(answer.index)) {
+    const conclusion = answer.translations[answer.index] ?? ''
+    const premises = answer.translations.filter((_, index) => index !== answer.index)
+    return premises.length > 0 && conclusion
+      ? `${premises.join(' / ')} // ${conclusion}`
+      : ''
+  }
+  return ''
+}
+
 function getArgumentKeyboardConfig(
   answer,
   symbolizationKey,
@@ -275,6 +300,10 @@ export default function ComboTranslationDerivation({
     proof?.question_snapshot?.answer,
     snapshot
   ) ?? proof?.answer ?? snapshot?.answer
+  const answerArgumentLine = useMemo(() => {
+    const line = getAnswerArgumentLine(answer)
+    return line ? canonicalizeArgumentLine(line) : ''
+  }, [answer, canonicalizeArgumentLine])
   const [argumentLine, setArgumentLine] = useState(
     () => canonicalizeArgumentLine(savedState?.argumentLine ?? '')
   )
@@ -376,6 +405,7 @@ export default function ComboTranslationDerivation({
       attemptLimit,
       initialAttemptCount: savedState?.attemptCount ?? 0,
     })
+  const showSolution = isLocked && status !== 'correct' && Boolean(answerArgumentLine)
 
   const handleArgumentChange = (value) => {
     setArgumentLine(value)
@@ -549,6 +579,15 @@ export default function ComboTranslationDerivation({
             onClose={() => setMessage('')}
           />
         )}
+
+        <SolutionReveal show={showSolution}>
+          <Typography variant="body2" sx={{ mb: 1, fontWeight: 600 }}>
+            Argument line
+          </Typography>
+          <Typography component="div" sx={{ fontFamily: 'monospace', fontSize: '1rem' }}>
+            {answerArgumentLine}
+          </Typography>
+        </SolutionReveal>
 
         <ProblemSetButtons
           onCheck={handleCheck}
