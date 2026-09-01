@@ -252,7 +252,11 @@ export default function MobileLogicInput({
     const val = f.value ?? ''
     if (start === 0 && end === 0) return
     if (start === end) {
-      f.setRangeText('', start - 1, end, 'end')
+      const previousCharacter = val[start - 1]
+      const deleteStart = /[\uFE0E\uFE0F]/.test(previousCharacter)
+        ? Math.max(0, start - 2)
+        : start - 1
+      f.setRangeText('', deleteStart, end, 'end')
     } else {
       f.setRangeText('', start, end, 'end')
     }
@@ -273,9 +277,10 @@ export default function MobileLogicInput({
       desktopInputRef.current = node
       if (node) {
         node.syntax = syntax
+        node.notation = notation
         node.symbols = symbols
         node.symbolcat = symbolcat
-        node.inputfix = syntax?.inputfix
+        node.inputfix = FormulaInput.formatForDisplay
         node.autoChange = FormulaInput.autoChange
         node.insertHere = FormulaInput.insertHere
         node.insOp = FormulaInput.insOp

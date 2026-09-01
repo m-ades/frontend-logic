@@ -1,3 +1,5 @@
+import { displayLogicText } from './logicText.js'
+
 const SUBSCRIPT_DIGITS = '₀₁₂₃₄₅₆₇₈₉'
 
 /** Normalize display-friendly Unicode indices to Carnap-style ASCII indices. */
@@ -19,7 +21,8 @@ export function displayIndexedSymbols(value) {
 
 /** Apply Fitch display notation without changing Hurley input. */
 export function displayIndexedSymbolsForNotation(value, notation) {
-  return notation === 'calgary' ? displayIndexedSymbols(value) : String(value ?? '')
+  const displayed = notation === 'calgary' ? displayIndexedSymbols(value) : String(value ?? '')
+  return displayLogicText(displayed)
 }
 
 /** A complete propositional symbol, indexed or unindexed. */

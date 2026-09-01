@@ -42,7 +42,6 @@ export function ensureMathJax() {
     },
     svg: {
       fontCache: 'local',
-      mtextInheritFont: true,
       merrorInheritFont: true,
     },
     startup: { typeset: false },
