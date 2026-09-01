@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { Box, Typography } from '@mui/material'
 import InstructorQuestionEditor from '../../InstructorQuestionEditor.jsx'
 import { useTheme, useMediaQuery } from '@mui/material'
@@ -13,6 +13,7 @@ import RichText from '../../../ui/RichText.jsx'
 import MathJaxFormula from '../../../ui/MathJaxFormula.jsx'
 import { canonicalizeFormula } from '../../../../lib/logicpenguin/symbolic/formula.js'
 import { plainTextToTex } from '../../../../lib/logicTex.js'
+import { sanitizeRichHtml } from '../../../../utils/sanitizeRichHtml.js'
 import {
   ST_PREDICATE_VARIABLES,
   getConstantLettersFromKey,
@@ -28,6 +29,38 @@ import {
   mapTranslationAnswer,
   parseTranslationAnswer,
 } from '../../../../lib/logicpenguin/translation-answer.js'
+
+/*
+legacy prompts contain instructions and sentence text in one html value
+explicit sentence data bypasses this compatibility split
+the returned sentence is plain text for tex rendering
+*/
+function resolveTranslationText(rawPrompt, explicitSentence) {
+  const prompt = String(rawPrompt ?? '')
+  const sentence = String(explicitSentence ?? '').trim()
+  if (sentence) return { prompt, sentence }
+  if (!prompt) return { prompt: '', sentence: '' }
+  if (typeof DOMParser === 'undefined' || !/<[^>]+>/.test(prompt)) {
+    return { prompt: '', sentence: prompt.trim() }
+  }
+
+  const document = new DOMParser().parseFromString(sanitizeRichHtml(prompt), 'text/html')
+  const instructionNodes = Array.from(
+    document.body.querySelectorAll('.instructions, .instruction')
+  ).filter((node) => !node.parentElement?.closest('.instructions, .instruction'))
+  const instructionHtml = instructionNodes.map((node) => node.outerHTML).join('')
+  instructionNodes.forEach((node) => node.remove())
+  const legacySentence = Array.from(document.body.childNodes)
+    .map((node) => node.textContent || '')
+    .join(' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+
+  return {
+    prompt: instructionHtml,
+    sentence: legacySentence,
+  }
+}
 
 function FormulaInputField({ value, onValueChange, onBlur, fieldReadOnly, formulaInputRef, onEnterKey, ariaLabel, notation }) {
   const theme = useTheme()
@@ -193,8 +226,12 @@ export default function SymbolicTranslation({
   const saveTimerRef = useRef(null)
   const lastSavedValueRef = useRef(null)
   const legend = problem?.legend || problem?.question_snapshot?.legend
-  const prompt = problem?.prompt || ''
-  const sentence = problem?.sentence || problem?.question_snapshot?.sentence || ''
+  const rawPrompt = problem?.prompt || problem?.question_snapshot?.prompt || ''
+  const explicitSentence = problem?.sentence || problem?.question_snapshot?.sentence || ''
+  const { prompt, sentence } = useMemo(
+    () => resolveTranslationText(rawPrompt, explicitSentence),
+    [explicitSentence, rawPrompt]
+  )
   const sentenceTex = sentence ? plainTextToTex(sentence) : ''
   const symbolizationKeyRaw = problem?.symbolizationKey
     ?? problem?.symbolization_key
@@ -207,7 +244,7 @@ export default function SymbolicTranslation({
       ? symbolizationKeyRaw.split('\n').map((line) => line.trim()).filter(Boolean)
       : [])
 
-  const isPredicate = isPredicateLogicKey(symbolizationKey, allowIndexedSymbols) || promptImpliesPredicateLogic(prompt)
+  const isPredicate = isPredicateLogicKey(symbolizationKey, allowIndexedSymbols) || promptImpliesPredicateLogic(rawPrompt)
   const predicateLetters = isPredicate
     ? getPredicateLettersFromKey(symbolizationKey, allowIndexedSymbols)
     : []
@@ -216,7 +253,7 @@ export default function SymbolicTranslation({
     ? (constantsFromKey.length > 0
         ? constantsFromKey
         : (symbolizationKey.length === 0
-            ? getConstantLettersFromPromptAndKey(prompt, symbolizationKey, 3)
+            ? getConstantLettersFromPromptAndKey(rawPrompt, symbolizationKey, 3)
             : []))
     : []
   const variableLetters = isPredicate ? ST_PREDICATE_VARIABLES : []

@@ -1,4 +1,5 @@
 import { Box } from '@mui/material'
+import { displayLogicText } from '../../../lib/logicText.js'
 
 const SYMBOL_SPEECH = {
   '~': 'tilde',
@@ -86,9 +87,10 @@ export const getInsertSymbolLabel = ({ insert, pair } = {}) => {
 export default function LogicSymbol({ symbol, component = 'span', sx }) {
   const expressionSpeech = EXPR_SPEECH[symbol]
   const symbolSpeech = expressionSpeech || getTokenSpeechLabel(symbol)
+  const displayedSymbol = displayLogicText(symbol)
   return (
     <Box component={component} role="text" aria-label={symbolSpeech} sx={sx}>
-      <Box component="span" aria-hidden="true">{symbol}</Box>
+      <Box component="span" aria-hidden="true">{displayedSymbol}</Box>
     </Box>
   )
 }
