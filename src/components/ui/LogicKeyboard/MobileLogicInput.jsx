@@ -273,9 +273,10 @@ export default function MobileLogicInput({
       desktopInputRef.current = node
       if (node) {
         node.syntax = syntax
+        node.notation = notation
         node.symbols = symbols
         node.symbolcat = symbolcat
-        node.inputfix = syntax?.inputfix
+        node.inputfix = FormulaInput.formatForDisplay
         node.autoChange = FormulaInput.autoChange
         node.insertHere = FormulaInput.insertHere
         node.insOp = FormulaInput.insOp

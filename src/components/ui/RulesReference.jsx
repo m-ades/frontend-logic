@@ -11,6 +11,7 @@ import {
   FITCH_TFL_RULE_GROUPS,
 } from '../../lib/fitchRulebook.js'
 import { FITCH_RULE_EXAMPLES } from '../../lib/fitchRuleExamples.js'
+import { displayLogicText } from '../../lib/logicText.js'
 import MathJaxFormula from './MathJaxFormula.jsx'
 
 function RulesCard({ title, children, defaultExpanded = true }) {
@@ -103,10 +104,10 @@ function FitchRuleEntries({ group }) {
       sx={{ px: 0.5, py: 1.25, borderBottom: 1, borderColor: 'divider' }}
     >
       <Typography component="h4" sx={{ m: 0, fontSize: '1rem', fontWeight: 700 }}>
-        {group.start + index}. {rule.title} ({rule.name})
+        {group.start + index}. {rule.title} ({displayLogicText(rule.name)})
       </Typography>
       <Typography component="div" sx={{ mt: 0.6, fontSize: '1rem', color: 'text.primary' }}>
-        <EmphasizedText text={rule.description} bold={rule.bold} />
+        <EmphasizedText text={displayLogicText(rule.description)} bold={rule.bold} />
       </Typography>
       {(FITCH_RULE_EXAMPLES[rule.name] || []).map((example, exampleIndex) => (
         <Box
@@ -134,7 +135,7 @@ function FitchRuleEntries({ group }) {
           <MathJaxFormula
             key={example}
             tex={example}
-            fallback={`${rule.title} (${rule.name}) proof example${FITCH_RULE_EXAMPLES[rule.name].length > 1 ? ` ${exampleIndex + 1}` : ''}`}
+            fallback={`${rule.title} (${displayLogicText(rule.name)}) proof example${FITCH_RULE_EXAMPLES[rule.name].length > 1 ? ` ${exampleIndex + 1}` : ''}`}
           />
         </Box>
       ))}
