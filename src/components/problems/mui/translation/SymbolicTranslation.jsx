@@ -347,7 +347,25 @@ export default function SymbolicTranslation({
       ) : null}
     >
       {sentence && (
-        <Box sx={{ fontSize: '1.171875rem', lineHeight: 1.6, mb: 1, overflowX: 'auto', overflowY: 'clip' }}>
+        <Box
+          sx={{
+            display: 'inline-block',
+            alignSelf: 'flex-start',
+            width: 'fit-content',
+            maxWidth: '100%',
+            px: 1.25,
+            py: 0.75,
+            mb: 1.5,
+            border: 1,
+            borderColor: 'divider',
+            borderRadius: 1,
+            bgcolor: 'action.hover',
+            fontSize: '1.171875rem',
+            lineHeight: 1.6,
+            overflowX: 'auto',
+            overflowY: 'clip',
+          }}
+        >
           <MathJaxFormula tex={sentenceTex} fallback={sentence} display={false} block />
         </Box>
       )}
