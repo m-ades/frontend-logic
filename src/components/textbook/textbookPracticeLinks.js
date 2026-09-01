@@ -267,3 +267,20 @@ export function linksForPracticeId(resolvedLinks, practiceId) {
     (link) => String(link.practiceId) === String(practiceId),
   )
 }
+
+export function resolveWorksheetTextbookContext(practiceLinks, navigationState) {
+  // only navigation from a linked chapter activates textbook context
+  const requestedSlug = String(navigationState?.textbookSlug || '').trim()
+  if (!requestedSlug) return null
+
+  const linkedPractice = (practiceLinks || []).find(
+    (link) => String(link.textbookSlug) === requestedSlug,
+  )
+  // stale and unrelated navigation state leaves the worksheet standalone
+  if (!linkedPractice) return null
+
+  return {
+    textbookSlug: linkedPractice.textbookSlug,
+    sectionId: navigationState?.textbookSectionId || linkedPractice.sectionId || null,
+  }
+}

@@ -7,13 +7,12 @@ import TextbookHubPage from '@/pages/TextbookHubPage.jsx'
 import { useAppRuntime } from '@/hooks/useAppRuntime.js'
 import { useTextbookPracticeLinks } from '@/hooks/useTextbookPracticeLinks.js'
 import { useTextbookStructure } from '@/hooks/useTextbookStructure.js'
-import { linksForPracticeId } from '@/components/textbook/textbookPracticeLinks.js'
+import {
+  linksForPracticeId,
+  resolveWorksheetTextbookContext,
+} from '@/components/textbook/textbookPracticeLinks.js'
 import { isTextbookAvailable } from '@/components/textbook/textbookAvailability.js'
 
-/**
- * Wraps a practice worksheet with the linked textbook chapter in a split view.
- * If no textbook link resolves, renders children alone (homework unchanged).
- */
 export default function WorksheetTextbookSplit({
   practiceId,
   activityKind,
@@ -33,9 +32,10 @@ export default function WorksheetTextbookSplit({
   )
   const isPractice = String(activityKind || '').toLowerCase() === 'practice'
 
-  const linkedSlug = location.state?.textbookSlug || practiceLinks[0]?.textbookSlug || null
-  const linkedPractice = practiceLinks.find((link) => link.textbookSlug === linkedSlug)
-  const sectionId = location.state?.textbookSectionId || linkedPractice?.sectionId || null
+  // textbook context belongs to the navigation entry and not the practice link alone
+  const textbookContext = resolveWorksheetTextbookContext(practiceLinks, location.state)
+  const linkedSlug = textbookContext?.textbookSlug || null
+  const sectionId = textbookContext?.sectionId || null
   const [openChapter, setOpenChapter] = useState(linkedSlug)
 
   useEffect(() => {
