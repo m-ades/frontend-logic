@@ -149,6 +149,7 @@ export const mapQuestionToProof = (question, assignment, index, logicSystem = DE
     const normalizedMultipleChoice = {
       ...baseMultipleChoice,
       subquestions: baseMultipleChoice.subquestions || subquestions,
+      multiSelect: baseMultipleChoice.multiSelect ?? snapshot.multiSelect ?? false,
     }
     return {
       ...proofBase,
