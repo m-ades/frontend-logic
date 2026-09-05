@@ -3,7 +3,10 @@ import { fetchJson, getStoredUser } from "../utils/api.js";
 import { DEFAULT_LOGIC_SYSTEM, normalizeLogicSystem } from "../lib/logicSystems.js";
 import { sortAssignmentsBySubchapter } from "../utils/assignmentSort.js";
 import { isInstructorRole } from "../utils/auth.js";
-import { parseDueDateAsEastern } from "../utils/easternTime.js";
+import {
+  parseDueDateAsEastern,
+  splitEasternDateTime,
+} from "../utils/easternTime.js";
 
 // ============================================================================
 // CONSTANTS
@@ -56,34 +59,6 @@ const writeStoredActiveCourseId = (userId, courseId) => {
   }
 };
 
-const EASTERN = "America/New_York";
-
-const splitDateTime = (isoString) => {
-  if (!isoString) return { date: null, time: null };
-  const date = new Date(isoString);
-  if (Number.isNaN(date.getTime())) return { date: null, time: null };
-  const dateParts = new Intl.DateTimeFormat("en-CA", {
-    timeZone: EASTERN,
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  }).formatToParts(date);
-  const y = dateParts.find((p) => p.type === "year").value;
-  const m = dateParts.find((p) => p.type === "month").value;
-  const d = dateParts.find((p) => p.type === "day").value;
-  const datePart = `${y}-${m}-${d}`;
-  const timeParts = new Intl.DateTimeFormat("en-GB", {
-    timeZone: EASTERN,
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: false,
-  }).formatToParts(date);
-  const hour = timeParts.find((p) => p.type === "hour").value;
-  const minute = timeParts.find((p) => p.type === "minute").value;
-  const timePart = `${hour}:${minute}`;
-  return { date: datePart, time: timePart };
-};
-
 const mapCourseRecord = (course, index) => ({
   id: course.id,
   name: course.title,
@@ -112,8 +87,8 @@ const normalizeCourseSettingsPayload = (settings = {}) => {
 
 const mapAssignmentRecord = (assignment) => {
   const dueAt = assignment.due_at ?? assignment.dueAt ?? assignment.due_date ?? null;
-  const due = splitDateTime(dueAt);
-  const publish = splitDateTime(assignment.created_at);
+  const due = splitEasternDateTime(dueAt);
+  const publish = splitEasternDateTime(assignment.publish_at);
   const questionCount = Number(assignment.question_count) || 0;
   const derivedPoints = questionCount * 100;
   const totalPoints = Number.isFinite(Number(assignment.total_points))
@@ -128,6 +103,7 @@ const mapAssignmentRecord = (assignment) => {
     kind: assignment.kind,
     chapter: assignment.chapter,
     subchapter: assignment.subchapter,
+    publishAt: assignment.publish_at ?? null,
     publishDate: publish.date,
     publishTime: publish.time,
     dueAt,

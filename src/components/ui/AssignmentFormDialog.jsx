@@ -11,6 +11,8 @@ import {
   Box,
   Typography,
 } from "@mui/material";
+import { toEasternIso } from "../../utils/easternTime.js";
+import { buildPublicationPayload } from "../../utils/publicationPolicy.js";
 
 export default function AssignmentFormDialog({
   open,
@@ -24,6 +26,14 @@ export default function AssignmentFormDialog({
 }) {
   const isPractice = type === "practice";
   const isCreate = mode === "create";
+  const hasPublishDate = Boolean(formData.publishDate);
+  const publication = hasPublishDate ? buildPublicationPayload(formData) : null;
+  const hasValidPublishTime = !hasPublishDate || publication !== null;
+  const hasFutureSchedule = publication?.is_locked === true;
+  const hasValidDueTime = !formData.dueDate || Boolean(toEasternIso(
+    formData.dueDate,
+    formData.dueTime || "23:59"
+  ));
   const title = isCreate
     ? isPractice
       ? "Create New Practice Assignment"
@@ -81,39 +91,63 @@ export default function AssignmentFormDialog({
             />
           </Stack>
 
-          {!isCreate && (
-            <Box>
-              <Typography
-                variant="subtitle2"
-                color="text.secondary"
-                sx={{ mb: 1 }}
-              >
-                Publish Date & Time
-              </Typography>
-              <Stack direction="row" spacing={2}>
-                <TextField
-                  label="Date"
-                  type="date"
-                  fullWidth
-                  value={formData.publishDate}
-                  onChange={(e) =>
-                    setFormData({ ...formData, publishDate: e.target.value })
-                  }
-                  InputLabelProps={{ shrink: true }}
-                />
-                <TextField
-                  label="Time"
-                  type="time"
-                  fullWidth
-                  value={formData.publishTime || "00:00"}
-                  onChange={(e) =>
-                    setFormData({ ...formData, publishTime: e.target.value })
-                  }
-                  InputLabelProps={{ shrink: true }}
-                />
-              </Stack>
-            </Box>
-          )}
+          <Box>
+            <Typography
+              variant="subtitle2"
+              color="text.secondary"
+              sx={{ mb: 1 }}
+            >
+              Scheduled publication
+            </Typography>
+            <Stack direction="row" spacing={2}>
+              <TextField
+                label="Date"
+                type="date"
+                fullWidth
+                value={formData.publishDate || ""}
+                onChange={(e) => {
+                  const publishDate = e.target.value;
+                  const publishTime = formData.publishTime || "00:00";
+                  const nextPublication = publishDate
+                    ? buildPublicationPayload({ publishDate, publishTime })
+                    : null;
+                  setFormData({
+                    ...formData,
+                    publishDate,
+                    ...(nextPublication ? { isLocked: nextPublication.is_locked } : {}),
+                  });
+                }}
+                InputLabelProps={{ shrink: true }}
+              />
+              <TextField
+                label="Time"
+                type="time"
+                fullWidth
+                value={formData.publishTime || "00:00"}
+                error={!hasValidPublishTime}
+                helperText={!hasValidPublishTime ? "Choose an unambiguous New York time" : undefined}
+                onChange={(e) => {
+                  const publishTime = e.target.value;
+                  const nextPublication = formData.publishDate
+                    ? buildPublicationPayload({ publishDate: formData.publishDate, publishTime })
+                    : null;
+                  setFormData({
+                    ...formData,
+                    publishTime,
+                    ...(nextPublication ? { isLocked: nextPublication.is_locked } : {}),
+                  });
+                }}
+                InputLabelProps={{ shrink: true }}
+              />
+            </Stack>
+            <Typography
+              variant="caption"
+              color="text.secondary"
+              sx={{ mt: 0.5, display: "block" }}
+            >
+              Optional New York time
+            </Typography>
+          </Box>
 
           <Box>
             <Typography
@@ -139,6 +173,8 @@ export default function AssignmentFormDialog({
                 type="time"
                 fullWidth
                 value={formData.dueTime || "23:59"}
+                error={!hasValidDueTime}
+                helperText={!hasValidDueTime ? "Choose an unambiguous New York time" : undefined}
                 onChange={(e) =>
                   setFormData({ ...formData, dueTime: e.target.value })
                 }
@@ -219,9 +255,15 @@ export default function AssignmentFormDialog({
             control={
               <Switch
                 checked={formData.isLocked}
-                onChange={(e) =>
-                  setFormData({ ...formData, isLocked: e.target.checked })
-                }
+                disabled={hasFutureSchedule}
+                onChange={(e) => {
+                  const isLocked = e.target.checked;
+                  setFormData({
+                    ...formData,
+                    isLocked,
+                    ...(isLocked ? { publishDate: "", publishTime: "00:00" } : {}),
+                  });
+                }}
               />
             }
             label="Lock assignment"
@@ -235,11 +277,11 @@ export default function AssignmentFormDialog({
           variant="contained"
           disabled={
             isSubmitting ||
+            !hasValidPublishTime ||
+            !hasValidDueTime ||
             !formData.name ||
             !formData.chapter ||
             !formData.subchapter ||
-            !formData.publishDate ||
-            !formData.publishTime ||
             (!isPractice && (!formData.dueDate || !formData.dueTime))
           }
         >

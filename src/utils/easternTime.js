@@ -1,42 +1,44 @@
-const EASTERN_TIMEZONE = 'America/New_York';
+import { Temporal } from '@js-temporal/polyfill';
 
-const padTwo = (value) => String(value).padStart(2, '0');
+const NEW_YORK_TIME_ZONE = 'America/New_York';
 
-const firstSundayOfMonth = (date) =>
-  date.getUTCDay() === 0 ? 1 : 8 - date.getUTCDay();
-
-export function easternOffsetFor(dateString) {
-  if (!dateString || dateString.length < 10) return '-05:00';
-  const [year, month, day] = dateString.slice(0, 10).split('-').map(Number);
-  if (!year || !month || !day) return '-05:00';
-
-  const mar1 = new Date(Date.UTC(year, 2, 1));
-  const nov1 = new Date(Date.UTC(year, 10, 1));
-  const dstStart = new Date(
-    Date.UTC(year, 2, firstSundayOfMonth(mar1) + 7)
-  );
-  const dstEnd = new Date(
-    Date.UTC(year, 10, firstSundayOfMonth(nov1))
-  );
-  const reference = new Date(Date.UTC(year, month - 1, day, 12, 0, 0));
-
-  return reference >= dstStart && reference < dstEnd ? '-04:00' : '-05:00';
+// converts supported values to temporal instants and throws otherwise
+export function toTemporalInstant(value) {
+  if (value instanceof Date) return Temporal.Instant.from(value.toISOString());
+  if (typeof value === 'number') return Temporal.Instant.fromEpochMilliseconds(value);
+  return Temporal.Instant.from(value);
 }
 
+// converts new york wall time to an offset timestamp and returns null when invalid
 export function toEasternIso(dateString, timeString = '00:00') {
   if (!dateString) return null;
-  const [year, month, day] = dateString.split('-').map(Number);
-  if (!year || !month || !day) return null;
+  try {
+    return Temporal.PlainDateTime.from(`${dateString}T${timeString || '00:00'}`)
+      .toZonedDateTime(NEW_YORK_TIME_ZONE, { disambiguation: 'reject' })
+      .toString({ timeZoneName: 'never', smallestUnit: 'second' });
+  } catch {
+    return null;
+  }
+}
 
-  const [hourStr, minuteStr] = (timeString || '00:00').split(':');
-  const hour = Number(hourStr);
-  const minute = Number(minuteStr || '0');
-  if (!Number.isFinite(hour) || !Number.isFinite(minute)) return null;
+export function getCurrentEasternDate(now = new Date()) {
+  return toTemporalInstant(now)
+    .toZonedDateTimeISO(NEW_YORK_TIME_ZONE)
+    .toPlainDate()
+    .toString();
+}
 
-  const offset = easternOffsetFor(dateString);
-  return `${year}-${padTwo(month)}-${padTwo(day)}T${padTwo(hour)}:${padTwo(
-    minute
-  )}:00${offset}`;
+export function splitEasternDateTime(isoString) {
+  if (!isoString) return { date: null, time: null };
+  try {
+    const local = toTemporalInstant(isoString).toZonedDateTimeISO(NEW_YORK_TIME_ZONE);
+    return {
+      date: local.toPlainDate().toString(),
+      time: local.toPlainTime().toString({ smallestUnit: 'minute' }),
+    };
+  } catch {
+    return { date: null, time: null };
+  }
 }
 
 export function formatEasternFromIso(isoString, options = {}) {
@@ -46,29 +48,22 @@ export function formatEasternFromIso(isoString, options = {}) {
 
   const includeYear = options.includeYear ?? true;
   const includeTime = options.includeTime ?? true;
-
-  const dateFormatter = new Intl.DateTimeFormat('en-US', {
-    timeZone: EASTERN_TIMEZONE,
+  const formattedDate = new Intl.DateTimeFormat('en-US', {
+    timeZone: NEW_YORK_TIME_ZONE,
     month: 'short',
     day: 'numeric',
     ...(includeYear ? { year: 'numeric' } : {}),
     ...options.dateOptions,
-  });
+  }).format(date);
+  if (!includeTime) return formattedDate;
 
-  const formattedDate = dateFormatter.format(date);
-  if (!includeTime) {
-    return formattedDate;
-  }
-
-  const timeFormatter = new Intl.DateTimeFormat('en-US', {
-    timeZone: EASTERN_TIMEZONE,
+  const formattedTime = new Intl.DateTimeFormat('en-US', {
+    timeZone: NEW_YORK_TIME_ZONE,
     hour: 'numeric',
     minute: '2-digit',
     hour12: true,
     ...options.timeOptions,
-  });
-  const formattedTime = timeFormatter.format(date);
-
+  }).format(date);
   return `${formattedDate} at ${formattedTime}`;
 }
 
@@ -79,20 +74,14 @@ export function formatEasternDateTime(dateString, timeString, options = {}) {
   return formatEasternFromIso(iso, { ...options, includeTime });
 }
 
-/**
- * Parse due date (and optional time) as Eastern, return a Date for comparison.
- * Use this for "is past due" / deadline checks so Feb 1 means end of Feb 1 Eastern.
- * - If dueDate is full ISO with offset (e.g. from API), parses as-is.
- * - If date-only (YYYY-MM-DD), treats as that day at 23:59 Eastern (or dueTime if provided).
- */
+// preserves offset instants and reads date only values in new york
 export function parseDueDateAsEastern(dueDate, dueTime = '23:59') {
   if (!dueDate) return null;
-  const dateOnly = String(dueDate).slice(0, 10);
-  if (String(dueDate).includes('T') && /[+-]\d{2}:?\d{2}$|Z$/i.test(String(dueDate))) {
-    return new Date(dueDate);
+  const source = String(dueDate);
+  if (source.includes('T') && /[+-]\d{2}:?\d{2}$|Z$/i.test(source)) {
+    const date = new Date(source);
+    return Number.isNaN(date.getTime()) ? null : date;
   }
-  const iso = toEasternIso(dateOnly, dueTime || '23:59');
-  if (!iso) return null;
-  const d = new Date(iso);
-  return Number.isNaN(d.getTime()) ? null : d;
+  const iso = toEasternIso(source.slice(0, 10), dueTime || '23:59');
+  return iso ? new Date(iso) : null;
 }

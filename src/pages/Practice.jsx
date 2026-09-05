@@ -77,6 +77,7 @@ export default function Practice() {
       return assignments.filter((assignment) => assignment.kind === 'practice')
     },
     enabled: !isSandbox && !!courseIdForApi,
+    refetchOnMount: 'always',
   })
 
   const practiceAssignments = useMemo(

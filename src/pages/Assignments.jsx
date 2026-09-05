@@ -121,6 +121,7 @@ export default function Assignments() {
     queryKey: ['course-assignments', courseIdForApi],
     queryFn: () => fetchJson(`/api/courses/${courseIdForApi}/assignments`),
     enabled: !sandbox && !!courseIdForApi,
+    refetchOnMount: 'always',
   })
 
   const assignments = sandbox ? sandboxData.assignments : (assignmentsQuery.data ?? [])

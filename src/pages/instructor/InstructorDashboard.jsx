@@ -26,6 +26,7 @@ export default function InstructorDashboard() {
     timeByCategory: [],
   });
   const [gradebookSummary, setGradebookSummary] = useState([]);
+  const [classAverageWithDrop, setClassAverageWithDrop] = useState(undefined);
 
   const course = courses.find((c) => c.id === activeCourseId);
   const assignments = sortAssignmentsBySubchapter(assignmentsByCourse[activeCourseId] || []);
@@ -48,12 +49,14 @@ export default function InstructorDashboard() {
         if (isMounted) {
           setAnalytics(snapshot?.analytics || { gradeSummary: null, assignmentStats: [], timeByCategory: [] });
           setGradebookSummary(snapshot?.gradebookSummary || []);
+          setClassAverageWithDrop(snapshot?.classAverageWithDrop);
         }
       } catch (error) {
         if (isMounted) {
           console.warn("Failed to load instructor analytics", error);
           setAnalytics({ gradeSummary: null, assignmentStats: [], timeByCategory: [] });
           setGradebookSummary([]);
+          setClassAverageWithDrop(undefined);
         }
       } finally {
         if (isMounted) setIsLoadingAnalytics(false);
@@ -187,22 +190,35 @@ export default function InstructorDashboard() {
     [nonPracticeAssignments]
   );
 
-  const totalAverage = enrichedAssignments.length > 0
-    ? Math.round(
-        enrichedAssignments.reduce((sum, a) => sum + a.average, 0) /
-          enrichedAssignments.length
-      )
-    : 0;
+  const pastDueAssignments = useMemo(() => {
+    const now = Date.now();
+    return enrichedAssignments.filter((assignment) => (
+      assignment.isLocked === false &&
+      assignment.dueAt instanceof Date &&
+      Number.isFinite(assignment.dueAt.getTime()) &&
+      now >= assignment.dueAt.getTime()
+    ));
+  }, [enrichedAssignments]);
 
-  const totalSubmissions = enrichedAssignments.reduce(
+  const fallbackAverage = pastDueAssignments.length > 0
+    ? Math.round(
+        pastDueAssignments.reduce((sum, assignment) => sum + assignment.average, 0) /
+          pastDueAssignments.length
+      )
+    : null;
+  const totalAverage = classAverageWithDrop !== undefined
+    ? classAverageWithDrop
+    : fallbackAverage;
+
+  const totalSubmissions = pastDueAssignments.reduce(
     (sum, a) => sum + a.submissions,
     0
   );
-  const totalPossible = totalStudents * nonPracticeAssignments.length;
+  const totalPossible = totalStudents * pastDueAssignments.length;
   const completionRate =
     totalPossible > 0
       ? Math.round((Math.min(totalSubmissions, totalPossible) / totalPossible) * 100)
-      : 0;
+      : null;
 
   const timeByCategory = analytics.timeByCategory || [];
 
@@ -257,15 +273,15 @@ export default function InstructorDashboard() {
       >
         <MetricCard
           title="Class Average"
-          value={`${totalAverage}%`}
-          subtitle="Across all assignments"
+          value={totalAverage == null ? "—" : `${Math.round(totalAverage)}%`}
+          subtitle="Across past due assignments"
           icon={TrendingUp}
           gradient={["#10b981", "#059669"]}
         />
         <MetricCard
           title="Completion Rate"
-          value={`${completionRate}%`}
-          subtitle={`${totalSubmissions} of ${totalPossible}`}
+          value={completionRate == null ? "—" : `${completionRate}%`}
+          subtitle={`${totalSubmissions} of ${totalPossible} past due`}
           icon={CheckCircle}
           gradient={[theme.palette.primary.main, theme.palette.primary.dark]}
         />

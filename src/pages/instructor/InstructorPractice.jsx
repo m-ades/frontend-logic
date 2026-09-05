@@ -14,8 +14,6 @@ import {
 } from "../../utils/assignmentStatus";
 import { useAppRuntime } from "../../hooks/useAppRuntime.js";
 
-const getCurrentEasternDate = () => new Date().toLocaleDateString('en-CA', { timeZone: 'America/New_York' });
-
 const INITIAL_FORM_DATA = {
   name: "",
   dueDate: "",
@@ -65,10 +63,7 @@ export default function InstructorPractice() {
     if (event?.currentTarget?.blur) {
       event.currentTarget.blur();
     }
-    setFormData({
-      ...INITIAL_FORM_DATA,
-      publishDate: getCurrentEasternDate(),
-    });
+    setFormData({ ...INITIAL_FORM_DATA });
     setCreateDialogOpen(true);
   };
 
@@ -92,7 +87,7 @@ export default function InstructorPractice() {
       name: practice.name,
       dueDate: practice.dueDate || "",
       dueTime: practice.dueTime || "23:59",
-      publishDate: practice.publishDate || getCurrentEasternDate(),
+      publishDate: practice.publishDate || "",
       publishTime: practice.publishTime || "00:00",
       chapter: practice.chapter || 1,
       subchapter: practice.subchapter || "A",
