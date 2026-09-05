@@ -143,6 +143,10 @@ export default function Dashboard() {
       !Array.isArray(gradebookResponse) && gradebookResponse != null
         ? gradebookResponse.class_avg_with_drop
         : null
+    const hasClassAvgWithDrop =
+      !Array.isArray(gradebookResponse) &&
+      gradebookResponse != null &&
+      Object.hasOwn(gradebookResponse, 'class_avg_with_drop')
     const grades = analyticsData?.assignmentGrades ?? []
     const gradeMap = new Map(
       (grades || []).map((g) => [g.assignment_id ?? g.Assignment?.id, g])
@@ -249,7 +253,7 @@ export default function Dashboard() {
       }
     }
     const classAverage =
-      classAvgWithDrop != null
+      hasClassAvgWithDrop
         ? classAvgWithDrop
         : (() => {
             const forAvg =
