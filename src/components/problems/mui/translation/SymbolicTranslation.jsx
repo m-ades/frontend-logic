@@ -10,9 +10,7 @@ import { MobileLogicInput } from '../../../ui/LogicKeyboard/index.js'
 import { useProblemChecker } from '../../../../hooks/useProblemChecker.js'
 import SolutionReveal from '../../SolutionReveal.jsx'
 import RichText from '../../../ui/RichText.jsx'
-import MathJaxFormula from '../../../ui/MathJaxFormula.jsx'
 import { canonicalizeFormula } from '../../../../lib/logicpenguin/symbolic/formula.js'
-import { plainTextToTex } from '../../../../lib/logicTex.js'
 import { sanitizeRichHtml } from '../../../../utils/sanitizeRichHtml.js'
 import {
   ST_PREDICATE_VARIABLES,
@@ -82,6 +80,7 @@ function FormulaInputField({ value, onValueChange, onBlur, fieldReadOnly, formul
       formulaInput.style.backgroundColor = theme.palette.background.paper
       formulaInput.style.color = theme.palette.text.primary
       formulaInput.setAttribute('aria-label', ariaLabel || 'Formula input')
+      formulaInput.setAttribute('placeholder', ariaLabel || 'Formula input')
       containerRef.current.appendChild(formulaInput)
     } else if (!containerRef.current.contains(formulaInputRef.current)) {
       containerRef.current.appendChild(formulaInputRef.current)
@@ -231,7 +230,6 @@ export default function SymbolicTranslation({
     () => resolveTranslationText(rawPrompt, explicitSentence),
     [explicitSentence, rawPrompt]
   )
-  const sentenceTex = sentence ? plainTextToTex(sentence) : ''
   const symbolizationKeyRaw = problem?.symbolizationKey
     ?? problem?.symbolization_key
     ?? problem?.question_snapshot?.symbolizationKey
@@ -364,11 +362,10 @@ export default function SymbolicTranslation({
             bgcolor: 'action.hover',
             fontSize: '1.171875rem',
             lineHeight: 1.6,
-            overflowX: 'auto',
-            overflowY: 'clip',
+            overflowWrap: 'anywhere',
           }}
         >
-          <MathJaxFormula tex={sentenceTex} fallback={sentence} display={false} block />
+          {sentence}
         </Box>
       )}
       {symbolizationKey.length > 0 && (
@@ -393,9 +390,6 @@ export default function SymbolicTranslation({
       {legacyLegend && (
         <RichText content={legacyLegend} variant="body2" sx={{ mb: 1, color: 'text.secondary' }} />
       )}
-      <Typography variant="body2" sx={{ mb: 1, mt: 1, color: 'text.secondary' }}>
-        Your translation:
-      </Typography>
       {isPhone ? (
         <MobileLogicInput
           value={inputValue}
