@@ -7,6 +7,11 @@ import {
   getInstructorSandboxPractices,
 } from '../sandbox/instructorSandboxData.js'
 import { DEFAULT_LOGIC_SYSTEM, normalizeLogicSystem } from '../lib/logicSystems.js'
+import { splitEasternDateTime, toEasternIso } from '../utils/easternTime.js'
+import {
+  buildPublicationPayload,
+  projectPublicationState,
+} from '../utils/publicationPolicy.js'
 
 const STORAGE_KEY = 'logicapp_instructor_sandbox_state_v1'
 const InstructorSandboxContext = createContext(null)
@@ -109,13 +114,25 @@ const readStoredState = () => {
 
 const buildDueFields = (dueDate, dueTime) => {
   const safeTime = dueTime || '23:59'
-  const dueAt = dueDate ? new Date(`${dueDate}T${safeTime}:00`).toISOString() : null
+  const dueAt = dueDate ? toEasternIso(dueDate, safeTime) : null
   return {
     dueAt,
     due_at: dueAt,
     dueDate: dueDate || '',
     dueTime: safeTime,
   }
+}
+
+const buildSandboxPublication = (formData, now = new Date()) => {
+  const payload = buildPublicationPayload(formData, now)
+    ?? { publish_at: null, is_locked: true }
+  const publish = splitEasternDateTime(payload.publish_at)
+  return projectPublicationState({
+    publishAt: payload.publish_at,
+    publishDate: publish.date || '',
+    publishTime: publish.time || '00:00',
+    isLocked: payload.is_locked,
+  }, now)
 }
 
 const nextCopyName = (name) => `${name} (Copy)`
@@ -177,6 +194,15 @@ export function InstructorSandboxProvider({ children }) {
       studentCount: studentCountByCourse[course.id] ?? course.studentCount ?? 0,
     }))
 
+    const assignmentsByCourse = Object.fromEntries(
+      Object.entries(state.assignmentsByCourse || {}).map(([courseId, assignments]) => [
+        courseId,
+        (assignments || []).map((assignment) => (
+          projectPublicationState(assignment)
+        )),
+      ])
+    )
+
     const practicesByCourse = Object.fromEntries(
       Object.entries(state.practicesByCourse || {}).map(([courseId, practices]) => {
         const students = state.gradebookByCourse?.[courseId] || []
@@ -189,7 +215,7 @@ export function InstructorSandboxProvider({ children }) {
             (student) => student.practices?.[practice.id]?.completed
           ).length
           return {
-            ...practice,
+            ...projectPublicationState(practice),
             attempts,
             completions,
           }
@@ -201,7 +227,7 @@ export function InstructorSandboxProvider({ children }) {
     return {
       courses,
       activeCourseId: state.activeCourseId,
-      assignmentsByCourse: state.assignmentsByCourse || {},
+      assignmentsByCourse,
       practicesByCourse,
       gradebookByCourse: state.gradebookByCourse || {},
       loading: false,
@@ -318,15 +344,12 @@ export function InstructorSandboxProvider({ children }) {
     kind,
     chapter: Number(formData.chapter) || 1,
     subchapter: formData.subchapter || '',
-    publishDate: formData.publishDate || previousItem?.publishDate || new Date().toLocaleDateString('en-CA'),
-    publishTime: formData.publishTime || previousItem?.publishTime || '00:00',
+    ...buildSandboxPublication(formData),
     ...buildDueFields(formData.dueDate, formData.dueTime || '23:59'),
     totalPoints: previousItem?.totalPoints || previousItem?.total_points || 100,
     total_points: previousItem?.totalPoints || previousItem?.total_points || 100,
     questionCount: previousItem?.questionCount || previousItem?.question_count || previousItem?.proofs?.length || 0,
     question_count: previousItem?.questionCount || previousItem?.question_count || previousItem?.proofs?.length || 0,
-    isPublished: previousItem?.isPublished ?? true,
-    isLocked: formData.isLocked ?? false,
     lateWindowDays: previousItem?.lateWindowDays ?? 3,
     latePenaltyPercent: previousItem?.latePenaltyPercent ?? 10,
     allowRetakes: kind === 'practice' ? (formData.allowRetakes ?? previousItem?.allowRetakes ?? true) : undefined,
@@ -346,8 +369,7 @@ export function InstructorSandboxProvider({ children }) {
     id: nextId,
     name: nextCopyName(item.name),
     title: nextCopyName(item.title || item.name),
-    isLocked: true,
-    isPublished: true,
+    ...buildSandboxPublication({ publishDate: '', isLocked: true }),
     proofs: (item.proofs || []).map((proof, index) => ({
       ...proof,
       id: `${prefix}-${nextId}-q-${index + 1}`,
@@ -387,7 +409,10 @@ export function InstructorSandboxProvider({ children }) {
       ...prev,
       assignmentsByCourse: upsertActivity(prev.assignmentsByCourse, courseId, assignmentId, (assignment) => ({
         ...assignment,
-        isLocked: !assignment.isLocked,
+        ...buildSandboxPublication({
+          publishDate: '',
+          isLocked: !projectPublicationState(assignment).isLocked,
+        }),
       })),
     }))
   }
@@ -397,8 +422,10 @@ export function InstructorSandboxProvider({ children }) {
       ...prev,
       assignmentsByCourse: upsertActivity(prev.assignmentsByCourse, courseId, assignmentId, (assignment) => ({
         ...assignment,
-        isPublished: !assignment.isPublished,
-        isLocked: assignment.isLocked || assignment.isPublished,
+        ...buildSandboxPublication({
+          publishDate: '',
+          isLocked: projectPublicationState(assignment).isPublished,
+        }),
       })),
     }))
   }
@@ -466,7 +493,10 @@ export function InstructorSandboxProvider({ children }) {
       ...prev,
       practicesByCourse: upsertActivity(prev.practicesByCourse, courseId, practiceId, (practice) => ({
         ...practice,
-        isLocked: !practice.isLocked,
+        ...buildSandboxPublication({
+          publishDate: '',
+          isLocked: !projectPublicationState(practice).isLocked,
+        }),
       })),
     }))
   }
@@ -476,8 +506,10 @@ export function InstructorSandboxProvider({ children }) {
       ...prev,
       practicesByCourse: upsertActivity(prev.practicesByCourse, courseId, practiceId, (practice) => ({
         ...practice,
-        isPublished: !practice.isPublished,
-        isLocked: practice.isLocked || practice.isPublished,
+        ...buildSandboxPublication({
+          publishDate: '',
+          isLocked: projectPublicationState(practice).isPublished,
+        }),
       })),
     }))
   }
