@@ -139,57 +139,51 @@ export default function AssignmentTable({
                     />
                   </Stack>
 
-                  <Stack
-                    direction="row"
-                    justifyContent="space-between"
-                    alignItems="center"
-                    sx={{
-                      "& .due-date-pencil": {
-                        opacity: 0,
-                        transition: "opacity 0.15s ease",
-                      },
-                      "&:hover .due-date-pencil": { opacity: 1 },
-                    }}
-                  >
-                    <Typography variant="caption" color="text.secondary">
-                      Due date
-                    </Typography>
-                    <Stack direction="row" alignItems="center" spacing={0.5}>
-                      <Typography variant="body2" color="text.secondary">
-                        {dueDateLabel(item)}
+                  {!isPractice && (
+                    <Stack
+                      direction="row"
+                      justifyContent="space-between"
+                      alignItems="center"
+                      sx={{
+                        "& .due-date-pencil": {
+                          opacity: 0,
+                          transition: "opacity 0.15s ease",
+                        },
+                        "&:hover .due-date-pencil": { opacity: 1 },
+                      }}
+                    >
+                      <Typography variant="caption" color="text.secondary">
+                        Due date
                       </Typography>
-                      {onEditDueDate && (
-                        <Tooltip title="Edit due date">
-                          <IconButton
-                            className="due-date-pencil"
-                            size="small"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              onEditDueDate(item);
-                            }}
-                            sx={{ p: 0.25 }}
-                          >
-                            <EditIcon fontSize="small" />
-                          </IconButton>
-                        </Tooltip>
-                      )}
+                      <Stack direction="row" alignItems="center" spacing={0.5}>
+                        <Typography variant="body2" color="text.secondary">
+                          {dueDateLabel(item)}
+                        </Typography>
+                        {onEditDueDate && (
+                          <Tooltip title="Edit due date">
+                            <IconButton
+                              className="due-date-pencil"
+                              size="small"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                onEditDueDate(item);
+                              }}
+                              sx={{ p: 0.25 }}
+                            >
+                              <EditIcon fontSize="small" />
+                            </IconButton>
+                          </Tooltip>
+                        )}
+                      </Stack>
                     </Stack>
-                  </Stack>
+                  )}
 
                   {isPractice ? (
-                    <Stack spacing={1}>
-                      <Stack direction="row" justifyContent="space-between" alignItems="center">
-                        <Typography variant="caption" color="text.secondary">
-                          Attempts
-                        </Typography>
-                        <Typography variant="body2">{item.attempts}</Typography>
-                      </Stack>
-                      <Stack direction="row" justifyContent="space-between" alignItems="center">
-                        <Typography variant="caption" color="text.secondary">
-                          Completions
-                        </Typography>
-                        {completionNode}
-                      </Stack>
+                    <Stack direction="row" justifyContent="space-between" alignItems="center">
+                      <Typography variant="caption" color="text.secondary">
+                        Completions
+                      </Typography>
+                      {completionNode}
                     </Stack>
                   ) : (
                     <Stack spacing={1}>
@@ -257,18 +251,15 @@ export default function AssignmentTable({
                 {isPractice ? "Name" : "Name"}
               </TableCell>
               <TableCell sx={{ fontWeight: 600 }}>Status</TableCell>
-              <TableCell sx={{ fontWeight: 600, minWidth: 180 }}>
-                Due Date & Time
-              </TableCell>
+              {!isPractice && (
+                <TableCell sx={{ fontWeight: 600, minWidth: 180 }}>
+                  Due Date & Time
+                </TableCell>
+              )}
               {isPractice ? (
-                <>
-                  <TableCell align="center" sx={{ fontWeight: 600 }}>
-                    Attempts
-                  </TableCell>
-                  <TableCell align="center" sx={{ fontWeight: 600 }}>
-                    Completions
-                  </TableCell>
-                </>
+                <TableCell align="center" sx={{ fontWeight: 600 }}>
+                  Completions
+                </TableCell>
               ) : (
                 <>
                   <TableCell align="center" sx={{ fontWeight: 600 }}>
@@ -331,61 +322,58 @@ export default function AssignmentTable({
                       sx={{ fontWeight: 600 }}
                     />
                   </TableCell>
-                  <TableCell>
-                    <Box
-                      sx={{
-                        "& .due-date-pencil": {
-                          opacity: 0,
-                          transition: "opacity 0.15s ease",
-                        },
-                        "&:hover .due-date-pencil": { opacity: 1 },
-                      }}
-                    >
-                      <Stack direction="row" alignItems="center" spacing={0.5}>
-                        <Typography variant="body2" color="text.secondary">
-                          {dueDateLabel(item)}
-                        </Typography>
-                        {onEditDueDate && (
-                          <Tooltip title="Edit due date">
-                            <IconButton
-                              className="due-date-pencil"
-                              size="small"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                onEditDueDate(item);
-                              }}
-                              sx={{ p: 0.25 }}
-                            >
-                              <EditIcon fontSize="small" />
-                            </IconButton>
-                          </Tooltip>
-                        )}
-                      </Stack>
-                    </Box>
-                  </TableCell>
-                  {isPractice ? (
-                    <>
-                      <TableCell align="center">
-                        <Typography variant="body2">{item.attempts}</Typography>
-                      </TableCell>
-                      <TableCell align="center">
-                        <Box
-                          sx={{
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            gap: 1,
-                          }}
-                        >
-                          <Typography variant="body2">
-                            {item.completions}/{item.totalStudents}
+                  {!isPractice && (
+                    <TableCell>
+                      <Box
+                        sx={{
+                          "& .due-date-pencil": {
+                            opacity: 0,
+                            transition: "opacity 0.15s ease",
+                          },
+                          "&:hover .due-date-pencil": { opacity: 1 },
+                        }}
+                      >
+                        <Stack direction="row" alignItems="center" spacing={0.5}>
+                          <Typography variant="body2" color="text.secondary">
+                            {dueDateLabel(item)}
                           </Typography>
-                          {completionRate === 100 && (
-                            <CheckCircle size={16} color="#4caf50" />
+                          {onEditDueDate && (
+                            <Tooltip title="Edit due date">
+                              <IconButton
+                                className="due-date-pencil"
+                                size="small"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  onEditDueDate(item);
+                                }}
+                                sx={{ p: 0.25 }}
+                              >
+                                <EditIcon fontSize="small" />
+                              </IconButton>
+                            </Tooltip>
                           )}
-                        </Box>
-                      </TableCell>
-                    </>
+                        </Stack>
+                      </Box>
+                    </TableCell>
+                  )}
+                  {isPractice ? (
+                    <TableCell align="center">
+                      <Box
+                        sx={{
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          gap: 1,
+                        }}
+                      >
+                        <Typography variant="body2">
+                          {item.completions}/{item.totalStudents}
+                        </Typography>
+                        {completionRate === 100 && (
+                          <CheckCircle size={16} color="#4caf50" />
+                        )}
+                      </Box>
+                    </TableCell>
                   ) : (
                     <>
                       <TableCell align="center">
