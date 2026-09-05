@@ -13,7 +13,7 @@ test('builds manual lock and immediate publication payloads', () => {
     is_locked: true,
   })
   assert.deepEqual(buildPublicationPayload({ isLocked: false }, now), {
-    publish_at: '2026-09-04T16:00:00Z',
+    publish_at: null,
     is_locked: false,
   })
 })

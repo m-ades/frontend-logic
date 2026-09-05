@@ -4,16 +4,12 @@ import {
   toTemporalInstant,
 } from './easternTime.js';
 
-/*
-uses manual locks without a date and derives lock state from scheduled new york time
-returns null for invalid wall times
-*/
+// omits publish_at on an unlocked write so the server stamps the publish time itself, not the client's clock
 export function buildPublicationPayload(formData, now = new Date()) {
   if (!formData?.publishDate) {
-    const isLocked = Boolean(formData?.isLocked);
     return {
-      publish_at: isLocked ? null : toTemporalInstant(now).toString(),
-      is_locked: isLocked,
+      publish_at: null,
+      is_locked: Boolean(formData?.isLocked),
     };
   }
 
