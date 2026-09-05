@@ -25,21 +25,16 @@ import {
   enhanceItems,
 } from "../../utils/assignmentStatus";
 import { useAppRuntime } from "../../hooks/useAppRuntime.js";
-
-// Helper to get current date
-const getCurrentDate = () => {
-  const today = new Date();
-  const year = today.getFullYear();
-  const month = String(today.getMonth() + 1).padStart(2, "0");
-  const day = String(today.getDate()).padStart(2, "0");
-  return `${year}-${month}-${day}`;
-};
+import {
+  getCurrentEasternDate,
+  toEasternIso,
+} from "../../utils/easternTime.js";
 
 const INITIAL_FORM_DATA = {
   name: "",
-  publishDate: getCurrentDate(),
+  publishDate: "",
   publishTime: "00:00",
-  dueDate: getCurrentDate(),
+  dueDate: getCurrentEasternDate(),
   dueTime: "23:59",
   chapter: 1,
   subchapter: "",
@@ -68,6 +63,10 @@ export default function InstructorAssignments() {
   const [dueDateDialogOpen, setDueDateDialogOpen] = useState(false);
   const [dueDateEditAssignment, setDueDateEditAssignment] = useState(null);
   const [dueDateForm, setDueDateForm] = useState({ dueDate: "", dueTime: "23:59" });
+  const hasValidDueDateEdit = !dueDateForm.dueDate || Boolean(toEasternIso(
+    dueDateForm.dueDate,
+    dueDateForm.dueTime || "23:59"
+  ));
 
   // Get current course data
   const activeCourse = courses.find((c) => c.id === activeCourseId);
@@ -100,8 +99,7 @@ export default function InstructorAssignments() {
     }
     setFormData({
       ...INITIAL_FORM_DATA,
-      publishDate: getCurrentDate(),
-      dueDate: getCurrentDate(),
+      dueDate: getCurrentEasternDate(),
     });
     setCreateDialogOpen(true);
   };
@@ -129,9 +127,9 @@ export default function InstructorAssignments() {
 
     setFormData({
       name: assignment.name,
-      publishDate: assignment.publishDate || getCurrentDate(),
+      publishDate: assignment.publishDate || "",
       publishTime: assignment.publishTime || "00:00",
-      dueDate: assignment.dueDate || getCurrentDate(),
+      dueDate: assignment.dueDate || getCurrentEasternDate(),
       dueTime: assignment.dueTime || "23:59",
       chapter: assignment.chapter || 1,
       subchapter: assignment.subchapter || "",
@@ -213,7 +211,7 @@ export default function InstructorAssignments() {
   const handleEditDueDateOpen = (assignment) => {
     setDueDateEditAssignment(assignment);
     setDueDateForm({
-      dueDate: assignment.dueDate || getCurrentDate(),
+      dueDate: assignment.dueDate || getCurrentEasternDate(),
       dueTime: assignment.dueTime || "23:59",
     });
     setDueDateDialogOpen(true);
@@ -373,6 +371,8 @@ export default function InstructorAssignments() {
             label="Due time"
             type="time"
             value={dueDateForm.dueTime}
+            error={!hasValidDueDateEdit}
+            helperText={!hasValidDueDateEdit ? "Choose an unambiguous New York time" : undefined}
             onChange={(e) =>
               setDueDateForm((prev) => ({ ...prev, dueTime: e.target.value }))
             }
@@ -392,7 +392,7 @@ export default function InstructorAssignments() {
           <Button
             variant="contained"
             onClick={handleEditDueDateSubmit}
-            disabled={!dueDateForm.dueDate}
+            disabled={!dueDateForm.dueDate || !hasValidDueDateEdit}
           >
             Save
           </Button>

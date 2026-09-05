@@ -14,21 +14,27 @@ import {
 } from "../context/CoursesContext.jsx";
 import { fetchJson } from "../utils/api.js";
 import { buildBreadcrumbInfo, buildRuntimePaths, remapStudentPath } from "./sandboxRuntime.js";
+import { toEasternIso } from "../utils/easternTime.js";
+import { buildPublicationPayload } from "../utils/publicationPolicy.js";
 
+// converts form dates in new york and throws for invalid wall times
 const toIsoDateTime = (date, time) => {
   if (!date) return null;
-  const safeTime = time || "00:00";
-  return new Date(`${date}T${safeTime}:00`).toISOString();
+  const value = toEasternIso(date, time || "00:00");
+  if (!value) throw new Error("choose a valid new york time");
+  return value;
 };
 
 const buildAssignmentPayload = (formData, courseId, overrides = {}) => {
   const dueDate = toIsoDateTime(formData.dueDate, formData.dueTime || "23:59");
+  const publication = buildPublicationPayload(formData);
+  if (!publication) throw new Error("choose a valid new york publish time");
   return {
     course_id: courseId,
     kind: "assignment",
     title: formData.name,
     description: formData.description || null,
-    is_locked: formData.isLocked,
+    ...publication,
     group_questions_by_type: Boolean(formData.groupQuestionsByType),
     chapter: Number(formData.chapter) || 1,
     subchapter: formData.subchapter || "",
@@ -37,20 +43,24 @@ const buildAssignmentPayload = (formData, courseId, overrides = {}) => {
   };
 };
 
-const buildPracticePayload = (formData, courseId, overrides = {}) => ({
-  course_id: courseId,
-  kind: "practice",
-  title: formData.name,
-  description: formData.description || null,
-  is_locked: formData.isLocked,
-  group_questions_by_type: Boolean(formData.groupQuestionsByType),
-  chapter: Number(formData.chapter) || 1,
-  subchapter: formData.subchapter || "A",
-  due_date: null,
-  late_window_days: null,
-  late_penalty_percent: null,
-  ...overrides,
-});
+const buildPracticePayload = (formData, courseId, overrides = {}) => {
+  const publication = buildPublicationPayload(formData);
+  if (!publication) throw new Error("choose a valid new york publish time");
+  return {
+    course_id: courseId,
+    kind: "practice",
+    title: formData.name,
+    description: formData.description || null,
+    ...publication,
+    group_questions_by_type: Boolean(formData.groupQuestionsByType),
+    chapter: Number(formData.chapter) || 1,
+    subchapter: formData.subchapter || "A",
+    due_date: null,
+    late_window_days: null,
+    late_penalty_percent: null,
+    ...overrides,
+  };
+};
 
 export function createAppRuntime({ coursesDispatch, coursesState, routeKind, user }) {
   const runtimePaths = buildRuntimePaths(routeKind);
@@ -97,11 +107,10 @@ export function createAppRuntime({ coursesDispatch, coursesState, routeKind, use
       coursesDispatch({ type: "SET_ASSIGNMENTS", courseId, payload: refreshed });
     },
     toggleAssignmentPublish: async (courseId, assignmentId, assignment) => {
-      const nextPublished = !assignment.isPublished;
       await fetchJson(`/api/assignments/${assignmentId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ is_locked: assignment.isLocked || !nextPublished }),
+        body: JSON.stringify({ is_locked: Boolean(assignment.isPublished) }),
       });
       const refreshed = await fetchCourseAssignments(courseId);
       coursesDispatch({ type: "SET_ASSIGNMENTS", courseId, payload: refreshed });
@@ -172,11 +181,10 @@ export function createAppRuntime({ coursesDispatch, coursesState, routeKind, use
       coursesDispatch({ type: "SET_PRACTICES", courseId, payload: refreshed });
     },
     togglePracticePublish: async (courseId, practiceId, practice) => {
-      const nextPublished = !practice.isPublished;
       await fetchJson(`/api/assignments/${practiceId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ is_locked: practice.isLocked || !nextPublished }),
+        body: JSON.stringify({ is_locked: Boolean(practice.isPublished) }),
       });
       const refreshed = await fetchCoursePractices(courseId);
       coursesDispatch({ type: "SET_PRACTICES", courseId, payload: refreshed });

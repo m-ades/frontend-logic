@@ -1,4 +1,5 @@
 import { parseDueDateAsEastern } from "./easternTime.js";
+import { projectPublicationState } from "./publicationPolicy.js";
 
 /**
  * Get status color for an assignment or practice
@@ -6,11 +7,11 @@ import { parseDueDateAsEastern } from "./easternTime.js";
  */
 export function getStatusColor(item, isPractice = false) {
   const now = new Date();
+  const publication = projectPublicationState(item, now);
   const dueDate = item.dueDate ? parseDueDateAsEastern(item.dueDate, item.dueTime) : null;
-  const publishDate = item.publishDate ? new Date(item.publishDate) : null;
 
-  if (item.isLocked) return "default";
-  if (!item.isPublished) return "warning";
+  if (publication.isLocked && publication.publishAt) return "info";
+  if (publication.isLocked) return "default";
   if (dueDate && dueDate < now) return isPractice ? "info" : "error";
   return "success";
 }
@@ -21,12 +22,11 @@ export function getStatusColor(item, isPractice = false) {
  */
 export function getStatusText(item, isPractice = false) {
   const now = new Date();
+  const publication = projectPublicationState(item, now);
   const dueDate = item.dueDate ? parseDueDateAsEastern(item.dueDate, item.dueTime) : null;
-  const publishDate = item.publishDate ? new Date(item.publishDate) : null;
 
-  if (item.isLocked) return "Locked";
-  if (!item.isPublished) return "Draft";
-  if (publishDate && publishDate > now) return "Active";
+  if (publication.isLocked && publication.publishAt) return "Scheduled";
+  if (publication.isLocked) return "Locked";
   if (dueDate && dueDate < now) return isPractice ? "Available" : "Past Due";
   return "Active";
 }
@@ -49,10 +49,8 @@ export function enhanceItems(
     const totalStudents = activeCourse?.studentCount || 0;
 
     const enhanced = {
-      ...item,
+      ...projectPublicationState(item),
       totalStudents,
-      isPublished: item.isPublished ?? true,
-      isLocked: item.isLocked ?? false,
       publishDate: item.publishDate || null,
     };
 
