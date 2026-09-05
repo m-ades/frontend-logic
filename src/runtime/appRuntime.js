@@ -268,14 +268,24 @@ export function createAppRuntime({ coursesDispatch, coursesState, routeKind, use
         }),
       });
     },
+    /**
+     * loads instructor analytics while preserving an explicit empty class average
+     */
     loadInstructorDashboard: async (courseId) => {
       const [analytics, summary] = await Promise.all([
         fetchJson(`/api/analytics/instructor-dashboard?courseId=${courseId}`),
         fetchJson(`/api/analytics/gradebook-summary?courseId=${courseId}`),
       ]);
+      const hasClassAverage =
+        !Array.isArray(summary) &&
+        summary != null &&
+        Object.hasOwn(summary, "class_avg_with_drop");
       return {
         analytics,
         gradebookSummary: Array.isArray(summary) ? summary : (summary?.assignments ?? []),
+        classAverageWithDrop: hasClassAverage
+          ? summary.class_avg_with_drop
+          : undefined,
       };
     },
   };

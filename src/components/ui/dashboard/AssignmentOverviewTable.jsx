@@ -23,6 +23,9 @@ import {
 import { formatEasternDateTime } from "../../../utils/easternTime.js";
 import { useAppRuntime } from "../../../hooks/useAppRuntime.js";
 
+/**
+ * renders assignment analytics and preserves explicit empty summary metrics
+ */
 export const AssignmentOverviewTable = ({
   assignments: assignmentsProp,
   totalAverage: totalAverageProp,
@@ -105,18 +108,20 @@ export const AssignmentOverviewTable = ({
   const totalPossible =
     totalPossibleProp ?? assignments.length * totalStudents;
   const totalAverage =
-    totalAverageProp ??
-    (assignmentsWithMetrics.length > 0
-      ? Math.round(
-          assignmentsWithMetrics.reduce((sum, a) => sum + a.average, 0) /
-            assignmentsWithMetrics.length
-        )
-      : 0);
+    totalAverageProp !== undefined
+      ? totalAverageProp
+      : assignmentsWithMetrics.length > 0
+        ? Math.round(
+            assignmentsWithMetrics.reduce((sum, a) => sum + a.average, 0) /
+              assignmentsWithMetrics.length
+          )
+        : null;
   const completionRate =
-    completionRateProp ??
-    (totalPossible > 0
-      ? Math.round((totalSubmissions / totalPossible) * 100)
-      : 0);
+    completionRateProp !== undefined
+      ? completionRateProp
+      : totalPossible > 0
+        ? Math.round((totalSubmissions / totalPossible) * 100)
+        : null;
 
   const handleAssignmentClick = (assignment) => {
     setSelectedAssignmentId(assignment.id);
@@ -169,14 +174,16 @@ export const AssignmentOverviewTable = ({
                 Overall Average
               </Typography>
               <Typography variant="h6" component="div" fontWeight={700} color="primary.main">
-                {totalAverage}%
+                {totalAverage == null ? "—" : `${Math.round(totalAverage)}%`}
               </Typography>
-              <Chip
-                label={getLetterGrade(totalAverage, gradingScale)}
-                color={getGradeColorVariant(totalAverage, gradingScale)}
-                size="small"
-                sx={{ mt: 0.5, fontWeight: 600 }}
-              />
+              {totalAverage != null && (
+                <Chip
+                  label={getLetterGrade(totalAverage, gradingScale)}
+                  color={getGradeColorVariant(totalAverage, gradingScale)}
+                  size="small"
+                  sx={{ mt: 0.5, fontWeight: 600 }}
+                />
+              )}
             </Box>
             <Box sx={{ textAlign: "center", flex: 1 }}>
               <Typography
@@ -201,7 +208,7 @@ export const AssignmentOverviewTable = ({
                 Avg Completion Rate
               </Typography>
               <Typography variant="h6" component="div" fontWeight={700} color="success.main">
-                {completionRate}%
+                {completionRate == null ? "—" : `${completionRate}%`}
               </Typography>
             </Box>
           </Stack>
