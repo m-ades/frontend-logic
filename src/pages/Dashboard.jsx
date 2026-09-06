@@ -91,6 +91,12 @@ const defaultGradeOverview = {
 const defaultReleaseOverview = { pastDuePercent: 0, remainingPercent: 0 }
 const isSubmittedGrade = (grade) => grade?.graded_at != null || grade?.graded_by != null
 const isPastCutoff = (assignment, now = Date.now()) => {
+  // the server sends cutoff_at with extensions and accommodations already applied
+  const cutoff = assignment?.cutoff_at
+  if (cutoff) {
+    const cutoffTime = new Date(cutoff).getTime()
+    return Number.isNaN(cutoffTime) ? false : now > cutoffTime
+  }
   const due = assignment?.due_at ?? assignment?.due_date
   if (!due) return false
   const dueTime = new Date(due).getTime()
@@ -164,7 +170,7 @@ export default function Dashboard() {
       : []
     // averages only count work whose late window has closed, never merely unlocked work
     // the sandbox summary is hand-authored to be chart-ready, so it skips the filter
-    const scoredSummary = sandbox ? unlockedSummary : unlockedSummary.filter(isPastCutoff)
+    const scoredSummary = sandbox ? unlockedSummary : unlockedSummary.filter((a) => isPastCutoff(a))
     const timeline =
       scoredSummary.length > 0
         ? scoredSummary
@@ -254,7 +260,7 @@ export default function Dashboard() {
       : completedGrades.filter((grade) => {
           const max = grade?.max_score ?? 0
           const score = grade?.final_score ?? grade?.raw_score ?? null
-          return max > 0 && score != null && score > 0
+          return max > 0 && score != null && score >= 0
         }).length
     let overallPercent = null
     if (sandbox) {

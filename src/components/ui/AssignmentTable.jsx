@@ -198,7 +198,7 @@ export default function AssignmentTable({
                           Average
                         </Typography>
                         <Typography variant="body2" fontWeight={600}>
-                          {item.submissions > 0 ? `${item.averageGrade}%` : "—"}
+                          {item.averageGrade == null ? "—" : `${item.averageGrade}%`}
                         </Typography>
                       </Stack>
                     </Stack>
@@ -395,7 +395,7 @@ export default function AssignmentTable({
                       </TableCell>
                       <TableCell align="center">
                         <Typography variant="body2" fontWeight={600}>
-                          {item.submissions > 0 ? `${item.averageGrade}%` : "—"}
+                          {item.averageGrade == null ? "—" : `${item.averageGrade}%`}
                         </Typography>
                       </TableCell>
                     </>

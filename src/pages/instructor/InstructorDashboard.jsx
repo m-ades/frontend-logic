@@ -200,10 +200,11 @@ export default function InstructorDashboard() {
     ));
   }, [enrichedAssignments]);
 
-  const fallbackAverage = pastDueAssignments.length > 0
+  const gradedPastDue = pastDueAssignments.filter((a) => a.average != null);
+  const fallbackAverage = gradedPastDue.length > 0
     ? Math.round(
-        pastDueAssignments.reduce((sum, assignment) => sum + assignment.average, 0) /
-          pastDueAssignments.length
+        gradedPastDue.reduce((sum, assignment) => sum + assignment.average, 0) /
+          gradedPastDue.length
       )
     : null;
   const totalAverage = classAverageWithDrop !== undefined

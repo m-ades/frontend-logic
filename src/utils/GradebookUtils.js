@@ -6,10 +6,10 @@ export function calculateAverage(grades) {
 }
 
 export function getStudentAverage(student) {
-  // Number(null) is 0 and passes isFinite, so null must be checked before the coercion
-  if (student?.average === null || student?.average === undefined) {
-    return calculateAverage(student?.grades || {});
-  }
+  // an explicit null means there is nothing past cutoff to average, so do not fall back
+  if (student?.average === null) return null;
+  // Number(undefined) is NaN, but be explicit rather than relying on the coercion below
+  if (student?.average === undefined) return calculateAverage(student?.grades || {});
   return Number.isFinite(Number(student.average))
     ? Number(student.average)
     : calculateAverage(student?.grades || {});

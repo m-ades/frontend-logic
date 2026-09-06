@@ -281,7 +281,7 @@ export function calculateAssignmentAverage(assignmentId, students) {
     .map((student) => student.grades[assignmentId])
     .filter((grade) => grade !== undefined && grade !== null);
 
-  if (grades.length === 0) return 0;
+  if (grades.length === 0) return null;
   return Math.round(
     grades.reduce((sum, grade) => sum + grade, 0) / grades.length
   );
