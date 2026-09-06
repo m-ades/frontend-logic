@@ -224,7 +224,7 @@ export async function fetchCourseGradebook(courseId) {
         student.dropped?.average_percent !== null &&
         student.dropped?.average_percent !== undefined
           ? Math.round(student.dropped.average_percent * 100000) / 1000
-          : 0,
+          : null,
       grades,
       submittedAssignments,
       submittedQuestionCounts,

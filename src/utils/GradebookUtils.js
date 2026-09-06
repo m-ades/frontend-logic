@@ -1,18 +1,23 @@
-// Calculate average grade from grades object
+// null means no gradeable work yet, which is not the same as scoring zero
 export function calculateAverage(grades) {
   const values = Object.values(grades);
-  if (values.length === 0) return 0;
+  if (values.length === 0) return null;
   return Math.round(values.reduce((a, b) => a + b, 0) / values.length);
 }
 
 export function getStudentAverage(student) {
-  return Number.isFinite(Number(student?.average))
+  // Number(null) is 0 and passes isFinite, so null must be checked before the coercion
+  if (student?.average === null || student?.average === undefined) {
+    return calculateAverage(student?.grades || {});
+  }
+  return Number.isFinite(Number(student.average))
     ? Number(student.average)
     : calculateAverage(student?.grades || {});
 }
 
 // Get letter grade from numeric grade
 export function getLetterGrade(grade) {
+  if (grade === null || grade === undefined || Number.isNaN(grade)) return "—";
   if (grade >= 90) return "A";
   if (grade >= 80) return "B";
   if (grade >= 70) return "C";
@@ -49,6 +54,7 @@ export function filterStudents(
     } else if (gradeFilter !== "all") {
       // Overall average filter
       const average = getStudentAverage(student);
+      if (average === null) return false;
       if (gradeFilter === "a" && average < 90) return false;
       if (gradeFilter === "b" && (average < 80 || average >= 90)) return false;
       if (gradeFilter === "c" && (average < 70 || average >= 80)) return false;
@@ -74,6 +80,10 @@ export function sortStudents(students, sortColumn, sortDirection) {
     } else if (sortColumn === "average") {
       aValue = getStudentAverage(a);
       bValue = getStudentAverage(b);
+      if (aValue === null || bValue === null) {
+        if (aValue === bValue) return 0;
+        return aValue === null ? 1 : -1;
+      }
     } else {
       aValue = a.grades[sortColumn] ?? -1;
       bValue = b.grades[sortColumn] ?? -1;
@@ -136,7 +146,7 @@ export function exportGradebookCSV(students, assignments, courseLabel) {
 
       return [
         student?.username ?? "",
-        `${average}%`,
+        average === null ? "" : `${average}%`,
         letterGrade,
         ...assignmentGrades,
       ];

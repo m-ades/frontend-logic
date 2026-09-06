@@ -63,19 +63,22 @@ export function calculateClassStats(students, assignments) {
   const forStats = studentsOnlyForStats(students);
   const totalStudents = forStats.length;
 
+  // students with no past due work yet have nothing to average, not real 0
+  const gradedStats = forStats
+    .map((s) => getStudentStats(s, assignments))
+    .filter((stats) => stats.average !== null);
+
   const averageClassGrade =
-    totalStudents > 0
+    gradedStats.length > 0
       ? Math.round(
-          forStats.reduce((sum, s) => {
-            const stats = getStudentStats(s, assignments);
-            return sum + stats.average;
-          }, 0) / totalStudents
+          gradedStats.reduce((sum, stats) => sum + stats.average, 0) /
+            gradedStats.length
         )
       : 0;
 
   const studentsAtRisk = forStats.filter((s) => {
     const stats = getStudentStats(s, assignments);
-    return stats.average < 70 && stats.average > 0;
+    return stats.average !== null && stats.average < 70;
   }).length;
 
   return { totalStudents, averageClassGrade, studentsAtRisk };
@@ -93,7 +96,7 @@ export function exportRosterCSV(students, courseCode, assignments) {
       const stats = getStudentStats(student, assignments);
       return [
         student.username,
-        `${stats.average}%`,
+        stats.average === null ? "" : `${stats.average}%`,
         stats.completed,
         stats.lateCount,
       ].join(",");
