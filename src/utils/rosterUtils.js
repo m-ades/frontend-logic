@@ -74,7 +74,7 @@ export function calculateClassStats(students, assignments) {
           gradedStats.reduce((sum, stats) => sum + stats.average, 0) /
             gradedStats.length
         )
-      : 0;
+      : null;
 
   const studentsAtRisk = forStats.filter((s) => {
     const stats = getStudentStats(s, assignments);
