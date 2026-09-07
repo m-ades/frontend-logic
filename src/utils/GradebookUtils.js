@@ -5,14 +5,11 @@ export function calculateAverage(grades) {
   return Math.round(values.reduce((a, b) => a + b, 0) / values.length);
 }
 
+// preserves a null average and calculates from grades only when the average is absent
 export function getStudentAverage(student) {
-  // an explicit null means there is nothing past cutoff to average, so do not fall back
   if (student?.average === null) return null;
-  // Number(undefined) is NaN, but be explicit rather than relying on the coercion below
   if (student?.average === undefined) return calculateAverage(student?.grades || {});
-  return Number.isFinite(Number(student.average))
-    ? Number(student.average)
-    : calculateAverage(student?.grades || {});
+  return Number(student.average);
 }
 
 // Get letter grade from numeric grade
