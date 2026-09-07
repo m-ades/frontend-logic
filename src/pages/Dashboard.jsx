@@ -89,7 +89,6 @@ const defaultGradeOverview = {
   lowestScores: [],
 }
 const defaultReleaseOverview = { pastDuePercent: 0, remainingPercent: 0 }
-const isSubmittedGrade = (grade) => grade?.graded_at != null || grade?.graded_by != null
 const isPastCutoff = (assignment, now = Date.now()) => {
   // the server sends cutoff_at with extensions and accommodations already applied
   const cutoff = assignment?.cutoff_at
@@ -240,28 +239,11 @@ export default function Dashboard() {
               })
               return list
             }, [])
-    const submittedAssignmentPercents = assignmentPercents.filter((entry) => {
-      const grade = entry.id != null
-        ? gradeMap.get(entry.id) ?? grades.find((item) => item?.assignment_id === entry.id)
-        : null
-      return sandbox ? isSubmittedGrade(grade) : true
-    })
     const totalAssignments =
       unlockedSummary.length > 0
         ? unlockedSummary.length
         : analyticsData?.assignments?.total ?? gradebookSummary?.length ?? grades?.length ?? 0
-    // progress counts everything unlocked, not just work that is already past due
-    const completedGrades =
-      unlockedSummary.length > 0
-        ? unlockedSummary.map((assignment) => gradeMap.get(assignment.id))
-        : (grades || []).filter((g) => g?.Assignment?.is_locked === false)
-    const completedCount = sandbox
-      ? submittedAssignmentPercents.length
-      : completedGrades.filter((grade) => {
-          const max = grade?.max_score ?? 0
-          const score = grade?.final_score ?? grade?.raw_score ?? null
-          return max > 0 && score != null && score >= 0
-        }).length
+    const completedCount = analyticsData?.assignments?.completed ?? 0
     let overallPercent = null
     if (sandbox) {
       const totalPossiblePoints = (grades || []).reduce((sum, grade) => sum + (Number(grade?.max_score) || 0), 0)
