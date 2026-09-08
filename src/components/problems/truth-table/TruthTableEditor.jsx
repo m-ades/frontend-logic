@@ -23,6 +23,7 @@ import {
   deriveTruthTableSolutionClassification,
   formatTruthTableStatements,
   isAtomicTruthTableToken,
+  isValidWitnessRow,
   normalizeSavedClassification,
   submitTruthTableAnswer,
   tokenizeTruthTableHeader,
@@ -98,6 +99,7 @@ function TruthTableEditorContent({
     )
   }, [proof?.options?.question, truthTable?.options?.question])
   const mainOperatorHighlight = kind === 'formula' && truthTable?.options?.highlightMainOperator === true
+  const witnessRowHighlight = truthTable?.options?.highlightWitnessRow === true
   const operatorSet = React.useMemo(() => new Set(Object.keys(syntax.operators)), [syntax])
   const statements = React.useMemo(() => {
     if (Array.isArray(truthTable.statements) && truthTable.statements.length > 0) {
@@ -210,6 +212,7 @@ function TruthTableEditorContent({
   const [selectedColumns, setSelectedColumns] = React.useState([]) // [{ tableIndex, colIndex }, ...]
   const [selectedRows, setSelectedRows] = React.useState([]) // [rowIndex, ...]
   const [mainOperatorColumn, setMainOperatorColumn] = React.useState(null)
+  const [witnessRow, setWitnessRow] = React.useState(null)
   const toggleColumn = (tableIndex, colIndex) => {
     setSelectedColumns((prev) => {
       const has = prev.some((c) => c.tableIndex === tableIndex && c.colIndex === colIndex)
@@ -239,28 +242,44 @@ function TruthTableEditorContent({
   const selectMainOperator = React.useCallback((tableIndex, colIndex) => {
     const next = { tableIndex, colIndex }
     setMainOperatorColumn(next)
-    scheduleStateChange(buildTruthTableStatePayload(tableInputs, mcSelection, next))
+    scheduleStateChange(buildTruthTableStatePayload(tableInputs, mcSelection, next, witnessRow))
     if (status !== 'unanswered') {
       setStatus('unanswered')
       setMessage('')
     }
-  }, [mcSelection, scheduleStateChange, status, tableInputs])
+  }, [mcSelection, scheduleStateChange, status, tableInputs, witnessRow])
   const clearMainOperator = React.useCallback(() => {
     setMainOperatorColumn(null)
-    scheduleStateChange(buildTruthTableStatePayload(tableInputs, mcSelection, null))
+    scheduleStateChange(buildTruthTableStatePayload(tableInputs, mcSelection, null, witnessRow))
     if (status !== 'unanswered') {
       setStatus('unanswered')
       setMessage('')
     }
-  }, [mcSelection, scheduleStateChange, status, tableInputs])
+  }, [mcSelection, scheduleStateChange, status, tableInputs, witnessRow])
+  const selectWitnessRow = React.useCallback((rowIndex) => {
+    setWitnessRow(rowIndex)
+    scheduleStateChange(buildTruthTableStatePayload(tableInputs, mcSelection, mainOperatorColumn, rowIndex))
+    if (status !== 'unanswered') {
+      setStatus('unanswered')
+      setMessage('')
+    }
+  }, [mainOperatorColumn, mcSelection, scheduleStateChange, status, tableInputs])
+  const clearWitnessRow = React.useCallback(() => {
+    setWitnessRow(null)
+    scheduleStateChange(buildTruthTableStatePayload(tableInputs, mcSelection, mainOperatorColumn, null))
+    if (status !== 'unanswered') {
+      setStatus('unanswered')
+      setMessage('')
+    }
+  }, [mainOperatorColumn, mcSelection, scheduleStateChange, status, tableInputs])
   const updateClassificationSelection = React.useCallback((next) => {
     setMcSelection(next)
-    onStateChange?.(buildTruthTableStatePayload(tableInputs, next, mainOperatorColumn))
+    onStateChange?.(buildTruthTableStatePayload(tableInputs, next, mainOperatorColumn, witnessRow))
     if (status !== 'unanswered') {
       setStatus('unanswered')
       setMessage('')
     }
-  }, [mainOperatorColumn, onStateChange, status, tableInputs])
+  }, [mainOperatorColumn, onStateChange, status, tableInputs, witnessRow])
 
   React.useEffect(() => {
     if (restorationKey === lastRestorationKeyRef.current) return
@@ -275,7 +294,10 @@ function TruthTableEditorContent({
         ? { tableIndex: 0, colIndex: savedColumn.colIndex }
         : null
     })
-  }, [derivedInitialTables, kind, mainOperatorHighlight, restorationKey, savedState?.mainOperatorColumn, savedState?.mcans, savedState?.taut, savedState?.contra, savedState?.valid, savedState?.equiv])
+    setWitnessRow(() => (
+      witnessRowHighlight && Number.isInteger(savedState?.witnessRow) ? savedState.witnessRow : null
+    ))
+  }, [derivedInitialTables, kind, mainOperatorHighlight, restorationKey, savedState?.mainOperatorColumn, savedState?.mcans, savedState?.taut, savedState?.contra, savedState?.valid, savedState?.equiv, savedState?.witnessRow, witnessRowHighlight])
 
   const handleCellChange = (tableIndex, rowIndex, colIndex, value) => {
     const nextTables = tableInputs.map((tableRows, tIdx) =>
@@ -288,7 +310,7 @@ function TruthTableEditorContent({
         : tableRows
     )
     setTableInputs(nextTables)
-    scheduleStateChange(buildTruthTableStatePayload(nextTables, mcSelection, mainOperatorColumn))
+    scheduleStateChange(buildTruthTableStatePayload(nextTables, mcSelection, mainOperatorColumn, witnessRow))
     if (status !== 'unanswered') {
       setStatus('unanswered')
       setMessage('')
@@ -319,8 +341,10 @@ function TruthTableEditorContent({
 
   const useCombinedTable = tables.length > 1
   const hasTruthTable = tables.length > 0 && expectedTables.length === tables.length
+  const witnessRowComplete = !witnessRowHighlight || witnessRow != null
   const tableFilledOnly =
     hasTruthTable &&
+    witnessRowComplete &&
     tableInputs.length > 0 &&
     tableInputs.every((t, tIdx) =>
       t.length === (tables[tIdx]?.rows?.length ?? 0) &&
@@ -344,15 +368,26 @@ function TruthTableEditorContent({
     mainOperatorColumn?.tableIndex === 0
     && mainOperatorColumn?.colIndex === tables[0]?.opspot
   )
+  const witnessRowCorrect = !witnessRowHighlight || isValidWitnessRow(kind, tables, witnessRow)
+  const witnessRowPrompt = kind === 'argument'
+    ? 'Double click the row number that shows this argument is invalid.'
+    : kind === 'equivalence'
+      ? 'Double click the row number that shows this set of sentences is jointly satisfiable.'
+      : 'Double click the row number that shows this sentence is not a contradiction.'
 
   const handleCheck = async () => {
     if (isChecking || attemptCount >= attemptLimit || isAssignmentLocked) return
+    if (!witnessRowComplete) {
+      setStatus('incorrect')
+      setMessage(`${witnessRowPrompt} before submitting.`)
+      return
+    }
     setIsChecking(true)
     try {
       const result = await submitTruthTableAnswer({
         assignmentQuestionId,
-        submissionData: buildTruthTableSubmissionData(kind, tableInputs, mcSelection, classificationEnabled, mainOperatorColumn),
-        localIsCorrect: tableCorrect && classificationCorrect && mainOperatorCorrect,
+        submissionData: buildTruthTableSubmissionData(kind, tableInputs, mcSelection, classificationEnabled, mainOperatorColumn, witnessRow),
+        localIsCorrect: tableCorrect && classificationCorrect && mainOperatorCorrect && witnessRowCorrect,
       })
       if (result.mode === 'remote') {
         const resp = result.response
@@ -362,7 +397,7 @@ function TruthTableEditorContent({
         const nextAttempt = resp?.submission?.attempt ?? Math.min(attemptCount + 1, attemptLimit)
         setAttemptCount((prev) => resp?.submission?.attempt ?? Math.min(prev + 1, attemptLimit))
         onStateChange?.({
-          ...buildTruthTableStatePayload(tableInputs, mcSelection, mainOperatorColumn),
+          ...buildTruthTableStatePayload(tableInputs, mcSelection, mainOperatorColumn, witnessRow),
           attemptCount: nextAttempt,
           lastSubmissionAt: Date.now(),
           lastStatus: result.nextStatus,
@@ -394,7 +429,7 @@ function TruthTableEditorContent({
         const nextAttempt = Math.min(attemptCount + 1, attemptLimit)
         setAttemptCount((prev) => Math.min(prev + 1, attemptLimit))
         onStateChange?.({
-          ...buildTruthTableStatePayload(tableInputs, mcSelection, mainOperatorColumn),
+          ...buildTruthTableStatePayload(tableInputs, mcSelection, mainOperatorColumn, witnessRow),
           attemptCount: nextAttempt,
           lastSubmissionAt: Date.now(),
           lastStatus: result.nextStatus,
@@ -420,10 +455,11 @@ function TruthTableEditorContent({
   const handleStartOver = () => {
     if (attemptCount >= attemptLimit) return
     setTableInputs(resetTables)
-    onStateChange?.(buildTruthTableStatePayload(resetTables, [], null))
+    onStateChange?.(buildTruthTableStatePayload(resetTables, [], null, null))
     setMcSelection([])
     setSelectedColumns([])
     setMainOperatorColumn(null)
+    setWitnessRow(null)
     setStatus('unanswered')
     setMessage('')
   }
@@ -506,6 +542,11 @@ function TruthTableEditorContent({
             Double click the operator above the column that represents the possible truth values for the whole sentence.
           </Typography>
         )}
+        {witnessRowHighlight && (
+          <Typography variant="body2" color="text.secondary">
+            {witnessRowPrompt}
+          </Typography>
+        )}
         <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
           <TruthTableGrid
             tables={tables}
@@ -522,6 +563,9 @@ function TruthTableEditorContent({
             mainOperatorColumn={mainOperatorHighlight ? mainOperatorColumn : undefined}
             onSelectMainOperator={mainOperatorHighlight ? selectMainOperator : undefined}
             onClearMainOperator={mainOperatorHighlight ? clearMainOperator : undefined}
+            witnessRow={witnessRowHighlight ? witnessRow : undefined}
+            onSelectWitnessRow={witnessRowHighlight ? selectWitnessRow : undefined}
+            onClearWitnessRow={witnessRowHighlight ? clearWitnessRow : undefined}
             isCellReadOnly={isPrefilledCell}
             showLabels={!statementText}
           />
