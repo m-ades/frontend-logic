@@ -95,14 +95,32 @@ export default function ActivityRow({
         )}
       </Box>
 
-      <Box sx={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+      <Box
+        sx={{
+          position: 'relative',
+          display: 'flex',
+          flexWrap: { xs: 'wrap', md: 'nowrap' },
+          alignItems: 'center',
+          gap: 0.5,
+        }}
+      >
         {anchorChip &&
           (() => {
             const { label, ...chipProps } = anchorChip
             return <Chip label={label} size="small" {...chipProps} />
           })()}
         {stackedChips.length > 0 && (
-          <Stack spacing={0.5} sx={{ position: 'absolute', left: 0, bottom: '100%', mb: 0.5 }}>
+          <Stack
+            direction={{ xs: 'row', md: 'column' }}
+            flexWrap={{ xs: 'wrap', md: 'nowrap' }}
+            spacing={0.5}
+            sx={{
+              position: { xs: 'static', md: 'absolute' },
+              left: 0,
+              bottom: '100%',
+              mb: { xs: 0, md: 0.5 },
+            }}
+          >
             {stackedChips.map(({ label, ...chipProps }) => (
               <Chip key={label} label={label} size="small" {...chipProps} />
             ))}
