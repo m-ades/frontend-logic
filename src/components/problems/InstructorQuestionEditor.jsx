@@ -56,6 +56,7 @@ import {
 } from '../../lib/logicpenguin/translation-answer.js'
 import { getInstructorProblemTypeLabel, isInstructorProblemType } from '../../lib/instructorProblemTypes.js'
 import TruthTableGrid from './truth-table/TruthTableGrid.jsx'
+import { isMultiSelectSubquestion, getSingleSelectAnswerIndex } from '../../lib/logicpenguin/multiple-choice-utils.js'
 import { TruthValueButton } from './truth-table/TruthTableControls.jsx'
 import {
   buildAlignedTruthTableHeader,
@@ -988,50 +989,83 @@ function IndirectTruthTableEditorForm({ proof, value, onChange, logicSystem = DE
       />
       <Box>
         <Typography variant="subtitle2" sx={{ mb: 1 }}>Questions</Typography>
-        {(questions.length ? questions : [{ prompt: '', choices: [], answerIndex: 0 }]).map((q, qIdx) => (
-          <Box key={qIdx} sx={{ mb: 2, p: 1, border: '1px solid', borderColor: 'divider', borderRadius: 1 }}>
-            <TextField
-              size="small"
-              label="Prompt"
-              value={q.prompt ?? ''}
-              onChange={(e) => updateQuestion(qIdx, { prompt: e.target.value })}
-              fullWidth
-              sx={{ mb: 1 }}
-            />
-            <Typography variant="caption" sx={{ display: 'block', mb: 0.5 }}>Choices</Typography>
-            {(q.choices?.length ? q.choices : ['']).map((choice, cIdx) => (
-              <Stack key={cIdx} direction="row" spacing={1} sx={{ mb: 0.5 }}>
-                <TextField
-                  size="small"
-                  value={choice}
-                  onChange={(e) => {
-                    const next = [...(q.choices || [''])]
-                    next[cIdx] = e.target.value
-                    updateQuestion(qIdx, { choices: next })
-                  }}
-                  fullWidth
-                  placeholder={`Choice ${cIdx + 1}`}
-                />
-                <IconButton size="small" onClick={() => updateQuestion(qIdx, { choices: (q.choices || []).filter((_, i) => i !== cIdx) })}>
-                  <DeleteOutlineIcon />
-                </IconButton>
-              </Stack>
-            ))}
-            <Button size="small" onClick={() => updateQuestion(qIdx, { choices: [...(q.choices || []), ''] })}>Add choice</Button>
-            <FormControl fullWidth size="small" sx={{ mt: 1 }}>
-              <InputLabel>Correct answer</InputLabel>
-              <Select
-                value={String(q.answerIndex ?? q.answer ?? 0)}
-                label="Correct answer"
-                onChange={(e) => updateQuestion(qIdx, { answerIndex: Number(e.target.value) })}
-              >
-                {(q.choices || []).map((_, i) => (
-                  <MenuItem key={i} value={String(i)}>Choice {i + 1}</MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </Box>
-        ))}
+        {(questions.length ? questions : [{ prompt: '', choices: [], answerIndex: 0 }]).map((q, qIdx) => {
+          const isMultiSelect = isMultiSelectSubquestion(q)
+          const answerIndex = getSingleSelectAnswerIndex(q) ?? 0
+          const answerIndices = isMultiSelect ? (q.answerIndices ?? []) : [answerIndex]
+          return (
+            <Box key={qIdx} sx={{ mb: 2, p: 1, border: '1px solid', borderColor: 'divider', borderRadius: 1 }}>
+              <TextField
+                size="small"
+                label="Prompt"
+                value={q.prompt ?? ''}
+                onChange={(e) => updateQuestion(qIdx, { prompt: e.target.value })}
+                fullWidth
+                sx={{ mb: 1 }}
+              />
+              <Typography variant="caption" sx={{ display: 'block', mb: 0.5 }}>Choices</Typography>
+              {(q.choices?.length ? q.choices : ['']).map((choice, cIdx) => (
+                <Stack key={cIdx} direction="row" spacing={1} sx={{ mb: 0.5 }}>
+                  <TextField
+                    size="small"
+                    value={choice}
+                    onChange={(e) => {
+                      const next = [...(q.choices || [''])]
+                      next[cIdx] = e.target.value
+                      updateQuestion(qIdx, { choices: next })
+                    }}
+                    fullWidth
+                    placeholder={`Choice ${cIdx + 1}`}
+                  />
+                  <IconButton size="small" onClick={() => updateQuestion(qIdx, {
+                    choices: (q.choices || []).filter((_, i) => i !== cIdx),
+                    ...(isMultiSelect ? {
+                      answerIndices: answerIndices.filter((i) => i !== cIdx).map((i) => i > cIdx ? i - 1 : i),
+                    } : {
+                      answerIndex: answerIndex === cIdx ? 0 : answerIndex > cIdx ? answerIndex - 1 : answerIndex,
+                    }),
+                  })} aria-label={`Remove choice ${cIdx + 1}`}>
+                    <DeleteOutlineIcon />
+                  </IconButton>
+                </Stack>
+              ))}
+              <Button size="small" onClick={() => updateQuestion(qIdx, { choices: [...(q.choices || []), ''] })}>Add choice</Button>
+              <FormControlLabel
+                control={(
+                  <Checkbox
+                    checked={isMultiSelect}
+                    onChange={(e) => updateQuestion(qIdx, {
+                      multiSelect: e.target.checked,
+                      answerIndices: e.target.checked ? answerIndices : [],
+                      answerIndex: e.target.checked ? null : (answerIndices[0] ?? 0),
+                    })}
+                  />
+                )}
+                label="Allow multiple answers"
+              />
+              <FormControl fullWidth size="small" sx={{ mt: 1 }}>
+                <InputLabel id={`itt-answer-${qIdx}`}>{isMultiSelect ? 'Correct answers' : 'Correct answer'}</InputLabel>
+                <Select
+                  multiple={isMultiSelect}
+                  labelId={`itt-answer-${qIdx}`}
+                  value={isMultiSelect ? answerIndices : answerIndex}
+                  label={isMultiSelect ? 'Correct answers' : 'Correct answer'}
+                  onChange={(e) => updateQuestion(qIdx, isMultiSelect
+                    ? { answerIndices: e.target.value }
+                    : { answerIndex: Number(e.target.value) })}
+                  renderValue={isMultiSelect ? (selected) => selected.map((i) => `Choice ${i + 1}`).join(', ') : undefined}
+                >
+                  {(q.choices || []).map((_, i) => (
+                    <MenuItem key={i} value={i}>
+                      {isMultiSelect && <Checkbox checked={answerIndices.includes(i)} />}
+                      Choice {i + 1}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Box>
+          )
+        })}
         <Button size="small" startIcon={<AddIcon />} onClick={() => setQuestions([...(questions.length ? questions : []), { prompt: '', choices: [], answerIndex: 0 }])}>
           Add question
         </Button>
@@ -2011,6 +2045,16 @@ function InstructorQuestionEditorInner({
         setError(`Invalid formula: ${formulaError}`)
         setSaving(false)
         return
+      }
+      if (proof.type === 'indirect-truth-table' || proof.type === 'nonclassical-truth-table') {
+        const missingAnswer = (mergedSnapshot.questions ?? []).findIndex((question) => (
+          isMultiSelectSubquestion(question) && !question.answerIndices?.length
+        ))
+        if (missingAnswer !== -1) {
+          setError(`Select a correct answer for question ${missingAnswer + 1}`)
+          setSaving(false)
+          return
+        }
       }
       const attemptLimit = editValue.attemptLimit
 

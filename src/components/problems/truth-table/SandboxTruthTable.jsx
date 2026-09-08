@@ -3,16 +3,14 @@ import {
   Box,
   Stack,
   Typography,
-  Radio,
-  RadioGroup,
-  FormControlLabel,
-  FormControl,
   Button,
 } from '@mui/material'
 import InstructorQuestionEditor from '../InstructorQuestionEditor.jsx'
 import ProblemSetButtons from '../mui/frame/ProblemSetButtons.jsx'
-import ProblemFrame, { choiceLabelWithGapSx, sectionLabelSx } from '../mui/frame/ProblemFrame.jsx'
+import ProblemFrame, { sectionLabelSx } from '../mui/frame/ProblemFrame.jsx'
 import TruthTableGrid from './TruthTableGrid.jsx'
+import { SubquestionChoiceList } from '../mui/choice/ChoiceGroup.jsx'
+import { getSubquestionChoices, isMultiSelectSubquestion, normalizeSubquestionSelection } from '../../../lib/logicpenguin/multiple-choice-utils.js'
 import { useProblemChecker } from '../../../hooks/useProblemChecker.js'
 import SolutionReveal from '../SolutionReveal.jsx'
 import PromptText from '../../ui/PromptText.jsx'
@@ -127,18 +125,17 @@ export default function SandboxTruthTable({
   )
   const defaultRow = useMemo(() => Array(sandboxCellCount).fill(''), [sandboxCellCount])
 
-  const initialSelections = useMemo(() => {
-    if (Array.isArray(savedState?.answers) && savedState.answers.length) {
-      return mcQuestions.map((_, idx) => {
-        const saved = savedState.answers[idx]
-        return saved !== undefined && saved !== null ? String(saved) : ''
-      })
-    }
-    if (savedState?.ans !== undefined && mcQuestions.length > 0) {
-      return mcQuestions.map((_, idx) => (idx === 0 ? String(savedState.ans) : ''))
-    }
-    return mcQuestions.map(() => '')
-  }, [mcQuestions, savedState?.ans, savedState?.answers])
+  const initialSelections = useMemo(
+    () => mcQuestions.map((question, idx) => normalizeSubquestionSelection(
+      question,
+      savedState?.answers?.[idx] ?? (idx === 0 ? savedState?.ans : undefined)
+    )),
+    [mcQuestions, savedState?.ans, savedState?.answers]
+  )
+  const emptySelections = () => mcQuestions.map((question) => isMultiSelectSubquestion(question) ? [] : '')
+  const hasIncompleteSelection = (selectedValues) => selectedValues.some((value) => (
+    Array.isArray(value) ? value.length === 0 : value === ''
+  ))
 
   const initialSandboxRows = useMemo(() => {
     if (Array.isArray(savedState?.sandboxRows) && savedState.sandboxRows.length > 0) {
@@ -181,8 +178,7 @@ export default function SandboxTruthTable({
     setSelectedValues((prev) => {
       const next = [...prev]
       next[index] = value
-      const answers = next.map((val) => (val === '' ? '' : parseInt(val, 10)))
-      scheduleStateChange({ answers, ans: answers[0] ?? '', sandboxRows })
+      scheduleStateChange({ answers: next, ans: next[0] ?? '', sandboxRows })
       return next
     })
   }
@@ -228,8 +224,7 @@ export default function SandboxTruthTable({
     setSandboxRows((prev) => {
       const next = prev.map((row, idx) => (idx === rowIndex ? [...row] : row))
       next[rowIndex][flatIndex] = value
-      const answers = selectedValues.map((val) => (val === '' ? '' : parseInt(val, 10)))
-      scheduleStateChange({ answers, ans: answers[0] ?? '', sandboxRows: next })
+      scheduleStateChange({ answers: selectedValues, ans: selectedValues[0] ?? '', sandboxRows: next })
       return next
     })
   }
@@ -238,8 +233,7 @@ export default function SandboxTruthTable({
     if (readOnly) return
     setSandboxRows((prev) => {
       const next = [...prev, [...defaultRow]]
-      const answers = selectedValues.map((val) => (val === '' ? '' : parseInt(val, 10)))
-      scheduleStateChange({ answers, ans: answers[0] ?? '', sandboxRows: next })
+      scheduleStateChange({ answers: selectedValues, ans: selectedValues[0] ?? '', sandboxRows: next })
       return next
     })
   }
@@ -250,17 +244,18 @@ export default function SandboxTruthTable({
       problemType,
       question: problem,
       getAnswer: () => ({
-        answers: selectedValues.map((val) => (val === '' ? '' : parseInt(val, 10))),
-        ans: selectedValues[0] === '' ? '' : parseInt(selectedValues[0], 10),
+        answers: selectedValues,
+        ans: selectedValues[0] ?? '',
         sandboxRows,
       }),
       onComplete,
-      isDisabled: () => selectedValues.some((val) => val === '') || mcQuestions.length === 0,
+      isDisabled: () => hasIncompleteSelection(selectedValues) || mcQuestions.length === 0,
       resetInput: () => {
         const reset = [[...defaultRow]]
-        setSelectedValues(mcQuestions.map(() => ''))
+        const answers = emptySelections()
+        setSelectedValues(answers)
         setSandboxRows(reset)
-        onStateChange?.({ answers: mcQuestions.map(() => ''), ans: '', sandboxRows: reset })
+        onStateChange?.({ answers, ans: answers[0] ?? '', sandboxRows: reset })
       },
       onStateChange,
       assignmentQuestionId,
@@ -274,19 +269,17 @@ export default function SandboxTruthTable({
   const solutionItems = useMemo(
     () =>
       mcQuestions.flatMap((mcq, qIdx) => {
-        const correctIndex = correctIndices[qIdx] ?? mcq?.answerIndex ?? mcq?.answer ?? mcq?.correctIndex
-        const choices = mcq?.choices || []
-        const numericIndex = Number(correctIndex)
-        const correctChoice = Number.isFinite(numericIndex) && choices[numericIndex] != null
-          ? choices[numericIndex]
-          : null
-        if (correctChoice == null && !Number.isFinite(numericIndex)) {
-          return []
-        }
+        const expected = correctIndices[qIdx] ?? (isMultiSelectSubquestion(mcq)
+          ? mcq?.answerIndices
+          : mcq?.answerIndex ?? mcq?.answer ?? mcq?.correctIndex)
+        const selection = normalizeSubquestionSelection(mcq, expected)
+        const indices = Array.isArray(selection) ? selection : (selection === '' ? [] : [selection])
+        const choices = getSubquestionChoices(mcq)
+        if (indices.length === 0) return []
         return [{
           key: `solution-${qIdx}`,
           prompt: mcq?.prompt,
-          content: correctChoice != null ? correctChoice : `(Answer index: ${correctIndex})`,
+          content: indices.map((index) => choices[index]).join('; '),
         }]
       }),
     [correctIndices, mcQuestions]
@@ -308,7 +301,7 @@ export default function SandboxTruthTable({
           onCheck={handleCheck}
           onStartOver={handleStartOver}
           isChecking={isChecking}
-          isDisabled={mcQuestions.length === 0 || selectedValues.some((val) => val === '') || isLocked || isAssignmentLocked}
+          isDisabled={mcQuestions.length === 0 || hasIncompleteSelection(selectedValues) || isLocked || isAssignmentLocked}
           align="flex-start"
           attemptCount={attemptCount}
           attemptLimit={maxAttempts}
@@ -387,30 +380,18 @@ export default function SandboxTruthTable({
               </Box>
             )}
 
-            <FormControl component="fieldset" sx={{ width: '100%' }}>
-              <Stack spacing={2}>
-                {mcQuestions.map((mcq, qIdx) => (
-                  <Box key={`stt-mc-${qIdx}`} sx={{ width: '100%' }}>
-                    <PromptText content={mcq.prompt} sx={{ ...sectionLabelSx, fontWeight: 500 }} />
-                    <RadioGroup
-                      value={selectedValues[qIdx] ?? ''}
-                      onChange={(event) => handleChoiceChange(qIdx, event.target.value)}
-                      name={`${problemType}-${assignmentQuestionId ?? proof?.id ?? instanceId}-choice-${qIdx}`}
-                    >
-                      {(mcq.choices || []).map((choice, index) => (
-                        <FormControlLabel
-                          key={`${choice}-${index}`}
-                          value={String(index)}
-                          control={<Radio disabled={readOnly || isLocked} />}
-                          label={choice}
-                          sx={choiceLabelWithGapSx}
-                        />
-                      ))}
-                    </RadioGroup>
-                  </Box>
-                ))}
-              </Stack>
-            </FormControl>
+            <SubquestionChoiceList
+              questions={mcQuestions}
+              selectedValues={selectedValues}
+              namePrefix={`${problemType}-${assignmentQuestionId ?? proof?.id ?? instanceId}-choice`}
+              promptSx={{ ...sectionLabelSx, fontWeight: 500 }}
+              disabled={readOnly || isLocked || isAssignmentLocked}
+              onSingleChange={(qIdx, value) => handleChoiceChange(qIdx, Number(value))}
+              onMultiChange={(qIdx, index, checked) => {
+                const current = selectedValues[qIdx] || []
+                handleChoiceChange(qIdx, checked ? [...current, index] : current.filter((value) => value !== index))
+              }}
+            />
 
       <SolutionReveal show={showSolution} title="Correct Answer">
         <Stack spacing={2}>

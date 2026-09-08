@@ -8,6 +8,15 @@ export const isMultiSelectSubquestion = (subq) => (
   || hasNonEmptyAnswerIndices(subq)
 )
 
+// restores a scalar or array selection to the shape isMultiSelectSubquestion expects
+export function normalizeSubquestionSelection(subq, value) {
+  const values = (Array.isArray(value) ? value : [value])
+    .filter((entry) => entry !== '' && entry != null)
+    .map(Number)
+    .filter((index) => Number.isInteger(index) && index >= 0 && index < getSubquestionChoices(subq).length)
+  return isMultiSelectSubquestion(subq) ? [...new Set(values)] : (values[0] ?? '')
+}
+
 const trueFalseChoices = Object.freeze(['True', 'False'])
 
 /*
