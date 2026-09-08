@@ -32,12 +32,23 @@ export function buildClassificationState(selection = []) {
   }
 }
 
-export function buildTruthTableStatePayload(rows, selection = [], mainOperatorColumn = null) {
+export function buildTruthTableStatePayload(rows, selection = [], mainOperatorColumn = null, witnessRow = null) {
   return {
     tables: rows.map((tableRows) => ({ rows: tableRows })),
     mainOperatorColumn,
+    witnessRow,
     ...buildClassificationState(selection),
   }
+}
+
+// builds a one-hot row-highlight array sized to the table's row count
+function buildRowHighlights(rowCount, witnessRow) {
+  if (!Number.isInteger(witnessRow) || rowCount <= 0) return []
+  const rowhls = Array(rowCount).fill(false)
+  if (witnessRow >= 0 && witnessRow < rowCount) {
+    rowhls[witnessRow] = true
+  }
+  return rowhls
 }
 
 // encodes truth values as booleans and preserves unfinished cells as unknown
@@ -46,7 +57,8 @@ export function buildTruthTableSubmissionData(
   rows,
   selection = [],
   classificationEnabled = false,
-  mainOperatorColumn = null
+  mainOperatorColumn = null,
+  witnessRow = null
 ) {
   const tableData = rows.map((tableRows) => ({
     rows: tableRows.map((row) => row.map((cell) => cell === 'T' ? true : cell === 'F' ? false : -1)),
@@ -63,11 +75,13 @@ export function buildTruthTableSubmissionData(
     return { lefts: [], right: { rows: [] }, rowhls: [] }
   }
 
+  const rowhls = buildRowHighlights(rows[0]?.length ?? 0, witnessRow)
+
   if (kind === 'formula') {
     return {
       lefts: [],
       right: tableData[0],
-      rowhls: [],
+      rowhls,
       ...(classificationEnabled
         ? {
             mcans: selection,
@@ -82,7 +96,7 @@ export function buildTruthTableSubmissionData(
     return {
       lefts: tableData.slice(0, -1),
       right: tableData[tableData.length - 1],
-      rowhls: [],
+      rowhls,
       ...(classificationEnabled
         ? {
             mcans: selection,
@@ -96,7 +110,7 @@ export function buildTruthTableSubmissionData(
     return {
       lefts: tableData.slice(0, -1),
       right: tableData[tableData.length - 1],
-      rowhls: [],
+      rowhls,
       ...(classificationEnabled
         ? {
             mcans: selection,
@@ -106,7 +120,29 @@ export function buildTruthTableSubmissionData(
     }
   }
 
-  return { lefts: [], right: tableData[0], rowhls: [] }
+  return { lefts: [], right: tableData[0], rowhls }
+}
+
+// tests whether rowIndex witnesses the property graded for this kind:
+// formula: not a contradiction; argument: invalid; equivalence: jointly
+// satisfiable. `tables` are the already-computed answer tables, each
+// with .rows (boolean cells) and .opspot (main-operator column index)
+export function isValidWitnessRow(kind, tables, rowIndex) {
+  if (!Array.isArray(tables) || tables.length === 0 || !Number.isInteger(rowIndex)) return false
+  const isTrueAt = (table) => table?.rows?.[rowIndex]?.[table.opspot] === true
+  const isFalseAt = (table) => table?.rows?.[rowIndex]?.[table.opspot] === false
+  if (kind === 'formula') {
+    return isTrueAt(tables[0])
+  }
+  if (kind === 'argument') {
+    const prems = tables.slice(0, -1)
+    const conc = tables[tables.length - 1]
+    return prems.every(isTrueAt) && isFalseAt(conc)
+  }
+  if (kind === 'equivalence') {
+    return tables.every(isTrueAt)
+  }
+  return false
 }
 
 export function normalizeSavedClassification(kind, savedState) {
