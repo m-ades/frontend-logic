@@ -67,7 +67,7 @@ export default function AssignmentFormDialog({
 
           <Stack direction="row" spacing={2}>
             <TextField
-              label="Chapter"
+              label="Part"
               type="number"
               fullWidth
               value={formData.chapter}
@@ -79,7 +79,7 @@ export default function AssignmentFormDialog({
               }
             />
             <TextField
-              label="Subchapter"
+              label="Chapter"
               fullWidth
               value={formData.subchapter}
               onChange={(e) =>
