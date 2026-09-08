@@ -11,7 +11,7 @@ export default function ProtectedRoute({ children, allowedRoles = [] }) {
   const searchParams = new URLSearchParams(location.search || "");
   const previewAs = searchParams.get("preview");
   const isInstructorPreviewingStudent =
-    normalizedRole === "instructor" && previewAs === "student";
+    normalizedRole === "instructor" && previewAs === "student" && allowedRoles.includes("student");
 
   if (isLoading) {
     return (
@@ -37,20 +37,10 @@ export default function ProtectedRoute({ children, allowedRoles = [] }) {
     !allowedRoles.includes(normalizedRole) &&
     !isInstructorPreviewingStudent
   ) {
-    // Redirect to appropriate dashboard based on role
     if (!normalizedRole) {
       return <Navigate to="/login" replace />;
     }
-    return (
-      <Navigate
-        to={
-          normalizedRole === "instructor"
-            ? "/instructor/dashboard"
-            : "/student/dashboard"
-        }
-        replace
-      />
-    );
+    return <Navigate to="/dashboard" replace />;
   }
 
   return children;

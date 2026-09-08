@@ -57,7 +57,7 @@ export default function WorksheetTextbookSplit({
 
   const linkBase = textbookChapterPath
     ? textbookChapterPath('').replace(/\/$/, '')
-    : `${routePrefix || '/student'}/textbook`
+    : `${routePrefix || ''}/textbook`
   const chapterLinks = practiceLinks.filter((link) => link.textbookSlug === openChapter)
 
   return (

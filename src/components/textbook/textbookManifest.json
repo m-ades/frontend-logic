@@ -2,13 +2,13 @@
   "bookTitle": "forall x: Calgary",
   "version": "Fall 2025 (2026-07-18)",
   "defaultSlug": "Ch1",
-  "assetBase": "/textbook",
+  "assetBase": "/textbook-assets",
   "stylesheets": [
-    "/textbook/LaTeXML.css",
-    "/textbook/ltx-book.css",
-    "/textbook/forallxyyc.css",
-    "/textbook/fitchml.css",
-    "/textbook/bmluser/colors.gitbook-forallxyyc-html.css"
+    "/textbook-assets/LaTeXML.css",
+    "/textbook-assets/ltx-book.css",
+    "/textbook-assets/forallxyyc.css",
+    "/textbook-assets/fitchml.css",
+    "/textbook-assets/bmluser/colors.gitbook-forallxyyc-html.css"
   ],
   "entries": [
     {

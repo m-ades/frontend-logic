@@ -74,11 +74,8 @@ function AppShell({ children }) {
     }
   }, [textSize]);
 
-  const isInstructorRoute = location.pathname.startsWith("/instructor")
-    ? true
-    : location.pathname.startsWith("/student")
-    ? false
-    : isInstructorRole(user?.role);
+  const isInstructorRoute = isInstructorRole(user?.role)
+    && new URLSearchParams(location.search).get("preview") !== "student";
   const baseSidebarStructure = isInstructorRoute
     ? InstructorSidebarStructure
     : StudentSidebarStructure;
@@ -98,7 +95,7 @@ function AppShell({ children }) {
   const pageContent = !initialized && !coursesError
     ? <LoadingSpinner label="Loading course..." />
     : textbookRoute && !isTextbookAvailable(logicSystem)
-    ? <Navigate to={`/${routeKind}/dashboard`} replace />
+    ? <Navigate to="/dashboard" replace />
     : children;
 
   const handleSignOut = async () => {

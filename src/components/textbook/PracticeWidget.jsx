@@ -23,13 +23,13 @@ export default function PracticeWidget({
   const title = practiceTitle || `Practice ${practiceId}`
 
   const openPractice = () => {
-    const path = assignmentPath?.(practiceId) || `/student/assignment/${practiceId}`
+    const path = assignmentPath?.(practiceId) || `/assignment/${practiceId}`
     const returnTo = isInstructor
       ? `${location.pathname}${location.search}${location.hash}`
       : (textbookSlug && textbookChapterPath?.(textbookSlug)) ||
         textbookPath ||
         practicePath ||
-        '/student/textbook'
+        '/textbook'
     navigate(path, {
       state: {
         returnTo,

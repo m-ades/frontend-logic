@@ -1,4 +1,11 @@
 {
+  "redirects": [
+    {
+      "source": "/textbook/:file(.*\\..*)",
+      "destination": "/textbook-assets/:file",
+      "permanent": true
+    }
+  ],
   "rewrites": [
     {
       "source": "/api/:path*",
@@ -8,7 +15,7 @@
   ],
   "headers": [
     {
-      "source": "/textbook/(.*)",
+      "source": "/textbook-assets/:path*",
       "headers": [
         {
           "key": "Content-Security-Policy",

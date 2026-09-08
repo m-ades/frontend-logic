@@ -13,7 +13,7 @@ const links = [
 test('linked practice stays standalone without textbook navigation state', () => {
   assert.equal(resolveWorksheetTextbookContext(links, null), null)
   assert.equal(
-    resolveWorksheetTextbookContext(links, { returnTo: '/student/practice' }),
+    resolveWorksheetTextbookContext(links, { returnTo: '/practice' }),
     null,
   )
 })

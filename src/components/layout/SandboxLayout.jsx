@@ -9,7 +9,6 @@ import ShellFrame from "./ShellFrame.jsx";
 import {
   buildBreadcrumbInfo,
   buildRuntimePaths,
-  remapStudentPath,
   remapRoutePath,
 } from "../../runtime/sandboxRuntime.js";
 import { isTextbookAvailable } from "../textbook/textbookAvailability.js";
@@ -17,7 +16,7 @@ import { isTextbookAvailable } from "../textbook/textbookAvailability.js";
 const STUDENT_SANDBOX_PREFIX = "/sandbox/student";
 const INSTRUCTOR_SANDBOX_PREFIX = "/sandbox/instructor";
 const sandboxSidebarLabels = new Set(["Dashboard", "Assignments", "Practice", "Textbook", "Grades"]);
-const remapInstructorPath = (path) => remapRoutePath(path, "/instructor", INSTRUCTOR_SANDBOX_PREFIX);
+const remapInstructorPath = (path) => remapRoutePath(path, "", INSTRUCTOR_SANDBOX_PREFIX);
 
 function SandboxFrame({ children, runtimeValue, sidebarStructure, onExit }) {
   const location = useLocation();
@@ -72,7 +71,6 @@ export default function SandboxLayout({ children }) {
     mode: "sandbox",
     ...runtimePaths,
     isSandbox: true,
-    remapStudentPath: (path) => remapStudentPath(path, STUDENT_SANDBOX_PREFIX),
     getBreadcrumbInfo: (pathname, returnTo) => buildBreadcrumbInfo(pathname, {
       routeKind: "student",
       routePrefix: runtimePaths.routePrefix,
@@ -101,7 +99,7 @@ export default function SandboxLayout({ children }) {
     .filter((item) => sandboxSidebarLabels.has(item.label))
     .map((item) => ({
       ...item,
-      link: remapStudentPath(item.link, STUDENT_SANDBOX_PREFIX),
+      link: remapRoutePath(item.link, "", STUDENT_SANDBOX_PREFIX),
     }));
 
   return (
@@ -126,7 +124,6 @@ export function InstructorSandboxLayout({ children }) {
     mode: "sandbox",
     ...runtimePaths,
     isSandbox: true,
-    remapStudentPath: remapInstructorPath,
     getBreadcrumbInfo: (pathname, returnTo) => buildBreadcrumbInfo(pathname, {
       routeKind: "instructor",
       routePrefix: runtimePaths.routePrefix,

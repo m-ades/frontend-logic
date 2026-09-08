@@ -22,10 +22,6 @@ const instructorSectionLabels = {
   "textbook-links": "Textbook",
 };
 
-export function getRoutePrefix(routeKind) {
-  return routeKind === "instructor" ? "/instructor" : "/student";
-}
-
 export function remapRoutePath(path, sourcePrefix, routePrefix) {
   if (typeof path !== "string") return path;
   if (path === sourcePrefix) return routePrefix;
@@ -33,13 +29,8 @@ export function remapRoutePath(path, sourcePrefix, routePrefix) {
   return `${routePrefix}${path.slice(sourcePrefix.length)}`;
 }
 
-export function remapStudentPath(path, routePrefix = "/student") {
-  return remapRoutePath(path, "/student", routePrefix);
-}
-
-// runtime textbook paths are available to students and instructors
-// instructor management remains on the textbook links route
-export function buildRuntimePaths(routeKind, routePrefix = getRoutePrefix(routeKind)) {
+// app paths are shared across roles and demos supply their own prefix
+export function buildRuntimePaths(routeKind, routePrefix = "") {
   const isInstructor = routeKind === "instructor";
   const gradesPath = isInstructor ? `${routePrefix}/gradebook` : `${routePrefix}/grades`;
 
@@ -72,7 +63,7 @@ export function buildRuntimePaths(routeKind, routePrefix = getRoutePrefix(routeK
  */
 export function buildBreadcrumbInfo(pathname, {
   routeKind,
-  routePrefix = getRoutePrefix(routeKind),
+  routePrefix = "",
   stripPrefix = routePrefix,
   returnTo,
 }) {
