@@ -210,7 +210,7 @@ const buildTruthTableState = (lefts, right, data) => {
   return state
 }
 
-const QUESTION_SESSION_TRACKING_ENABLED = false
+const QUESTION_SESSION_TRACKING_ENABLED = true
 
 function RealWorksheetContent() {
   const { worksheetId, assignmentId } = useParams()
@@ -437,7 +437,11 @@ function RealWorksheetContent() {
               scheduleIdleTimeoutRef.current()
             }
           } catch (err) {
-            // ignore for now
+            /*
+            give up for this attempt instead of hot-looping against a failing
+            endpoint - the next activity/focus/question-switch event will retry.
+            */
+            break
           }
           continue
         }
@@ -491,6 +495,15 @@ function RealWorksheetContent() {
 
     const handleActivity = () => {
       lastActivityRef.current = Date.now()
+      /*
+      an idle timeout (or a failed create) can leave no active session while
+      the user is still on a question. keystrokes/clicks/scroll resume it -
+      previously only a focus/visibility event or switching questions could.
+      */
+      if (!questionSessionId.current && currentProof?.questionId) {
+        desiredQuestionSessionQuestionIdRef.current = currentProof.questionId
+        syncQuestionSession()
+      }
       scheduleIdleTimeout()
     }
 
@@ -525,6 +538,19 @@ function RealWorksheetContent() {
     window.addEventListener('focus', handleFocus)
     document.addEventListener('visibilitychange', handleVisibilityChange)
 
+    /*
+    a normal PUT close request can't be relied on to finish before the page
+    is torn down. sendBeacon queues a fire-and-forget POST that survives
+    unload; pagehide (not beforeunload) covers tab close/navigation/refresh
+    without blocking the back/forward cache.
+    */
+    const handlePageHide = () => {
+      const activeSessionId = questionSessionId.current
+      if (!activeSessionId || typeof navigator === 'undefined' || !navigator.sendBeacon) return
+      navigator.sendBeacon(`${API_CONFIG.baseUrl}/api/question-sessions/${activeSessionId}/close`)
+    }
+    window.addEventListener('pagehide', handlePageHide)
+
     // initialize timers when mounted
     handleActivity()
 
@@ -538,6 +564,7 @@ function RealWorksheetContent() {
       window.removeEventListener('blur', handleBlur)
       window.removeEventListener('focus', handleFocus)
       document.removeEventListener('visibilitychange', handleVisibilityChange)
+      window.removeEventListener('pagehide', handlePageHide)
     }
   }, [currentProof?.questionId, syncQuestionSession])
 
