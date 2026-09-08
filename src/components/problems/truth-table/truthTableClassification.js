@@ -1,6 +1,3 @@
-// owns classification copy completeness and equality rules
-// functions are pure and do not depend on rendering storage or submission
-
 export function getTruthTableClassification(kind, statementCount = 0) {
   if (kind === 'formula') {
     return {
@@ -40,20 +37,6 @@ export function getTruthTableClassification(kind, statementCount = 0) {
     }
   }
   return { selectionMode: 'multiple', prompt: 'Select all that apply', options: [] }
-}
-
-export function isTruthTableClassificationComplete(kind, selection = []) {
-  const values = new Set(selection)
-  if (kind === 'formula') {
-    return ['tautology', 'self-contradiction', 'contingent'].filter((value) => values.has(value)).length === 1
-  }
-  if (kind === 'argument') {
-    return ['valid', 'invalid'].filter((value) => values.has(value)).length === 1
-  }
-  if (kind === 'equivalence') {
-    return ['consistent', 'inconsistent'].filter((value) => values.has(value)).length === 1
-  }
-  return selection.length > 0
 }
 
 export function truthTableClassificationsMatch(selection = [], expected = []) {

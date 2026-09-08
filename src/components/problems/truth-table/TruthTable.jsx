@@ -27,7 +27,6 @@ import {
 } from './truthTableUi.js'
 import {
   getTruthTableClassification,
-  isTruthTableClassificationComplete,
   truthTableClassificationsMatch,
 } from './truthTableClassification.js'
 import PromptText from '../../ui/PromptText.jsx'
@@ -302,8 +301,6 @@ export default function TruthTable({
           row.every((cell) => cell !== '')
       )
     )
-  const classificationComplete = !classificationEnabled || isTruthTableClassificationComplete(kind, mcSelection)
-  const tableFilled = tableFilledOnly && classificationComplete
 
   const tableCorrect =
     hasTruthTable &&
@@ -326,23 +323,12 @@ export default function TruthTable({
 
   const handleCheck = async () => {
     if (isChecking || attemptCount >= attemptLimit) return
-    if (!tableFilled) {
-      setStatus('unanswered')
-      setMessage(classificationEnabled && !classificationComplete
-        ? 'Select a classification before submitting.'
-        : 'Complete the table before submitting.'
-      )
-      return
-    }
     setIsChecking(true)
     try {
       const result = await submitTruthTableAnswer({
         assignmentQuestionId,
         submissionData: buildTruthTableSubmissionData(kind, tableInputs, mcSelection, classificationEnabled),
         localIsCorrect: tableCorrect && classificationCorrect,
-        attemptLimit,
-        classificationEnabled,
-        selection: mcSelection,
       })
       if (result.mode === 'remote') {
         const resp = result.response
@@ -514,7 +500,7 @@ export default function TruthTable({
             onCheck={handleCheck}
             onStartOver={handleStartOver}
             isChecking={isChecking}
-            isDisabled={!tableFilled || attemptCount >= attemptLimit}
+            isDisabled={attemptCount >= attemptLimit}
             align="flex-start"
             attemptCount={attemptCount}
             attemptLimit={attemptLimit}

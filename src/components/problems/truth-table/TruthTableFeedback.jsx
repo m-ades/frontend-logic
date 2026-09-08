@@ -9,7 +9,7 @@ const FEEDBACK = {
   incomplete: {
     color: 'text.secondary',
     icon: null,
-    message: 'Fill every blank cell.',
+    message: 'Table incomplete.',
   },
   incorrect: {
     color: 'error.main',

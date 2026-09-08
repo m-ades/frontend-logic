@@ -94,20 +94,13 @@ export default function PartialTruthTable({
     setRowInputs((prev) => (rowsEqual(prev, initialRow) ? prev : initialRow))
   }, [initialRow])
 
-  const isDisabled = useCallback(
-    () =>
-      rowInputs.length === 0 ||
-      rowInputs.some((cell, idx) => editableIndices[idx] && cell === ''),
-    [editableIndices, rowInputs]
-  )
-
   const { status, message, isChecking, handleCheck, handleStartOver, setStatus, setMessage, attemptCount, maxAttempts, isLocked } = useProblemChecker({
     answer: null,
     problemType: 'partial-truth-table',
     question: problem,
     getAnswer: () => ({ row: rowInputs }),
     onComplete,
-    isDisabled,
+    isDisabled: () => isAssignmentLocked,
     resetInput: () => {
       setRowInputs(initialRow)
       onStateChange?.({ row: initialRow })
@@ -168,7 +161,7 @@ export default function PartialTruthTable({
           onCheck={handleCheck}
           onStartOver={handleStartOver}
           isChecking={isChecking}
-          isDisabled={isDisabled() || isLocked || isAssignmentLocked}
+          isDisabled={isLocked || isAssignmentLocked}
           align="flex-start"
           attemptCount={attemptCount}
           attemptLimit={maxAttempts}
