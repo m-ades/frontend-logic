@@ -18,7 +18,7 @@ import SolutionReveal from '../SolutionReveal.jsx'
 import PromptText from '../../ui/PromptText.jsx'
 import { rowsEqual, matrixEqual, clearDebounce, scheduleDebouncedChange } from '../../../utils/tablePerf.js'
 import { getNotation } from '../../../lib/logicSystems.js'
-import { formatTruthTableStatements } from './truthTableUi.js'
+import { formatTruthTableStatements, SELECTOR_LANE_WIDTH } from './truthTableUi.js'
 import { logicStatementsToTex } from '../../../lib/logicTex.js'
 import MathJaxFormula from '../../ui/MathJaxFormula.jsx'
 
@@ -377,7 +377,7 @@ export default function SandboxTruthTable({
                       toggleValues={normalizedToggleValues}
                       shrinkWrap
                     />
-                    <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 0.25, width: '100%' }}>
+                    <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 0.25, width: '100%', pr: `${SELECTOR_LANE_WIDTH}px` }}>
                       <Button size="small" variant="outlined" onClick={handleAddRow} disabled={readOnly}>
                         + Add row
                       </Button>

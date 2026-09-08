@@ -412,12 +412,14 @@ export function getDisplayedColumnCount(tables = [], combined) {
 }
 
 // keep wide tables readable without measuring the dom
+export const SELECTOR_LANE_WIDTH = 36
+
 export function getTruthTableDensity(columnCount) {
   if (columnCount >= 11) {
-    return { cell: 56, cellMax: 60, separator: 28, selectorLane: 36 }
+    return { cell: 56, cellMax: 60, separator: 28, selectorLane: SELECTOR_LANE_WIDTH }
   }
   if (columnCount >= 8) {
-    return { cell: 64, cellMax: 68, separator: 32, selectorLane: 36 }
+    return { cell: 64, cellMax: 68, separator: 32, selectorLane: SELECTOR_LANE_WIDTH }
   }
-  return { cell: 76, cellMax: 80, separator: 36, selectorLane: 36 }
+  return { cell: 76, cellMax: 80, separator: 36, selectorLane: SELECTOR_LANE_WIDTH }
 }
