@@ -312,7 +312,7 @@ export default function AssignmentDetailModal({ open, onClose, assignmentId }) {
           {[
             {
               title: "Average Grade",
-              value: `${averageGrade}%`,
+              value: averageGrade == null ? "—" : `${averageGrade}%`,
               subtitle: getLetterGrade(averageGrade),
               icon: Award,
               gradient: [theme.palette.primary.main, theme.palette.primary.dark],

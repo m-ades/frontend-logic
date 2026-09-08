@@ -271,7 +271,7 @@ export default function GradebookTable({
                         }}
                       >
                         <Typography variant="body2" fontWeight={600}>
-                          {average}%
+                          {average === null ? "—" : `${average}%`}
                         </Typography>
                         <Chip
                           label={letterGrade}

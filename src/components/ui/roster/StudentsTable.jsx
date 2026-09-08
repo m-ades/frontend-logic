@@ -92,6 +92,7 @@ export default function StudentsTable({
           <TableBody>
             {students.map((student) => {
               const stats = getStudentStats(student);
+              const hasAverage = stats.average != null;
               const letterGrade =
                 stats.average >= 90
                   ? "A"
@@ -138,12 +139,12 @@ export default function StudentsTable({
                       variant="body2"
                       fontWeight={600}
                       color={
-                        stats.completed > 0 && stats.average < 70
+                        hasAverage && stats.average < 70
                           ? "error.main"
                           : "text.primary"
                       }
                     >
-                      {stats.completed > 0 ? `${stats.average}%` : "—"}
+                      {hasAverage ? `${stats.average}%` : "—"}
                     </Typography>
                   </TableCell>
 
@@ -151,7 +152,7 @@ export default function StudentsTable({
                     align="center"
                     onClick={() => onStudentClick(student)}
                   >
-                    {stats.completed > 0 ? (
+                    {hasAverage ? (
                       <Chip
                         label={letterGrade}
                         color={gradeColor}

@@ -28,7 +28,7 @@ export default function RosterStatsSection({
 
       <MetricCard
         title="Class Average"
-        value={`${averageGrade}%`}
+        value={averageGrade === null ? "—" : `${averageGrade}%`}
         subtitle="Across all students"
         icon={TrendingUp}
         gradient={["#22c55e", "#16a34a"]}

@@ -215,6 +215,10 @@ export function SandboxProvider({ children }) {
     return {
       assignments: {
         ...classroomAnalytics.assignments,
+        completed: grades.filter(({ Assignment: assignment }) => (
+          !assignment.is_locked && assignment.proofs.length > 0 &&
+          assignment.proofs.every((proof) => proof.attemptCount > 0)
+        )).length,
         upcomingList: dynamicUpcoming,
       },
       performance: {

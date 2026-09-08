@@ -609,7 +609,7 @@ export default function StudentProfileModal({
                 sx={{ display: "flex", alignItems: "baseline", gap: 2, mt: 1 }}
               >
                 <Typography variant="h2" component="div" fontWeight={800} color="primary.main">
-                  {average}%
+                  {average === null ? "—" : `${average}%`}
                 </Typography>
                 <Chip
                   label={averageGrade.letter}

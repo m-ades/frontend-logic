@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'react'
 import { useParams, useNavigate, useLocation } from 'react-router-dom'
+import { useQueryClient } from '@tanstack/react-query'
 import { Box } from '@mui/material'
 import LoadingSpinner from '../components/ui/LoadingSpinner.jsx'
 import WorksheetLayout from '../components/layout/WorksheetLayout.jsx'
@@ -128,6 +129,8 @@ function SandboxWorksheetContent() {
   )
 }
 
+const GRADE_QUERY_KEYS = ['user-grades', 'analytics-student', 'gradebook-summary']
+
 function clampIndex(index, length) {
   return Math.max(0, Math.min(index, Math.max(0, length - 1)))
 }
@@ -213,6 +216,7 @@ function RealWorksheetContent() {
   const { worksheetId, assignmentId } = useParams()
   const navigate = useNavigate()
   const location = useLocation()
+  const queryClient = useQueryClient()
   const currentWorksheetIdRef = useRef(null)
   const restoredQuestionIndexForAssignmentRef = useRef(null)
   const [{ currentProofIndex, worksheets }, dispatchWorksheetView] = useReducer(
@@ -636,6 +640,8 @@ function RealWorksheetContent() {
           ...prev,
           [questionId]: Math.max(score, prev[questionId] ?? 0),
         }))
+        // unmounted while the worksheet is open, so these only mark stale; the refetch happens on next mount
+        GRADE_QUERY_KEYS.forEach((key) => queryClient.invalidateQueries({ queryKey: [key] }))
       }
       if (Number.isFinite(questionId)) {
         // sync attempts
@@ -674,7 +680,7 @@ function RealWorksheetContent() {
     }
     window.addEventListener('assignment-submission', handleSubmission)
     return () => window.removeEventListener('assignment-submission', handleSubmission)
-  }, [refreshQuestionSolutions])
+  }, [refreshQuestionSolutions, queryClient])
 
   useEffect(() => {
     let isMounted = true
