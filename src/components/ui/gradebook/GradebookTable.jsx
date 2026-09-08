@@ -86,8 +86,10 @@ export default function GradebookTable({
                   sx={{
                     fontWeight: 600,
                     backgroundColor: "background.paper",
-                    width: 130,
-                    minWidth: 130,
+                    width: { xs: 110, sm: 130 },
+                    minWidth: { xs: 110, sm: 130 },
+                    maxWidth: { xs: 110, sm: 130 },
+                    overflowWrap: "anywhere",
                     position: "sticky",
                     left: 0,
                     zIndex: 3,
@@ -119,7 +121,7 @@ export default function GradebookTable({
                     width: 90,
                     minWidth: 90,
                     position: "sticky",
-                    left: 130,
+                    left: { xs: "auto", sm: 130 },
                     zIndex: 3,
                     borderRight: "2px solid",
                     borderColor: "divider",
@@ -220,8 +222,10 @@ export default function GradebookTable({
                         borderColor: "divider",
                         cursor: "pointer",
                         transition: "background-image 0.1s",
-                        width: 130,
-                        minWidth: 130,
+                        width: { xs: 110, sm: 130 },
+                        minWidth: { xs: 110, sm: 130 },
+                        maxWidth: { xs: 110, sm: 130 },
+                        overflowWrap: "anywhere",
                         px: 1,
                         py: 0.75,
                         "&:hover": {
@@ -239,8 +243,8 @@ export default function GradebookTable({
                     <TableCell
                       align="center"
                       sx={{
-                        position: "sticky",
-                        left: 130,
+                        position: { xs: "static", sm: "sticky" },
+                        left: { xs: "auto", sm: 130 },
                         backgroundColor: "background.paper",
                         backgroundImage: isRowHovered
                           ? (theme) =>
