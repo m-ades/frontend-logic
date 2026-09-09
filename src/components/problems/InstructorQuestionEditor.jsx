@@ -114,6 +114,7 @@ function InstructorQuestionEditorInner({
       base.partialCredit = opts.partialCredit ?? opts.partialcredit ?? opts.partial_credit ?? Boolean(proof.partialCredit)
       base.classificationQuestion = opts.question ?? false
       base.mainOperatorHighlight = opts.highlightMainOperator ?? false
+      base.witnessRowHighlight = opts.highlightWitnessRow ?? false
     }
     if (proof?.type === 'indirect-truth-table') {
       const itt = proof.indirectTruthTable || {}

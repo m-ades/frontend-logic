@@ -29,6 +29,7 @@ export function buildTruthTableSnapshot(proof, edited, existing, logicSystem = D
     ...(edited.partialCredit !== undefined ? { partialCredit: edited.partialCredit } : {}),
     ...(edited.classificationQuestion !== undefined ? { question: edited.classificationQuestion } : {}),
     ...(edited.mainOperatorHighlight !== undefined ? { highlightMainOperator: edited.mainOperatorHighlight } : {}),
+    ...(edited.witnessRowHighlight !== undefined ? { highlightWitnessRow: edited.witnessRowHighlight } : {}),
   }
   const equivalenceStatements = Array.isArray(edited.statements)
     ? [...edited.statements]
@@ -75,6 +76,12 @@ export function TruthTableEditorForm({ proof, value, onChange, logicSystem = DEF
   const partialCredit = value.partialCredit ?? opts.partialCredit ?? opts.partialcredit ?? opts.partial_credit ?? proof?.partialCredit ?? false
   const classificationQuestion = value.classificationQuestion ?? opts.question ?? false
   const mainOperatorHighlight = value.mainOperatorHighlight ?? opts.highlightMainOperator ?? false
+  const witnessRowHighlight = value.witnessRowHighlight ?? opts.highlightWitnessRow ?? false
+  const witnessRowLabel = kind === 'argument'
+    ? 'Require highlighting a row that shows the argument is invalid'
+    : kind === 'equivalence'
+      ? 'Require highlighting a row that shows the set is jointly satisfiable'
+      : 'Require highlighting a row that shows the sentence is not a contradiction'
 
   const update = (updates) => onChange({ ...value, ...updates })
 
@@ -224,6 +231,15 @@ export function TruthTableEditorForm({ proof, value, onChange, logicSystem = DEF
           label="Require main operator highlight"
         />
       )}
+      <FormControlLabel
+        control={
+          <Checkbox
+            checked={witnessRowHighlight}
+            onChange={(e) => update({ witnessRowHighlight: e.target.checked })}
+          />
+        }
+        label={witnessRowLabel}
+      />
     </Stack>
   )
 }
