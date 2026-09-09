@@ -85,3 +85,20 @@ export function parseDueDateAsEastern(dueDate, dueTime = '23:59') {
   const iso = toEasternIso(source.slice(0, 10), dueTime || '23:59');
   return iso ? new Date(iso) : null;
 }
+
+/*
+counts new york calendar days from now to a date or instant
+ignores clock time and returns null for invalid inputs
+*/
+export function daysUntilDue(dueDate, now = new Date()) {
+  if (dueDate == null) return null;
+  try {
+    const date = typeof dueDate === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(dueDate)
+      ? Temporal.PlainDate.from(dueDate)
+      : toTemporalInstant(dueDate).toZonedDateTimeISO(NEW_YORK_TIME_ZONE).toPlainDate();
+    const today = toTemporalInstant(now).toZonedDateTimeISO(NEW_YORK_TIME_ZONE).toPlainDate();
+    return today.until(date, { largestUnit: 'days' }).days;
+  } catch {
+    return null;
+  }
+}
