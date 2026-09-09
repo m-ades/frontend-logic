@@ -1,22 +1,13 @@
-import { createContext, useContext, useEffect, useState } from 'react'
-import { createTheme } from '@mui/material/styles'
-import defaultThemeConfig from '../themes/default.js'
-import darkThemeConfig from '../themes/dark.js'
-import { getOverrides } from '../themes/overrides.js'
+import { createContext, useCallback, useContext, useEffect, useState } from 'react'
+import { getAppTheme } from '../theme.js'
 
 const ThemeStateContext = createContext()
 const ThemeDispatchContext = createContext()
 
-const createAppTheme = (isDark) => {
-  const baseTheme = isDark ? darkThemeConfig : defaultThemeConfig
-  const overrides = getOverrides(isDark)
-  return createTheme({ ...baseTheme, ...overrides })
-}
-
 export function ThemeProvider({ children }) {
   const [theme, setTheme] = useState(() => {
     const savedTheme = localStorage.getItem('theme') || 'dark'
-    return createAppTheme(savedTheme === 'dark')
+    return getAppTheme(savedTheme)
   })
 
   useEffect(() => {
@@ -26,10 +17,10 @@ export function ThemeProvider({ children }) {
     document.documentElement.dataset.theme = mode
   }, [theme])
 
-  const changeTheme = (themeName) => {
+  const changeTheme = useCallback((themeName) => {
     localStorage.setItem('theme', themeName)
-    setTheme(createAppTheme(themeName === 'dark'))
-  }
+    setTheme(getAppTheme(themeName))
+  }, [])
 
   return (
     <ThemeStateContext.Provider value={theme}>
