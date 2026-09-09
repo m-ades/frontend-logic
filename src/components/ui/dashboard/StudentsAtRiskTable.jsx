@@ -15,6 +15,7 @@ import {
   getGradeColorVariant,
   getDefaultGradingScale,
 } from "../../../utils/gradingUtils";
+import { getStudentAverage } from "../../../utils/GradebookUtils.js";
 import { useAppRuntime } from "../../../hooks/useAppRuntime.js";
 
 export const StudentsAtRiskTable = ({ students, assignments }) => {
@@ -36,19 +37,17 @@ export const StudentsAtRiskTable = ({ students, assignments }) => {
 
   const atRiskStudents = students
     .map((student) => {
+      const rawAvg = getStudentAverage(student);
+      const avg = rawAvg !== null ? Math.round(rawAvg) : null;
       const grades = Object.values(student.grades).filter(
         (g) => g !== undefined && g !== null
       );
-      const avg =
-        grades.length > 0
-          ? Math.round(grades.reduce((sum, g) => sum + g, 0) / grades.length)
-          : 0;
       const missing = assignments.length - grades.length;
       const letterGrade = getLetterGrade(avg, gradingScale);
-      return { ...student, avg, missing, letterGrade };
+      return { ...student, rawAvg, avg, missing, letterGrade };
     })
-    .filter((s) => s.avg < atRiskThreshold && s.avg > 0)
-    .sort((a, b) => a.avg - b.avg);
+    .filter((s) => s.rawAvg !== null && s.rawAvg < atRiskThreshold)
+    .sort((a, b) => a.rawAvg - b.rawAvg);
 
   // Get the grade level name for the threshold for display
   const thresholdGrade = gradingScale.find(
