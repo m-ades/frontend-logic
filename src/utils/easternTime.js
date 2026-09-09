@@ -86,14 +86,19 @@ export function parseDueDateAsEastern(dueDate, dueTime = '23:59') {
   return iso ? new Date(iso) : null;
 }
 
-// calendar days from today (eastern) to the due date (eastern); 0 the whole day
-// it's due, negative once overdue; null when unparseable. deliberately ignores
-// time-of-day, so "due today at 11:59pm" reads as 0 all day, not 1 until evening
-export function daysUntilDue(dueDate, dueTime, now = new Date()) {
-  const deadline = parseDueDateAsEastern(dueDate, dueTime);
-  if (!deadline) return null;
-  const todayEastern = getCurrentEasternDate(now);
-  const dueEastern = getCurrentEasternDate(deadline);
-  const diffMs = new Date(`${dueEastern}T00:00:00Z`) - new Date(`${todayEastern}T00:00:00Z`);
-  return Math.round(diffMs / (1000 * 60 * 60 * 24));
+/*
+counts new york calendar days from now to a date or instant
+ignores clock time and returns null for invalid inputs
+*/
+export function daysUntilDue(dueDate, now = new Date()) {
+  if (dueDate == null) return null;
+  try {
+    const date = typeof dueDate === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(dueDate)
+      ? Temporal.PlainDate.from(dueDate)
+      : toTemporalInstant(dueDate).toZonedDateTimeISO(NEW_YORK_TIME_ZONE).toPlainDate();
+    const today = toTemporalInstant(now).toZonedDateTimeISO(NEW_YORK_TIME_ZONE).toPlainDate();
+    return today.until(date, { largestUnit: 'days' }).days;
+  } catch {
+    return null;
+  }
 }

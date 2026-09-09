@@ -16,7 +16,7 @@ import { formatEasternDateTime, daysUntilDue } from "../../../utils/easternTime.
 export const UpcomingDeadlinesTable = ({ assignments, onAssignmentClick }) => {
   const isInteractive = typeof onAssignmentClick === "function";
   const upcomingAssignments = assignments
-    .map((a) => ({ ...a, daysLeft: daysUntilDue(a.dueDate, a.dueTime) }))
+    .map((a) => ({ ...a, daysLeft: daysUntilDue(a.dueDate) }))
     .filter((a) => a.daysLeft !== null && a.daysLeft >= 0 && a.daysLeft <= 7)
     .sort((a, b) => a.daysLeft - b.daysLeft);
 
