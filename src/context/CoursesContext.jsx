@@ -341,24 +341,6 @@ export function calculateGradeDistribution(students, gradingScale) {
   return distribution;
 }
 
-// Calculate students at risk (below 70%)
-export function getStudentsAtRisk(students, assignments) {
-  return students
-    .map((student) => {
-      const grades = Object.values(student.grades).filter(
-        (g) => g !== undefined && g !== null
-      );
-      const avg =
-        grades.length > 0
-          ? Math.round(grades.reduce((sum, g) => sum + g, 0) / grades.length)
-          : 0;
-      const missing = assignments.length - grades.length;
-      return { ...student, avg, missing };
-    })
-    .filter((s) => s.avg < 70 && s.avg > 0)
-    .sort((a, b) => a.avg - b.avg);
-}
-
 // Get upcoming deadlines (within 7 days); due dates compared in Eastern
 export function getUpcomingDeadlines(assignments) {
   const today = new Date();

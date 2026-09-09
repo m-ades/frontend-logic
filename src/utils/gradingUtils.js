@@ -107,30 +107,6 @@ export function calculateGradeDistribution(students, gradingScale) {
 }
 
 /**
- * Get students at risk based on a threshold
- * @param {Array} students - Array of student objects
- * @param {Array} assignments - Array of assignments
- * @param {number} threshold - Grade percentage threshold (default 70)
- * @returns {Array} Students below threshold, sorted by average
- */
-export function getStudentsAtRisk(students, assignments, threshold = 70) {
-  return students
-    .map((student) => {
-      const grades = Object.values(student.grades).filter(
-        (g) => g !== undefined && g !== null && !isNaN(g)
-      );
-      const avg =
-        grades.length > 0
-          ? Math.round(grades.reduce((sum, g) => sum + g, 0) / grades.length)
-          : 0;
-      const missing = assignments.length - grades.length;
-      return { ...student, avg, missing };
-    })
-    .filter((s) => s.avg < threshold && s.avg > 0)
-    .sort((a, b) => a.avg - b.avg);
-}
-
-/**
  * Check if a grade is passing based on grading scale
  * Typically, the lowest passing grade is anything above the lowest grade level
  * @param {number} percentage - The grade percentage
