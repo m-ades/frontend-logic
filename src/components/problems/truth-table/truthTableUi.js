@@ -123,10 +123,10 @@ export function buildTruthTableSubmissionData(
   return { lefts: [], right: tableData[0], rowhls }
 }
 
-// tests whether rowIndex witnesses the property graded for this kind:
-// formula: not a contradiction; argument: invalid; equivalence: jointly
-// satisfiable. `tables` are the already-computed answer tables, each
-// with .rows (boolean cells) and .opspot (main-operator column index)
+/* tests whether rowIndex witnesses the property graded for this kind:
+formula: not a contradiction; argument: invalid; equivalence: jointly
+satisfiable. `tables` are the already-computed answer tables, each
+with .rows (boolean cells) and .opspot (main-operator column index) */
 export function isValidWitnessRow(kind, tables, rowIndex) {
   if (!Array.isArray(tables) || tables.length === 0 || !Number.isInteger(rowIndex)) return false
   const isTrueAt = (table) => table?.rows?.[rowIndex]?.[table.opspot] === true

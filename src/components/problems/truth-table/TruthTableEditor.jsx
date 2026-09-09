@@ -274,6 +274,7 @@ function TruthTableEditorContent({
   }, [mainOperatorColumn, mcSelection, scheduleStateChange, status, tableInputs])
   const updateClassificationSelection = React.useCallback((next) => {
     setMcSelection(next)
+    clearDebounce(onStateChangeTimerRef)
     onStateChange?.(buildTruthTableStatePayload(tableInputs, next, mainOperatorColumn, witnessRow))
     if (status !== 'unanswered') {
       setStatus('unanswered')
@@ -456,6 +457,7 @@ function TruthTableEditorContent({
   const handleStartOver = () => {
     if (attemptCount >= attemptLimit) return
     setTableInputs(resetTables)
+    clearDebounce(onStateChangeTimerRef)
     onStateChange?.(buildTruthTableStatePayload(resetTables, [], null, null))
     setMcSelection([])
     setSelectedColumns([])

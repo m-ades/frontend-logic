@@ -98,9 +98,9 @@ export default function TruthTableGrid({
     ...(top ? { borderTop: `${mainOpBorderWidth}px solid ${theme.palette.primary.main}` } : {}),
     ...(bottom ? { borderBottom: `${mainOpBorderWidth}px solid ${theme.palette.primary.main}` } : {}),
   })
-  // the row equivalent of mainOpBorderStyle: a horizontal box around the
-  // confirmed witness row instead of a vertical one around the main
-  // operator column
+  /* the row equivalent of mainOpBorderStyle: a horizontal box around the
+  confirmed witness row instead of a vertical one around the main
+  operator column */
   const witnessRowBorderStyle = ({ left = false, right = false } = {}) => ({
     borderTop: `${mainOpBorderWidth}px solid ${theme.palette.primary.main}`,
     borderBottom: `${mainOpBorderWidth}px solid ${theme.palette.primary.main}`,
@@ -193,11 +193,11 @@ export default function TruthTableGrid({
       <TruthTableSelectorButton selected={selected} onClick={onClick} ariaLabel={ariaLabel} tooltip={tooltip} label={label} />
     </Box>
   )
-  // a row selector click cycles through none -> highlighted -> witness (graded)
-  // highlight, the same duality the column header buttons use for the main
-  // operator: a single tap is the plain visual highlight every problem type
-  // already has, tapping the already-highlighted row again marks it as the
-  // single graded witness row
+  /* a row selector click cycles through none -> highlighted -> witness (graded)
+  highlight, the same duality the column header buttons use for the main
+  operator: a single tap is the plain visual highlight every problem type
+  already has, tapping the already-highlighted row again marks it as the
+  single graded witness row */
   const witnessRowMode = typeof onSelectWitnessRow === 'function'
   const isRowSelected = (rowIndex) => witnessRow === rowIndex || selectedRows.includes(rowIndex)
   const handleRowSelectorClick = (rowIndex) => {
