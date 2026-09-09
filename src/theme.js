@@ -1,8 +1,6 @@
 import { createTheme } from '@mui/material/styles'
 import tinycolor from 'tinycolor2'
 
-const themes = new Map()
-
 function accentColor(main) {
   return {
     main,
@@ -11,15 +9,7 @@ function accentColor(main) {
   }
 }
 
-/*
- * returns a shared mui theme built once per mode
- * dark selects dark mode and any other value selects light without throwing
- * callers must treat the returned theme as read only
- */
-export function getAppTheme(themeName) {
-  const mode = themeName === 'dark' ? 'dark' : 'light'
-  if (themes.has(mode)) return themes.get(mode)
-
+function createAppTheme(mode) {
   const isDark = mode === 'dark'
   const palette = {
     mode,
@@ -52,7 +42,7 @@ export function getAppTheme(themeName) {
       : '0px 12px 40px 0px #E8EAFC, 0 3px 3px -2px #B2B2B21A, 0 1px 8px 0 #9A9A9A1A',
   }
 
-  const theme = createTheme({
+  return createTheme({
     palette,
     customShadows,
     typography: {
@@ -71,31 +61,6 @@ export function getAppTheme(themeName) {
           '[class*="material-symbols"]': {
             fontFamily: 'Material Symbols Outlined',
           },
-        },
-      },
-      MuiPaper: {
-        styleOverrides: {
-          root: isDark ? {
-            backgroundColor: palette.background.paper,
-            boxShadow: `${customShadows.widget} !important`,
-          } : {},
-        },
-      },
-      MuiAppBar: {
-        styleOverrides: {
-          root: isDark ? {
-            backgroundColor: `${palette.background.paper} !important`,
-          } : {},
-        },
-      },
-      MuiButton: {
-        styleOverrides: {
-          root: isDark ? { boxShadow: 'none !important' } : {},
-        },
-      },
-      MuiCheckbox: {
-        styleOverrides: {
-          root: isDark ? { color: palette.text.hint } : {},
         },
       },
       MuiCard: {
@@ -146,33 +111,17 @@ export function getAppTheme(themeName) {
         },
       },
       MuiTableCell: {
-        // keep the existing table density in each mode
-        styleOverrides: isDark ? {
-          head: { color: palette.text.hint },
-        } : {
+        styleOverrides: {
           root: {
             borderBottom: `1px solid ${palette.divider}`,
             padding: '14px 40px 14px 24px',
           },
-          head: { fontSize: '0.95rem' },
+          head: {
+            fontSize: '0.95rem',
+            color: isDark ? palette.text.hint : palette.text.primary,
+          },
           body: { fontSize: '0.95rem' },
           paddingCheckbox: { padding: '0 0 0 15px' },
-        },
-      },
-      MuiTableSortLabel: {
-        styleOverrides: {
-          root: isDark ? {
-            '&.Mui-active, &.Mui-active .MuiTableSortLabel-icon': {
-              color: `${palette.text.hint} !important`,
-            },
-          } : {},
-          icon: isDark ? { color: palette.text.hint } : {},
-        },
-      },
-      MuiTablePagination: {
-        styleOverrides: {
-          toolbar: isDark ? { color: palette.text.hint } : {},
-          selectIcon: isDark ? { color: palette.text.hint } : {},
         },
       },
       MuiAccordion: {
@@ -182,9 +131,64 @@ export function getAppTheme(themeName) {
           },
         },
       },
+      // only components without shared rules belong here
+      ...(isDark ? {
+        MuiPaper: {
+          styleOverrides: {
+            root: {
+              backgroundColor: palette.background.paper,
+              boxShadow: `${customShadows.widget} !important`,
+            },
+          },
+        },
+        MuiAppBar: {
+          styleOverrides: {
+            root: {
+              backgroundColor: `${palette.background.paper} !important`,
+            },
+          },
+        },
+        MuiButton: {
+          styleOverrides: {
+            root: { boxShadow: 'none !important' },
+          },
+        },
+        MuiCheckbox: {
+          styleOverrides: {
+            root: { color: palette.text.hint },
+          },
+        },
+        MuiTableSortLabel: {
+          styleOverrides: {
+            root: {
+              '&.Mui-active, &.Mui-active .MuiTableSortLabel-icon': {
+                color: `${palette.text.hint} !important`,
+              },
+            },
+            icon: { color: palette.text.hint },
+          },
+        },
+        MuiTablePagination: {
+          styleOverrides: {
+            toolbar: { color: palette.text.hint },
+            selectIcon: { color: palette.text.hint },
+          },
+        },
+      } : {}),
     },
   })
+}
 
-  themes.set(mode, theme)
-  return theme
+let lightTheme
+let darkTheme
+
+/*
+ * returns one of two shared mui themes built on first use
+ * dark selects dark mode and any other value selects light without throwing
+ * callers must treat the returned theme as read only
+ */
+export function getAppTheme(themeName) {
+  return themeName === 'dark'
+    ? (darkTheme ??= createAppTheme('dark'))
+    : (lightTheme ??= createAppTheme('light'))
 }
