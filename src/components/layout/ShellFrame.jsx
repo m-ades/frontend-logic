@@ -27,7 +27,7 @@ export default function ShellFrame({
   const hasDesktopPointer = useMediaQuery("(hover: hover) and (pointer: fine)");
   const isDesktopRulebookLayout = isLargeScreen && hasDesktopPointer;
   const isWorksheetRoute = /\/assignment\/[^/]+\/?$/.test(location.pathname);
-  const shouldShiftShellForRulebook = isWorksheetRoute && isDesktopRulebookLayout && isRulesReferenceOpen;
+  const shouldShiftShellForRulebook = isDesktopRulebookLayout && isRulesReferenceOpen;
   const isDashboardRoute = /\/dashboard$/.test(location.pathname);
   const isTextbookRoute = /\/textbook\/[^/]+$/.test(location.pathname);
   const isImmersiveSplitRoute =
@@ -90,7 +90,7 @@ export default function ShellFrame({
           onOpenSettings={onOpenSettings}
         />
         <Box sx={{ display: "flex", flexDirection: "column", flexGrow: 1, minWidth: 0 }}>
-          <Header onSignOut={onSignOut} showRulesReference={isWorksheetRoute} />
+          <Header onSignOut={onSignOut} />
           <Box
             component="main"
             id="main-content"
@@ -122,7 +122,7 @@ export default function ShellFrame({
           onTextSizeChange={onTextSizeChange}
         />
       )}
-      {isWorksheetRoute && <RulesReference logicSystem={logicSystem} />}
+      <RulesReference logicSystem={logicSystem} />
     </Box>
   );
 }
