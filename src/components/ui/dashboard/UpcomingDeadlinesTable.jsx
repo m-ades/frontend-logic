@@ -11,19 +11,13 @@ import {
   alpha,
 } from "@mui/material";
 import { Clock } from "lucide-react";
-import { formatEasternDateTime } from "../../../utils/easternTime.js";
+import { formatEasternDateTime, daysUntilDue } from "../../../utils/easternTime.js";
 
 export const UpcomingDeadlinesTable = ({ assignments, onAssignmentClick }) => {
   const isInteractive = typeof onAssignmentClick === "function";
   const upcomingAssignments = assignments
-    .map((a) => {
-      const dueDate = new Date(a.dueDate);
-      const today = new Date();
-      const diffTime = dueDate - today;
-      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-      return { ...a, daysLeft: diffDays };
-    })
-    .filter((a) => a.daysLeft >= 0 && a.daysLeft <= 7)
+    .map((a) => ({ ...a, daysLeft: daysUntilDue(a.dueDate, a.dueTime) }))
+    .filter((a) => a.daysLeft !== null && a.daysLeft >= 0 && a.daysLeft <= 7)
     .sort((a, b) => a.daysLeft - b.daysLeft);
 
   return (

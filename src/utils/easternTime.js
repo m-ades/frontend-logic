@@ -85,3 +85,15 @@ export function parseDueDateAsEastern(dueDate, dueTime = '23:59') {
   const iso = toEasternIso(source.slice(0, 10), dueTime || '23:59');
   return iso ? new Date(iso) : null;
 }
+
+// calendar days from today (eastern) to the due date (eastern); 0 the whole day
+// it's due, negative once overdue; null when unparseable. deliberately ignores
+// time-of-day, so "due today at 11:59pm" reads as 0 all day, not 1 until evening
+export function daysUntilDue(dueDate, dueTime, now = new Date()) {
+  const deadline = parseDueDateAsEastern(dueDate, dueTime);
+  if (!deadline) return null;
+  const todayEastern = getCurrentEasternDate(now);
+  const dueEastern = getCurrentEasternDate(deadline);
+  const diffMs = new Date(`${dueEastern}T00:00:00Z`) - new Date(`${todayEastern}T00:00:00Z`);
+  return Math.round(diffMs / (1000 * 60 * 60 * 24));
+}
