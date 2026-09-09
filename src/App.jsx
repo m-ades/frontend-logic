@@ -227,7 +227,7 @@ function AppContent() {
   const theme = useThemeState();
   return (
     <MuiThemeProvider theme={theme}>
-      <CssBaseline />
+      <CssBaseline enableColorScheme />
       <BrowserRouter>
         <ScrollToTop />
         <LayoutProvider>
