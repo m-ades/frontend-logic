@@ -286,6 +286,7 @@ function TruthTableEditorContent({
     lastRestorationKeyRef.current = restorationKey
     setTableInputs((prev) => (tablesEqual(prev, derivedInitialTables) ? prev : derivedInitialTables))
     setMcSelection(normalizeSavedClassification(kind, savedState))
+    setSelectedRows([])
     setMainOperatorColumn(() => {
       const savedColumn = savedState?.mainOperatorColumn
       return mainOperatorHighlight
@@ -458,6 +459,7 @@ function TruthTableEditorContent({
     onStateChange?.(buildTruthTableStatePayload(resetTables, [], null, null))
     setMcSelection([])
     setSelectedColumns([])
+    setSelectedRows([])
     setMainOperatorColumn(null)
     setWitnessRow(null)
     setStatus('unanswered')
