@@ -57,7 +57,7 @@ export default function TextbookChapterPage({
         onOpenChapter(target)
         return
       }
-      const path = textbookChapterPath?.(target) || `${textbookPath || '/student/textbook'}/${target}`
+      const path = textbookChapterPath?.(target) || `${textbookPath || '/textbook'}/${target}`
       navigate(path, { replace: true })
       return
     }
@@ -68,7 +68,7 @@ export default function TextbookChapterPage({
         onOpenHub()
         return
       }
-      navigate(textbookPath || '/student/textbook', { replace: true })
+      navigate(textbookPath || '/textbook', { replace: true })
     }
   }, [
     slug,
@@ -129,7 +129,7 @@ export default function TextbookChapterPage({
     if (location.pathname.startsWith('/sandbox/student')) {
       return '/sandbox/student/textbook'
     }
-    return '/student/textbook'
+    return '/textbook'
   }, [textbookChapterPath, location.pathname])
 
   const hubPath = textbookPath || linkBase

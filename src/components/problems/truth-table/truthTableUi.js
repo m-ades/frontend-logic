@@ -40,6 +40,7 @@ export function buildTruthTableStatePayload(rows, selection = [], mainOperatorCo
   }
 }
 
+// encodes truth values as booleans and preserves unfinished cells as unknown
 export function buildTruthTableSubmissionData(
   kind,
   rows,
@@ -48,7 +49,7 @@ export function buildTruthTableSubmissionData(
   mainOperatorColumn = null
 ) {
   const tableData = rows.map((tableRows) => ({
-    rows: tableRows.map((row) => row.map((cell) => cell === 'T')),
+    rows: tableRows.map((row) => row.map((cell) => cell === 'T' ? true : cell === 'F' ? false : -1)),
     colhls: tableRows.length > 0 ? Array(tableRows[0].length).fill(false) : [],
   }))
 
@@ -356,13 +357,11 @@ export function buildDisplaySolutionTables(solution, fallbackTables = [], defaul
   return hasCompatibleShape ? candidateTablesWithSplitSupport : normalizedFallbackTables
 }
 
+// submits any table state and returns grading feedback with api failures passed to the caller
 export async function submitTruthTableAnswer({
   assignmentQuestionId,
   submissionData,
   localIsCorrect,
-  attemptLimit,
-  classificationEnabled,
-  selection,
 }) {
   if (shouldUseApiValidation(assignmentQuestionId)) {
     const { response, validation, successstatus, rawScore } = await submitApiValidation({
@@ -389,13 +388,9 @@ export async function submitTruthTableAnswer({
     score: null,
     isCorrect: localIsCorrect,
     nextStatus: localIsCorrect ? 'correct' : 'incorrect',
-    message: localIsCorrect
-      ? 'Correct!'
-        : classificationEnabled && selection.length === 0
-          ? 'Select a classification before submitting.'
-        : 'Incorrect.',
-    }
+    message: localIsCorrect ? 'Correct!' : 'Incorrect.',
   }
+}
 
 export function getDisplayedColumnCount(tables = [], combined) {
   if (!Array.isArray(tables) || tables.length === 0) return 0
@@ -412,12 +407,14 @@ export function getDisplayedColumnCount(tables = [], combined) {
 }
 
 // keep wide tables readable without measuring the dom
+export const SELECTOR_LANE_WIDTH = 36
+
 export function getTruthTableDensity(columnCount) {
   if (columnCount >= 11) {
-    return { cell: 56, cellMax: 60, separator: 28, selectorLane: 36 }
+    return { cell: 56, cellMax: 60, separator: 28, selectorLane: SELECTOR_LANE_WIDTH }
   }
   if (columnCount >= 8) {
-    return { cell: 64, cellMax: 68, separator: 32, selectorLane: 36 }
+    return { cell: 64, cellMax: 68, separator: 32, selectorLane: SELECTOR_LANE_WIDTH }
   }
-  return { cell: 76, cellMax: 80, separator: 36, selectorLane: 36 }
+  return { cell: 76, cellMax: 80, separator: 36, selectorLane: SELECTOR_LANE_WIDTH }
 }

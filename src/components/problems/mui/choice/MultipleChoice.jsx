@@ -1,20 +1,16 @@
 import { useState, useEffect, useId, useRef } from 'react'
-import { Box, Checkbox, FormControl, FormControlLabel, FormGroup, Radio, RadioGroup } from '@mui/material'
+import { Box } from '@mui/material'
 import ProblemSetButtons from '../frame/ProblemSetButtons.jsx'
 import InstructorQuestionEditor from '../../InstructorQuestionEditor.jsx'
-import ProblemFrame, { choiceLabelWithGapSx } from '../frame/ProblemFrame.jsx'
+import ProblemFrame from '../frame/ProblemFrame.jsx'
+import { FieldsetChoiceGroup, SubquestionChoiceList } from './ChoiceGroup.jsx'
 import { useProblemChecker } from '../../../../hooks/useProblemChecker.js'
 import SolutionReveal from '../../SolutionReveal.jsx'
-import PromptText from '../../../ui/PromptText.jsx'
 import {
   getSingleSelectAnswerIndex,
-  getSubquestionChoices,
   hasNonEmptyAnswerIndices,
   isMultiSelectSubquestion,
 } from '../../../../lib/logicpenguin/multiple-choice-utils.js'
-
-const multiSelectLabelSx = { ...choiceLabelWithGapSx, ml: 2 }
-const singleSelectLabelSx = choiceLabelWithGapSx
 
 const isMissingSingleValue = (value) => (
   value === '' || value === null || value === undefined
@@ -29,59 +25,6 @@ const hasIncompleteCompositeSelection = (subquestions, selectedValue) => (
     return isMissingSingleValue(value)
   })
 )
-
-function ChoiceGroup({
-  choices,
-  isMultiSelect,
-  selectedValue,
-  name,
-  disabled,
-  onSingleChange,
-  onMultiChange,
-}) {
-  if (isMultiSelect) {
-    return (
-      <FormGroup>
-        {choices.map((choice, index) => (
-          <FormControlLabel
-            key={`${name}-${index}`}
-            control={(
-              <Checkbox
-                checked={Array.isArray(selectedValue) && selectedValue.includes(index)}
-                onChange={onMultiChange ? (event) => onMultiChange(index, event.target.checked) : undefined}
-                disabled={disabled}
-              />
-            )}
-            label={choice}
-            sx={multiSelectLabelSx}
-          />
-        ))}
-      </FormGroup>
-    )
-  }
-
-  const radioValue = selectedValue === '' || selectedValue === null || selectedValue === undefined
-    ? ''
-    : String(selectedValue)
-
-  return (
-    <RadioGroup
-      value={radioValue}
-      onChange={onSingleChange ? (event) => onSingleChange(event.target.value) : undefined}
-      name={name}
-    >
-      {choices.map((choice, index) => (
-        <FormControlLabel
-          key={`${name}-${index}`}
-          value={String(index)}
-          control={<Radio disabled={disabled} />}
-          label={choice}
-          sx={singleSelectLabelSx}
-        />
-      ))}
-    </RadioGroup>
-  )
-}
 
 export default function MultipleChoice({
   problem,
@@ -278,85 +221,51 @@ export default function MultipleChoice({
       ) : null}
     >
       {isComposite ? (
-        <Box sx={{ display: 'grid', gap: 3 }}>
-          {subquestions.map((subq, subIdx) => {
-            const choices = getSubquestionChoices(subq)
-
-            return (
-              <Box key={`mc-subq-${subIdx}`}>
-                <PromptText content={subq?.prompt} sx={{ mb: 1, fontWeight: 500 }} />
-                <FormControl component="fieldset" sx={{ width: '100%' }}>
-                  <ChoiceGroup
-                    choices={choices}
-                    isMultiSelect={isMultiSelectSubquestion(subq)}
-                    selectedValue={selectedValue?.[subIdx]}
-                    name={`${groupBase}-subq-${subIdx}`}
-                    disabled={readOnly || isLocked}
-                    onSingleChange={(value) => {
-                      const nextValue = value === '' ? '' : Number(value)
-                      handleCompositeSingleChange(subIdx, nextValue)
-                    }}
-                    onMultiChange={(choiceIndex, checked) => {
-                      handleCompositeMultiChange(subIdx, choiceIndex, checked)
-                    }}
-                  />
-                </FormControl>
-              </Box>
-            )
-          })}
-        </Box>
+        <SubquestionChoiceList
+          questions={subquestions}
+          selectedValues={selectedValue}
+          namePrefix={`${groupBase}-subq`}
+          disabled={readOnly || isLocked}
+          onSingleChange={(subIdx, value) => {
+            const nextValue = value === '' ? '' : Number(value)
+            handleCompositeSingleChange(subIdx, nextValue)
+          }}
+          onMultiChange={handleCompositeMultiChange}
+        />
       ) : (
         <Box>
-          <FormControl component="fieldset" sx={{ width: '100%' }}>
-            <ChoiceGroup
-              choices={Array.isArray(problem?.choices) ? problem.choices : []}
-              isMultiSelect={isMultiSelect}
-              selectedValue={selectedValue}
-              name={`${groupBase}-single`}
-              disabled={readOnly}
-              onSingleChange={handleSingleChange}
-              onMultiChange={handleMultiChange}
-            />
-          </FormControl>
+          <FieldsetChoiceGroup
+            choices={Array.isArray(problem?.choices) ? problem.choices : []}
+            isMultiSelect={isMultiSelect}
+            selectedValue={selectedValue}
+            name={`${groupBase}-single`}
+            disabled={readOnly}
+            onSingleChange={handleSingleChange}
+            onMultiChange={handleMultiChange}
+          />
         </Box>
       )}
       {!suppressReveal && (
         <SolutionReveal show={showSolution}>
           {isComposite ? (
-            <Box sx={{ display: 'grid', gap: 3 }}>
-              {subquestions.map((subq, subIdx) => {
-                const choices = getSubquestionChoices(subq)
-                const isMulti = isMultiSelectSubquestion(subq)
-                const expected = isMulti
+            <SubquestionChoiceList
+              questions={subquestions}
+              selectedValues={subquestions.map((subq) => (
+                isMultiSelectSubquestion(subq)
                   ? (Array.isArray(subq.answerIndices) ? subq.answerIndices : [])
                   : getSingleSelectAnswerIndex(subq)
-
-                return (
-                  <Box key={`solution-${subIdx}`}>
-                    <PromptText content={subq?.prompt} sx={{ mb: 1, fontWeight: 500 }} />
-                    <FormControl component="fieldset" sx={{ width: '100%' }}>
-                      <ChoiceGroup
-                        choices={choices}
-                        isMultiSelect={isMulti}
-                        selectedValue={expected}
-                        name={`${groupBase}-reveal-${subIdx}`}
-                        disabled
-                      />
-                    </FormControl>
-                  </Box>
-                )
-              })}
-            </Box>
+              ))}
+              namePrefix={`${groupBase}-reveal`}
+              disabled
+            />
           ) : (
-            <FormControl component="fieldset" sx={{ width: '100%' }}>
-              <ChoiceGroup
-                choices={Array.isArray(problem?.choices) ? problem.choices : []}
-                isMultiSelect={isMultiSelect}
-                selectedValue={correctAnswer}
-                name={`${groupBase}-reveal`}
-                disabled
-              />
-            </FormControl>
+            <FieldsetChoiceGroup
+              choices={Array.isArray(problem?.choices) ? problem.choices : []}
+              isMultiSelect={isMultiSelect}
+              selectedValue={correctAnswer}
+              name={`${groupBase}-reveal`}
+              disabled
+            />
           )}
         </SolutionReveal>
       )}

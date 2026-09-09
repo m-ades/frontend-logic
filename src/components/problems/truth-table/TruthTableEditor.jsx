@@ -29,7 +29,6 @@ import {
 } from './truthTableUi.js'
 import {
   getTruthTableClassification,
-  isTruthTableClassificationComplete,
   truthTableClassificationsMatch,
 } from './truthTableClassification.js'
 import PromptText from '../../ui/PromptText.jsx'
@@ -331,9 +330,6 @@ function TruthTableEditorContent({
           row.every((cell) => cell !== '')
       )
     )
-  const classificationComplete = !classificationEnabled || isTruthTableClassificationComplete(kind, mcSelection)
-  const mainOperatorComplete = !mainOperatorHighlight || mainOperatorColumn != null
-  const tableFilled = tableFilledOnly && classificationComplete && mainOperatorComplete
 
   const tableCorrect =
     hasTruthTable &&
@@ -350,27 +346,13 @@ function TruthTableEditorContent({
   )
 
   const handleCheck = async () => {
-    if (isChecking || attemptCount >= attemptLimit) return
-    if (!tableFilled) {
-      setStatus('unanswered')
-      setMessage(
-        !tableFilledOnly
-          ? 'Complete the table before submitting.'
-          : classificationEnabled && mcSelection.length === 0
-            ? 'Select a classification before submitting.'
-            : 'Click the main operator column header twice before submitting.'
-      )
-      return
-    }
+    if (isChecking || attemptCount >= attemptLimit || isAssignmentLocked) return
     setIsChecking(true)
     try {
       const result = await submitTruthTableAnswer({
         assignmentQuestionId,
         submissionData: buildTruthTableSubmissionData(kind, tableInputs, mcSelection, classificationEnabled, mainOperatorColumn),
         localIsCorrect: tableCorrect && classificationCorrect && mainOperatorCorrect,
-        attemptLimit,
-        classificationEnabled,
-        selection: mcSelection,
       })
       if (result.mode === 'remote') {
         const resp = result.response
@@ -546,7 +528,6 @@ function TruthTableEditorContent({
           {!embedded && (
             <TruthTableFeedback
               state={tableFilledOnly ? (tableCorrect ? 'complete' : 'incorrect') : 'incomplete'}
-              classificationRequired={classificationEnabled && !classificationComplete}
             />
           )}
         </Box>
@@ -634,7 +615,7 @@ function TruthTableEditorContent({
             onCheck={handleCheck}
             onStartOver={handleStartOver}
             isChecking={isChecking}
-            isDisabled={!tableFilled || attemptCount >= attemptLimit || isAssignmentLocked}
+            isDisabled={attemptCount >= attemptLimit || isAssignmentLocked}
             align="flex-start"
             attemptCount={attemptCount}
             attemptLimit={attemptLimit}

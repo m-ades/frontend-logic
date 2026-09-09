@@ -1,9 +1,5 @@
-/**
- * Prepare forall x: Calgary BookML/SCORM HTML for HuLA's TextbookReader.
- * Raw pages are full GitBook shells; we keep only the chapter body.
- */
-
-const ASSET_BASE = '/textbook'
+// static assets use a separate path from application routes
+const ASSET_BASE = '/textbook-assets'
 
 const TEXTBOOK_HTML_FILE = /^[A-Za-z0-9][A-Za-z0-9_-]*\.html(?:#.*)?$/i
 
@@ -56,11 +52,8 @@ export function extractTextbookBody(fullHtml) {
   return root.innerHTML
 }
 
-/**
- * Rewrite relative asset/page URLs so they resolve under /textbook and
- * in-app routes for chapter hops.
- */
-export function rewriteTextbookUrls(html, { linkBase = '/student/textbook' } = {}) {
+// keeps chapter navigation in the app and other files under the asset path
+export function rewriteTextbookUrls(html, { linkBase = '/textbook' } = {}) {
   if (typeof html !== 'string') return ''
 
   const parser = new DOMParser()
@@ -103,9 +96,7 @@ export function rewriteHref(href, linkBase) {
   // Already absolute app/textbook/hash/protocol
   if (
     trimmed.startsWith('#') ||
-    trimmed.startsWith('/student/') ||
-    trimmed.startsWith('/sandbox/') ||
-    trimmed.startsWith('/textbook/') ||
+    trimmed.startsWith('/') ||
     trimmed.startsWith('http://') ||
     trimmed.startsWith('https://') ||
     trimmed.startsWith('mailto:') ||
@@ -191,7 +182,7 @@ export function injectPracticeWidgetSlots(html, slug) {
  * Full pipeline: extract → rewrite URLs.
  * Practice widgets are attached via course link metadata (not HTML slots).
  */
-export function prepareTextbookHtml(fullHtml, { linkBase = '/student/textbook' } = {}) {
+export function prepareTextbookHtml(fullHtml, { linkBase = '/textbook' } = {}) {
   const body = extractTextbookBody(fullHtml)
   return rewriteTextbookUrls(body, { linkBase })
 }

@@ -137,12 +137,6 @@ export default function SingleRowTruthTable({
     compound: toSymbol(nextCompound),
   }), [])
 
-  const isDisabled = useCallback(() =>
-    rowInputs.length === 0 ||
-    rowInputs.some((cell, idx) => cell === '' && !isGivenCell(idx)) ||
-    compoundInput === '',
-  [compoundInput, isGivenCell, rowInputs])
-
   const { status, message, isChecking, handleCheck, handleStartOver, setStatus, setMessage, attemptCount, maxAttempts, isLocked } = useProblemChecker({
     answer: expectedAnswer,
     problemType: 'single-row-truth-table',
@@ -155,7 +149,7 @@ export default function SingleRowTruthTable({
       compound: toSymbol(compoundInput),
     }),
     onComplete,
-    isDisabled,
+    isDisabled: () => isAssignmentLocked,
     resetInput: () => {
       setRowInputs(resetRow)
       setCompoundInput('')
@@ -229,7 +223,6 @@ export default function SingleRowTruthTable({
 
   const tableFilled = rowInputs.length > 0 &&
     !rowInputs.some((cell, idx) => cell === '' && !isGivenCell(idx))
-  const answerComplete = tableFilled && compoundInput !== ''
   const isTableCurrentlyCorrect = tableFilled &&
     rowInputs.length === expectedRow.length &&
     rowInputs.every((cell, idx) => cell === expectedRow[idx])
@@ -249,7 +242,7 @@ export default function SingleRowTruthTable({
           onCheck={handleCheckCurrent}
           onStartOver={handleStartOver}
           isChecking={isChecking}
-          isDisabled={!answerComplete || isLocked || isAssignmentLocked}
+          isDisabled={isLocked || isAssignmentLocked}
           align="flex-start"
           attemptCount={attemptCount}
           attemptLimit={maxAttempts}

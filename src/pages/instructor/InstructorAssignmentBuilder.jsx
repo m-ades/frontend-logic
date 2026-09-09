@@ -9,20 +9,20 @@ export default function AssignmentBuilder() {
   const { assignmentId, practiceId } = location.state || {};
   useEffect(() => {
     if (assignmentId) {
-      navigate(`/instructor/assignment/${assignmentId}`, {
+      navigate(`/assignment/${assignmentId}`, {
         replace: true,
-        state: { returnTo: "/instructor/assignments" },
+        state: { returnTo: "/assignments" },
       });
       return;
     }
     if (practiceId) {
-      navigate(`/instructor/assignment/${practiceId}`, {
+      navigate(`/assignment/${practiceId}`, {
         replace: true,
-        state: { returnTo: "/instructor/practice" },
+        state: { returnTo: "/practice" },
       });
       return;
     }
-    navigate("/instructor/assignments", { replace: true });
+    navigate("/assignments", { replace: true });
   }, [assignmentId, practiceId, navigate]);
 
   return null;

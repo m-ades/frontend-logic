@@ -424,10 +424,6 @@ function TextbookPreviewPanel() {
   )
 }
 
-/**
- * Instructor textbook page: structure editor + practice links.
- * Route: `/instructor/textbook-links`
- */
 export default function InstructorTextbookLinks() {
   const [searchParams, setSearchParams] = useSearchParams()
   const { courseState } = useAppRuntime()

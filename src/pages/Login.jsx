@@ -18,7 +18,6 @@ import ThemedCard from '../components/ui/ThemedCard.jsx';
 import { useThemeState, useThemeDispatch } from '../context/ThemeContext.jsx';
 import { API_CONFIG, fetchJson, setStoredUser } from '../utils/api.js';
 import { useAuthState, useAuthDispatch, login } from '../context/AuthContext';
-import { isInstructorRole } from '../utils/auth.js';
 
 export default function Login() {
   const navigate = useNavigate();
@@ -41,11 +40,7 @@ export default function Login() {
 
   useEffect(() => {
     if (!authLoading && isAuthenticated && user) {
-      if (isInstructorRole(user.role)) {
-        navigate('/instructor/dashboard', { replace: true });
-      } else {
-        navigate('/student/dashboard', { replace: true });
-      }
+      navigate('/dashboard', { replace: true });
     }
   }, [authLoading, isAuthenticated, user, navigate]);
 
@@ -82,7 +77,7 @@ export default function Login() {
       const userWithRole = { ...data?.user, role };
       setStoredUser(userWithRole);
       login(dispatch, userWithRole);
-      navigate(role === 'instructor' ? '/instructor/dashboard' : '/student/dashboard');
+      navigate('/dashboard');
     } catch (err) {
       setError(err?.message || 'Login failed.');
     } finally {

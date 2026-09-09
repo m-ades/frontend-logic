@@ -1,15 +1,3 @@
-/**
- * Regenerate textbook file inventory after dropping a new BookML HTML build
- * into public/textbook/.
- *
- * Usage (from frontend-logic):
- *   node scripts/generate-textbook-inventory.mjs
- *
- * Then use Instructor → Textbook → Sync from bundle to merge into course structure.
- *
- * Note: Pt* / Ptx* files are inventoried for sync identity but HuLA treats them as
- * toc dividers are not textbook destinations
- */
 import fs from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
@@ -17,11 +5,11 @@ import { stripNumberPrefix } from '../src/components/textbook/textbookTitles.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const root = path.join(__dirname, '..')
-const publicDir = path.join(root, 'public/textbook')
 const manifestPath = path.join(root, 'src/components/textbook/textbookManifest.json')
 const outPath = path.join(root, 'src/components/textbook/textbookInventory.json')
 
 const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'))
+const publicDir = path.join(root, 'public', manifest.assetBase)
 const bySlug = Object.fromEntries((manifest.entries || []).map((e) => [e.slug, e]))
 
 function inferKind(stem) {
@@ -37,7 +25,7 @@ function inferKind(stem) {
 const files = fs.readdirSync(publicDir).filter((f) => f.endsWith('.html')).sort()
 const inventory = {
   generatedAt: new Date().toISOString(),
-  assetBase: '/textbook',
+  assetBase: manifest.assetBase,
   files: files.map((file) => {
     const slug = file.replace(/\.html$/i, '')
     const entry = bySlug[slug]

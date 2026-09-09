@@ -79,7 +79,7 @@ export default function LatePolicySection({ course, onSave }) {
             <Stack spacing={3} sx={{ pl: 2 }}>
               <Alert icon={<AlertCircle size={20} />} severity="info">
                 Late submissions will be accepted with a flat penalty applied to
-                the final grade
+                the assignment grade
               </Alert>
 
               <TextField

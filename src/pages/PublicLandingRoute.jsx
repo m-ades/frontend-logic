@@ -29,11 +29,8 @@ export default function PublicLandingRoute() {
 
   if (isAuthenticated) {
     const role = normalizeRole(user?.role)
-    if (role === 'instructor') {
-      return <Navigate to="/instructor/dashboard" replace />
-    }
-    if (role === 'student') {
-      return <Navigate to="/student/dashboard" replace />
+    if (role === 'instructor' || role === 'student') {
+      return <Navigate to="/dashboard" replace />
     }
     return <Navigate to="/login" replace />
   }

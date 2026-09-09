@@ -61,7 +61,7 @@ export default function TextbookHubPage({ onOpenChapter = null }) {
       onOpenChapter(slug)
       return
     }
-    const path = textbookChapterPath?.(slug) || `${textbookPath || '/student/textbook'}/${slug}`
+    const path = textbookChapterPath?.(slug) || `${textbookPath || '/textbook'}/${slug}`
     navigate(path)
   }
 

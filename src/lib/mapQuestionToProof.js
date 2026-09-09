@@ -5,6 +5,8 @@ import {
   normalizeLogicSystem,
 } from './logicSystems.js'
 
+import { isMultiSelectSubquestion } from './logicpenguin/multiple-choice-utils.js'
+
 export const normalizeType = (snapshot) => (
   snapshot?.type || snapshot?.problemType || snapshot?.logic_problem_type || 'derivation'
 )
@@ -30,7 +32,9 @@ function normalizeChoiceQuestions(snapshot) {
         }]
       : [])
   const derivedAnswer = questions.length
-    ? questions.map((question) => question.answerIndex ?? question.answer ?? question.correctIndex)
+    ? questions.map((question) => isMultiSelectSubquestion(question)
+      ? question.answerIndices
+      : question.answerIndex ?? question.answer ?? question.correctIndex)
     : (snapshot.answerIndex ?? snapshot.answer ?? snapshot.answerIndices)
 
   return { questions, choiceList, derivedAnswer }

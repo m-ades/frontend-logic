@@ -57,7 +57,8 @@ export default function InstructorGradebook() {
     <Box
       sx={{
         width: "100%",
-        maxWidth: "calc(100vw - 140px)",
+        maxWidth: "100%",
+        minWidth: 0,
         overflow: "hidden",
       }}
     >

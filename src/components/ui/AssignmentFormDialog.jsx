@@ -67,19 +67,20 @@ export default function AssignmentFormDialog({
 
           <Stack direction="row" spacing={2}>
             <TextField
-              label="Chapter"
+              label="Part"
               type="number"
+              inputProps={{ min: 1, step: 1 }}
               fullWidth
               value={formData.chapter}
               onChange={(e) =>
                 setFormData({
                   ...formData,
-                  chapter: parseInt(e.target.value) || 1,
+                  chapter: e.target.value,
                 })
               }
             />
             <TextField
-              label="Subchapter"
+              label="Chapter"
               fullWidth
               value={formData.subchapter}
               onChange={(e) =>
@@ -280,7 +281,8 @@ export default function AssignmentFormDialog({
             !hasValidPublishTime ||
             !hasValidDueTime ||
             !formData.name ||
-            !formData.chapter ||
+            !Number.isInteger(Number(formData.chapter)) ||
+            Number(formData.chapter) < 1 ||
             !formData.subchapter ||
             (!isPractice && (!formData.dueDate || !formData.dueTime))
           }

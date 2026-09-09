@@ -13,7 +13,7 @@ import {
   updateEnrollmentRole,
 } from "../context/CoursesContext.jsx";
 import { fetchJson } from "../utils/api.js";
-import { buildBreadcrumbInfo, buildRuntimePaths, remapStudentPath } from "./sandboxRuntime.js";
+import { buildBreadcrumbInfo, buildRuntimePaths } from "./sandboxRuntime.js";
 import { toEasternIso } from "../utils/easternTime.js";
 import { buildPublicationPayload } from "../utils/publicationPolicy.js";
 
@@ -294,7 +294,6 @@ export function createAppRuntime({ coursesDispatch, coursesState, routeKind, use
     mode: "app",
     ...runtimePaths,
     isSandbox: false,
-    remapStudentPath: (path) => remapStudentPath(path, runtimePaths.routePrefix),
     getBreadcrumbInfo: (pathname, returnTo) => buildBreadcrumbInfo(pathname, {
       routeKind,
       routePrefix: runtimePaths.routePrefix,

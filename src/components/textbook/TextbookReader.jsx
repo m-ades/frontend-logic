@@ -38,13 +38,9 @@ function sanitizeTextbookHtml(html) {
   return DOMPurify.sanitize(html, PURIFY_CONFIG)
 }
 
-/**
- * Fetches BookML SCORM HTML from `/textbook/{slug}.html`, extracts the chapter
- * body, rewrites asset/chapter links, and injects practice widgets.
- */
 export default function TextbookReader({
   slug: rawSlug,
-  linkBase = '/student/textbook',
+  linkBase = '/textbook',
   linkedPractices = [],
   scrollToId = null,
   onMetaChange,
@@ -105,7 +101,7 @@ export default function TextbookReader({
         if (!response.ok) {
           throw new Error(
             response.status === 404
-              ? `Chapter “${slug}” was not found under /textbook/.`
+              ? `Chapter “${slug}” was not found.`
               : `Failed to load chapter (HTTP ${response.status}).`,
           )
         }

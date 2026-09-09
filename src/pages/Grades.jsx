@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { Box, Typography, CardContent, Stack } from '@mui/material'
+import { Box, Typography, CardContent, Stack, useMediaQuery } from '@mui/material'
 import { DataGrid } from '@mui/x-data-grid'
 import ThemedCard from '../components/ui/ThemedCard.jsx'
 import LoadingSpinner from '../components/ui/LoadingSpinner.jsx'
@@ -20,6 +20,7 @@ function NoRowsOverlay() {
 }
 
 export default function Grades() {
+  const isMobile = useMediaQuery((theme) => theme.breakpoints.down('sm'))
   const { isSandbox, sandbox: sandboxData, user, activeCourseId } = useAppRuntime()
   const courseId = activeCourseId ?? API_CONFIG.courseId
   const courseIdForApi = isSandbox ? null : (activeCourseId ?? null)
@@ -126,24 +127,27 @@ export default function Grades() {
   )
 
   const columns = useMemo(
-    () => [
-      { field: 'assignment', headerName: 'Assignment', flex: 1, minWidth: 200 },
-      { field: 'due', headerName: 'Due', minWidth: 140 },
-      { field: 'submitted', headerName: 'Submitted', minWidth: 140 },
-      { field: 'percent', headerName: 'Percent', minWidth: 110, align: 'right', headerAlign: 'right' }
-    ],
-    []
+    () => {
+      const assignment = { field: 'assignment', headerName: 'Assignment', flex: 1, minWidth: isMobile ? 150 : 200 }
+      const percent = { field: 'percent', headerName: 'Percent', width: isMobile ? 90 : 110, align: 'right', headerAlign: 'right' }
+      const dates = [
+        { field: 'due', headerName: 'Due', minWidth: 140 },
+        { field: 'submitted', headerName: 'Submitted', minWidth: 140 },
+      ]
+      return isMobile ? [assignment, percent, ...dates] : [assignment, ...dates, percent]
+    },
+    [isMobile]
   )
 
   return (
-    <Box>
+    <Box sx={{ minWidth: 0, maxWidth: '100%' }}>
       <Typography variant="h4" component="h1" sx={{ mb: 3, fontWeight: 600 }}>
         Grades
       </Typography>
 
       <ThemedCard>
-        <CardContent sx={{ '& .MuiDataGrid-root': { fontSize: '1rem' } }}>
-          <Stack direction={{ xs: 'column', sm: 'row' }} justifyContent="space-between" sx={{ mb: 2 }}>
+        <CardContent sx={{ px: { xs: 1.5, sm: 2 }, '& .MuiDataGrid-root': { fontSize: '1rem' } }}>
+          <Stack direction="row" justifyContent="space-between" sx={{ mb: 2 }}>
             <Typography variant="h6" component="h2" sx={{ fontSize: '1rem' }}>Overall</Typography>
             <Typography variant="body2" color="text.secondary" sx={{ fontSize: '1rem' }}>
               {overallPercentage.toFixed(1)}%

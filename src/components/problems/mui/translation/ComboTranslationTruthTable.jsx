@@ -11,6 +11,7 @@ import FormulaInput from '../../../ui/logicpenguin/formula-input.js'
 import SymbolButtonRow from '../../../ui/logicpenguin/SymbolButtonRow.jsx'
 import { MobileLogicInput } from '../../../ui/LogicKeyboard/index.js'
 import TruthTableEditor from '../../truth-table/TruthTableEditor.jsx'
+import { buildTruthTableSubmissionData } from '../../truth-table/truthTableUi.js'
 import getFormulaClass from '../../../../lib/logicpenguin/symbolic/formula.js'
 import { useProblemChecker } from '../../../../hooks/useProblemChecker.js'
 import PromptText from '../../../ui/PromptText.jsx'
@@ -51,34 +52,6 @@ const parseArgumentLine = (line) => {
   }
   return { premises, conclusion }
 }
-
-const buildTableAnswer = (tableState) => {
-  if (!tableState?.tables?.length) return null
-  const toBool = (cell) => cell === 'T'
-  const mapRows = (rows) => rows.map((row) => row.map(toBool))
-  const mapped = tableState.tables.map((t) => ({
-    rows: mapRows(t.rows || []),
-    colhls: t.rows?.[0]?.length ? Array(t.rows[0].length).fill(false) : [],
-  }))
-  if (mapped.length === 1) return { lefts: [], right: mapped[0], rowhls: [] }
-  const payload = {
-    lefts: mapped.slice(0, -1),
-    right: mapped[mapped.length - 1],
-    rowhls: [],
-    mcans: tableState.mcans ?? [],
-    valid: tableState.mcans?.includes('valid'),
-  }
-  return payload
-}
-
-const isTableComplete = (tableState) =>
-  tableState?.tables?.every((t) =>
-    t.rows?.every((row) => row?.every((cell) => cell !== ''))
-  ) ?? false
-
-// combo argument table: require valid/invalid selection
-const hasClassification = (tableState) =>
-  Array.isArray(tableState?.mcans) && tableState.mcans.length > 0
 
 // Resolve expected argument (premises + conclusion) from snapshot/answer for solution reveal
 function resolveExpectedAnswer(answer) {
@@ -252,18 +225,21 @@ export default function ComboTranslationTruthTable({
     question: snapshot,
     options: proof?.options ?? snapshot?.options,
     getAnswer: () => {
-      const payload = { argumentLine }
-      const built = buildTableAnswer(tableState)
-      if (built) payload.tableAns = built
+      const payload = {
+        argumentLine,
+        tableAns: buildTruthTableSubmissionData(
+          'argument',
+          tableState?.tables?.map((table) => table.rows)
+            ?? [...parseStatus.parsed.premises, parseStatus.parsed.conclusion].map(() => []),
+          tableState?.mcans ?? [],
+          true
+        ),
+      }
       if (tableState && typeof tableState === 'object') payload.tableState = tableState
       return payload
     },
     onComplete,
-    isDisabled: () =>
-      !parseStatus.ok ||
-      !tableState ||
-      !isTableComplete(tableState) ||
-      !hasClassification(tableState),
+    isDisabled: () => !parseStatus.ok || isAssignmentLocked,
     resetInput: () => {
       setArgumentLine('')
       setTableState(null)
@@ -413,9 +389,6 @@ export default function ComboTranslationTruthTable({
         isChecking={isChecking}
         isDisabled={
           !parseStatus.ok ||
-          !tableState ||
-          !isTableComplete(tableState) ||
-          !hasClassification(tableState) ||
           isLocked ||
           isAssignmentLocked
         }
