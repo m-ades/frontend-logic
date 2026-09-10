@@ -42,3 +42,21 @@ export function fullTableMatch(ansrows, givenrows) {
     const numchecked = rowstocheck * ncols;
     return { rowdiff, offcells, numchecked };
 }
+
+/*
+checks exactly one boolean row highlight against the supplied witness predicate
+missing highlights fail and predicate errors pass through
+*/
+export function hasSingleRowHighlight(givenans, isValidWitness) {
+    const highlights = Array.isArray(givenans?.rowhls) ? givenans.rowhls : [];
+    const selectedCount = highlights.filter((v) => v === true).length;
+    return selectedCount === 1 && isValidWitness(highlights.indexOf(true));
+}
+
+/*
+checks boolean main operator cells in semantic answer tables
+an empty table list is vacuously true and missing row cells are false
+*/
+export function allTrueAtRow(tables, i) {
+    return tables.every((table) => table.rows[i]?.[table.opspot] === true);
+}
