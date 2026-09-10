@@ -91,6 +91,7 @@ export default function InstructorGradebook() {
       </Box>
 
       <GradebookTable
+        key={activeCourseId}
         students={sortedStudents}
         assignments={assignments}
         sortColumn={sortColumn}
