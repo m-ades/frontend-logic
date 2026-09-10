@@ -1,3 +1,4 @@
+import { roundNumber, formatNumber } from "../../utils/numberUtils.js";
 import { useEffect, useMemo, useState } from "react";
 import {
   Dialog,
@@ -427,7 +428,7 @@ export default function StudentProfileModal({
     (assignment) => assignment.status === "missing"
   ).length;
   const completionRate = totalAssignments
-    ? Math.round((completedAssignments / totalAssignments) * 100)
+    ? roundNumber((completedAssignments / totalAssignments) * 100)
     : 0;
 
   // Grade distribution
@@ -609,7 +610,7 @@ export default function StudentProfileModal({
                 sx={{ display: "flex", alignItems: "baseline", gap: 2, mt: 1 }}
               >
                 <Typography variant="h2" component="div" fontWeight={800} color="primary.main">
-                  {average === null ? "—" : `${average}%`}
+                  {average === null ? "—" : `${formatNumber(average)}%`}
                 </Typography>
                 <Chip
                   label={averageGrade.letter}
@@ -630,7 +631,7 @@ export default function StudentProfileModal({
                     Completion Rate
                   </Typography>
                   <Typography variant="body2" fontWeight={600}>
-                    {completionRate}% ({completedAssignments}/{totalAssignments}
+                    {formatNumber(completionRate)}% ({completedAssignments}/{totalAssignments}
                     )
                   </Typography>
                 </Box>
@@ -643,7 +644,7 @@ export default function StudentProfileModal({
                     fontWeight={600}
                     color="success.main"
                   >
-                    {highestGrade}%
+                    {formatNumber(highestGrade)}%
                   </Typography>
                 </Box>
                 <Box sx={{ display: "flex", justifyContent: "space-between" }}>
@@ -655,7 +656,7 @@ export default function StudentProfileModal({
                     fontWeight={600}
                     color="error.main"
                   >
-                    {lowestGrade}%
+                    {formatNumber(lowestGrade)}%
                   </Typography>
                 </Box>
               </Stack>
@@ -678,7 +679,7 @@ export default function StudentProfileModal({
           <MetricCard
             title="Completed"
             value={completedAssignments}
-            subtitle={`${completionRate}% of total`}
+            subtitle={`${formatNumber(completionRate)}% of total`}
             icon={Award}
             gradient={["#10b981", "#059669"]}
           />
@@ -691,14 +692,14 @@ export default function StudentProfileModal({
           />
           <MetricCard
             title="Highest"
-            value={`${highestGrade}%`}
+            value={`${formatNumber(highestGrade)}%`}
             subtitle={getLetterGrade(highestGrade, gradingScale)}
             icon={TrendingUp}
             gradient={[theme.palette.primary.main, theme.palette.primary.dark]}
           />
           <MetricCard
             title="Lowest"
-            value={`${lowestGrade}%`}
+            value={`${formatNumber(lowestGrade)}%`}
             subtitle={getLetterGrade(lowestGrade, gradingScale)}
             icon={TrendingDown}
             gradient={["#f59e0b", "#d97706"]}
@@ -906,7 +907,7 @@ export default function StudentProfileModal({
                             fontWeight={600}
                             color={gradeMeta.textColor}
                           >
-                            {assignment.studentGrade}%
+                            {formatNumber(assignment.studentGrade)}%
                           </Typography>
                         ) : (
                           <Typography variant="body2" color="text.secondary">

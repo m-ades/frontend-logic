@@ -1,3 +1,4 @@
+import { formatNumber } from "../../../utils/numberUtils.js";
 import {
   Box,
   Typography,
@@ -37,8 +38,7 @@ export const StudentsAtRiskTable = ({ students, assignments }) => {
 
   const atRiskStudents = students
     .map((student) => {
-      const rawAvg = getStudentAverage(student);
-      const avg = rawAvg !== null ? Math.round(rawAvg) : null;
+      const avg = getStudentAverage(student);
       const grades = Object.values(student.grades).filter(
         (g) => g !== undefined && g !== null
       );
@@ -117,7 +117,7 @@ export const StudentsAtRiskTable = ({ students, assignments }) => {
                     fontWeight={600}
                     color="error.main"
                   >
-                    {student.avg}%
+                    {formatNumber(student.avg)}%
                   </Typography>
                 </TableCell>
                 <TableCell align="center">

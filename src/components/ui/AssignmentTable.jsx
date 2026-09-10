@@ -1,3 +1,4 @@
+import { roundNumber, formatNumber } from "../../utils/numberUtils.js";
 import {
   Paper,
   Box,
@@ -84,7 +85,7 @@ export default function AssignmentTable({
             const numerator = item.submissions ?? item.completions ?? 0;
             const completionRate =
               totalStudents > 0
-                ? Math.round((numerator / totalStudents) * 100)
+                ? roundNumber((numerator / totalStudents) * 100)
                 : 0;
             const completionNode = (
               <Stack direction="row" spacing={0.5} alignItems="center">
@@ -198,7 +199,7 @@ export default function AssignmentTable({
                           Average
                         </Typography>
                         <Typography variant="body2" fontWeight={600}>
-                          {item.averageGrade == null ? "—" : `${item.averageGrade}%`}
+                          {item.averageGrade == null ? "—" : `${formatNumber(item.averageGrade)}%`}
                         </Typography>
                       </Stack>
                     </Stack>
@@ -281,7 +282,7 @@ export default function AssignmentTable({
               const statusText = getStatusText(item);
               const completionRate =
                 item.totalStudents > 0
-                  ? Math.round(
+                  ? roundNumber(
                       ((item.submissions || item.completions) /
                         item.totalStudents) *
                         100
@@ -395,7 +396,7 @@ export default function AssignmentTable({
                       </TableCell>
                       <TableCell align="center">
                         <Typography variant="body2" fontWeight={600}>
-                          {item.averageGrade == null ? "—" : `${item.averageGrade}%`}
+                          {item.averageGrade == null ? "—" : `${formatNumber(item.averageGrade)}%`}
                         </Typography>
                       </TableCell>
                     </>

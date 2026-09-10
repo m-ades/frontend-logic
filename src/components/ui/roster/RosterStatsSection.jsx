@@ -1,3 +1,4 @@
+import { formatNumber } from "../../../utils/numberUtils.js";
 import { Box, useTheme } from "@mui/material";
 import { MetricCard } from "../MetricCard";
 import { Users, TrendingUp, AlertTriangle } from "lucide-react";
@@ -28,7 +29,7 @@ export default function RosterStatsSection({
 
       <MetricCard
         title="Class Average"
-        value={averageGrade === null ? "—" : `${averageGrade}%`}
+        value={averageGrade === null ? "—" : `${formatNumber(averageGrade)}%`}
         subtitle="Across all students"
         icon={TrendingUp}
         gradient={["#22c55e", "#16a34a"]}

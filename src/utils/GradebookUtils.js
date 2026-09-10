@@ -1,19 +1,23 @@
-// null means no gradeable work yet, which is not the same as scoring zero
+import { numberOrNull, formatNumber } from "./numberUtils.js";
+// averages valid grades without rounding and returns null when none are present
 export function calculateAverage(grades) {
-  const values = Object.values(grades);
+  const values = Object.values(grades)
+    .map(numberOrNull)
+    .filter((grade) => grade !== null);
   if (values.length === 0) return null;
-  return Math.round(values.reduce((a, b) => a + b, 0) / values.length);
+  return values.reduce((a, b) => a + b, 0) / values.length;
 }
 
-// preserves a null average and calculates from grades only when the average is absent
+// preserves a supplied average or calculates one without rounding when absent and returns null for missing grades
 export function getStudentAverage(student) {
   if (student?.average === null) return null;
   if (student?.average === undefined) return calculateAverage(student?.grades || {});
-  return Number(student.average);
+  return numberOrNull(student.average);
 }
 
-// Get letter grade from numeric grade
+// classifies the unrounded grade and returns a dash for missing or invalid values
 export function getLetterGrade(grade) {
+  grade = numberOrNull(grade);
   if (grade === null || grade === undefined || Number.isNaN(grade)) return "—";
   if (grade >= 90) return "A";
   if (grade >= 80) return "B";
@@ -40,8 +44,8 @@ export function filterStudents(
 
     // Assignment-specific grade filter
     if (selectedAssignment !== "all") {
-      const grade = student.grades[selectedAssignment];
-      if (grade === undefined) return false;
+      const grade = numberOrNull(student.grades[selectedAssignment]);
+      if (grade === null) return false;
 
       if (gradeFilter === "a" && grade < 90) return false;
       if (gradeFilter === "b" && (grade < 80 || grade >= 90)) return false;
@@ -138,12 +142,12 @@ export function exportGradebookCSV(students, assignments, courseLabel) {
         if (grade === undefined || grade === null || Number.isNaN(grade)) {
           return "";
         }
-        return `${grade}%`;
+        return `${formatNumber(grade)}%`;
       });
 
       return [
         student?.username ?? "",
-        average === null ? "" : `${average}%`,
+        average === null ? "" : `${formatNumber(average)}%`,
         letterGrade,
         ...assignmentGrades,
       ];

@@ -1,3 +1,4 @@
+import { roundNumber, formatNumber } from "../utils/numberUtils.js";
 export function useWorksheetMetrics({
   score,
   total,
@@ -7,11 +8,11 @@ export function useWorksheetMetrics({
   const safeTotal = Number.isFinite(total) ? total : 0
   const safeScore = Number.isFinite(score) ? score : 0
   const completionPercent = safeTotal > 0
-    ? Math.round((safeScore / safeTotal) * 100)
+    ? roundNumber((safeScore / safeTotal) * 100)
     : 0
   // total from local calc only. no api fetch.
   const gradeLabel = Number.isFinite(calculatedGradePercent)
-    ? `${calculatedGradePercent.toFixed(1)}%`
+    ? `${formatNumber(calculatedGradePercent)}%`
     : '—'
   const dueAtDate = dueAt ? new Date(dueAt) : null
   const isOverdue = dueAtDate && !Number.isNaN(dueAtDate.getTime())

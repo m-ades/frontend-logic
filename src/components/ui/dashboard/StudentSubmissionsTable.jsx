@@ -1,3 +1,4 @@
+import { formatNumber } from "../../../utils/numberUtils.js";
 import {
   Box,
   Paper,
@@ -106,7 +107,7 @@ export default function StudentSubmissionsTable({ students, onView }) {
                         : "text.primary"
                     }
                   >
-                    {student.submitted ? `${student.grade}%` : "—"}
+                    {student.submitted ? `${formatNumber(student.grade)}%` : "—"}
                   </Typography>
                 </TableCell>
 

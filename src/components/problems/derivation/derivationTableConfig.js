@@ -1,3 +1,4 @@
+import { formatNumber } from "../../../utils/numberUtils.js";
 import { alpha } from '@mui/material/styles'
 import { formatDerivationRuleName } from '../../../lib/derivationRules.js'
 import {
@@ -105,17 +106,14 @@ export function getDerivationScoreLabel({
 }) {
   if (!Number.isFinite(totalQuestions) || totalQuestions <= 0) return null
   const pointsPerQuestion = 100 / totalQuestions
-  const formatPoints = (points) => points % 1 === 0
-    ? String(Math.round(points))
-    : points.toFixed(1)
-  const maxLabel = formatPoints(pointsPerQuestion)
+  const maxLabel = formatNumber(pointsPerQuestion)
   const score = currentQuestionScore != null && Number.isFinite(Number(currentQuestionScore))
     ? Number(currentQuestionScore)
     : null
 
   if (score != null) {
     const color = score >= 100 ? 'success.main' : score > 0 ? 'text.secondary' : 'error.main'
-    return { text: `${formatPoints((score / 100) * pointsPerQuestion)}/${maxLabel}`, color }
+    return { text: `${formatNumber((score / 100) * pointsPerQuestion)}/${maxLabel}`, color }
   }
   if (lastSubmitStatus === 'correct') {
     return { text: `${maxLabel}/${maxLabel}`, color: 'success.main' }

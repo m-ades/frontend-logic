@@ -1,3 +1,4 @@
+import { roundNumber, formatNumber } from "../../../utils/numberUtils.js";
 import { Paper, Typography, Stack, Box, LinearProgress } from "@mui/material";
 import { alpha } from "@mui/material/styles";
 
@@ -19,7 +20,7 @@ export default function GradeBreakdown({ data, total }) {
       <Stack spacing={2}>
         {data.map((item) => {
           const percentage =
-            total > 0 ? Math.round((item.count / total) * 100) : 0;
+            total > 0 ? roundNumber((item.count / total) * 100) : 0;
 
           return (
             <Box key={item.grade}>
@@ -34,7 +35,7 @@ export default function GradeBreakdown({ data, total }) {
                   {item.grade} ({item.range})
                 </Typography>
                 <Typography color="text.secondary">
-                  {item.count} students ({percentage}%)
+                  {item.count} students ({formatNumber(percentage)}%)
                 </Typography>
               </Box>
 

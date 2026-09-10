@@ -1,3 +1,4 @@
+import { formatNumber } from "../../utils/numberUtils.js";
 import * as React from 'react'
 import { Box, Stack, Tabs, Tab, useTheme, useMediaQuery, Chip, Button, Menu, MenuItem } from '@mui/material'
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
@@ -349,9 +350,7 @@ function ProofTabs({
           {proofs.map((proof, idx) => {
             const totalQuestions = proofs.length
             const pointsPerQuestion = totalQuestions > 0 ? 100 / totalQuestions : 0
-            const maxLabel = pointsPerQuestion % 1 === 0
-              ? String(Math.round(pointsPerQuestion))
-              : pointsPerQuestion.toFixed(1)
+            const maxLabel = formatNumber(pointsPerQuestion)
             const sectionLabel = problemTypeLabel(proof.type)
             const startsSection = groupQuestionsByType
               && (idx === 0 || problemTypeLabel(proofs[idx - 1]?.type) !== sectionLabel)
@@ -429,7 +428,7 @@ function ProofTabs({
                     const score = displayScoreForProof(proof, rawScore)
                     if (hasScore) {
                       const earned = (Number(score) / 100) * pointsPerQuestion
-                      const earnedLabel = earned % 1 === 0 ? String(Math.round(earned)) : earned.toFixed(1)
+                      const earnedLabel = formatNumber(earned)
                       const color = score >= 100 ? theme.palette.success.main : score > 0 ? theme.palette.text.secondary : theme.palette.error.main
                       return (
                         <span style={{ fontSize: '0.875rem', fontWeight: 500, color }}>

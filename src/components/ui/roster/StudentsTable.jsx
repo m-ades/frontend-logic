@@ -1,3 +1,4 @@
+import { formatNumber } from "../../../utils/numberUtils.js";
 import {
   Box,
   Typography,
@@ -144,7 +145,7 @@ export default function StudentsTable({
                           : "text.primary"
                       }
                     >
-                      {hasAverage ? `${stats.average}%` : "—"}
+                      {hasAverage ? `${formatNumber(stats.average)}%` : "—"}
                     </Typography>
                   </TableCell>
 

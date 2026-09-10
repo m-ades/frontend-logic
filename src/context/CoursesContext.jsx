@@ -208,9 +208,7 @@ export async function fetchCourseGradebook(courseId) {
         lateSubmissions[assignment.assignment_id] = true;
       }
       if (assignment.has_grade && assignment.max_score > 0) {
-        grades[assignment.assignment_id] = Math.round(
-          (assignment.final_score / assignment.max_score) * 100000
-        ) / 1000;
+        grades[assignment.assignment_id] = (assignment.final_score / assignment.max_score) * 100;
       }
     });
 
@@ -223,7 +221,7 @@ export async function fetchCourseGradebook(courseId) {
       average:
         student.dropped?.average_percent !== null &&
         student.dropped?.average_percent !== undefined
-          ? Math.round(student.dropped.average_percent * 100000) / 1000
+          ? student.dropped.average_percent * 100
           : null,
       grades,
       submittedAssignments,
@@ -282,9 +280,7 @@ export function calculateAssignmentAverage(assignmentId, students) {
     .filter((grade) => grade !== undefined && grade !== null);
 
   if (grades.length === 0) return null;
-  return Math.round(
-    grades.reduce((sum, grade) => sum + grade, 0) / grades.length
-  );
+  return grades.reduce((sum, grade) => sum + grade, 0) / grades.length;
 }
 
 // Calculate practice completion rate
@@ -300,45 +296,6 @@ export function calculatePracticeCompletion(practiceId, students) {
       0
     ),
   };
-}
-
-// Calculate grade distribution with custom grading scale
-export function calculateGradeDistribution(students, gradingScale) {
-  // Use default grading scale if none provided or if gradingScale is undefined
-  const scale =
-    gradingScale && Array.isArray(gradingScale)
-      ? gradingScale
-      : DEFAULT_GRADING_SCALE;
-
-  const distribution = scale.map((grade) => ({
-    grade: grade.letter,
-    range: `${grade.minPercent}-${grade.maxPercent}`,
-    count: 0,
-    color: grade.color,
-    minPercent: grade.minPercent,
-    maxPercent: grade.maxPercent,
-  }));
-
-  students.forEach((student) => {
-    const grades = Object.values(student.grades).filter(
-      (g) => g !== undefined && g !== null
-    );
-    if (grades.length === 0) return;
-
-    const average = Math.round(
-      grades.reduce((sum, g) => sum + g, 0) / grades.length
-    );
-
-    const gradeIndex = distribution.findIndex(
-      (d) => average >= d.minPercent && average <= d.maxPercent
-    );
-
-    if (gradeIndex !== -1) {
-      distribution[gradeIndex].count++;
-    }
-  });
-
-  return distribution;
 }
 
 // Get upcoming deadlines (within 7 days); due dates compared in Eastern

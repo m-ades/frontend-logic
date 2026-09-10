@@ -1,3 +1,4 @@
+import { formatNumber } from "./numberUtils.js";
 // Utility functions for roster management
 import { parseDueDateAsEastern } from "./easternTime.js";
 import { getStudentAverage } from "./GradebookUtils.js";
@@ -70,7 +71,7 @@ export function calculateClassStats(students, assignments) {
 
   const averageClassGrade =
     gradedStats.length > 0
-      ? Math.round(
+      ? (
           gradedStats.reduce((sum, stats) => sum + stats.average, 0) /
             gradedStats.length
         )
@@ -96,7 +97,7 @@ export function exportRosterCSV(students, courseCode, assignments) {
       const stats = getStudentStats(student, assignments);
       return [
         student.username,
-        stats.average === null ? "" : `${stats.average}%`,
+        stats.average === null ? "" : `${formatNumber(stats.average)}%`,
         stats.completed,
         stats.lateCount,
       ].join(",");

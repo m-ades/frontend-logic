@@ -1,3 +1,4 @@
+import { formatNumber } from "../../../utils/numberUtils.js";
 import { useState } from "react";
 import {
   Box,
@@ -277,7 +278,7 @@ export default function GradebookTable({
                         }}
                       >
                         <Typography variant="body2" fontWeight={600}>
-                          {average === null ? "—" : `${average}%`}
+                          {average === null ? "—" : `${formatNumber(average)}%`}
                         </Typography>
                         <Chip
                           label={letterGrade}
@@ -326,7 +327,7 @@ export default function GradebookTable({
                           <Typography
                             component={canViewSubmission ? "button" : "span"}
                             type={canViewSubmission ? "button" : undefined}
-                            aria-label={canViewSubmission ? `View ${student.username}'s submission for ${assignment.name}: ${grade}%` : undefined}
+                            aria-label={canViewSubmission ? `View ${student.username}'s submission for ${assignment.name}: ${formatNumber(grade)}%` : undefined}
                             onClick={canViewSubmission ? () => setSelectedSubmission({ student, assignment }) : undefined}
                             variant="body2"
                             sx={{
@@ -349,7 +350,7 @@ export default function GradebookTable({
                               fontWeight: hasGrade ? 600 : 400,
                             }}
                           >
-                            {hasGrade ? `${grade}%` : "—"}
+                            {hasGrade ? `${formatNumber(grade)}%` : "—"}
                           </Typography>
                         </TableCell>
                       );
