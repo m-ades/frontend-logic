@@ -7,37 +7,38 @@
 // checkers for truth-table type problems                             //
 ////////////////////////////////////////////////////////////////////////
 
+function toBool(v) {
+    if (v === true || v === 1 || v === '1' || v === 'T' || v === 't') return true;
+    if (v === false || v === 0 || v === '0' || v === 'F' || v === 'f') return false;
+    return undefined;
+}
+
 /*
- * if rowdiff positive, they didn't use enough rows, check all their rows
- * rows to check = real rows - diff
- *
- * if rowdiff negative, they gave too many rows, check all answer rows
- *
- */
-
-// returns how many rows it is off by, an array of cell coordinates
-// that are wrong, and the number of cells checked
-
+compares boolean numeric and letter truth values across overlapping rows
+returns row difference wrong cell coordinates and the number of checked cells
+missing submissions and empty answer tables are accepted without throwing
+*/
 export function fullTableMatch(ansrows, givenrows) {
     const offcells = [];
-    // positive row diff => they didn't use enough rows
-    // negative row diff => they used too many rows
-    const rowdiff = (ansrows.length - givenrows.length);
-    // determine overlapping row number to check
+    if (!ansrows?.length || !ansrows[0]?.length) {
+        return { rowdiff: givenrows?.length ?? 0, offcells, numchecked: 0 };
+    }
+    const ncols = ansrows[0].length;
+    const rowdiff = (ansrows.length - (givenrows?.length ?? 0));
     let rowstocheck = ansrows.length;
     if (rowdiff > 0) {
         rowstocheck = ansrows.length - rowdiff;
     }
     for (let i = 0; i < rowstocheck; i++) {
-        for (let j = 0; j<ansrows[0].length; j++) {
-            const cellans = ansrows[i][j];
-            const givencellans = givenrows[i][j];
-            if (cellans !== givencellans) {
-                offcells.push([i,j]);
+        const givenrow = givenrows?.[i];
+        for (let j = 0; j < ncols; j++) {
+            const cellans = toBool(ansrows[i][j]);
+            const givencellans = givenrow?.[j] !== undefined ? toBool(givenrow[j]) : undefined;
+            if (givencellans === undefined || cellans !== givencellans) {
+                offcells.push([i, j]);
             }
         }
     }
-    const numchecked = (rowstocheck * ansrows[0].length);
-    return {rowdiff, offcells, numchecked};
+    const numchecked = rowstocheck * ncols;
+    return { rowdiff, offcells, numchecked };
 }
-
