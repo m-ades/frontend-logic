@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -37,6 +37,7 @@ import {
 import { MetricCard } from "../MetricCard";
 import { GradeDistributionChart } from "./GradeDistributionChart";
 import StudentSubmissionsTable from "./StudentSubmissionsTable";
+import StudentSubmissionDialog from "../gradebook/StudentSubmissionDialog.jsx";
 import GradeBreakdown from "./GradeBreakdown";
 import { formatEasternDateTime } from "../../../utils/easternTime.js";
 import { useAppRuntime } from "../../../hooks/useAppRuntime.js";
@@ -61,12 +62,17 @@ function getGradeColor(grade) {
 export default function AssignmentDetailModal({ open, onClose, assignmentId }) {
   const theme = useTheme();
   const [activeTab, setActiveTab] = useState(0);
+  const [selectedStudent, setSelectedStudent] = useState(null);
   const navigate = useNavigate();
   const location = useLocation();
-  const { courseState, courseActions, assignmentPath } = useAppRuntime();
+  const { courseState, courseActions, assignmentPath, user } = useAppRuntime();
 
   // Pull data from context
   const { activeCourseId, assignmentsByCourse, gradebookByCourse, courses } = courseState;
+
+  useEffect(() => {
+    setSelectedStudent(null);
+  }, [open, assignmentId, activeCourseId]);
 
   // Get current course and assignment data
   const activeCourse = courses.find((c) => c.id === activeCourseId);
@@ -380,6 +386,7 @@ export default function AssignmentDetailModal({ open, onClose, assignmentId }) {
         {activeTab === 1 && (
           <StudentSubmissionsTable
             students={studentSubmissions}
+            onView={activeCourse?.role === "instructor" || user?.is_system_admin ? setSelectedStudent : undefined}
           />
         )}
       </DialogContent>
@@ -394,6 +401,14 @@ export default function AssignmentDetailModal({ open, onClose, assignmentId }) {
           Open Assignment
         </Button>
       </DialogActions>
+      {open && selectedStudent && (
+        <StudentSubmissionDialog
+          key={`${assignment.id}-${selectedStudent.id}`}
+          student={selectedStudent}
+          assignment={assignment}
+          onClose={() => setSelectedStudent(null)}
+        />
+      )}
     </Dialog>
   );
 }

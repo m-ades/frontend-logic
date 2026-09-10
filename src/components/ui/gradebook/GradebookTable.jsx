@@ -21,6 +21,7 @@ import {
 } from "../../../utils/gradingUtils";
 import { getStudentAverage } from "../../../utils/GradebookUtils";
 import StudentProfileModal from "../StudentProfileModal";
+import StudentSubmissionDialog from "./StudentSubmissionDialog.jsx";
 import { useAppRuntime } from "../../../hooks/useAppRuntime.js";
 
 function splitAssignmentTitle(name = "") {
@@ -44,14 +45,15 @@ export default function GradebookTable({
   sortDirection,
   handleSort,
 }) {
-  const { courseState } = useAppRuntime();
+  const { courseState, user } = useAppRuntime();
   const { courses, activeCourseId } = courseState;
   const activeCourse = courses.find((c) => c.id === activeCourseId);
   const gradingScale = activeCourse?.gradingScale || getDefaultGradingScale();
-  const isInstructor = activeCourse?.role === "instructor";
+  const isInstructor = activeCourse?.role === "instructor" || Boolean(user?.is_system_admin);
 
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [profileModalOpen, setProfileModalOpen] = useState(false);
+  const [selectedSubmission, setSelectedSubmission] = useState(null);
 
   // Track hovered column
   const [hoveredColumn, setHoveredColumn] = useState(null);
@@ -292,8 +294,10 @@ export default function GradebookTable({
 
                     {assignments.map((assignment) => {
                       const grade = student.grades[assignment.id];
+                      const hasGrade = grade !== undefined && grade !== null;
+                      const canViewSubmission = isInstructor && hasGrade;
                       const isPassing =
-                        grade !== undefined
+                        hasGrade
                           ? isPassingGrade(grade, gradingScale)
                           : null;
 
@@ -320,18 +324,32 @@ export default function GradebookTable({
                           onMouseLeave={() => setHoveredColumn(null)}
                         >
                           <Typography
+                            component={canViewSubmission ? "button" : "span"}
+                            type={canViewSubmission ? "button" : undefined}
+                            aria-label={canViewSubmission ? `View ${student.username}'s submission for ${assignment.name}: ${grade}%` : undefined}
+                            onClick={canViewSubmission ? () => setSelectedSubmission({ student, assignment }) : undefined}
                             variant="body2"
                             sx={{
+                              border: 0,
+                              p: 0,
+                              background: "none",
+                              cursor: canViewSubmission ? "pointer" : undefined,
+                              "&:hover": canViewSubmission ? { textDecoration: "underline" } : undefined,
+                              "&:focus-visible": {
+                                outline: "2px solid",
+                                outlineColor: "primary.main",
+                                outlineOffset: 2,
+                              },
                               color:
-                                grade !== undefined
+                                hasGrade
                                   ? isPassing
                                     ? "text.primary"
                                     : "error.main"
                                   : "text.secondary",
-                              fontWeight: grade !== undefined ? 600 : 400,
+                              fontWeight: hasGrade ? 600 : 400,
                             }}
                           >
-                            {grade !== undefined ? `${grade}%` : "—"}
+                            {hasGrade ? `${grade}%` : "—"}
                           </Typography>
                         </TableCell>
                       );
@@ -352,6 +370,14 @@ export default function GradebookTable({
         assignments={assignments}
         canEditAccommodations={isInstructor}
       />
+      {isInstructor && selectedSubmission && (
+        <StudentSubmissionDialog
+          key={`${selectedSubmission.assignment.id}-${selectedSubmission.student.id}`}
+          student={selectedSubmission.student}
+          assignment={selectedSubmission.assignment}
+          onClose={() => setSelectedSubmission(null)}
+        />
+      )}
     </>
   );
 }

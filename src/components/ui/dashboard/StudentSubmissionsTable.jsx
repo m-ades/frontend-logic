@@ -22,6 +22,7 @@ function getGradeColor(grade) {
   return "error";
 }
 
+// submitted rows call on view with the student and stay disabled without a handler
 export default function StudentSubmissionsTable({ students, onView }) {
   if (!students || students.length === 0) {
     return (
@@ -145,14 +146,17 @@ export default function StudentSubmissionsTable({ students, onView }) {
                 </TableCell>
 
                 <TableCell align="center">
-                  <Tooltip title="View Submission">
-                    <IconButton
-                      size="small"
-                      disabled={!student.submitted}
-                      onClick={() => onView?.(student)}
-                    >
-                      <Eye size={16} />
-                    </IconButton>
+                  <Tooltip title="View submission">
+                    <span>
+                      <IconButton
+                        size="small"
+                        aria-label={`View submission for ${student.username}`}
+                        disabled={!student.submitted || !onView}
+                        onClick={() => onView?.(student)}
+                      >
+                        <Eye size={16} />
+                      </IconButton>
+                    </span>
                   </Tooltip>
                 </TableCell>
               </TableRow>
