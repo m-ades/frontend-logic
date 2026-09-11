@@ -12,8 +12,8 @@ import {
 } from '../src/utils/gradingUtils.js';
 import { useWorksheetMetrics } from '../src/hooks/useWorksheetMetrics.js';
 
-test('numbers use three decimal precision without trailing zeros', () => {
-  for (const [input, expected] of [[89.3464, 89.346], [89.3466, 89.347], [89.9995, 90], [100 / 3, 33.333], [0, 0], ['89.9', 89.9]]) {
+test('numbers use one decimal precision without trailing zeros', () => {
+  for (const [input, expected] of [[89.34, 89.3], [89.36, 89.4], [89.95, 90], [100 / 3, 33.3], [0, 0], ['89.9', 89.9]]) {
     assert.equal(roundNumber(input), expected);
     assert.equal(formatNumber(input), String(expected));
   }
@@ -69,6 +69,6 @@ test('averages and filters keep full precision while worksheet labels round', ()
   assert.deepEqual(filterStudents([student], '', 'a', 'a'), []);
   assert.deepEqual(filterStudents([student], '', 'all', 'a'), []);
   const metrics = useWorksheetMetrics({ score: 1, total: 3, calculatedGradePercent: 89.3464 });
-  assert.equal(metrics.completionPercent, 33.333);
-  assert.equal(metrics.gradeLabel, '89.346%');
+  assert.equal(metrics.completionPercent, 33.3);
+  assert.equal(metrics.gradeLabel, '89.3%');
 });
