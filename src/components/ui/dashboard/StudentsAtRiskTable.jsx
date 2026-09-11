@@ -1,3 +1,4 @@
+import { formatNumber } from "../../../utils/numberUtils.js";
 import {
   Box,
   Typography,
@@ -37,17 +38,16 @@ export const StudentsAtRiskTable = ({ students, assignments }) => {
 
   const atRiskStudents = students
     .map((student) => {
-      const rawAvg = getStudentAverage(student);
-      const avg = rawAvg !== null ? Math.round(rawAvg) : null;
+      const avg = getStudentAverage(student);
       const grades = Object.values(student.grades).filter(
         (g) => g !== undefined && g !== null
       );
       const missing = assignments.length - grades.length;
       const letterGrade = getLetterGrade(avg, gradingScale);
-      return { ...student, rawAvg, avg, missing, letterGrade };
+      return { ...student, avg, missing, letterGrade };
     })
-    .filter((s) => s.rawAvg !== null && s.rawAvg < atRiskThreshold)
-    .sort((a, b) => a.rawAvg - b.rawAvg);
+    .filter((s) => s.avg !== null && s.avg < atRiskThreshold)
+    .sort((a, b) => a.avg - b.avg);
 
   // Get the grade level name for the threshold for display
   const thresholdGrade = gradingScale.find(
@@ -117,7 +117,7 @@ export const StudentsAtRiskTable = ({ students, assignments }) => {
                     fontWeight={600}
                     color="error.main"
                   >
-                    {student.avg}%
+                    {formatNumber(student.avg)}%
                   </Typography>
                 </TableCell>
                 <TableCell align="center">

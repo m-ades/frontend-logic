@@ -6,7 +6,8 @@
 // checks whether a truth table answer for arguments is correct or not //
 /////////////////////////////////////////////////////////////////////////
 
-import { fullTableMatch } from './truth-tables.js';
+import { fullTableMatch, hasSingleRowHighlight, allTrueAtRow } from './truth-tables.js';
+import { gradeComponents } from '../component-grading.js';
 
 function normalizeSelection(givenans) {
     if (Array.isArray(givenans?.mcans)) {
@@ -31,9 +32,14 @@ function sameSelection(a, b) {
     return true;
 }
 
-// determines whether it should be valid or invalid depending on the
-// table given
+/*
+derives validity from the submitted main operator cells
+empty or mismatched row counts leave the classification undetermined
+*/
 function shouldBe(prems, conc) {
+    if (conc.rows.length === 0 || prems.some((prem) => prem.rows.length !== conc.rows.length)) {
+        return { valid: false, comp: false };
+    }
     let valid = true;
     for (let i = 0; i < conc.rows.length; i++) {
         let allprems = true;
@@ -56,80 +62,76 @@ function shouldBe(prems, conc) {
     return { valid, comp: true }
 }
 
+/*
+grades the table and each enabled classification or witness as equal components
+classification may follow a complete submitted table but witnesses use the answer key
+missing submission data fails its component and detailed feedback requires cheat
+*/
 export default async function(
-    question, answer, givenans, partialcredit, points, cheat, options
+  question, answer, givenans, partialcredit, points, cheat, options
 ) {
-    let correct = true;
-    // check table portion
-    //
-    // the table itself gives points out of five
-    let offive = 0;
+    // normalize given answer shape to avoid runtime errors
+    const givenLefts = Array.isArray(givenans?.lefts) ? givenans.lefts : [];
+    const givenRight = givenans?.right;
+    const expectedPremCount = Array.isArray(answer?.prems) ? answer.prems.length : 0;
+    const shapeIsValid = (
+        expectedPremCount > 0 &&
+        givenLefts.length === expectedPremCount &&
+        givenLefts.every((prem) => prem?.rows && Array.isArray(prem.rows)) &&
+        givenRight?.rows && Array.isArray(givenRight.rows)
+    );
+
     const tmPremResults = [];
     // check table for each premise and conclusion
-    for (let i = 0 ; i < answer.prems.length; i++) {
-        tmPremResults.push(fullTableMatch(answer.prems[i].rows,
-            givenans.lefts[i].rows));
+    if (shapeIsValid) {
+        for (let i = 0 ; i < answer.prems.length; i++) {
+            tmPremResults.push(fullTableMatch(answer.prems[i].rows,
+                givenLefts[i].rows));
+        }
     }
-    const tmConcResult = fullTableMatch(answer.conc.rows, givenans.right.rows);
+    const tmConcResult = shapeIsValid
+        ? fullTableMatch(answer.conc.rows, givenRight.rows)
+        : { offcells: [], rowdiff: 0, numchecked: 0 };
 
-    let numOffCells = tmConcResult.offcells.length;
-    for (const tmResult of tmPremResults) {
-        numOffCells += tmResult.offcells.length;
-    }
-    if ((tmConcResult.rowdiff == 0) && (numOffCells == 0)) {
-        offive = 5;
-    } else {
-        correct = false;
-        offive = 0; // table is all-or-nothing; no row-by-row credit
-    }
-
-    // if there is a multiple choice answer it is worth 2 compared to
-    // the 5
-
-    // check answer
+    // table credit requires every premise and conclusion row
+    const tableCorrect = shapeIsValid
+        && tmConcResult.rowdiff === 0
+        && tmConcResult.offcells.length === 0
+        && tmPremResults.every((result) => result.rowdiff === 0 && result.offcells.length === 0);
+    const componentScores = [tableCorrect ? 1 : 0];
     let qright = false;
-    let awarded = 0;
     if (options.question) {
         const selection = normalizeSelection(givenans);
         const expected = correctSelection(answer);
         qright = sameSelection(selection, expected);
-        if (!qright) {
+        if (!qright && shapeIsValid) {
             const prems = [];
-            for (let i =0 ; i < givenans.lefts.length ; i++) {
-                const prem = givenans.lefts[i];
+            for (let i =0 ; i < givenLefts.length ; i++) {
+                const prem = givenLefts[i];
                 prems.push({ rows: prem.rows, opspot: answer.prems[i].opspot });
             }
             const theyshouldthink = shouldBe(prems,
-                { rows: givenans.right.rows, opspot: answer.conc.opspot }
+                { rows: givenRight.rows, opspot: answer.conc.opspot }
             );
             if (theyshouldthink.comp) {
                 const derived = correctSelection(theyshouldthink);
                 qright = sameSelection(selection, derived);
             }
         }
-        if (!qright) { correct = false; }
-        if (partialcredit) {
-            const tableScore = offive / 5;
-            const mcScore = qright ? 1 : 0;
-            awarded = Math.floor(points * (0.5 * tableScore + 0.5 * mcScore));
-        } else {
-            awarded = (correct) ? points : 0;
-        }
-    } else {
-        // if no multiple choice it's out of 5
-        if (partialcredit) {
-            awarded = Math.floor((offive/5) * points);
-        } else {
-            awarded = (correct) ? points: 0;
-        }
+        componentScores.push(qright ? 1 : 0);
     }
-    const rv = {
-        successstatus: (correct ? "correct" : "incorrect"),
-        points: awarded
+    if (options.highlightWitnessRow) {
+        const isValidWitness = (i) => (
+            Array.isArray(answer?.prems) && answer?.conc?.rows
+            && allTrueAtRow(answer.prems, i)
+            && answer.conc.rows[i]?.[answer.conc.opspot] === false
+        );
+        const witnessRight = hasSingleRowHighlight(givenans, isValidWitness);
+        componentScores.push(witnessRight ? 1 : 0);
     }
-    // only add offcells to response if they are allowed to cheat
-    // at this point
-    if (cheat && !correct) {
+    const rv = gradeComponents(componentScores, partialcredit, points);
+    // include detailed feedback only when requested
+    if (cheat && rv.successstatus !== 'correct') {
         rv.offcells = {}
         rv.offcells.prems = [];
         for (const tmResult of tmPremResults) {
@@ -139,7 +141,7 @@ export default async function(
         if (options.question) {
             rv.qright = qright;
         }
-        rv.rowdiff = tmConcResult.rowdiff;
+        rv.rowdiff = tmConcResult.rowdiff ?? 0;
     }
     return rv;
 }

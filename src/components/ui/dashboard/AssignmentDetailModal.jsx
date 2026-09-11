@@ -1,3 +1,4 @@
+import { roundNumber, formatNumber, numberOrNull } from "../../../utils/numberUtils.js";
 import { useEffect, useState } from "react";
 import {
   Dialog,
@@ -44,6 +45,7 @@ import { useAppRuntime } from "../../../hooks/useAppRuntime.js";
 
 // Helper functions
 function getLetterGrade(grade) {
+  grade = numberOrNull(grade);
   if (grade >= 90) return "A";
   if (grade >= 80) return "B";
   if (grade >= 70) return "C";
@@ -52,6 +54,7 @@ function getLetterGrade(grade) {
 }
 
 function getGradeColor(grade) {
+  grade = numberOrNull(grade);
   if (grade >= 90) return "success";
   if (grade >= 80) return "info";
   if (grade >= 70) return "warning";
@@ -90,7 +93,7 @@ export default function AssignmentDetailModal({ open, onClose, assignmentId }) {
   ).length;
 
   const completionRate =
-    totalStudents > 0 ? Math.round((submissions / totalStudents) * 100) : 0;
+    totalStudents > 0 ? roundNumber((submissions / totalStudents) * 100) : 0;
 
   const averageGrade = calculateAssignmentAverage(assignment.id, gradebookStudentsOnly);
 
@@ -318,14 +321,14 @@ export default function AssignmentDetailModal({ open, onClose, assignmentId }) {
           {[
             {
               title: "Average Grade",
-              value: averageGrade == null ? "—" : `${averageGrade}%`,
+              value: averageGrade == null ? "—" : `${formatNumber(averageGrade)}%`,
               subtitle: getLetterGrade(averageGrade),
               icon: Award,
               gradient: [theme.palette.primary.main, theme.palette.primary.dark],
             },
             {
               title: "Completion Rate",
-              value: `${completionRate}%`,
+              value: `${formatNumber(completionRate)}%`,
               subtitle: `${submissions}/${totalStudents} submitted`,
               icon: CheckCircle,
               gradient: ["#10b981", "#059669"],

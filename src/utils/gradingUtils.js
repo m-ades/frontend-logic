@@ -1,55 +1,32 @@
-/**
- * Get letter grade based on percentage and course grading scale
- * @param {number} percentage - The grade percentage (0-100)
- * @param {Array} gradingScale - The course's grading scale configuration
- * @returns {string} The letter grade
- */
-export function getLetterGrade(percentage, gradingScale) {
-  if (percentage === null || percentage === undefined || isNaN(percentage)) {
-    return "—";
-  }
+import { numberOrNull } from "./numberUtils.js";
+import { getStudentAverage } from "./GradebookUtils.js";
 
-  // Find the grade range that includes this percentage
-  const grade = gradingScale.find(
-    (g) => percentage >= g.minPercent && percentage <= g.maxPercent
-  );
+// selects the highest lower bound cleared without rounding and returns no match for invalid grades
+function findGrade(percentage, gradingScale) {
+  const value = numberOrNull(percentage);
+  if (value === null) return undefined;
+  return [...gradingScale]
+    .sort((a, b) => b.minPercent - a.minPercent)
+    .find((grade) => value >= grade.minPercent);
+}
+
+// returns the letter for the unrounded percentage or a dash when no grade matches
+export function getLetterGrade(percentage, gradingScale) {
+  const grade = findGrade(percentage, gradingScale);
 
   return grade ? grade.letter : "—";
 }
 
-/**
- * Get color for a grade based on course grading scale
- * @param {number} percentage - The grade percentage (0-100)
- * @param {Array} gradingScale - The course's grading scale configuration
- * @returns {string} MUI color name or hex color
- */
+// returns the color for the unrounded percentage or default when no grade matches
 export function getGradeColor(percentage, gradingScale) {
-  if (percentage === null || percentage === undefined || isNaN(percentage)) {
-    return "default";
-  }
-
-  const grade = gradingScale.find(
-    (g) => percentage >= g.minPercent && percentage <= g.maxPercent
-  );
+  const grade = findGrade(percentage, gradingScale);
 
   return grade ? grade.color : "default";
 }
 
-/**
- * Get MUI chip color variant based on percentage
- * Maps custom colors to MUI's standard color props
- * @param {number} percentage - The grade percentage (0-100)
- * @param {Array} gradingScale - The course's grading scale configuration
- * @returns {string} MUI color variant (success, info, warning, error, default)
- */
+// returns the standard chip color for the unrounded percentage or default when unavailable
 export function getGradeColorVariant(percentage, gradingScale) {
-  if (percentage === null || percentage === undefined || isNaN(percentage)) {
-    return "default";
-  }
-
-  const grade = gradingScale.find(
-    (g) => percentage >= g.minPercent && percentage <= g.maxPercent
-  );
+  const grade = findGrade(percentage, gradingScale);
 
   if (!grade) return "default";
 
@@ -65,15 +42,10 @@ export function getGradeColorVariant(percentage, gradingScale) {
   return colorMap[grade.color] || "default";
 }
 
-/**
- * Calculate grade distribution based on grading scale
- * @param {Array} students - Array of student objects with grades
- * @param {Array} gradingScale - The course's grading scale configuration
- * @returns {Array} Distribution array with counts for each grade level
- */
+// counts unrounded student averages in scale order with default scale fallback and skips missing or unmatched grades
 export function calculateGradeDistribution(students, gradingScale) {
-  // Initialize distribution with the custom grading scale
-  const distribution = gradingScale.map((grade) => ({
+  const scale = Array.isArray(gradingScale) ? gradingScale : getDefaultGradingScale();
+  const distribution = scale.map((grade) => ({
     grade: grade.letter,
     range: `${grade.minPercent}-${grade.maxPercent}`,
     count: 0,
@@ -83,38 +55,17 @@ export function calculateGradeDistribution(students, gradingScale) {
   }));
 
   students.forEach((student) => {
-    const grades = Object.values(student.grades).filter(
-      (g) => g !== undefined && g !== null && !isNaN(g)
-    );
-
-    if (grades.length === 0) return;
-
-    const average = Math.round(
-      grades.reduce((sum, g) => sum + g, 0) / grades.length
-    );
-
-    // Find which grade bracket this average falls into
-    const gradeIndex = distribution.findIndex(
-      (d) => average >= d.minPercent && average <= d.maxPercent
-    );
-
-    if (gradeIndex !== -1) {
-      distribution[gradeIndex].count++;
-    }
+    const grade = findGrade(getStudentAverage(student), scale);
+    if (grade) distribution[scale.indexOf(grade)].count++;
   });
 
   return distribution;
 }
 
-/**
- * Check if a grade is passing based on grading scale
- * Typically, the lowest passing grade is anything above the lowest grade level
- * @param {number} percentage - The grade percentage
- * @param {Array} gradingScale - The course's grading scale configuration
- * @returns {boolean} True if passing
- */
+// checks the unrounded percentage against the lowest passing bound and returns false for invalid grades
 export function isPassingGrade(percentage, gradingScale) {
-  if (percentage === null || percentage === undefined || isNaN(percentage)) {
+  percentage = numberOrNull(percentage);
+  if (percentage === null) {
     return false;
   }
 

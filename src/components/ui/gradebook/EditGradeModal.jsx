@@ -1,3 +1,4 @@
+import { formatNumber } from "../../../utils/numberUtils.js";
 import { useState } from "react";
 import {
   Dialog,
@@ -164,7 +165,7 @@ export default function EditGradeModal({
                 color="primary.main"
                 mt={1}
               >
-                {currentGrade !== undefined ? `${currentGrade}%` : "No Grade"}
+                {currentGrade !== undefined ? `${formatNumber(currentGrade)}%` : "No Grade"}
               </Typography>
             </Paper>
 

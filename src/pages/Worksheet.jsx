@@ -888,11 +888,6 @@ function RealWorksheetContent() {
           return
         }
 
-        if (proof.type === 'valid-correct-sound') {
-          initialStates[proof.id] = { ans: data }
-          return
-        }
-
         if (isDerivationProblemType(proof.type)) {
           initialStates[proof.id] = data.ans || data.ind ? data : { ans: data }
           return

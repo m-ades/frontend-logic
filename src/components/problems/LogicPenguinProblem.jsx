@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react'
 import SymbolicTranslation from './mui/translation/SymbolicTranslation.jsx'
 import MultipleChoice from './mui/choice/MultipleChoice.jsx'
 import EvaluateTruth from './mui/choice/EvaluateTruth.jsx'
-import ValidCorrectSound from './mui/choice/ValidCorrectSound.jsx'
 import SingleRowTruthTable from './truth-table/SingleRowTruthTable.jsx'
 import ComboTranslationTruthTable from './mui/translation/ComboTranslationTruthTable.jsx'
 import ComboTranslationDerivation from './mui/translation/ComboTranslationDerivation.jsx'
@@ -105,29 +104,6 @@ export default function LogicPenguinProblem({
     problemData = proof.evaluateTruth || proof.description || ''
     return (
       <EvaluateTruth
-        problem={problemData}
-        proof={proof}
-        answer={proof.answer}
-        attemptLimit={proof.attemptLimit}
-        assignmentQuestionId={proof.questionId}
-        onStateChange={handleStateChange}
-        onComplete={handleComplete}
-        savedState={localState}
-        isAssignmentLocked={isAssignmentLocked}
-        isInstructorView={isInstructorView}
-        onQuestionSaved={onQuestionSaved}
-        problemLabel={problemLabel}
-        logicSystem={logicSystem}
-      />
-    )
-  } else if (proof.type === 'valid-correct-sound') {
-    problemData = {
-      prompt: proof.description || '',
-      prems: Array.isArray(proof.premises) ? proof.premises : (proof.premises ? [proof.premises] : []),
-      conc: proof.conclusion || '',
-    }
-    return (
-      <ValidCorrectSound
         problem={problemData}
         proof={proof}
         answer={proof.answer}

@@ -6,7 +6,8 @@
 // Determines if an equivalence truth table answer is correct        //
 ///////////////////////////////////////////////////////////////////////
 
-import { fullTableMatch } from './truth-tables.js';
+import { fullTableMatch, hasSingleRowHighlight, allTrueAtRow } from './truth-tables.js';
+import { gradeComponents } from '../component-grading.js';
 
 function normalizeSelection(givenans) {
     if (Array.isArray(givenans?.mcans)) {
@@ -27,33 +28,43 @@ function sameSelection(a, b) {
     return true;
 }
 
-function relationSet(rowsA, opspotA, rowsB, opspotB) {
-    let equiv = true;
-    let contra = true;
+function truthValue(value) {
+    if (value === true || value === 1 || value === '1' || value === 'T' || value === 't') {
+        return true;
+    }
+    if (value === false || value === 0 || value === '0' || value === 'F' || value === 'f') {
+        return false;
+    }
+    return null;
+}
+
+// classifies consistency across every table and equivalence only for a pair
+function relationSet(tables) {
+    let comp = tables.length >= 2 && tables[0].rows.length > 0;
+    let equiv = comp;
     let consistent = false;
-    let comp = true;
-    for (let i = 0 ; i < rowsA.length ; i++) {
-        const tvA = rowsA[i][opspotA];
-        const tvB = rowsB[i][opspotB];
-        if ((tvA === -1) || (tvB === -1)) {
+    const rowCount = tables[0]?.rows?.length ?? 0;
+    if (tables.some((table) => table.rows.length !== rowCount)) {
+        comp = false;
+        equiv = false;
+    }
+    for (let i = 0 ; comp && i < rowCount ; i++) {
+        const values = tables.map((table) => truthValue(table.rows[i]?.[table.opspot]));
+        if (values.some((value) => value === null)) {
             comp = false;
             equiv = false;
-            contra = false;
             break;
         }
-        if (tvA !== tvB) {
+        if (!values.every((value) => value === values[0])) {
             equiv = false;
-        } else {
-            contra = false;
         }
-        if (tvA && tvB) {
+        if (values.every(Boolean)) {
             consistent = true;
         }
     }
     const inconsistent = comp ? !consistent : false;
     const labels = new Set();
-    if (equiv) { labels.add('equivalent'); }
-    if (contra) { labels.add('contradictory'); }
+    if (equiv && tables.length === 2) { labels.add('equivalent'); }
     if (comp) {
         if (consistent) { labels.add('consistent'); }
         if (inconsistent) { labels.add('inconsistent'); }
@@ -61,104 +72,67 @@ function relationSet(rowsA, opspotA, rowsB, opspotB) {
     return { labels, comp };
 }
 
-// determines whether according to the table they gave, they should
-// be equivalent
-function shouldBe(rowsA, opspotA, rowsB, opspotB) {
-    let equiv = true;
-    let comp = true;
-    for (let i = 0 ; i < rowsA.length ; i++) {
-        const rowA = rowsA[i];
-        const rowB = rowsB[i];
-        const tvA = rowA[opspotA];
-        const tvB = rowB[opspotB];
-        if ((tvA === -1) || (tvB === -1)) {
-            comp = false;
-            equiv = false;
-            break;
-        }
-        if (tvA !== tvB) {
-            equiv = false;
-        }
-    }
-    return { equiv, comp };
-}
-
-// partial credit is out of 5 for the table itself, and out of 2 for
-// the multiple choice answer if given; multiple choice points are
-// awarded if it is either correct or should be correct given their
-// table
-
+/*
+grades semantic table sets or legacy pairs with equal component credit
+classification checks consistency and pair equivalence and witnesses use the answer key
+missing submissions fail their components and detailed feedback requires cheat
+*/
 export default async function(
     question, answer, givenans, partialcredit, points, cheat, options
 ) {
-    let correct = true;
     // check table portion
-    let offive = 0;
-    const givenLeftRows = givenans?.lefts?.[0]?.rows ?? [];
-    const givenRightRows = givenans?.right?.rows ?? [];
-    const tmResultA = fullTableMatch(answer.A.rows, givenLeftRows);
-    const tmResultB = fullTableMatch(answer.B.rows, givenRightRows);
-    if ((tmResultA.rowdiff == 0) &&
-        (tmResultA.offcells.length == 0) &&
-        (tmResultB.offcells.length == 0)) {
-        offive = 5;
-    } else {
-        correct = false;
-        offive = 0; // table is all-or-nothing; no row-by-row credit
-    }
-    // check multiple choice answer answer
-    let qright = false;
-    let awarded = 0;
-    if (options.question) {
-        const selection = normalizeSelection(givenans);
-        const expected = relationSet(
-            answer.A.rows, answer.A.opspot,
-            answer.B.rows, answer.B.opspot
+    const answerTables = Array.isArray(answer?.tables)
+        ? answer.tables
+        : [answer?.A, answer?.B].filter(Boolean);
+    const givenTables = [
+        ...(Array.isArray(givenans?.lefts) ? givenans.lefts : []),
+        ...(givenans?.right ? [givenans.right] : [])
+    ];
+    const tableMatches = answerTables.map((table, index) =>
+        fullTableMatch(table.rows, givenTables[index]?.rows ?? [])
+    );
+    const tableFullyCorrect = givenTables.length === answerTables.length &&
+        tableMatches.every((result) =>
+            result.rowdiff === 0 && result.offcells.length === 0
         );
+    const componentScores = [tableFullyCorrect ? 1 : 0];
+    let qright = false;
+    const opts = options || {};
+    if (opts.question) {
+        const selection = normalizeSelection(givenans);
+        const expected = relationSet(answerTables);
         qright = sameSelection(selection, expected.labels);
         if (!qright) {
-            const leftRows = givenans?.lefts?.[0]?.rows;
-            const rightRows = givenans?.right?.rows;
-            if (leftRows && rightRows) {
-                const derived = relationSet(
-                    leftRows, answer.A.opspot,
-                    rightRows, answer.B.opspot
-                );
+            if (givenTables.length === answerTables.length) {
+                const derived = relationSet(answerTables.map((table, index) => ({
+                    opspot: table.opspot,
+                    rows: givenTables[index].rows,
+                })));
                 if (derived.comp) {
                     qright = sameSelection(selection, derived.labels);
                 }
             }
         }
-        if (!qright) { correct = false; }
-        if (partialcredit) {
-            const tableScore = offive / 5;
-            const mcScore = qright ? 1 : 0;
-            awarded = Math.floor(points * (0.5 * tableScore + 0.5 * mcScore));
-        } else {
-            awarded = (correct) ? points : 0;
-        }
-    } else {
-        if (partialcredit) {
-            awarded = Math.floor((offive/5)*points);
-        } else {
-            awarded = (correct) ? points: 0;
-        }
+        componentScores.push(qright ? 1 : 0);
     }
-    const rv = {
-        successstatus: (correct ? "correct" : "incorrect"),
-        points: awarded
+    if (opts.highlightWitnessRow) {
+        // an empty statement set has no witness row
+        const isValidWitness = (i) => answerTables.length > 0 && allTrueAtRow(answerTables, i);
+        const witnessRight = hasSingleRowHighlight(givenans, isValidWitness);
+        componentScores.push(witnessRight ? 1 : 0);
     }
-    // only send off cells back to browser if they are allowed to 
-    // cheat at this point
-    if (cheat && !correct) {
+    const rv = gradeComponents(componentScores, partialcredit, points);
+    // include detailed feedback only when requested
+    if (cheat && rv.successstatus !== 'correct') {
         rv.offcells = {
-            A: tmResultA.offcells,
-            B: tmResultB.offcells
+            tables: tableMatches.map((result) => result.offcells),
+            A: tableMatches[0]?.offcells ?? [],
+            B: tableMatches[1]?.offcells ?? []
         }
-        if (options.question) {
+        if (opts.question) {
             rv.qright = qright;
         }
-        rv.rowdiff = tmResultA.rowdiff;
+        rv.rowdiff = tableMatches[0]?.rowdiff ?? 0;
     }
     return rv;
 }

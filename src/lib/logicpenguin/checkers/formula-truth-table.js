@@ -6,7 +6,8 @@
 // determines if a truth-table answer for a single formula is correct //
 ////////////////////////////////////////////////////////////////////////
 
-import { fullTableMatch } from './truth-tables.js';
+import { fullTableMatch, hasSingleRowHighlight } from './truth-tables.js';
+import { gradeComponents } from '../component-grading.js';
 
 function normalizeSelection(givenans) {
     if (Array.isArray(givenans?.mcans)) {
@@ -38,8 +39,14 @@ function sameSelection(a, b) {
     return true;
 }
 
-// tests whether they should think the statement is a tautology,
-// self contradiction or contingent
+function hasMainOperatorHighlight(givenans, opspot) {
+    const highlights = Array.isArray(givenans?.right?.colhls) ? givenans.right.colhls : [];
+    return highlights.length > opspot
+        && highlights[opspot] === true
+        && highlights.filter((highlight) => highlight === true).length === 1;
+}
+
+// classifies the submitted main operator cells
 function shouldBe(rows, opspot) {
     let taut = true;
     let contra = true;
@@ -61,60 +68,47 @@ function shouldBe(rows, opspot) {
     return { taut, contra, comp };
 }
 
-// partial credit is based on 5 points for the table, and 2 additional
-// points if there is a partial credit portion; these 2 points are
-// awarded if the answer is either correct or would be correct if the
-// table was right
-
+/*
+grades the table and each enabled classification or highlight as equal components
+classification may follow the submitted table but highlights use the answer key
+missing submission data fails its component and detailed feedback requires cheat
+*/
 export default async function(
     question, answer, givenans, partialcredit, points, cheat, options
 ) {
-    let correct = true;
-    // check table portion
-    let offive = 0;
-    const tmResult = fullTableMatch(answer.rows, givenans.right.rows);
-    if ((tmResult.offcells.length == 0) && (tmResult.rowdiff == 0)) {
-        offive = 5;
-    } else {
-        correct = false;
-        offive = 0; // table is all-or-nothing; no row-by-row credit
-    }
-    // check answer
+    const givenRows = givenans?.right?.rows;
+    const shapeIsValid = Array.isArray(givenRows) && Array.isArray(answer?.rows);
+    const tmResult = shapeIsValid
+        ? fullTableMatch(answer.rows, givenRows)
+        : { offcells: [], rowdiff: 0, numchecked: 0 };
+    const tableCorrect = shapeIsValid && tmResult.offcells.length === 0 && tmResult.rowdiff === 0;
+    const componentScores = [tableCorrect ? 1 : 0];
     let qright = false;
-    let awarded = 0;
     if (options.question) {
         const selection = normalizeSelection(givenans);
         const expected = correctSelection(answer);
         qright = sameSelection(selection, expected);
-        if (!qright) {
-            const theyshouldthink = shouldBe(givenans.right.rows, answer.opspot);
+        if (!qright && shapeIsValid) {
+            const theyshouldthink = shouldBe(givenRows, answer.opspot);
             if (theyshouldthink.comp) {
                 const derived = correctSelection(theyshouldthink);
                 qright = sameSelection(selection, derived);
             }
         }
-        if (!qright) { correct = false; }
-        if (partialcredit) {
-            const tableScore = offive / 5;
-            const mcScore = qright ? 1 : 0;
-            awarded = Math.floor(points * (0.5 * tableScore + 0.5 * mcScore));
-        } else {
-            awarded = (correct) ? points : 0;
-        }
-    } else {
-        if (partialcredit) {
-            awarded = Math.floor((offive/5)*points);
-        } else {
-            awarded = (correct) ? points: 0;
-        }
+        componentScores.push(qright ? 1 : 0);
     }
-    const rv = {
-        successstatus: (correct ? "correct" : "incorrect"),
-        points: awarded
+    if (options.highlightMainOperator) {
+        componentScores.push(hasMainOperatorHighlight(givenans, answer.opspot) ? 1 : 0);
     }
-    // only send off cells back to browser if they are allowed to 
-    // cheat at this stage
-    if (cheat && !correct) {
+    if (options.highlightWitnessRow) {
+        const witnessRight = hasSingleRowHighlight(
+            givenans, (i) => Array.isArray(answer?.rows) && answer.rows[i]?.[answer.opspot] === true
+        );
+        componentScores.push(witnessRight ? 1 : 0);
+    }
+    const rv = gradeComponents(componentScores, partialcredit, points);
+    // include detailed feedback only when requested
+    if (cheat && rv.successstatus !== 'correct') {
         rv.offcells = tmResult.offcells;
         if (options.question) {
             rv.qright = qright;

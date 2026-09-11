@@ -1,3 +1,4 @@
+import { formatNumber } from "../../../utils/numberUtils.js";
 import { useState } from "react";
 import { Box, Typography, Paper, Stack, useTheme } from "@mui/material";
 import {
@@ -50,7 +51,7 @@ const CustomLineTooltip = ({ active, payload }) => {
               fontWeight={700}
               color={data.average >= 70 ? "success.main" : "error.main"}
             >
-              {data.average}%
+              {formatNumber(data.average)}%
             </Typography>
           </Box>
           <Box
@@ -97,7 +98,7 @@ const CustomLineTooltip = ({ active, payload }) => {
             </Typography>
             <Typography variant="body2" fontWeight={600}>
               {data.avgAttempts !== null && data.avgAttempts !== undefined
-                ? Number(data.avgAttempts).toFixed(1)
+                ? formatNumber(data.avgAttempts)
                 : "—"}
             </Typography>
           </Box>

@@ -1,3 +1,4 @@
+import { roundNumber, formatNumber } from "../../../utils/numberUtils.js";
 import { useState } from "react";
 import {
   Box,
@@ -63,7 +64,7 @@ export const AssignmentOverviewTable = ({
     const average =
       assignment.average ??
       (grades.length > 0
-        ? Math.round(
+        ? (
             grades.reduce((sum, grade) => sum + grade, 0) / grades.length
           )
         : 0);
@@ -111,7 +112,7 @@ export const AssignmentOverviewTable = ({
     totalAverageProp !== undefined
       ? totalAverageProp
       : assignmentsWithMetrics.length > 0
-        ? Math.round(
+        ? (
             assignmentsWithMetrics.reduce((sum, a) => sum + a.average, 0) /
               assignmentsWithMetrics.length
           )
@@ -120,7 +121,7 @@ export const AssignmentOverviewTable = ({
     completionRateProp !== undefined
       ? completionRateProp
       : totalPossible > 0
-        ? Math.round((totalSubmissions / totalPossible) * 100)
+        ? roundNumber((totalSubmissions / totalPossible) * 100)
         : null;
 
   const handleAssignmentClick = (assignment) => {
@@ -174,7 +175,7 @@ export const AssignmentOverviewTable = ({
                 Overall Average
               </Typography>
               <Typography variant="h6" component="div" fontWeight={700} color="primary.main">
-                {totalAverage == null ? "—" : `${Math.round(totalAverage)}%`}
+                {totalAverage == null ? "—" : `${formatNumber(totalAverage)}%`}
               </Typography>
               {totalAverage != null && (
                 <Chip
@@ -208,7 +209,7 @@ export const AssignmentOverviewTable = ({
                 Avg Completion Rate
               </Typography>
               <Typography variant="h6" component="div" fontWeight={700} color="success.main">
-                {completionRate == null ? "—" : `${completionRate}%`}
+                {completionRate == null ? "—" : `${formatNumber(completionRate)}%`}
               </Typography>
             </Box>
           </Stack>
@@ -288,7 +289,7 @@ export const AssignmentOverviewTable = ({
                 );
                 const assignmentCompletionRate =
                   totalStudents > 0
-                    ? Math.round((assignment.submissions / totalStudents) * 100)
+                    ? roundNumber((assignment.submissions / totalStudents) * 100)
                     : 0;
 
                 return (
@@ -320,7 +321,7 @@ export const AssignmentOverviewTable = ({
                     </TableCell>
                     <TableCell align="center">
                       <Typography variant="body2" fontWeight={600}>
-                        {assignment.average}%
+                        {formatNumber(assignment.average)}%
                       </Typography>
                     </TableCell>
                     <TableCell align="center">
@@ -346,7 +347,7 @@ export const AssignmentOverviewTable = ({
                         }}
                       >
                         <Typography variant="body2" fontWeight={500}>
-                          {assignmentCompletionRate}%
+                          {formatNumber(assignmentCompletionRate)}%
                         </Typography>
                         {assignmentCompletionRate === 100 && (
                           <CheckCircle size={16} color="#10b981" />
@@ -357,7 +358,7 @@ export const AssignmentOverviewTable = ({
                       <MuiTooltip title="Average attempts per student">
                         <Typography variant="body2" color="text.secondary">
                           {assignment.avgAttempts !== null && assignment.avgAttempts !== undefined
-                            ? Number(assignment.avgAttempts).toFixed(1)
+                            ? formatNumber(assignment.avgAttempts)
                             : "—"}
                         </Typography>
                       </MuiTooltip>

@@ -1,3 +1,4 @@
+import { formatNumber } from "../utils/numberUtils.js";
 import { useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { Box, Typography, CardContent, Stack, useMediaQuery } from '@mui/material'
@@ -120,7 +121,7 @@ export default function Grades() {
             ? formatDateTime(assignment.due_at ?? assignment.due_date)
             : '—',
           submitted: submittedLabel,
-          percent: `${percentage.toFixed(1)}%`
+          percent: `${formatNumber(percentage)}%`
         }
       }),
     [gradeEntries]
@@ -150,7 +151,7 @@ export default function Grades() {
           <Stack direction="row" justifyContent="space-between" sx={{ mb: 2 }}>
             <Typography variant="h6" component="h2" sx={{ fontSize: '1rem' }}>Overall</Typography>
             <Typography variant="body2" color="text.secondary" sx={{ fontSize: '1rem' }}>
-              {overallPercentage.toFixed(1)}%
+              {formatNumber(overallPercentage)}%
             </Typography>
           </Stack>
           {isLoadingGrades ? (

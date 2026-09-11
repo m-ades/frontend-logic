@@ -1,3 +1,4 @@
+import { roundNumber, formatNumber, numberOrNull } from "../utils/numberUtils.js";
 import { Link } from 'react-router-dom'
 import { useEffect, useMemo, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
@@ -37,7 +38,7 @@ import { isInstructorRole } from '../utils/auth.js'
 import ThemedCard from '../components/ui/ThemedCard.jsx'
 import { useAppRuntime } from '../hooks/useAppRuntime.js'
 
-const formatPercent = (value) => (value === null || value === undefined ? '—' : `${value.toFixed(1)}%`)
+const formatPercent = (value) => (value === null || value === undefined ? '—' : `${formatNumber(value)}%`)
 
 const GRADE_THRESHOLDS = [
   { letter: 'A', min: 93 },
@@ -54,6 +55,7 @@ const GRADE_THRESHOLDS = [
 ]
 
 const getLetterGrade = (percent) => {
+  percent = numberOrNull(percent)
   if (percent === null || percent === undefined) return null
   const match = GRADE_THRESHOLDS.find((threshold) => percent >= threshold.min)
   return match ? match.letter : 'F'
@@ -296,8 +298,8 @@ export default function Dashboard() {
         lowestScores,
       },
       releaseOverview: {
-        pastDuePercent: Number(pastDuePercent.toFixed(1)),
-        remainingPercent: Number(remainingPercent.toFixed(1)),
+        pastDuePercent: roundNumber(pastDuePercent),
+        remainingPercent: roundNumber(remainingPercent),
       },
     }
   }, [sandbox, courseIdForApi, analyticsData, gradebookResponse])
@@ -369,9 +371,9 @@ export default function Dashboard() {
     () =>
       gradeTimeline.map((item) => ({
         name: shortAssignmentLabel(item.title),
-        studentPercent: item.studentPercent !== null ? Number(item.studentPercent.toFixed(1)) : null,
-        avgPercent: item.avgPercent !== null ? Number(item.avgPercent.toFixed(1)) : null,
-        medianPercent: item.medianPercent !== null ? Number(item.medianPercent.toFixed(1)) : null,
+        studentPercent: item.studentPercent !== null ? roundNumber(item.studentPercent) : null,
+        avgPercent: item.avgPercent !== null ? roundNumber(item.avgPercent) : null,
+        medianPercent: item.medianPercent !== null ? roundNumber(item.medianPercent) : null,
       })),
     [gradeTimeline]
   )
@@ -484,13 +486,13 @@ export default function Dashboard() {
                 <Typography variant="body2" color="text.secondary">
                   Lowest score:{' '}
                   {gradeOverview.lowestScore !== null
-                    ? `${gradeOverview.lowestScore.toFixed(1)}%${gradeOverview.lowestTitle ? ` (${gradeOverview.lowestTitle})` : ''}`
+                    ? `${formatNumber(gradeOverview.lowestScore)}%${gradeOverview.lowestTitle ? ` (${gradeOverview.lowestTitle})` : ''}`
                     : '—'}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
                   Second lowest:{' '}
                   {gradeOverview.lowestScores?.[1]
-                    ? `${gradeOverview.lowestScores[1].percent.toFixed(1)}%${gradeOverview.lowestScores[1].title ? ` (${gradeOverview.lowestScores[1].title})` : ''}`
+                    ? `${formatNumber(gradeOverview.lowestScores[1].percent)}%${gradeOverview.lowestScores[1].title ? ` (${gradeOverview.lowestScores[1].title})` : ''}`
                     : '—'}
                 </Typography>
               </Box>
@@ -529,7 +531,7 @@ export default function Dashboard() {
                     fontWeight="medium"
                     sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}
                   >
-                    {releaseOverview.remainingPercent}%
+                    {formatNumber(releaseOverview.remainingPercent)}%
                   </Typography>
                   <Box
                     role="img"
@@ -589,7 +591,7 @@ export default function Dashboard() {
                         {item.label}
                       </Typography>
                       <Typography variant="caption" fontWeight="medium" sx={{ ml: 1 }}>
-                        {item.value}%
+                        {formatNumber(item.value)}%
                       </Typography>
                     </Box>
                   </Box>
@@ -792,7 +794,7 @@ export default function Dashboard() {
                   />
                   <Tooltip
                     formatter={(value) =>
-                      value === null || value === undefined ? '—' : `${Number(value).toFixed(1)}%`
+                      value === null || value === undefined ? '—' : `${formatNumber(value)}%`
                     }
                   />
                   <Line
@@ -845,7 +847,7 @@ export default function Dashboard() {
                     Avg final score
                   </Typography>
                   <Typography variant="h5" component="div" fontWeight="medium">
-                    {instructorAnalytics.gradeSummary?.avg_final_score?.toFixed(1) ?? '—'}
+                    {formatNumber(instructorAnalytics.gradeSummary?.avg_final_score)}
                   </Typography>
                 </Grid>
                 <Grid size={{ xs: 12, md: 4 }}>
@@ -853,7 +855,7 @@ export default function Dashboard() {
                     Avg raw score
                   </Typography>
                   <Typography variant="h5" component="div" fontWeight="medium">
-                    {instructorAnalytics.gradeSummary?.avg_raw_score?.toFixed(1) ?? '—'}
+                    {formatNumber(instructorAnalytics.gradeSummary?.avg_raw_score)}
                   </Typography>
                 </Grid>
                 <Grid size={{ xs: 12, md: 4 }}>
@@ -898,8 +900,8 @@ export default function Dashboard() {
                               {assignment.title}
                             </Typography>
                           </TableCell>
-                          <TableCell align="right">{assignment.avg_score?.toFixed(1) ?? '—'}</TableCell>
-                          <TableCell align="right">{assignment.avg_attempt?.toFixed(2) ?? '—'}</TableCell>
+                          <TableCell align="right">{formatNumber(assignment.avg_score)}</TableCell>
+                          <TableCell align="right">{formatNumber(assignment.avg_attempt)}</TableCell>
                           <TableCell align="right">{assignment.students_submitted ?? 0}</TableCell>
                         </TableRow>
                       ))

@@ -1,10 +1,9 @@
+import { roundNumber, formatNumber } from "../../utils/numberUtils.js";
+import { calculateGradeDistribution } from "../../utils/gradingUtils.js";
 import { Box, Typography, Alert, LinearProgress, useTheme } from "@mui/material";
 import { useEffect, useMemo, useState } from "react";
 import { TrendingUp, Users, CheckCircle, Calendar } from "lucide-react";
-import {
-  calculateAssignmentAverage,
-  calculateGradeDistribution,
-} from "../../context/CoursesContext";
+import { calculateAssignmentAverage } from "../../context/CoursesContext";
 import { MetricCard } from "../../components/ui/MetricCard";
 import { PerformanceTrendsChart } from "../../components/ui/dashboard/PerformanceTrendsChart";
 import { GradeDistributionChart } from "../../components/ui/dashboard/GradeDistributionChart";
@@ -121,9 +120,9 @@ export default function InstructorDashboard() {
       const averagePercent = summary?.avg_percent ?? null;
       const average =
         averagePercent !== null && averagePercent !== undefined
-          ? Math.round(averagePercent * 100)
+          ? averagePercent * 100
           : typeof stats?.avg_score === "number"
-          ? Math.round(stats.avg_score)
+          ? stats.avg_score
           : calculateAssignmentAverage(assignment.id, studentsForAssignments);
       const submissionsFallback = studentsForAssignments.filter(
         (student) => Boolean(student.submittedAssignments?.[assignment.id])
@@ -202,7 +201,7 @@ export default function InstructorDashboard() {
 
   const gradedPastDue = pastDueAssignments.filter((a) => a.average != null);
   const fallbackAverage = gradedPastDue.length > 0
-    ? Math.round(
+    ? (
         gradedPastDue.reduce((sum, assignment) => sum + assignment.average, 0) /
           gradedPastDue.length
       )
@@ -218,7 +217,7 @@ export default function InstructorDashboard() {
   const totalPossible = totalStudents * pastDueAssignments.length;
   const completionRate =
     totalPossible > 0
-      ? Math.round((Math.min(totalSubmissions, totalPossible) / totalPossible) * 100)
+      ? roundNumber((Math.min(totalSubmissions, totalPossible) / totalPossible) * 100)
       : null;
 
   const timeByCategory = analytics.timeByCategory || [];
@@ -274,14 +273,14 @@ export default function InstructorDashboard() {
       >
         <MetricCard
           title="Class Average"
-          value={totalAverage == null ? "—" : `${Math.round(totalAverage)}%`}
+          value={totalAverage == null ? "—" : `${formatNumber(totalAverage)}%`}
           subtitle="Across past due assignments"
           icon={TrendingUp}
           gradient={["#10b981", "#059669"]}
         />
         <MetricCard
           title="Completion Rate"
-          value={completionRate == null ? "—" : `${completionRate}%`}
+          value={completionRate == null ? "—" : `${formatNumber(completionRate)}%`}
           subtitle={`${totalSubmissions} of ${totalPossible} past due`}
           icon={CheckCircle}
           gradient={[theme.palette.primary.main, theme.palette.primary.dark]}

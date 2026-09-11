@@ -1,3 +1,4 @@
+import { roundNumber, formatNumber } from "../../utils/numberUtils.js";
 import { Box, Typography, Chip, CardActionArea, CardContent, Stack } from '@mui/material'
 import ThemedCard from './ThemedCard.jsx'
 import DescriptionIcon from '@mui/icons-material/Description'
@@ -71,7 +72,7 @@ export default function ActivityCard({ activity, onClick, completedProofs }) {
     const total = activity.worksheet.proofs.length
     if (total === 0) return null
     const completed = activity.worksheet.proofs.filter(p => completedProofs.has(p.id)).length
-    const percentage = Math.round((completed / total) * 100)
+    const percentage = roundNumber((completed / total) * 100)
     return { completed, total, percentage }
   }
 
@@ -190,7 +191,7 @@ export default function ActivityCard({ activity, onClick, completedProofs }) {
                         fontWeight: 500
                       }}
                     >
-                      {stats.percentage}% submitted
+                      {formatNumber(stats.percentage)}% submitted
                     </Typography>
                   )}
                   {activity.dueDate && (
