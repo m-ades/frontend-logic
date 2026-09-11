@@ -78,7 +78,6 @@ const problemTypeLabels = {
   'derivation-calgary': 'Derivations',
   'derivation-hurley': 'Derivations',
   'evaluate-truth': 'Evaluate truth',
-  'valid-correct-sound': 'Validity and soundness',
 }
 
 function problemTypeLabel(type) {
