@@ -151,7 +151,8 @@ export default class DerivationCheck {
                 subderiv.lnmap[subderiv.showline.n] = subderiv.showline;
             }
         }
-        for (let p of subderiv?.parts) {
+        const parts = Array.isArray(subderiv?.parts) ? subderiv.parts : [];
+        for (let p of parts) {
             // if a subderivation, get its analysis and merge
             if ("parts" in p) {
                 p = this.analyze(p);
@@ -855,10 +856,14 @@ export default class DerivationCheck {
         return line;
     }
 
+    /*
+    returns a direction hint after a rule with one allowed form fails
+    returns an empty string when no directional correction applies
+    */
     getDirectionalRuleCorrection(line, rulename) {
+        if (this.rules[rulename]?.forms?.length !== 1) { return ''; }
         const Formula = this.Formula;
         if (rulename === 'Simp' && line.citedlines.length >= 1) {
-            // catch the wrong side move
             const source = line.citedlines[0];
             const sourceFormula = source?.formula ?? (source?.s ? Formula.from(source.s) : null);
             const andSym = this.syntax?.symbols?.AND ?? '•';
@@ -874,7 +879,6 @@ export default class DerivationCheck {
         }
 
         if (rulename === 'DS' && line.citedlines.length >= 2) {
-            // same idea for ds on the other side
             const disjSym = this.syntax?.symbols?.OR ?? '∨';
             const notSym = this.syntax?.symbols?.NOT ?? '~';
             const resultNormal = line.formulaNormal ??

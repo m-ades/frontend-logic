@@ -20,7 +20,18 @@ function normalizeRuleName(rule) {
     return alias || rule;
 }
 
+/*
+checks the submitted hurley proof without using an answer key
+missing proof data returns incorrect with zero points
+*/
 export default async function(question, givenans, points, options) {
+    if (!givenans) {
+        return {
+            successstatus: "incorrect",
+            errors: { '??': { justification: { high: { 'no proof data': 1 } } } },
+            points: 0
+        };
+    }
     // clone the answer to avoid messing it up when checking it
     const ansclone = JSON.parse(JSON.stringify(givenans));
     const { allow, deny, require, requireAny } = getRulesetRestrictions(question, options);
