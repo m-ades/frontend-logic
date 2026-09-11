@@ -44,10 +44,10 @@ export const StudentsAtRiskTable = ({ students, assignments }) => {
       );
       const missing = assignments.length - grades.length;
       const letterGrade = getLetterGrade(avg, gradingScale);
-      return { ...student, rawAvg, avg, missing, letterGrade };
+      return { ...student, avg, missing, letterGrade };
     })
-    .filter((s) => s.rawAvg !== null && s.rawAvg < atRiskThreshold)
-    .sort((a, b) => a.rawAvg - b.rawAvg);
+    .filter((s) => s.avg !== null && s.avg < atRiskThreshold)
+    .sort((a, b) => a.avg - b.avg);
 
   // Get the grade level name for the threshold for display
   const thresholdGrade = gradingScale.find(
