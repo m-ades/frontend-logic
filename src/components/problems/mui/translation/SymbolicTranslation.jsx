@@ -211,7 +211,8 @@ export default function SymbolicTranslation({
   const separatorButtons = notation === 'calgary'
     ? [{ insert: ' ∴ ', label: '∴' }]
     : [{ insert: '/' }, { insert: '//' }]
-  const mobileSeparatorButtons = notation === 'calgary' && hasMultipleStatements
+  // separator keys must remain available when the answer key is hidden
+  const mobileSeparatorButtons = notation === 'calgary'
     ? [...separatorButtons, { insert: ',', label: ',' }]
     : separatorButtons
   const allowIndexedSymbols = notation === 'calgary'
