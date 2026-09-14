@@ -55,7 +55,7 @@ function isBinaryOp(symbolcat, op) {
  * (array of "Symbol = definition" strings); we do not parse premises.
  * Returns the symbol (letter) from each key line for quick-insert buttons.
  */
-function getVariableLettersOnly(symbolizationKey) {
+export function getVariableLettersOnly(symbolizationKey) {
   if (!Array.isArray(symbolizationKey) || symbolizationKey.length === 0) return DEFAULT_LETTERS
   const letters = symbolizationKey
     .map((line) => {
