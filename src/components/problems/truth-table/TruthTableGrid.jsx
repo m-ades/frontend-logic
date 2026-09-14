@@ -77,6 +77,8 @@ export default function TruthTableGrid({
   renderCell,
   isCellReadOnly,
   showLabels = true,
+  letterColumns = [],
+  letterRows = [],
 }) {
   const theme = useTheme()
   const cellBorderColor = theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.12)' : 'var(--logic-gray6)'
@@ -244,6 +246,39 @@ export default function TruthTableGrid({
     return `${tableLabel}row ${rowIndex + 1} token ${token}`
   }
 
+  // sentence-letter columns are read-only recaps of table values; they share row highlighting and borders, with a divider setting them apart from the first formula column
+  const hasLetterColumns = letterColumns.length > 0
+  const renderLetterHeaderCells = () => letterColumns.map((label, letterIndex) => (
+    <TableCell
+      key={`letter-header-${letterIndex}`}
+      className="tt-token tt-letter-token"
+      align="center"
+      sx={compactHeaderCellSx}
+    >
+      {label}
+    </TableCell>
+  ))
+  const renderLetterCells = (rowIndex, rowMatch, isWitnessRowActive) => letterColumns.map((label, letterIndex) => {
+    const value = letterRows[rowIndex]?.[letterIndex]
+    return (
+      <TableCell
+        key={`letter-cell-${rowIndex}-${letterIndex}`}
+        className="tt-cell tt-letter-cell"
+        align="center"
+        data-tt-highlight={withSelectors && allowRowSelection && rowMatch ? 'true' : undefined}
+        sx={withSelectors && allowRowSelection && rowMatch ? { ...compactCellSx, ...highlightStyle } : compactCellSx}
+        style={isWitnessRowActive ? witnessRowBorderStyle({ left: letterIndex === 0 }) : undefined}
+      >
+        <TruthValueButton
+          value={value === true ? 'T' : value === false ? 'F' : ''}
+          ariaLabel={`row ${rowIndex + 1} ${label}`}
+          accent={false}
+          readOnly
+        />
+      </TableCell>
+    )
+  })
+
   if (combined) {
     const rowCount = tables.reduce((max, table) => Math.max(max, table?.rows?.length ?? 0), 0)
     return (
@@ -256,6 +291,7 @@ export default function TruthTableGrid({
         <Table className="tt-table" sx={compactTableSx}>
           <TableHead className="tt-head">
             <TableRow className="tt-token-row">
+              {hasLetterColumns && renderLetterHeaderCells()}
               {tables.map((table, tableIndex) => {
                 const isConclusion = showHurleySeparators && tableIndex === tables.length - 1 && tables.length > 1
                 const headerTokens = table.headerTokens && table.headerTokens.length > 0 ? table.headerTokens : table.tokens
@@ -276,6 +312,7 @@ export default function TruthTableGrid({
                             'tt-token',
                             isConclusion && tokenIndex === 0 ? 'tt-conclusion' : '',
                             !showHurleySeparators && tableIndex > 0 && tokenIndex === 0 ? 'tt-statement-start' : '',
+                            hasLetterColumns && tableIndex === 0 && tokenIndex === 0 ? 'tt-statement-start' : '',
                           ].filter(Boolean).join(' ')}
                           align="center"
                           data-tt-highlight={selected && !isMainOp ? 'true' : undefined}
@@ -307,8 +344,10 @@ export default function TruthTableGrid({
             {Array.from({ length: rowCount }, (_, rowIndex) => {
               const isWitnessRowActive = withSelectors && allowRowSelection
                 && witnessRowMode && witnessRow === rowIndex
+              const rowMatch = isRowSelected(rowIndex)
               return (
               <TableRow key={`combined-row-${rowIndex}`} className="tt-row">
+                {hasLetterColumns && renderLetterCells(rowIndex, rowMatch, isWitnessRowActive)}
                 {tables.map((table, tableIndex) => {
                   const isConclusion = showHurleySeparators && tableIndex === tables.length - 1 && tables.length > 1
                   const row = table.rows[rowIndex] ?? []
@@ -325,9 +364,8 @@ export default function TruthTableGrid({
                       )}
                       {headerTokens.map((_, colIndex) => {
                         const colMatch = selectedColumns.some((col) => col.tableIndex === tableIndex && col.colIndex === colIndex)
-                        const rowMatch = isRowSelected(rowIndex)
                         const isMainOp = isMainOperatorColumn(tableIndex, colIndex)
-                        const isFirstCellInRow = tableIndex === 0 && colIndex === 0
+                        const isFirstCellInRow = !hasLetterColumns && tableIndex === 0 && colIndex === 0
                         const isLastCellInRow = tableIndex === tables.length - 1 && colIndex === headerTokens.length - 1
                         const cellValue = tableInputs[tableIndex]?.[rowIndex]?.[colIndex]
                         const cellReadOnly = readOnly || Boolean(isCellReadOnly?.({
@@ -354,6 +392,7 @@ export default function TruthTableGrid({
                               'tt-cell',
                               isConclusion && colIndex === 0 ? 'tt-conclusion-cell' : '',
                               !showHurleySeparators && tableIndex > 0 && colIndex === 0 ? 'tt-statement-start' : '',
+                              hasLetterColumns && tableIndex === 0 && colIndex === 0 ? 'tt-statement-start' : '',
                             ].filter(Boolean).join(' ')}
                             align="center"
                             data-tt-highlight={withSelectors && !isMainOp && (colMatch || (allowRowSelection && rowMatch)) ? 'true' : undefined}
@@ -417,13 +456,14 @@ export default function TruthTableGrid({
             <Table className="tt-table" sx={compactTableSx}>
               <TableHead className="tt-head">
                 <TableRow className="tt-token-row">
+                  {hasLetterColumns && tableIndex === 0 && renderLetterHeaderCells()}
                   {headerTokens.map((token, tokenIndex) => {
                     const selected = selectedColumns.some((col) => col.tableIndex === tableIndex && col.colIndex === tokenIndex)
                     const isMainOp = isMainOperatorColumn(tableIndex, tokenIndex)
                     return (
                       <TableCell
                         key={`header-${tableIndex}-${tokenIndex}`}
-                        className="tt-token"
+                        className={hasLetterColumns && tableIndex === 0 && tokenIndex === 0 ? 'tt-token tt-statement-start' : 'tt-token'}
                         align="center"
                         data-tt-highlight={selected && !isMainOp ? 'true' : undefined}
                         sx={isMainOp ? { ...compactHeaderCellSx, ...highlightStyle } : compactHeaderCellSx}
@@ -451,13 +491,14 @@ export default function TruthTableGrid({
                 {table.rows.map((row, rowIndex) => {
                   const isWitnessRowActive = withSelectors && allowRowSelection
                     && witnessRowMode && witnessRow === rowIndex
+                  const rowMatch = isRowSelected(rowIndex)
                   return (
                   <TableRow key={`row-${tableIndex}-${rowIndex}`} className="tt-row">
+                    {hasLetterColumns && tableIndex === 0 && renderLetterCells(rowIndex, rowMatch, isWitnessRowActive)}
                     {row.map((_, colIndex) => {
                       const colMatch = selectedColumns.some((col) => col.tableIndex === tableIndex && col.colIndex === colIndex)
-                      const rowMatch = isRowSelected(rowIndex)
                       const isMainOp = isMainOperatorColumn(tableIndex, colIndex)
-                      const isFirstCellInRow = colIndex === 0
+                      const isFirstCellInRow = !hasLetterColumns && colIndex === 0
                       const isLastCellInRow = colIndex === row.length - 1
                       const cellValue = tableInputs[tableIndex]?.[rowIndex]?.[colIndex]
                       const cellReadOnly = readOnly || Boolean(isCellReadOnly?.({
@@ -480,7 +521,7 @@ export default function TruthTableGrid({
                       return (
                         <TableCell
                           key={`cell-${tableIndex}-${rowIndex}-${colIndex}`}
-                          className="tt-cell"
+                          className={hasLetterColumns && tableIndex === 0 && colIndex === 0 ? 'tt-cell tt-statement-start' : 'tt-cell'}
                           align="center"
                           data-tt-highlight={withSelectors && !isMainOp && (colMatch || (allowRowSelection && rowMatch)) ? 'true' : undefined}
                           sx={

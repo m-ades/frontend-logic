@@ -11,7 +11,7 @@ import {
   formulaTable,
   multiTables,
 } from '@logic-app/logic-engine/symbolic/libsemantics.js'
-import { fullTableMatch } from '@logic-app/logic-engine/checkers/truth-tables.js'
+import { fullTableMatch, allTrueAtRow } from '@logic-app/logic-engine/checkers/truth-tables.js'
 import ProblemSetButtons from '../mui/frame/ProblemSetButtons.jsx'
 import InstructorQuestionEditor from '../InstructorQuestionEditor.jsx'
 import ProblemFrame from '../mui/frame/ProblemFrame.jsx'
@@ -21,6 +21,7 @@ import {
   buildDisplaySolutionTables,
   buildTruthTableStatePayload,
   buildTruthTableSubmissionData,
+  deriveTruthTableLetterColumns,
   deriveTruthTableSolutionClassification,
   formatTruthTableStatements,
   isAtomicTruthTableToken,
@@ -141,6 +142,10 @@ function TruthTableEditorContent({
   const isAtomicToken = React.useCallback(
     (token) => isAtomicTruthTableToken(token, operatorSet, syntax),
     [operatorSet, syntax]
+  )
+  const { letters: letterColumns, letterRows } = React.useMemo(
+    () => deriveTruthTableLetterColumns(tables, operatorSet, syntax),
+    [operatorSet, syntax, tables]
   )
   const statementText = statements.length > 0 && notation === 'calgary'
     ? formatTruthTableStatements(statements, notation, kind === 'argument')
@@ -328,10 +333,34 @@ function TruthTableEditorContent({
 
   const useCombinedTable = tables.length > 1
   const hasTruthTable = tables.length > 0 && expectedTables.length === tables.length
-  const witnessRowComplete = !witnessRowHighlight || witnessRow != null
+  // false when no row could witness a contradiction, valid argument, or inconsistent set
+  const hasWitnessRow = React.useMemo(() => {
+    if (!witnessRowHighlight) return true
+    if (kind === 'formula') {
+      const table = tables[0]
+      if (!table) return true
+      return table.rows.some((row) => row[table.opspot] === true)
+    }
+    if (kind === 'argument') {
+      if (tables.length < 2) return true
+      const prems = tables.slice(0, -1)
+      const conc = tables[tables.length - 1]
+      for (let i = 0; i < conc.rows.length; i += 1) {
+        if (allTrueAtRow(prems, i) && conc.rows[i]?.[conc.opspot] === false) return true
+      }
+      return false
+    }
+    if (tables.length === 0) return true
+    for (let i = 0; i < tables[0].rows.length; i += 1) {
+      if (allTrueAtRow(tables, i)) return true
+    }
+    return false
+  }, [kind, tables, witnessRowHighlight])
+  const witnessRowComplete = !witnessRowHighlight || witnessRow != null || !hasWitnessRow
+  const mainOperatorComplete = !mainOperatorHighlight || mainOperatorColumn != null
+  const classificationComplete = !classificationEnabled || classificationOptions.length === 0 || mcSelection.length > 0
   const tableFilledOnly =
     hasTruthTable &&
-    witnessRowComplete &&
     tableInputs.length > 0 &&
     tableInputs.every((t, tIdx) =>
       t.length === (tables[tIdx]?.rows?.length ?? 0) &&
@@ -351,18 +380,33 @@ function TruthTableEditorContent({
     [kind, notation, proof?.solution, statements]
   )
   const witnessRowPrompt = kind === 'argument'
-    ? 'Double click the row number that shows this argument is invalid.'
+    ? 'Double click the row number that shows this argument is invalid if there is one.'
     : kind === 'equivalence'
-      ? 'Double click the row number that shows this set of sentences is jointly satisfiable.'
-      : 'Double click the row number that shows this sentence is not a contradiction.'
+      ? 'Double click the row number that shows this set of sentences is jointly satisfiable if there is one.'
+      : 'Double click the row number that shows this sentence is not a contradiction if there is one.'
+
+  const incompleteSelectionWarning = React.useMemo(() => {
+    const missing = []
+    if (!mainOperatorComplete) missing.push('main operator')
+    if (!witnessRowComplete) missing.push('row')
+    if (!classificationComplete) missing.push('classification')
+    if (missing.length === 0) return null
+    const list = missing.length === 1
+      ? missing[0]
+      : missing.length === 2
+        ? `${missing[0]} and ${missing[1]}`
+        : `${missing.slice(0, -1).join(', ')}, and ${missing[missing.length - 1]}`
+    return `Missing ${list} selection.`
+  }, [classificationComplete, mainOperatorComplete, witnessRowComplete])
+
+  const finalizeMessage = (baseMessage, statusValue) => (
+    incompleteSelectionWarning && (statusValue === 'incorrect' || statusValue === 'partial')
+      ? `${baseMessage} ${incompleteSelectionWarning}`
+      : baseMessage
+  )
 
   const handleCheck = async () => {
     if (isChecking || attemptCount >= attemptLimit || isAssignmentLocked) return
-    if (!witnessRowComplete) {
-      setStatus('incorrect')
-      setMessage(`${witnessRowPrompt} before submitting.`)
-      return
-    }
     setIsChecking(true)
     try {
       const result = await submitTruthTableAnswer({
@@ -398,14 +442,14 @@ function TruthTableEditorContent({
         }
         if (result.isCorrect) {
           setStatus('correct')
-          setMessage(result.message)
+          setMessage(finalizeMessage(result.message, 'correct'))
           onProofComplete?.(proof.id)
         } else if (result.nextStatus === 'partial') {
           setStatus('partial')
-          setMessage(result.message)
+          setMessage(finalizeMessage(result.message, 'partial'))
         } else {
           setStatus(result.nextStatus)
-          setMessage(result.message)
+          setMessage(finalizeMessage(result.message, result.nextStatus))
         }
       } else {
         const nextAttempt = Math.min(attemptCount + 1, attemptLimit)
@@ -419,11 +463,11 @@ function TruthTableEditorContent({
         })
         if (result.isCorrect) {
           setStatus('correct')
-          setMessage(result.message)
+          setMessage(finalizeMessage(result.message, 'correct'))
           onProofComplete?.(proof.id)
         } else {
           setStatus(result.nextStatus)
-          setMessage(result.message)
+          setMessage(finalizeMessage(result.message, result.nextStatus))
         }
       }
     } catch (err) {
@@ -552,6 +596,8 @@ function TruthTableEditorContent({
             onClearWitnessRow={witnessRowHighlight ? clearWitnessRow : undefined}
             isCellReadOnly={isPrefilledCell}
             showLabels={!statementText}
+            letterColumns={letterColumns}
+            letterRows={letterRows}
           />
           {!embedded && (
             <TruthTableFeedback
@@ -577,6 +623,8 @@ function TruthTableEditorContent({
                 readOnly
                 showHurleySeparators={showHurleySeparators}
                 withSelectors={false}
+                letterColumns={letterColumns}
+                letterRows={letterRows}
               />
             </TruthTableSection>
             {classificationEnabled && solutionMcValues.length > 0 && (
@@ -608,6 +656,8 @@ function TruthTableEditorContent({
             readOnly
             showHurleySeparators={showHurleySeparators}
             withSelectors={false}
+            letterColumns={letterColumns}
+            letterRows={letterRows}
           />
         </TruthTableSection>
         {classificationEnabled && solutionMcValues.length > 0 && (
