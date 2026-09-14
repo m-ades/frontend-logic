@@ -182,6 +182,7 @@ export const SANDBOX_ASSIGNMENTS = [
         id: 'sandbox-q-4',
         questionId: 'sandbox-q-4',
         type: 'single-row-truth-table',
+        logicSystem: 'hurley',
         attemptLimit: 3,
         description: '<div class=instructions>Complete a line of the truth table for the following compound statement, given the truth value assignment to its component statements. And, determine whether the compound statement is true or false.</div> <div>Values for G, H, and I are true. <br> Values for M, N, and O are false.</div>',
         singleRowTruthTable: {
@@ -194,6 +195,7 @@ export const SANDBOX_ASSIGNMENTS = [
         id: 'sandbox-q-5',
         questionId: 'sandbox-q-5',
         type: 'truth-table',
+        logicSystem: 'hurley',
         attemptLimit: 3,
         description: 'Complete the truth table for the given argument below to determine whether it is valid or not.',
         truthTable: {
@@ -627,6 +629,7 @@ export const SANDBOX_PRACTICES = [
         id: 'sandbox-practice-4-q-1',
         questionId: 'sandbox-practice-4-q-1',
         type: 'single-row-truth-table',
+        logicSystem: 'hurley',
         attemptLimit: 3,
         description: '<div class=instructions>Complete a line of the truth table for the following compound statement, given the truth value assignment to its component statements. And, determine whether the compound statement is true or false.</div> <div>Values for G, H, and I are true. <br> Values for M, N, and O are false.</div>',
         singleRowTruthTable: {
@@ -639,6 +642,7 @@ export const SANDBOX_PRACTICES = [
         id: 'sandbox-practice-4-q-2',
         questionId: 'sandbox-practice-4-q-2',
         type: 'truth-table',
+        logicSystem: 'hurley',
         attemptLimit: 3,
         description: '<div class=instructions>Complete the truth table for the following statement, and determine whether it is tautologous, self-contradictory, or contingent.</div> <div> You can click the squares to fill in the truth value for a cell once for <strong>True</strong> and twice for <strong>False</strong>. Make sure the <strong>entire</strong> table is filled in before you submit your answer.</div>',
         partialCredit: true,
@@ -652,6 +656,7 @@ export const SANDBOX_PRACTICES = [
         id: 'sandbox-practice-4-q-3',
         questionId: 'sandbox-practice-4-q-3',
         type: 'truth-table',
+        logicSystem: 'hurley',
         attemptLimit: 3,
         description: "<div class=instructions>Consider Sookyeong's beliefs about justice below. To evaluate them logically, we can symbolize them in propositional logic and construct a truth table.</div> <div> \"Justice prevails if either laws are fair or society is compassionate. However, if justice prevails, then laws are not fair.\"</div> <div> J = Justice prevails. <br> S = Society is compassionate. <br> L = Laws are fair. </div>",
         partialCredit: true,
@@ -666,6 +671,7 @@ export const SANDBOX_PRACTICES = [
         id: 'sandbox-practice-4-q-4',
         questionId: 'sandbox-practice-4-q-4',
         type: 'indirect-truth-table',
+        logicSystem: 'hurley',
         attemptLimit: 3,
         answer: [0, 1],
         indirectTruthTable: {
@@ -701,6 +707,7 @@ export const SANDBOX_PRACTICES = [
         id: 'sandbox-practice-4-q-5',
         questionId: 'sandbox-practice-4-q-5',
         type: 'indirect-truth-table',
+        logicSystem: 'hurley',
         attemptLimit: 3,
         answer: [4, 3, 0],
         indirectTruthTable: {
