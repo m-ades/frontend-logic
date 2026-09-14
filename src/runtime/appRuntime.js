@@ -16,6 +16,7 @@ import { fetchJson } from "../utils/api.js";
 import { buildBreadcrumbInfo, buildRuntimePaths } from "./sandboxRuntime.js";
 import { toEasternIso } from "../utils/easternTime.js";
 import { buildPublicationPayload } from "../utils/publicationPolicy.js";
+import { excludeNonStudents } from "../utils/GradebookUtils.js";
 
 // converts form dates in new york and throws for invalid wall times
 const toIsoDateTime = (date, time) => {
@@ -231,7 +232,7 @@ export function createAppRuntime({ coursesDispatch, coursesState, routeKind, use
       coursesDispatch({
         type: "UPDATE_COURSE_SETTINGS",
         courseId,
-        payload: { studentCount: updatedGradebook.length },
+        payload: { studentCount: excludeNonStudents(updatedGradebook).length },
       });
       return newStudents;
     },
@@ -242,6 +243,11 @@ export function createAppRuntime({ coursesDispatch, coursesState, routeKind, use
         student.id === userId ? { ...student, role: normalizedRole } : student
       );
       coursesDispatch({ type: "SET_GRADEBOOK", courseId, payload: updated });
+      coursesDispatch({
+        type: "UPDATE_COURSE_SETTINGS",
+        courseId,
+        payload: { studentCount: excludeNonStudents(updated).length },
+      });
       return updated;
     },
     getAccommodations: async (courseId, userId) => {

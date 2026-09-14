@@ -42,6 +42,7 @@ import StudentSubmissionDialog from "../gradebook/StudentSubmissionDialog.jsx";
 import GradeBreakdown from "./GradeBreakdown";
 import { formatEasternDateTime } from "../../../utils/easternTime.js";
 import { useAppRuntime } from "../../../hooks/useAppRuntime.js";
+import { excludeNonStudents } from "../../../utils/GradebookUtils.js";
 
 // Helper functions
 function getLetterGrade(grade) {
@@ -81,7 +82,7 @@ export default function AssignmentDetailModal({ open, onClose, assignmentId }) {
   const activeCourse = courses.find((c) => c.id === activeCourseId);
   const assignments = assignmentsByCourse[activeCourseId] || [];
   const gradebook = gradebookByCourse[activeCourseId] || [];
-  const gradebookStudentsOnly = gradebook.filter((s) => s.role !== "ta");
+  const gradebookStudentsOnly = excludeNonStudents(gradebook);
   const assignment = assignments.find((a) => a.id === assignmentId);
 
   if (!assignment) return null;

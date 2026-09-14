@@ -15,6 +15,7 @@ import {
   alpha,
 } from "@mui/material";
 import { Plus, MoreVertical } from "lucide-react";
+import { formatStudentDisplayName } from "../../../utils/GradebookUtils.js";
 
 export default function StudentsTable({
   students,
@@ -128,7 +129,7 @@ export default function StudentsTable({
                 >
                   <TableCell onClick={() => onStudentClick(student)}>
                     <Typography variant="body2" fontWeight={500}>
-                      {student.username}
+                      {formatStudentDisplayName(student)}
                     </Typography>
                   </TableCell>
 

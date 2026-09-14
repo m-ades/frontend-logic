@@ -7,6 +7,7 @@ import {
 import { useAppRuntime } from '../../../hooks/useAppRuntime.js'
 import { fetchJson } from '../../../utils/api.js'
 import { formatEasternFromIso, splitEasternDateTime, toEasternIso } from '../../../utils/easternTime.js'
+import { formatStudentDisplayName } from '../../../utils/GradebookUtils.js'
 import SubmissionAnswer from './SubmissionAnswer.jsx'
 
 /*
@@ -104,7 +105,7 @@ export default function StudentSubmissionDialog({ student, assignment, onClose }
       <DialogTitle id="student-submission-title">
         <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={2}>
           <Box>
-            {student.username} · {assignment.name}
+            {formatStudentDisplayName(student)} · {assignment.name}
             {extensionLabel && (
               <Typography variant="caption" color="text.secondary" display="block">
                 Extension: {extensionLabel}

@@ -3,6 +3,7 @@ import { fetchJson, getStoredUser } from "../utils/api.js";
 import { DEFAULT_LOGIC_SYSTEM, normalizeLogicSystem } from "../lib/logicSystems.js";
 import { sortAssignmentsBySubchapter } from "../utils/assignmentSort.js";
 import { isInstructorRole } from "../utils/auth.js";
+import { excludeNonStudents } from "../utils/GradebookUtils.js";
 import {
   parseDueDateAsEastern,
   splitEasternDateTime,
@@ -855,7 +856,7 @@ export async function addStudentToCourse(dispatch, courseId, studentData) {
     dispatch({
       type: "UPDATE_COURSE_SETTINGS",
       courseId,
-      payload: { studentCount: updatedGradebook.length },
+      payload: { studentCount: excludeNonStudents(updatedGradebook).length },
     });
 
     dispatch({ type: "SET_LOADING", payload: false });
@@ -886,7 +887,7 @@ export async function removeStudentFromCourse(dispatch, courseId, studentId) {
     dispatch({
       type: "UPDATE_COURSE_SETTINGS",
       courseId,
-      payload: { studentCount: updatedGradebook.length },
+      payload: { studentCount: excludeNonStudents(updatedGradebook).length },
     });
 
     dispatch({ type: "SET_LOADING", payload: false });

@@ -1,4 +1,14 @@
 import { numberOrNull, formatNumber } from "./numberUtils.js";
+
+export function excludeNonStudents(people) {
+  return Array.isArray(people) ? people.filter((person) => person?.role !== "ta") : [];
+}
+
+export function formatStudentDisplayName(person) {
+  const name = person?.username ?? "";
+  return person?.role === "ta" ? `${name} (TA)` : name;
+}
+
 // averages valid grades without rounding and returns null when none are present
 export function calculateAverage(grades) {
   const values = Object.values(grades)
@@ -146,7 +156,7 @@ export function exportGradebookCSV(students, assignments, courseLabel) {
       });
 
       return [
-        student?.username ?? "",
+        formatStudentDisplayName(student),
         average === null ? "" : `${formatNumber(average)}%`,
         letterGrade,
         ...assignmentGrades,

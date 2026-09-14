@@ -1,7 +1,7 @@
 import { formatNumber } from "./numberUtils.js";
 // Utility functions for roster management
 import { parseDueDateAsEastern } from "./easternTime.js";
-import { getStudentAverage } from "./GradebookUtils.js";
+import { excludeNonStudents, formatStudentDisplayName, getStudentAverage } from "./GradebookUtils.js";
 
 const getAssignmentDeadline = (assignment) => {
   if (!assignment?.dueDate) return null;
@@ -53,11 +53,8 @@ export function filterStudents(students, searchQuery) {
   );
 }
 
-/** Students onlyfor analytics */
 function studentsOnlyForStats(students) {
-  return Array.isArray(students)
-    ? students.filter((s) => s.role !== "ta")
-    : [];
+  return excludeNonStudents(students);
 }
 
 export function calculateClassStats(students, assignments) {
@@ -96,7 +93,7 @@ export function exportRosterCSV(students, courseCode, assignments) {
     ...students.map((student) => {
       const stats = getStudentStats(student, assignments);
       return [
-        student.username,
+        formatStudentDisplayName(student),
         stats.average === null ? "" : `${formatNumber(stats.average)}%`,
         stats.completed,
         stats.lateCount,
