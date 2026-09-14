@@ -1,13 +1,13 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import derivationHurley from '../src/lib/logicpenguin/checkers/derivation-hurley.js'
-import { getDerivationCheckerForLogicSystem } from '../src/lib/logicpenguin/checkers/derivation-by-logic-system.js'
+import derivationHurley from '@logic-app/logic-engine/checkers/derivation-hurley.js'
+import { getDerivationCheckerForLogicSystem } from '@logic-app/logic-engine/checkers/derivation-by-logic-system.js'
 
 const question = { prems: ['A'], conc: 'A' }
 
 test('rejects an absent submission without throwing', async () => {
   for (const submission of [undefined, null]) {
-    const result = await derivationHurley(question, submission, 1, {})
+    const result = await derivationHurley(question, null, submission, false, 1, false, {})
 
     assert.equal(result.successstatus, 'incorrect')
     assert.equal(result.points, 0)
@@ -17,7 +17,7 @@ test('rejects an absent submission without throwing', async () => {
 
 test('handles absent or invalid subderivation parts without throwing', async () => {
   for (const submission of [{}, { parts: null }, { parts: {} }, { parts: [{ parts: null }] }]) {
-    const result = await derivationHurley(question, submission, 1, {})
+    const result = await derivationHurley(question, null, submission, false, 1, false, {})
 
     assert.equal(result.successstatus, 'incorrect')
     assert.equal(result.points, 0)

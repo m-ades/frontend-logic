@@ -3,7 +3,7 @@ import { createRoot } from 'react-dom/client'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import App from './App.jsx'
 import './global.css'
-import './lib/logicpenguin/stylesheets/common.css'
+import './lib/logic-engine/stylesheets/common.css'
 
 // fresh until stale then refetch
 const STALE_TIME_MS = 5 * 60 * 1000   // 5m

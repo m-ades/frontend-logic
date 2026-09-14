@@ -1,16 +1,17 @@
+import { getTruthTableStatements } from '@logic-app/logic-engine/truthTableAnswer.js'
 import * as React from 'react'
 import {
   Box,
   Stack,
   Typography,
 } from '@mui/material'
-import getFormulaClass from '../../../lib/logicpenguin/symbolic/formula.js'
-import getSyntax from '../../../lib/logicpenguin/symbolic/libsyntax.js'
+import getFormulaClass from '@logic-app/logic-engine/symbolic/formula.js'
+import getSyntax from '@logic-app/logic-engine/symbolic/libsyntax.js'
 import {
   formulaTable,
   multiTables,
-} from '../../../lib/logicpenguin/symbolic/libsemantics.js'
-import { fullTableMatch } from '../../../lib/logicpenguin/checkers/truth-tables.js'
+} from '@logic-app/logic-engine/symbolic/libsemantics.js'
+import { fullTableMatch } from '@logic-app/logic-engine/checkers/truth-tables.js'
 import ProblemSetButtons from '../mui/frame/ProblemSetButtons.jsx'
 import InstructorQuestionEditor from '../InstructorQuestionEditor.jsx'
 import ProblemFrame from '../mui/frame/ProblemFrame.jsx'
@@ -23,14 +24,12 @@ import {
   deriveTruthTableSolutionClassification,
   formatTruthTableStatements,
   isAtomicTruthTableToken,
-  isValidWitnessRow,
   normalizeSavedClassification,
   submitTruthTableAnswer,
   tokenizeTruthTableHeader,
 } from './truthTableUi.js'
 import {
   getTruthTableClassification,
-  truthTableClassificationsMatch,
 } from './truthTableClassification.js'
 import PromptText from '../../ui/PromptText.jsx'
 import { tablesEqual, clearDebounce, scheduleDebouncedChange } from '../../../utils/tablePerf.js'
@@ -101,24 +100,10 @@ function TruthTableEditorContent({
   const mainOperatorHighlight = kind === 'formula' && truthTable?.options?.highlightMainOperator === true
   const witnessRowHighlight = truthTable?.options?.highlightWitnessRow === true
   const operatorSet = React.useMemo(() => new Set(Object.keys(syntax.operators)), [syntax])
-  const statements = React.useMemo(() => {
-    if (Array.isArray(truthTable.statements) && truthTable.statements.length > 0) {
-      return truthTable.statements
-    }
-    if (Array.isArray(truthTable.formulas) && truthTable.formulas.length > 0) {
-      return truthTable.formulas
-    }
-    if (kind === 'argument' && truthTable.lefts && truthTable.right) {
-      return [...truthTable.lefts, truthTable.right]
-    }
-    if (kind === 'equivalence' && truthTable.left && truthTable.right) {
-      return [truthTable.left, truthTable.right]
-    }
-    if (truthTable.statement || truthTable.formula) {
-      return [truthTable.statement ?? truthTable.formula]
-    }
-    return []
-  }, [kind, truthTable])
+  const statements = React.useMemo(
+    () => getTruthTableStatements({ truthTable: { ...truthTable, kind } }),
+    [kind, truthTable]
+  )
   const classification = React.useMemo(
     () => getTruthTableClassification(kind, statements.length),
     [kind, statements.length]
@@ -362,15 +347,9 @@ function TruthTableEditorContent({
     tableChecks.length > 0 &&
     tableChecks.every((res) => res.rowdiff === 0 && res.offcells.length === 0)
   const solutionMcValues = React.useMemo(
-    () => deriveTruthTableSolutionClassification(kind, proof?.solution, statements, Formula, notation),
-    [Formula, kind, notation, proof?.solution, statements]
+    () => deriveTruthTableSolutionClassification(kind, proof?.solution, statements, notation),
+    [kind, notation, proof?.solution, statements]
   )
-  const classificationCorrect = !classificationEnabled || truthTableClassificationsMatch(mcSelection, solutionMcValues)
-  const mainOperatorCorrect = !mainOperatorHighlight || (
-    mainOperatorColumn?.tableIndex === 0
-    && mainOperatorColumn?.colIndex === tables[0]?.opspot
-  )
-  const witnessRowCorrect = !witnessRowHighlight || isValidWitnessRow(kind, tables, witnessRow)
   const witnessRowPrompt = kind === 'argument'
     ? 'Double click the row number that shows this argument is invalid.'
     : kind === 'equivalence'
@@ -389,7 +368,8 @@ function TruthTableEditorContent({
       const result = await submitTruthTableAnswer({
         assignmentQuestionId,
         submissionData: buildTruthTableSubmissionData(kind, tableInputs, mcSelection, classificationEnabled, mainOperatorColumn, witnessRow),
-        localIsCorrect: tableCorrect && classificationCorrect && mainOperatorCorrect && witnessRowCorrect,
+        question: { truthTable: { kind, statements } },
+        options: { ...proof?.options, ...truthTable?.options, notation, question: classificationEnabled },
       })
       if (result.mode === 'remote') {
         const resp = result.response
@@ -424,7 +404,7 @@ function TruthTableEditorContent({
           setStatus('partial')
           setMessage(result.message)
         } else {
-          setStatus('incorrect')
+          setStatus(result.nextStatus)
           setMessage(result.message)
         }
       } else {
@@ -435,14 +415,14 @@ function TruthTableEditorContent({
           attemptCount: nextAttempt,
           lastSubmissionAt: Date.now(),
           lastStatus: result.nextStatus,
-          rawScore: result.isCorrect ? 100 : 0,
+          rawScore: result.score,
         })
         if (result.isCorrect) {
           setStatus('correct')
           setMessage(result.message)
           onProofComplete?.(proof.id)
         } else {
-          setStatus('incorrect')
+          setStatus(result.nextStatus)
           setMessage(result.message)
         }
       }

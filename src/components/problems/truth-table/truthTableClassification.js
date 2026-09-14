@@ -38,10 +38,3 @@ export function getTruthTableClassification(kind, statementCount = 0) {
   }
   return { selectionMode: 'multiple', prompt: 'Select all that apply', options: [] }
 }
-
-export function truthTableClassificationsMatch(selection = [], expected = []) {
-  const selectedValues = new Set(selection)
-  const expectedValues = new Set(expected)
-  if (selectedValues.size !== expectedValues.size) return false
-  return [...selectedValues].every((value) => expectedValues.has(value))
-}

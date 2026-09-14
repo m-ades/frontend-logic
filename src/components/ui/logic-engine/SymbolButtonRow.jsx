@@ -1,4 +1,4 @@
-import getSyntax from '../../../lib/logicpenguin/symbolic/libsyntax.js'
+import getSyntax from '@logic-app/logic-engine/symbolic/libsyntax.js'
 import { getNotation } from '../../../lib/logicSystems.js'
 import LogicSymbol, { getInsertSymbolLabel } from './LogicSymbol.jsx'
 import LogicSymbolKeyRow, { getLogicSymbolKeySx } from './LogicSymbolKeyRow.jsx'

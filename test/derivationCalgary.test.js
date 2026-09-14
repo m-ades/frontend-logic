@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import derivationCalgary from '../src/lib/logicpenguin/checkers/derivation-calgary.js'
+import derivationCalgary from '@logic-app/logic-engine/checkers/derivation-calgary.js'
 
 test('fitch allows eliminating the right disjunct and reports extra citations without a directional restriction', async () => {
   const question = { prems: ['R', 'P ∨ Q', '¬Q'], conc: 'P' }

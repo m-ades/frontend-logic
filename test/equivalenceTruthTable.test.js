@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import equivalenceTruthTable from '../src/lib/logicpenguin/checkers/equivalence-truth-table.js'
+import equivalenceTruthTable from '@logic-app/logic-engine/checkers/equivalence-truth-table.js'
 
 const a = { opspot: 0, rows: [[true], [true], [false], [false]] }
 const b = { opspot: 0, rows: [[true], [false], [true], [false]] }

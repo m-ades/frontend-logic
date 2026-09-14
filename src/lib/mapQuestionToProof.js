@@ -5,7 +5,7 @@ import {
   normalizeLogicSystem,
 } from './logicSystems.js'
 
-import { isMultiSelectSubquestion } from './logicpenguin/multiple-choice-utils.js'
+import { getCompositeSubquestions, isMultiSelectSubquestion } from '@logic-app/logic-engine/multiple-choice-utils.js'
 
 export const normalizeType = (snapshot) => (
   snapshot?.type || snapshot?.problemType || snapshot?.logic_problem_type || 'derivation'
@@ -144,15 +144,16 @@ export const mapQuestionToProof = (question, assignment, index, logicSystem = DE
   }
 
   if (type === 'multiple-choice') {
-    const subquestions = snapshot.subquestions || snapshot.questions || []
-    const hasSubquestions = Array.isArray(subquestions) && subquestions.length > 0
     const baseMultipleChoice = snapshot.multipleChoice || {
       prompt: snapshot.prompt || '',
       choices: snapshot.choices || [],
     }
+    const nestedSubquestions = getCompositeSubquestions(baseMultipleChoice)
+    const subquestions = nestedSubquestions.length ? nestedSubquestions : getCompositeSubquestions(snapshot)
+    const hasSubquestions = subquestions.length > 0
     const normalizedMultipleChoice = {
       ...baseMultipleChoice,
-      subquestions: baseMultipleChoice.subquestions || subquestions,
+      subquestions,
       multiSelect: baseMultipleChoice.multiSelect ?? snapshot.multiSelect ?? false,
     }
     return {

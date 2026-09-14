@@ -4,13 +4,13 @@ import InstructorQuestionEditor from '../../InstructorQuestionEditor.jsx'
 import { useTheme, useMediaQuery } from '@mui/material'
 import ProblemFrame from '../frame/ProblemFrame.jsx'
 import ProblemSetButtons from '../frame/ProblemSetButtons.jsx'
-import FormulaInput from '../../../ui/logicpenguin/formula-input.js'
-import SymbolButtonRow from '../../../ui/logicpenguin/SymbolButtonRow.jsx'
+import FormulaInput from '../../../ui/logic-engine/formula-input.js'
+import SymbolButtonRow from '../../../ui/logic-engine/SymbolButtonRow.jsx'
 import { MobileLogicInput } from '../../../ui/LogicKeyboard/index.js'
 import { useProblemChecker } from '../../../../hooks/useProblemChecker.js'
 import SolutionReveal from '../../SolutionReveal.jsx'
 import RichText from '../../../ui/RichText.jsx'
-import { canonicalizeFormula } from '../../../../lib/logicpenguin/symbolic/formula.js'
+import { canonicalizeFormula } from '@logic-app/logic-engine/symbolic/formula.js'
 import { sanitizeRichHtml } from '../../../../utils/sanitizeRichHtml.js'
 import {
   ST_PREDICATE_VARIABLES,
@@ -26,7 +26,7 @@ import {
   isCompleteTranslationAnswer,
   mapTranslationAnswer,
   parseTranslationAnswer,
-} from '../../../../lib/logicpenguin/translation-answer.js'
+} from '@logic-app/logic-engine/translation-answer.js'
 
 /*
 legacy prompts contain instructions and sentence text in one html value

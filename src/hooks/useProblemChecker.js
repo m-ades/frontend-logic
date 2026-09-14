@@ -3,8 +3,8 @@
  * handles state management, answer validation, checking answers and resetting problems.
  */
 import { useState, useEffect } from 'react'
-import { localCheck } from '../lib/logicpenguin/common.js'
-import { componentScorePercent } from '../lib/logicpenguin/component-grading.js'
+import { localCheck } from '../lib/logic-engine/common.js'
+import { componentScorePercent } from '@logic-app/logic-engine/checkers/component-grading.js'
 import { buildPersistedSubmissionState, shouldUseApiValidation, submitApiValidation } from '../utils/submissionRuntime.js'
 
 export function useProblemChecker({
@@ -101,7 +101,7 @@ export function useProblemChecker({
           setMessage('Error checking answer')
           return
         }
-        const partialScore = componentScorePercent(result.componentScores)
+        const partialScore = componentScorePercent(result.componentScores, result.componentWeights)
         const rawScore = result.successstatus === 'correct'
           ? 100
           : result.successstatus === 'partial'

@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import argumentTruthTable from '../src/lib/logicpenguin/checkers/argument-truth-table.js'
+import argumentTruthTable from '@logic-app/logic-engine/checkers/argument-truth-table.js'
 
 const answer = {
   valid: false,

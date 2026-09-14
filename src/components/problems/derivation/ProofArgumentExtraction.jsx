@@ -15,16 +15,16 @@ import StatusBanner, { isTerminalStatus } from '../../ui/StatusBanner.jsx'
 import PromptText from '../../ui/PromptText.jsx'
 import ProblemSetButtons from '../mui/frame/ProblemSetButtons.jsx'
 import FormulaField from '../mui/inputs/FormulaField.jsx'
-import SymbolButtonRow from '../../ui/logicpenguin/SymbolButtonRow.jsx'
+import SymbolButtonRow from '../../ui/logic-engine/SymbolButtonRow.jsx'
 import { useProblemChecker } from '../../../hooks/useProblemChecker.js'
 import { getNotation } from '../../../lib/logicSystems.js'
-import getFormulaClass from '../../../lib/logicpenguin/symbolic/formula.js'
-import { parseExtractionArgument } from '../../../lib/proofArgumentExtractionArgument.js'
+import getFormulaClass from '@logic-app/logic-engine/symbolic/formula.js'
+import { parseExtractionArgument } from '@logic-app/logic-engine/proofArgumentExtractionArgument.js'
 import {
   getAssumptionDepths,
   getAssumptionRuleRequirements,
   parseAssumptionScopes,
-} from '../../../lib/proofArgumentExtractionScopes.js'
+} from '@logic-app/logic-engine/proofArgumentExtractionScopes.js'
 import { extractLines } from './derivationUtils.js'
 import { getFormulaKeyboardConfig } from '../mui/translation/symbolizationKeyboard.js'
 import DerivationCard from './DerivationCard.jsx'

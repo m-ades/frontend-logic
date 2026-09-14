@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import formulaTruthTable from '../src/lib/logicpenguin/checkers/formula-truth-table.js'
+import formulaTruthTable from '@logic-app/logic-engine/checkers/formula-truth-table.js'
 
 const answer = {
   rows: [[true, false], [false, true]],

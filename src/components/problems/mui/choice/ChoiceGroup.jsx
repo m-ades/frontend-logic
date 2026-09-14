@@ -1,7 +1,7 @@
 import { Box, Checkbox, FormControl, FormControlLabel, FormGroup, Radio, RadioGroup } from '@mui/material'
 import { choiceLabelWithGapSx } from '../frame/ProblemFrame.jsx'
 import PromptText from '../../../ui/PromptText.jsx'
-import { getSubquestionChoices, isMultiSelectSubquestion } from '../../../../lib/logicpenguin/multiple-choice-utils.js'
+import { getSubquestionChoices, isMultiSelectSubquestion } from '@logic-app/logic-engine/multiple-choice-utils.js'
 
 const multiSelectLabelSx = { ...choiceLabelWithGapSx, ml: 2 }
 const singleSelectLabelSx = choiceLabelWithGapSx

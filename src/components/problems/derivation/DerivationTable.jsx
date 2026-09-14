@@ -15,9 +15,9 @@ import { alpha } from '@mui/material/styles'
 import PromptText from '../../ui/PromptText.jsx'
 import ProblemSetButtons from '../mui/frame/ProblemSetButtons.jsx'
 import { useMobileLogicKeyboardEnabled } from '../../ui/LogicKeyboard/index.js'
-import { getDerivationCheckerForLogicSystem } from '../../../lib/logicpenguin/checkers/derivation-by-logic-system.js'
-import { canonicalizeFormula } from '../../../lib/logicpenguin/symbolic/formula.js'
-import getSyntax from '../../../lib/logicpenguin/symbolic/libsyntax.js'
+import { getDerivationCheckerForLogicSystem } from '@logic-app/logic-engine/checkers/derivation-by-logic-system.js'
+import { canonicalizeFormula } from '@logic-app/logic-engine/symbolic/formula.js'
+import getSyntax from '@logic-app/logic-engine/symbolic/libsyntax.js'
 import {
   getDerivationProblemType,
   getNotation,
@@ -28,8 +28,8 @@ import {
   getDerivationRuleLookup,
   getDerivationRules,
 } from '../../../lib/derivationRules.js'
-import { getRulesetRestrictions } from '../../../lib/logicpenguin/checkers/derivation-rule-restrictions.js'
-import { justParse } from '../../ui/logicpenguin/justification-parse.js'
+import { getRulesetRestrictions } from '@logic-app/logic-engine/checkers/derivation-rule-restrictions.js'
+import { justParse } from '@logic-app/logic-engine/justification-parse.js'
 import { displayIndexedSymbolsForNotation } from '../../../lib/indexedSymbols.js'
 import { logicStatementsToTex } from '../../../lib/logicTex.js'
 import { buildPersistedSubmissionState, shouldUseApiValidation, submitApiValidation } from '../../../utils/submissionRuntime.js'

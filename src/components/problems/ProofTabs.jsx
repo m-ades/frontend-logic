@@ -6,7 +6,7 @@ import CancelIcon from '@mui/icons-material/Cancel'
 import WarningAmberIcon from '@mui/icons-material/WarningAmber'
 import AddIcon from '@mui/icons-material/Add'
 import ProofEditor from './ProofEditor.jsx'
-import LogicPenguinProblem from './LogicPenguinProblem.jsx'
+import LogicProblem from './LogicProblem.jsx'
 import TruthTableEditor from './truth-table/TruthTableEditor.jsx'
 import { ProblemNavigationContext } from './ProblemNavigationContext.jsx'
 import { allowPartialForProof, displayScoreForProof } from '../../utils/problemHelpers.js'
@@ -677,7 +677,7 @@ function ProofTabs({
                         }
 
                         return (
-                          <LogicPenguinProblem
+                          <LogicProblem
                             key={`proof-${proof.id}`}
                             proof={proof}
                             problemLabel={problemLabel}

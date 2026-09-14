@@ -1,6 +1,6 @@
-import getHurleyRuleset from './logicpenguin/checkers/rules/hurley-rules.js'
-import getForallxRuleset from './logicpenguin/checkers/rules/forallx-rules.js'
-import getSyntax from './logicpenguin/symbolic/libsyntax.js'
+import getHurleyRuleset from '@logic-app/logic-engine/checkers/rules/hurley-rules.js'
+import getForallxRuleset from '@logic-app/logic-engine/checkers/rules/forallx-rules.js'
+import getSyntax from '@logic-app/logic-engine/symbolic/libsyntax.js'
 import { DEFAULT_LOGIC_SYSTEM, getDerivationProblemType } from './logicSystems.js'
 
 export const FORCE_UPPER_DERIVATION_RULES = new Set([

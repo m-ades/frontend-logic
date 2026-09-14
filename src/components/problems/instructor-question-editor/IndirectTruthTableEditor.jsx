@@ -16,7 +16,7 @@ import {
 import AddIcon from '@mui/icons-material/Add'
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
 import { DEFAULT_LOGIC_SYSTEM } from '../../../lib/logicSystems.js'
-import { isMultiSelectSubquestion, getSingleSelectAnswerIndex } from '../../../lib/logicpenguin/multiple-choice-utils.js'
+import { isMultiSelectSubquestion, getSingleSelectAnswerIndex } from '@logic-app/logic-engine/multiple-choice-utils.js'
 import { displayFormulaInput, normalizeArgumentInput } from './formulaHelpers.js'
 import { typeKey } from './snapshotUtils.js'
 

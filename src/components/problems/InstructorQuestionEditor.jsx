@@ -21,9 +21,9 @@ import {
   getAssumptionRuleRequirements,
   getJustificationRule,
   parseAssumptionScopes,
-} from '../../lib/proofArgumentExtractionScopes.js'
+} from '@logic-app/logic-engine/proofArgumentExtractionScopes.js'
 import { getInstructorProblemTypeLabel, isInstructorProblemType } from '../../lib/instructorProblemTypes.js'
-import { isMultiSelectSubquestion } from '../../lib/logicpenguin/multiple-choice-utils.js'
+import { isMultiSelectSubquestion } from '@logic-app/logic-engine/multiple-choice-utils.js'
 import { deepMerge } from './instructor-question-editor/snapshotUtils.js'
 import { validateQuestionSnapshotFormulas } from './instructor-question-editor/snapshotValidation.js'
 import { validateDerivationRuleset } from './instructor-question-editor/ruleHelpers.js'

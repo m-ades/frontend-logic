@@ -5,11 +5,9 @@ Shared truth table helpers for truthtable and truthtableeditor
 */  
 
 import { shouldUseApiValidation, submitApiValidation } from '../../../utils/submissionRuntime.js'
-import {
-  argumentTables,
-  equivTablesMany,
-  formulaTable,
-} from '../../../lib/logicpenguin/symbolic/libsemantics.js'
+import { computeTruthTableAnswer } from '@logic-app/logic-engine/truthTableAnswer.js'
+import { checkers } from '@logic-app/logic-engine/checkers.js'
+import { componentScorePercent } from '@logic-app/logic-engine/checkers/component-grading.js'
 import {
   displayIndexedSymbolsForNotation,
   isPropositionalSymbol,
@@ -123,28 +121,6 @@ export function buildTruthTableSubmissionData(
   return { lefts: [], right: tableData[0], rowhls }
 }
 
-/* tests whether rowIndex witnesses the property graded for this kind:
-formula: not a contradiction; argument: invalid; equivalence: jointly
-satisfiable. `tables` are the already-computed answer tables, each
-with .rows (boolean cells) and .opspot (main-operator column index) */
-export function isValidWitnessRow(kind, tables, rowIndex) {
-  if (!Array.isArray(tables) || tables.length === 0 || !Number.isInteger(rowIndex)) return false
-  const isTrueAt = (table) => table?.rows?.[rowIndex]?.[table.opspot] === true
-  const isFalseAt = (table) => table?.rows?.[rowIndex]?.[table.opspot] === false
-  if (kind === 'formula') {
-    return isTrueAt(tables[0])
-  }
-  if (kind === 'argument') {
-    const prems = tables.slice(0, -1)
-    const conc = tables[tables.length - 1]
-    return prems.every(isTrueAt) && isFalseAt(conc)
-  }
-  if (kind === 'equivalence') {
-    return tables.every(isTrueAt)
-  }
-  return false
-}
-
 export function normalizeSavedClassification(kind, savedState) {
   if (Array.isArray(savedState?.mcans)) {
     return savedState.mcans.map((value) => String(value))
@@ -220,15 +196,15 @@ export function formatTruthTableStatements(statements, notation, isArgument = fa
   return displayed.join(', ')
 }
 
-export function deriveTruthTableSolutionClassification(kind, solution, statements, Formula, notation) {
+// derives solution labels from saved answers or shared semantics and returns no labels on failure
+export function deriveTruthTableSolutionClassification(kind, solution, statements, notation) {
   if (kind === 'formula') {
     if (solution?.taut) return ['tautology']
     if (solution?.contra) return ['self-contradiction']
     if (solution?.mcans === 1) return ['contingent']
     if (statements.length === 0) return []
     try {
-      const wff = Formula.from(statements[0])
-      const { taut, contra } = formulaTable(wff, notation)
+      const { taut, contra } = computeTruthTableAnswer({ truthTable: { kind, statements } }, { notation })
       if (taut) return ['tautology']
       if (contra) return ['self-contradiction']
       return ['contingent']
@@ -242,9 +218,7 @@ export function deriveTruthTableSolutionClassification(kind, solution, statement
     if (solution?.valid === false) return ['invalid']
     if (statements.length < 2) return []
     try {
-      const leftWffs = statements.slice(0, -1).map((statement) => Formula.from(statement))
-      const rightWff = Formula.from(statements[statements.length - 1])
-      const { valid } = argumentTables(leftWffs, rightWff, notation)
+      const { valid } = computeTruthTableAnswer({ truthTable: { kind, statements } }, { notation })
       return valid ? ['valid'] : ['invalid']
     } catch {
       return []
@@ -254,8 +228,7 @@ export function deriveTruthTableSolutionClassification(kind, solution, statement
   if (kind === 'equivalence') {
     if (statements.length < 2) return []
     try {
-      const wffs = statements.map((statement) => Formula.from(statement))
-      const { equiv, tables } = equivTablesMany(wffs, notation)
+      const { equiv, tables } = computeTruthTableAnswer({ truthTable: { kind, statements } }, { notation })
       const toBool = (value) => value === true || value === 'T'
       let consistent = false
       for (let rowIndex = 0; rowIndex < tables[0].rows.length; rowIndex += 1) {
@@ -393,11 +366,17 @@ export function buildDisplaySolutionTables(solution, fallbackTables = [], defaul
   return hasCompatibleShape ? candidateTablesWithSplitSupport : normalizedFallbackTables
 }
 
-// submits any table state and returns grading feedback with api failures passed to the caller
+/*
+submits table data to the api or the shared checker for local practice
+returns the same status and component percentage in either mode
+question and options supply the semantic answer and grading policy
+parser and api failures pass to the caller
+*/
 export async function submitTruthTableAnswer({
   assignmentQuestionId,
   submissionData,
-  localIsCorrect,
+  question,
+  options = {},
 }) {
   if (shouldUseApiValidation(assignmentQuestionId)) {
     const { response, validation, successstatus, rawScore } = await submitApiValidation({
@@ -418,13 +397,18 @@ export async function submitTruthTableAnswer({
     }
   }
 
+  const kind = question.truthTable?.kind || question.truth_table?.kind || 'formula'
+  const answer = computeTruthTableAnswer(question, options)
+  const partialCredit = Boolean(options.partialcredit ?? options.partialCredit ?? options.partial_credit)
+  const result = await checkers[`${kind}-truth-table`](question, answer, submissionData, partialCredit, 100, true, options)
+  const score = componentScorePercent(result.componentScores, result.componentWeights) ?? result.points
   return {
     mode: 'local',
     response: null,
-    score: null,
-    isCorrect: localIsCorrect,
-    nextStatus: localIsCorrect ? 'correct' : 'incorrect',
-    message: localIsCorrect ? 'Correct!' : 'Incorrect.',
+    score,
+    isCorrect: result.successstatus === 'correct',
+    nextStatus: result.successstatus,
+    message: result.successstatus === 'correct' ? 'Correct!' : result.successstatus === 'partial' ? 'Partially correct.' : 'Incorrect.',
   }
 }
 

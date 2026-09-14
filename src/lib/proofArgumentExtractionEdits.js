@@ -2,7 +2,7 @@
 // insertions shift references at and after the changed line
 // removals clear citations covering the removed line and shift later references
 // invalid changes leave a normalized copy unchanged
-import { justParse } from '../components/ui/logicpenguin/justification-parse.js'
+import { justParse } from '@logic-app/logic-engine/justification-parse.js'
 
 function formatJustification({ nums, ranges, citedrules }, rulesFirst) {
   const references = [

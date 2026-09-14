@@ -1,6 +1,6 @@
 import { Box } from '@mui/material'
 import { alpha } from '@mui/material/styles'
-import { getInsertSymbolLabel } from '../../ui/logicpenguin/LogicSymbol.jsx'
+import { getInsertSymbolLabel } from '../../ui/logic-engine/LogicSymbol.jsx'
 import { DERIVATION_LINE_FONT_SIZE } from './derivationTableConfig.js'
 
 export default function DerivationFormulaText({ text = '', id, onInsert, sx }) {
