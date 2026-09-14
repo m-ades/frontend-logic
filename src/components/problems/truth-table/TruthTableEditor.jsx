@@ -11,7 +11,7 @@ import {
   formulaTable,
   multiTables,
 } from '@logic-app/logic-engine/symbolic/libsemantics.js'
-import { fullTableMatch } from '@logic-app/logic-engine/checkers/truth-tables.js'
+import { fullTableMatch, allTrueAtRow } from '@logic-app/logic-engine/checkers/truth-tables.js'
 import ProblemSetButtons from '../mui/frame/ProblemSetButtons.jsx'
 import InstructorQuestionEditor from '../InstructorQuestionEditor.jsx'
 import ProblemFrame from '../mui/frame/ProblemFrame.jsx'
@@ -333,7 +333,30 @@ function TruthTableEditorContent({
 
   const useCombinedTable = tables.length > 1
   const hasTruthTable = tables.length > 0 && expectedTables.length === tables.length
-  const witnessRowComplete = !witnessRowHighlight || witnessRow != null
+  // false when no row could witness a contradiction, valid argument, or inconsistent set
+  const hasWitnessRow = React.useMemo(() => {
+    if (!witnessRowHighlight) return true
+    if (kind === 'formula') {
+      const table = tables[0]
+      if (!table) return true
+      return table.rows.some((row) => row[table.opspot] === true)
+    }
+    if (kind === 'argument') {
+      if (tables.length < 2) return true
+      const prems = tables.slice(0, -1)
+      const conc = tables[tables.length - 1]
+      for (let i = 0; i < conc.rows.length; i += 1) {
+        if (allTrueAtRow(prems, i) && conc.rows[i]?.[conc.opspot] === false) return true
+      }
+      return false
+    }
+    if (tables.length === 0) return true
+    for (let i = 0; i < tables[0].rows.length; i += 1) {
+      if (allTrueAtRow(tables, i)) return true
+    }
+    return false
+  }, [kind, tables, witnessRowHighlight])
+  const witnessRowComplete = !witnessRowHighlight || witnessRow != null || !hasWitnessRow
   const mainOperatorComplete = !mainOperatorHighlight || mainOperatorColumn != null
   const classificationComplete = !classificationEnabled || classificationOptions.length === 0 || mcSelection.length > 0
   const tableFilledOnly =
@@ -357,10 +380,10 @@ function TruthTableEditorContent({
     [kind, notation, proof?.solution, statements]
   )
   const witnessRowPrompt = kind === 'argument'
-    ? 'Double click the row number that shows this argument is invalid.'
+    ? 'Double click the row number that shows this argument is invalid if there is one.'
     : kind === 'equivalence'
-      ? 'Double click the row number that shows this set of sentences is jointly satisfiable.'
-      : 'Double click the row number that shows this sentence is not a contradiction.'
+      ? 'Double click the row number that shows this set of sentences is jointly satisfiable if there is one.'
+      : 'Double click the row number that shows this sentence is not a contradiction if there is one.'
 
   const incompleteSelectionWarning = React.useMemo(() => {
     const missing = []
