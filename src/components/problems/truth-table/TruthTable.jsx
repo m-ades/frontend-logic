@@ -19,6 +19,7 @@ import {
   buildDisplaySolutionTables,
   buildTruthTableStatePayload,
   buildTruthTableSubmissionData,
+  deriveTruthTableLetterColumns,
   deriveTruthTableSolutionClassification,
   formatTruthTableStatements,
   isAtomicTruthTableToken,
@@ -136,6 +137,10 @@ export default function TruthTable({
   const isAtomicToken = React.useCallback(
     (token) => isAtomicTruthTableToken(token, operatorSet, syntax),
     [operatorSet, syntax]
+  )
+  const { letters: letterColumns, letterRows } = React.useMemo(
+    () => deriveTruthTableLetterColumns(tables, operatorSet, syntax),
+    [operatorSet, syntax, tables]
   )
   const statementText = statements.length > 0 && notation === 'calgary'
     ? formatTruthTableStatements(statements, notation, kind === 'argument')
@@ -431,6 +436,8 @@ export default function TruthTable({
             onToggleRow={toggleRow}
             isCellReadOnly={isPrefilledCell}
             showLabels={!statementText}
+            letterColumns={letterColumns}
+            letterRows={letterRows}
           />
           <TruthTableFeedback
             state={tableFilledOnly ? (tableCorrect ? 'complete' : 'incorrect') : 'incomplete'}
@@ -453,6 +460,8 @@ export default function TruthTable({
                 readOnly
                 showHurleySeparators={showHurleySeparators}
                 withSelectors={false}
+                letterColumns={letterColumns}
+                letterRows={letterRows}
               />
             </TruthTableSection>
             {classificationEnabled && solutionMcValues.length > 0 && (

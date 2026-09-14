@@ -185,6 +185,39 @@ export function isAtomicTruthTableToken(token, operatorSet, syntax) {
   return stripped.length === 1 && !operatorSet.has(stripped)
 }
 
+/* derives the deduplicated sentence-letter columns shown to the left of a
+truth table's own formula columns. values come straight from the already
+computed rows, so this is purely a display of facts the table already knows. */
+export function deriveTruthTableLetterColumns(tables, operatorSet, syntax) {
+  if (!Array.isArray(tables) || tables.length === 0) return { letters: [], letterRows: [] }
+
+  const seen = new Map()
+  tables.forEach((table, tableIndex) => {
+    const tokens = table?.tokens ?? []
+    const headerTokens = table?.headerTokens?.length ? table.headerTokens : tokens
+    tokens.forEach((token, colIndex) => {
+      if (!seen.has(token) && isAtomicTruthTableToken(token, operatorSet, syntax)) {
+        const rawLabel = headerTokens[colIndex] ?? token
+        const label = rawLabel.replace(/[()[\]{}]/g, '')
+        seen.set(token, { tableIndex, colIndex, label })
+      }
+    })
+  })
+
+  const entries = [...seen.values()]
+  if (entries.length === 0) return { letters: [], letterRows: [] }
+
+  const rowCount = tables.reduce((max, table) => Math.max(max, table?.rows?.length ?? 0), 0)
+  const letterRows = Array.from({ length: rowCount }, (_, rowIndex) => (
+    entries.map(({ tableIndex, colIndex }) => tables[tableIndex]?.rows?.[rowIndex]?.[colIndex])
+  ))
+
+  return {
+    letters: entries.map((entry) => entry.label),
+    letterRows,
+  }
+}
+
 // formats multiple statements as a single line for display above a truth table
 export function formatTruthTableStatements(statements, notation, isArgument = false) {
   if (!Array.isArray(statements) || statements.length === 0) return ''
