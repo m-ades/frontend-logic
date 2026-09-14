@@ -246,10 +246,7 @@ export default function TruthTableGrid({
     return `${tableLabel}row ${rowIndex + 1} token ${token}`
   }
 
-  /* the sentence-letter columns are always given: no selectors, no
-  highlighting of their own, just a read-only recap of values the table
-  already knows. a divider border is added to the first real formula
-  column to set them apart, the same way separate statements are set apart. */
+  // sentence-letter columns are read-only recaps of table values; they share row highlighting and borders, with a divider setting them apart from the first formula column
   const hasLetterColumns = letterColumns.length > 0
   const renderLetterHeaderCells = () => letterColumns.map((label, letterIndex) => (
     <TableCell
@@ -261,7 +258,7 @@ export default function TruthTableGrid({
       {label}
     </TableCell>
   ))
-  const renderLetterCells = (rowIndex, rowMatch) => letterColumns.map((label, letterIndex) => {
+  const renderLetterCells = (rowIndex, rowMatch, isWitnessRowActive) => letterColumns.map((label, letterIndex) => {
     const value = letterRows[rowIndex]?.[letterIndex]
     return (
       <TableCell
@@ -270,6 +267,7 @@ export default function TruthTableGrid({
         align="center"
         data-tt-highlight={withSelectors && allowRowSelection && rowMatch ? 'true' : undefined}
         sx={withSelectors && allowRowSelection && rowMatch ? { ...compactCellSx, ...highlightStyle } : compactCellSx}
+        style={isWitnessRowActive ? witnessRowBorderStyle({ left: letterIndex === 0 }) : undefined}
       >
         <TruthValueButton
           value={value === true ? 'T' : value === false ? 'F' : ''}
@@ -349,7 +347,7 @@ export default function TruthTableGrid({
               const rowMatch = isRowSelected(rowIndex)
               return (
               <TableRow key={`combined-row-${rowIndex}`} className="tt-row">
-                {hasLetterColumns && renderLetterCells(rowIndex, rowMatch)}
+                {hasLetterColumns && renderLetterCells(rowIndex, rowMatch, isWitnessRowActive)}
                 {tables.map((table, tableIndex) => {
                   const isConclusion = showHurleySeparators && tableIndex === tables.length - 1 && tables.length > 1
                   const row = table.rows[rowIndex] ?? []
@@ -367,7 +365,7 @@ export default function TruthTableGrid({
                       {headerTokens.map((_, colIndex) => {
                         const colMatch = selectedColumns.some((col) => col.tableIndex === tableIndex && col.colIndex === colIndex)
                         const isMainOp = isMainOperatorColumn(tableIndex, colIndex)
-                        const isFirstCellInRow = tableIndex === 0 && colIndex === 0
+                        const isFirstCellInRow = !hasLetterColumns && tableIndex === 0 && colIndex === 0
                         const isLastCellInRow = tableIndex === tables.length - 1 && colIndex === headerTokens.length - 1
                         const cellValue = tableInputs[tableIndex]?.[rowIndex]?.[colIndex]
                         const cellReadOnly = readOnly || Boolean(isCellReadOnly?.({
@@ -496,11 +494,11 @@ export default function TruthTableGrid({
                   const rowMatch = isRowSelected(rowIndex)
                   return (
                   <TableRow key={`row-${tableIndex}-${rowIndex}`} className="tt-row">
-                    {hasLetterColumns && tableIndex === 0 && renderLetterCells(rowIndex, rowMatch)}
+                    {hasLetterColumns && tableIndex === 0 && renderLetterCells(rowIndex, rowMatch, isWitnessRowActive)}
                     {row.map((_, colIndex) => {
                       const colMatch = selectedColumns.some((col) => col.tableIndex === tableIndex && col.colIndex === colIndex)
                       const isMainOp = isMainOperatorColumn(tableIndex, colIndex)
-                      const isFirstCellInRow = colIndex === 0
+                      const isFirstCellInRow = !hasLetterColumns && colIndex === 0
                       const isLastCellInRow = colIndex === row.length - 1
                       const cellValue = tableInputs[tableIndex]?.[rowIndex]?.[colIndex]
                       const cellReadOnly = readOnly || Boolean(isCellReadOnly?.({
