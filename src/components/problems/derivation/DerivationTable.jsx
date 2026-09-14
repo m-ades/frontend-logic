@@ -423,6 +423,7 @@ export default function DerivationTable({
     autoCheckState,
     clearLineGateNotice,
     lineGateNotice,
+    runAutoCheck,
     setAutoCheckEnabled,
     setAutoCheckState,
     setLineGateErrorNotice,
