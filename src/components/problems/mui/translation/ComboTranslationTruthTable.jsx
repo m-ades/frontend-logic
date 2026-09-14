@@ -4,15 +4,15 @@ import EditIcon from '@mui/icons-material/Edit'
 import InstructorQuestionEditor from '../../InstructorQuestionEditor.jsx'
 import StatusBanner, { isTerminalStatus } from '../../../ui/StatusBanner.jsx'
 import { useTheme, useMediaQuery } from '@mui/material'
-import getSyntax from '../../../../lib/logicpenguin/symbolic/libsyntax.js'
+import getSyntax from '@logic-app/logic-engine/symbolic/libsyntax.js'
 import { DEFAULT_QUESTION_CARD_MIN_HEIGHT } from '../frame/ProblemFrame.jsx'
 import ProblemSetButtons from '../frame/ProblemSetButtons.jsx'
-import FormulaInput from '../../../ui/logicpenguin/formula-input.js'
-import SymbolButtonRow from '../../../ui/logicpenguin/SymbolButtonRow.jsx'
+import FormulaInput from '../../../ui/logic-engine/formula-input.js'
+import SymbolButtonRow from '../../../ui/logic-engine/SymbolButtonRow.jsx'
 import { MobileLogicInput } from '../../../ui/LogicKeyboard/index.js'
 import TruthTableEditor from '../../truth-table/TruthTableEditor.jsx'
 import { buildTruthTableSubmissionData } from '../../truth-table/truthTableUi.js'
-import getFormulaClass from '../../../../lib/logicpenguin/symbolic/formula.js'
+import getFormulaClass from '@logic-app/logic-engine/symbolic/formula.js'
 import { useProblemChecker } from '../../../../hooks/useProblemChecker.js'
 import PromptText from '../../../ui/PromptText.jsx'
 import { getNotation, getSymbols } from '../../../../lib/logicSystems.js'
@@ -275,8 +275,8 @@ export default function ComboTranslationTruthTable({
 
   return (
     <Stack spacing={3} sx={{ px: 0, width: '100%' }}>
-      <Box className="logicpenguin" sx={{ width: '100%' }}>
-        <Box className="lp-problem-card" sx={{ minHeight: DEFAULT_QUESTION_CARD_MIN_HEIGHT }}>
+      <Box className="logic-engine" sx={{ width: '100%' }}>
+        <Box className="logic-problem-card" sx={{ minHeight: DEFAULT_QUESTION_CARD_MIN_HEIGHT }}>
           <Stack spacing={3} sx={{ p: { xs: 2, md: 2 } }}>
             {isInstructorView && proof && (
               <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
@@ -355,8 +355,8 @@ export default function ComboTranslationTruthTable({
       )}
 
       {showSolution && answerProof && (
-        <Box className="logicpenguin" sx={{ width: '100%' }}>
-          <Box className="lp-problem-card" sx={{ borderColor: 'primary.main', borderWidth: 1, borderStyle: 'solid' }}>
+        <Box className="logic-engine" sx={{ width: '100%' }}>
+          <Box className="logic-problem-card" sx={{ borderColor: 'primary.main', borderWidth: 1, borderStyle: 'solid' }}>
             <Stack spacing={2} sx={{ p: 2 }}>
               <Typography variant="h6" component="h2" sx={{ fontWeight: 600, color: 'primary.main' }}>
                 Correct Answer

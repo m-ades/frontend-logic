@@ -2,16 +2,7 @@
 // Public License along with this program. If not, see
 // https://www.gnu.org/licenses/.
 
-/////////////////// common.js //////////////////////////////////////////
-// Some functions that are used all over the place in logic penguin   //
-////////////////////////////////////////////////////////////////////////
-
-
-// Common functions
-
-const localcheckers = {};
-// Pre-declare all checker modules so Vite can statically analyze imports
-const checkerImports = import.meta.glob('./checkers/**/*.js');
+import { checkers as localcheckers } from '@logic-app/logic-engine/checkers.js';
 
 // determine URL
 export const url = new URL(import.meta.url).origin;
@@ -170,38 +161,19 @@ export async function localCheck(prob) {
         ?? question.options?.partial_credit
         ?? false
     );
-    // load checker if need be
     if (!localcheckers[problemtype]) {
-        try {
-            const importer = checkerImports[`./checkers/${problemtype}.js`];
-            if (importer) {
-                const imported = await importer();
-                localcheckers[problemtype] = imported.default;
-            } else {
-                throw new Error('Unknown checker: ' + problemtype);
-            }
-        } catch(err) {
-            // report error if cannot be loaded
-            prob.setIndicator({
-                savestatus: 'malfunction',
-                successStatus: 'malfunction',
-                points: -1,
-                message: 'Error when loading script ' +
-                    'needed to check this answer. Check your internet '
-                    + 'connection and reload. If the problem persists, '
-                    + 'inform your instructor. (ERR: ' + err.toString() +
-                    ')'
-            });
-            return false;
-        }
+        prob.setIndicator({
+            savestatus: 'malfunction',
+            successstatus: 'malfunction',
+            score: 0,
+            message: 'Unsupported problem type.',
+        });
+        return false;
     }
-    // apply the checker to the problem
     const checkStatus = await localcheckers[problemtype](question, rightans,
-        givenans, partialcredit, -1, true, checkerOptions);
-    // local checks never confer points
-    checkStatus.points = -1;
+        givenans, partialcredit, true, checkerOptions);
     // saved status based on previous save status
-    checkStatus.savestatus = prob.getIndicatorStatus().savestatus;
+    checkStatus.savestatus = savestatus;
     prob.setIndicator(checkStatus);
     return checkStatus;
 }
@@ -237,7 +209,7 @@ export function processSaveAnswerResponse(err, respobj) {
         target.setIndicator({
             savestatus: 'malfunction',
             sucesstatus: 'malfunction',
-            points: -1,
+            score: 0,
             message: 'Error saving answer: ' + err.toString() +
                 '... Check your internet connection and reload the ' +
                 'page. If the problem persists, contact your ' +

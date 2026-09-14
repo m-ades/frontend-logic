@@ -1,7 +1,7 @@
 import { Box, IconButton, Stack, TableCell, TableRow, Tooltip } from '@mui/material'
 import SubdirectoryArrowRightIcon from '@mui/icons-material/SubdirectoryArrowRight'
-import { getInsertSymbolLabel } from '../../ui/logicpenguin/LogicSymbol.jsx'
-import LogicSymbolKeyRow from '../../ui/logicpenguin/LogicSymbolKeyRow.jsx'
+import { getInsertSymbolLabel } from '../../ui/logic-engine/LogicSymbol.jsx'
+import LogicSymbolKeyRow from '../../ui/logic-engine/LogicSymbolKeyRow.jsx'
 import {
   DERIVATION_NUMBER_CELL_WIDTH_DESKTOP,
   DERIVATION_NUMBER_CELL_WIDTH_MOBILE,

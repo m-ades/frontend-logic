@@ -7,10 +7,11 @@ import { FieldsetChoiceGroup, SubquestionChoiceList } from './ChoiceGroup.jsx'
 import { useProblemChecker } from '../../../../hooks/useProblemChecker.js'
 import SolutionReveal from '../../SolutionReveal.jsx'
 import {
+  getCompositeSubquestions,
   getSingleSelectAnswerIndex,
   hasNonEmptyAnswerIndices,
   isMultiSelectSubquestion,
-} from '../../../../lib/logicpenguin/multiple-choice-utils.js'
+} from '@logic-app/logic-engine/multiple-choice-utils.js'
 
 const isMissingSingleValue = (value) => (
   value === '' || value === null || value === undefined
@@ -47,8 +48,7 @@ export default function MultipleChoice({
   const editorRef = useRef(null)
   const openEdit = () => editorRef.current?.open?.()
   const prompt = problem?.prompt || ''
-  const rawSubquestions = problem?.subquestions
-  const subquestions = Array.isArray(rawSubquestions) ? rawSubquestions : []
+  const subquestions = getCompositeSubquestions(problem)
   const isComposite = subquestions.length > 0
   const isMultiSelect = !isComposite && (
     Array.isArray(answer)
@@ -135,7 +135,7 @@ export default function MultipleChoice({
     } else {
       setSelectedValue(String(savedState.ans))
     }
-  }, [savedState?.ans, savedState?.answers, isComposite, isMultiSelect, rawSubquestions])
+  }, [savedState?.ans, savedState?.answers, isComposite, isMultiSelect, subquestions])
 
   const setUnanswered = () => {
     setStatus('unanswered')

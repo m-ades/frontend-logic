@@ -1,11 +1,11 @@
-import getFormulaClass from '../../../lib/logicpenguin/symbolic/formula.js'
-import getSyntax from '../../../lib/logicpenguin/symbolic/libsyntax.js'
+import getFormulaClass from '@logic-app/logic-engine/symbolic/formula.js'
+import getSyntax from '@logic-app/logic-engine/symbolic/libsyntax.js'
 import { DEFAULT_LOGIC_SYSTEM, getNotation } from '../../../lib/logicSystems.js'
 import { displayIndexedSymbolsForNotation } from '../../../lib/indexedSymbols.js'
 import {
   mapTranslationAnswer,
   parseTranslationAnswer,
-} from '../../../lib/logicpenguin/translation-answer.js'
+} from '@logic-app/logic-engine/translation-answer.js'
 
 export function normalizeFormulaInput(value, logicSystem = DEFAULT_LOGIC_SYSTEM) {
   return getSyntax(getNotation(logicSystem)).inputfix(String(value ?? '')).trim()

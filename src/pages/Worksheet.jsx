@@ -1071,7 +1071,7 @@ function RealWorksheetContent() {
     <Box
       sx={{
         // keep the old baseline and let root scaling work
-        '& .logicpenguin': { fontSize: '1.25rem' },
+        '& .logic-engine': { fontSize: '1.25rem' },
       }}
     >
       <WorksheetTextbookSplit

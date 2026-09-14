@@ -10,7 +10,7 @@ import PartialTruthTable from './truth-table/PartialTruthTable.jsx'
 import NonClassicalTruthTable from './truth-table/NonClassicalTruthTable.jsx'
 import ProofArgumentExtraction from './derivation/ProofArgumentExtraction.jsx'
 
-export default function LogicPenguinProblem({ 
+export default function LogicProblem({ 
   proof, 
   onProofComplete, 
   savedState, 

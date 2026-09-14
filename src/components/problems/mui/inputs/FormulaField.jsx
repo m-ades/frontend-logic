@@ -2,8 +2,8 @@ import { forwardRef, useCallback } from 'react'
 import { TextField, useMediaQuery } from '@mui/material'
 import { useTheme } from '@mui/material/styles'
 import MobileLogicInput from '../../../ui/LogicKeyboard/MobileLogicInput.jsx'
-import FormulaInput from '../../../ui/logicpenguin/formula-input.js'
-import getSyntax from '../../../../lib/logicpenguin/symbolic/libsyntax.js'
+import FormulaInput from '../../../ui/logic-engine/formula-input.js'
+import getSyntax from '@logic-app/logic-engine/symbolic/libsyntax.js'
 import { getNotation } from '../../../../lib/logicSystems.js'
 
 // shared formula field for symbolic inputs

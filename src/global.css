@@ -19,54 +19,54 @@ html, body {
   overflow: auto;
 }
 
-body[data-theme='dark'] .logicpenguin {
-  --lpblack: rgba(255, 255, 255, 0.92);
-  --lpwhite: #0f1116;
-  --lpgray1: #c7c9d1;
-  --lpgray2: #a6abba;
-  --lpgray3: #8a909b;
-  --lpgray4: #6c7380;
-  --lpgray5: #474c59;
-  --lpgray6: #2e3340;
-  --lpred: #ff8a8a;
-  --lpgreen: #7cd992;
-  --lpyellow: #f0c27a;
-  --lpblue: #9db0ff;
-  --lpmagenta: #d18cff;
-  --lpcyan: #74d4e6;
-  --lpbggreen: rgba(124, 217, 146, 0.16);
-  --lpbgred: rgba(255, 138, 138, 0.16);
-  --lpbgyellow: rgba(240, 194, 122, 0.18);
-  --lpbgblue: rgba(157, 176, 255, 0.15);
-  --lpbgmagenta: rgba(209, 140, 255, 0.16);
-  --lpbgcyan: rgba(116, 212, 230, 0.16);
-  --lpbgwhite: #1f222b;
+body[data-theme='dark'] .logic-engine {
+  --logic-black: rgba(255, 255, 255, 0.92);
+  --logic-white: #0f1116;
+  --logic-gray1: #c7c9d1;
+  --logic-gray2: #a6abba;
+  --logic-gray3: #8a909b;
+  --logic-gray4: #6c7380;
+  --logic-gray5: #474c59;
+  --logic-gray6: #2e3340;
+  --logic-red: #ff8a8a;
+  --logic-green: #7cd992;
+  --logic-yellow: #f0c27a;
+  --logic-blue: #9db0ff;
+  --logic-magenta: #d18cff;
+  --logic-cyan: #74d4e6;
+  --logic-bggreen: rgba(124, 217, 146, 0.16);
+  --logic-bgred: rgba(255, 138, 138, 0.16);
+  --logic-bgyellow: rgba(240, 194, 122, 0.18);
+  --logic-bgblue: rgba(157, 176, 255, 0.15);
+  --logic-bgmagenta: rgba(209, 140, 255, 0.16);
+  --logic-bgcyan: rgba(116, 212, 230, 0.16);
+  --logic-bgwhite: #1f222b;
 }
 
-body[data-theme='dark'] .logicpenguin .lp-problem-card,
-body[data-theme='dark'] .logicpenguin .derivationcore,
-body[data-theme='dark'] .logicpenguin .tt-table {
+body[data-theme='dark'] .logic-engine .logic-problem-card,
+body[data-theme='dark'] .logic-engine .derivationcore,
+body[data-theme='dark'] .logic-engine .tt-table {
   background-color: #1f222b !important;
   border-color: #343a46 !important;
 }
 
-body[data-theme='dark'] .logicpenguin .tt-head {
+body[data-theme='dark'] .logic-engine .tt-head {
   background: #272b36;
 }
 
-body[data-theme='dark'] .logicpenguin .tt-group-row th {
+body[data-theme='dark'] .logic-engine .tt-group-row th {
   background: #2d3342;
 }
 
-body[data-theme='dark'] .logicpenguin .tt-token-row th {
+body[data-theme='dark'] .logic-engine .tt-token-row th {
   background: #232734;
 }
 
-body[data-theme='dark'] .logicpenguin .tt-row:nth-child(even) {
+body[data-theme='dark'] .logic-engine .tt-row:nth-child(even) {
   background: #1c202a;
 }
 
-body[data-theme='dark'] .logicpenguin .tt-row-ok {
+body[data-theme='dark'] .logic-engine .tt-row-ok {
   background: #203226;
 }
 

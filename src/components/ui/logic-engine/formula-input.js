@@ -7,8 +7,8 @@
 // to the window                                                         //
 ///////////////////////////////////////////////////////////////////////////
 
-import getSyntax from '../../../lib/logicpenguin/symbolic/libsyntax.js';
-import { addelem, htmlEscape } from '../../../lib/logicpenguin/common.js';
+import getSyntax from '@logic-app/logic-engine/symbolic/libsyntax.js';
+import { addelem, htmlEscape } from '../../../lib/logic-engine/common.js';
 import { displayIndexedSymbolsForNotation } from '../../../lib/indexedSymbols.js';
 
 export default class FormulaInput {
@@ -533,7 +533,7 @@ function makeSymbolWidget() {
         const symbolwidget = document.createElement("div");
         window.symbolwidget = symbolwidget;
         symbolwidget.classList.add("symbolinsertwidget",
-            "symbolic", "logicpenguin");
+            "symbolic", "logic-engine");
         symbolwidget.syntax = getSyntax();
         symbolwidget.symbols = symbolwidget.syntax.symbols;
         const symbols = symbolwidget.symbols;

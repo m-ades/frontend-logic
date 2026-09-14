@@ -18,7 +18,7 @@ import {
   Typography,
 } from "@mui/material";
 import { Visibility, VisibilityOff, Logout as LogoutIcon } from "@mui/icons-material";
-import { useAuthState } from "../../context/AuthContext.jsx";
+import { logout, useAuthDispatch, useAuthState } from "../../context/AuthContext.jsx";
 import { fetchJson } from "../../utils/api.js";
 import {
   PASSWORD_POLICY,
@@ -112,6 +112,7 @@ export default function AccountSettingsDialog({
   onTextSizeChange,
 }) {
   const { user } = useAuthState();
+  const authDispatch = useAuthDispatch();
   const [mobileKeyboardEnabled, setMobileKeyboardEnabled] = useState(
     () => !getDesktopKeyboardOnMobile()
   );

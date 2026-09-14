@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { fullTableMatch } from '../src/lib/logicpenguin/checkers/truth-tables.js'
+import { fullTableMatch } from '@logic-app/logic-engine/checkers/truth-tables.js'
 
 test('matches boolean numeric and letter truth values in either table', () => {
   const trueValues = [true, 1, '1', 'T', 't']

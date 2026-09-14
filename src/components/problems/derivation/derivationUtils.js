@@ -1,7 +1,7 @@
 import { alpha } from '@mui/material/styles'
 import { formatDerivationRuleName } from '../../../lib/derivationRules.js'
-import getFormulaClass from '../../../lib/logicpenguin/symbolic/formula.js'
-import { justParse } from '../../ui/logicpenguin/justification-parse.js'
+import getFormulaClass from '@logic-app/logic-engine/symbolic/formula.js'
+import { justParse } from '@logic-app/logic-engine/justification-parse.js'
 import {
   getIndexedLowerSymbols,
   getIndexedUpperSymbols,
@@ -398,20 +398,20 @@ export const buildErrorRows = (errors, linesSnapshot = [], { skipCompletion = fa
   return rows
 }
 
-const lineFromLP = (line) => ({
+const lineFromSavedProof = (line) => ({
   formula: line?.s ?? '',
   justification: line?.j ?? '',
   readOnly: false,
 })
 
-// flatten saved lp nesting for the table
-const flattenLPParts = (parts = []) => {
+// flatten saved proof nesting for the table
+const flattenProofParts = (parts = []) => {
   const lines = []
   for (const part of parts) {
     if (Array.isArray(part?.parts)) {
-      lines.push(...flattenLPParts(part.parts))
+      lines.push(...flattenProofParts(part.parts))
     } else {
-      lines.push(lineFromLP(part))
+      lines.push(lineFromSavedProof(part))
     }
   }
   return lines
@@ -425,7 +425,7 @@ export const extractLines = (savedState, premises = []) => {
   const first = Array.isArray(ans?.parts) ? ans.parts[0] : null
   if (!first) return []
   const parts = Array.isArray(first.parts) ? first.parts : []
-  const lines = flattenLPParts(parts)
+  const lines = flattenProofParts(parts)
   const savedPremiseCount = Array.isArray(ans?.prems) ? ans.prems.length : premises.length
   if (premises.length || savedPremiseCount) {
     const premLines = premises.map((premise) => ({ formula: premise, justification: '', readOnly: true }))
@@ -441,7 +441,7 @@ export const extractLines = (savedState, premises = []) => {
   return lines
 }
 
-// rebuild lp nesting from cited ranges
+// rebuild proof nesting from cited ranges
 const buildNestedSubderivationParts = (numbered, assumptionRules = ASSUMPTION_RULES) => {
   const byLineNumber = new Map(numbered.map((part) => [Number(part.n), part]))
   const rangesByStart = new Map()

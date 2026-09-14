@@ -1,8 +1,8 @@
 import { Box, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material'
 import PromptText from '../PromptText.jsx'
 import { SubquestionChoiceList, FieldsetChoiceGroup } from '../../problems/mui/choice/ChoiceGroup.jsx'
-import getFormulaClass from '../../../lib/logicpenguin/symbolic/formula.js'
-import { multiTables } from '../../../lib/logicpenguin/symbolic/libsemantics.js'
+import getFormulaClass from '@logic-app/logic-engine/symbolic/formula.js'
+import { multiTables } from '@logic-app/logic-engine/symbolic/libsemantics.js'
 import { getNotation } from '../../../lib/logicSystems.js'
 
 /*

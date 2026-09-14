@@ -56,6 +56,7 @@ export default function useDerivationAutoCheck({
         })
   ), [activeAssumptionRules, usesFixedScopeNesting, usesNestedSubderivations])
 
+  // checks a snapshot without changing state and returns line feedback or rejects on checker failure
   const runCheck = useCallback(async (linesSnapshot) => {
     const submission = buildSubmission(
       linesSnapshot,
@@ -72,7 +73,6 @@ export default function useDerivationAutoCheck({
     const result = await checkDerivation(
       { prems: premises, conc: proof?.conclusion, ruleset: proof?.ruleset },
       submission.ans,
-      -1,
       { ...(proof?.options || {}), notation }
     )
     const normalizedConclusion = normalizeFormula(proof?.conclusion || '')
@@ -339,6 +339,7 @@ export default function useDerivationAutoCheck({
     autoCheckState: state,
     clearLineGateNotice: clearNotice,
     lineGateNotice: notice,
+    runAutoCheck: runCheck,
     setAutoCheckEnabled: setEnabled,
     setAutoCheckState: setState,
     setLineGateErrorNotice: showError,

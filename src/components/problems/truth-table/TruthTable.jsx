@@ -1,15 +1,16 @@
+import { getTruthTableStatements } from '@logic-app/logic-engine/truthTableAnswer.js'
 import * as React from 'react'
 import {
   Box,
   Stack,
   Typography,
 } from '@mui/material'
-import getFormulaClass from '../../../lib/logicpenguin/symbolic/formula.js'
-import getSyntax from '../../../lib/logicpenguin/symbolic/libsyntax.js'
+import getFormulaClass from '@logic-app/logic-engine/symbolic/formula.js'
+import getSyntax from '@logic-app/logic-engine/symbolic/libsyntax.js'
 import {
   multiTables,
-} from '../../../lib/logicpenguin/symbolic/libsemantics.js'
-import { fullTableMatch } from '../../../lib/logicpenguin/checkers/truth-tables.js'
+} from '@logic-app/logic-engine/symbolic/libsemantics.js'
+import { fullTableMatch } from '@logic-app/logic-engine/checkers/truth-tables.js'
 import ProblemSetButtons from '../mui/frame/ProblemSetButtons.jsx'
 import ProblemFrame from '../mui/frame/ProblemFrame.jsx'
 import TruthTableGrid from './TruthTableGrid.jsx'
@@ -27,7 +28,6 @@ import {
 } from './truthTableUi.js'
 import {
   getTruthTableClassification,
-  truthTableClassificationsMatch,
 } from './truthTableClassification.js'
 import PromptText from '../../ui/PromptText.jsx'
 import { tablesEqual, clearDebounce, scheduleDebouncedChange } from '../../../utils/tablePerf.js'
@@ -106,21 +106,10 @@ export default function TruthTable({
     )
   }, [proof?.options?.question, tableConfig?.options?.question])
   const operatorSet = React.useMemo(() => new Set(Object.keys(syntax.operators)), [syntax])
-  const statements = React.useMemo(() => {
-    if (Array.isArray(tableConfig.statements) && tableConfig.statements.length > 0) {
-      return tableConfig.statements
-    }
-    if (Array.isArray(tableConfig.formulas) && tableConfig.formulas.length > 0) {
-      return tableConfig.formulas
-    }
-    if (kind === 'argument' && tableConfig.lefts && tableConfig.right) {
-      return [...tableConfig.lefts, tableConfig.right]
-    }
-    if (tableConfig.statement || tableConfig.formula) {
-      return [tableConfig.statement ?? tableConfig.formula]
-    }
-    return []
-  }, [kind, tableConfig])
+  const statements = React.useMemo(
+    () => getTruthTableStatements({ truthTable: { ...tableConfig, kind } }),
+    [kind, tableConfig]
+  )
   const classification = React.useMemo(
     () => getTruthTableClassification(kind, statements.length),
     [kind, statements.length]
@@ -307,10 +296,9 @@ export default function TruthTable({
     tableChecks.length > 0 &&
     tableChecks.every((res) => res.rowdiff === 0 && res.offcells.length === 0)
   const solutionMcValues = React.useMemo(
-    () => deriveTruthTableSolutionClassification(kind, proof?.solution, statements, Formula, notation),
-    [Formula, kind, notation, proof?.solution, statements]
+    () => deriveTruthTableSolutionClassification(kind, proof?.solution, statements, notation),
+    [kind, notation, proof?.solution, statements]
   )
-  const classificationCorrect = !classificationEnabled || truthTableClassificationsMatch(mcSelection, solutionMcValues)
   if (!hasTruthTable) {
     return (
       <Stack spacing={2} sx={{ px: 0, width: '100%' }}>
@@ -328,7 +316,8 @@ export default function TruthTable({
       const result = await submitTruthTableAnswer({
         assignmentQuestionId,
         submissionData: buildTruthTableSubmissionData(kind, tableInputs, mcSelection, classificationEnabled),
-        localIsCorrect: tableCorrect && classificationCorrect,
+        question: { truthTable: { kind, statements } },
+        options: { ...proof?.options, ...tableConfig?.options, notation, question: classificationEnabled },
       })
       if (result.mode === 'remote') {
         const resp = result.response
@@ -355,7 +344,7 @@ export default function TruthTable({
           setStatus('partial')
           setMessage(result.message)
         } else {
-          setStatus('incorrect')
+          setStatus(result.nextStatus)
           setMessage(result.message)
         }
       } else {
@@ -365,7 +354,7 @@ export default function TruthTable({
           setMessage(result.message)
           onProofComplete?.(proof.id)
         } else {
-          setStatus('incorrect')
+          setStatus(result.nextStatus)
           setMessage(result.message)
         }
       }

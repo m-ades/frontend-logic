@@ -3,19 +3,19 @@
 
 /* mobile */
 @media (max-width: 900px) {
-    .logicpenguin derivation-hurley {
+    .logic-engine derivation-hurley {
         width: 100% !important;
         max-width: 100% !important;
         overflow-x: hidden !important;
     }
     
-    .logicpenguin derivation-hurley .derivationline {
+    .logic-engine derivation-hurley .derivationline {
         width: 100% !important;
         max-width: 100% !important;
         align-items: center !important;
     }
     
-    .logicpenguin derivation-hurley .derivationline input.formulainput {
+    .logic-engine derivation-hurley .derivationline input.formulainput {
         font-size: 1.09375rem !important;
         min-width: 0 !important;
         padding: 0 !important;
@@ -25,7 +25,7 @@
         vertical-align: top !important;
     }
     
-    .logicpenguin derivation-hurley .derivationline input.justification {
+    .logic-engine derivation-hurley .derivationline input.justification {
         font-size: 1.09375rem !important;
         width: 3.5em !important;
         min-width: 3.5em !important;
@@ -37,35 +37,35 @@
         vertical-align: top !important;
     }
     
-    .logicpenguin derivation-hurley .derivationcore {
+    .logic-engine derivation-hurley .derivationcore {
         width: 100% !important;
         max-width: 100% !important;
         font-size: 1.09375rem !important;
     }
 
-    .logicpenguin derivation-hurley .derivationline .derivationlinenumber {
+    .logic-engine derivation-hurley .derivationline .derivationlinenumber {
         font-size: 1.09375rem !important;
     }
     
-    .logicpenguin derivation-hurley .innersubderiv {
+    .logic-engine derivation-hurley .innersubderiv {
         width: 100% !important;
         max-width: 100% !important;
     }
     
-    .logicpenguin derivation-hurley .derivationline .jbwrap {
+    .logic-engine derivation-hurley .derivationline .jbwrap {
         height: 2em !important;
         align-items: center !important;
         display: flex !important;
     }
     
-    .logicpenguin derivation-hurley .derivationline .jbwrap > div {
+    .logic-engine derivation-hurley .derivationline .jbwrap > div {
         height: 2em !important;
         display: flex !important;
         align-items: center !important;
     }
 }
 
-.logicpenguin derivation-hurley .derivationline {
+.logic-engine derivation-hurley .derivationline {
     width: 100%;
     min-width: 0;
     display: flex;
@@ -74,7 +74,7 @@
     max-width: 100%;
 }
 
-.logicpenguin derivation-hurley .derivationline .derivationlinenumber {
+.logic-engine derivation-hurley .derivationline .derivationlinenumber {
     order: 0;
     flex-shrink: 0;
     padding-top: 0;
@@ -83,7 +83,7 @@
     align-items: center;
 }
 
-.logicpenguin derivation-hurley .derivationline input.formulainput {
+.logic-engine derivation-hurley .derivationline input.formulainput {
     flex: 1 1 auto;
     min-width: 0;
     width: 100%;
@@ -91,27 +91,27 @@
     order: 1;
 }
 
-.logicpenguin derivation-hurley .derivationline input.justification {
+.logic-engine derivation-hurley .derivationline input.justification {
     min-width: 8em;
     width: auto;
 }
 
-.logicpenguin derivation-hurley .problemstatusindicator,
-.logicpenguin derivation-hurley .problemsuccessindicator,
-.logicpenguin derivation-hurley .problemsavedindicator,
-.logicpenguin derivation-hurley .problempointsindicator,
-.logicpenguin derivation-hurley .problemindicatormessage {
+.logic-engine derivation-hurley .problemstatusindicator,
+.logic-engine derivation-hurley .problemsuccessindicator,
+.logic-engine derivation-hurley .problemsavedindicator,
+.logic-engine derivation-hurley .problempointsindicator,
+.logic-engine derivation-hurley .problemindicatormessage {
     display: none;
 }
 
-.logicpenguin derivation-hurley .buttondiv,
-.logicpenguin derivation-hurley .derivlinebuttons,
-.logicpenguin derivation-hurley .derivlineactionbutton,
-.logicpenguin derivation-hurley .derivlinecheck {
+.logic-engine derivation-hurley .buttondiv,
+.logic-engine derivation-hurley .derivlinebuttons,
+.logic-engine derivation-hurley .derivlineactionbutton,
+.logic-engine derivation-hurley .derivlinecheck {
     display: none;
 }
 
-.logicpenguin derivation-hurley .derivationline .jbwrap {
+.logic-engine derivation-hurley .derivationline .jbwrap {
     order: 2;
     flex: 1 1 auto;
     min-width: 0;
@@ -121,62 +121,62 @@
     gap: 0.9375rem;
 }
 
-.logicpenguin derivation-hurley .derivationline input.formulainput,
-.logicpenguin derivation-hurley .derivationline input.justification {
+.logic-engine derivation-hurley .derivationline input.formulainput,
+.logic-engine derivation-hurley .derivationline input.justification {
     padding: 0.78125rem 0.9375rem;
     line-height: 1.4;
     height: 3.4375rem;
 }
 
-.logicpenguin derivation-hurley .derivationline.derivationshowline .bottombar {
+.logic-engine derivation-hurley .derivationline.derivationshowline .bottombar {
     display: none !important;
 }
 
-.logicpenguin derivation-hurley .derivationline.derivationshowline .showlineshow {
+.logic-engine derivation-hurley .derivationline.derivationshowline .showlineshow {
     display: inline-block;
-    color: var(--lpmagenta);
+    color: var(--logic-magenta);
     cursor: pointer;
     padding-left: 4px;
 }
 
-.logicpenguin derivation-hurley .derivationline .showlineshow {
+.logic-engine derivation-hurley .derivationline .showlineshow {
     display: inline-block;
     width: 3.5em;
-    color: var(--lpmagenta);
+    color: var(--logic-magenta);
     cursor: pointer;
 }
 
-.logicpenguin derivation-hurley sub-derivation.closed
+.logic-engine derivation-hurley sub-derivation.closed
     > div > .derivationline .showlineshow {
     text-decoration: line-through;
-    text-decoration-color: var(--lpmagenata);
+    text-decoration-color: var(--logic-magenata);
     text-decoration-thickness: 3px;
-    color: var(--lpgray3);
+    color: var(--logic-gray3);
 }
 
-.logicpenguin derivation-hurley .derivationline .showlineshow:hover {
-    background-color: var(--lpbgmagenta);
+.logic-engine derivation-hurley .derivationline .showlineshow:hover {
+    background-color: var(--logic-bgmagenta);
     text-decoration: line-through;
-    text-decoration-color: var(--lpblack);
+    text-decoration-color: var(--logic-black);
     text-decoration-thickness: 3px;
 }
 
-.logicpenguin derivation-hurley sub-derivation.closed > div >
+.logic-engine derivation-hurley sub-derivation.closed > div >
     .derivationline .showlineshow:hover {
-    background-color: var(--lpbgmagenta);
-    color: var(--lpmagenta);
+    background-color: var(--logic-bgmagenta);
+    color: var(--logic-magenta);
     text-decoration: none;
 }
 
 
-.logicpenguin derivation-hurley .derivationline.derivationshowline input.formulainput {
+.logic-engine derivation-hurley .derivationline.derivationshowline input.formulainput {
     flex: 0 1 auto;
     min-width: 15em;
     width: auto;
     max-width: none;
 }
 
-.logicpenguin derivation-hurley .derivationcore {
+.logic-engine derivation-hurley .derivationcore {
     position: relative;
     margin-left: 0;
     display: block;
@@ -191,13 +191,13 @@
     box-shadow: 0 7px 12px -3px rgba(0, 0, 0, 0.08), 0 3px 5px -2px rgba(0, 0, 0, 0.04);
 }
 
-body[data-theme='dark'] .logicpenguin derivation-hurley .derivationcore {
+body[data-theme='dark'] .logic-engine derivation-hurley .derivationcore {
     background-color: #1f222b !important;
     border-color: #343a46 !important;
 }
 
-.logicpenguin derivation-hurley .derivationlinenumber {
-    color: var(--lpblack);
+.logic-engine derivation-hurley .derivationlinenumber {
+    color: var(--logic-black);
     font-family: "IBM Plex Sans", sans-serif;
     font-size: inherit;
     font-weight: inherit;
@@ -207,19 +207,19 @@ body[data-theme='dark'] .logicpenguin derivation-hurley .derivationcore {
     text-align: right;
 }
 
-body[data-theme='dark'] .logicpenguin derivation-hurley .derivationlinenumber {
+body[data-theme='dark'] .logic-engine derivation-hurley .derivationlinenumber {
     color: #fff;
 }
 
-.logicpenguin derivation-hurley .derivationlinenumber::before {
+.logic-engine derivation-hurley .derivationlinenumber::before {
     content: '';
 }
 
-.logicpenguin derivation-hurley .derivationlinenumber::after {
+.logic-engine derivation-hurley .derivationlinenumber::after {
     content: '';
 }
 
-.logicpenguin derivation-hurley .innersubderiv {
+.logic-engine derivation-hurley .innersubderiv {
     border: none;
     margin-left: 0.7em;
     margin-right: 0.1em;
@@ -231,11 +231,11 @@ body[data-theme='dark'] .logicpenguin derivation-hurley .derivationlinenumber {
     max-width: none;
 }
 
-.logicpenguin derivation-hurley sub-derivation.closed > div > .innersubderiv {
+.logic-engine derivation-hurley sub-derivation.closed > div > .innersubderiv {
     border: none;
 }
 
-.logicpenguin derivation-hurley sub-derivation.premiseroot > div >
+.logic-engine derivation-hurley sub-derivation.premiseroot > div >
     .innersubderiv {
     border: none;
     margin-left: 0;
@@ -244,7 +244,7 @@ body[data-theme='dark'] .logicpenguin derivation-hurley .derivationlinenumber {
 }
 
 /* Remove indentation for mainderivation lines (user's proof lines) */
-.logicpenguin derivation-hurley sub-derivation.mainderivation > div >
+.logic-engine derivation-hurley sub-derivation.mainderivation > div >
     .innersubderiv {
     border: none;
     margin-left: 0;
@@ -255,37 +255,37 @@ body[data-theme='dark'] .logicpenguin derivation-hurley .derivationlinenumber {
 }
 
 /* hide the pr justification for premise */
-.logicpenguin derivation-hurley .derivationline.premiseline .jbwrap.premisejwrap {
+.logic-engine derivation-hurley .derivationline.premiseline .jbwrap.premisejwrap {
     display: none !important;
 }
 
 /* display conclusion */
-.logicpenguin derivation-hurley .derivationline.lastpremise .jbwrap {
+.logic-engine derivation-hurley .derivationline.lastpremise .jbwrap {
     display: block !important;
 }
 
-.logicpenguin derivation-hurley .derivationline.lastpremise .jbwrap input.justification {
+.logic-engine derivation-hurley .derivationline.lastpremise .jbwrap input.justification {
     pointer-events: none;
     cursor: default;
     user-select: none;
 }
 
 /* hide the mainderivation showline from appearing as a numbered proof line */
-.logicpenguin sub-derivation.mainderivation div.derivationshowline {
+.logic-engine sub-derivation.mainderivation div.derivationshowline {
     display: none !important;
 }
 
 /* show line check button only for main showline */
-.logicpenguin sub-derivation.mainderivation div.derivationshowline div.derivlinebuttons.invisible {
+.logic-engine sub-derivation.mainderivation div.derivationshowline div.derivlinebuttons.invisible {
     visibility: visible !important;
     cursor: default !important;
 }
 
-.logicpenguin sub-derivation.mainderivation div.derivationshowline div.derivlinebuttons.invisible div.derivlineactionbutton {
+.logic-engine sub-derivation.mainderivation div.derivationshowline div.derivlinebuttons.invisible div.derivlineactionbutton {
     visibility: hidden !important;
 }
 
-.logicpenguin sub-derivation.mainderivation div.derivationshowline div.derivlinebuttons.invisible div.derivlinecheck {
+.logic-engine sub-derivation.mainderivation div.derivationshowline div.derivlinebuttons.invisible div.derivlinecheck {
     visibility: visible !important;
     cursor: default !important;
 }
