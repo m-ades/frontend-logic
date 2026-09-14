@@ -135,7 +135,7 @@ export default function MultipleChoice({
     } else {
       setSelectedValue(String(savedState.ans))
     }
-  }, [savedState?.ans, savedState?.answers, isComposite, isMultiSelect, rawSubquestions])
+  }, [savedState?.ans, savedState?.answers, isComposite, isMultiSelect, subquestions])
 
   const setUnanswered = () => {
     setStatus('unanswered')
