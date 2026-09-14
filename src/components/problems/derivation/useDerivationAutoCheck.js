@@ -72,7 +72,6 @@ export default function useDerivationAutoCheck({
     const result = await checkDerivation(
       { prems: premises, conc: proof?.conclusion, ruleset: proof?.ruleset },
       submission.ans,
-      -1,
       { ...(proof?.options || {}), notation }
     )
     const normalizedConclusion = normalizeFormula(proof?.conclusion || '')

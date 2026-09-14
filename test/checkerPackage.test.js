@@ -1,7 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { localCheck } from '../src/lib/logic-engine/common.js';
-import { componentScorePercent } from '@logic-app/logic-engine/checkers/component-grading.js';
 import { computeTruthTableAnswer } from '@logic-app/logic-engine/truthTableAnswer.js';
 import { mapQuestionToProof } from '../src/lib/mapQuestionToProof.js';
 
@@ -22,8 +21,25 @@ test('local standalone choices accept correct selections with empty composite fi
         setIndicator: () => {},
       });
       assert.equal(result.successstatus, status);
-      assert.equal(componentScorePercent(result.componentScores), status === 'correct' ? 100 : 0);
-      assert.equal(result.points, -1);
+      assert.equal(result.score, status === 'correct' ? 100 : 0);
+      assert.equal(Object.hasOwn(result, 'points'), false);
+    }
+  }
+});
+
+test('local choices still earn one hundred or zero inside a single subquestion', async () => {
+  for (const partialCredit of [true, false]) {
+    for (const [selection, score] of [[1, 100], [0, 0], ['', 0]]) {
+      const result = await localCheck({
+        myquestion: { subquestions: [{ answerIndex: 1 }] },
+        myproblemtype: 'multiple-choice',
+        options: { partialCredit },
+        getAnswer: () => ({ answers: [selection] }),
+        getIndicatorStatus: () => ({ savestatus: 'unsaved' }),
+        setIndicator: () => {},
+      });
+      assert.equal(result.score, score);
+      assert.equal(result.successstatus, score === 100 ? 'correct' : 'incorrect');
     }
   }
 });
@@ -52,12 +68,12 @@ test('local composite choices keep legacy subquestions and partial credit', asyn
         setIndicator: () => {},
       });
       assert.equal(result.successstatus, status);
-      assert.equal(componentScorePercent(result.componentScores), score);
+      assert.equal(result.score, score);
     }
   }
 });
 
-test('local combo feedback retains partial status while hiding awarded points', async () => {
+test('local combo feedback retains partial status and returns its percentage', async () => {
   const result = await localCheck({
     myproblemtype: 'combo-translation-truth-table',
     myquestion: {},
@@ -68,10 +84,10 @@ test('local combo feedback retains partial status while hiding awarded points', 
     setIndicator: () => {},
   });
   assert.equal(result.successstatus, 'partial');
-  assert.equal(result.points, -1);
+  assert.equal(Object.hasOwn(result, 'points'), false);
   assert.deepEqual(result.componentScores, [1, 0]);
   assert.deepEqual(result.componentWeights, [2, 4]);
-  assert.equal(componentScorePercent(result.componentScores, result.componentWeights), 33);
+  assert.equal(result.score, 33);
 });
 
 for (const partialCredit of [true, false]) {
@@ -95,8 +111,8 @@ for (const partialCredit of [true, false]) {
         getIndicatorStatus: () => ({ savestatus: 'unsaved' }),
         setIndicator: () => {},
       });
-      assert.equal(result.points, -1);
-      assert.equal(componentScorePercent(result.componentScores, result.componentWeights),
+      assert.equal(Object.hasOwn(result, 'points'), false);
+      assert.equal(result.score,
         partialCredit || percentage === 100 ? percentage : 0);
     }
   });

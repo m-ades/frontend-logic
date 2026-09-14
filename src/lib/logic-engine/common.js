@@ -165,16 +165,13 @@ export async function localCheck(prob) {
         prob.setIndicator({
             savestatus: 'malfunction',
             successstatus: 'malfunction',
-            points: -1,
+            score: 0,
             message: 'Unsupported problem type.',
         });
         return false;
     }
-    // a positive scale lets checkers determine partial credit before hiding local points
     const checkStatus = await localcheckers[problemtype](question, rightans,
-        givenans, partialcredit, 100, true, checkerOptions);
-    // local checks never confer points
-    checkStatus.points = -1;
+        givenans, partialcredit, true, checkerOptions);
     // saved status based on previous save status
     checkStatus.savestatus = savestatus;
     prob.setIndicator(checkStatus);
@@ -212,7 +209,7 @@ export function processSaveAnswerResponse(err, respobj) {
         target.setIndicator({
             savestatus: 'malfunction',
             sucesstatus: 'malfunction',
-            points: -1,
+            score: 0,
             message: 'Error saving answer: ' + err.toString() +
                 '... Check your internet connection and reload the ' +
                 'page. If the problem persists, contact your ' +

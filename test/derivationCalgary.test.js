@@ -8,7 +8,7 @@ test('fitch allows eliminating the right disjunct and reports extra citations wi
   for (const [justification, expectedStatus] of [['DS 2,3', 'correct'], ['DS 1,2,3', 'incorrect']]) {
     const result = await derivationCalgary(question, null, {
       parts: [...premises, { n: '4', s: 'P', j: justification }],
-    }, false, 1, false, { notation: 'calgary' })
+    }, false, false, { notation: 'calgary' })
 
     assert.equal(result.successstatus, expectedStatus)
     assert.equal(result.errors?.['4']?.rule?.high?.['DS eliminates only the left disjunct'], undefined)

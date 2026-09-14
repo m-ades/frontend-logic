@@ -129,8 +129,8 @@ export default function DerivationTable({
   const activeAssumptionRules = usesNestedSubderivations ? FITCH_ASSUMPTION_RULES : HURLEY_ASSUMPTION_RULES
   const checkDerivation = useMemo(() => {
     const checker = getDerivationCheckerForLogicSystem(activeLogicSystem)
-    return (question, givenans, points, options) =>
-      checker(question, null, givenans, false, points, true, options)
+    return (question, givenans, options) =>
+      checker(question, null, givenans, false, true, options)
   }, [activeLogicSystem])
   const allDerivationRules = getDerivationRules(activeLogicSystem)
   const derivationRuleLookup = getDerivationRuleLookup(activeLogicSystem)
@@ -937,7 +937,6 @@ export default function DerivationTable({
         const validation = await checkDerivation(
           { prems: premises, conc: proof?.conclusion, ruleset: proof?.ruleset },
           submission_data.ans,
-          1,
           { ...(proof?.options || {}), notation }
         )
         const successstatus = validation?.successstatus || 'incorrect'

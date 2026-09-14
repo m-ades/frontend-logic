@@ -7,7 +7,6 @@ Shared truth table helpers for truthtable and truthtableeditor
 import { shouldUseApiValidation, submitApiValidation } from '../../../utils/submissionRuntime.js'
 import { computeTruthTableAnswer } from '@logic-app/logic-engine/truthTableAnswer.js'
 import { checkers } from '@logic-app/logic-engine/checkers.js'
-import { componentScorePercent } from '@logic-app/logic-engine/checkers/component-grading.js'
 import {
   displayIndexedSymbolsForNotation,
   isPropositionalSymbol,
@@ -400,8 +399,8 @@ export async function submitTruthTableAnswer({
   const kind = question.truthTable?.kind || question.truth_table?.kind || 'formula'
   const answer = computeTruthTableAnswer(question, options)
   const partialCredit = Boolean(options.partialcredit ?? options.partialCredit ?? options.partial_credit)
-  const result = await checkers[`${kind}-truth-table`](question, answer, submissionData, partialCredit, 100, true, options)
-  const score = componentScorePercent(result.componentScores, result.componentWeights) ?? result.points
+  const result = await checkers[`${kind}-truth-table`](question, answer, submissionData, partialCredit, true, options)
+  const score = result.score
   return {
     mode: 'local',
     response: null,
