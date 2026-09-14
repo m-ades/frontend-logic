@@ -4,6 +4,7 @@ import { Box, Typography, Alert, LinearProgress, useTheme } from "@mui/material"
 import { useEffect, useMemo, useState } from "react";
 import { TrendingUp, Users, CheckCircle, Calendar } from "lucide-react";
 import { calculateAssignmentAverage } from "../../context/CoursesContext";
+import { excludeNonStudents } from "../../utils/GradebookUtils.js";
 import { MetricCard } from "../../components/ui/MetricCard";
 import { PerformanceTrendsChart } from "../../components/ui/dashboard/PerformanceTrendsChart";
 import { GradeDistributionChart } from "../../components/ui/dashboard/GradeDistributionChart";
@@ -31,7 +32,7 @@ export default function InstructorDashboard() {
   const assignments = sortAssignmentsBySubchapter(assignmentsByCourse[activeCourseId] || []);
   const students = gradebookByCourse[activeCourseId] || [];
   const studentsForStats = useMemo(
-    () => students.filter((s) => s.role !== "ta"),
+    () => excludeNonStudents(students),
     [students]
   );
   const totalStudents = course?.studentCount ?? studentsForStats.length;

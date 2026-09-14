@@ -15,6 +15,7 @@ import { useNavigate } from "react-router-dom";
 import {
   calculateAssignmentAverage,
 } from "../../context/CoursesContext";
+import { excludeNonStudents } from "../../utils/GradebookUtils";
 import AssignmentTable from "../../components/ui/AssignmentTable";
 import AssignmentFormDialog from "../../components/ui/AssignmentFormDialog";
 import AssignmentContextMenu from "../../components/ui/AssignmentContextMenu";
@@ -72,6 +73,7 @@ export default function InstructorAssignments() {
   const activeCourse = courses.find((c) => c.id === activeCourseId);
   const assignments = sortAssignmentsBySubchapter(assignmentsByCourse[activeCourseId] || []);
   const gradebook = gradebookByCourse[activeCourseId] || [];
+  const gradebookStudentsOnly = excludeNonStudents(gradebook);
 
   // Enhance assignments with calculated data
   const enhancedAssignments = enhanceItems(
@@ -80,8 +82,8 @@ export default function InstructorAssignments() {
     gradebook,
     false
   ).map((assignment) => {
-    const average = calculateAssignmentAverage(assignment.id, gradebook);
-    const submissions = gradebook.filter(
+    const average = calculateAssignmentAverage(assignment.id, gradebookStudentsOnly);
+    const submissions = gradebookStudentsOnly.filter(
       (student) => Boolean(student.submittedAssignments?.[assignment.id])
     ).length;
 

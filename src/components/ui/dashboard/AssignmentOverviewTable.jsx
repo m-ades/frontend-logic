@@ -23,6 +23,7 @@ import {
 } from "../../../utils/gradingUtils";
 import { formatEasternDateTime } from "../../../utils/easternTime.js";
 import { useAppRuntime } from "../../../hooks/useAppRuntime.js";
+import { excludeNonStudents } from "../../../utils/GradebookUtils.js";
 
 /**
  * renders assignment analytics and preserves explicit empty summary metrics
@@ -40,7 +41,7 @@ export const AssignmentOverviewTable = ({
 
   const assignments = assignmentsProp ?? (assignmentsByCourse[activeCourseId] || []);
   const gradebook = gradebookByCourse[activeCourseId] || [];
-  const gradebookStudentsOnly = gradebook.filter((s) => s.role !== "ta");
+  const gradebookStudentsOnly = excludeNonStudents(gradebook);
   const totalStudents = activeCourse?.studentCount ?? gradebookStudentsOnly.length;
 
   // Use course's grading scale or default

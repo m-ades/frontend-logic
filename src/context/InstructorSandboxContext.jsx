@@ -12,6 +12,7 @@ import {
   buildPublicationPayload,
   projectPublicationState,
 } from '../utils/publicationPolicy.js'
+import { excludeNonStudents } from '../utils/GradebookUtils.js'
 
 const STORAGE_KEY = 'logicapp_instructor_sandbox_state_v1'
 const InstructorSandboxContext = createContext(null)
@@ -186,7 +187,10 @@ export function InstructorSandboxProvider({ children }) {
 
   const courseState = useMemo(() => {
     const studentCountByCourse = Object.fromEntries(
-      Object.entries(state.gradebookByCourse || {}).map(([courseId, students]) => [courseId, students.length])
+      Object.entries(state.gradebookByCourse || {}).map(([courseId, students]) => [
+        courseId,
+        excludeNonStudents(students).length,
+      ])
     )
 
     const courses = (state.courses || []).map((course) => ({
@@ -205,7 +209,7 @@ export function InstructorSandboxProvider({ children }) {
 
     const practicesByCourse = Object.fromEntries(
       Object.entries(state.practicesByCourse || {}).map(([courseId, practices]) => {
-        const students = state.gradebookByCourse?.[courseId] || []
+        const students = excludeNonStudents(state.gradebookByCourse?.[courseId] || [])
         const enhancedPractices = (practices || []).map((practice) => {
           const attempts = students.reduce(
             (sum, student) => sum + (Number(student.practices?.[practice.id]?.attempts) || 0),
@@ -239,7 +243,7 @@ export function InstructorSandboxProvider({ children }) {
   const gradebookSummaryByCourse = useMemo(() => (
     Object.fromEntries(
       Object.entries(courseState.assignmentsByCourse || {}).map(([courseId, assignments]) => {
-        const students = courseState.gradebookByCourse?.[courseId] || []
+        const students = excludeNonStudents(courseState.gradebookByCourse?.[courseId] || [])
         const summary = (assignments || []).map((assignment) => {
           const grades = students
             .map((student) => student.grades?.[assignment.id])
@@ -261,7 +265,7 @@ export function InstructorSandboxProvider({ children }) {
   const dashboardAnalyticsByCourse = useMemo(() => (
     Object.fromEntries(
       Object.entries(courseState.assignmentsByCourse || {}).map(([courseId, assignments]) => {
-        const students = courseState.gradebookByCourse?.[courseId] || []
+        const students = excludeNonStudents(courseState.gradebookByCourse?.[courseId] || [])
         const assignmentStats = (assignments || []).map((assignment) => {
           const grades = students
             .map((student) => Number(student.grades?.[assignment.id]))

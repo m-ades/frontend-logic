@@ -20,7 +20,7 @@ import {
   isPassingGrade,
   getDefaultGradingScale,
 } from "../../../utils/gradingUtils";
-import { getStudentAverage } from "../../../utils/GradebookUtils";
+import { getStudentAverage, formatStudentDisplayName } from "../../../utils/GradebookUtils";
 import StudentProfileModal from "../StudentProfileModal";
 import StudentSubmissionDialog from "./StudentSubmissionDialog.jsx";
 import { useAppRuntime } from "../../../hooks/useAppRuntime.js";
@@ -240,7 +240,7 @@ export default function GradebookTable({
                       onMouseEnter={() => setHoveredColumn("username")}
                       onMouseLeave={() => setHoveredColumn(null)}
                     >
-                      {student.username}
+                      {formatStudentDisplayName(student)}
                     </TableCell>
 
                     <TableCell
