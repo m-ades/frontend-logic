@@ -6,7 +6,7 @@ import ProblemFrame from '../frame/ProblemFrame.jsx'
 import ProblemSetButtons from '../frame/ProblemSetButtons.jsx'
 import FormulaInput from '../../../ui/logic-engine/formula-input.js'
 import SymbolButtonRow from '../../../ui/logic-engine/SymbolButtonRow.jsx'
-import { MobileLogicInput } from '../../../ui/LogicKeyboard/index.js'
+import { MobileLogicInput, getVariableLettersOnly } from '../../../ui/LogicKeyboard/index.js'
 import { useProblemChecker } from '../../../../hooks/useProblemChecker.js'
 import SolutionReveal from '../../SolutionReveal.jsx'
 import RichText from '../../../ui/RichText.jsx'
@@ -258,6 +258,15 @@ export default function SymbolicTranslation({
             : []))
     : []
   const variableLetters = isPredicate ? ST_PREDICATE_VARIABLES : []
+  const letterInsertButtons = allowIndexedSymbols
+    ? (isPredicate
+        ? [...predicateLetters, ...constantLetters, ...variableLetters]
+        : getVariableLettersOnly(symbolizationKey)
+      ).map((letter) => {
+        const displayLetter = displayIndexedSymbolsForNotation(letter, notation)
+        return { insert: displayLetter, label: displayLetter }
+      })
+    : []
 
   const scheduleStateSave = useCallback((nextValue) => {
     if (!onStateChange) return
@@ -441,13 +450,14 @@ export default function SymbolicTranslation({
               inputRef={formulaInputRef}
               disabled={readOnly}
               includeQuantifiers={isPredicate}
+              showBackspace={false}
               onValueChange={(value) => {
                 if (readOnly) return
                 setInputValue(value)
                 scheduleStateSave(value)
               }}
               logicSystem={logicSystem}
-              extraInsertButtons={separatorButtons}
+              extraInsertButtons={[...letterInsertButtons, ...separatorButtons]}
             />
           </Box>
         </>
