@@ -222,7 +222,7 @@ export default function AssignmentFormDialog({
                     }
                   />
                 }
-                label="Show solutions after completion"
+                label="Show solutions after attempts exhausted"
               />
             </>
           )}
