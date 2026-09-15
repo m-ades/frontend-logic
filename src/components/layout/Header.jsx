@@ -58,28 +58,34 @@ export default function Header({ onSignOut }) {
         borderColor: "divider",
       }}
     >
-      <Toolbar>
+      <Toolbar sx={{ px: { xs: 1, sm: 2 }, gap: 0.5 }}>
         {isMobile && (
           <IconButton
             edge="start"
             aria-label="Open navigation"
             onClick={() => toggleSidebar(layoutDispatch)}
-            sx={{ mr: 1 }}
+            sx={{ mr: 0.5 }}
           >
             <MenuIcon />
           </IconButton>
         )}
         <Box
-          sx={{ flexGrow: 1, display: "flex", alignItems: "center", gap: 1.5, minWidth: 0 }}
+          sx={{ flexGrow: 1, flexShrink: 1, display: "flex", alignItems: "center", gap: 1, minWidth: 0 }}
         >
-          <Box sx={{ minWidth: 0, display: "flex", alignItems: "center" }}>
+          <Box sx={{ minWidth: 0, flexShrink: 1, display: "flex", alignItems: "center", overflow: "hidden" }}>
             {activeCourse ? (
               <Breadcrumbs
                 separator={<ChevronRight size={16} />}
                 sx={{
+                  minWidth: 0,
+                  maxWidth: { xs: "42vw", sm: "none" },
+                  overflow: "hidden",
+                  "& .MuiBreadcrumbs-ol": { flexWrap: "nowrap" },
+                  "& .MuiBreadcrumbs-li": { minWidth: 0, overflow: "hidden" },
                   "& .MuiBreadcrumbs-separator": {
-                    mx: 1,
+                    mx: { xs: 0.5, sm: 1 },
                     color: "text.disabled",
+                    flexShrink: 0,
                   },
                 }}
               >
@@ -89,7 +95,8 @@ export default function Header({ onSignOut }) {
                   underline="hover"
                   color="text.primary"
                   variant="body1"
-                  sx={{ fontWeight: 600 }}
+                  noWrap
+                  sx={{ fontWeight: 600, display: "block", minWidth: 0 }}
                 >
                   {activeCourse.code}
                 </Link>
@@ -99,6 +106,8 @@ export default function Header({ onSignOut }) {
                   underline="hover"
                   color="text.secondary"
                   variant="body1"
+                  noWrap
+                  sx={{ display: "block", minWidth: 0 }}
                 >
                   {pageInfo.label}
                 </Link>
@@ -106,9 +115,11 @@ export default function Header({ onSignOut }) {
             ) : (
               <Typography
                 variant="body1"
+                noWrap
                 sx={{
                   fontWeight: 600,
                   color: "text.primary",
+                  minWidth: 0,
                 }}
               >
                 {pageInfo.label}
@@ -116,21 +127,34 @@ export default function Header({ onSignOut }) {
             )}
           </Box>
           {sandbox && (
-            <Button
-              onClick={onSignOut}
-              variant="outlined"
-              size="small"
-              startIcon={<ArrowBackIcon />}
-              sx={{
-                textTransform: 'none',
-                flexShrink: 0,
-              }}
-            >
-              Exit demo
-            </Button>
+            isMobile ? (
+              <Tooltip title="Exit demo">
+                <IconButton
+                  onClick={onSignOut}
+                  size="small"
+                  aria-label="Exit demo"
+                  sx={{ flexShrink: 0 }}
+                >
+                  <ArrowBackIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
+            ) : (
+              <Button
+                onClick={onSignOut}
+                variant="outlined"
+                size="small"
+                startIcon={<ArrowBackIcon />}
+                sx={{
+                  textTransform: 'none',
+                  flexShrink: 0,
+                }}
+              >
+                Exit demo
+              </Button>
+            )
           )}
         </Box>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 0.25, sm: 1 }, flexShrink: 0 }}>
           <Tooltip
             title={isRulesReferenceOpen ? "Close rulebook" : "Need rules or keyboard shortcuts?"}
             open={showRulesReferenceHint || undefined}
@@ -141,22 +165,22 @@ export default function Header({ onSignOut }) {
             <Button
               id="rules-reference-trigger"
               onClick={() => setRulesReferenceOpen(layoutDispatch, !isRulesReferenceOpen)}
-              startIcon={isRulesReferenceOpen ? undefined : <MenuBookIcon />}
-              aria-label={isRulesReferenceOpen ? "Close rulebook" : undefined}
+              startIcon={isRulesReferenceOpen || isMobile ? undefined : <MenuBookIcon />}
+              aria-label={isRulesReferenceOpen || isMobile ? (isRulesReferenceOpen ? "Close rulebook" : "Rulebook") : undefined}
               aria-expanded={isRulesReferenceOpen}
               aria-controls="rules-reference"
               sx={{
                 textTransform: 'none',
                 color: 'primary.main',
-                minWidth: isRulesReferenceOpen ? 40 : undefined,
-                px: isRulesReferenceOpen ? 1 : undefined,
+                minWidth: isRulesReferenceOpen || isMobile ? 40 : undefined,
+                px: isRulesReferenceOpen || isMobile ? 1 : undefined,
                 backgroundColor: showRulesReferenceHint ? 'action.selected' : 'transparent',
                 '&:hover': {
                   backgroundColor: 'rgba(47, 107, 255, 0.08)',
                 }
               }}
             >
-              {isRulesReferenceOpen ? <MenuBookIcon /> : 'Rulebook'}
+              {isRulesReferenceOpen || isMobile ? <MenuBookIcon /> : 'Rulebook'}
             </Button>
           </Tooltip>
           <ThemeToggle />
