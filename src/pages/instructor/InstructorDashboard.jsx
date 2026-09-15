@@ -311,7 +311,7 @@ export default function InstructorDashboard() {
         }}
       >
         <PerformanceTrendsChart
-          data={enrichedAssignments}
+          data={gradedUnlockedAssignments}
         />
         <GradeDistributionChart data={gradeDistribution} />
       </Box>
