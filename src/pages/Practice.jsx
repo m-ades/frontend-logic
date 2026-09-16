@@ -7,14 +7,17 @@ import ActivityRow from '../components/ui/ActivityRow.jsx'
 import { ACTIVITY_TYPES } from '../placeholder/courseActivities.js'
 import { fetchJson } from '../utils/api.js'
 import { compareSubchapterLabels, sortAssignmentsBySubchapter } from '../utils/assignmentSort.js'
+import { toRomanNumeral } from '../utils/romanNumerals.js'
 import { useAppRuntime } from '../hooks/useAppRuntime.js'
 
 const buildCourseStructure = (assignments, sectionTitle) => {
   const chapters = new Map()
+  const chapterSortValues = new Map()
 
   assignments.forEach((assignment) => {
-    const chapterLabel = assignment.chapter ? `Chapter ${assignment.chapter}` : 'Other'
-    const subLabel = assignment.subchapter || sectionTitle
+    const chapterNum = Number(assignment.chapter) || null
+    const chapterLabel = chapterNum ? `Part ${toRomanNumeral(chapterNum)}` : 'Other'
+    const subLabel = assignment.subchapter ? `Chapter ${assignment.subchapter}` : sectionTitle
     const chapterEntry = chapters.get(chapterLabel) || new Map()
     const items = chapterEntry.get(subLabel) || []
     items.push({
@@ -29,18 +32,15 @@ const buildCourseStructure = (assignments, sectionTitle) => {
     })
     chapterEntry.set(subLabel, items)
     chapters.set(chapterLabel, chapterEntry)
+    chapterSortValues.set(chapterLabel, chapterNum)
   })
 
   const compareLabels = (a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' })
-  const chapterValue = (label) => {
-    const match = /^Chapter\s+(\d+)/i.exec(label)
-    return match ? Number(match[1]) : null
-  }
 
   return Array.from(chapters.entries())
     .sort(([labelA], [labelB]) => {
-      const aNum = chapterValue(labelA)
-      const bNum = chapterValue(labelB)
+      const aNum = chapterSortValues.get(labelA)
+      const bNum = chapterSortValues.get(labelB)
       if (aNum !== null && bNum !== null) return aNum - bNum
       if (aNum !== null) return -1
       if (bNum !== null) return 1

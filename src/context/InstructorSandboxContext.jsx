@@ -13,6 +13,7 @@ import {
   projectPublicationState,
 } from '../utils/publicationPolicy.js'
 import { excludeNonStudents } from '../utils/GradebookUtils.js'
+import { toRomanNumeral } from '../utils/romanNumerals.js'
 
 const STORAGE_KEY = 'logicapp_instructor_sandbox_state_v1'
 const InstructorSandboxContext = createContext(null)
@@ -286,7 +287,9 @@ export function InstructorSandboxProvider({ children }) {
 
         const timeByCategory = (assignments || []).map((assignment) => ({
           key: `chapter-${assignment.chapter || 'other'}`,
-          label: assignment.subchapter || `Chapter ${assignment.chapter || 'Other'}`,
+          label: assignment.chapter
+            ? `Part ${toRomanNumeral(assignment.chapter)}${assignment.subchapter ? `, Ch ${assignment.subchapter}` : ''}`
+            : 'Other',
           avg_minutes: 8 + Number(assignment.chapter || 1) * 2,
         }))
 
