@@ -78,6 +78,7 @@ export default function AssignmentFormDialog({
                   chapter: e.target.value,
                 })
               }
+              onWheel={(e) => e.target.blur()}
             />
             <TextField
               label="Chapter"
