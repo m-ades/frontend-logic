@@ -1,4 +1,4 @@
-import { useState, useEffect, useId, useRef } from 'react'
+import { useState, useEffect, useId, useMemo, useRef } from 'react'
 import { Box } from '@mui/material'
 import ProblemSetButtons from '../frame/ProblemSetButtons.jsx'
 import InstructorQuestionEditor from '../../InstructorQuestionEditor.jsx'
@@ -48,7 +48,8 @@ export default function MultipleChoice({
   const editorRef = useRef(null)
   const openEdit = () => editorRef.current?.open?.()
   const prompt = problem?.prompt || ''
-  const subquestions = getCompositeSubquestions(problem)
+  // keep answer restoration from restarting on every render
+  const subquestions = useMemo(() => getCompositeSubquestions(problem), [problem])
   const isComposite = subquestions.length > 0
   const isMultiSelect = !isComposite && (
     Array.isArray(answer)

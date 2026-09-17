@@ -10,7 +10,7 @@ function isMathJaxReady() {
     && typeof window.MathJax.typesetPromise === 'function'
 }
 
-/** owns the safe mathjax runtime and serializes typesetting */
+// owns the safe mathjax runtime and serializes typesetting
 export function ensureMathJax() {
   if (isMathJaxReady()) return Promise.resolve(window.MathJax)
   if (readyPromise) return readyPromise
@@ -68,25 +68,41 @@ export function ensureMathJax() {
 
 /*
 disconnected elements and aborted requests are skipped before mutation
-active mathjax work finishes before the next queued request
+aborting releases retained math after active work finishes
+failures reject the request without blocking later work
 */
 function queueTypeset(elements, prepare, signal) {
   const requested = (elements || []).filter(Boolean)
   typesetQueue = typesetQueue.catch(() => {}).then(async () => {
+    if (signal?.aborted || !requested.some((element) => element.isConnected)) return
     const mathJax = await ensureMathJax()
     if (signal?.aborted) return
     const connected = requested.filter((element) => element.isConnected)
     if (!connected.length) return
 
-    mathJax.typesetClear?.(connected)
-    prepare?.()
-    await mathJax.typesetPromise(connected)
+    const clear = () => mathJax.typesetClear?.(connected)
+    clear()
+    try {
+      prepare?.()
+      await mathJax.typesetPromise(connected)
+    } catch (error) {
+      clear()
+      throw error
+    }
+
+    const removed = connected.filter((element) => signal?.aborted || !element.isConnected)
+    if (removed.length) mathJax.typesetClear?.(removed)
+    if (signal && !signal.aborted) {
+      signal.addEventListener('abort', () => {
+        typesetQueue = typesetQueue.catch(() => {}).then(clear)
+      }, { once: true })
+    }
   })
   return typesetQueue
 }
 
-export function typesetMath(elements) {
-  return queueTypeset(elements)
+export function typesetMath(elements, { signal } = {}) {
+  return queueTypeset(elements, undefined, signal)
 }
 
 export function typesetTex(element, tex, display = true, { signal } = {}) {

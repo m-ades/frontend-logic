@@ -137,27 +137,26 @@ export default function TextbookReader({
   useEffect(() => {
     if (!content || !containerRef.current) return undefined
 
-    let cancelled = false
+    const element = containerRef.current
+    const controller = new AbortController()
 
     async function runTypeset() {
       try {
-        await typesetMath([containerRef.current])
+        await typesetMath([element], { signal: controller.signal })
       } catch (typesetError) {
         console.warn('MathJax typeset failed', typesetError)
       }
-      if (cancelled || !containerRef.current) return
+      if (controller.signal.aborted || !element.isConnected) return
 
       const hash = scrollToId || window.location.hash?.replace(/^#/, '')
       if (!hash) return
-      const target = containerRef.current.querySelector(`#${CSS.escape(hash)}`)
+      const target = element.querySelector(`#${CSS.escape(hash)}`)
       target?.scrollIntoView({ block: 'start', behavior: 'smooth' })
     }
 
     runTypeset()
 
-    return () => {
-      cancelled = true
-    }
+    return () => controller.abort()
   }, [content, scrollToId])
 
   const handleClick = useCallback(
