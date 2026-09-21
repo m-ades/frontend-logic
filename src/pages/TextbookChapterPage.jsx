@@ -15,7 +15,8 @@ import {
   ChevronRight as NextIcon,
   Menu as MenuIcon,
 } from '@mui/icons-material'
-import { useLocation, useNavigate, useParams } from 'react-router-dom'
+import { Link as RouterLink, useLocation, useNavigate, useParams } from 'react-router-dom'
+import { isPlainLinkClick } from '@/utils/linkNavigation.js'
 import SplitViewLayout from '@/components/layout/SplitViewLayout.jsx'
 import ResizableRail from '@/components/layout/ResizableRail.jsx'
 import TextbookReader from '@/components/textbook/TextbookReader.jsx'
@@ -133,6 +134,7 @@ export default function TextbookChapterPage({
   }, [textbookChapterPath, location.pathname])
 
   const hubPath = textbookPath || linkBase
+  const getChapterPath = (targetSlug) => `${linkBase}/${resolveSlug(targetSlug) || targetSlug}`
 
   const goChapter = useCallback(
     (targetSlug) => {
@@ -171,10 +173,10 @@ export default function TextbookChapterPage({
       linkBase={linkBase}
       linkedPractices={[]}
       onMetaChange={handleMetaChange}
-      onChapterNavigate={(targetSlug) => {
+      onChapterNavigate={onOpenChapter || onOpenHub ? (targetSlug) => {
         if (targetSlug) goChapter(targetSlug)
         else goHub()
-      }}
+      } : undefined}
       resolveInternalSlug={resolveSlug}
     />
   )
@@ -198,7 +200,14 @@ export default function TextbookChapterPage({
         <Tooltip title="Back to Textbook">
           <IconButton
             size="small"
-            onClick={goHub}
+            component={RouterLink}
+            to={hubPath}
+            onClick={(event) => {
+              if (onOpenHub && isPlainLinkClick(event)) {
+                event.preventDefault()
+                onOpenHub()
+              }
+            }}
             aria-label="Back to Textbook table of contents"
             sx={{
               '&:focus-visible': {
@@ -254,7 +263,14 @@ export default function TextbookChapterPage({
             <IconButton
               size="small"
               disabled={!prev}
-              onClick={() => goChapter(prev?.slug)}
+              component={prev ? RouterLink : 'button'}
+              to={prev ? getChapterPath(prev.slug) : undefined}
+              onClick={(event) => {
+                if (onOpenChapter && isPlainLinkClick(event)) {
+                  event.preventDefault()
+                  goChapter(prev?.slug)
+                }
+              }}
               aria-label={
                 prev ? `Previous chapter: ${prevLabel}` : 'No previous chapter'
               }
@@ -294,7 +310,14 @@ export default function TextbookChapterPage({
             <IconButton
               size="small"
               disabled={!next}
-              onClick={() => goChapter(next?.slug)}
+              component={next ? RouterLink : 'button'}
+              to={next ? getChapterPath(next.slug) : undefined}
+              onClick={(event) => {
+                if (onOpenChapter && isPlainLinkClick(event)) {
+                  event.preventDefault()
+                  goChapter(next?.slug)
+                }
+              }}
               aria-label={
                 next ? `Next chapter: ${nextLabel}` : 'No next chapter'
               }
@@ -318,7 +341,8 @@ export default function TextbookChapterPage({
         drawerOpen={drawerOpen}
         onDrawerClose={() => setDrawerOpen(false)}
         activeSlug={slug}
-        onSelect={goChapter}
+        getChapterPath={getChapterPath}
+        onSelect={onOpenChapter ? goChapter : undefined}
         linkedSlugs={linkedSlugs}
       />
 
@@ -345,7 +369,8 @@ export default function TextbookChapterPage({
               tree={numberedTree}
               variant="rail"
               activeSlug={slug}
-              onSelect={goChapter}
+              getChapterPath={getChapterPath}
+              onSelect={onOpenChapter ? goChapter : undefined}
               linkedSlugs={linkedSlugs}
             />
           </ResizableRail>

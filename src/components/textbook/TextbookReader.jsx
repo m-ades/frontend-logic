@@ -3,6 +3,7 @@ import parse from 'html-react-parser'
 import { Alert, Box, Button } from '@mui/material'
 import DOMPurify from 'dompurify'
 import { useNavigate } from 'react-router-dom'
+import { isPlainLinkClick } from '@/utils/linkNavigation.js'
 import LoadingSpinner from '@/components/ui/LoadingSpinner.jsx'
 import TextbookLinkedPractices from '@/components/textbook/TextbookLinkedPractices.jsx'
 import { prepareTextbookHtml } from '@/components/textbook/prepareTextbookHtml.js'
@@ -109,7 +110,7 @@ export default function TextbookReader({
         const rawHtml = await response.text()
         if (cancelled) return
 
-        const prepared = prepareTextbookHtml(rawHtml, { linkBase })
+        const prepared = prepareTextbookHtml(rawHtml, { linkBase, chapterSlug: slug })
         const safe = sanitizeTextbookHtml(prepared)
         setContent(safe)
 
@@ -163,13 +164,15 @@ export default function TextbookReader({
     (event) => {
       const anchor = event.target.closest?.('a')
       if (!anchor || !containerRef.current?.contains(anchor)) return
+      if (!isPlainLinkClick(event, anchor)) return
 
       const href = anchor.getAttribute('href')
       if (!href) return
 
-      if (href.startsWith('#')) {
+      const chapterPath = `${linkBase}/${slug}`
+      if (href.startsWith('#') || href.startsWith(`${chapterPath}#`)) {
         event.preventDefault()
-        const id = decodeURIComponent(href.slice(1))
+        const id = decodeURIComponent(href.slice(href.indexOf('#') + 1))
         if (!id) return
         const target = containerRef.current.querySelector(`#${CSS.escape(id)}`)
         target?.scrollIntoView({ block: 'start', behavior: 'smooth' })
@@ -186,7 +189,8 @@ export default function TextbookReader({
           navigate(href)
           return
         }
-        const targetSlug = href.slice(linkBase.length + 1).split(/[?#]/)[0]
+        const targetUrl = new URL(href, window.location.origin)
+        const targetSlug = targetUrl.pathname.slice(linkBase.length + 1)
         const decodedTargetSlug = decodeURIComponent(targetSlug)
         const resolved = resolveInternalSlug
           ? resolveInternalSlug(decodedTargetSlug)
@@ -203,10 +207,10 @@ export default function TextbookReader({
           onChapterNavigate(resolved)
           return
         }
-        navigate(`${linkBase}/${resolved}`)
+        navigate(`${linkBase}/${resolved}${targetUrl.search}${targetUrl.hash}`)
       }
     },
-    [linkBase, navigate, onChapterNavigate, resolveInternalSlug],
+    [linkBase, slug, navigate, onChapterNavigate, resolveInternalSlug],
   )
 
   if (isLoading) {
@@ -285,7 +289,7 @@ export default function TextbookReader({
           fontSize: '1rem',
           lineHeight: 1.7,
         },
-        '& img, & svg': {
+        '& img, & svg:not(mjx-container svg)': {
           maxWidth: '100%',
           height: 'auto',
         },
@@ -302,8 +306,25 @@ export default function TextbookReader({
         '& .hula-practice-slot': {
           my: '1em',
         },
-        '& table.fitch, & table.ltx_tabular': {
+        '& table.ltx_tabular': {
           fontSize: '0.95rem',
+        },
+        // fitch geometry also depends on the original book table and paragraph styles
+        '& table.fitch': {
+          width: '100%',
+          borderCollapse: 'collapse',
+          borderSpacing: 0,
+          fontFamily: '"Helvetica Neue", Helvetica, Arial, sans-serif',
+          fontSize: '16px',
+          lineHeight: 1.7,
+        },
+        '& table.fitch p': {
+          m: 0,
+          fontSize: 'inherit',
+          lineHeight: 'inherit',
+        },
+        '& table.fitch td.fml-fmla': {
+          whiteSpace: 'nowrap',
         },
       }}
     >

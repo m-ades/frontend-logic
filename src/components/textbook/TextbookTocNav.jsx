@@ -14,10 +14,13 @@ import {
   MenuBook as BookIcon,
 } from '@mui/icons-material'
 import { isDividerKind, isNavigableNode } from '@/components/textbook/textbookStructure.js'
+import { Link as RouterLink } from 'react-router-dom'
+import { isPlainLinkClick } from '@/utils/linkNavigation.js'
 
 function TocList({
   tree,
   activeSlug,
+  getChapterPath,
   onSelect,
   linkedSlugSet,
   dense = false,
@@ -107,8 +110,10 @@ function TocList({
                     return (
                       <ListItemButton
                         key={child.slug}
+                        component={RouterLink}
+                        to={getChapterPath(child.slug)}
                         selected={childActive}
-                        onClick={() => onSelect(child.slug)}
+                        onClick={(event) => onSelect(event, child.slug)}
                         sx={{
                           pl: 3,
                           py: dense ? 0.35 : 0.5,
@@ -146,8 +151,10 @@ function TocList({
         return (
           <ListItemButton
             key={node.slug}
+            component={RouterLink}
+            to={getChapterPath(node.slug)}
             selected={isActive}
-            onClick={() => onSelect(node.slug)}
+            onClick={(event) => onSelect(event, node.slug)}
             sx={{
               py: dense ? 0.5 : 0.75,
               borderRadius: 1,
@@ -179,6 +186,7 @@ function TocList({
 export default function TextbookTocNav({
   tree, // parent owned to avoid duplicate structure work
   activeSlug,
+  getChapterPath,
   onSelect,
   linkedSlugs = [],
   variant = 'rail', // 'rail' | 'drawer'
@@ -201,8 +209,13 @@ export default function TextbookTocNav({
     <TocList
       tree={tree}
       activeSlug={activeSlug}
-      onSelect={(slug) => {
-        onSelect(slug)
+      getChapterPath={getChapterPath}
+      onSelect={(event, slug) => {
+        if (!isPlainLinkClick(event)) return
+        if (onSelect) {
+          event.preventDefault()
+          onSelect(slug)
+        }
         onDrawerClose?.()
       }}
       linkedSlugSet={linkedSlugSet}

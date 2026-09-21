@@ -9,6 +9,18 @@ function stripScripts(html) {
     .replace(/<script\b[^>]*\/>/gi, '')
 }
 
+/*
+laTeXML marks calligraphic script letters (used constantly as TFL/FOL schematic
+letters, e.g. 𝒜, ℬ) with a trailing unicode variation selector (U+FE00/U+FE01).
+the book's own mathjax config remaps these to proper calligraphic glyphs; our
+mathjax build doesn't recognize them and renders each as a huge phantom glyph,
+throwing off the vertical alignment of fitch derivation rows. stripping the
+selector leaves the plain calligraphic codepoint, which renders fine on its own.
+*/
+function stripMathVariationSelectors(html) {
+  return html.replace(/[︀︁]/g, '')
+}
+
 /**
  * Extract the readable body from a BookML page.
  * Prefers #bml-main-content section(s); falls back to body.
@@ -53,7 +65,7 @@ export function extractTextbookBody(fullHtml) {
 }
 
 // keeps chapter navigation in the app and other files under the asset path
-export function rewriteTextbookUrls(html, { linkBase = '/textbook' } = {}) {
+export function rewriteTextbookUrls(html, { linkBase = '/textbook', chapterSlug } = {}) {
   if (typeof html !== 'string') return ''
 
   const parser = new DOMParser()
@@ -64,7 +76,7 @@ export function rewriteTextbookUrls(html, { linkBase = '/textbook' } = {}) {
   root.querySelectorAll('[href]').forEach((el) => {
     const href = el.getAttribute('href')
     if (href == null) return
-    const next = rewriteHref(href, linkBase)
+    const next = rewriteHref(href, linkBase, chapterSlug)
     if (next !== href) el.setAttribute('href', next)
     if (next.startsWith('http://') || next.startsWith('https://') || next.startsWith('mailto:')) {
       el.setAttribute('target', '_blank')
@@ -89,9 +101,10 @@ export function rewriteTextbookUrls(html, { linkBase = '/textbook' } = {}) {
   return root.innerHTML
 }
 
-export function rewriteHref(href, linkBase) {
+export function rewriteHref(href, linkBase, chapterSlug) {
   const trimmed = href.trim()
-  if (!trimmed || trimmed === '#') return trimmed
+  if (!trimmed) return trimmed
+  if (chapterSlug && trimmed.startsWith('#')) return `${linkBase}/${chapterSlug}${trimmed}`
 
   // Already absolute app/textbook/hash/protocol
   if (
@@ -182,9 +195,9 @@ export function injectPracticeWidgetSlots(html, slug) {
  * Full pipeline: extract → rewrite URLs.
  * Practice widgets are attached via course link metadata (not HTML slots).
  */
-export function prepareTextbookHtml(fullHtml, { linkBase = '/textbook' } = {}) {
-  const body = extractTextbookBody(fullHtml)
-  return rewriteTextbookUrls(body, { linkBase })
+export function prepareTextbookHtml(fullHtml, { linkBase = '/textbook', chapterSlug } = {}) {
+  const body = stripMathVariationSelectors(extractTextbookBody(fullHtml))
+  return rewriteTextbookUrls(body, { linkBase, chapterSlug })
 }
 
 export { ASSET_BASE }
