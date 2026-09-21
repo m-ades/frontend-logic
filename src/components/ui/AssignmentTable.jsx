@@ -27,12 +27,13 @@ import {
   Plus,
 } from "lucide-react";
 import { formatEasternDateTime } from "../../utils/easternTime.js";
+import { Link as RouterLink } from "react-router-dom";
 
-// Helper function to format date and time
 export default function AssignmentTable({
   items,
   type = "assignment",
-  onView,
+  getItemPath,
+  navigationState,
   onToggleLock,
   onTogglePublish,
   onMenuOpen,
@@ -116,9 +117,14 @@ export default function AssignmentTable({
                     >
                       {isPractice && <PracticeIcon sx={{ fontSize: 16, color: "text.secondary" }} />}
                       <Typography
+                        component={RouterLink}
+                        to={getItemPath(item)}
+                        state={navigationState}
                         variant="body2"
                         fontWeight={500}
                         sx={{
+                          color: "inherit",
+                          textDecoration: "none",
                           cursor: "pointer",
                           wordBreak: "break-word",
                           "&:hover": {
@@ -126,7 +132,6 @@ export default function AssignmentTable({
                             textDecoration: "underline",
                           },
                         }}
-                        onClick={() => onView(item)}
                       >
                         {item.name}
                       </Typography>
@@ -207,7 +212,13 @@ export default function AssignmentTable({
 
                   <Stack direction="row" spacing={0.5} justifyContent="flex-end">
                     <Tooltip title="Open Assignment">
-                      <IconButton size="small" onClick={() => onView(item)}>
+                      <IconButton
+                        size="small"
+                        component={RouterLink}
+                        to={getItemPath(item)}
+                        state={navigationState}
+                        aria-label={`Open ${item.name}`}
+                      >
                         <FileEdit size={18} />
                       </IconButton>
                     </Tooltip>
@@ -295,10 +306,15 @@ export default function AssignmentTable({
                     <Box sx={{ display: "flex", alignItems: "center", gap: 1, minWidth: 0, overflow: "hidden" }}>
                       {isPractice && <PracticeIcon sx={{ fontSize: 16, color: "text.secondary" }} />}
                       <Typography
+                        component={RouterLink}
+                        to={getItemPath(item)}
+                        state={navigationState}
                         variant="body2"
                         fontWeight={500}
                         noWrap
                         sx={{
+                          color: "inherit",
+                          textDecoration: "none",
                           cursor: "pointer",
                           minWidth: 0,
                           overflow: "hidden",
@@ -308,7 +324,6 @@ export default function AssignmentTable({
                             textDecoration: "underline",
                           },
                         }}
-                        onClick={() => onView(item)}
                       >
                         {item.name}
                       </Typography>
@@ -408,7 +423,13 @@ export default function AssignmentTable({
                       justifyContent="center"
                     >
                       <Tooltip title="Open Assignment">
-                        <IconButton size="small" onClick={() => onView(item)}>
+                        <IconButton
+                          size="small"
+                          component={RouterLink}
+                          to={getItemPath(item)}
+                          state={navigationState}
+                          aria-label={`Open ${item.name}`}
+                        >
                           <FileEdit size={18} />
                         </IconButton>
                       </Tooltip>

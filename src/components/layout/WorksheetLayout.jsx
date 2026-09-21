@@ -2,13 +2,14 @@ import { Box, Typography, IconButton, Stack } from '@mui/material'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import LockIcon from '@mui/icons-material/Lock'
 import { formatEasternFromIso } from '../../utils/easternTime.js'
+import { Link as RouterLink } from 'react-router-dom'
 
 export default function Layout({ 
   title, 
   subtitle, 
   children, 
   inModal = false,
-  onBackToLMS,
+  backTo,
   isOverdue,
   isLocked = false,
   dueAt = null,
@@ -67,9 +68,10 @@ export default function Layout({
             gap: 2,
           }}
         >
-          {onBackToLMS && (
+          {backTo && (
             <IconButton
-              onClick={onBackToLMS}
+              component={RouterLink}
+              to={backTo}
               aria-label="Back to dashboard"
               sx={{
                 color: 'text.secondary',

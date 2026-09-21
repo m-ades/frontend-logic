@@ -31,7 +31,8 @@ import {
   Download,
 } from "lucide-react";
 
-import { useNavigate, useLocation } from "react-router-dom";
+import { Link as RouterLink, useLocation } from "react-router-dom";
+import { isPlainLinkClick } from "../../../utils/linkNavigation.js";
 import {
   calculateAssignmentAverage,
 } from "../../../context/CoursesContext";
@@ -67,7 +68,6 @@ export default function AssignmentDetailModal({ open, onClose, assignmentId }) {
   const theme = useTheme();
   const [activeTab, setActiveTab] = useState(0);
   const [selectedStudent, setSelectedStudent] = useState(null);
-  const navigate = useNavigate();
   const location = useLocation();
   const { courseState, courseActions, assignmentPath, user } = useAppRuntime();
 
@@ -170,11 +170,8 @@ export default function AssignmentDetailModal({ open, onClose, assignmentId }) {
     courseActions.toggleAssignmentPublish?.(activeCourseId, assignment.id, assignment);
   };
 
-  const handleOpenAssignment = () => {
-    navigate(assignmentPath(assignment.id), {
-      state: { returnTo: location.pathname },
-    });
-    onClose();
+  const handleOpenAssignment = (event) => {
+    if (isPlainLinkClick(event)) onClose();
   };
 
   const handleExportGrades = () => {
@@ -296,6 +293,9 @@ export default function AssignmentDetailModal({ open, onClose, assignmentId }) {
               size="small"
               startIcon={<FileEdit size={16} />}
               onClick={handleOpenAssignment}
+              component={RouterLink}
+              to={assignmentPath(assignment.id)}
+              state={{ returnTo: location.pathname }}
             >
               Open Assignment
             </Button>
@@ -401,6 +401,9 @@ export default function AssignmentDetailModal({ open, onClose, assignmentId }) {
           variant="contained"
           startIcon={<FileEdit size={16} />}
           onClick={handleOpenAssignment}
+          component={RouterLink}
+          to={assignmentPath(assignment.id)}
+          state={{ returnTo: location.pathname }}
         >
           Open Assignment
         </Button>

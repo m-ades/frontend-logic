@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useCallback, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { Box, Tabs, Tab, Typography } from '@mui/material'
 import ActivityAccordion from '../components/ui/ActivityAccordion.jsx'
@@ -81,7 +80,6 @@ export default function Assignments() {
     user,
     activeCourseId,
   } = useAppRuntime()
-  const navigate = useNavigate()
   const courseIdForApi = sandbox ? null : (activeCourseId ?? null)
   const userId = sandbox ? user.id : getActiveUserId()
   const tabStorageKey = useMemo(() => {
@@ -211,14 +209,6 @@ export default function Assignments() {
     }
   }
 
-  const handleActivityClick = (activity) => {
-    if (activity.worksheet) {
-      navigate(assignmentPath(activity.worksheet.id), {
-        state: { returnTo: assignmentsPath }
-      })
-    }
-  }
-
   const renderActivity = (activity, datePrefix, showCompletionChip) => {
     const policy = activity.policy
     const extensionDueLabel = policy?.extension_due_at
@@ -258,7 +248,8 @@ export default function Assignments() {
         chips={chips}
         dateLabel={`${datePrefix}${formatDateTime(activity.dueDate) || 'No due date'}`}
         noteLines={noteLines}
-        onClick={() => handleActivityClick(activity)}
+        to={activity.worksheet ? assignmentPath(activity.worksheet.id) : undefined}
+        state={{ returnTo: assignmentsPath }}
       />
     )
   }
