@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   Alert,
   Button,
@@ -38,6 +38,11 @@ export default function QuestionAttemptOverrideDialog({
   const [studentId, setStudentId] = useState("");
   const [extraAttempts, setExtraAttempts] = useState("1");
   const [reason, setReason] = useState("");
+  // courseActions gets a fresh identity on every layout render, so read it through
+  // a ref instead of listing it as an effect dependency (which would refetch needlessly)
+  const actionsRef = useRef(courseActions);
+  actionsRef.current = courseActions;
+  const savedTimerRef = useRef(null);
 
   const students = useMemo(
     () => (gradebookByCourse?.[activeCourseId] || []).filter(
@@ -62,7 +67,7 @@ export default function QuestionAttemptOverrideDialog({
       setError("");
       setSaved(false);
       try {
-        const rows = await courseActions.getQuestionAttemptOverrides?.(questionId);
+        const rows = await actionsRef.current.getQuestionAttemptOverrides?.(questionId);
         if (!isMounted) return;
         setOverrides(Array.isArray(rows) ? rows : []);
       } catch (err) {
@@ -78,7 +83,7 @@ export default function QuestionAttemptOverrideDialog({
     return () => {
       isMounted = false;
     };
-  }, [open, questionId, courseActions]);
+  }, [open, questionId]);
 
   useEffect(() => {
     if (!open) {
@@ -89,6 +94,8 @@ export default function QuestionAttemptOverrideDialog({
       setSaved(false);
     }
   }, [open]);
+
+  useEffect(() => () => clearTimeout(savedTimerRef.current), []);
 
   useEffect(() => {
     if (!studentId) return;
@@ -110,15 +117,17 @@ export default function QuestionAttemptOverrideDialog({
     setError("");
     setSaved(false);
     try {
-      const record = await courseActions.saveQuestionAttemptOverride?.(questionId, {
+      const actions = actionsRef.current;
+      const record = await actions.saveQuestionAttemptOverride?.(questionId, {
         userId: Number(studentId),
         extraAttempts: parsedExtra,
         reason,
       });
-      const rows = await courseActions.getQuestionAttemptOverrides?.(questionId);
+      const rows = await actions.getQuestionAttemptOverrides?.(questionId);
       setOverrides(Array.isArray(rows) ? rows : (record ? [record] : []));
       setSaved(true);
-      setTimeout(() => setSaved(false), 1500);
+      clearTimeout(savedTimerRef.current);
+      savedTimerRef.current = setTimeout(() => setSaved(false), 1500);
     } catch (err) {
       setError(err?.message || "Failed to save extra attempts.");
     } finally {

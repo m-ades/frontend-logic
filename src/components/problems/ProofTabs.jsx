@@ -733,13 +733,15 @@ function ProofTabs({
             </ProblemNavigationContext.Provider>
           )
         })}
-      <QuestionAttemptOverrideDialog
-        open={attemptOverrideOpen}
-        onClose={() => setAttemptOverrideOpen(false)}
-        questionId={currentProof?.questionId}
-        questionLabel={currentProof ? `Problem ${currentProofIndex + 1}` : ""}
-        baseAttemptLimit={currentProof?.attemptLimit ?? 3}
-      />
+      {isInstructorView && (
+        <QuestionAttemptOverrideDialog
+          open={attemptOverrideOpen}
+          onClose={() => setAttemptOverrideOpen(false)}
+          questionId={currentProof?.questionId}
+          questionLabel={currentProof ? `Problem ${currentProofIndex + 1}` : ""}
+          baseAttemptLimit={currentProof?.attemptLimit ?? 3}
+        />
+      )}
     </Box>
   )
 }

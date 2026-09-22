@@ -743,23 +743,24 @@ export function InstructorSandboxProvider({ children }) {
       extra_attempts: extra,
       reason: trimmedReason || null,
     }
-    setState((prev) => {
-      const next = {
-        ...prev,
-        questionOverridesByCourse: {
-          ...prev.questionOverridesByCourse,
-          [courseId]: {
-            ...(prev.questionOverridesByCourse?.[courseId] || {}),
-            [normalizedQuestionId]: {
-              ...(prev.questionOverridesByCourse?.[courseId]?.[normalizedQuestionId] || {}),
-              [targetUserId]: record,
-            },
+    // derive from stateRef (not a setState updater) so the very next
+    // getQuestionAttemptOverrides call sees this record before react re-renders
+    const base = stateRef.current
+    const next = {
+      ...base,
+      questionOverridesByCourse: {
+        ...base.questionOverridesByCourse,
+        [courseId]: {
+          ...(base.questionOverridesByCourse?.[courseId] || {}),
+          [normalizedQuestionId]: {
+            ...(base.questionOverridesByCourse?.[courseId]?.[normalizedQuestionId] || {}),
+            [targetUserId]: record,
           },
         },
-      }
-      stateRef.current = next
-      return next
-    })
+      },
+    }
+    stateRef.current = next
+    setState(next)
     const student = courseState.gradebookByCourse?.[courseId]?.find((entry) => entry.id === targetUserId)
     return {
       ...record,
