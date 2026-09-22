@@ -240,12 +240,15 @@ function GroupRow({
   );
 }
 
-export default function AssignmentSubmissionsTable({ rows = [] }) {
+export default function AssignmentSubmissionsTable({ rows = [], questions = [] }) {
   const [groupBy, setGroupBy] = useState("student");
   const [query, setQuery] = useState("");
   const [openGroups, setOpenGroups] = useState(() => new Set());
 
-  const organized = useMemo(() => organizeAssignmentSubmissions(rows), [rows]);
+  const organized = useMemo(
+    () => organizeAssignmentSubmissions(rows, questions),
+    [rows, questions]
+  );
   const filtered = useMemo(
     () => filterOrganizedSubmissions(organized, query),
     [organized, query]
