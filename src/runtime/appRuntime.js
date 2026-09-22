@@ -298,6 +298,35 @@ export function createAppRuntime({ coursesDispatch, coursesState, routeKind, use
         }),
       });
     },
+    getAssignmentSubmissions: async (assignmentId) => {
+      const id = Number(assignmentId);
+      if (!Number.isInteger(id) || id <= 0) return [];
+      // summary=true leaves out submission_data, which the classwide table never shows
+      const rows = await fetchJson(`/api/instructor/assignments/${id}/submissions?summary=true`);
+      return Array.isArray(rows) ? rows : [];
+    },
+    getQuestionAttemptOverrides: async (questionId) => {
+      const id = Number(questionId);
+      if (!Number.isFinite(id)) return [];
+      return fetchJson(`/api/instructor/assignment-questions/${id}/overrides`);
+    },
+    saveQuestionAttemptOverride: async (questionId, { userId, extraAttempts, reason } = {}) => {
+      const id = Number(questionId);
+      const targetUserId = Number(userId);
+      const extra = Number(extraAttempts);
+      if (!Number.isFinite(id) || !Number.isFinite(targetUserId) || !Number.isFinite(extra) || extra < 0) {
+        throw new Error("A valid student and extra attempts value are required.");
+      }
+      return fetchJson(`/api/instructor/assignment-questions/${id}/overrides`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          user_id: targetUserId,
+          extra_attempts: extra,
+          reason: typeof reason === "string" ? reason.trim().slice(0, 500) || null : null,
+        }),
+      });
+    },
     /**
      * loads instructor analytics while preserving an explicit empty class average
      */

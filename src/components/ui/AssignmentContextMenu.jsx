@@ -1,5 +1,5 @@
 import { Menu, MenuItem } from "@mui/material";
-import { FileEdit, Edit, Copy, Trash2, CalendarClock, List } from "lucide-react";
+import { FileEdit, Edit, Copy, Trash2, CalendarClock, List, ListChecks } from "lucide-react";
 
 export default function AssignmentContextMenu({
   anchorEl,
@@ -12,6 +12,7 @@ export default function AssignmentContextMenu({
   onDelete,
   onClasswideExtension,
   onViewExtensions,
+  onViewSubmissions,
 }) {
   const select = (handler) => () => {
     onClose?.();
@@ -44,6 +45,12 @@ export default function AssignmentContextMenu({
         <MenuItem onClick={select(onViewExtensions)}>
           <List size={16} style={{ marginRight: 8 }} />
           View extensions
+        </MenuItem>
+      )}
+      {onViewSubmissions && (
+        <MenuItem onClick={select(onViewSubmissions)}>
+          <ListChecks size={16} style={{ marginRight: 8 }} />
+          View submissions
         </MenuItem>
       )}
       <MenuItem onClick={select(onDuplicate)}>

@@ -21,6 +21,7 @@ import AssignmentFormDialog from "../../components/ui/AssignmentFormDialog";
 import AssignmentContextMenu from "../../components/ui/AssignmentContextMenu";
 import ClasswideExtensionDialog from "../../components/ui/assignments/ClasswideExtensionDialog";
 import AssignmentExtensionsDialog from "../../components/ui/assignments/AssignmentExtensionsDialog";
+import AssignmentSubmissionsDialog from "../../components/ui/assignments/AssignmentSubmissionsDialog";
 import { sortAssignmentsBySubchapter } from "../../utils/assignmentSort.js";
 import {
   getStatusColor,
@@ -80,6 +81,8 @@ export default function InstructorAssignments() {
   });
   const [classwideSaving, setClasswideSaving] = useState(false);
   const [classwideError, setClasswideError] = useState("");
+  const [submissionsAssignment, setSubmissionsAssignment] = useState(null);
+  const [submissionsOpen, setSubmissionsOpen] = useState(false);
 
   // Get current course data
   const activeCourse = courses.find((c) => c.id === activeCourseId);
@@ -303,6 +306,18 @@ export default function InstructorAssignments() {
     }
   };
 
+  const loadAssignmentSubmissions = useCallback(
+    (assignmentId) =>
+      courseActions.getAssignmentSubmissions?.(assignmentId) ?? Promise.resolve([]),
+    [courseActions]
+  );
+
+  const handleOpenSubmissions = (assignment) => {
+    if (!assignment?.id) return;
+    setSubmissionsAssignment(assignment);
+    setSubmissionsOpen(true);
+  };
+
   // Show message if no active course
   if (!activeCourseId) {
     return (
@@ -380,8 +395,17 @@ export default function InstructorAssignments() {
         onEdit={handleEditOpen}
         onClasswideExtension={handleOpenClasswideExtension}
         onViewExtensions={handleOpenExtensionsList}
+        onViewSubmissions={handleOpenSubmissions}
         onDuplicate={handleDuplicate}
         onDelete={handleDelete}
+      />
+
+      <AssignmentSubmissionsDialog
+        open={submissionsOpen}
+        assignment={submissionsAssignment}
+        loadSubmissions={loadAssignmentSubmissions}
+        // keep the assignment so the title stays put during the close animation
+        onClose={() => setSubmissionsOpen(false)}
       />
 
       {/* Create Dialog */}

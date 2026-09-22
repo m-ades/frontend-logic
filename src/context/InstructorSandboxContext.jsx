@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useMemo, useState } from 'react'
+import { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import {
   INSTRUCTOR_SANDBOX_COURSE,
   INSTRUCTOR_SANDBOX_STUDENTS,
@@ -75,6 +75,7 @@ const createInitialState = () => ({
   },
   accommodationsByCourse: {},
   deadlinesByCourse: {},
+  questionOverridesByCourse: {},
   questionStates: {},
   completedQuestionIds: [],
   nextIds: {
@@ -98,6 +99,7 @@ const sanitizeState = (value) => {
     gradebookByCourse: isPlainObject(value.gradebookByCourse) ? value.gradebookByCourse : initial.gradebookByCourse,
     accommodationsByCourse: isPlainObject(value.accommodationsByCourse) ? value.accommodationsByCourse : {},
     deadlinesByCourse: isPlainObject(value.deadlinesByCourse) ? value.deadlinesByCourse : {},
+    questionOverridesByCourse: isPlainObject(value.questionOverridesByCourse) ? value.questionOverridesByCourse : {},
     questionStates: isPlainObject(value.questionStates) ? value.questionStates : {},
     completedQuestionIds: Array.isArray(value.completedQuestionIds) ? value.completedQuestionIds : [],
     nextIds: isPlainObject(value.nextIds) ? { ...initial.nextIds, ...value.nextIds } : initial.nextIds,
@@ -175,6 +177,11 @@ const normalizeQuestionState = (value) => {
 
 export function InstructorSandboxProvider({ children }) {
   const [state, setState] = useState(readStoredState)
+  const stateRef = useRef(state)
+
+  useEffect(() => {
+    stateRef.current = state
+  }, [state])
 
   useEffect(() => {
     if (typeof window === 'undefined') return
@@ -770,6 +777,127 @@ export function InstructorSandboxProvider({ children }) {
     return { updated, preserved, total: students.length }
   }
 
+  const getAssignmentSubmissions = async (assignmentId) => {
+    const courseId = courseState.activeCourseId
+    const assignments = Object.values(courseState.assignmentsByCourse || {}).flat()
+    const practices = Object.values(courseState.practicesByCourse || {}).flat()
+    const assignment = [...assignments, ...practices].find(
+      (item) => String(item.id) === String(assignmentId)
+    )
+    const proofs = assignment?.proofs || []
+    if (!proofs.length) return []
+
+    const students = (courseState.gradebookByCourse?.[courseId] || []).filter(
+      (student) => String(student.role || "student").toLowerCase() !== "ta"
+    )
+
+    const rows = []
+    let nextId = 1
+    for (const student of students) {
+      if (!student.submittedAssignments?.[assignmentId]) continue
+      const attemptCount = Math.min(
+        5,
+        Math.max(1, Number(student.attemptCounts?.[assignmentId]) || 1)
+      )
+      const grade = Number(student.grades?.[assignmentId])
+      const submittedAt = student.submissionDates?.[assignmentId] || new Date().toISOString()
+
+      proofs.forEach((proof, index) => {
+        const questionId = proof.questionId ?? proof.id ?? `${assignmentId}-q-${index + 1}`
+        for (let attempt = 1; attempt <= attemptCount; attempt += 1) {
+          const isFinal = attempt === attemptCount
+          const score = Number.isFinite(grade)
+            ? (isFinal ? Math.round(grade) : Math.max(0, Math.round(grade) - (attemptCount - attempt) * 10))
+            : 0
+          rows.push({
+            id: nextId++,
+            assignment_question_id: questionId,
+            user_id: student.id,
+            attempt,
+            score,
+            is_correct: score >= 100,
+            auto_submitted: false,
+            submitted_at: submittedAt,
+            validated_at: submittedAt,
+            User: { id: student.id, username: student.username },
+            AssignmentQuestion: {
+              id: questionId,
+              order_index: Number.isFinite(Number(proof.orderIndex)) ? Number(proof.orderIndex) : index,
+              points_value: 100,
+            },
+          })
+        }
+      })
+    }
+
+    return rows.sort((a, b) => String(b.submitted_at).localeCompare(String(a.submitted_at)))
+  }
+
+  const getQuestionAttemptOverrides = async (questionId) => {
+    const normalizedQuestionId = questionId != null && String(questionId).trim() !== ''
+      ? String(questionId)
+      : null
+    if (!normalizedQuestionId) return []
+    const snapshot = stateRef.current
+    const courseId = snapshot.activeCourseId
+    const byQuestion = snapshot.questionOverridesByCourse?.[courseId]?.[normalizedQuestionId] || {}
+    const students = snapshot.gradebookByCourse?.[courseId] || []
+    const studentById = new Map(students.map((student) => [student.id, student]))
+    return Object.values(byQuestion).map((row, index) => ({
+      id: row.id ?? `${normalizedQuestionId}-${row.user_id}-${index}`,
+      assignment_question_id: normalizedQuestionId,
+      user_id: row.user_id,
+      extra_attempts: row.extra_attempts,
+      reason: row.reason ?? null,
+      User: studentById.get(row.user_id)
+        ? { id: row.user_id, username: studentById.get(row.user_id).username }
+        : null,
+    }))
+  }
+
+  const saveQuestionAttemptOverride = async (questionId, { userId, extraAttempts, reason } = {}) => {
+    const normalizedQuestionId = questionId != null && String(questionId).trim() !== ''
+      ? String(questionId)
+      : null
+    const targetUserId = Number(userId)
+    const extra = Number(extraAttempts)
+    if (!normalizedQuestionId || !Number.isFinite(targetUserId) || !Number.isFinite(extra) || extra < 0) {
+      throw new Error("A valid student and extra attempts value are required.")
+    }
+    const courseId = courseState.activeCourseId
+    const trimmedReason = typeof reason === "string" ? reason.trim().slice(0, 500) : null
+    const record = {
+      id: `${normalizedQuestionId}-${targetUserId}`,
+      assignment_question_id: normalizedQuestionId,
+      user_id: targetUserId,
+      extra_attempts: extra,
+      reason: trimmedReason || null,
+    }
+    // derive from stateRef (not a setState updater) so the very next
+    // getQuestionAttemptOverrides call sees this record before react re-renders
+    const base = stateRef.current
+    const next = {
+      ...base,
+      questionOverridesByCourse: {
+        ...base.questionOverridesByCourse,
+        [courseId]: {
+          ...(base.questionOverridesByCourse?.[courseId] || {}),
+          [normalizedQuestionId]: {
+            ...(base.questionOverridesByCourse?.[courseId]?.[normalizedQuestionId] || {}),
+            [targetUserId]: record,
+          },
+        },
+      },
+    }
+    stateRef.current = next
+    setState(next)
+    const student = courseState.gradebookByCourse?.[courseId]?.find((entry) => entry.id === targetUserId)
+    return {
+      ...record,
+      User: student ? { id: student.id, username: student.username } : null,
+    }
+  }
+
   const getActivity = (activityId) => {
     const assignments = Object.values(courseState.assignmentsByCourse || {}).flat()
     const practices = Object.values(courseState.practicesByCourse || {}).flat()
@@ -857,6 +985,9 @@ export function InstructorSandboxProvider({ children }) {
     saveDeadline,
     getAssignmentExtensions,
     saveClasswideExtension,
+    getAssignmentSubmissions,
+    getQuestionAttemptOverrides,
+    saveQuestionAttemptOverride,
     getActivity,
     getQuestionState: (questionId) => state.questionStates?.[questionId] || null,
     isQuestionComplete: (questionId) => completedQuestionIds.has(questionId),
