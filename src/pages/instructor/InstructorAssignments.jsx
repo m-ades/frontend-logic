@@ -1,4 +1,5 @@
 import { useCallback, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import {
   Box,
   Typography,
@@ -14,6 +15,7 @@ import { Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import {
   calculateAssignmentAverage,
+  fetchCourseGradebook,
 } from "../../context/CoursesContext";
 import { excludeNonStudents } from "../../utils/GradebookUtils";
 import AssignmentTable from "../../components/ui/AssignmentTable";
@@ -56,6 +58,7 @@ export default function InstructorAssignments() {
   } = useAppRuntime();
   const { activeCourseId, assignmentsByCourse, gradebookByCourse, courses } = courseState;
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
@@ -296,6 +299,16 @@ export default function InstructorAssignments() {
       if ((result?.total ?? 0) === 0) {
         setClasswideError("No enrolled students to extend.");
         return;
+      }
+      // best-effort refresh, grant already succeeded
+      if (!isSandbox) {
+        await queryClient.invalidateQueries({ queryKey: ["student-deadline", activeCourseId] });
+        try {
+          const freshGradebook = await fetchCourseGradebook(activeCourseId);
+          courseActions.setGradebook?.(activeCourseId, freshGradebook);
+        } catch (refreshError) {
+          console.error("Failed to refresh gradebook after classwide extension", refreshError);
+        }
       }
       setClasswideOpen(false);
       setExtensionsListOpen(true);

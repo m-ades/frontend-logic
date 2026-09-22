@@ -49,8 +49,9 @@ export default function ClasswideExtensionDialog({
               </Typography>
             )}
             <Alert severity="info">
-              Applies this due date to enrolled students. Anyone with an individual extension
-              that ends later will keep that later date.
+              Applies this due date and reason to enrolled students, replacing the date, reason,
+              and granting instructor on any existing extension. Anyone with an individual
+              extension that ends later keeps their existing date, reason, and granting instructor.
             </Alert>
             {error && <Alert severity="error">{error}</Alert>}
             <TextField

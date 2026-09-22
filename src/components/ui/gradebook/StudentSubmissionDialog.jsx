@@ -5,6 +5,7 @@ import {
   LinearProgress, MenuItem, Popover, Stack, TextField, Typography,
 } from '@mui/material'
 import { useAppRuntime } from '../../../hooks/useAppRuntime.js'
+import { fetchCourseGradebook } from '../../../context/CoursesContext.jsx'
 import { fetchJson } from '../../../utils/api.js'
 import { formatEasternFromIso, splitEasternDateTime, toEasternIso } from '../../../utils/easternTime.js'
 import { formatStudentDisplayName } from '../../../utils/GradebookUtils.js'
@@ -87,6 +88,15 @@ export default function StudentSubmissionDialog({ student, assignment, onClose }
     try {
       await courseActions.saveDeadline?.(activeCourseId, assignment.id, student.id, iso)
       await queryClient.invalidateQueries({ queryKey: deadlineQueryKey })
+      // best-effort refresh, extension already saved
+      if (!isSandbox) {
+        try {
+          const freshGradebook = await fetchCourseGradebook(activeCourseId)
+          courseActions.setGradebook?.(activeCourseId, freshGradebook)
+        } catch (refreshError) {
+          console.error('Failed to refresh gradebook after extension', refreshError)
+        }
+      }
       setExtensionAnchorEl(null)
     } catch (err) {
       setExtensionError('Failed to save extension.')
