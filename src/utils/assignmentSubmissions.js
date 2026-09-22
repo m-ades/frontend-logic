@@ -1,18 +1,9 @@
-/**
- * Organize classwide assignment submissions for instructor review.
- *
- * Design:
- * - Group by student (default) or by question
- * - Collapse attempt history: each question shows its latest attempt;
- *   earlier attempts stay available under expand
- * - Sort students by most recent activity; questions by order_index
- */
-
 function studentName(row) {
   return row?.User?.username || row?.user?.username || `User ${row?.user_id ?? "?"}`;
 }
 
-function questionOrderIndex(row) {
+// fallback when no question list is given
+function rawOrderIndex(row) {
   const raw =
     row?.AssignmentQuestion?.order_index ??
     row?.assignment_question?.order_index;
@@ -24,9 +15,25 @@ function questionId(row) {
   return row?.assignment_question_id ?? row?.AssignmentQuestion?.id ?? null;
 }
 
-function questionLabel(row) {
-  const order = questionOrderIndex(row);
-  if (order !== Number.MAX_SAFE_INTEGER) return `Problem ${order + 1}`;
+// id -> position (order_index has gaps)
+function buildQuestionPositions(questions) {
+  const positionById = new Map();
+  const sorted = (Array.isArray(questions) ? questions : [])
+    .filter((q) => q?.id != null)
+    .sort((a, b) => Number(a.order_index) - Number(b.order_index));
+  sorted.forEach((q, index) => positionById.set(String(q.id), index));
+  return positionById;
+}
+
+function questionPosition(row, positionById) {
+  const id = questionId(row);
+  if (id != null && positionById.has(String(id))) return positionById.get(String(id));
+  return rawOrderIndex(row);
+}
+
+function questionLabel(row, positionById) {
+  const position = questionPosition(row, positionById);
+  if (position !== Number.MAX_SAFE_INTEGER) return `Problem ${position + 1}`;
   const id = questionId(row);
   return id != null ? `Question ${id}` : "Question";
 }
@@ -59,14 +66,16 @@ function buildAttemptBundle(attempts) {
 
 /**
  * @param {Array} rows raw submission rows from API
+ * @param {Array} questions full question list, for numbering
  * @returns {{
  *   byStudent: Array,
  *   byQuestion: Array,
  *   summary: { submissionCount, studentCount, questionCount, latestSubmittedAt }
  * }}
  */
-export function organizeAssignmentSubmissions(rows = []) {
+export function organizeAssignmentSubmissions(rows = [], questions = []) {
   const list = Array.isArray(rows) ? rows : [];
+  const positionById = buildQuestionPositions(questions);
 
   const studentMap = new Map();
   const questionMap = new Map();
@@ -87,8 +96,8 @@ export function organizeAssignmentSubmissions(rows = []) {
     if (!student.questions.has(qid)) {
       student.questions.set(qid, {
         questionId: qid,
-        label: questionLabel(row),
-        orderIndex: questionOrderIndex(row),
+        label: questionLabel(row, positionById),
+        orderIndex: questionPosition(row, positionById),
         attempts: [],
       });
     }
@@ -97,8 +106,8 @@ export function organizeAssignmentSubmissions(rows = []) {
     if (!questionMap.has(qid)) {
       questionMap.set(qid, {
         questionId: qid,
-        label: questionLabel(row),
-        orderIndex: questionOrderIndex(row),
+        label: questionLabel(row, positionById),
+        orderIndex: questionPosition(row, positionById),
         students: new Map(),
       });
     }
@@ -111,6 +120,17 @@ export function organizeAssignmentSubmissions(rows = []) {
       });
     }
     question.students.get(uid).attempts.push(row);
+  }
+
+  // include unattempted questions too
+  for (const q of Array.isArray(questions) ? questions : []) {
+    if (q?.id == null || questionMap.has(q.id)) continue;
+    questionMap.set(q.id, {
+      questionId: q.id,
+      label: questionLabel({ assignment_question_id: q.id }, positionById),
+      orderIndex: questionPosition({ assignment_question_id: q.id }, positionById),
+      students: new Map(),
+    });
   }
 
   const byStudent = Array.from(studentMap.values())

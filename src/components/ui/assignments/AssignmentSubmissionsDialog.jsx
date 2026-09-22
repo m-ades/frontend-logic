@@ -15,17 +15,22 @@ export default function AssignmentSubmissionsDialog({
   open,
   assignment,
   loadSubmissions,
+  loadQuestions,
   onClose,
 }) {
   const [rows, setRows] = useState([]);
+  const [questions, setQuestions] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const loadRef = useRef(loadSubmissions);
   loadRef.current = loadSubmissions;
+  const loadQuestionsRef = useRef(loadQuestions);
+  loadQuestionsRef.current = loadQuestions;
 
   useEffect(() => {
     if (!open || !assignment?.id) return undefined;
     const load = loadRef.current;
+    const loadQ = loadQuestionsRef.current;
     if (typeof load !== "function") {
       setRows([]);
       setError("Submissions are not available.");
@@ -35,13 +40,20 @@ export default function AssignmentSubmissionsDialog({
     let cancelled = false;
     setError("");
     setLoading(true);
-    load(assignment.id)
-      .then((data) => {
-        if (!cancelled) setRows(Array.isArray(data) ? data : []);
+    // numbering only; ignore errors here
+    const questionsPromise = typeof loadQ === "function"
+      ? loadQ(assignment.id).catch(() => [])
+      : Promise.resolve([]);
+    Promise.all([load(assignment.id), questionsPromise])
+      .then(([submissionRows, questionRows]) => {
+        if (cancelled) return;
+        setRows(Array.isArray(submissionRows) ? submissionRows : []);
+        setQuestions(Array.isArray(questionRows) ? questionRows : []);
       })
       .catch((err) => {
         if (!cancelled) {
           setRows([]);
+          setQuestions([]);
           setError(err?.message || "Failed to load submissions.");
         }
       })
@@ -74,7 +86,7 @@ export default function AssignmentSubmissionsDialog({
             Latest attempt is shown first. Expand a row for question details, then expand again for prior attempts.
           </Typography>
         )}
-        {!loading && <AssignmentSubmissionsTable rows={rows} />}
+        {!loading && <AssignmentSubmissionsTable rows={rows} questions={questions} />}
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose}>Close</Button>

@@ -113,3 +113,71 @@ test('an empty query returns the organized data unchanged', () => {
   assert.equal(filterOrganizedSubmissions(organized, ''), organized)
   assert.equal(filterOrganizedSubmissions(organized, undefined), organized)
 })
+
+test('numbers problems by position in the full question list, not order_index + 1', () => {
+  // order_index starts at 1 here
+  const questions = [
+    { id: 20, order_index: 1, points_value: 100 },
+    { id: 21, order_index: 2, points_value: 100 },
+  ]
+  const oneBasedRows = [
+    row({
+      id: 5, assignment_question_id: 20, submitted_at: '2026-09-05T09:00:00Z',
+      AssignmentQuestion: { id: 20, order_index: 1, points_value: 100 },
+    }),
+    row({
+      id: 6, assignment_question_id: 21, submitted_at: '2026-09-05T10:00:00Z',
+      AssignmentQuestion: { id: 21, order_index: 2, points_value: 100 },
+    }),
+  ]
+
+  const { byQuestion } = organizeAssignmentSubmissions(oneBasedRows, questions)
+  assert.deepEqual(byQuestion.map((q) => q.label), ['Problem 1', 'Problem 2'])
+})
+
+test('numbers problems by position even when order_index has gaps from a deleted question', () => {
+  const questions = [
+    { id: 30, order_index: 0, points_value: 100 },
+    { id: 31, order_index: 5, points_value: 100 }, // order_index 1-4 deleted
+  ]
+  const gappedRows = [
+    row({
+      id: 7, assignment_question_id: 30, submitted_at: '2026-09-06T09:00:00Z',
+      AssignmentQuestion: { id: 30, order_index: 0, points_value: 100 },
+    }),
+    row({
+      id: 8, assignment_question_id: 31, submitted_at: '2026-09-06T10:00:00Z',
+      AssignmentQuestion: { id: 31, order_index: 5, points_value: 100 },
+    }),
+  ]
+
+  const { byQuestion } = organizeAssignmentSubmissions(gappedRows, questions)
+  assert.deepEqual(byQuestion.map((q) => q.label), ['Problem 1', 'Problem 2'])
+})
+
+test('includes questions nobody has submitted yet, using the full question list', () => {
+  const questions = [
+    { id: 40, order_index: 0, points_value: 100 },
+    { id: 41, order_index: 1, points_value: 100 }, // nobody has attempted this one
+    { id: 42, order_index: 2, points_value: 100 },
+  ]
+  const partialRows = [
+    row({
+      id: 9, assignment_question_id: 40, submitted_at: '2026-09-07T09:00:00Z',
+      AssignmentQuestion: { id: 40, order_index: 0, points_value: 100 },
+    }),
+    row({
+      id: 10, assignment_question_id: 42, submitted_at: '2026-09-07T10:00:00Z',
+      AssignmentQuestion: { id: 42, order_index: 2, points_value: 100 },
+    }),
+  ]
+
+  const { byQuestion, summary } = organizeAssignmentSubmissions(partialRows, questions)
+  assert.deepEqual(byQuestion.map((q) => q.label), ['Problem 1', 'Problem 2', 'Problem 3'])
+  const untouched = byQuestion[1]
+  assert.equal(untouched.questionId, 41)
+  assert.equal(untouched.studentCount, 0)
+  assert.deepEqual(untouched.students, [])
+  assert.equal(untouched.averageLatestScore, null)
+  assert.equal(summary.questionCount, 3)
+})
