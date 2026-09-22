@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   Alert,
   Button,
@@ -29,20 +30,30 @@ export default function QuestionAttemptOverrideDialog({
 }) {
   const { courseState, courseActions } = useAppRuntime();
   const { activeCourseId, gradebookByCourse } = courseState;
+  const queryClient = useQueryClient();
 
-  const [overrides, setOverrides] = useState([]);
-  const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [saved, setSaved] = useState(false);
   const [studentId, setStudentId] = useState("");
   const [extraAttempts, setExtraAttempts] = useState("1");
   const [reason, setReason] = useState("");
-  // courseActions gets a fresh identity on every layout render, so read it through
-  // a ref instead of listing it as an effect dependency (which would refetch needlessly)
-  const actionsRef = useRef(courseActions);
-  actionsRef.current = courseActions;
   const savedTimerRef = useRef(null);
+
+  // matches StudentSubmissionDialog's query key
+  const overridesQueryKey = ["question-attempt-overrides", questionId];
+  const {
+    data: overridesData,
+    isPending: overridesPending,
+    isFetching: overridesFetching,
+    isError: overridesError,
+    refetch: refetchOverrides,
+  } = useQuery({
+    queryKey: overridesQueryKey,
+    enabled: open && Boolean(questionId),
+    queryFn: () => courseActions.getQuestionAttemptOverrides?.(questionId),
+  });
+  const overrides = Array.isArray(overridesData) ? overridesData : [];
 
   const students = useMemo(
     () => (gradebookByCourse?.[activeCourseId] || []).filter(
@@ -53,37 +64,10 @@ export default function QuestionAttemptOverrideDialog({
 
   const baseLimit = Number.isFinite(Number(baseAttemptLimit)) ? Number(baseAttemptLimit) : 3;
   const parsedExtra = Number(extraAttempts);
-  const effectiveLimit = Number.isFinite(parsedExtra)
-    ? Math.max(1, baseLimit + parsedExtra)
-    : baseLimit;
-  const canSubmit = Boolean(studentId) && Number.isFinite(parsedExtra) && parsedExtra >= 0 && !saving;
-
-  useEffect(() => {
-    if (!open || !questionId) return undefined;
-    let isMounted = true;
-
-    const load = async () => {
-      setLoading(true);
-      setError("");
-      setSaved(false);
-      try {
-        const rows = await actionsRef.current.getQuestionAttemptOverrides?.(questionId);
-        if (!isMounted) return;
-        setOverrides(Array.isArray(rows) ? rows : []);
-      } catch (err) {
-        if (!isMounted) return;
-        setOverrides([]);
-        setError(err?.message || "Failed to load extra attempts.");
-      } finally {
-        if (isMounted) setLoading(false);
-      }
-    };
-
-    load();
-    return () => {
-      isMounted = false;
-    };
-  }, [open, questionId]);
+  const isValidExtra = Number.isInteger(parsedExtra) && parsedExtra >= 0;
+  const effectiveLimit = isValidExtra ? Math.max(1, baseLimit + parsedExtra) : baseLimit;
+  const overridesReady = !overridesPending && !overridesFetching && !overridesError;
+  const canSubmit = Boolean(studentId) && isValidExtra && !saving && overridesReady;
 
   useEffect(() => {
     if (!open) {
@@ -117,14 +101,12 @@ export default function QuestionAttemptOverrideDialog({
     setError("");
     setSaved(false);
     try {
-      const actions = actionsRef.current;
-      const record = await actions.saveQuestionAttemptOverride?.(questionId, {
+      await courseActions.saveQuestionAttemptOverride?.(questionId, {
         userId: Number(studentId),
         extraAttempts: parsedExtra,
         reason,
       });
-      const rows = await actions.getQuestionAttemptOverrides?.(questionId);
-      setOverrides(Array.isArray(rows) ? rows : (record ? [record] : []));
+      await queryClient.invalidateQueries({ queryKey: overridesQueryKey });
       setSaved(true);
       clearTimeout(savedTimerRef.current);
       savedTimerRef.current = setTimeout(() => setSaved(false), 1500);
@@ -144,7 +126,7 @@ export default function QuestionAttemptOverrideDialog({
     >
       <form onSubmit={handleSubmit}>
         <DialogTitle>Extra attempts</DialogTitle>
-        {(loading || saving) && <LinearProgress />}
+        {(overridesPending || overridesFetching || saving) && <LinearProgress />}
         <DialogContent>
           <Stack spacing={2} sx={{ mt: 0.5 }}>
             {questionLabel && (
@@ -158,8 +140,20 @@ export default function QuestionAttemptOverrideDialog({
             </Alert>
             {error && <Alert severity="error">{error}</Alert>}
             {saved && <Alert severity="success">Extra attempts saved.</Alert>}
+            {overridesError && (
+              <Alert
+                severity="error"
+                action={(
+                  <Button color="inherit" onClick={() => refetchOverrides()} disabled={overridesFetching}>
+                    Retry
+                  </Button>
+                )}
+              >
+                Failed to load extra attempts for this question.
+              </Alert>
+            )}
 
-            <FormControl fullWidth required disabled={saving || students.length === 0}>
+            <FormControl fullWidth required disabled={saving || !overridesReady || students.length === 0}>
               <InputLabel id="attempt-override-student-label">Student</InputLabel>
               <Select
                 labelId="attempt-override-student-label"
@@ -181,7 +175,8 @@ export default function QuestionAttemptOverrideDialog({
               value={extraAttempts}
               onChange={(event) => setExtraAttempts(event.target.value)}
               inputProps={{ min: 0, step: 1 }}
-              helperText={`Effective attempt limit: ${effectiveLimit}`}
+              helperText={isValidExtra ? `Effective attempt limit: ${effectiveLimit}` : "Whole number, 0 or more"}
+              error={!isValidExtra}
               fullWidth
               required
               disabled={saving}
@@ -205,7 +200,7 @@ export default function QuestionAttemptOverrideDialog({
             <QuestionAttemptOverridesTable
               rows={overrides}
               baseAttemptLimit={baseLimit}
-              loading={loading}
+              loading={overridesPending}
             />
           </Stack>
         </DialogContent>

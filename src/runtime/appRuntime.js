@@ -320,7 +320,7 @@ export function createAppRuntime({ coursesDispatch, coursesState, routeKind, use
       const id = Number(questionId);
       const targetUserId = Number(userId);
       const extra = Number(extraAttempts);
-      if (!Number.isFinite(id) || !Number.isFinite(targetUserId) || !Number.isFinite(extra) || extra < 0) {
+      if (!Number.isFinite(id) || !Number.isFinite(targetUserId) || !Number.isInteger(extra) || extra < 0) {
         throw new Error("A valid student and extra attempts value are required.");
       }
       return fetchJson(`/api/instructor/assignment-questions/${id}/overrides`, {

@@ -876,7 +876,7 @@ export function InstructorSandboxProvider({ children }) {
       : null
     const targetUserId = Number(userId)
     const extra = Number(extraAttempts)
-    if (!normalizedQuestionId || !Number.isFinite(targetUserId) || !Number.isFinite(extra) || extra < 0) {
+    if (!normalizedQuestionId || !Number.isFinite(targetUserId) || !Number.isInteger(extra) || extra < 0) {
       throw new Error("A valid student and extra attempts value are required.")
     }
     const courseId = courseState.activeCourseId
