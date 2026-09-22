@@ -41,7 +41,6 @@ export const LOGIC_SYSTEMS = {
 /** Historical / notation-style aliases → canonical system ids (fitch ≈ calgary/forallx glyphs). */
 const LOGIC_SYSTEM_ALIASES = {
   calgary: 'fitch',
-  cambridge: 'fitch',
   forallx: 'fitch',
   'forall-x': 'fitch',
 }
