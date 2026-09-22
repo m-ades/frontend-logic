@@ -113,8 +113,10 @@ export default function LogicInput({
   const handleFocus = useCallback(() => {
     if (disabled) return
     setIsFocused(true)
+    // cursor starts at end for prefilled text
+    if (value.length > 0 && clampedCursor === 0) setCursor(value.length)
     onFocus?.()
-  }, [disabled, onFocus])
+  }, [disabled, onFocus, value.length, clampedCursor, setCursor])
 
   const handleBlur = useCallback(() => {
     setIsFocused(false)
@@ -127,9 +129,15 @@ export default function LogicInput({
       if (e.key === 'Backspace') {
         e.preventDefault()
         if (clampedCursor > 0) {
-          const next = value.slice(0, clampedCursor - 1) + value.slice(clampedCursor)
+          // variation selectors are 2 code units
+          const prevCode = value.codePointAt(clampedCursor - 1)
+          const isVariationSelector = prevCode === 0xfe0e || prevCode === 0xfe0f
+          const deleteStart = isVariationSelector
+            ? Math.max(0, clampedCursor - 2)
+            : clampedCursor - 1
+          const next = value.slice(0, deleteStart) + value.slice(clampedCursor)
           onChange?.(next)
-          setCursor(clampedCursor - 1)
+          setCursor(deleteStart)
         }
         return
       }
