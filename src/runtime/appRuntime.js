@@ -274,6 +274,13 @@ export function createAppRuntime({ coursesDispatch, coursesState, routeKind, use
         }),
       });
     },
+    getAssignmentSubmissions: async (assignmentId) => {
+      const id = Number(assignmentId);
+      if (!Number.isInteger(id) || id <= 0) return [];
+      // summary=true leaves out submission_data, which the classwide table never shows
+      const rows = await fetchJson(`/api/instructor/assignments/${id}/submissions?summary=true`);
+      return Array.isArray(rows) ? rows : [];
+    },
     getQuestionAttemptOverrides: async (questionId) => {
       const id = Number(questionId);
       if (!Number.isFinite(id)) return [];

@@ -169,6 +169,7 @@ export function InstructorSandboxLayout({ children }) {
       saveAccommodations: sandbox.saveAccommodations,
       getDeadlines: sandbox.getDeadlines,
       saveDeadline: sandbox.saveDeadline,
+      getAssignmentSubmissions: sandbox.getAssignmentSubmissions,
       getQuestionAttemptOverrides: sandbox.getQuestionAttemptOverrides,
       saveQuestionAttemptOverride: sandbox.saveQuestionAttemptOverride,
       loadInstructorDashboard: async (courseId) => {
