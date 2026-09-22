@@ -335,10 +335,8 @@ export default function InstructorAssignments() {
         open={submissionsOpen}
         assignment={submissionsAssignment}
         loadSubmissions={loadAssignmentSubmissions}
-        onClose={() => {
-          setSubmissionsOpen(false);
-          setSubmissionsAssignment(null);
-        }}
+        // keep the assignment so the title stays put during the close animation
+        onClose={() => setSubmissionsOpen(false)}
       />
 
       {/* Create Dialog */}
