@@ -732,40 +732,41 @@ export function InstructorSandboxProvider({ children }) {
     )
     const grantedAt = new Date().toISOString()
     const trimmedReason = typeof reason === "string" ? reason.trim().slice(0, 500) : null
+
+    // build the next deadlines map up front: setState updaters run lazily (and twice
+    // in strict mode), so counting inside one would return wrong numbers
+    const courseDeadlines = { ...(state.deadlinesByCourse?.[courseId] || {}) }
     let updated = 0
     let preserved = 0
-
-    setState((prev) => {
-      const courseDeadlines = { ...(prev.deadlinesByCourse?.[courseId] || {}) }
-      for (const student of students) {
-        const existing = courseDeadlines[student.id]?.[assignmentId]
-        const existingMs = existing?.extension_due_at
-          ? Date.parse(existing.extension_due_at)
-          : NaN
-        if (existing?.extension_due_at && !Number.isNaN(existingMs) && existingMs > classwideMs) {
-          preserved += 1
-          continue
-        }
-        courseDeadlines[student.id] = {
-          ...(courseDeadlines[student.id] || {}),
-          [assignmentId]: {
-            assignment_id: assignmentId,
-            user_id: student.id,
-            extension_due_at: extendedDueDate,
-            reason: trimmedReason || null,
-            created_at: grantedAt,
-          },
-        }
-        updated += 1
+    for (const student of students) {
+      const existing = courseDeadlines[student.id]?.[assignmentId]
+      const existingMs = existing?.extension_due_at
+        ? Date.parse(existing.extension_due_at)
+        : NaN
+      if (Number.isFinite(existingMs) && existingMs > classwideMs) {
+        preserved += 1
+        continue
       }
-      return {
-        ...prev,
-        deadlinesByCourse: {
-          ...prev.deadlinesByCourse,
-          [courseId]: courseDeadlines,
+      courseDeadlines[student.id] = {
+        ...(courseDeadlines[student.id] || {}),
+        [assignmentId]: {
+          assignment_id: assignmentId,
+          user_id: student.id,
+          extension_due_at: extendedDueDate,
+          reason: trimmedReason || null,
+          created_at: grantedAt,
         },
       }
-    })
+      updated += 1
+    }
+
+    setState((prev) => ({
+      ...prev,
+      deadlinesByCourse: {
+        ...prev.deadlinesByCourse,
+        [courseId]: courseDeadlines,
+      },
+    }))
     return { updated, preserved, total: students.length }
   }
 

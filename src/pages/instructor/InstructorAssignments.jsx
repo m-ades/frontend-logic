@@ -258,7 +258,7 @@ export default function InstructorAssignments() {
     if (!assignment?.id) return;
     setExtensionAssignment(assignment);
     setClasswideForm({
-      dueDate: assignment.dueDate || getCurrentDate(),
+      dueDate: assignment.dueDate || getCurrentEasternDate(),
       dueTime: assignment.dueTime || "23:59",
       reason: "",
     });
