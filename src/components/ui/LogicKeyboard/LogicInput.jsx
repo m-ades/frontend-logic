@@ -82,14 +82,32 @@ export default function LogicInput({
       if (index !== null && index !== undefined) {
         const i = parseInt(index, 10)
         if (!Number.isFinite(i)) return
+        // tapping a glyph lands the caret on whichever side is closer
         const rect = target.getBoundingClientRect()
         setCursor(e.clientX > rect.left + rect.width / 2 ? i + 1 : i)
         return
       }
-      const rect = e.currentTarget.getBoundingClientRect()
-      setCursor(e.clientX < rect.left + rect.width / 2 ? 0 : len)
+      // tapping empty space: go to the end of the visual line that was tapped,
+      // or before its first glyph when the tap is left of the text
+      const glyphs = Array.from(e.currentTarget.querySelectorAll('[data-char-index]'))
+      if (glyphs.length === 0) {
+        setCursor(0)
+        return
+      }
+      const onTappedLine = glyphs.filter((el) => {
+        const rect = el.getBoundingClientRect()
+        return e.clientY >= rect.top && e.clientY <= rect.bottom
+      })
+      const line = onTappedLine.length > 0 ? onTappedLine : glyphs
+      const first = line[0]
+      const last = line[line.length - 1]
+      if (e.clientX < first.getBoundingClientRect().left) {
+        setCursor(parseInt(first.getAttribute('data-char-index'), 10))
+        return
+      }
+      setCursor(parseInt(last.getAttribute('data-char-index'), 10) + 1)
     },
-    [disabled, setCursor, len]
+    [disabled, setCursor]
   )
 
   const handleFocus = useCallback(() => {
