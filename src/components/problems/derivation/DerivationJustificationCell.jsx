@@ -55,6 +55,7 @@ export default function DerivationJustificationCell({
   onRequestFullScreen,
   onRuleChange,
   onTypedCommit,
+  persistentUnderline = false,
   premisesCount,
   registerInput,
   useRuleDropdown,
@@ -191,6 +192,10 @@ export default function DerivationJustificationCell({
                 '& .MuiInput-root:before, & .MuiInput-root:after': {
                   right: 'auto',
                   width: '75%',
+                  opacity: persistentUnderline ? 1 : 0,
+                },
+                'tr:focus-within & .MuiInput-root:before, tr:focus-within & .MuiInput-root:after': {
+                  opacity: persistentUnderline || !justificationReadOnly ? 1 : 0,
                 },
               }}
             />
