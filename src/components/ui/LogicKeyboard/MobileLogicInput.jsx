@@ -253,7 +253,12 @@ export default function MobileLogicInput({
     document.body.style.paddingBottom = `${pad}px`
 
     const id = window.setTimeout(() => {
-      field.scrollIntoView({ block: 'center', behavior: 'smooth' })
+      // avoid centering behind the fixed panel
+      const visibleHeight = window.visualViewport?.height || window.innerHeight
+      const availableHeight = visibleHeight - pad
+      const rect = field.getBoundingClientRect()
+      const delta = rect.top + rect.height / 2 - availableHeight / 2
+      window.scrollBy({ top: delta, behavior: 'smooth' })
     }, 60)
 
     return () => {

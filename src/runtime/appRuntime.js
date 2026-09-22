@@ -305,6 +305,12 @@ export function createAppRuntime({ coursesDispatch, coursesState, routeKind, use
       const rows = await fetchJson(`/api/instructor/assignments/${id}/submissions?summary=true`);
       return Array.isArray(rows) ? rows : [];
     },
+    getAssignmentQuestions: async (assignmentId) => {
+      const id = Number(assignmentId);
+      if (!Number.isInteger(id) || id <= 0) return [];
+      const questions = await fetchJson(`/api/assignments/${id}/questions`);
+      return Array.isArray(questions) ? questions : [];
+    },
     getQuestionAttemptOverrides: async (questionId) => {
       const id = Number(questionId);
       if (!Number.isFinite(id)) return [];

@@ -51,8 +51,10 @@ export function isLogicSystem(value) {
 
 export function normalizeLogicSystem(value, fallback = DEFAULT_LOGIC_SYSTEM) {
   if (typeof value !== 'string') return fallback
-  if (isLogicSystem(value)) return value
-  const aliased = LOGIC_SYSTEM_ALIASES[value]
+  // tolerate inconsistent casing
+  const lowered = value.toLowerCase()
+  if (isLogicSystem(lowered)) return lowered
+  const aliased = LOGIC_SYSTEM_ALIASES[lowered]
   return aliased && isLogicSystem(aliased) ? aliased : fallback
 }
 
