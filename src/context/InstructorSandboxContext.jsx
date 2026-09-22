@@ -698,6 +698,7 @@ export function InstructorSandboxProvider({ children }) {
               extension_due_at: extendedDueDate,
               reason: reason || null,
               created_at: new Date().toISOString(),
+              grantedBy: INSTRUCTOR_SANDBOX_USER,
             },
           },
         },
@@ -722,6 +723,7 @@ export function InstructorSandboxProvider({ children }) {
           extended_due_date: ext.extension_due_at,
           reason: ext.reason || null,
           created_at: ext.created_at || null,
+          grantedBy: ext.grantedBy || null,
           User: { id: student.id, username: student.username },
         }
       })
@@ -762,6 +764,7 @@ export function InstructorSandboxProvider({ children }) {
           extension_due_at: extendedDueDate,
           reason: trimmedReason || null,
           created_at: grantedAt,
+          grantedBy: INSTRUCTOR_SANDBOX_USER,
         },
       }
       updated += 1
