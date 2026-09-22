@@ -74,9 +74,6 @@ export const mobileKeyBaseSx = {
 }
 
 const mobileKeyToneSx = {
-  connective: hueTone('primary', 0.12, 0.24),
-  grouping: hueTone('info', 0.1, 0.22),
-  extra: hueTone('primary', 0.06, 0.16),
   // shape cue for colorblind users
   predicate: { ...hueTone('warning', 0.18, 0.22), borderRadius: 0.5 },
   constant: hueTone('success', 0.14, 0.2),
