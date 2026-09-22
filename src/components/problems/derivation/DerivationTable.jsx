@@ -1234,8 +1234,8 @@ export default function DerivationTable({
                       getRuleFromJustification(line.justification).toUpperCase()
                     )
               )
-              const isPremiseLine = usesNestedSubderivations && idx < premises.length
-              const showsFitchDivider = isPremiseLine || startsScope
+              const isLastPremiseLine = usesNestedSubderivations && idx === premises.length - 1
+              const showsFitchDivider = isLastPremiseLine || startsScope
               return (
               <TableRow
                 key={`line-${idx}`}
@@ -1368,6 +1368,7 @@ export default function DerivationTable({
                   }}
                   onRuleChange={(rule) => handleRuleChange(idx, line, rule)}
                   onTypedCommit={(raw) => handleTypedJustificationCommit(idx, raw)}
+                  persistentUnderline={isFixedProof}
                   premisesCount={premises.length}
                   registerInput={(element) => { if (element) justRefs.current[idx] = element }}
                   useRuleDropdown={useRuleDropdown}

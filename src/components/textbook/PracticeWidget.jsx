@@ -1,12 +1,8 @@
 import { Box, Button, Chip, Stack, Typography } from '@mui/material'
 import { Psychology as PracticeIcon } from '@mui/icons-material'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { Link as RouterLink, useLocation } from 'react-router-dom'
 import { useAppRuntime } from '@/hooks/useAppRuntime.js'
 
-/**
- * Linked practice CTA embedded in the textbook reader.
- * Only rendered when a resolved textbook↔practice link exists.
- */
 export default function PracticeWidget({
   practiceId,
   practiceTitle,
@@ -14,7 +10,6 @@ export default function PracticeWidget({
   textbookSlug = null,
 }) {
   const location = useLocation()
-  const navigate = useNavigate()
   const { assignmentPath, isInstructor, practicePath, textbookPath, textbookChapterPath } =
     useAppRuntime()
 
@@ -22,22 +17,13 @@ export default function PracticeWidget({
 
   const title = practiceTitle || `Practice ${practiceId}`
 
-  const openPractice = () => {
-    const path = assignmentPath?.(practiceId) || `/assignment/${practiceId}`
-    const returnTo = isInstructor
-      ? `${location.pathname}${location.search}${location.hash}`
-      : (textbookSlug && textbookChapterPath?.(textbookSlug)) ||
-        textbookPath ||
-        practicePath ||
-        '/textbook'
-    navigate(path, {
-      state: {
-        returnTo,
-        textbookSlug: textbookSlug || undefined,
-        textbookSectionId: sectionId || undefined,
-      },
-    })
-  }
+  const path = assignmentPath?.(practiceId) || `/assignment/${practiceId}`
+  const returnTo = isInstructor
+    ? `${location.pathname}${location.search}${location.hash}`
+    : (textbookSlug && textbookChapterPath?.(textbookSlug)) ||
+      textbookPath ||
+      practicePath ||
+      '/textbook'
 
   return (
     <Box
@@ -67,7 +53,17 @@ export default function PracticeWidget({
       <Typography sx={{ fontSize: '1rem', lineHeight: 1.6, mb: '1em', color: 'text.secondary' }}>
         {title}
       </Typography>
-      <Button variant="contained" size="small" onClick={openPractice}>
+      <Button
+        variant="contained"
+        size="small"
+        component={RouterLink}
+        to={path}
+        state={{
+          returnTo,
+          textbookSlug: textbookSlug || undefined,
+          textbookSectionId: sectionId || undefined,
+        }}
+      >
         Open practice
       </Button>
     </Box>

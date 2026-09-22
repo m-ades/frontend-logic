@@ -12,7 +12,8 @@ import {
   ExpandMore,
   Psychology as PracticeIcon,
 } from '@mui/icons-material'
-import { useNavigate } from 'react-router-dom'
+import { Link as RouterLink } from 'react-router-dom'
+import { isPlainLinkClick } from '@/utils/linkNavigation.js'
 import ThemedCard from '@/components/ui/ThemedCard.jsx'
 import { useAppRuntime } from '@/hooks/useAppRuntime.js'
 import { useTextbookPracticeLinks } from '@/hooks/useTextbookPracticeLinks.js'
@@ -21,12 +22,7 @@ import { getTextbookManifest } from '@/components/textbook/textbookCatalog.js'
 import { linksForTextbookSlug } from '@/components/textbook/textbookPracticeLinks.js'
 import { isDividerKind, isNavigableNode } from '@/components/textbook/textbookStructure.js'
 
-/**
- * textbook hub for the table of contents and linked practice
- * route student textbook
- */
 export default function TextbookHubPage({ onOpenChapter = null }) {
-  const navigate = useNavigate()
   const { textbookChapterPath, textbookPath } = useAppRuntime()
   const { resolvedLinks } = useTextbookPracticeLinks()
   const { numberedTree: tree } = useTextbookStructure()
@@ -56,15 +52,6 @@ export default function TextbookHubPage({ onOpenChapter = null }) {
     })
   }, [tree])
 
-  const go = (slug) => {
-    if (onOpenChapter) {
-      onOpenChapter(slug)
-      return
-    }
-    const path = textbookChapterPath?.(slug) || `${textbookPath || '/textbook'}/${slug}`
-    navigate(path)
-  }
-
   const togglePart = (slug) => {
     setOpenParts((prev) => ({ ...prev, [slug]: !prev[slug] }))
   }
@@ -74,7 +61,12 @@ export default function TextbookHubPage({ onOpenChapter = null }) {
     return (
       <ThemedCard
         key={item.slug}
+        component={RouterLink}
+        to={textbookChapterPath?.(item.slug) || `${textbookPath || '/textbook'}/${item.slug}`}
         sx={{
+          display: 'block',
+          color: 'inherit',
+          textDecoration: 'none',
           cursor: 'pointer',
           ml: nested ? { xs: 0, sm: 2 } : 0,
           '&:hover': { boxShadow: 4 },
@@ -84,15 +76,12 @@ export default function TextbookHubPage({ onOpenChapter = null }) {
             outlineOffset: 2,
           },
         }}
-        onClick={() => go(item.slug)}
-        onKeyDown={(event) => {
-          if (event.key === 'Enter' || event.key === ' ') {
+        onClick={(event) => {
+          if (onOpenChapter && isPlainLinkClick(event)) {
             event.preventDefault()
-            go(item.slug)
+            onOpenChapter(item.slug)
           }
         }}
-        tabIndex={0}
-        role="link"
         aria-label={`Open ${item.label}`}
       >
         <Box
