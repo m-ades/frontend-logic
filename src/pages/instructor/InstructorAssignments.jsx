@@ -302,10 +302,10 @@ export default function InstructorAssignments() {
       }
       // best-effort refresh, grant already succeeded
       if (!isSandbox) {
+        await queryClient.invalidateQueries({ queryKey: ["student-deadline", activeCourseId] });
         try {
           const freshGradebook = await fetchCourseGradebook(activeCourseId);
           courseActions.setGradebook?.(activeCourseId, freshGradebook);
-          await queryClient.invalidateQueries({ queryKey: ["student-deadline", activeCourseId] });
         } catch (refreshError) {
           console.error("Failed to refresh gradebook after classwide extension", refreshError);
         }
