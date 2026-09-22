@@ -3,14 +3,20 @@ import { displayLogicText } from '../../../lib/logicText.js'
 
 const SYMBOL_SPEECH = {
   '~': 'tilde',
+  '¬': 'negation',
   '•': 'dot',
+  '∧': 'conjunction',
+  '&': 'ampersand',
   '∨': 'wedge',
   '⊃': 'horseshoe',
+  '→': 'arrow',
   '≡': 'triple bar',
+  '↔': 'biconditional',
+  '↔︎': 'biconditional',
   '∀': 'universal quantifier',
   '∃': 'existential quantifier',
-  '⊥': 'contradiction',
-  '✖': 'contradiction',
+  '⊥': 'falsum',
+  '✖': 'falsum',
   '∴': 'therefore',
 }
 
@@ -84,10 +90,17 @@ export const getInsertSymbolLabel = ({ insert, pair } = {}) => {
   return `Insert ${insert}`
 }
 
-export default function LogicSymbol({ symbol, component = 'span', sx }) {
+export default function LogicSymbol({ symbol, component = 'span', sx, decorative = false }) {
+  const displayedSymbol = displayLogicText(symbol)
+  if (decorative) {
+    return (
+      <Box component={component} aria-hidden sx={sx}>
+        {displayedSymbol}
+      </Box>
+    )
+  }
   const expressionSpeech = EXPR_SPEECH[symbol]
   const symbolSpeech = expressionSpeech || getTokenSpeechLabel(symbol)
-  const displayedSymbol = displayLogicText(symbol)
   return (
     <Box component={component} role="text" aria-label={symbolSpeech} sx={sx}>
       <Box component="span" aria-hidden="true">{displayedSymbol}</Box>

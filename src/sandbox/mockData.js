@@ -161,7 +161,7 @@ export const SANDBOX_ASSIGNMENTS = [
             'M = Michelle goes to the concert',
             'D = Daniel plays the piano at the concert',
           ],
-          options: { pred: false, hints: true, notation: 'cambridge' },
+          options: { pred: false, hints: true, notation: 'hurley' },
         },
       },
     ],
@@ -305,7 +305,7 @@ export const SANDBOX_ASSIGNMENTS = [
             'Sx: x is satisfied',
             'Ix: x is impressed',
           ],
-          options: { pred: true, hints: true, notation: 'cambridge' },
+          options: { pred: true, hints: true, notation: 'hurley' },
         },
       },
       {
@@ -486,7 +486,7 @@ export const SANDBOX_PRACTICES = [
             'P = Being elected President of the United States',
             'C = Being the Commander-in-Chief',
           ],
-          options: { pred: false, hints: true, notation: 'cambridge' },
+          options: { pred: false, hints: true, notation: 'hurley' },
         },
       },
       {
@@ -503,7 +503,7 @@ export const SANDBOX_PRACTICES = [
             'C = Cardi B will release new music',
             'M = Marc Anthony will release new music',
           ],
-          options: { pred: false, hints: true, notation: 'cambridge' },
+          options: { pred: false, hints: true, notation: 'hurley' },
         },
       },
       {
@@ -515,7 +515,7 @@ export const SANDBOX_PRACTICES = [
         translation: {
           prompt: '<div class=instructions>Symbolize the following statements into predicate logic. <strong> Note: </strong> The upper-case letters are predicates, and the lower-case letters are individual constants for proper nouns in English. <strong>Avoid</strong> using the negation sign (~) before quantifiers.</div><div>Unicorns do not exist.</div>',
           symbolizationKey: ['U: is a unicorn'],
-          options: { pred: true, hints: true, notation: 'cambridge' },
+          options: { pred: true, hints: true, notation: 'hurley' },
         },
       },
       {
@@ -527,7 +527,7 @@ export const SANDBOX_PRACTICES = [
         translation: {
           prompt: '<div class=instructions>Symbolize the following statement into predicate logic. </div>\n<p> <strong>Note:</strong> When symbolizing the English statement, avoid using the negation sign (~) before quantifiers.</p>\n\n<br>\n<div style="border: 1px #f9f9f9; padding: 10px; width: 500px; text-align: center;background-color: #F6F4FF; border-radius: 5px;">\nNot all reptiles are venomous.</div>',
           symbolizationKey: ['Rx: x is a reptile', 'Vx: x is venomous'],
-          options: { pred: true, hints: true, notation: 'cambridge' },
+          options: { pred: true, hints: true, notation: 'hurley' },
         },
       },
       {
@@ -539,7 +539,7 @@ export const SANDBOX_PRACTICES = [
         translation: {
           prompt: '<div class=instructions>Symbolize the following statements into predicate logic using relational predicates. <strong> Note: </strong> The upper-case letters are predicates, and the lower-case letters are individual constants for proper nouns in English. </div><div>Disney protects everything it creates.</div>',
           symbolizationKey: ['d: Disney', 'Pxy: x protects y', 'Cxy: x creates y'],
-          options: { pred: true, hints: true, notation: 'cambridge' },
+          options: { pred: true, hints: true, notation: 'hurley' },
         },
       },
     ],

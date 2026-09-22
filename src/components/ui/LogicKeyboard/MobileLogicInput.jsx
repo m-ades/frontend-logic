@@ -3,9 +3,19 @@ import { createPortal, flushSync } from 'react-dom'
 import { Box, Button, Stack, TextField } from '@mui/material'
 import { alpha } from '@mui/material/styles'
 import { useTheme, useMediaQuery } from '@mui/material'
+import BackspaceOutlined from '@mui/icons-material/BackspaceOutlined'
+import ChevronLeft from '@mui/icons-material/ChevronLeft'
+import ChevronRight from '@mui/icons-material/ChevronRight'
+import FirstPage from '@mui/icons-material/FirstPage'
+import LastPage from '@mui/icons-material/LastPage'
 import FormulaInput from '../logic-engine/formula-input.js'
 import LogicInput from './LogicInput.jsx'
-import SymbolButtonRow, { symbolRowButtonSx } from '../logic-engine/SymbolButtonRow.jsx'
+import SymbolButtonRow from '../logic-engine/SymbolButtonRow.jsx'
+import {
+  getMobileKeySx,
+  mobileKeyGridSx,
+  mobileKeyWellSx,
+} from '../logic-engine/mobileKeyStyles.js'
 import getSyntax from '@logic-app/logic-engine/symbolic/libsyntax.js'
 import { getNotation } from '../../../lib/logicSystems.js'
 import { displayIndexedSymbolsForNotation } from '../../../lib/indexedSymbols.js'
@@ -48,6 +58,24 @@ export function useMobileLogicKeyboardEnabled() {
 /** Binary operators get leading and trailing space (matches formula-input.js insOp / logic parsing). */
 function isBinaryOp(symbolcat, op) {
   return symbolcat && typeof symbolcat[op] === 'number' && symbolcat[op] >= 2
+}
+
+function MobileNavKey({ label, onClick, disabled, kind = 'nav', children }) {
+  return (
+    <Button
+      type="button"
+      variant="text"
+      disableRipple
+      disableElevation
+      disabled={disabled}
+      onClick={onClick}
+      onMouseDown={(e) => e.preventDefault()}
+      aria-label={label}
+      sx={getMobileKeySx(kind)}
+    >
+      {children}
+    </Button>
+  )
 }
 
 /**
@@ -103,6 +131,8 @@ export default function MobileLogicInput({
   const [isClosing, setIsClosing] = useState(false)
   const [slideIn, setSlideIn] = useState(false)
   const desktopInputRef = useRef(null)
+  const fieldWrapRef = useRef(null)
+  const panelRef = useRef(null)
   const notation = getNotation(logicSystem)
   const syntax = getSyntax(notation)
   const symbols = syntax?.symbols || {}
@@ -212,6 +242,26 @@ export default function MobileLogicInput({
     if (!keyboardFocused) setSlideIn(false)
   }, [keyboardFocused, slideIn])
 
+  useEffect(() => {
+    if (!keyboardFocused || !isVisible) return undefined
+    const field = fieldWrapRef.current
+    const panel = panelRef.current
+    if (!field) return undefined
+
+    const pad = panel?.offsetHeight || 220
+    const previousPad = document.body.style.paddingBottom
+    document.body.style.paddingBottom = `${pad}px`
+
+    const id = window.setTimeout(() => {
+      field.scrollIntoView({ block: 'center', behavior: 'smooth' })
+    }, 60)
+
+    return () => {
+      window.clearTimeout(id)
+      document.body.style.paddingBottom = previousPad
+    }
+  }, [keyboardFocused, isVisible])
+
   const handlePanelTransitionEnd = useCallback((e) => {
     if (e.propertyName === 'transform' && isClosing) setIsClosing(false)
   }, [isClosing])
@@ -261,6 +311,39 @@ export default function MobileLogicInput({
       f.setRangeText('', start, end, 'end')
     }
   }, [disabled])
+
+  const renderLetterButton = (letter, kind) => (
+    <Button
+      key={`${kind}-${letter}`}
+      type="button"
+      size="medium"
+      variant="text"
+      disableRipple
+      disableElevation
+      disabled={disabled}
+      aria-disabled={disabled}
+      onClick={() => handleLetterInsert(letter)}
+      onMouseDown={(e) => e.preventDefault()}
+      aria-label={
+        kind === 'letter'
+          ? `Insert ${formatKeyboardLetter(letter)}`
+          : `Insert ${kind} ${formatKeyboardLetter(letter)}`
+      }
+      title={`Insert ${formatKeyboardLetter(letter)}`}
+      sx={getMobileKeySx(kind)}
+    >
+      {formatKeyboardLetter(letter)}
+    </Button>
+  )
+
+  const letterRow = (letters, kind) => {
+    const cols = Math.min(Math.max(letters.length, 1), 6)
+    return (
+      <Box sx={mobileKeyGridSx(cols)}>
+        {letters.map((letter) => renderLetterButton(letter, kind))}
+      </Box>
+    )
+  }
 
   if (!isPhone) {
     return children ?? null
@@ -354,27 +437,30 @@ export default function MobileLogicInput({
 
   return (
     <>
-      <LogicInput
-        value={value ?? ''}
-        onChange={(nextValue) => onChangeRef.current?.(formatForDisplay(nextValue))}
-        onFocus={handleFocus}
-        onBlur={handleBlur}
-        cursorPosition={cursorPosition}
-        onCursorChange={(position) => {
-          setCursorPosition(position)
-          onCursorChange?.(position)
-        }}
-        disabled={disabled}
-        placeholder={placeholder}
-        aria-label={ariaLabel}
-      />
+      <Box ref={fieldWrapRef}>
+        <LogicInput
+          value={value ?? ''}
+          onChange={(nextValue) => onChangeRef.current?.(formatForDisplay(nextValue))}
+          onFocus={handleFocus}
+          onBlur={handleBlur}
+          cursorPosition={cursorPosition}
+          onCursorChange={(position) => {
+            setCursorPosition(position)
+            onCursorChange?.(position)
+          }}
+          disabled={disabled}
+          placeholder={placeholder}
+          aria-label={ariaLabel}
+        />
+      </Box>
       {showPanel && typeof document !== 'undefined'
         ? createPortal(
             <Box
+              ref={panelRef}
               onMouseDown={(e) => e.preventDefault()}
               onTransitionEnd={handlePanelTransitionEnd}
               role="region"
-              aria-label="Formula keyboard: insert logic symbols and letters, move cursor with arrow buttons"
+              aria-label="Logic keyboard"
               sx={{
                 position: 'fixed',
                 left: 0,
@@ -384,218 +470,107 @@ export default function MobileLogicInput({
                 boxSizing: 'border-box',
                 width: '100%',
                 maxWidth: '100vw',
-                p: 1.5,
-                pb: 'max(8px, env(safe-area-inset-bottom, 0px))',
-                bgcolor: (t) =>
+                px: 1,
+                pt: 0.75,
+                pb: 'max(10px, env(safe-area-inset-bottom, 0px))',
+                bgcolor: 'transparent',
+                backgroundImage: (t) =>
                   t.palette.mode === 'dark'
-                    ? alpha(t.palette.background.paper, 0.98)
-                    : t.palette.grey[100],
+                    ? `linear-gradient(180deg, ${alpha(t.palette.primary.main, 0.22)} 0%, ${alpha(t.palette.background.paper, 0.96)} 34%, ${t.palette.background.default} 100%)`
+                    : `linear-gradient(180deg, ${alpha(t.palette.primary.main, 0.14)} 0%, ${t.palette.grey[100]} 32%, ${t.palette.grey[300]} 100%)`,
                 borderTop: '1px solid',
-                borderColor: 'divider',
-                boxShadow: (t) => t.shadows[8],
+                borderColor: (t) => alpha(t.palette.primary.main, t.palette.mode === 'dark' ? 0.28 : 0.18),
+                boxShadow: (t) =>
+                  t.palette.mode === 'dark'
+                    ? '0 -12px 32px rgba(0,0,0,0.45)'
+                    : '0 -10px 28px rgba(83, 109, 254, 0.12), 0 -4px 12px rgba(15, 23, 42, 0.08)',
                 overflow: 'hidden',
-                borderTopLeftRadius: 12,
-                borderTopRightRadius: 12,
+                borderTopLeftRadius: 16,
+                borderTopRightRadius: 16,
                 transform: isVisible ? 'translateY(0)' : 'translateY(100%)',
                 transition: 'transform 0.28s ease-in-out',
                 willChange: 'transform',
+                '&::before': {
+                  content: '""',
+                  position: 'absolute',
+                  left: 0,
+                  right: 0,
+                  top: 0,
+                  height: 18,
+                  pointerEvents: 'none',
+                  background: (t) =>
+                    t.palette.mode === 'dark'
+                      ? 'linear-gradient(180deg, rgba(255,255,255,0.08) 0%, transparent 100%)'
+                      : 'linear-gradient(180deg, rgba(255,255,255,0.55) 0%, transparent 100%)',
+                },
                 '@media (prefers-reduced-motion: reduce)': {
                   transition: 'none',
                 },
               }}
             >
-          <Stack spacing={1} sx={{ width: '100%' }}>
-            <Box role="group" sx={{ width: '100%' }} aria-label="Logic symbols: connectives, quantifiers, parentheses">
-              <SymbolButtonRow
-                inputRef={facadeRef}
-                onValueChange={onChange}
-                disabled={disabled}
-                includeQuantifiers={includeQuantifiers}
-                showBackspace={false}
-                extraInsertButtons={extraInsertButtons}
-                centerButtons
-                logicSystem={logicSystem}
-              />
-            </Box>
-            {usePredicateLayout ? (
               <Box
-                role="group"
-                sx={{ width: '100%' }}
-                aria-label="Letters: predicates, constants, variables. Tap to insert at cursor"
-              >
-                <Stack
-                  direction="row"
-                  spacing={0.5}
-                  flexWrap="wrap"
-                  useFlexGap
-                  justifyContent="center"
-                  sx={{ rowGap: 0.5 }}
-                >
-                  {predicateLetters.map((letter) => (
-                    <Button
-                      key={`pred-${letter}`}
-                      type="button"
-                      size="medium"
-                      variant="outlined"
-                      disabled={disabled}
-                      aria-disabled={disabled}
-                      onClick={() => handleLetterInsert(letter)}
-                      onMouseDown={(e) => e.preventDefault()}
-                      aria-label={`Insert predicate ${formatKeyboardLetter(letter)}`}
-                      title={`Insert ${formatKeyboardLetter(letter)}`}
-                      sx={symbolRowButtonSx}
-                    >
-                      {formatKeyboardLetter(letter)}
-                    </Button>
-                  ))}
-                  {constantLetters.map((letter) => (
-                    <Button
-                      key={`const-${letter}`}
-                      type="button"
-                      size="medium"
-                      variant="outlined"
-                      disabled={disabled}
-                      aria-disabled={disabled}
-                      onClick={() => handleLetterInsert(letter)}
-                      onMouseDown={(e) => e.preventDefault()}
-                      aria-label={`Insert constant ${formatKeyboardLetter(letter)}`}
-                      title={`Insert ${formatKeyboardLetter(letter)}`}
-                      sx={symbolRowButtonSx}
-                    >
-                      {formatKeyboardLetter(letter)}
-                    </Button>
-                  ))}
-                  {variableLettersProp.map((letter) => (
-                    <Button
-                      key={`var-${letter}`}
-                      type="button"
-                      size="medium"
-                      variant="outlined"
-                      disabled={disabled}
-                      aria-disabled={disabled}
-                      onClick={() => handleLetterInsert(letter)}
-                      onMouseDown={(e) => e.preventDefault()}
-                      aria-label={`Insert variable ${formatKeyboardLetter(letter)}`}
-                      title={`Insert ${formatKeyboardLetter(letter)}`}
-                      sx={symbolRowButtonSx}
-                    >
-                      {formatKeyboardLetter(letter)}
-                    </Button>
-                  ))}
-                </Stack>
-              </Box>
-            ) : (
-              <Box role="group" sx={{ width: '100%' }} aria-label="Variable letters: tap to insert at cursor">
-                <Stack
-                  direction="row"
-                  spacing={0.5}
-                  flexWrap="wrap"
-                  useFlexGap
-                  justifyContent="center"
-                >
-                  {variableLetters.map((letter) => (
-                    <Button
-                      key={letter}
-                      type="button"
-                      size="medium"
-                      variant="outlined"
-                      disabled={disabled}
-                      aria-disabled={disabled}
-                      onClick={() => handleLetterInsert(letter)}
-                      onMouseDown={(e) => e.preventDefault()}
-                      aria-label={`Insert ${formatKeyboardLetter(letter)}`}
-                      title={`Insert ${formatKeyboardLetter(letter)}`}
-                      sx={symbolRowButtonSx}
-                    >
-                      {formatKeyboardLetter(letter)}
-                    </Button>
-                  ))}
-                </Stack>
-              </Box>
-            )}
-            <Box role="group" sx={{ width: '100%' }} aria-label="Cursor navigation and backspace">
-              <Stack
-                direction="row"
-                spacing={0.5}
-                flexWrap="wrap"
-                useFlexGap
-                justifyContent="center"
-              >
-                <Button
-                  type="button"
-                  size="medium"
-                  variant="outlined"
-                  disabled={disabled}
-                  aria-disabled={disabled}
-                  onClick={handleNavStart}
-                  onMouseDown={(e) => e.preventDefault()}
-                  aria-label="Move cursor to start"
-                  title="Move cursor to start"
-                  sx={symbolRowButtonSx}
-                >
-                  ⇤
-                </Button>
-                <Button
-                  type="button"
-                  size="medium"
-                  variant="outlined"
-                  disabled={disabled}
-                  aria-disabled={disabled}
-                  onClick={handleNavLeft}
-                  onMouseDown={(e) => e.preventDefault()}
-                  aria-label="Move cursor left"
-                  title="Move cursor left"
-                  sx={symbolRowButtonSx}
-                >
-                  {'<'}
-                </Button>
-                <Button
-                  type="button"
-                  size="medium"
-                  variant="outlined"
-                  disabled={disabled}
-                  aria-disabled={disabled}
-                  onClick={handleNavRight}
-                  onMouseDown={(e) => e.preventDefault()}
-                  aria-label="Move cursor right"
-                  title="Move cursor right"
-                  sx={symbolRowButtonSx}
-                >
-                  {'>'}
-                </Button>
-                <Button
-                  type="button"
-                  size="medium"
-                  variant="outlined"
-                  disabled={disabled}
-                  aria-disabled={disabled}
-                  onClick={handleNavEnd}
-                  onMouseDown={(e) => e.preventDefault()}
-                  aria-label="Move cursor to end"
-                  title="Move cursor to end"
-                  sx={symbolRowButtonSx}
-                >
-                  ⇥
-                </Button>
-                <Button
-                  type="button"
-                  size="medium"
-                  variant="outlined"
-                  disabled={disabled}
-                  aria-disabled={disabled}
-                  onClick={handleBackspace}
-                  onMouseDown={(e) => e.preventDefault()}
-                  aria-label="Backspace"
-                  title="Backspace"
-                  sx={symbolRowButtonSx}
-                >
-                  ←
-                </Button>
+                aria-hidden
+                sx={{
+                  width: 36,
+                  height: 4,
+                  borderRadius: 2,
+                  bgcolor: 'text.disabled',
+                  opacity: 0.45,
+                  mx: 'auto',
+                  mb: 0.85,
+                  position: 'relative',
+                }}
+              />
+              <Stack spacing={1} sx={{ width: '100%', position: 'relative' }}>
+                <Box role="group" aria-label="Connectives and grouping" sx={mobileKeyWellSx('operators')}>
+                  <SymbolButtonRow
+                    inputRef={facadeRef}
+                    onValueChange={(nextValue) => onChangeRef.current?.(formatForDisplay(nextValue))}
+                    disabled={disabled}
+                    includeQuantifiers={includeQuantifiers}
+                    showBackspace={false}
+                    extraInsertButtons={extraInsertButtons}
+                    centerButtons
+                    logicSystem={logicSystem}
+                  />
+                </Box>
+
+                {usePredicateLayout ? (
+                  <Box role="group" aria-label="Predicates, constants, and variables" sx={mobileKeyWellSx('letters')}>
+                    <Stack spacing={0.5}>
+                      {predicateLetters.length > 0 && letterRow(predicateLetters, 'predicate')}
+                      {constantLetters.length > 0 && letterRow(constantLetters, 'constant')}
+                      {variableLettersProp.length > 0 && letterRow(variableLettersProp, 'variable')}
+                    </Stack>
+                  </Box>
+                ) : (
+                  <Box role="group" aria-label="Letters" sx={mobileKeyWellSx('letters')}>
+                    {letterRow(variableLetters, 'letter')}
+                  </Box>
+                )}
+
+                <Box role="group" aria-label="Cursor and backspace" sx={mobileKeyWellSx('nav')}>
+                  <Box sx={mobileKeyGridSx(5)}>
+                    <MobileNavKey label="Move cursor to start" onClick={handleNavStart} disabled={disabled}>
+                      <FirstPage fontSize="small" />
+                    </MobileNavKey>
+                    <MobileNavKey label="Move cursor left" onClick={handleNavLeft} disabled={disabled}>
+                      <ChevronLeft fontSize="small" />
+                    </MobileNavKey>
+                    <MobileNavKey label="Move cursor right" onClick={handleNavRight} disabled={disabled}>
+                      <ChevronRight fontSize="small" />
+                    </MobileNavKey>
+                    <MobileNavKey label="Move cursor to end" onClick={handleNavEnd} disabled={disabled}>
+                      <LastPage fontSize="small" />
+                    </MobileNavKey>
+                    <MobileNavKey label="Backspace" onClick={handleBackspace} disabled={disabled} kind="backspace">
+                      <BackspaceOutlined fontSize="small" />
+                    </MobileNavKey>
+                  </Box>
+                </Box>
               </Stack>
-            </Box>
-          </Stack>
-        </Box>,
-            document.body
+            </Box>,
+            document.body,
           )
         : null}
     </>
