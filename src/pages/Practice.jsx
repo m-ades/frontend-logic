@@ -1,5 +1,4 @@
 import { useMemo } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { Box, Typography } from '@mui/material'
 import ActivityAccordion from '../components/ui/ActivityAccordion.jsx'
@@ -60,7 +59,6 @@ const buildCourseStructure = (assignments, sectionTitle) => {
 }
 
 export default function Practice() {
-  const navigate = useNavigate()
   const {
     isSandbox,
     assignmentPath,
@@ -105,14 +103,6 @@ export default function Practice() {
   )
   const isLoadingPractice = isSandbox ? false : practiceQuery.isPending
 
-  const handleActivityClick = (activity) => {
-    if (activity.worksheet) {
-      navigate(assignmentPath(activity.worksheet.id), {
-        state: { returnTo: practicePath }
-      })
-    }
-  }
-
   const renderActivity = (activity) => {
     const totalQuestions = Number(activity.questionCount) || 0
     const completedQuestions = Math.min(Number(activity.answeredCount) || 0, totalQuestions)
@@ -125,7 +115,8 @@ export default function Practice() {
         completedQuestions={completedQuestions}
         progressAriaLabel={`Practice completion: ${completedQuestions} of ${totalQuestions} complete`}
         chips={[{ label: 'Practice', color: 'primary', variant: 'outlined' }]}
-        onClick={() => handleActivityClick(activity)}
+        to={activity.worksheet ? assignmentPath(activity.worksheet.id) : undefined}
+        state={{ returnTo: practicePath }}
       />
     )
   }

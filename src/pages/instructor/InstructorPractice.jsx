@@ -154,10 +154,6 @@ export default function InstructorPractice() {
     setMenuAnchor(null);
   };
 
-  const handleViewPractice = (practice) => {
-    navigateToPractice(practice?.id);
-  };
-
   // Show message if no active course
   if (!activeCourseId) {
     return (
@@ -214,7 +210,8 @@ export default function InstructorPractice() {
       <AssignmentTable
         items={enhancedPractices}
         type="practice"
-        onView={handleViewPractice}
+        getItemPath={(practice) => assignmentPath(practice.id)}
+        navigationState={{ returnTo: practicePath }}
         onToggleLock={handleToggleLock}
         onTogglePublish={handleTogglePublish}
         onMenuOpen={(e, practice) => {
@@ -238,7 +235,8 @@ export default function InstructorPractice() {
         open={Boolean(menuAnchor)}
         onClose={() => setMenuAnchor(null)}
         item={menuPractice}
-        onOpenBuilder={handleViewPractice}
+        builderPath={menuPractice ? assignmentPath(menuPractice.id) : undefined}
+        navigationState={{ returnTo: practicePath }}
         onEdit={handleEditOpen}
         onDuplicate={handleDuplicate}
         onDelete={handleDelete}

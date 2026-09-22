@@ -17,7 +17,8 @@ import {
   Circle as CircleIcon,
   CheckCircle as CheckCircleIcon,
 } from "@mui/icons-material";
-import { useNavigate, useLocation } from "react-router-dom";
+import { Link as RouterLink, useNavigate, useLocation } from "react-router-dom";
+import { isPlainLinkClick } from "../../utils/linkNavigation.js";
 import { useAppRuntime } from "../../hooks/useAppRuntime.js";
 
 export default function CourseSelector({ isSidebarOpened }) {
@@ -64,9 +65,8 @@ export default function CourseSelector({ isSidebarOpened }) {
     }
   };
 
-  const handleViewAllCourses = () => {
-    navigate(coursesPath);
-    handleClose();
+  const handleViewAllCourses = (event) => {
+    if (isPlainLinkClick(event)) handleClose();
   };
 
   // Collapsed sidebar view (icon only)
@@ -123,6 +123,8 @@ export default function CourseSelector({ isSidebarOpened }) {
           }}
         >
           <MenuItem
+            component={RouterLink}
+            to={coursesPath}
             onClick={handleViewAllCourses}
             sx={{
               py: 1.5,
@@ -354,6 +356,8 @@ export default function CourseSelector({ isSidebarOpened }) {
       <Button
         fullWidth
         startIcon={<GridViewIcon />}
+        component={RouterLink}
+        to={coursesPath}
         onClick={handleViewAllCourses}
         sx={{
           mt: 1,

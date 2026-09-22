@@ -1,12 +1,15 @@
 import { Menu, MenuItem } from "@mui/material";
 import { FileEdit, Edit, Copy, Trash2, CalendarClock, List, ListChecks } from "lucide-react";
+import { Link as RouterLink } from "react-router-dom";
+import { isPlainLinkClick } from "../../utils/linkNavigation.js";
 
 export default function AssignmentContextMenu({
   anchorEl,
   open,
   onClose,
   item,
-  onOpenBuilder,
+  builderPath,
+  navigationState,
   onEdit,
   onDuplicate,
   onDelete,
@@ -27,7 +30,15 @@ export default function AssignmentContextMenu({
       anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
       transformOrigin={{ vertical: "top", horizontal: "right" }}
     >
-      <MenuItem onClick={select(onOpenBuilder)}>
+      <MenuItem
+        component={builderPath ? RouterLink : 'li'}
+        to={builderPath}
+        state={builderPath ? navigationState : undefined}
+        disabled={!builderPath}
+        onClick={(event) => {
+          if (isPlainLinkClick(event)) onClose();
+        }}
+      >
         <FileEdit size={16} style={{ marginRight: 8 }} />
         Open Builder
       </MenuItem>

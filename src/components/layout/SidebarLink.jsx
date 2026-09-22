@@ -11,7 +11,8 @@ import {
   Divider,
 } from '@mui/material'
 import { ExpandMore as ExpandIcon } from '@mui/icons-material'
-import { useNavigate, useLocation } from 'react-router-dom'
+import { Link as RouterLink, useLocation } from 'react-router-dom'
+import { isPlainLinkClick } from '../../utils/linkNavigation.js'
 
 export default function SidebarLink({
   link,
@@ -29,7 +30,6 @@ export default function SidebarLink({
   const [isOpen, setIsOpen] = useState(false)
   const openTimerRef = useRef(null)
   const closeTimerRef = useRef(null)
-  const navigate = useNavigate()
   const currentLocation = useLocation()
 
   const isLinkActive = link && (
@@ -45,6 +45,7 @@ export default function SidebarLink({
   }, [])
 
   const handleClick = (e) => {
+    if (link && !onClick && !isPlainLinkClick(e)) return
     if (onClick) {
       onClick()
       if (isTemporary) {
@@ -55,7 +56,6 @@ export default function SidebarLink({
       return
     }
     if (link) {
-      navigate(link)
       if (isTemporary) {
         toggleDrawer()
       } else if (!isSidebarOpened) {
@@ -96,6 +96,9 @@ export default function SidebarLink({
     return (
       <ListItem disablePadding>
         <ListItemButton
+          component={link && !onClick ? RouterLink : 'div'}
+          to={link && !onClick ? link : undefined}
+          aria-label={label}
           onClick={handleClick}
           selected={isLinkActive}
           sx={(theme) => ({
@@ -165,6 +168,9 @@ export default function SidebarLink({
     >
       <ListItem disablePadding>
         <ListItemButton
+          component={link && !onClick ? RouterLink : 'div'}
+          to={link && !onClick ? link : undefined}
+          aria-label={label}
           onClick={handleClick}
           selected={isLinkActive}
           sx={(theme) => ({

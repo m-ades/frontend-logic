@@ -1,7 +1,6 @@
 import { Box, ButtonBase, Chip, LinearProgress, Stack, Typography } from '@mui/material'
 import LockIcon from '@mui/icons-material/Lock'
-
-// single-line-ish activity row shared by Assignments and Practice
+import { Link as RouterLink } from 'react-router-dom'
 
 export default function ActivityRow({
   title,
@@ -13,7 +12,8 @@ export default function ActivityRow({
   chips = [],
   dateLabel,
   noteLines = [],
-  onClick,
+  to,
+  state,
 }) {
   const total = Math.max(Number(totalQuestions) || 0, 0)
   const completed = Math.min(Math.max(Number(completedQuestions) || 0, 0), total)
@@ -24,9 +24,10 @@ export default function ActivityRow({
 
   return (
     <ButtonBase
-      component="button"
-      type="button"
-      onClick={onClick}
+      component={to ? RouterLink : 'button'}
+      to={to}
+      state={to ? state : undefined}
+      disabled={!to}
       sx={{
         display: 'grid',
         gridTemplateColumns: {

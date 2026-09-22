@@ -21,7 +21,6 @@ import { useAssignmentSession } from '../hooks/useAssignmentSession.js'
 
 function SandboxWorksheetContent() {
   const { assignmentId } = useParams()
-  const navigate = useNavigate()
   const location = useLocation()
   const {
     assignmentsPath,
@@ -98,7 +97,7 @@ function SandboxWorksheetContent() {
   return (
     <WorksheetLayout
       subtitle={currentWorksheet.title || currentWorksheet.name || "Assignment"}
-      onBackToLMS={() => navigate(backTarget)}
+      backTo={backTarget}
       worksheets={worksheets}
       currentWorksheetIndex={0}
       onWorksheetIndexChange={() => {}}
@@ -1081,7 +1080,7 @@ function RealWorksheetContent() {
       >
         <WorksheetLayout
           subtitle={currentWorksheet.title || "Predicate Logic: Natural Deduction"}
-          onBackToLMS={() => navigate(backTarget)}
+          backTo={backTarget}
           worksheets={worksheets}
           currentWorksheetIndex={currentWorksheetIndex}
           onWorksheetIndexChange={handleWorksheetChange}

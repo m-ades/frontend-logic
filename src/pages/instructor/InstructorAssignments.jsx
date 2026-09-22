@@ -53,7 +53,6 @@ export default function InstructorAssignments() {
     courseState,
     courseActions,
     assignmentPath,
-    assignmentBuilderPath,
     isSandbox,
   } = useAppRuntime();
   const { activeCourseId, assignmentsByCourse, gradebookByCourse, courses } = courseState;
@@ -131,9 +130,7 @@ export default function InstructorAssignments() {
       const created = await courseActions.createAssignment?.(activeCourseId, formData);
       setCreateDialogOpen(false);
       if (!isSandbox && created?.id) {
-        navigate(assignmentBuilderPath, {
-          state: { assignmentId: created.id },
-        });
+        navigate(assignmentPath(created.id));
       }
     } catch (error) {
       console.error("Failed to create assignment", error);
@@ -207,23 +204,6 @@ export default function InstructorAssignments() {
       } catch (error) {
         console.error("Failed to delete assignment", error);
       }
-    }
-    setMenuAnchor(null);
-  };
-
-  const handleViewAssignment = (assignment) => {
-    if (isSandbox) {
-      navigate(assignmentPath(assignment.id));
-      return;
-    }
-    navigate(assignmentBuilderPath, { state: { assignmentId: assignment.id } });
-  };
-
-  const handleOpenBuilder = (assignment) => {
-    if (isSandbox) {
-      navigate(assignmentPath(assignment.id));
-    } else {
-      navigate(assignmentBuilderPath, { state: { assignmentId: assignment.id } });
     }
     setMenuAnchor(null);
   };
@@ -387,7 +367,7 @@ export default function InstructorAssignments() {
       <AssignmentTable
         items={enhancedAssignments}
         type="assignment"
-        onView={handleViewAssignment}
+        getItemPath={(assignment) => assignmentPath(assignment.id)}
         onToggleLock={handleToggleLock}
         onTogglePublish={handleTogglePublish}
         onEditDueDate={handleEditDueDateOpen}
@@ -411,7 +391,7 @@ export default function InstructorAssignments() {
         open={Boolean(menuAnchor)}
         onClose={() => setMenuAnchor(null)}
         item={menuAssignment}
-        onOpenBuilder={handleOpenBuilder}
+        builderPath={menuAssignment ? assignmentPath(menuAssignment.id) : undefined}
         onEdit={handleEditOpen}
         onClasswideExtension={handleOpenClasswideExtension}
         onViewExtensions={handleOpenExtensionsList}
