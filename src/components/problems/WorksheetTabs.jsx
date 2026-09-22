@@ -38,6 +38,7 @@ export default function WorksheetTabs({
   policySummary = [],
   isOverdue,
   isInstructorView = false,
+  canGrantAttempts = isInstructorView,
   onQuestionSaved,
   onQuestionCreated,
   logicSystem,
@@ -80,6 +81,7 @@ export default function WorksheetTabs({
             isOverdue={isOverdue}
             isAssignmentLocked={worksheet.isLocked ?? false}
             isInstructorView={isInstructorView}
+            canGrantAttempts={canGrantAttempts}
             onQuestionSaved={onQuestionSaved}
             onQuestionCreated={onQuestionCreated}
             assignmentId={worksheet.id}

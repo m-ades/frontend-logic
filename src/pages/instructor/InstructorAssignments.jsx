@@ -325,6 +325,13 @@ export default function InstructorAssignments() {
     [courseActions]
   );
 
+  // for worksheet-consistent problem numbering
+  const loadAssignmentQuestions = useCallback(
+    (assignmentId) =>
+      courseActions.getAssignmentQuestions?.(assignmentId) ?? Promise.resolve([]),
+    [courseActions]
+  );
+
   const handleOpenSubmissions = (assignment) => {
     if (!assignment?.id) return;
     setSubmissionsAssignment(assignment);
@@ -417,6 +424,7 @@ export default function InstructorAssignments() {
         open={submissionsOpen}
         assignment={submissionsAssignment}
         loadSubmissions={loadAssignmentSubmissions}
+        loadQuestions={loadAssignmentQuestions}
         // keep the assignment so the title stays put during the close animation
         onClose={() => setSubmissionsOpen(false)}
       />

@@ -105,6 +105,7 @@ function ProofTabs({
   isOverdue,
   isAssignmentLocked = true,
   isInstructorView = false,
+  canGrantAttempts = isInstructorView,
   onQuestionSaved,
   onQuestionCreated,
   assignmentId,
@@ -484,68 +485,76 @@ function ProofTabs({
             flexDirection: 'column', 
             gap: 0
           }}>
-            {isInstructorView && (
+            {(isInstructorView || canGrantAttempts) && (
               <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 0.5, pb: 1, px: 1 }}>
-                <Button
-                  size="small"
-                  startIcon={<AddIcon />}
-                  variant="text"
-                  onClick={handleCreateMenuOpen}
-                  disabled={!assignmentId}
-                  sx={{
-                    width: 160,
-                    justifyContent: 'flex-start',
-                    textTransform: 'none',
-                    fontSize: { xs: '0.875rem', md: '1rem' },
-                    fontWeight: 400,
-                    color: 'primary.main',
-                    '&:hover': { backgroundColor: 'rgba(47, 107, 255, 0.08)' },
-                  }}
-                >
-                  Add question
-                </Button>
-                <Button
-                  size="small"
-                  variant="text"
-                  onClick={() => setAttemptOverrideOpen(true)}
-                  disabled={!currentProof?.questionId}
-                  sx={{
-                    width: 160,
-                    justifyContent: 'flex-start',
-                    textTransform: 'none',
-                    fontSize: { xs: '0.875rem', md: '1rem' },
-                    fontWeight: 400,
-                    color: 'primary.main',
-                    '&:hover': { backgroundColor: 'rgba(47, 107, 255, 0.08)' },
-                  }}
-                >
-                  Extra attempts
-                </Button>
-                <Menu
-                  anchorEl={createAnchorEl}
-                  open={Boolean(createAnchorEl)}
-                  onClose={handleCreateMenuClose}
-                  anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
-                >
-                  {instructorProblemTypes.map(({ type, label }) => (
-                    <MenuItem key={type} onClick={() => handleCreateStart(type)}>{label}</MenuItem>
-                  ))}
-                </Menu>
-                {createProof && (
-                  <InstructorQuestionEditor
-                    ref={createEditorRef}
-                    proof={createProof}
-                    isInstructorView
-                    trigger="none"
-                    mode="create"
-                    assignmentId={assignmentId}
-                    orderIndex={nextOrderIndex}
-                    logicSystem={logicSystem}
-                    onCreated={(created) => {
-                      onQuestionCreated?.(assignmentId, created)
-                      setCreateProof(null)
+                {isInstructorView && (
+                  <Button
+                    size="small"
+                    startIcon={<AddIcon />}
+                    variant="text"
+                    onClick={handleCreateMenuOpen}
+                    disabled={!assignmentId}
+                    sx={{
+                      width: 160,
+                      justifyContent: 'flex-start',
+                      textTransform: 'none',
+                      fontSize: { xs: '0.875rem', md: '1rem' },
+                      fontWeight: 400,
+                      color: 'primary.main',
+                      '&:hover': { backgroundColor: 'rgba(47, 107, 255, 0.08)' },
                     }}
-                  />
+                  >
+                    Add question
+                  </Button>
+                )}
+                {canGrantAttempts && (
+                  <Button
+                    size="small"
+                    variant="text"
+                    onClick={() => setAttemptOverrideOpen(true)}
+                    disabled={!currentProof?.questionId}
+                    sx={{
+                      width: 160,
+                      justifyContent: 'flex-start',
+                      textTransform: 'none',
+                      fontSize: { xs: '0.875rem', md: '1rem' },
+                      fontWeight: 400,
+                      color: 'primary.main',
+                      '&:hover': { backgroundColor: 'rgba(47, 107, 255, 0.08)' },
+                    }}
+                  >
+                    Extra attempts
+                  </Button>
+                )}
+                {isInstructorView && (
+                  <>
+                    <Menu
+                      anchorEl={createAnchorEl}
+                      open={Boolean(createAnchorEl)}
+                      onClose={handleCreateMenuClose}
+                      anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+                    >
+                      {instructorProblemTypes.map(({ type, label }) => (
+                        <MenuItem key={type} onClick={() => handleCreateStart(type)}>{label}</MenuItem>
+                      ))}
+                    </Menu>
+                    {createProof && (
+                      <InstructorQuestionEditor
+                        ref={createEditorRef}
+                        proof={createProof}
+                        isInstructorView
+                        trigger="none"
+                        mode="create"
+                        assignmentId={assignmentId}
+                        orderIndex={nextOrderIndex}
+                        logicSystem={logicSystem}
+                        onCreated={(created) => {
+                          onQuestionCreated?.(assignmentId, created)
+                          setCreateProof(null)
+                        }}
+                      />
+                    )}
+                  </>
                 )}
               </Box>
             )}
@@ -628,7 +637,7 @@ function ProofTabs({
                 isMobile={isMobile}
               >
                 <Stack spacing={3} sx={{ minWidth: 0 }}>
-                  {isInstructorView && isMobile && (
+                  {canGrantAttempts && isMobile && (
                     <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
                       <Button
                         size="small"
@@ -733,7 +742,7 @@ function ProofTabs({
             </ProblemNavigationContext.Provider>
           )
         })}
-      {isInstructorView && (
+      {canGrantAttempts && (
         <QuestionAttemptOverrideDialog
           open={attemptOverrideOpen}
           onClose={() => setAttemptOverrideOpen(false)}

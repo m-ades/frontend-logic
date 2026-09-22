@@ -836,6 +836,21 @@ export function InstructorSandboxProvider({ children }) {
     return rows.sort((a, b) => String(b.submitted_at).localeCompare(String(a.submitted_at)))
   }
 
+  const getAssignmentQuestions = async (assignmentId) => {
+    const assignments = Object.values(courseState.assignmentsByCourse || {}).flat()
+    const practices = Object.values(courseState.practicesByCourse || {}).flat()
+    const assignment = [...assignments, ...practices].find(
+      (item) => String(item.id) === String(assignmentId)
+    )
+    const proofs = assignment?.proofs || []
+    // mirrors getAssignmentSubmissions' id/order logic
+    return proofs.map((proof, index) => ({
+      id: proof.questionId ?? proof.id ?? `${assignmentId}-q-${index + 1}`,
+      order_index: Number.isFinite(Number(proof.orderIndex)) ? Number(proof.orderIndex) : index,
+      points_value: 100,
+    }))
+  }
+
   const getQuestionAttemptOverrides = async (questionId) => {
     const normalizedQuestionId = questionId != null && String(questionId).trim() !== ''
       ? String(questionId)
@@ -864,7 +879,7 @@ export function InstructorSandboxProvider({ children }) {
       : null
     const targetUserId = Number(userId)
     const extra = Number(extraAttempts)
-    if (!normalizedQuestionId || !Number.isFinite(targetUserId) || !Number.isFinite(extra) || extra < 0) {
+    if (!normalizedQuestionId || !Number.isFinite(targetUserId) || !Number.isInteger(extra) || extra < 0) {
       throw new Error("A valid student and extra attempts value are required.")
     }
     const courseId = courseState.activeCourseId
@@ -989,6 +1004,7 @@ export function InstructorSandboxProvider({ children }) {
     getAssignmentExtensions,
     saveClasswideExtension,
     getAssignmentSubmissions,
+    getAssignmentQuestions,
     getQuestionAttemptOverrides,
     saveQuestionAttemptOverride,
     getActivity,

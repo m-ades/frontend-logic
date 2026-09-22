@@ -305,6 +305,12 @@ export function createAppRuntime({ coursesDispatch, coursesState, routeKind, use
       const rows = await fetchJson(`/api/instructor/assignments/${id}/submissions?summary=true`);
       return Array.isArray(rows) ? rows : [];
     },
+    getAssignmentQuestions: async (assignmentId) => {
+      const id = Number(assignmentId);
+      if (!Number.isInteger(id) || id <= 0) return [];
+      const questions = await fetchJson(`/api/assignments/${id}/questions`);
+      return Array.isArray(questions) ? questions : [];
+    },
     getQuestionAttemptOverrides: async (questionId) => {
       const id = Number(questionId);
       if (!Number.isFinite(id)) return [];
@@ -314,7 +320,7 @@ export function createAppRuntime({ coursesDispatch, coursesState, routeKind, use
       const id = Number(questionId);
       const targetUserId = Number(userId);
       const extra = Number(extraAttempts);
-      if (!Number.isFinite(id) || !Number.isFinite(targetUserId) || !Number.isFinite(extra) || extra < 0) {
+      if (!Number.isFinite(id) || !Number.isFinite(targetUserId) || !Number.isInteger(extra) || extra < 0) {
         throw new Error("A valid student and extra attempts value are required.");
       }
       return fetchJson(`/api/instructor/assignment-questions/${id}/overrides`, {
