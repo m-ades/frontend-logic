@@ -12,6 +12,7 @@ import SubmissionAnswer from './SubmissionAnswer.jsx'
 
 /*
 shows saved attempts and edits the selected student assignment extension
+extra attempts sit on the question row because an override is per question
 mount for a selected student and unmount on close to reset question selection
 extension editing waits for the saved deadline and uses new york wall time
 invalid or ambiguous dates stay in the form with an error and are never saved
@@ -100,6 +101,64 @@ export default function StudentSubmissionDialog({ student, assignment, onClose }
     .sort((a, b) => b.attempt - a.attempt)
   const attempt = attempts.find((submission) => submission.id === attemptId) || attempts[0]
 
+  const overridesQueryKey = ['question-attempt-overrides', question?.id]
+  const {
+    data: questionOverrides,
+    isFetching: overridesFetching,
+    isPending: overridesPending,
+    isError: overridesError,
+    refetch: refetchOverrides,
+  } = useQuery({
+    queryKey: overridesQueryKey,
+    enabled: !isSandbox && Boolean(question?.id),
+    queryFn: () => courseActions.getQuestionAttemptOverrides?.(question.id),
+  })
+  const studentOverride = (questionOverrides || []).find((row) => String(row.user_id) === String(student.id)) || null
+  const baseAttemptLimit = Number.isFinite(Number(question?.attempt_limit)) ? Number(question.attempt_limit) : 3
+  const currentExtraAttempts = Number(studentOverride?.extra_attempts) || 0
+  const effectiveAttemptLimit = Math.max(1, baseAttemptLimit + currentExtraAttempts)
+
+  const [attemptsAnchorEl, setAttemptsAnchorEl] = useState(null)
+  const [extraAttempts, setExtraAttempts] = useState('1')
+  const [attemptsReason, setAttemptsReason] = useState('')
+  const [attemptsSaving, setAttemptsSaving] = useState(false)
+  const [attemptsError, setAttemptsError] = useState('')
+  const parsedExtraAttempts = Number(extraAttempts)
+  const extraAttemptsValid = Number.isInteger(parsedExtraAttempts) && parsedExtraAttempts >= 0
+
+  const handleOpenAttempts = (event) => {
+    setAttemptsError('')
+    setExtraAttempts(String(studentOverride ? currentExtraAttempts : 1))
+    setAttemptsReason(studentOverride?.reason || '')
+    setAttemptsAnchorEl(event.currentTarget)
+  }
+
+  const handleCloseAttempts = () => {
+    setAttemptsAnchorEl(null)
+  }
+
+  const handleSaveAttempts = async () => {
+    setAttemptsError('')
+    if (!extraAttemptsValid) {
+      setAttemptsError('Extra attempts must be a whole number of 0 or more.')
+      return
+    }
+    setAttemptsSaving(true)
+    try {
+      await courseActions.saveQuestionAttemptOverride?.(question.id, {
+        userId: student.id,
+        extraAttempts: parsedExtraAttempts,
+        reason: attemptsReason,
+      })
+      await queryClient.invalidateQueries({ queryKey: overridesQueryKey })
+      setAttemptsAnchorEl(null)
+    } catch (err) {
+      setAttemptsError('Failed to save extra attempts.')
+    } finally {
+      setAttemptsSaving(false)
+    }
+  }
+
   return (
     <Dialog open onClose={onClose} fullWidth maxWidth="md" aria-labelledby="student-submission-title">
       <DialogTitle id="student-submission-title">
@@ -135,20 +194,32 @@ export default function StudentSubmissionDialog({ student, assignment, onClose }
           <Typography color="text.secondary">No submission available.</Typography>
         ) : (
           <Stack spacing={3}>
-            <Stack direction="row" spacing={2} sx={{ flexWrap: 'wrap', gap: 1 }}>
-              <TextField
-                select
-                label="Question"
-                size="small"
-                value={questionIndex}
-                onChange={(event) => {
-                  setQuestionIndex(Number(event.target.value))
-                  setAttemptId(null)
-                }}
-                sx={{ minWidth: 140 }}
-              >
-                {questions.map((item, index) => <MenuItem key={item.id} value={index}>Question {index + 1}</MenuItem>)}
-              </TextField>
+            {overridesError && (
+              <Alert severity="error" action={<Button color="inherit" onClick={() => refetchOverrides()} disabled={overridesFetching}>Retry</Button>}>
+                Could not load extra attempts for this question.
+              </Alert>
+            )}
+            <Stack direction="row" spacing={2} sx={{ flexWrap: 'wrap', gap: 1, alignItems: 'flex-start' }}>
+              <Box>
+                <TextField
+                  select
+                  label="Question"
+                  size="small"
+                  value={questionIndex}
+                  onChange={(event) => {
+                    setQuestionIndex(Number(event.target.value))
+                    setAttemptId(null)
+                  }}
+                  sx={{ minWidth: 140 }}
+                >
+                  {questions.map((item, index) => <MenuItem key={item.id} value={index}>Question {index + 1}</MenuItem>)}
+                </TextField>
+                {currentExtraAttempts > 0 && (
+                  <Typography variant="caption" color="text.secondary" display="block" sx={{ mt: 0.5 }}>
+                    Extra attempts: +{currentExtraAttempts} (limit {effectiveAttemptLimit})
+                  </Typography>
+                )}
+              </Box>
               {attempt && (
                 <>
                   <TextField
@@ -171,6 +242,15 @@ export default function StudentSubmissionDialog({ student, assignment, onClose }
                   </Box>
                 </>
               )}
+              <Box sx={{ ml: 'auto', alignSelf: 'center' }}>
+                <Button
+                  size="small"
+                  onClick={handleOpenAttempts}
+                  disabled={!question?.id || overridesPending || overridesFetching || overridesError || attemptsSaving}
+                >
+                  Give Extra Attempts
+                </Button>
+              </Box>
             </Stack>
             <SubmissionAnswer key={attempt?.id ?? question?.id} snapshot={question?.question_snapshot} data={attempt?.submission_data} logicSystem={course?.logicSystem} />
           </Stack>
@@ -214,6 +294,52 @@ export default function StudentSubmissionDialog({ student, assignment, onClose }
             <Button onClick={handleCloseExtension}>Cancel</Button>
             <Button variant="contained" onClick={handleSaveExtension} disabled={extensionSaving}>
               Save Extension
+            </Button>
+          </Box>
+        </Stack>
+      </Popover>
+      <Popover
+        open={Boolean(attemptsAnchorEl)}
+        anchorEl={attemptsAnchorEl}
+        onClose={attemptsSaving ? undefined : handleCloseAttempts}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+        slotProps={{ paper: { sx: { p: 2, width: 320 } } }}
+      >
+        <Stack spacing={2}>
+          <Box>
+            <Typography variant="subtitle2" fontWeight={600}>Extra attempts</Typography>
+            <Typography variant="caption" color="text.secondary">
+              Question {questionIndex + 1} · base limit {baseAttemptLimit}
+            </Typography>
+          </Box>
+          {attemptsSaving && <LinearProgress />}
+          {attemptsError && <Alert severity="error">{attemptsError}</Alert>}
+          <TextField
+            label="Extra attempts"
+            type="number"
+            value={extraAttempts}
+            onChange={(e) => setExtraAttempts(e.target.value)}
+            inputProps={{ min: 0, step: 1 }}
+            helperText={extraAttemptsValid
+              ? `Effective attempt limit: ${Math.max(1, baseAttemptLimit + parsedExtraAttempts)}. Set 0 to remove the bonus.`
+              : 'Whole number, 0 or more'}
+            error={!extraAttemptsValid}
+            fullWidth
+          />
+          <TextField
+            label="Reason (optional)"
+            value={attemptsReason}
+            onChange={(e) => setAttemptsReason(e.target.value.slice(0, 500))}
+            inputProps={{ maxLength: 500 }}
+            multiline
+            minRows={2}
+            fullWidth
+          />
+          <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
+            <Button onClick={handleCloseAttempts} disabled={attemptsSaving}>Cancel</Button>
+            <Button variant="contained" onClick={handleSaveAttempts} disabled={attemptsSaving || !extraAttemptsValid}>
+              Save Extra Attempts
             </Button>
           </Box>
         </Stack>
