@@ -228,6 +228,7 @@ export default function DerivationJustificationCell({
                       color={isDischarged ? 'primary' : 'default'}
                       variant={isDischarged ? 'filled' : 'outlined'}
                       aria-label={isDischarged ? `Undo discharge on line ${lineIndex + 1}` : `Discharge subproof on line ${lineIndex + 1}`}
+                      sx={{ borderRadius: 1 }}
                     />
                   </Tooltip>
                 )}
