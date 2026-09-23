@@ -217,9 +217,8 @@ export default function DerivationJustificationCell({
               <CancelIcon fontSize="small" color="error" />
             )}
             {showDischargeControl && (
-              // reserves the chip's footprint on every eligible line so the column doesn't
-              // resize as the chip itself appears/disappears with which line is active
-              <Box sx={{ minWidth: '4.5rem', display: 'flex', alignItems: 'center' }}>
+              // skip the reserved width on phone - it was pushing delete off the clipped fullscreen viewport
+              <Box sx={{ minWidth: isPhone ? 0 : '4.5rem', display: 'flex', alignItems: 'center' }}>
                 {isActiveLine && (
                   <Tooltip title={isDischarged ? 'Undo discharge' : 'Discharge subproof here'}>
                     <Chip
