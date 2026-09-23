@@ -270,56 +270,53 @@ export const getRuleFromJustification = (value) => {
   return formatRuleName(citedrules[0])
 }
 
-const getCitedAssumptionRanges = (
-  linesSnapshot = [],
-  assumptionRules = ASSUMPTION_RULES,
-  { keepUnclosedOpen = false } = {}
-) => {
+/* a scope closes only where the student discharges it, never just from a citation that would close it -
+the discharge marker belongs on the line that leaves the scope (the one at the reduced depth), not on
+the last line still inside it - that outside line is closed off up to (but not including) itself.
+depth for a line is the open-scope stack's size right after that line's own pop/push are applied, so
+one forward pass gives indentation, discharge status and discharge eligibility together */
+const walkManualScopes = (linesSnapshot = [], assumptionRules = ASSUMPTION_RULES) => {
   const rangesByStart = new Map()
+  const depths = new Array(linesSnapshot.length).fill(0)
+  const dischargedByLine = new Array(linesSnapshot.length).fill(false)
+  const eligibleByLine = new Array(linesSnapshot.length).fill(false)
+  const openStack = []
   linesSnapshot.forEach((line, idx) => {
     const lineNumber = idx + 1
-    const { ranges } = justParse(String(line?.justification || ''))
-    ranges.forEach(([start, end]) => {
-      if (!Number.isFinite(start) || !Number.isFinite(end)) return
-      if (start >= end || end >= lineNumber) return
-      const startLine = linesSnapshot[start - 1]
-      const startRule = getRuleFromJustification(startLine?.justification || '').toUpperCase()
-      if (!assumptionRules.has(startRule)) return
-      const currentEnd = rangesByStart.get(start)
-      if (!currentEnd || end > currentEnd) {
-        rangesByStart.set(start, end)
-      }
-    })
+    eligibleByLine[idx] = openStack.length > 0
+    if (line?.dischargesScope && openStack.length > 0) {
+      rangesByStart.set(openStack.pop(), lineNumber - 1)
+      dischargedByLine[idx] = true
+    }
+    const rule = getRuleFromJustification(line?.justification || '').toUpperCase()
+    if (assumptionRules.has(rule)) {
+      openStack.push(lineNumber)
+    }
+    depths[idx] = Math.min(openStack.length, MAX_INDENT_LEVEL)
   })
-  if (keepUnclosedOpen) {
-    linesSnapshot.forEach((line, idx) => {
-      const lineNumber = idx + 1
-      const rule = getRuleFromJustification(line?.justification || '').toUpperCase()
-      if (!assumptionRules.has(rule)) return
-      if (rangesByStart.has(lineNumber)) return
-      rangesByStart.set(lineNumber, linesSnapshot.length)
-    })
-  }
-  return rangesByStart
+  openStack.forEach((startLine) => {
+    if (!rangesByStart.has(startLine)) {
+      rangesByStart.set(startLine, linesSnapshot.length)
+    }
+  })
+  return { rangesByStart, depths, dischargedByLine, eligibleByLine }
+}
+
+const getManualAssumptionRanges = (linesSnapshot, assumptionRules) =>
+  walkManualScopes(linesSnapshot, assumptionRules).rangesByStart
+
+// indentation, discharge status (which line's toggle closed a scope) and discharge eligibility
+// (where an open scope exists for a line to close), from the one shared walk above
+export const getFitchScopeInfo = (linesSnapshot = [], assumptionRules = ASSUMPTION_RULES) => {
+  const { depths, dischargedByLine, eligibleByLine } = walkManualScopes(linesSnapshot, assumptionRules)
+  return { depths, dischargedByLine, eligibleByLine }
 }
 
 export const getOpenAssumptionDepths = (linesSnapshot = [], options = {}) => {
   const mode = options.mode ?? 'flat'
   const assumptionRules = options.assumptionRules ?? ASSUMPTION_RULES
   if (mode === 'nested') {
-    const rangesByStart = getCitedAssumptionRanges(linesSnapshot, assumptionRules, {
-      keepUnclosedOpen: true,
-    })
-    return linesSnapshot.map((_, idx) => {
-      const lineNumber = idx + 1
-      let depth = 0
-      rangesByStart.forEach((end, start) => {
-        if (lineNumber >= start && lineNumber <= end) {
-          depth += 1
-        }
-      })
-      return Math.min(depth, MAX_INDENT_LEVEL)
-    })
+    return walkManualScopes(linesSnapshot, assumptionRules).depths
   }
   let depth = 0
   return linesSnapshot.map((line) => {
@@ -375,6 +372,11 @@ export const buildErrorRows = (errors, linesSnapshot = [], { skipCompletion = fa
               'formulas must start with an uppercase predicate letter (A–Z) or =/≠; lowercase predicates are not accepted.',
               'derivations must start with an uppercase predicate letter (A–Z); lowercase predicates are not accepted.'
             )
+            // subproofs only close when the student discharges them, so a range mismatch here usually means a missing discharge
+            .replace(
+              'line number given for end of range not at the end of a subderivation',
+              "cites this range as a closed subproof, but it hasn't been discharged there — use the discharge control to mark where the subproof actually closes"
+            )
           if (lineRule && INDENT_END_RULES.has(lineRule) && displayDesc === 'cites the wrong number of subderivation line ranges for the rule specified') {
             descs.push(`${displayDesc} (e.g. 3-9)`)
           } else {
@@ -402,6 +404,7 @@ const lineFromSavedProof = (line) => ({
   formula: line?.s ?? '',
   justification: line?.j ?? '',
   readOnly: false,
+  dischargesScope: line?.x === true,
 })
 
 // flatten saved proof nesting for the table
@@ -441,34 +444,13 @@ export const extractLines = (savedState, premises = []) => {
   return lines
 }
 
-// rebuild proof nesting from cited ranges
+// use the same discharge-driven ranges for display and submission
 const buildNestedSubderivationParts = (numbered, assumptionRules = ASSUMPTION_RULES) => {
   const byLineNumber = new Map(numbered.map((part) => [Number(part.n), part]))
-  const rangesByStart = new Map()
-
-  // only assumption ranges open subderivations
-  for (const part of numbered) {
-    const lineNumber = Number(part.n)
-    const { ranges } = justParse(String(part.j || ''))
-    for (const [start, end] of ranges) {
-      if (!Number.isFinite(start) || !Number.isFinite(end)) continue
-      if (start >= end || end >= lineNumber) continue
-      const startPart = byLineNumber.get(start)
-      const startRule = getRuleFromJustification(startPart?.j || '').toUpperCase()
-      if (!assumptionRules.has(startRule)) continue
-      const currentEnd = rangesByStart.get(start)
-      if (!currentEnd || end > currentEnd) {
-        rangesByStart.set(start, end)
-      }
-    }
-  }
-  for (const part of numbered) {
-    const lineNumber = Number(part.n)
-    const rule = getRuleFromJustification(part?.j || '').toUpperCase()
-    if (!Number.isFinite(lineNumber) || !assumptionRules.has(rule)) continue
-    if (rangesByStart.has(lineNumber)) continue
-    rangesByStart.set(lineNumber, Number(numbered[numbered.length - 1]?.n ?? lineNumber))
-  }
+  const rangesByStart = getManualAssumptionRanges(
+    numbered.map((part) => ({ justification: part.j, dischargesScope: part.x === true })),
+    assumptionRules
+  )
 
   const buildRange = (startLine, endLine, wrappedStartLine = null) => {
     const parts = []
@@ -532,6 +514,7 @@ export const buildSubmission = (lines, conclusion, premises, normalizeFormula, n
     n: String(idx + 1),
     s: normalizeFormula(line.formula ?? ''),
     j: idx < premises.length ? 'Pr' : normalizeJustification(line.justification ?? ''),
+    ...(idx >= premises.length && line.dischargesScope ? { x: true } : {}),
   }))
   const canonicalParts = options.canonicalScopes
     ? buildCanonicalSubderivationParts(numbered, lines)

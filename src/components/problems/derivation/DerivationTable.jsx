@@ -47,6 +47,7 @@ import {
   formatJustificationParts,
   getConstantLettersFromFormulasAndKey,
   getConstantLettersFromPrompt,
+  getFitchScopeInfo,
   getJustificationMeta,
   getOpenAssumptionDepths,
   getPredicateLettersFromKey,
@@ -367,8 +368,14 @@ export default function DerivationTable({
       }),
     [lineDrafts, lines, useRuleDropdown, usesNestedSubderivations]
   )
+  // discharge only applies to non-fixed nested (fitch) proofs
+  const fitchScopeInfo = useMemo(() => (
+    usesNestedSubderivations && !isFixedProof
+      ? getFitchScopeInfo(effectiveLines, activeAssumptionRules)
+      : null
+  ), [activeAssumptionRules, effectiveLines, isFixedProof, usesNestedSubderivations])
   const indentLevels = useMemo(() => {
-    const inferred = getOpenAssumptionDepths(effectiveLines, {
+    const inferred = fitchScopeInfo?.depths ?? getOpenAssumptionDepths(effectiveLines, {
       mode: usesNestedSubderivations ? 'nested' : 'flat',
       assumptionRules: activeAssumptionRules,
     })
@@ -376,7 +383,9 @@ export default function DerivationTable({
     return effectiveLines.map((line, index) => (
       Number.isInteger(line.scopeDepth) ? line.scopeDepth : inferred[index]
     ))
-  }, [activeAssumptionRules, effectiveLines, isFixedProof, usesNestedSubderivations])
+  }, [activeAssumptionRules, effectiveLines, fitchScopeInfo, isFixedProof, usesNestedSubderivations])
+  const dischargeStatusByLine = fitchScopeInfo?.dischargedByLine ?? []
+  const dischargeEligibleByLine = fitchScopeInfo?.eligibleByLine ?? []
 
   const normalizeJustification = useCallback((value) => String(value ?? '').trim(), [])
 
@@ -590,6 +599,18 @@ export default function DerivationTable({
     if (!activeAssumptionRules.has(upperRule) && usesNestedSubderivations) {
       window.setTimeout(() => justRefs.current[index]?.focus(), 0)
     }
+  }
+
+  // this line discharges the scope it exits - the box it closes ends on the line before it
+  const handleToggleDischarge = (index) => {
+    const line = lines[index]
+    if (!line || line.readOnly || isFixedProof) return
+    commitLines(
+      (previous) => previous.map((item, itemIndex) => (
+        itemIndex === index ? { ...item, dischargesScope: !item.dischargesScope } : item
+      )),
+      index
+    )
   }
 
   // click row number to append it to current line's line(s) field (with space after)
@@ -1344,6 +1365,7 @@ export default function DerivationTable({
                   autoCheckStatus={autoCheckState.perLine[idx]}
                   citationDraft={lineDrafts[idx]}
                   conclusion={isFixedProof ? '' : conclusionTargetText}
+                  isDischarged={dischargeStatusByLine[idx]}
                   isFullScreen={isFullScreen}
                   isMobile={isMobile}
                   isPhone={isPhone}
@@ -1367,10 +1389,12 @@ export default function DerivationTable({
                     handleInputRequestFullScreen(idx, 'justification')
                   }}
                   onRuleChange={(rule) => handleRuleChange(idx, line, rule)}
+                  onToggleDischarge={() => handleToggleDischarge(idx)}
                   onTypedCommit={(raw) => handleTypedJustificationCommit(idx, raw)}
                   persistentUnderline={isFixedProof}
                   premisesCount={premises.length}
                   registerInput={(element) => { if (element) justRefs.current[idx] = element }}
+                  showDischargeControl={usesNestedSubderivations && !isFixedProof && dischargeEligibleByLine[idx]}
                   useRuleDropdown={useRuleDropdown}
                   usesNestedSubderivations={usesNestedSubderivations}
                 />

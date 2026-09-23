@@ -11,6 +11,7 @@ import {
 } from '@mui/material'
 import CancelIcon from '@mui/icons-material/Cancel'
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
+import FormatIndentDecreaseIcon from '@mui/icons-material/FormatIndentDecrease'
 import RemoveIcon from '@mui/icons-material/Remove'
 import DerivationFormulaText from './DerivationFormulaText.jsx'
 import {
@@ -40,6 +41,7 @@ export default function DerivationJustificationCell({
   autoCheckStatus,
   citationDraft,
   conclusion,
+  isDischarged,
   isFullScreen,
   isMobile,
   isPhone,
@@ -54,10 +56,12 @@ export default function DerivationJustificationCell({
   onKeyDown,
   onRequestFullScreen,
   onRuleChange,
+  onToggleDischarge,
   onTypedCommit,
   persistentUnderline = false,
   premisesCount,
   registerInput,
+  showDischargeControl,
   useRuleDropdown,
   usesNestedSubderivations,
 }) {
@@ -206,6 +210,18 @@ export default function DerivationJustificationCell({
           )}
           {autoCheckEnabled && autoCheckStatus === 'error' && (
             <CancelIcon fontSize="small" color="error" />
+          )}
+          {showDischargeControl && (
+            <Tooltip title={isDischarged ? 'Undo discharge' : 'Discharge subproof here'}>
+              <IconButton
+                onClick={onToggleDischarge}
+                size="small"
+                aria-label={isDischarged ? `Undo discharge on line ${lineIndex + 1}` : `Discharge subproof on line ${lineIndex + 1}`}
+                sx={{ color: isDischarged ? 'primary.main' : 'text.secondary' }}
+              >
+                <FormatIndentDecreaseIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
           )}
           {!line.readOnly && !line.formulaReadOnly && (
             <Tooltip title="Delete line">
