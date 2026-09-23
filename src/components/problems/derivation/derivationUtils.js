@@ -1,6 +1,4 @@
-import { alpha } from '@mui/material/styles'
 import { formatDerivationRuleName } from '../../../lib/derivationRules.js'
-import { DERIVATION_SMALL_FONT_SIZE } from './derivationTableConfig.js'
 import getFormulaClass from '@logic-app/logic-engine/symbolic/formula.js'
 import { justParse } from '@logic-app/logic-engine/justification-parse.js'
 import {
@@ -109,8 +107,6 @@ export const HURLEY_ASSUMPTION_RULES = new Set(['ACP', 'AIP'])
 export const FITCH_ASSUMPTION_RULES = new Set(['AS', 'HYP'])
 export const ASSUMPTION_RULES = new Set([...HURLEY_ASSUMPTION_RULES, ...FITCH_ASSUMPTION_RULES])
 export const INDENT_END_RULES = new Set(['CP', 'IP'])
-export const INDENT_PX = 18
-export const ASSUMPTION_INDENT_PX = 12
 export const MAX_INDENT_LEVEL = 8
 export const AUTO_CHECK_STORAGE_KEY = 'logic-app:autocheck-enabled'
 export const RULE_INPUT_MODE_KEY = 'logic-app:derivation-rule-input-mode'
@@ -124,78 +120,6 @@ export function formulasEqualNormally(a, b, normalizeForFallback, notation) {
     return Formula.from(String(a)).normal === Formula.from(String(b)).normal
   } catch {
     return normalizeForFallback ? normalizeForFallback(a) === normalizeForFallback(b) : false
-  }
-}
-
-export const symbolBtnSx = (isFullScreen, isMobile, isPhone) => {
-  const mobileFullscreen = isPhone && isFullScreen
-  return {
-    minWidth: mobileFullscreen ? 42 : (isFullScreen ? 28 : 34),
-    px: mobileFullscreen ? 1.25 : (isFullScreen ? 0.75 : 1),
-    py: mobileFullscreen ? 0.5 : 0.35,
-    fontSize: mobileFullscreen ? '1.0625rem' : (isFullScreen ? DERIVATION_SMALL_FONT_SIZE : '0.95rem'),
-    lineHeight: 1.1,
-    minHeight: mobileFullscreen ? 44 : 32,
-    fontWeight: 600,
-    textTransform: 'none',
-    boxShadow: 'none',
-    border: 'none',
-    bgcolor: (theme) =>
-      theme.palette.mode === 'dark' ? alpha(theme.palette.common.white, 0.08) : theme.palette.grey[100],
-    color: 'text.primary',
-    '&:hover': (theme) => ({
-      boxShadow: 'none',
-      border: 'none',
-      backgroundColor: alpha(theme.palette.primary.main, theme.palette.action.hoverOpacity),
-    }),
-  }
-}
-
-export const plainIconButtonSx = {
-  p: 0.25,
-  borderRadius: 0,
-  backgroundColor: 'transparent',
-  '&:hover': {
-    backgroundColor: 'transparent',
-  },
-  '&.Mui-disabled': {
-    backgroundColor: 'transparent',
-  },
-}
-
-export const getUnderlineColors = (theme) => {
-  if (theme.palette.mode === 'dark') {
-    return {
-      base: theme.palette.divider,
-      hover: alpha(theme.palette.common.white, 0.24),
-      focus: theme.palette.primary.main,
-    }
-  }
-  return {
-    base: '#e3e6ee',
-    hover: '#edf1f7',
-    focus: '#dfe5f0',
-  }
-}
-
-export const getInputUnderlineSx = (theme) => {
-  const colors = getUnderlineColors(theme)
-  return {
-    '& .MuiInput-underline:before': { borderBottomColor: colors.base },
-    '& .MuiInput-underline:hover:before': { borderBottomColor: colors.hover },
-    '& .MuiInput-underline:after': { borderBottomColor: colors.focus },
-  }
-}
-
-export const getSelectUnderlineSx = (theme) => {
-  const colors = getUnderlineColors(theme)
-  return {
-    '&:before': { borderBottomColor: colors.base },
-    '&:hover:not(.Mui-disabled):before': { borderBottomColor: colors.hover },
-    '&:after': { borderBottomColor: colors.focus },
-    '& .MuiInput-underline:before': { borderBottomColor: colors.base },
-    '& .MuiInput-underline:hover:before': { borderBottomColor: colors.hover },
-    '& .MuiInput-underline:after': { borderBottomColor: colors.focus },
   }
 }
 

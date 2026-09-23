@@ -13,7 +13,7 @@ import {
 } from '@mui/material'
 import CancelIcon from '@mui/icons-material/Cancel'
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
-import RemoveIcon from '@mui/icons-material/Remove'
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
 import DerivationFormulaText from './DerivationFormulaText.jsx'
 import {
   DERIVATION_JUSTIFICATION_WIDTH_SM,
@@ -87,10 +87,12 @@ export default function DerivationJustificationCell({
         verticalAlign: 'middle',
         ...(isFullScreen ? { width: '50%', minWidth: 0 } : { width: 'auto', whiteSpace: 'nowrap' }),
         '& .line-delete': {
-          opacity: isPhone && isFullScreen ? Number(activeFormulaIndex === lineIndex) : 0,
+          // phones don't have real hover, so reveal by active line there instead - in any
+          // other context (desktop, or a mouse/trackpad on a tablet) hover still works fine
+          opacity: isPhone ? Number(activeFormulaIndex === lineIndex) : 0,
           transition: 'opacity 120ms ease',
         },
-        ...(!(isPhone && isFullScreen) && { '&:hover .line-delete': { opacity: 1 } }),
+        ...(!isPhone && { '&:hover .line-delete': { opacity: 1 } }),
       }}
     >
       {isPremise ? (
@@ -242,7 +244,7 @@ export default function DerivationJustificationCell({
                   aria-label={`Delete line ${lineIndex + 1}`}
                   className="line-delete"
                 >
-                  <RemoveIcon />
+                  <DeleteOutlineIcon />
                 </IconButton>
               </Tooltip>
             )}
