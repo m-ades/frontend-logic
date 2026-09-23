@@ -76,7 +76,7 @@ function FormulaInputField({ value, onValueChange, onBlur, fieldReadOnly, formul
       formulaInput.style.border = `1px solid ${theme.palette.divider}`
       formulaInput.style.borderRadius = theme.shape.borderRadius
       formulaInput.style.fontSize = '1rem'
-      formulaInput.style.fontFamily = 'monospace'
+      formulaInput.style.fontFamily = 'var(--app-font-mono)'
       formulaInput.style.backgroundColor = theme.palette.background.paper
       formulaInput.style.color = theme.palette.text.primary
       formulaInput.setAttribute('aria-label', ariaLabel || 'Formula input')

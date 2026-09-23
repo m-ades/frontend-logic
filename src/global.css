@@ -7,6 +7,27 @@ html {
   font-size: 80%;
 }
 
+/* keep biconditionals in the bundled text font */
+@font-face {
+  font-family: 'Biconditional';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/biconditional.woff2') format('woff2');
+  unicode-range: U+2194, U+FE0E-FE0F;
+}
+
+:root {
+  --app-font-sans: 'Biconditional', 'IBM Plex Sans', sans-serif;
+  --app-font-mono: 'Biconditional', monospace;
+  --app-font-plex-mono: 'Biconditional', 'IBM Plex Mono', monospace;
+}
+
+body {
+  font-family: var(--app-font-sans);
+  font-variant-emoji: text;
+}
+
 html, body {
   overflow: auto;
   height: 100%;

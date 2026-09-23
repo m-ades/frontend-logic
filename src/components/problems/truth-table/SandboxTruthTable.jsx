@@ -322,7 +322,7 @@ export default function SandboxTruthTable({
             {argument.premises?.length > 0 && (
               <Box sx={{ width: '100%', display: 'flex', alignItems: 'flex-start', gap: 0.5 }}>
                 {isHurley && isStackedLayout(layout) ? (
-                  <Stack spacing={0.5} sx={{ fontSize: '1.1rem', fontFamily: 'monospace' }}>
+                  <Stack spacing={0.5} sx={{ fontSize: '1.1rem', fontFamily: 'var(--app-font-mono)' }}>
                     {argument.premises.map((premise, idx) => (
                       <Typography key={`premise-${idx}`} sx={{ fontSize: '1.1rem' }}>
                         {premise}
@@ -338,7 +338,7 @@ export default function SandboxTruthTable({
                     )}
                   </Stack>
                 ) : isHurley ? (
-                  <Typography sx={{ fontSize: '1.1rem', fontFamily: 'monospace' }}>
+                  <Typography sx={{ fontSize: '1.1rem', fontFamily: 'var(--app-font-mono)' }}>
                     {labels.join(' / ')}
                   </Typography>
                 ) : (

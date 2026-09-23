@@ -198,7 +198,7 @@ body[data-theme='dark'] .logic-engine derivation-hurley .derivationcore {
 
 .logic-engine derivation-hurley .derivationlinenumber {
     color: var(--logic-black);
-    font-family: "IBM Plex Sans", sans-serif;
+    font-family: var(--app-font-sans);
     font-size: inherit;
     font-weight: inherit;
     line-height: inherit;

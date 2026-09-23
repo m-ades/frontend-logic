@@ -115,7 +115,7 @@ export default function ComboTranslationTruthTable({
       border: `1px solid ${theme.palette.divider}`,
       borderRadius: theme.shape.borderRadius,
       fontSize: '1rem',
-      fontFamily: 'monospace',
+      fontFamily: 'var(--app-font-mono)',
       backgroundColor: theme.palette.background.paper,
       color: theme.palette.text.primary,
     })
@@ -364,7 +364,7 @@ export default function ComboTranslationTruthTable({
               <Typography variant="body2" sx={{ fontWeight: 600 }}>
                 Argument line
               </Typography>
-              <Typography component="div" sx={{ fontFamily: 'monospace', fontSize: '1rem' }}>
+              <Typography component="div" sx={{ fontFamily: 'var(--app-font-mono)', fontSize: '1rem' }}>
                 {answerArgumentLine}
               </Typography>
               <TruthTableEditor

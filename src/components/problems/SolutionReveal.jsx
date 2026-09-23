@@ -7,7 +7,7 @@ function renderLines(lines) {
       sx={{
         pl: 3,
         my: 0,
-        fontFamily: '"IBM Plex Mono", monospace',
+        fontFamily: 'var(--app-font-plex-mono)',
         fontSize: '0.95rem',
         lineHeight: 1.6
       }}
@@ -50,7 +50,7 @@ function renderSolution({ solution, children }) {
         component="pre"
         sx={{
           m: 0,
-          fontFamily: '"IBM Plex Mono", monospace',
+          fontFamily: 'var(--app-font-plex-mono)',
           fontSize: '0.9rem',
           whiteSpace: 'pre-wrap'
         }}

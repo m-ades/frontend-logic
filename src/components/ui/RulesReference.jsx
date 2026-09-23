@@ -258,7 +258,7 @@ function ShortcutTable({ rows }) {
                       borderRadius: 0.75,
                       bgcolor: 'transparent',
                       color: 'text.primary',
-                      fontFamily: 'monospace',
+                      fontFamily: 'var(--app-font-mono)',
                       fontSize: '0.875rem',
                       lineHeight: 1.4,
                       textAlign: 'center',

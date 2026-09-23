@@ -421,7 +421,7 @@ export default function MobileLogicInput({
           }}
           sx={{
             '& .MuiInputBase-input': {
-              fontFamily: 'monospace',
+              fontFamily: 'var(--app-font-mono)',
               fontSize: '1rem',
             },
           }}
