@@ -29,7 +29,7 @@ export default function DerivationFeedbackPanel({
             onClick={onToggleAutoCheck}
             size="small"
             aria-label="Toggle autochecker"
-            sx={{ p: 0.25, mt: -0.25, color: autoCheckEnabled ? 'primary.main' : 'text.disabled' }}
+            sx={{ p: 0.25, mt: -0.25, color: autoCheckEnabled ? 'primary.main' : 'text.secondary' }}
           >
             <AutoAwesomeIcon />
           </IconButton>

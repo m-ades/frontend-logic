@@ -62,6 +62,7 @@ import {
   DERIVATION_FORMULA_WIDTH,
   DERIVATION_NUMBER_CELL_WIDTH_DESKTOP,
   DERIVATION_NUMBER_CELL_WIDTH_MOBILE,
+  DERIVATION_PROMPT_FONT_SIZE,
   FITCH_LINE_WIDTH,
   RULE_INPUT_MODE_KEY,
   applyInsertion,
@@ -1160,7 +1161,7 @@ export default function DerivationTable({
         )}
         {proof.description && !isFullScreen && !hideActions && (
           <Box sx={{ mb: 2, display: 'flex', alignItems: 'flex-start', gap: 0.5 }}>
-            <PromptText content={proof.description} sx={{ fontSize: '1.171875rem', flex: 1 }} />
+            <PromptText content={proof.description} sx={{ fontSize: DERIVATION_PROMPT_FONT_SIZE, flex: 1 }} />
           </Box>
         )}
         {isPhone && !isFullScreen && canOpenFullScreen ? (
@@ -1177,7 +1178,7 @@ export default function DerivationTable({
               borderRadius: 2,
               bgcolor: (t) => alpha(t.palette.primary.main, 0.04),
               color: 'primary.main',
-              fontSize: '1.171875rem',
+              fontSize: DERIVATION_PROMPT_FONT_SIZE,
               lineHeight: 2,
               fontWeight: 400,
               cursor: 'pointer',

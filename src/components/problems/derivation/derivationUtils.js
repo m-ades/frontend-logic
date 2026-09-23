@@ -1,5 +1,6 @@
 import { alpha } from '@mui/material/styles'
 import { formatDerivationRuleName } from '../../../lib/derivationRules.js'
+import { DERIVATION_SMALL_FONT_SIZE } from './derivationTableConfig.js'
 import getFormulaClass from '@logic-app/logic-engine/symbolic/formula.js'
 import { justParse } from '@logic-app/logic-engine/justification-parse.js'
 import {
@@ -132,7 +133,7 @@ export const symbolBtnSx = (isFullScreen, isMobile, isPhone) => {
     minWidth: mobileFullscreen ? 42 : (isFullScreen ? 28 : 34),
     px: mobileFullscreen ? 1.25 : (isFullScreen ? 0.75 : 1),
     py: mobileFullscreen ? 0.5 : 0.35,
-    fontSize: mobileFullscreen ? '1.0625rem' : (isFullScreen ? '0.8125rem' : '0.95rem'),
+    fontSize: mobileFullscreen ? '1.0625rem' : (isFullScreen ? DERIVATION_SMALL_FONT_SIZE : '0.95rem'),
     lineHeight: 1.1,
     minHeight: mobileFullscreen ? 44 : 32,
     fontWeight: 600,

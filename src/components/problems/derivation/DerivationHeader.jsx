@@ -1,6 +1,6 @@
 import { Box, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material'
 import MathJaxFormula from '../../ui/MathJaxFormula.jsx'
-import { DERIVATION_LINE_FONT_SIZE } from './derivationTableConfig.js'
+import { DERIVATION_LINE_FONT_SIZE, DERIVATION_SMALL_FONT_SIZE } from './derivationTableConfig.js'
 
 /**
  * renders the argument and rule controls above a derivation table
@@ -64,9 +64,10 @@ export default function DerivationHeader({
                   '& .MuiToggleButton-root': {
                     py: 0.25,
                     px: 1.25,
-                    fontSize: '0.8125rem',
+                    fontSize: DERIVATION_SMALL_FONT_SIZE,
                     border: 'none',
-                    '&.Mui-selected': { fontWeight: 600 },
+                    color: 'text.secondary',
+                    '&.Mui-selected': { fontWeight: 600, color: 'primary.main' },
                   },
                 }}
               >
