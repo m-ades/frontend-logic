@@ -1,4 +1,6 @@
 import {
+  Box,
+  Chip,
   FormControl,
   IconButton,
   MenuItem,
@@ -11,7 +13,6 @@ import {
 } from '@mui/material'
 import CancelIcon from '@mui/icons-material/Cancel'
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
-import FormatIndentDecreaseIcon from '@mui/icons-material/FormatIndentDecrease'
 import RemoveIcon from '@mui/icons-material/Remove'
 import DerivationFormulaText from './DerivationFormulaText.jsx'
 import {
@@ -68,6 +69,7 @@ export default function DerivationJustificationCell({
   const selectedRule = getRuleFromJustification(line.justification)
   const justificationReadOnly = isDerivationFieldReadOnly(line, 'justification')
   const omitsCitations = assumptionRules.has(selectedRule.toUpperCase())
+  const isActiveLine = activeFormulaIndex === lineIndex
   const isPremise = lineIndex < premisesCount
   const ruleOptions = selectedRule && !allowedRules.some((rule) => (
     rule.toLowerCase() === selectedRule.toLowerCase()
@@ -205,36 +207,45 @@ export default function DerivationJustificationCell({
             />
           )}
 
-          {autoCheckEnabled && autoCheckStatus === 'ok' && (
-            <CheckCircleIcon fontSize="small" sx={{ color: 'primary.main' }} />
-          )}
-          {autoCheckEnabled && autoCheckStatus === 'error' && (
-            <CancelIcon fontSize="small" color="error" />
-          )}
-          {showDischargeControl && (
-            <Tooltip title={isDischarged ? 'Undo discharge' : 'Discharge subproof here'}>
-              <IconButton
-                onClick={onToggleDischarge}
-                size="small"
-                aria-label={isDischarged ? `Undo discharge on line ${lineIndex + 1}` : `Discharge subproof on line ${lineIndex + 1}`}
-                sx={{ color: isDischarged ? 'primary.main' : 'text.secondary' }}
-              >
-                <FormatIndentDecreaseIcon fontSize="small" />
-              </IconButton>
-            </Tooltip>
-          )}
-          {!line.readOnly && !line.formulaReadOnly && (
-            <Tooltip title="Delete line">
-              <IconButton
-                onClick={onDelete}
-                size="small"
-                aria-label={`Delete line ${lineIndex + 1}`}
-                className="line-delete"
-              >
-                <RemoveIcon />
-              </IconButton>
-            </Tooltip>
-          )}
+          <Stack direction="row" alignItems="center" spacing={0.75} sx={{ ml: 0.75 }}>
+            {autoCheckEnabled && autoCheckStatus === 'ok' && (
+              <CheckCircleIcon fontSize="small" sx={{ color: 'primary.main' }} />
+            )}
+            {autoCheckEnabled && autoCheckStatus === 'error' && (
+              <CancelIcon fontSize="small" color="error" />
+            )}
+            {showDischargeControl && (
+              // reserves the chip's footprint on every eligible line so the column doesn't
+              // resize as the chip itself appears/disappears with which line is active
+              <Box sx={{ minWidth: '4.5rem', display: 'flex', alignItems: 'center' }}>
+                {isActiveLine && (
+                  <Tooltip title={isDischarged ? 'Undo discharge' : 'Discharge subproof here'}>
+                    <Chip
+                      label={isDischarged ? 'Discharged' : 'Discharge'}
+                      onClick={onToggleDischarge}
+                      size="small"
+                      clickable
+                      color={isDischarged ? 'primary' : 'default'}
+                      variant={isDischarged ? 'filled' : 'outlined'}
+                      aria-label={isDischarged ? `Undo discharge on line ${lineIndex + 1}` : `Discharge subproof on line ${lineIndex + 1}`}
+                    />
+                  </Tooltip>
+                )}
+              </Box>
+            )}
+            {!line.readOnly && !line.formulaReadOnly && (
+              <Tooltip title="Delete line">
+                <IconButton
+                  onClick={onDelete}
+                  size="small"
+                  aria-label={`Delete line ${lineIndex + 1}`}
+                  className="line-delete"
+                >
+                  <RemoveIcon />
+                </IconButton>
+              </Tooltip>
+            )}
+          </Stack>
         </Stack>
       )}
     </TableCell>
