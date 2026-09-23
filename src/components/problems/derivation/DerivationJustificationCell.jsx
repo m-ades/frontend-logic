@@ -1,4 +1,6 @@
 import {
+  Box,
+  Chip,
   FormControl,
   IconButton,
   MenuItem,
@@ -11,7 +13,7 @@ import {
 } from '@mui/material'
 import CancelIcon from '@mui/icons-material/Cancel'
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
-import RemoveIcon from '@mui/icons-material/Remove'
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
 import DerivationFormulaText from './DerivationFormulaText.jsx'
 import {
   DERIVATION_JUSTIFICATION_WIDTH_SM,
@@ -38,8 +40,10 @@ export default function DerivationJustificationCell({
   assumptionRules,
   autoCheckEnabled,
   autoCheckStatus,
+  canDischargeMore,
   citationDraft,
   conclusion,
+  isDischarged,
   isFullScreen,
   isMobile,
   isPhone,
@@ -54,16 +58,23 @@ export default function DerivationJustificationCell({
   onKeyDown,
   onRequestFullScreen,
   onRuleChange,
+  onToggleDischarge,
   onTypedCommit,
   persistentUnderline = false,
   premisesCount,
   registerInput,
+  showDischargeControl,
   useRuleDropdown,
   usesNestedSubderivations,
 }) {
   const selectedRule = getRuleFromJustification(line.justification)
   const justificationReadOnly = isDerivationFieldReadOnly(line, 'justification')
   const omitsCitations = assumptionRules.has(selectedRule.toUpperCase())
+  const isActiveLine = activeFormulaIndex === lineIndex
+  const dischargeLabel = isDischarged > 1 ? `Discharged ×${isDischarged}` : isDischarged ? 'Discharged' : 'Discharge'
+  const dischargeAction = !isDischarged ? 'Discharge subproof here'
+    : canDischargeMore ? `${dischargeLabel}, click to close another`
+      : `${dischargeLabel}, click to undo`
   const isPremise = lineIndex < premisesCount
   const ruleOptions = selectedRule && !allowedRules.some((rule) => (
     rule.toLowerCase() === selectedRule.toLowerCase()
@@ -81,10 +92,11 @@ export default function DerivationJustificationCell({
         verticalAlign: 'middle',
         ...(isFullScreen ? { width: '50%', minWidth: 0 } : { width: 'auto', whiteSpace: 'nowrap' }),
         '& .line-delete': {
-          opacity: isPhone && isFullScreen ? Number(activeFormulaIndex === lineIndex) : 0,
+          // phones don't have real hover, so reveal by active line there instead
+          opacity: isPhone ? Number(activeFormulaIndex === lineIndex) : 0,
           transition: 'opacity 120ms ease',
         },
-        ...(!(isPhone && isFullScreen) && { '&:hover .line-delete': { opacity: 1 } }),
+        ...(!isPhone && { '&:hover .line-delete': { opacity: 1 } }),
       }}
     >
       {isPremise ? (
@@ -104,7 +116,7 @@ export default function DerivationJustificationCell({
           )}
         </Stack>
       ) : (
-        <Stack direction="row" alignItems="center" sx={{ flexWrap: 'nowrap', gap: 0, minWidth: 0 }}>
+        <Stack direction="row" alignItems="center" sx={{ flexWrap: isPhone ? 'wrap' : 'nowrap', gap: 0, minWidth: 0 }}>
           {useRuleDropdown ? (
             <>
               {!omitsCitations && (
@@ -201,24 +213,45 @@ export default function DerivationJustificationCell({
             />
           )}
 
-          {autoCheckEnabled && autoCheckStatus === 'ok' && (
-            <CheckCircleIcon fontSize="small" sx={{ color: 'primary.main' }} />
-          )}
-          {autoCheckEnabled && autoCheckStatus === 'error' && (
-            <CancelIcon fontSize="small" color="error" />
-          )}
-          {!line.readOnly && !line.formulaReadOnly && (
-            <Tooltip title="Delete line">
-              <IconButton
-                onClick={onDelete}
-                size="small"
-                aria-label={`Delete line ${lineIndex + 1}`}
-                className="line-delete"
-              >
-                <RemoveIcon />
-              </IconButton>
-            </Tooltip>
-          )}
+          <Stack direction="row" alignItems="center" spacing={0.75} sx={{ ml: 0.75 }}>
+            {autoCheckEnabled && autoCheckStatus === 'ok' && (
+              <CheckCircleIcon fontSize="small" sx={{ color: 'primary.main' }} />
+            )}
+            {autoCheckEnabled && autoCheckStatus === 'error' && (
+              <CancelIcon fontSize="small" color="error" />
+            )}
+            {showDischargeControl && (
+              // skip the reserved width on phone - it was pushing delete off the clipped fullscreen viewport
+              <Box sx={{ minWidth: isPhone ? 0 : '4.5rem', display: 'flex', alignItems: 'center' }}>
+                {isActiveLine && (
+                  <Tooltip title={dischargeAction}>
+                    <Chip
+                      label={dischargeLabel}
+                      onClick={onToggleDischarge}
+                      size="small"
+                      clickable
+                      color={isDischarged ? 'primary' : 'default'}
+                      variant={isDischarged ? 'filled' : 'outlined'}
+                      aria-label={`${dischargeAction} on line ${lineIndex + 1}`}
+                      sx={{ borderRadius: 1 }}
+                    />
+                  </Tooltip>
+                )}
+              </Box>
+            )}
+            {!line.readOnly && !line.formulaReadOnly && (
+              <Tooltip title="Delete line">
+                <IconButton
+                  onClick={onDelete}
+                  size="small"
+                  aria-label={`Delete line ${lineIndex + 1}`}
+                  className="line-delete"
+                >
+                  <DeleteOutlineIcon />
+                </IconButton>
+              </Tooltip>
+            )}
+          </Stack>
         </Stack>
       )}
     </TableCell>

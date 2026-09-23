@@ -26,6 +26,7 @@ import {
   parseAssumptionScopes,
 } from '@logic-app/logic-engine/proofArgumentExtractionScopes.js'
 import { extractLines } from './derivationUtils.js'
+import { DERIVATION_CAPTION_FONT_SIZE } from './derivationTableConfig.js'
 import { getFormulaKeyboardConfig } from '../mui/translation/symbolizationKeyboard.js'
 import DerivationCard from './DerivationCard.jsx'
 
@@ -209,7 +210,7 @@ export default function ProofArgumentExtraction({
           <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
             <Box sx={{ flex: 1 }}>
               {problemLabel && (
-                <Typography sx={{ color: 'text.secondary', fontSize: '0.875rem', lineHeight: 1.2, mb: 1.5 }}>
+                <Typography sx={{ color: 'text.secondary', fontSize: DERIVATION_CAPTION_FONT_SIZE, lineHeight: 1.2, mb: 1.5 }}>
                   {problemLabel}
                 </Typography>
               )}

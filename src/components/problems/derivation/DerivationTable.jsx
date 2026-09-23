@@ -47,6 +47,7 @@ import {
   formatJustificationParts,
   getConstantLettersFromFormulasAndKey,
   getConstantLettersFromPrompt,
+  getFitchScopeInfo,
   getJustificationMeta,
   getOpenAssumptionDepths,
   getPredicateLettersFromKey,
@@ -61,6 +62,7 @@ import {
   DERIVATION_FORMULA_WIDTH,
   DERIVATION_NUMBER_CELL_WIDTH_DESKTOP,
   DERIVATION_NUMBER_CELL_WIDTH_MOBILE,
+  DERIVATION_PROMPT_FONT_SIZE,
   FITCH_LINE_WIDTH,
   RULE_INPUT_MODE_KEY,
   applyInsertion,
@@ -367,8 +369,14 @@ export default function DerivationTable({
       }),
     [lineDrafts, lines, useRuleDropdown, usesNestedSubderivations]
   )
+  // discharge only applies to non-fixed nested (fitch) proofs
+  const fitchScopeInfo = useMemo(() => (
+    usesNestedSubderivations && !isFixedProof
+      ? getFitchScopeInfo(effectiveLines, activeAssumptionRules)
+      : null
+  ), [activeAssumptionRules, effectiveLines, isFixedProof, usesNestedSubderivations])
   const indentLevels = useMemo(() => {
-    const inferred = getOpenAssumptionDepths(effectiveLines, {
+    const inferred = fitchScopeInfo?.depths ?? getOpenAssumptionDepths(effectiveLines, {
       mode: usesNestedSubderivations ? 'nested' : 'flat',
       assumptionRules: activeAssumptionRules,
     })
@@ -376,7 +384,9 @@ export default function DerivationTable({
     return effectiveLines.map((line, index) => (
       Number.isInteger(line.scopeDepth) ? line.scopeDepth : inferred[index]
     ))
-  }, [activeAssumptionRules, effectiveLines, isFixedProof, usesNestedSubderivations])
+  }, [activeAssumptionRules, effectiveLines, fitchScopeInfo, isFixedProof, usesNestedSubderivations])
+  const dischargeStatusByLine = fitchScopeInfo?.dischargedByLine ?? []
+  const dischargeOpenCountByLine = fitchScopeInfo?.openCountByLine ?? []
 
   const normalizeJustification = useCallback((value) => String(value ?? '').trim(), [])
 
@@ -590,6 +600,21 @@ export default function DerivationTable({
     if (!activeAssumptionRules.has(upperRule) && usesNestedSubderivations) {
       window.setTimeout(() => justRefs.current[index]?.focus(), 0)
     }
+  }
+
+  // cycles how many scopes this line closes, 0 up to however many are open, wrapping back to 0
+  const handleToggleDischarge = (index) => {
+    const line = lines[index]
+    if (!line || line.readOnly || isFixedProof) return
+    const max = dischargeOpenCountByLine[index] ?? 0
+    commitLines(
+      (previous) => previous.map((item, itemIndex) => {
+        if (itemIndex !== index) return item
+        const current = Number(item.dischargesScope) || 0
+        return { ...item, dischargesScope: current >= max ? 0 : current + 1 }
+      }),
+      index
+    )
   }
 
   // click row number to append it to current line's line(s) field (with space after)
@@ -1139,7 +1164,7 @@ export default function DerivationTable({
         )}
         {proof.description && !isFullScreen && !hideActions && (
           <Box sx={{ mb: 2, display: 'flex', alignItems: 'flex-start', gap: 0.5 }}>
-            <PromptText content={proof.description} sx={{ fontSize: '1.171875rem', flex: 1 }} />
+            <PromptText content={proof.description} sx={{ fontSize: DERIVATION_PROMPT_FONT_SIZE, flex: 1 }} />
           </Box>
         )}
         {isPhone && !isFullScreen && canOpenFullScreen ? (
@@ -1156,7 +1181,7 @@ export default function DerivationTable({
               borderRadius: 2,
               bgcolor: (t) => alpha(t.palette.primary.main, 0.04),
               color: 'primary.main',
-              fontSize: '1.171875rem',
+              fontSize: DERIVATION_PROMPT_FONT_SIZE,
               lineHeight: 2,
               fontWeight: 400,
               cursor: 'pointer',
@@ -1342,8 +1367,10 @@ export default function DerivationTable({
                   assumptionRules={activeAssumptionRules}
                   autoCheckEnabled={autoCheckEnabled}
                   autoCheckStatus={autoCheckState.perLine[idx]}
+                  canDischargeMore={dischargeStatusByLine[idx] < dischargeOpenCountByLine[idx]}
                   citationDraft={lineDrafts[idx]}
                   conclusion={isFixedProof ? '' : conclusionTargetText}
+                  isDischarged={dischargeStatusByLine[idx]}
                   isFullScreen={isFullScreen}
                   isMobile={isMobile}
                   isPhone={isPhone}
@@ -1367,10 +1394,12 @@ export default function DerivationTable({
                     handleInputRequestFullScreen(idx, 'justification')
                   }}
                   onRuleChange={(rule) => handleRuleChange(idx, line, rule)}
+                  onToggleDischarge={() => handleToggleDischarge(idx)}
                   onTypedCommit={(raw) => handleTypedJustificationCommit(idx, raw)}
                   persistentUnderline={isFixedProof}
                   premisesCount={premises.length}
                   registerInput={(element) => { if (element) justRefs.current[idx] = element }}
+                  showDischargeControl={usesNestedSubderivations && !isFixedProof && dischargeOpenCountByLine[idx] > 0}
                   useRuleDropdown={useRuleDropdown}
                   usesNestedSubderivations={usesNestedSubderivations}
                 />
@@ -1396,6 +1425,7 @@ export default function DerivationTable({
         <DerivationFeedbackPanel
           autoCheckEnabled={autoCheckEnabled}
           autoCheckRows={autoCheckState.rows}
+          hasCheckedLine={Object.values(autoCheckState.perLine).some((status) => status === 'ok')}
           isFullScreen={isFullScreen}
           lineGateNotice={lineGateNotice}
           onToggleAutoCheck={() => setAutoCheckEnabled((enabled) => !enabled)}

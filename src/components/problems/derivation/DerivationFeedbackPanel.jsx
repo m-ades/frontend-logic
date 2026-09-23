@@ -4,6 +4,7 @@ import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome'
 export default function DerivationFeedbackPanel({
   autoCheckEnabled,
   autoCheckRows,
+  hasCheckedLine,
   isFullScreen,
   lineGateNotice,
   onToggleAutoCheck,
@@ -29,7 +30,7 @@ export default function DerivationFeedbackPanel({
             onClick={onToggleAutoCheck}
             size="small"
             aria-label="Toggle autochecker"
-            sx={{ p: 0.25, mt: -0.25, color: autoCheckEnabled ? 'primary.main' : 'text.disabled' }}
+            sx={{ p: 0.25, mt: -0.25, color: autoCheckEnabled ? 'primary.main' : 'text.secondary' }}
           >
             <AutoAwesomeIcon />
           </IconButton>
@@ -38,7 +39,9 @@ export default function DerivationFeedbackPanel({
           {!autoCheckEnabled ? (
             <Typography variant="body2">Autochecker off.</Typography>
           ) : autoCheckRows.length === 0 ? (
-            <Typography variant="body2">Autochecker: no issues.</Typography>
+            <Typography variant="body2">
+              {hasCheckedLine ? 'Autochecker: no issues.' : 'Autochecker on.'}
+            </Typography>
           ) : autoCheckRows.map((row, idx) => (
             <Box key={`autocheck-row-${idx}`} sx={{ mb: idx < autoCheckRows.length - 1 ? 1 : 0 }}>
               {row.line && row.line !== '??' && (

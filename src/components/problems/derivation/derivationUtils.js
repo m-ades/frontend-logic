@@ -1,4 +1,3 @@
-import { alpha } from '@mui/material/styles'
 import { formatDerivationRuleName } from '../../../lib/derivationRules.js'
 import getFormulaClass from '@logic-app/logic-engine/symbolic/formula.js'
 import { justParse } from '@logic-app/logic-engine/justification-parse.js'
@@ -108,8 +107,6 @@ export const HURLEY_ASSUMPTION_RULES = new Set(['ACP', 'AIP'])
 export const FITCH_ASSUMPTION_RULES = new Set(['AS', 'HYP'])
 export const ASSUMPTION_RULES = new Set([...HURLEY_ASSUMPTION_RULES, ...FITCH_ASSUMPTION_RULES])
 export const INDENT_END_RULES = new Set(['CP', 'IP'])
-export const INDENT_PX = 18
-export const ASSUMPTION_INDENT_PX = 12
 export const MAX_INDENT_LEVEL = 8
 export const AUTO_CHECK_STORAGE_KEY = 'logic-app:autocheck-enabled'
 export const RULE_INPUT_MODE_KEY = 'logic-app:derivation-rule-input-mode'
@@ -123,78 +120,6 @@ export function formulasEqualNormally(a, b, normalizeForFallback, notation) {
     return Formula.from(String(a)).normal === Formula.from(String(b)).normal
   } catch {
     return normalizeForFallback ? normalizeForFallback(a) === normalizeForFallback(b) : false
-  }
-}
-
-export const symbolBtnSx = (isFullScreen, isMobile, isPhone) => {
-  const mobileFullscreen = isPhone && isFullScreen
-  return {
-    minWidth: mobileFullscreen ? 42 : (isFullScreen ? 28 : 34),
-    px: mobileFullscreen ? 1.25 : (isFullScreen ? 0.75 : 1),
-    py: mobileFullscreen ? 0.5 : 0.35,
-    fontSize: mobileFullscreen ? '1.0625rem' : (isFullScreen ? '0.8125rem' : '0.95rem'),
-    lineHeight: 1.1,
-    minHeight: mobileFullscreen ? 44 : 32,
-    fontWeight: 600,
-    textTransform: 'none',
-    boxShadow: 'none',
-    border: 'none',
-    bgcolor: (theme) =>
-      theme.palette.mode === 'dark' ? alpha(theme.palette.common.white, 0.08) : theme.palette.grey[100],
-    color: 'text.primary',
-    '&:hover': (theme) => ({
-      boxShadow: 'none',
-      border: 'none',
-      backgroundColor: alpha(theme.palette.primary.main, theme.palette.action.hoverOpacity),
-    }),
-  }
-}
-
-export const plainIconButtonSx = {
-  p: 0.25,
-  borderRadius: 0,
-  backgroundColor: 'transparent',
-  '&:hover': {
-    backgroundColor: 'transparent',
-  },
-  '&.Mui-disabled': {
-    backgroundColor: 'transparent',
-  },
-}
-
-export const getUnderlineColors = (theme) => {
-  if (theme.palette.mode === 'dark') {
-    return {
-      base: theme.palette.divider,
-      hover: alpha(theme.palette.common.white, 0.24),
-      focus: theme.palette.primary.main,
-    }
-  }
-  return {
-    base: '#e3e6ee',
-    hover: '#edf1f7',
-    focus: '#dfe5f0',
-  }
-}
-
-export const getInputUnderlineSx = (theme) => {
-  const colors = getUnderlineColors(theme)
-  return {
-    '& .MuiInput-underline:before': { borderBottomColor: colors.base },
-    '& .MuiInput-underline:hover:before': { borderBottomColor: colors.hover },
-    '& .MuiInput-underline:after': { borderBottomColor: colors.focus },
-  }
-}
-
-export const getSelectUnderlineSx = (theme) => {
-  const colors = getUnderlineColors(theme)
-  return {
-    '&:before': { borderBottomColor: colors.base },
-    '&:hover:not(.Mui-disabled):before': { borderBottomColor: colors.hover },
-    '&:after': { borderBottomColor: colors.focus },
-    '& .MuiInput-underline:before': { borderBottomColor: colors.base },
-    '& .MuiInput-underline:hover:before': { borderBottomColor: colors.hover },
-    '& .MuiInput-underline:after': { borderBottomColor: colors.focus },
   }
 }
 
@@ -270,56 +195,56 @@ export const getRuleFromJustification = (value) => {
   return formatRuleName(citedrules[0])
 }
 
-const getCitedAssumptionRanges = (
-  linesSnapshot = [],
-  assumptionRules = ASSUMPTION_RULES,
-  { keepUnclosedOpen = false } = {}
-) => {
+/* a scope closes only where the student discharges it, never just from a citation that would close it -
+the discharge marker belongs on the line that leaves the scope(s) (the one at the reduced depth), not on
+the last line still inside it - that outside line is closed off up to (but not including) itself.
+dischargesScope is a count, not a boolean: closing two assumptions opened back to back (nothing written
+at the depth between them) has nowhere else to put a second discharge, so one line can close several -
+each pop ends a different box at the same line, and buildRange already nests same-ending ranges correctly.
+depth for a line is the open-scope stack's size right after that line's own pops/push are applied, so
+one forward pass gives indentation, discharge counts and how many scopes are open to discharge */
+const walkManualScopes = (linesSnapshot = [], assumptionRules = ASSUMPTION_RULES) => {
   const rangesByStart = new Map()
+  const depths = new Array(linesSnapshot.length).fill(0)
+  const dischargedByLine = new Array(linesSnapshot.length).fill(0)
+  const openCountByLine = new Array(linesSnapshot.length).fill(0)
+  const openStack = []
   linesSnapshot.forEach((line, idx) => {
     const lineNumber = idx + 1
-    const { ranges } = justParse(String(line?.justification || ''))
-    ranges.forEach(([start, end]) => {
-      if (!Number.isFinite(start) || !Number.isFinite(end)) return
-      if (start >= end || end >= lineNumber) return
-      const startLine = linesSnapshot[start - 1]
-      const startRule = getRuleFromJustification(startLine?.justification || '').toUpperCase()
-      if (!assumptionRules.has(startRule)) return
-      const currentEnd = rangesByStart.get(start)
-      if (!currentEnd || end > currentEnd) {
-        rangesByStart.set(start, end)
-      }
-    })
+    openCountByLine[idx] = openStack.length
+    const count = Math.min(Number(line?.dischargesScope) || 0, openStack.length)
+    for (let i = 0; i < count; i++) {
+      rangesByStart.set(openStack.pop(), lineNumber - 1)
+    }
+    dischargedByLine[idx] = count
+    const rule = getRuleFromJustification(line?.justification || '').toUpperCase()
+    if (assumptionRules.has(rule)) {
+      openStack.push(lineNumber)
+    }
+    depths[idx] = Math.min(openStack.length, MAX_INDENT_LEVEL)
   })
-  if (keepUnclosedOpen) {
-    linesSnapshot.forEach((line, idx) => {
-      const lineNumber = idx + 1
-      const rule = getRuleFromJustification(line?.justification || '').toUpperCase()
-      if (!assumptionRules.has(rule)) return
-      if (rangesByStart.has(lineNumber)) return
-      rangesByStart.set(lineNumber, linesSnapshot.length)
-    })
-  }
-  return rangesByStart
+  openStack.forEach((startLine) => {
+    if (!rangesByStart.has(startLine)) {
+      rangesByStart.set(startLine, linesSnapshot.length)
+    }
+  })
+  return { rangesByStart, depths, dischargedByLine, openCountByLine }
+}
+
+const getManualAssumptionRanges = (linesSnapshot, assumptionRules) =>
+  walkManualScopes(linesSnapshot, assumptionRules).rangesByStart
+
+// indentation, discharge counts, and how many scopes are open per line, from the one shared walk above
+export const getFitchScopeInfo = (linesSnapshot = [], assumptionRules = ASSUMPTION_RULES) => {
+  const { depths, dischargedByLine, openCountByLine } = walkManualScopes(linesSnapshot, assumptionRules)
+  return { depths, dischargedByLine, openCountByLine }
 }
 
 export const getOpenAssumptionDepths = (linesSnapshot = [], options = {}) => {
   const mode = options.mode ?? 'flat'
   const assumptionRules = options.assumptionRules ?? ASSUMPTION_RULES
   if (mode === 'nested') {
-    const rangesByStart = getCitedAssumptionRanges(linesSnapshot, assumptionRules, {
-      keepUnclosedOpen: true,
-    })
-    return linesSnapshot.map((_, idx) => {
-      const lineNumber = idx + 1
-      let depth = 0
-      rangesByStart.forEach((end, start) => {
-        if (lineNumber >= start && lineNumber <= end) {
-          depth += 1
-        }
-      })
-      return Math.min(depth, MAX_INDENT_LEVEL)
-    })
+    return walkManualScopes(linesSnapshot, assumptionRules).depths
   }
   let depth = 0
   return linesSnapshot.map((line) => {
@@ -375,6 +300,11 @@ export const buildErrorRows = (errors, linesSnapshot = [], { skipCompletion = fa
               'formulas must start with an uppercase predicate letter (A–Z) or =/≠; lowercase predicates are not accepted.',
               'derivations must start with an uppercase predicate letter (A–Z); lowercase predicates are not accepted.'
             )
+            // subproofs only close when the student discharges them, so a range mismatch here usually means a missing discharge
+            .replace(
+              'line number given for end of range not at the end of a subderivation',
+              "cites this range as a closed subproof, but it hasn't been discharged there — use the discharge control to mark where the subproof actually closes"
+            )
           if (lineRule && INDENT_END_RULES.has(lineRule) && displayDesc === 'cites the wrong number of subderivation line ranges for the rule specified') {
             descs.push(`${displayDesc} (e.g. 3-9)`)
           } else {
@@ -402,6 +332,7 @@ const lineFromSavedProof = (line) => ({
   formula: line?.s ?? '',
   justification: line?.j ?? '',
   readOnly: false,
+  dischargesScope: Number(line?.x) || 0,
 })
 
 // flatten saved proof nesting for the table
@@ -441,34 +372,13 @@ export const extractLines = (savedState, premises = []) => {
   return lines
 }
 
-// rebuild proof nesting from cited ranges
+// use the same discharge-driven ranges for display and submission
 const buildNestedSubderivationParts = (numbered, assumptionRules = ASSUMPTION_RULES) => {
   const byLineNumber = new Map(numbered.map((part) => [Number(part.n), part]))
-  const rangesByStart = new Map()
-
-  // only assumption ranges open subderivations
-  for (const part of numbered) {
-    const lineNumber = Number(part.n)
-    const { ranges } = justParse(String(part.j || ''))
-    for (const [start, end] of ranges) {
-      if (!Number.isFinite(start) || !Number.isFinite(end)) continue
-      if (start >= end || end >= lineNumber) continue
-      const startPart = byLineNumber.get(start)
-      const startRule = getRuleFromJustification(startPart?.j || '').toUpperCase()
-      if (!assumptionRules.has(startRule)) continue
-      const currentEnd = rangesByStart.get(start)
-      if (!currentEnd || end > currentEnd) {
-        rangesByStart.set(start, end)
-      }
-    }
-  }
-  for (const part of numbered) {
-    const lineNumber = Number(part.n)
-    const rule = getRuleFromJustification(part?.j || '').toUpperCase()
-    if (!Number.isFinite(lineNumber) || !assumptionRules.has(rule)) continue
-    if (rangesByStart.has(lineNumber)) continue
-    rangesByStart.set(lineNumber, Number(numbered[numbered.length - 1]?.n ?? lineNumber))
-  }
+  const rangesByStart = getManualAssumptionRanges(
+    numbered.map((part) => ({ justification: part.j, dischargesScope: Number(part.x) || 0 })),
+    assumptionRules
+  )
 
   const buildRange = (startLine, endLine, wrappedStartLine = null) => {
     const parts = []
@@ -532,6 +442,7 @@ export const buildSubmission = (lines, conclusion, premises, normalizeFormula, n
     n: String(idx + 1),
     s: normalizeFormula(line.formula ?? ''),
     j: idx < premises.length ? 'Pr' : normalizeJustification(line.justification ?? ''),
+    ...(idx >= premises.length && line.dischargesScope ? { x: line.dischargesScope } : {}),
   }))
   const canonicalParts = options.canonicalScopes
     ? buildCanonicalSubderivationParts(numbered, lines)
