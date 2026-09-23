@@ -40,6 +40,7 @@ export default function DerivationJustificationCell({
   assumptionRules,
   autoCheckEnabled,
   autoCheckStatus,
+  canDischargeMore,
   citationDraft,
   conclusion,
   isDischarged,
@@ -70,6 +71,10 @@ export default function DerivationJustificationCell({
   const justificationReadOnly = isDerivationFieldReadOnly(line, 'justification')
   const omitsCitations = assumptionRules.has(selectedRule.toUpperCase())
   const isActiveLine = activeFormulaIndex === lineIndex
+  const dischargeLabel = isDischarged > 1 ? `Discharged ×${isDischarged}` : isDischarged ? 'Discharged' : 'Discharge'
+  const dischargeAction = !isDischarged ? 'Discharge subproof here'
+    : canDischargeMore ? `${dischargeLabel}, click to close another`
+      : `${dischargeLabel}, click to undo`
   const isPremise = lineIndex < premisesCount
   const ruleOptions = selectedRule && !allowedRules.some((rule) => (
     rule.toLowerCase() === selectedRule.toLowerCase()
@@ -87,8 +92,7 @@ export default function DerivationJustificationCell({
         verticalAlign: 'middle',
         ...(isFullScreen ? { width: '50%', minWidth: 0 } : { width: 'auto', whiteSpace: 'nowrap' }),
         '& .line-delete': {
-          // phones don't have real hover, so reveal by active line there instead - in any
-          // other context (desktop, or a mouse/trackpad on a tablet) hover still works fine
+          // phones don't have real hover, so reveal by active line there instead
           opacity: isPhone ? Number(activeFormulaIndex === lineIndex) : 0,
           transition: 'opacity 120ms ease',
         },
@@ -220,15 +224,15 @@ export default function DerivationJustificationCell({
               // skip the reserved width on phone - it was pushing delete off the clipped fullscreen viewport
               <Box sx={{ minWidth: isPhone ? 0 : '4.5rem', display: 'flex', alignItems: 'center' }}>
                 {isActiveLine && (
-                  <Tooltip title={isDischarged ? 'Undo discharge' : 'Discharge subproof here'}>
+                  <Tooltip title={dischargeAction}>
                     <Chip
-                      label={isDischarged ? 'Discharged' : 'Discharge'}
+                      label={dischargeLabel}
                       onClick={onToggleDischarge}
                       size="small"
                       clickable
                       color={isDischarged ? 'primary' : 'default'}
                       variant={isDischarged ? 'filled' : 'outlined'}
-                      aria-label={isDischarged ? `Undo discharge on line ${lineIndex + 1}` : `Discharge subproof on line ${lineIndex + 1}`}
+                      aria-label={`${dischargeAction} on line ${lineIndex + 1}`}
                       sx={{ borderRadius: 1 }}
                     />
                   </Tooltip>

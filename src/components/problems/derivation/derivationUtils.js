@@ -196,23 +196,27 @@ export const getRuleFromJustification = (value) => {
 }
 
 /* a scope closes only where the student discharges it, never just from a citation that would close it -
-the discharge marker belongs on the line that leaves the scope (the one at the reduced depth), not on
+the discharge marker belongs on the line that leaves the scope(s) (the one at the reduced depth), not on
 the last line still inside it - that outside line is closed off up to (but not including) itself.
-depth for a line is the open-scope stack's size right after that line's own pop/push are applied, so
-one forward pass gives indentation, discharge status and discharge eligibility together */
+dischargesScope is a count, not a boolean: closing two assumptions opened back to back (nothing written
+at the depth between them) has nowhere else to put a second discharge, so one line can close several -
+each pop ends a different box at the same line, and buildRange already nests same-ending ranges correctly.
+depth for a line is the open-scope stack's size right after that line's own pops/push are applied, so
+one forward pass gives indentation, discharge counts and how many scopes are open to discharge */
 const walkManualScopes = (linesSnapshot = [], assumptionRules = ASSUMPTION_RULES) => {
   const rangesByStart = new Map()
   const depths = new Array(linesSnapshot.length).fill(0)
-  const dischargedByLine = new Array(linesSnapshot.length).fill(false)
-  const eligibleByLine = new Array(linesSnapshot.length).fill(false)
+  const dischargedByLine = new Array(linesSnapshot.length).fill(0)
+  const openCountByLine = new Array(linesSnapshot.length).fill(0)
   const openStack = []
   linesSnapshot.forEach((line, idx) => {
     const lineNumber = idx + 1
-    eligibleByLine[idx] = openStack.length > 0
-    if (line?.dischargesScope && openStack.length > 0) {
+    openCountByLine[idx] = openStack.length
+    const count = Math.min(Number(line?.dischargesScope) || 0, openStack.length)
+    for (let i = 0; i < count; i++) {
       rangesByStart.set(openStack.pop(), lineNumber - 1)
-      dischargedByLine[idx] = true
     }
+    dischargedByLine[idx] = count
     const rule = getRuleFromJustification(line?.justification || '').toUpperCase()
     if (assumptionRules.has(rule)) {
       openStack.push(lineNumber)
@@ -224,17 +228,16 @@ const walkManualScopes = (linesSnapshot = [], assumptionRules = ASSUMPTION_RULES
       rangesByStart.set(startLine, linesSnapshot.length)
     }
   })
-  return { rangesByStart, depths, dischargedByLine, eligibleByLine }
+  return { rangesByStart, depths, dischargedByLine, openCountByLine }
 }
 
 const getManualAssumptionRanges = (linesSnapshot, assumptionRules) =>
   walkManualScopes(linesSnapshot, assumptionRules).rangesByStart
 
-// indentation, discharge status (which line's toggle closed a scope) and discharge eligibility
-// (where an open scope exists for a line to close), from the one shared walk above
+// indentation, discharge counts, and how many scopes are open per line, from the one shared walk above
 export const getFitchScopeInfo = (linesSnapshot = [], assumptionRules = ASSUMPTION_RULES) => {
-  const { depths, dischargedByLine, eligibleByLine } = walkManualScopes(linesSnapshot, assumptionRules)
-  return { depths, dischargedByLine, eligibleByLine }
+  const { depths, dischargedByLine, openCountByLine } = walkManualScopes(linesSnapshot, assumptionRules)
+  return { depths, dischargedByLine, openCountByLine }
 }
 
 export const getOpenAssumptionDepths = (linesSnapshot = [], options = {}) => {
@@ -329,7 +332,7 @@ const lineFromSavedProof = (line) => ({
   formula: line?.s ?? '',
   justification: line?.j ?? '',
   readOnly: false,
-  dischargesScope: line?.x === true,
+  dischargesScope: Number(line?.x) || 0,
 })
 
 // flatten saved proof nesting for the table
@@ -373,7 +376,7 @@ export const extractLines = (savedState, premises = []) => {
 const buildNestedSubderivationParts = (numbered, assumptionRules = ASSUMPTION_RULES) => {
   const byLineNumber = new Map(numbered.map((part) => [Number(part.n), part]))
   const rangesByStart = getManualAssumptionRanges(
-    numbered.map((part) => ({ justification: part.j, dischargesScope: part.x === true })),
+    numbered.map((part) => ({ justification: part.j, dischargesScope: Number(part.x) || 0 })),
     assumptionRules
   )
 
@@ -439,7 +442,7 @@ export const buildSubmission = (lines, conclusion, premises, normalizeFormula, n
     n: String(idx + 1),
     s: normalizeFormula(line.formula ?? ''),
     j: idx < premises.length ? 'Pr' : normalizeJustification(line.justification ?? ''),
-    ...(idx >= premises.length && line.dischargesScope ? { x: true } : {}),
+    ...(idx >= premises.length && line.dischargesScope ? { x: line.dischargesScope } : {}),
   }))
   const canonicalParts = options.canonicalScopes
     ? buildCanonicalSubderivationParts(numbered, lines)

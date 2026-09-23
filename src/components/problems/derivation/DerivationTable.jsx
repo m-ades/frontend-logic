@@ -386,7 +386,7 @@ export default function DerivationTable({
     ))
   }, [activeAssumptionRules, effectiveLines, fitchScopeInfo, isFixedProof, usesNestedSubderivations])
   const dischargeStatusByLine = fitchScopeInfo?.dischargedByLine ?? []
-  const dischargeEligibleByLine = fitchScopeInfo?.eligibleByLine ?? []
+  const dischargeOpenCountByLine = fitchScopeInfo?.openCountByLine ?? []
 
   const normalizeJustification = useCallback((value) => String(value ?? '').trim(), [])
 
@@ -602,14 +602,17 @@ export default function DerivationTable({
     }
   }
 
-  // this line discharges the scope it exits - the box it closes ends on the line before it
+  // cycles how many scopes this line closes, 0 up to however many are open, wrapping back to 0
   const handleToggleDischarge = (index) => {
     const line = lines[index]
     if (!line || line.readOnly || isFixedProof) return
+    const max = dischargeOpenCountByLine[index] ?? 0
     commitLines(
-      (previous) => previous.map((item, itemIndex) => (
-        itemIndex === index ? { ...item, dischargesScope: !item.dischargesScope } : item
-      )),
+      (previous) => previous.map((item, itemIndex) => {
+        if (itemIndex !== index) return item
+        const current = Number(item.dischargesScope) || 0
+        return { ...item, dischargesScope: current >= max ? 0 : current + 1 }
+      }),
       index
     )
   }
@@ -1364,6 +1367,7 @@ export default function DerivationTable({
                   assumptionRules={activeAssumptionRules}
                   autoCheckEnabled={autoCheckEnabled}
                   autoCheckStatus={autoCheckState.perLine[idx]}
+                  canDischargeMore={dischargeStatusByLine[idx] < dischargeOpenCountByLine[idx]}
                   citationDraft={lineDrafts[idx]}
                   conclusion={isFixedProof ? '' : conclusionTargetText}
                   isDischarged={dischargeStatusByLine[idx]}
@@ -1395,7 +1399,7 @@ export default function DerivationTable({
                   persistentUnderline={isFixedProof}
                   premisesCount={premises.length}
                   registerInput={(element) => { if (element) justRefs.current[idx] = element }}
-                  showDischargeControl={usesNestedSubderivations && !isFixedProof && dischargeEligibleByLine[idx]}
+                  showDischargeControl={usesNestedSubderivations && !isFixedProof && dischargeOpenCountByLine[idx] > 0}
                   useRuleDropdown={useRuleDropdown}
                   usesNestedSubderivations={usesNestedSubderivations}
                 />
