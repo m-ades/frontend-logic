@@ -116,7 +116,7 @@ export default function DerivationJustificationCell({
           )}
         </Stack>
       ) : (
-        <Stack direction="row" alignItems="center" sx={{ flexWrap: 'nowrap', gap: 0, minWidth: 0 }}>
+        <Stack direction="row" alignItems="center" sx={{ flexWrap: isPhone ? 'wrap' : 'nowrap', gap: 0, minWidth: 0 }}>
           {useRuleDropdown ? (
             <>
               {!omitsCitations && (
