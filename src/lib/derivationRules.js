@@ -1,6 +1,6 @@
 import getHurleyRuleset from '@logic-app/logic-engine/checkers/rules/hurley-rules.js'
 import getForallxRuleset from '@logic-app/logic-engine/checkers/rules/forallx-rules.js'
-import getSyntax from '@logic-app/logic-engine/symbolic/libsyntax.js'
+import getSyntax, { normalizeRuleSymbolName } from '@logic-app/logic-engine/symbolic/libsyntax.js'
 import { DEFAULT_LOGIC_SYSTEM, getDerivationProblemType } from './logicSystems.js'
 
 export const FORCE_UPPER_DERIVATION_RULES = new Set([
@@ -32,24 +32,8 @@ const RULE_NAME_ALIASES = new Map([
 ])
 const RULE_SYMBOL_SYNTAX = getSyntax('calgary')
 
-function normalizeRuleSymbolName(rule) {
-  const raw = String(rule || '').trim()
-  const match = raw.match(/^(.+)([iIeE])$/)
-  if (!match) return raw
-  let connective = match[1]
-  if (/^v$/i.test(connective)) {
-    connective = RULE_SYMBOL_SYNTAX.symbols.OR
-  } else if (connective === '-' || connective === '–') {
-    connective = RULE_SYMBOL_SYNTAX.symbols.NOT
-  } else {
-    connective = RULE_SYMBOL_SYNTAX.symbolfix(connective)
-  }
-  if (/^[A-Za-z]+$/.test(connective)) return raw
-  return `${connective}${match[2].toUpperCase()}`
-}
-
 export function formatDerivationRuleName(rule) {
-  const raw = normalizeRuleSymbolName(rule)
+  const raw = normalizeRuleSymbolName(rule, RULE_SYMBOL_SYNTAX)
   const upper = raw.toUpperCase()
   if (FORCE_UPPER_DERIVATION_RULES.has(upper)) return upper
   const canonical = RULE_NAME_ALIASES.get(raw.toLowerCase())
