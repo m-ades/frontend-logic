@@ -1421,6 +1421,7 @@ export default function DerivationTable({
         <DerivationFeedbackPanel
           autoCheckEnabled={autoCheckEnabled}
           autoCheckRows={autoCheckState.rows}
+          hasCheckedLine={Object.values(autoCheckState.perLine).some((status) => status === 'ok')}
           isFullScreen={isFullScreen}
           lineGateNotice={lineGateNotice}
           onToggleAutoCheck={() => setAutoCheckEnabled((enabled) => !enabled)}
