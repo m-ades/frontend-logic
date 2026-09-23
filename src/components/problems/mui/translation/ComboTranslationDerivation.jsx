@@ -46,7 +46,7 @@ function FormulaInputField({ value, onValueChange, onBlur, formulaInputRef, nota
       formulaInput.style.border = `1px solid ${theme.palette.divider}`
       formulaInput.style.borderRadius = theme.shape.borderRadius
       formulaInput.style.fontSize = '1rem'
-      formulaInput.style.fontFamily = 'monospace'
+      formulaInput.style.fontFamily = 'var(--app-font-mono)'
       formulaInput.style.backgroundColor = theme.palette.background.paper
       formulaInput.style.color = theme.palette.text.primary
       containerRef.current.appendChild(formulaInput)
@@ -584,7 +584,7 @@ export default function ComboTranslationDerivation({
           <Typography variant="body2" sx={{ mb: 1, fontWeight: 600 }}>
             Argument line
           </Typography>
-          <Typography component="div" sx={{ fontFamily: 'monospace', fontSize: '1rem' }}>
+          <Typography component="div" sx={{ fontFamily: 'var(--app-font-mono)', fontSize: '1rem' }}>
             {answerArgumentLine}
           </Typography>
         </SolutionReveal>

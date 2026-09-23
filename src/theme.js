@@ -46,7 +46,7 @@ function createAppTheme(mode) {
     palette,
     customShadows,
     typography: {
-      fontFamily: '"IBM Plex Sans", sans-serif',
+      fontFamily: 'var(--app-font-sans)',
       h1: { fontSize: '3rem' },
       h2: { fontSize: '2rem' },
       h3: { fontSize: '1.64rem' },

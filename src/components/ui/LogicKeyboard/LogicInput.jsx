@@ -195,7 +195,7 @@ export default function LogicInput({
           isFocused ? `0 0 0 3px ${alpha(theme.palette.primary.main, 0.16)}` : 'none',
         bgcolor: 'background.paper',
         color: 'text.primary',
-        fontFamily: 'monospace',
+        fontFamily: 'var(--app-font-mono)',
         fontSize: '1rem',
         lineHeight: 1.5,
         cursor: disabled ? 'default' : 'text',

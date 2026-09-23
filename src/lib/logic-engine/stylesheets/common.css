@@ -37,7 +37,7 @@
 :where(.logic-engine) {
   all: revert-layer;
   font-size: 1rem;
-  font-family: 'IBM Plex Sans', sans-serif;
+  font-family: var(--app-font-sans);
   background-color: transparent;
   color: var(--logic-black);
   --tt-font-size: clamp(1rem, 0.9rem + 0.45vw, 1.25rem);
@@ -270,7 +270,7 @@
 
 :where(.logic-engine) .math,
 :where(.logic-engine) .symbolic {
-  font-family: 'IBM Plex Sans', sans-serif;
+  font-family: var(--app-font-sans);
 }
 
 /* material icons generally */
@@ -738,7 +738,7 @@ a#logic-logo:hover span {
 
 :where(.logic-engine) button,
 :where(.logic-engine) .buttondiv button {
-  font-family: 'Roboto', 'Helvetica', 'Arial', sans-serif;
+  font-family: 'Biconditional', 'Roboto', 'Helvetica', 'Arial', sans-serif;
   font-weight: 500;
   font-size: 0.875rem;
   line-height: 1.75;

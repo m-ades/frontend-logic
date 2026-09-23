@@ -314,7 +314,7 @@ export default function TextbookReader({
           width: '100%',
           borderCollapse: 'collapse',
           borderSpacing: 0,
-          fontFamily: '"Helvetica Neue", Helvetica, Arial, sans-serif',
+          fontFamily: '"Biconditional", "Helvetica Neue", Helvetica, Arial, sans-serif',
           fontSize: '16px',
           lineHeight: 1.7,
         },
