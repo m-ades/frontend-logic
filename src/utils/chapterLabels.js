@@ -20,6 +20,5 @@ export const formatChapterLabel = (chapter, logicSystem) => {
 export const formatSubchapterLabel = (subchapter, fallback, logicSystem) => {
   const label = String(subchapter ?? '').trim()
   if (!label) return fallback
-  const number = label.replace(/^HW\s*(\d+(?:\.\d+)*)$/i, '$1')
-  return `${getOutlineTerms(logicSystem).subchapter} ${number}`
+  return `${getOutlineTerms(logicSystem).subchapter} ${label}`
 }
