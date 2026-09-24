@@ -133,6 +133,26 @@ export default function DerivationFormulaCell({
           placeholder="Statement"
           aria-label={`Formula line ${lineIndex + 1}`}
           inputRef={registerInput}
+          inputSx={{
+            minHeight: 0,
+            px: 0,
+            py: 0.5,
+            border: 0,
+            borderRadius: 0,
+            boxShadow: 'none',
+            bgcolor: 'transparent',
+            fontFamily: 'var(--app-font-sans)',
+            fontSize: DERIVATION_LINE_FONT_SIZE,
+            lineHeight: '1.4375em',
+            display: 'block',
+            whiteSpace: 'pre',
+            overflowX: 'auto',
+            '& [data-char-index]': {
+              minWidth: 0,
+              minHeight: 0,
+              px: 0,
+            },
+          }}
           onCursorChange={onMobileCursorChange}
           includeQuantifiers={keyboardConfig.isPredicateMode}
           extraInsertButtons={keyboardConfig.extraSymbolButtons}
