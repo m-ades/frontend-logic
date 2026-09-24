@@ -6,6 +6,7 @@ import ActivityRow from '../components/ui/ActivityRow.jsx'
 import { ACTIVITY_TYPES } from '../placeholder/courseActivities.js'
 import { fetchJson } from '../utils/api.js'
 import { compareSubchapterLabels, sortAssignmentsBySubchapter } from '../utils/assignmentSort.js'
+import { formatChapterLabel } from '../utils/chapterLabels.js'
 import { toRomanNumeral } from '../utils/romanNumerals.js'
 import { useAppRuntime } from '../hooks/useAppRuntime.js'
 
@@ -16,7 +17,7 @@ const buildCourseStructure = (assignments, sectionTitle) => {
   assignments.forEach((assignment) => {
     const chapterNum = Number(assignment.chapter) || null
     const chapterLabel = chapterNum ? `Part ${toRomanNumeral(chapterNum)}` : 'Other'
-    const subLabel = assignment.subchapter ? `Chapter ${assignment.subchapter}` : sectionTitle
+    const subLabel = formatChapterLabel(assignment.subchapter, sectionTitle)
     const chapterEntry = chapters.get(chapterLabel) || new Map()
     const items = chapterEntry.get(subLabel) || []
     items.push({
@@ -114,7 +115,9 @@ export default function Practice() {
         totalQuestions={totalQuestions}
         completedQuestions={completedQuestions}
         progressAriaLabel={`Practice completion: ${completedQuestions} of ${totalQuestions} complete`}
-        chips={[{ label: 'Practice', color: 'primary', variant: 'outlined' }]}
+        chips={totalQuestions > 0 && completedQuestions === totalQuestions
+          ? [{ label: 'Completed', color: 'success' }]
+          : []}
         to={activity.worksheet ? assignmentPath(activity.worksheet.id) : undefined}
         state={{ returnTo: practicePath }}
       />
@@ -122,7 +125,7 @@ export default function Practice() {
   }
 
   return (
-    <Box>
+    <Box sx={{ width: '100%', maxWidth: 1280 }}>
       <Typography variant="h4" component="h1" sx={{ mb: 3, fontWeight: 600 }}>
         Practice
       </Typography>
@@ -130,6 +133,7 @@ export default function Practice() {
         courseStructure={courseStructure}
         isLoading={isLoadingPractice}
         emptyText="No practice problems available"
+        showExpandCollapseToggle
         defaultSubchapterExpanded
         renderActivity={renderActivity}
       />

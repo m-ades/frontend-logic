@@ -7,6 +7,7 @@ import { ACTIVITY_TYPES } from '../placeholder/courseActivities.js'
 import { formatDateTime } from '../utils/formatting.js'
 import { parseDueDateAsEastern } from '../utils/easternTime.js'
 import { compareSubchapterLabels, sortAssignmentsBySubchapter } from '../utils/assignmentSort.js'
+import { formatChapterLabel } from '../utils/chapterLabels.js'
 import { toRomanNumeral } from '../utils/romanNumerals.js'
 import { fetchJson, getActiveUserId } from '../utils/api.js'
 import { useAppRuntime } from '../hooks/useAppRuntime.js'
@@ -18,7 +19,7 @@ const buildCourseStructure = (assignments, sectionTitle) => {
   assignments.forEach((assignment) => {
     const chapterNum = Number(assignment.chapter) || null
     const chapterLabel = chapterNum ? `Part ${toRomanNumeral(chapterNum)}` : 'Other'
-    const subLabel = assignment.subchapter ? `Chapter ${assignment.subchapter}` : sectionTitle
+    const subLabel = formatChapterLabel(assignment.subchapter, sectionTitle)
     const chapterEntry = chapters.get(chapterLabel) || new Map()
     const items = chapterEntry.get(subLabel) || []
     items.push({
@@ -65,7 +66,7 @@ const buildCourseStructure = (assignments, sectionTitle) => {
 function TabPanel({ children, value, index }) {
   return (
     <div role="tabpanel" hidden={value !== index}>
-      {value === index && <Box sx={{ pt: 3 }}>{children}</Box>}
+      {value === index && <Box sx={{ pt: 1 }}>{children}</Box>}
     </div>
   )
 }
@@ -209,7 +210,7 @@ export default function Assignments() {
     }
   }
 
-  const renderActivity = (activity, datePrefix, showCompletionChip) => {
+  const renderActivity = (activity) => {
     const policy = activity.policy
     const extensionDueLabel = policy?.extension_due_at
       ? formatDateTime(policy.extension_due_at)
@@ -223,8 +224,6 @@ export default function Assignments() {
     const isPastDue = Boolean(
       activity.dueDate && !isCompleted && parseDueDateAsEastern(activity.dueDate, activity.dueTime) < new Date()
     )
-    const typeLabel =
-      activity.type === ACTIVITY_TYPES.HOMEWORK ? 'Homework' : activity.type === ACTIVITY_TYPES.QUIZ ? 'Quiz' : 'Exam'
     const noteLines = [
       extensionDueLabel && `Extension: ${extensionDueLabel}`,
       accommodationDueLabel && `Accommodation: ${accommodationDueLabel}`,
@@ -232,8 +231,7 @@ export default function Assignments() {
     ].filter(Boolean)
     const chips = [
       isPastDue && { label: 'Past due', color: 'error' },
-      showCompletionChip && isCompleted && { label: 'Completed', color: 'success' },
-      { label: typeLabel, color: 'primary', variant: 'outlined' },
+      isCompleted && { label: 'Completed', color: 'success' },
     ].filter(Boolean)
 
     return (
@@ -246,7 +244,7 @@ export default function Assignments() {
         completedQuestions={completedQuestions}
         progressAriaLabel={`Assignment completion: ${completedQuestions} of ${totalQuestions} complete`}
         chips={chips}
-        dateLabel={`${datePrefix}${formatDateTime(activity.dueDate) || 'No due date'}`}
+        dateLabel={activity.dueDate ? `Due ${formatDateTime(activity.dueDate)}` : 'No due date'}
         noteLines={noteLines}
         to={activity.worksheet ? assignmentPath(activity.worksheet.id) : undefined}
         state={{ returnTo: assignmentsPath }}
@@ -254,7 +252,7 @@ export default function Assignments() {
     )
   }
 
-  const renderAssignmentsAccordion = (emptyText, datePrefix, showCompletionChip, defaultExpanded = true) => (
+  const renderAssignmentsAccordion = (emptyText, defaultExpanded = true) => (
     <ActivityAccordion
       courseStructure={filteredStructure}
       isLoading={isLoadingAssignments}
@@ -264,12 +262,12 @@ export default function Assignments() {
       defaultSubchapterExpanded
       persistKey={accordionStorageKey}
       storage={storageScope}
-      renderActivity={(activity) => renderActivity(activity, datePrefix, showCompletionChip)}
+      renderActivity={renderActivity}
     />
   )
 
   return (
-    <Box>
+    <Box sx={{ width: '100%', maxWidth: 1280 }}>
       <Typography variant="h4" component="h1" sx={{ mb: 3, fontWeight: 600 }}>
         Assignments
       </Typography>
@@ -282,7 +280,7 @@ export default function Assignments() {
         sx={{
           borderBottom: 1,
           borderColor: 'divider',
-          mb: 3,
+          mb: 1,
           maxWidth: '100%',
           minHeight: 44,
           '& .MuiTab-root': {
@@ -303,15 +301,15 @@ export default function Assignments() {
       </Tabs>
 
       <TabPanel value={tabValue} index={0}>
-        {renderAssignmentsAccordion('No upcoming assignments', 'Due: ', false, true)}
+        {renderAssignmentsAccordion('No upcoming assignments')}
       </TabPanel>
 
       <TabPanel value={tabValue} index={1}>
-        {renderAssignmentsAccordion('No assignments found', '', true, false)}
+        {renderAssignmentsAccordion('No assignments found', false)}
       </TabPanel>
 
       <TabPanel value={tabValue} index={2}>
-        {renderAssignmentsAccordion('No submitted assignments', 'Submitted: ', true, true)}
+        {renderAssignmentsAccordion('No completed assignments')}
       </TabPanel>
     </Box>
   )
