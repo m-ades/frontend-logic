@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useAppRuntime } from '@/hooks/useAppRuntime.js'
 import { fetchJson } from '@/utils/api.js'
+import { isTextbookAvailable } from '@/components/textbook/textbookAvailability.js'
 
 /** creates a course scoped textbook resource hook */
 export function createCourseScopedTextbookResource({
@@ -23,7 +24,13 @@ export function createCourseScopedTextbookResource({
     const isSandbox = Boolean(runtime?.isSandbox)
     const storageScope = runtime?.storageScope === 'session' ? 'session' : 'local'
     const courseId = runtime?.courseState?.activeCourseId ?? runtime?.activeCourseId ?? null
-    const courseIdForApi = isSandbox ? null : courseId
+    const activeCourse = runtime?.courseState?.courses?.find(
+      (course) => String(course.id) === String(courseId),
+    )
+    const textbookAvailable = isTextbookAvailable(
+      activeCourse?.logicSystem ?? activeCourse?.logic_system,
+    )
+    const courseIdForApi = isSandbox || !textbookAvailable ? null : courseId
 
     const [sandboxRevision, setSandboxRevision] = useState(0)
     const migratedRef = useRef(new Set())
