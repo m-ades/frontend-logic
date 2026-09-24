@@ -6,18 +6,18 @@ import ActivityRow from '../components/ui/ActivityRow.jsx'
 import { ACTIVITY_TYPES } from '../placeholder/courseActivities.js'
 import { fetchJson } from '../utils/api.js'
 import { compareSubchapterLabels, sortAssignmentsBySubchapter } from '../utils/assignmentSort.js'
-import { formatChapterLabel } from '../utils/chapterLabels.js'
-import { toRomanNumeral } from '../utils/romanNumerals.js'
+import { formatChapterLabel, formatSubchapterLabel } from '../utils/chapterLabels.js'
 import { useAppRuntime } from '../hooks/useAppRuntime.js'
+import { useActiveLogicSystem } from '../hooks/useActiveLogicSystem.js'
 
-const buildCourseStructure = (assignments, sectionTitle) => {
+const buildCourseStructure = (assignments, sectionTitle, logicSystem) => {
   const chapters = new Map()
   const chapterSortValues = new Map()
 
   assignments.forEach((assignment) => {
     const chapterNum = Number(assignment.chapter) || null
-    const chapterLabel = chapterNum ? `Part ${toRomanNumeral(chapterNum)}` : 'Other'
-    const subLabel = formatChapterLabel(assignment.subchapter, sectionTitle)
+    const chapterLabel = formatChapterLabel(chapterNum, logicSystem)
+    const subLabel = formatSubchapterLabel(assignment.subchapter, sectionTitle, logicSystem)
     const chapterEntry = chapters.get(chapterLabel) || new Map()
     const items = chapterEntry.get(subLabel) || []
     items.push({
@@ -68,6 +68,7 @@ export default function Practice() {
     sandbox: sandboxData,
     activeCourseId,
   } = useAppRuntime()
+  const logicSystem = useActiveLogicSystem()
   const courseIdForApi = isSandbox ? null : (activeCourseId ?? null)
 
   const practiceQuery = useQuery({
@@ -99,9 +100,10 @@ export default function Practice() {
           answered_count: answeredCount,
         }
       }),
-      'Practice'
+      'Practice',
+      logicSystem
     ),
-    [isSandbox, practiceAssignments, sandboxData]
+    [isSandbox, practiceAssignments, sandboxData, logicSystem]
   )
   const isLoadingPractice = isSandbox ? false : practiceQuery.isPending
 

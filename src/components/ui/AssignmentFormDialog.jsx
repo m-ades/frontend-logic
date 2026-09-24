@@ -13,6 +13,8 @@ import {
 } from "@mui/material";
 import { toEasternIso } from "../../utils/easternTime.js";
 import { buildPublicationPayload } from "../../utils/publicationPolicy.js";
+import { getOutlineTerms } from "../../utils/chapterLabels.js";
+import { useActiveLogicSystem } from "../../hooks/useActiveLogicSystem.js";
 
 export default function AssignmentFormDialog({
   open,
@@ -25,6 +27,7 @@ export default function AssignmentFormDialog({
   isSubmitting = false,
 }) {
   const isPractice = type === "practice";
+  const outlineTerms = getOutlineTerms(useActiveLogicSystem());
   const isCreate = mode === "create";
   const hasPublishDate = Boolean(formData.publishDate);
   const publication = hasPublishDate ? buildPublicationPayload(formData) : null;
@@ -67,7 +70,7 @@ export default function AssignmentFormDialog({
 
           <Stack direction="row" spacing={2}>
             <TextField
-              label="Part"
+              label={outlineTerms.chapter}
               type="number"
               inputProps={{ min: 1, step: 1 }}
               fullWidth
@@ -81,7 +84,7 @@ export default function AssignmentFormDialog({
               onWheel={(e) => e.target.blur()}
             />
             <TextField
-              label="Chapter"
+              label={outlineTerms.subchapter}
               fullWidth
               value={formData.subchapter}
               onChange={(e) =>
