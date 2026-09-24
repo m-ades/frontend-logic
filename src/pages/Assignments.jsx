@@ -7,19 +7,19 @@ import { ACTIVITY_TYPES } from '../placeholder/courseActivities.js'
 import { formatDateTime } from '../utils/formatting.js'
 import { parseDueDateAsEastern } from '../utils/easternTime.js'
 import { compareSubchapterLabels, sortAssignmentsBySubchapter } from '../utils/assignmentSort.js'
-import { formatChapterLabel } from '../utils/chapterLabels.js'
-import { toRomanNumeral } from '../utils/romanNumerals.js'
+import { formatChapterLabel, formatSubchapterLabel } from '../utils/chapterLabels.js'
 import { fetchJson, getActiveUserId } from '../utils/api.js'
 import { useAppRuntime } from '../hooks/useAppRuntime.js'
+import { useActiveLogicSystem } from '../hooks/useActiveLogicSystem.js'
 
-const buildCourseStructure = (assignments, sectionTitle) => {
+const buildCourseStructure = (assignments, sectionTitle, logicSystem) => {
   const chapters = new Map()
   const chapterSortValues = new Map()
 
   assignments.forEach((assignment) => {
     const chapterNum = Number(assignment.chapter) || null
-    const chapterLabel = chapterNum ? `Part ${toRomanNumeral(chapterNum)}` : 'Other'
-    const subLabel = formatChapterLabel(assignment.subchapter, sectionTitle)
+    const chapterLabel = formatChapterLabel(chapterNum, logicSystem)
+    const subLabel = formatSubchapterLabel(assignment.subchapter, sectionTitle, logicSystem)
     const chapterEntry = chapters.get(chapterLabel) || new Map()
     const items = chapterEntry.get(subLabel) || []
     items.push({
@@ -81,6 +81,7 @@ export default function Assignments() {
     user,
     activeCourseId,
   } = useAppRuntime()
+  const logicSystem = useActiveLogicSystem()
   const courseIdForApi = sandbox ? null : (activeCourseId ?? null)
   const userId = sandbox ? user.id : getActiveUserId()
   const tabStorageKey = useMemo(() => {
@@ -135,8 +136,8 @@ export default function Assignments() {
   )
 
   const courseStructure = useMemo(
-    () => ((sandbox || courseIdForApi) ? buildCourseStructure(gradedAssignments, 'Assignments') : []),
-    [sandbox, courseIdForApi, gradedAssignments]
+    () => ((sandbox || courseIdForApi) ? buildCourseStructure(gradedAssignments, 'Assignments', logicSystem) : []),
+    [sandbox, courseIdForApi, gradedAssignments, logicSystem]
   )
 
   const completedAssignments = useMemo(() => {

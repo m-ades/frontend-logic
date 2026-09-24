@@ -13,7 +13,7 @@ import {
   projectPublicationState,
 } from '../utils/publicationPolicy.js'
 import { excludeNonStudents } from '../utils/GradebookUtils.js'
-import { toRomanNumeral } from '../utils/romanNumerals.js'
+import { formatChapterLabel, formatSubchapterLabel } from '../utils/chapterLabels.js'
 
 const STORAGE_KEY = 'logicapp_instructor_sandbox_state_v1'
 const InstructorSandboxContext = createContext(null)
@@ -292,11 +292,13 @@ export function InstructorSandboxProvider({ children }) {
           }
         })
 
+        const course = courseState.courses?.find((entry) => String(entry.id) === String(courseId))
+        const logicSystem = course?.logicSystem ?? course?.logic_system
         const timeByCategory = (assignments || []).map((assignment) => ({
           key: `chapter-${assignment.chapter || 'other'}`,
-          label: assignment.chapter
-            ? `Part ${toRomanNumeral(assignment.chapter)}${assignment.subchapter ? `, Ch ${assignment.subchapter}` : ''}`
-            : 'Other',
+          label: assignment.chapter && assignment.subchapter
+            ? `${formatChapterLabel(assignment.chapter, logicSystem)}, ${formatSubchapterLabel(assignment.subchapter, '', logicSystem)}`
+            : formatChapterLabel(assignment.chapter, logicSystem),
           avg_minutes: 8 + Number(assignment.chapter || 1) * 2,
         }))
 
@@ -310,7 +312,7 @@ export function InstructorSandboxProvider({ children }) {
         }]
       })
     )
-  ), [courseState.assignmentsByCourse, courseState.gradebookByCourse, gradebookSummaryByCourse])
+  ), [courseState.assignmentsByCourse, courseState.courses, courseState.gradebookByCourse, gradebookSummaryByCourse])
 
   const setActiveCourseId = (courseId) => {
     setState((prev) => ({ ...prev, activeCourseId: courseId }))
