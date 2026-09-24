@@ -29,6 +29,7 @@ const buildCourseStructure = (assignments, sectionTitle) => {
       worksheet: { id: assignment.id, proofs: [] },
       questionCount: Number(assignment.question_count) || Number(assignment.proofs?.length) || 0,
       answeredCount: Number(assignment.answered_count) || 0,
+      isLocked: assignment.is_locked ?? assignment.isLocked ?? false,
     })
     chapterEntry.set(subLabel, items)
     chapters.set(chapterLabel, chapterEntry)
@@ -115,6 +116,7 @@ export default function Practice() {
         totalQuestions={totalQuestions}
         completedQuestions={completedQuestions}
         progressAriaLabel={`Practice completion: ${completedQuestions} of ${totalQuestions} complete`}
+        isLocked={activity.isLocked}
         chips={totalQuestions > 0 && completedQuestions === totalQuestions
           ? [{ label: 'Completed', color: 'success' }]
           : []}
