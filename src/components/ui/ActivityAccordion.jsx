@@ -7,11 +7,9 @@ import {
   AccordionDetails,
   List,
   ListItem,
-  Chip,
+  Button,
 } from '@mui/material'
-import { alpha } from '@mui/material/styles'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
-import FolderIcon from '@mui/icons-material/Folder'
 import LoadingSpinner from './LoadingSpinner.jsx'
 
 export default function ActivityAccordion({
@@ -139,7 +137,7 @@ export default function ActivityAccordion({
 
   if (!courseStructure?.length) {
     return (
-      <Box sx={{ width: '100%', maxWidth: 1200, ml: 0, mr: 'auto' }}>
+      <Box sx={{ width: '100%', minWidth: 0 }}>
         {titleNode && <Box sx={{ mb: 3 }}>{titleNode}</Box>}
         <Box
           sx={{
@@ -158,48 +156,24 @@ export default function ActivityAccordion({
   }
 
   return (
-    <Box sx={{ width: '100%', maxWidth: 1200, ml: 0, mr: 'auto' }}>
+    <Box sx={{ width: '100%', minWidth: 0 }}>
       <Box
         sx={{
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          mb: 2,
+          mb: 1,
         }}
       >
         {titleNode}
-        {showExpandCollapseToggle ? (
-          <Typography
-            variant="body2"
-            onClick={() => setAllExpanded(isAnyCollapsed)}
-            sx={{
-              cursor: 'pointer',
-              color: 'primary.main',
-              fontWeight: 500,
-              '&:hover': {
-                textDecoration: 'underline',
-              },
-            }}
+        {(showExpandCollapseToggle || showCollapseAll) && (
+          <Button
+            size="small"
+            onClick={() => setAllExpanded(showExpandCollapseToggle && isAnyCollapsed)}
+            sx={{ ml: 'auto', textTransform: 'none' }}
           >
-            {isAnyCollapsed ? 'Expand all' : 'Collapse all'}
-          </Typography>
-        ) : (
-          showCollapseAll && (
-            <Typography
-              variant="body2"
-              onClick={() => setAllExpanded(false)}
-              sx={{
-                cursor: 'pointer',
-                color: 'primary.main',
-                fontWeight: 500,
-                '&:hover': {
-                  textDecoration: 'underline',
-                },
-              }}
-            >
-              Collapse all
-            </Typography>
-          )
+            {showExpandCollapseToggle && isAnyCollapsed ? 'Expand all' : 'Collapse all'}
+          </Button>
         )}
       </Box>
 
@@ -225,6 +199,7 @@ export default function ActivityAccordion({
                 backgroundColor: 'background.paper',
                 boxShadow: 'none !important',
                 '&:before': { display: 'none' },
+                '& > h2': { m: 0 },
                 '&.Mui-expanded': {
                   margin: 0,
                 },
@@ -234,10 +209,10 @@ export default function ActivityAccordion({
                 expandIcon={<ExpandMoreIcon />}
                 sx={{
                   px: 2,
-                  py: 1,
-                  minHeight: 56,
+                  py: 0,
+                  minHeight: 52,
                   '&.Mui-expanded': {
-                    minHeight: 56,
+                    minHeight: 52,
                     borderBottom: '1px solid',
                     borderColor: 'divider',
                   },
@@ -250,7 +225,6 @@ export default function ActivityAccordion({
                 }}
               >
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.25, width: '100%' }}>
-                  <FolderIcon sx={{ color: 'primary.main', fontSize: 22 }} />
                   <Box sx={{ flex: 1 }}>
                     <Typography
                       variant="h6"
@@ -263,17 +237,9 @@ export default function ActivityAccordion({
                       {chapter.title}
                     </Typography>
                   </Box>
-                  <Chip
-                    label={`${chapterActivityCount} ${chapterActivityCount === 1 ? 'activity' : 'activities'}`}
-                    size="small"
-                    sx={(theme) => ({
-                      height: 24,
-                      fontSize: '0.75rem',
-                      fontWeight: 500,
-                      backgroundColor: alpha(theme.palette.primary.main, 0.12),
-                      color: 'primary.main',
-                    })}
-                  />
+                  <Typography variant="body2" color="text.secondary" sx={{ mr: 1 }}>
+                    {chapterActivityCount} {chapterActivityCount === 1 ? 'activity' : 'activities'}
+                  </Typography>
                 </Box>
               </AccordionSummary>
 
@@ -303,8 +269,10 @@ export default function ActivityAccordion({
                           slots={{ heading: 'h3' }}
                           sx={{
                             width: '100%',
+                            '&.Mui-expanded': { margin: 0 },
                             boxShadow: 'none !important',
                             '&:before': { display: 'none' },
+                            '& > h3': { m: 0 },
                             backgroundColor: 'transparent',
                           }}
                         >
@@ -312,10 +280,11 @@ export default function ActivityAccordion({
                             expandIcon={<ExpandMoreIcon sx={{ fontSize: 20 }} />}
                             sx={{
                               px: 2,
-                              py: 0.5,
-                              minHeight: 40,
+                              py: 0,
+                              minHeight: 36,
+                              bgcolor: 'action.hover',
                               '&.Mui-expanded': {
-                                minHeight: 40,
+                                minHeight: 36,
                               },
                               '& .MuiAccordionSummary-content': {
                                 my: 0,
@@ -326,18 +295,18 @@ export default function ActivityAccordion({
                             }}
                           >
                             <Typography
-                              variant="subtitle1"
+                              variant="body2"
                               component="span"
                               sx={{
                                 fontWeight: 500,
-                                color: 'text.primary',
+                                color: 'text.secondary',
                               }}
                             >
                               {subchapter.title}
                             </Typography>
                           </AccordionSummary>
 
-                          <AccordionDetails sx={{ px: 0.5, py: 0 }}>
+                          <AccordionDetails sx={{ p: 0 }}>
                             <Box
                               sx={{
                                 display: 'flex',

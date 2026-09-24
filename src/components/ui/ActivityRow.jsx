@@ -19,8 +19,9 @@ export default function ActivityRow({
   const completed = Math.min(Math.max(Number(completedQuestions) || 0, 0), total)
   const completionValue = total > 0 ? (completed / total) * 100 : 0
   const hasDateColumn = Boolean(dateLabel) || noteLines.length > 0
-  const anchorChip = chips[chips.length - 1]
-  const stackedChips = chips.slice(0, -1)
+  const statusChips = chips.length > 0
+    ? chips
+    : [{ label: completed > 0 ? 'In progress' : 'Not started', color: 'default' }]
 
   return (
     <ButtonBase
@@ -31,19 +32,23 @@ export default function ActivityRow({
       sx={{
         display: 'grid',
         gridTemplateColumns: {
-          xs: '1fr',
-          md: hasDateColumn
-            ? 'minmax(0, 1fr) minmax(140px, 200px) auto minmax(140px, 190px)'
-            : 'minmax(0, 1fr) minmax(140px, 200px) auto',
+          xs: 'minmax(0, 1fr) 104px',
+          lg: hasDateColumn
+            ? 'minmax(0, 1fr) 240px 104px 200px'
+            : 'minmax(0, 1fr) 240px 104px',
+        },
+        gridTemplateAreas: {
+          xs: hasDateColumn ? '"title title" "progress status" "date date"' : '"title title" "progress status"',
+          lg: hasDateColumn ? '"title progress status date"' : '"title progress status"',
         },
         columnGap: 2,
-        rowGap: 0.5,
+        rowGap: 1,
         alignItems: 'center',
         width: '100%',
-        minHeight: 52,
-        px: 1.5,
-        py: 0.5,
-        borderRadius: 1,
+        minHeight: 64,
+        px: 2,
+        py: 1.5,
+        borderRadius: 0,
         textAlign: 'left',
         opacity: isLocked ? 0.65 : 1,
         '&:hover': { backgroundColor: 'action.hover' },
@@ -54,7 +59,7 @@ export default function ActivityRow({
         },
       }}
     >
-      <Box sx={{ minWidth: 0 }}>
+      <Box sx={{ minWidth: 0, gridArea: 'title' }}>
         <Stack direction="row" spacing={0.75} alignItems="center">
           <Typography variant="body1" sx={{ fontWeight: 600, wordBreak: 'break-word' }}>
             {title}
@@ -70,7 +75,7 @@ export default function ActivityRow({
         )}
       </Box>
 
-      <Box sx={{ minWidth: 0, width: '100%' }}>
+      <Box sx={{ minWidth: 0, width: '100%', gridArea: 'progress' }}>
         {total > 0 ? (
           <Stack direction="row" spacing={1} alignItems="center">
             <LinearProgress
@@ -85,7 +90,7 @@ export default function ActivityRow({
                 '& .MuiLinearProgress-bar': { borderRadius: 999 },
               }}
             />
-            <Typography variant="body2" sx={{ fontWeight: 600, whiteSpace: 'nowrap' }}>
+            <Typography variant="body2" sx={{ fontWeight: 500, whiteSpace: 'nowrap', minWidth: '5ch', textAlign: 'right', fontVariantNumeric: 'tabular-nums' }}>
               {completed}/{total}
             </Typography>
           </Stack>
@@ -96,41 +101,21 @@ export default function ActivityRow({
         )}
       </Box>
 
-      <Box
-        sx={{
-          position: 'relative',
-          display: 'flex',
-          flexWrap: { xs: 'wrap', md: 'nowrap' },
-          alignItems: 'center',
-          gap: 0.5,
-        }}
-      >
-        {anchorChip &&
-          (() => {
-            const { label, ...chipProps } = anchorChip
-            return <Chip label={label} size="small" {...chipProps} />
-          })()}
-        {stackedChips.length > 0 && (
-          <Stack
-            direction={{ xs: 'row', md: 'column' }}
-            flexWrap={{ xs: 'wrap', md: 'nowrap' }}
-            spacing={0.5}
-            sx={{
-              position: { xs: 'static', md: 'absolute' },
-              left: 0,
-              bottom: '100%',
-              mb: { xs: 0, md: 0.5 },
-            }}
-          >
-            {stackedChips.map(({ label, ...chipProps }) => (
-              <Chip key={label} label={label} size="small" {...chipProps} />
-            ))}
-          </Stack>
-        )}
+      <Box sx={{ gridArea: 'status', display: 'flex', flexWrap: 'wrap', gap: 0.5, minWidth: 0 }}>
+        {statusChips.map(({ label, ...chipProps }) => (
+          <Chip
+            key={label}
+            label={label}
+            size="small"
+            variant="filled"
+            {...chipProps}
+            sx={{ height: 'auto', minHeight: 24, maxWidth: '100%', '& .MuiChip-label': { whiteSpace: 'normal', py: 0.25 } }}
+          />
+        ))}
       </Box>
 
       {hasDateColumn && (
-        <Box sx={{ minWidth: 0, textAlign: { xs: 'left', md: 'right' } }}>
+        <Box sx={{ minWidth: 0, gridArea: 'date', textAlign: { xs: 'left', lg: 'right' }, overflowWrap: 'anywhere' }}>
           {dateLabel && (
             <Typography variant="body2" color="text.secondary" sx={{ display: 'block' }}>
               {dateLabel}
