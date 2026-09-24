@@ -132,13 +132,9 @@ const CoursesDispatchContext = createContext();
 // ============================================================================
 
 export async function fetchInstructorCourses() {
-  const enrollments = await fetchJson("/api/course-enrollments");
-  const courseIds = new Set((enrollments || []).map((item) => Number(item.course_id)));
   const courses = await fetchJson("/api/courses");
 
-  return (courses || [])
-    .filter((course) => courseIds.size === 0 || courseIds.has(Number(course.id)))
-    .map((course, index) => mapCourseRecord(course, index));
+  return (courses || []).map((course, index) => mapCourseRecord(course, index));
 }
 
 const assignmentsListCache = new Map();
