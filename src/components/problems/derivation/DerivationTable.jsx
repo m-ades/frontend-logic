@@ -8,11 +8,8 @@ import {
   TableContainer,
   TableRow,
   Typography,
-  Tooltip,
 } from '@mui/material'
-import EditIcon from '@mui/icons-material/Edit'
 import { alpha } from '@mui/material/styles'
-import PromptText from '../../ui/PromptText.jsx'
 import ProblemSetButtons from '../mui/frame/ProblemSetButtons.jsx'
 import { useMobileLogicKeyboardEnabled } from '../../ui/LogicKeyboard/index.js'
 import { getDerivationCheckerForLogicSystem } from '@logic-app/logic-engine/checkers/derivation-by-logic-system.js'
@@ -78,7 +75,7 @@ import DerivationFormulaCell from './DerivationFormulaCell.jsx'
 import DerivationHeader from './DerivationHeader.jsx'
 import DerivationJustificationCell from './DerivationJustificationCell.jsx'
 import DerivationKeyboardRow from './DerivationKeyboardRow.jsx'
-import DerivationCard from './DerivationCard.jsx'
+import ProblemFrame from '../mui/frame/ProblemFrame.jsx'
 import useDerivationAutoCheck from './useDerivationAutoCheck.js'
 
 function applyLineChange(lines, index, field, value) {
@@ -116,6 +113,7 @@ export default function DerivationTable({
   currentQuestionScore,
   isInstructorView = false,
   onEditQuestion,
+  problemLabel,
   hideActions = false,
   fixedLines = null,
 }) {
@@ -1096,7 +1094,7 @@ export default function DerivationTable({
     [canOpenFullScreen, onOpenFullScreen]
   )
 
-  const Wrapper = isFullScreen || hideActions ? Box : DerivationCard
+  const Wrapper = isFullScreen || hideActions ? Box : ProblemFrame
   const wrapperSx = isFullScreen
     ? {
         py: 2,
@@ -1146,27 +1144,14 @@ export default function DerivationTable({
           : undefined
       }
     >
-      <Wrapper sx={wrapperSx}>
-        {isInstructorView && onEditQuestion && !isFullScreen && !hideActions && (
-          <Box sx={{ mb: 2, display: 'flex', justifyContent: 'flex-end' }}>
-            <Tooltip title="Edit question">
-              <Box
-                component="span"
-                onClick={onEditQuestion}
-                role="button"
-                aria-label="Edit question"
-                sx={{ display: 'inline-flex', alignItems: 'center', cursor: 'pointer', color: 'text.secondary', '&:hover': { opacity: 0.8 } }}
-              >
-                <EditIcon fontSize="small" />
-              </Box>
-            </Tooltip>
-          </Box>
-        )}
-        {proof.description && !isFullScreen && !hideActions && (
-          <Box sx={{ mb: 2, display: 'flex', alignItems: 'flex-start', gap: 0.5 }}>
-            <PromptText content={proof.description} sx={{ fontSize: DERIVATION_PROMPT_FONT_SIZE, flex: 1 }} />
-          </Box>
-        )}
+      <Wrapper {...(isFullScreen || hideActions ? { sx: wrapperSx } : {
+        expandForContent: true,
+        problemLabel,
+        prompt: proof.description,
+        promptSx: { fontSize: DERIVATION_PROMPT_FONT_SIZE },
+        isInstructorView,
+        onEditQuestion,
+      })}>
         {isPhone && !isFullScreen && canOpenFullScreen ? (
           <Box
             component="button"

@@ -1,18 +1,14 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   Box,
-  IconButton,
   Stack,
-  Tooltip,
   Typography,
   useMediaQuery,
 } from '@mui/material'
 import { useTheme } from '@mui/material/styles'
-import EditIcon from '@mui/icons-material/Edit'
 import InstructorQuestionEditor from '../InstructorQuestionEditor.jsx'
 import ProofEditor from '../ProofEditor.jsx'
 import StatusBanner, { isTerminalStatus } from '../../ui/StatusBanner.jsx'
-import PromptText from '../../ui/PromptText.jsx'
 import ProblemSetButtons from '../mui/frame/ProblemSetButtons.jsx'
 import FormulaField from '../mui/inputs/FormulaField.jsx'
 import SymbolButtonRow from '../../ui/logic-engine/SymbolButtonRow.jsx'
@@ -26,9 +22,8 @@ import {
   parseAssumptionScopes,
 } from '@logic-app/logic-engine/proofArgumentExtractionScopes.js'
 import { extractLines } from './derivationUtils.js'
-import { DERIVATION_CAPTION_FONT_SIZE } from './derivationTableConfig.js'
 import { getFormulaKeyboardConfig } from '../mui/translation/symbolizationKeyboard.js'
-import DerivationCard from './DerivationCard.jsx'
+import ProblemFrame from '../mui/frame/ProblemFrame.jsx'
 
 const ARGUMENT_SEPARATOR_BUTTONS = [
   { insert: ' ∴ ', label: '∴' },
@@ -205,26 +200,14 @@ export default function ProofArgumentExtraction({
 
   return (
     <Stack spacing={3} sx={{ width: '100%' }}>
-      <DerivationCard>
+      <ProblemFrame
+        expandForContent
+        problemLabel={problemLabel}
+        prompt={prompt}
+        isInstructorView={isInstructorView}
+        onEditQuestion={() => editorRef.current?.open?.()}
+      >
         <Stack spacing={2.5}>
-          <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
-            <Box sx={{ flex: 1 }}>
-              {problemLabel && (
-                <Typography sx={{ color: 'text.secondary', fontSize: DERIVATION_CAPTION_FONT_SIZE, lineHeight: 1.2, mb: 1.5 }}>
-                  {problemLabel}
-                </Typography>
-              )}
-              {prompt && <PromptText content={prompt} />}
-            </Box>
-            {isInstructorView && (
-              <Tooltip title="Edit question">
-                <IconButton size="small" onClick={() => editorRef.current?.open?.()} aria-label="Edit question">
-                  <EditIcon fontSize="small" />
-                </IconButton>
-              </Tooltip>
-            )}
-          </Box>
-
           <ProofEditor
             key={derivationKey}
             proof={derivationProof}
@@ -275,7 +258,7 @@ export default function ProofArgumentExtraction({
             )}
           </Box>
         </Stack>
-      </DerivationCard>
+      </ProblemFrame>
 
       {isTerminalStatus(status) && (
         <StatusBanner status={status} message={message} onClose={() => setMessage('')} />

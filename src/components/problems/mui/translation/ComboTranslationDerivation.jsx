@@ -1,13 +1,12 @@
 import { createPortal } from 'react-dom'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Alert, Box, IconButton, Stack, Typography, Tooltip } from '@mui/material'
-import EditIcon from '@mui/icons-material/Edit'
+import { Alert, Box, IconButton, Stack, Typography } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close'
 import InstructorQuestionEditor from '../../InstructorQuestionEditor.jsx'
 import SolutionReveal from '../../SolutionReveal.jsx'
 import StatusBanner, { isTerminalStatus } from '../../../ui/StatusBanner.jsx'
 import { useTheme, useMediaQuery } from '@mui/material'
-import DerivationCard from '../../derivation/DerivationCard.jsx'
+import ProblemFrame from '../frame/ProblemFrame.jsx'
 import ProblemSetButtons from '../frame/ProblemSetButtons.jsx'
 import FormulaInput from '../../../ui/logic-engine/formula-input.js'
 import SymbolButtonRow from '../../../ui/logic-engine/SymbolButtonRow.jsx'
@@ -15,7 +14,6 @@ import { MobileLogicInput } from '../../../ui/LogicKeyboard/index.js'
 import DerivationTable from '../../derivation/DerivationTable.jsx'
 import getFormulaClass from '@logic-app/logic-engine/symbolic/formula.js'
 import { useProblemChecker } from '../../../../hooks/useProblemChecker.js'
-import PromptText from '../../../ui/PromptText.jsx'
 import { getNotation, getSymbols } from '../../../../lib/logicSystems.js'
 import {
   displayIndexedSymbolsForNotation,
@@ -265,6 +263,7 @@ export default function ComboTranslationDerivation({
   isAssignmentLocked = false,
   isInstructorView = false,
   onQuestionSaved,
+  problemLabel,
   logicSystem,
 }) {
   const theme = useTheme()
@@ -499,20 +498,15 @@ export default function ComboTranslationDerivation({
     <>
       {fullScreenOverlay}
       <Stack spacing={3} sx={{ px: 0, width: '100%' }}>
-        <DerivationCard>
+        <ProblemFrame
+          expandForContent
+          problemLabel={problemLabel}
+          prompt={promptText}
+          promptSx={{ whiteSpace: 'pre-line' }}
+          isInstructorView={isInstructorView && Boolean(proof)}
+          onEditQuestion={openEdit}
+        >
           <Stack spacing={3}>
-            {isInstructorView && proof && (
-              <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-                <Tooltip title="Edit prompt">
-                  <Box component="span" onClick={openEdit} role="button" aria-label="Edit question" sx={{ display: 'inline-flex', alignItems: 'center', cursor: 'pointer', color: 'text.secondary', '&:hover': { opacity: 0.8 } }}>
-                    <EditIcon fontSize="small" />
-                  </Box>
-                </Tooltip>
-              </Box>
-            )}
-            {promptText && (
-              <PromptText content={promptText} sx={{ whiteSpace: 'pre-line' }} />
-            )}
             <Typography variant="body2" color="text.secondary">
               Enter the argument as a single line, then build a derivation for it.
             </Typography>
@@ -566,7 +560,7 @@ export default function ComboTranslationDerivation({
               />
             )}
           </Stack>
-        </DerivationCard>
+        </ProblemFrame>
 
         {!parseStatus.ok && parseStatus.reason && (
           <Alert severity="info">{parseStatus.reason}</Alert>

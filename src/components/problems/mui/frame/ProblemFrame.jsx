@@ -54,6 +54,8 @@ export function ProblemCard({ minHeight = DEFAULT_QUESTION_CARD_MIN_HEIGHT, card
   )
 }
 
+// numbered cards render the supplied label above the prompt and content
+// omitted labels leave embedded and unnumbered surfaces without a heading
 export default function ProblemFrame({
   problemLabel,
   prompt = '',

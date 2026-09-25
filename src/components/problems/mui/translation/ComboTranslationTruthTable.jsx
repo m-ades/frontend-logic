@@ -1,11 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { Box, Stack, Typography, Tooltip } from '@mui/material'
-import EditIcon from '@mui/icons-material/Edit'
+import { Box, Stack, Typography } from '@mui/material'
 import InstructorQuestionEditor from '../../InstructorQuestionEditor.jsx'
 import StatusBanner, { isTerminalStatus } from '../../../ui/StatusBanner.jsx'
 import { useTheme, useMediaQuery } from '@mui/material'
 import getSyntax from '@logic-app/logic-engine/symbolic/libsyntax.js'
-import { DEFAULT_QUESTION_CARD_MIN_HEIGHT } from '../frame/ProblemFrame.jsx'
+import ProblemFrame from '../frame/ProblemFrame.jsx'
 import ProblemSetButtons from '../frame/ProblemSetButtons.jsx'
 import FormulaInput from '../../../ui/logic-engine/formula-input.js'
 import SymbolButtonRow from '../../../ui/logic-engine/SymbolButtonRow.jsx'
@@ -14,7 +13,6 @@ import TruthTableEditor from '../../truth-table/TruthTableEditor.jsx'
 import { buildTruthTableSubmissionData } from '../../truth-table/truthTableUi.js'
 import getFormulaClass from '@logic-app/logic-engine/symbolic/formula.js'
 import { useProblemChecker } from '../../../../hooks/useProblemChecker.js'
-import PromptText from '../../../ui/PromptText.jsx'
 import { getNotation, getSymbols } from '../../../../lib/logicSystems.js'
 import { normalizeIndexedSymbols } from '../../../../lib/indexedSymbols.js'
 
@@ -81,6 +79,7 @@ export default function ComboTranslationTruthTable({
   isAssignmentLocked = false,
   isInstructorView = false,
   onQuestionSaved,
+  problemLabel,
   logicSystem,
 }) {
   const theme = useTheme()
@@ -275,76 +274,69 @@ export default function ComboTranslationTruthTable({
 
   return (
     <Stack spacing={3} sx={{ px: 0, width: '100%' }}>
-      <Box className="logic-engine" sx={{ width: '100%' }}>
-        <Box className="logic-problem-card" sx={{ minHeight: DEFAULT_QUESTION_CARD_MIN_HEIGHT }}>
-          <Stack spacing={3} sx={{ p: { xs: 2, md: 2 } }}>
-            {isInstructorView && proof && (
-              <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-                <Tooltip title="Edit prompt">
-                  <Box component="span" onClick={openEdit} role="button" aria-label="Edit question" sx={{ display: 'inline-flex', alignItems: 'center', cursor: 'pointer', color: 'text.secondary', '&:hover': { opacity: 0.8 } }}>
-                    <EditIcon fontSize="small" />
-                  </Box>
-                </Tooltip>
-              </Box>
-            )}
-            {promptText && (
-              <PromptText content={promptText} sx={{ whiteSpace: 'pre-line' }} />
-            )}
-            <Typography variant="body2" color="text.secondary">
-              Enter the argument as a single line, then complete the truth table and classify it.
+      <ProblemFrame
+        expandForContent
+        problemLabel={problemLabel}
+        prompt={promptText}
+        promptSx={{ whiteSpace: 'pre-line' }}
+        isInstructorView={isInstructorView && Boolean(proof)}
+        onEditQuestion={openEdit}
+      >
+        <Stack spacing={3}>
+          <Typography variant="body2" color="text.secondary">
+            Enter the argument as a single line, then complete the truth table and classify it.
+          </Typography>
+          <Box>
+            <Typography variant="body2" sx={{ mb: 1, fontWeight: 600 }}>
+              Argument line
             </Typography>
-            <Box>
-              <Typography variant="body2" sx={{ mb: 1, fontWeight: 600 }}>
-                Argument line
-              </Typography>
-              {isPhone ? (
-                <MobileLogicInput
-                  value={argumentLine}
-                  onChange={handleArgumentChange}
-                  placeholder={`e.g. P ${symbols.conditional} Q / P // Q`}
-                  aria-label="Argument line"
-                  symbolizationKey={symbolizationKey}
-                  includeQuantifiers={false}
-                  extraInsertButtons={[{ insert: '/' }, { insert: '//' }]}
-                  logicSystem={logicSystem}
-                />
-              ) : (
-                <>
-                  <Box
-                    ref={inputContainerRef}
-                    sx={{ width: '100%', minHeight: 56, display: 'flex', alignItems: 'center' }}
-                  />
-                  <Box sx={{ mt: 1 }}>
-                    <SymbolButtonRow
-                      inputRef={inputRef}
-                      onValueChange={handleArgumentChange}
-                      includeQuantifiers={false}
-                      logicSystem={logicSystem}
-                    />
-                  </Box>
-                </>
-              )}
-            </Box>
-            {parseStatus.ok && tableProof && (
-              <TruthTableEditor
-                key={argumentLine}
-                proof={tableProof}
-                savedState={tableState}
-                onStateChange={(next) => {
-                  setTableState(next)
-                  updateState({ tableState: next })
-                }}
-                hideActions
-                suppressReveal={status === 'correct' || attemptCount < maxAttempts || showSolution}
-                embedded
-                parentStatus={status}
-                parentAttemptCount={attemptCount}
-                parentAttemptLimit={maxAttempts}
+            {isPhone ? (
+              <MobileLogicInput
+                value={argumentLine}
+                onChange={handleArgumentChange}
+                placeholder={`e.g. P ${symbols.conditional} Q / P // Q`}
+                aria-label="Argument line"
+                symbolizationKey={symbolizationKey}
+                includeQuantifiers={false}
+                extraInsertButtons={[{ insert: '/' }, { insert: '//' }]}
+                logicSystem={logicSystem}
               />
+            ) : (
+              <>
+                <Box
+                  ref={inputContainerRef}
+                  sx={{ width: '100%', minHeight: 56, display: 'flex', alignItems: 'center' }}
+                />
+                <Box sx={{ mt: 1 }}>
+                  <SymbolButtonRow
+                    inputRef={inputRef}
+                    onValueChange={handleArgumentChange}
+                    includeQuantifiers={false}
+                    logicSystem={logicSystem}
+                  />
+                </Box>
+              </>
             )}
-          </Stack>
-        </Box>
-      </Box>
+          </Box>
+          {parseStatus.ok && tableProof && (
+            <TruthTableEditor
+              key={argumentLine}
+              proof={tableProof}
+              savedState={tableState}
+              onStateChange={(next) => {
+                setTableState(next)
+                updateState({ tableState: next })
+              }}
+              hideActions
+              suppressReveal={status === 'correct' || attemptCount < maxAttempts || showSolution}
+              embedded
+              parentStatus={status}
+              parentAttemptCount={attemptCount}
+              parentAttemptLimit={maxAttempts}
+            />
+          )}
+        </Stack>
+      </ProblemFrame>
 
       {isTerminalStatus(status) && (
         <StatusBanner
