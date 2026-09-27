@@ -1,16 +1,13 @@
-import { createPortal } from 'react-dom'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Alert, Box, IconButton, Stack, Typography } from '@mui/material'
-import CloseIcon from '@mui/icons-material/Close'
+import { Alert, Box, Typography } from '@mui/material'
 import InstructorQuestionEditor from '../../InstructorQuestionEditor.jsx'
 import SolutionReveal from '../../SolutionReveal.jsx'
 import { useTheme, useMediaQuery } from '@mui/material'
 import ProblemFrame from '../frame/ProblemFrame.jsx'
 import ProblemSetButtons from '../frame/ProblemSetButtons.jsx'
-import FormulaInput from '../../../ui/logic-engine/formula-input.js'
+import FormulaField from '../inputs/FormulaField.jsx'
 import SymbolButtonRow from '../../../ui/logic-engine/SymbolButtonRow.jsx'
-import { MobileLogicInput } from '../../../ui/LogicKeyboard/index.js'
-import DerivationTable from '../../derivation/DerivationTable.jsx'
+import ProofEditor from '../../ProofEditor.jsx'
 import getFormulaClass from '@logic-app/logic-engine/symbolic/formula.js'
 import { useProblemChecker } from '../../../../hooks/useProblemChecker.js'
 import { getNotation, getSymbols } from '../../../../lib/logicSystems.js'
@@ -27,89 +24,6 @@ import {
   parseSymbolizationKeyFromPrompt,
   promptImpliesPredicateLogic,
 } from './symbolizationKeyboard.js'
-
-function FormulaInputField({ value, onValueChange, onBlur, formulaInputRef, notation }) {
-  const theme = useTheme()
-  const containerRef = useRef(null)
-  const changeHandlerRef = useRef(null)
-
-  useEffect(() => {
-    if (!containerRef.current) return
-    if (!formulaInputRef.current) {
-      const formulaInput = FormulaInput.getnew({ notation })
-      formulaInputRef.current = formulaInput
-      formulaInput.style.width = '100%'
-      formulaInput.style.padding = theme.spacing(1.5)
-      formulaInput.style.border = `1px solid ${theme.palette.divider}`
-      formulaInput.style.borderRadius = theme.shape.borderRadius
-      formulaInput.style.fontSize = '1rem'
-      formulaInput.style.fontFamily = 'var(--app-font-mono)'
-      formulaInput.style.backgroundColor = theme.palette.background.paper
-      formulaInput.style.color = theme.palette.text.primary
-      containerRef.current.appendChild(formulaInput)
-    } else if (!containerRef.current.contains(formulaInputRef.current)) {
-      containerRef.current.appendChild(formulaInputRef.current)
-    }
-    return () => {
-      if (formulaInputRef.current) {
-        if (changeHandlerRef.current) {
-          formulaInputRef.current.removeEventListener('input', changeHandlerRef.current)
-          formulaInputRef.current.removeEventListener('change', changeHandlerRef.current)
-          changeHandlerRef.current = null
-        }
-        if (formulaInputRef.current.parentNode) {
-          formulaInputRef.current.parentNode.removeChild(formulaInputRef.current)
-        }
-        formulaInputRef.current = null
-      }
-    }
-  }, [formulaInputRef, notation, theme])
-
-  useEffect(() => {
-    const formulaInput = formulaInputRef.current
-    if (!formulaInput) return
-    formulaInput.readOnly = false
-    if (changeHandlerRef.current) {
-      formulaInput.removeEventListener('input', changeHandlerRef.current)
-      formulaInput.removeEventListener('change', changeHandlerRef.current)
-      changeHandlerRef.current = null
-    }
-    if (onValueChange) {
-      const handleChange = () => {
-        onValueChange(formulaInput.value)
-      }
-      changeHandlerRef.current = handleChange
-      formulaInput.addEventListener('input', handleChange)
-      formulaInput.addEventListener('change', handleChange)
-    }
-    return () => {
-      if (changeHandlerRef.current) {
-        formulaInput.removeEventListener('input', changeHandlerRef.current)
-        formulaInput.removeEventListener('change', changeHandlerRef.current)
-        changeHandlerRef.current = null
-      }
-    }
-  }, [onValueChange, formulaInputRef])
-
-  useEffect(() => {
-    if (formulaInputRef.current && value !== undefined && formulaInputRef.current.value !== value) {
-      formulaInputRef.current.value = value
-    }
-  }, [value, formulaInputRef])
-
-  return (
-    <Box
-      ref={containerRef}
-      onBlur={onBlur}
-      sx={{
-        width: '100%',
-        minHeight: '56px',
-        display: 'flex',
-        alignItems: 'center',
-      }}
-    />
-  )
-}
 
 const parseArgumentLine = (line) => {
   if (!line || typeof line !== 'string') {
@@ -266,7 +180,6 @@ export default function ComboTranslationDerivation({
   logicSystem,
 }) {
   const theme = useTheme()
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'))
   const isPhone = useMediaQuery(theme.breakpoints.down('sm'))
   const editorRef = useRef(null)
   const openEdit = () => editorRef.current?.open?.()
@@ -307,8 +220,6 @@ export default function ComboTranslationDerivation({
   )
   const [derivationState, setDerivationState] = useState(savedState?.derivationState ?? null)
   const inputRef = useRef(null)
-  const [fullScreenOpen, setFullScreenOpen] = useState(false)
-  const [fullScreenFocusTarget, setFullScreenFocusTarget] = useState(null)
 
   useEffect(() => {
     if (savedState?.argumentLine !== undefined) {
@@ -378,9 +289,6 @@ export default function ComboTranslationDerivation({
   const resetInputs = () => {
     setArgumentLine('')
     setDerivationState(null)
-    if (inputRef.current) {
-      inputRef.current.value = ''
-    }
     updateState({ argumentLine: '', derivationState: null })
   }
 
@@ -420,175 +328,90 @@ export default function ComboTranslationDerivation({
     updateState({ derivationState: state })
   }
 
-  const openFullScreen = useCallback((focusTarget) => {
-    setFullScreenFocusTarget(focusTarget ?? null)
-    setFullScreenOpen(true)
-  }, [])
-
-  const closeFullScreen = useCallback(() => {
-    setFullScreenOpen(false)
-    setFullScreenFocusTarget(null)
-  }, [])
-
-  const derivationProps = derivationProof
-    ? {
-        proof: derivationProof,
-        savedState: derivationState,
-        onStateChange: handleDerivationChange,
-        onAttempt: () => {},
-        onProofComplete: () => {},
-        attemptCount,
-        attemptLimit: maxAttempts,
-        isChecking,
-        setAttemptCount: () => {},
-        setAttemptLimit: () => {},
-        setStatusBanner: () => {},
-        setIsChecking: () => {},
-        isAssignmentLocked,
-        isMobile,
-        isPhone,
-        onOpenFullScreen: openFullScreen,
-        onCloseFullScreen: closeFullScreen,
-        hideActions: true,
-        logicSystem,
-      }
-    : null
-
-  const fullScreenOverlay = isMobile && fullScreenOpen && derivationProps && typeof document !== 'undefined' && createPortal(
-    <Box
-      sx={{
-        position: 'fixed',
-        inset: 0,
-        width: '100%',
-        maxWidth: '100%',
-        boxSizing: 'border-box',
-        margin: 0,
-        padding: 0,
-        zIndex: 1300,
-        bgcolor: 'background.paper',
-        overflowX: 'hidden',
-        overflowY: 'auto',
-        display: 'flex',
-        flexDirection: 'column',
-      }}
-    >
-      <Box sx={{ display: 'flex', justifyContent: 'flex-end', pt: 1, pb: 1, pl: 2, pr: 0, flexShrink: 0 }}>
-        <IconButton
-          onClick={closeFullScreen}
-          aria-label="Close full screen"
-          size="large"
-          sx={{ color: 'text.primary' }}
-        >
-          <CloseIcon />
-        </IconButton>
-      </Box>
-      <DerivationTable
-        key={`fullscreen-${argumentLine}`}
-        {...derivationProps}
-        isFullScreen
-        initialFocusLineIndex={fullScreenFocusTarget?.lineIndex}
-        initialFocusField={fullScreenFocusTarget?.field}
-      />
-    </Box>,
-    document.body
-  )
-
   return (
-    <>
-      {fullScreenOverlay}
-      <ProblemFrame
-        expandForContent
-        problemLabel={problemLabel}
-        prompt={promptText}
-        promptSx={{ whiteSpace: 'pre-line' }}
-        isInstructorView={isInstructorView && Boolean(proof)}
-        onEditQuestion={openEdit}
-        status={status}
-        message={message}
-        onCloseStatus={() => setMessage('')}
-        actionNode={
-          <ProblemSetButtons
-            onCheck={handleCheck}
-            onStartOver={handleStartOver}
-            isChecking={isChecking}
-            isDisabled={!parseStatus.ok || isLocked || isAssignmentLocked || !hasStartedDerivationLine}
-            align="flex-start"
-            attemptCount={attemptCount}
-            attemptLimit={maxAttempts}
-            isInstructorView={isInstructorView}
-          />
-        }
-        editorNode={isInstructorView && proof ? (
-          <InstructorQuestionEditor ref={editorRef} proof={proof} isInstructorView onSaved={onQuestionSaved} trigger="none" logicSystem={logicSystem} />
-        ) : null}
-      >
-        <Stack spacing={3}>
-          <Typography variant="body2" color="text.secondary">
-            Enter the argument as a single line, then build a derivation for it.
-          </Typography>
-          <Box>
-            <Typography variant="body2" sx={{ mb: 1, fontWeight: 600 }}>
-              Argument line
-            </Typography>
-            <Typography variant="body2" sx={{ mb: 1, color: 'text.secondary', fontSize: '0.875rem' }}>
-              Use "/" for separate premises and "//" for the conclusion. Example: A {symbols.conditional} B / A // B.
-            </Typography>
-            {isPhone ? (
-              <MobileLogicInput
-                value={argumentLine}
-                onChange={handleArgumentChange}
-                onBlur={handleArgumentBlur}
-                placeholder={`e.g. A ${symbols.conditional} B / A // B`}
-                aria-label="Argument line"
-                includeQuantifiers
-                symbolizationKey={argumentKeyboardConfig.symbolizationKey}
-                extraInsertButtons={[{ insert: '/' }, { insert: '//' }]}
-                predicateLetters={argumentKeyboardConfig.isPredicateMode ? argumentKeyboardConfig.predicateLetters : undefined}
-                constantLetters={argumentKeyboardConfig.isPredicateMode ? argumentKeyboardConfig.constantLetters : undefined}
-                variableLetters={argumentKeyboardConfig.isPredicateMode ? argumentKeyboardConfig.variableLetters : undefined}
-                logicSystem={logicSystem}
-              />
-            ) : (
-              <>
-                <FormulaInputField
-                  value={argumentLine}
-                  onValueChange={handleArgumentChange}
-                  onBlur={handleArgumentBlur}
-                  formulaInputRef={inputRef}
-                  notation={notation}
-                />
-                <Box sx={{ mt: 1 }}>
-                  <SymbolButtonRow
-                    inputRef={inputRef}
-                    onValueChange={handleArgumentChange}
-                    logicSystem={logicSystem}
-                  />
-                </Box>
-              </>
-            )}
-          </Box>
-
-          {!parseStatus.ok && parseStatus.reason && (
-            <Alert severity="info">{parseStatus.reason}</Alert>
-          )}
-
-          {parseStatus.ok && derivationProps && (!fullScreenOpen || !isPhone) && (
-            <DerivationTable
-              key={argumentLine}
-              {...derivationProps}
-              isFullScreen={false}
+    <ProblemFrame
+      expandForContent
+      problemLabel={problemLabel}
+      prompt={promptText}
+      promptSx={{ whiteSpace: 'pre-line' }}
+      isInstructorView={isInstructorView && Boolean(proof)}
+      onEditQuestion={openEdit}
+      status={status}
+      message={message}
+      onCloseStatus={() => setMessage('')}
+      actionNode={
+        <ProblemSetButtons
+          onCheck={handleCheck}
+          onStartOver={handleStartOver}
+          isChecking={isChecking}
+          isDisabled={!parseStatus.ok || isLocked || isAssignmentLocked || !hasStartedDerivationLine}
+          align="flex-start"
+          attemptCount={attemptCount}
+          attemptLimit={maxAttempts}
+          isInstructorView={isInstructorView}
+        />
+      }
+      editorNode={isInstructorView && proof ? (
+        <InstructorQuestionEditor ref={editorRef} proof={proof} isInstructorView onSaved={onQuestionSaved} trigger="none" logicSystem={logicSystem} />
+      ) : null}
+    >
+      <Typography variant="body2" color="text.secondary">
+        Enter the argument as a single line, then build a derivation for it.
+      </Typography>
+      <Box>
+        <Typography variant="body2" sx={{ mb: 1, fontWeight: 600 }}>
+          Argument line
+        </Typography>
+        <Typography variant="body2" sx={{ mb: 1, color: 'text.secondary', fontSize: '0.875rem' }}>
+          Use "/" for separate premises and "//" for the conclusion. Example: A {symbols.conditional} B / A // B.
+        </Typography>
+        <FormulaField
+          ref={inputRef}
+          value={argumentLine}
+          onValueChange={handleArgumentChange}
+          onBlur={handleArgumentBlur}
+          placeholder={`e.g. A ${symbols.conditional} B / A // B`}
+          aria-label="Argument line"
+          symbolizationKey={argumentKeyboardConfig.symbolizationKey}
+          extraInsertButtons={[{ insert: '/' }, { insert: '//' }]}
+          predicateLetters={argumentKeyboardConfig.isPredicateMode ? argumentKeyboardConfig.predicateLetters : undefined}
+          constantLetters={argumentKeyboardConfig.isPredicateMode ? argumentKeyboardConfig.constantLetters : undefined}
+          variableLetters={argumentKeyboardConfig.isPredicateMode ? argumentKeyboardConfig.variableLetters : undefined}
+          logicSystem={logicSystem}
+        />
+        {!isPhone && (
+          <Box sx={{ mt: 1 }}>
+            <SymbolButtonRow
+              inputRef={inputRef}
+              onValueChange={handleArgumentChange}
+              logicSystem={logicSystem}
             />
-          )}
-        </Stack>
-        <SolutionReveal show={showSolution}>
-          <Typography variant="body2" sx={{ mb: 1, fontWeight: 600 }}>
-            Argument line
-          </Typography>
-          <Typography component="div" sx={{ fontFamily: 'var(--app-font-mono)', fontSize: '1rem' }}>
-            {answerArgumentLine}
-          </Typography>
-        </SolutionReveal>
-      </ProblemFrame>
-    </>
+          </Box>
+        )}
+      </Box>
+      {!parseStatus.ok && parseStatus.reason && (
+        <Alert severity="info">{parseStatus.reason}</Alert>
+      )}
+      {parseStatus.ok && derivationProof && (
+        <ProofEditor
+          key={argumentLine}
+          proof={derivationProof}
+          savedState={derivationState}
+          onStateChange={handleDerivationChange}
+          onProofComplete={() => {}}
+          isAssignmentLocked={isAssignmentLocked}
+          hideActions
+          logicSystem={logicSystem}
+        />
+      )}
+      <SolutionReveal show={showSolution}>
+        <Typography variant="body2" sx={{ mb: 1, fontWeight: 600 }}>
+          Argument line
+        </Typography>
+        <Typography component="div" sx={{ fontFamily: 'var(--app-font-mono)', fontSize: '1rem' }}>
+          {answerArgumentLine}
+        </Typography>
+      </SolutionReveal>
+    </ProblemFrame>
   )
 }
