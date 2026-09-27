@@ -131,12 +131,14 @@ export default function ComboTranslationDerivation({
   const allowIndexedSymbols = notation === 'calgary'
   const Formula = useMemo(() => getFormulaClass(notation), [notation])
   const canonicalizeArgumentLine = useCallback((value) => {
+    // saved lines come back with ascii indices so even partial lines need display form
+    const displayed = displayIndexedSymbolsForNotation(value, notation)
     const parsed = parseArgumentLine(value)
-    if (parsed.error) return value
+    if (parsed.error) return displayed
     const premises = parsed.premises.map((premise) => Formula.from(premise))
     const conclusion = Formula.from(parsed.conclusion)
     if (premises.some((formula) => !formula.wellformed) || !conclusion.wellformed) {
-      return value
+      return displayed
     }
     const canonical = `${premises.map((formula) => formula.normal).join(' / ')} // ${conclusion.normal}`
     return displayIndexedSymbolsForNotation(canonical, notation)

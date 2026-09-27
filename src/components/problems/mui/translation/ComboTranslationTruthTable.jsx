@@ -14,7 +14,10 @@ import getFormulaClass from '@logic-app/logic-engine/symbolic/formula.js'
 import { parseArgumentLine } from '@logic-app/logic-engine/argumentLine.js'
 import { useProblemChecker } from '../../../../hooks/useProblemChecker.js'
 import { getNotation, getSymbols } from '../../../../lib/logicSystems.js'
-import { normalizeIndexedSymbols } from '../../../../lib/indexedSymbols.js'
+import {
+  displayIndexedSymbolsForNotation,
+  normalizeIndexedSymbols,
+} from '../../../../lib/indexedSymbols.js'
 import { parseSymbolizationKeyFromPrompt } from './symbolizationKeyboard.js'
 import { formatArgumentLine, getExpectedArgument } from './argumentAnswer.js'
 
@@ -46,15 +49,18 @@ export default function ComboTranslationTruthTable({
     () => parseSymbolizationKeyFromPrompt(promptText, allowIndexedSymbols),
     [allowIndexedSymbols, promptText]
   )
-  const [argumentLine, setArgumentLine] = useState(savedState?.argumentLine ?? '')
+  // saved lines come back with ascii indices so show them in display form
+  const [argumentLine, setArgumentLine] = useState(
+    () => displayIndexedSymbolsForNotation(savedState?.argumentLine ?? '', notation)
+  )
   const [tableState, setTableState] = useState(savedState?.tableState ?? null)
   const inputRef = useRef(null)
 
   useEffect(() => {
     if (savedState?.argumentLine !== undefined) {
-      setArgumentLine(savedState.argumentLine)
+      setArgumentLine(displayIndexedSymbolsForNotation(savedState.argumentLine, notation))
     }
-  }, [savedState?.argumentLine])
+  }, [notation, savedState?.argumentLine])
 
   const updateState = (updates) => {
     const state = { argumentLine, tableState, ...updates }
