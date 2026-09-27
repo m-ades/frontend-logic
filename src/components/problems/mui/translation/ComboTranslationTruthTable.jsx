@@ -1,29 +1,20 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { Box, Stack, Typography } from '@mui/material'
+import { Box, Typography } from '@mui/material'
 import InstructorQuestionEditor from '../../InstructorQuestionEditor.jsx'
 import SolutionReveal from '../../SolutionReveal.jsx'
 import { useTheme, useMediaQuery } from '@mui/material'
 import getSyntax from '@logic-app/logic-engine/symbolic/libsyntax.js'
 import ProblemFrame from '../frame/ProblemFrame.jsx'
 import ProblemSetButtons from '../frame/ProblemSetButtons.jsx'
-import FormulaInput from '../../../ui/logic-engine/formula-input.js'
+import FormulaField from '../inputs/FormulaField.jsx'
 import SymbolButtonRow from '../../../ui/logic-engine/SymbolButtonRow.jsx'
-import { MobileLogicInput } from '../../../ui/LogicKeyboard/index.js'
 import TruthTableEditor from '../../truth-table/TruthTableEditor.jsx'
 import { buildTruthTableSubmissionData } from '../../truth-table/truthTableUi.js'
 import getFormulaClass from '@logic-app/logic-engine/symbolic/formula.js'
 import { useProblemChecker } from '../../../../hooks/useProblemChecker.js'
 import { getNotation, getSymbols } from '../../../../lib/logicSystems.js'
 import { normalizeIndexedSymbols } from '../../../../lib/indexedSymbols.js'
-
-/** Extract symbolization key lines from prompt text (e.g. "E = ...\\nL = ..."). Used for mobile keyboard variable letters. */
-function parseSymbolizationKeyFromPrompt(promptText) {
-  if (!promptText || typeof promptText !== 'string') return []
-  return promptText
-    .split(/\r?\n/)
-    .map((line) => line.trim())
-    .filter((line) => /^[A-Za-z]+\s*=/.test(line))
-}
+import { parseSymbolizationKeyFromPrompt } from './symbolizationKeyboard.js'
 
 const parseArgumentLine = (line) => {
   if (!line || typeof line !== 'string') {
@@ -94,54 +85,12 @@ export default function ComboTranslationTruthTable({
   const snapshot = proof?.comboTranslationTruthTable || proof?.snapshot || {}
   const promptText = snapshot?.prompt || proof?.description || ''
   const symbolizationKey = useMemo(
-    () => parseSymbolizationKeyFromPrompt(promptText),
-    [promptText]
+    () => parseSymbolizationKeyFromPrompt(promptText, allowIndexedSymbols),
+    [allowIndexedSymbols, promptText]
   )
   const [argumentLine, setArgumentLine] = useState(savedState?.argumentLine ?? '')
   const [tableState, setTableState] = useState(savedState?.tableState ?? null)
   const inputRef = useRef(null)
-  const inputContainerRef = useRef(null)
-
-  useEffect(() => {
-    if (isPhone) return
-    const container = inputContainerRef.current
-    if (!container) return
-    const inp = FormulaInput.getnew({ notation })
-    inputRef.current = inp
-    Object.assign(inp.style, {
-      width: '100%',
-      padding: theme.spacing(1.5),
-      border: `1px solid ${theme.palette.divider}`,
-      borderRadius: theme.shape.borderRadius,
-      fontSize: '1rem',
-      fontFamily: 'var(--app-font-mono)',
-      backgroundColor: theme.palette.background.paper,
-      color: theme.palette.text.primary,
-    })
-    container.appendChild(inp)
-    inp.value = inp.inputfix(argumentLine ?? '')
-    const onInput = () => {
-      setArgumentLine(inp.value)
-      setTableState(null)
-      updateState({ argumentLine: inp.value, tableState: null })
-    }
-    inp.addEventListener('input', onInput)
-    inp.addEventListener('change', onInput)
-    return () => {
-      inp.removeEventListener('input', onInput)
-      inp.removeEventListener('change', onInput)
-      if (inp.parentNode) inp.parentNode.removeChild(inp)
-      inputRef.current = null
-    }
-  }, [theme, isPhone, notation])
-
-  useEffect(() => {
-    if (isPhone) return
-    const inp = inputRef.current
-    if (!inp || argumentLine === undefined || inp.value === argumentLine) return
-    if (document.activeElement === inp) return
-    inp.value = inp.inputfix(argumentLine)
-  }, [argumentLine, isPhone])
 
   useEffect(() => {
     if (savedState?.argumentLine !== undefined) {
@@ -242,7 +191,6 @@ export default function ComboTranslationTruthTable({
     resetInput: () => {
       setArgumentLine('')
       setTableState(null)
-      if (inputRef.current) inputRef.current.value = ''
       updateState({ argumentLine: '', tableState: null })
     },
     onStateChange: updateState,
@@ -303,60 +251,52 @@ export default function ComboTranslationTruthTable({
         <InstructorQuestionEditor ref={editorRef} proof={proof} isInstructorView onSaved={onQuestionSaved} trigger="none" logicSystem={logicSystem} />
       ) : null}
     >
-      <Stack spacing={3}>
-        <Typography variant="body2" color="text.secondary">
-          Enter the argument as a single line, then complete the truth table and classify it.
+      <Typography variant="body2" color="text.secondary">
+        Enter the argument as a single line, then complete the truth table and classify it.
+      </Typography>
+      <Box>
+        <Typography variant="body2" sx={{ mb: 1, fontWeight: 600 }}>
+          Argument line
         </Typography>
-        <Box>
-          <Typography variant="body2" sx={{ mb: 1, fontWeight: 600 }}>
-            Argument line
-          </Typography>
-          {isPhone ? (
-            <MobileLogicInput
-              value={argumentLine}
-              onChange={handleArgumentChange}
-              placeholder={`e.g. P ${symbols.conditional} Q / P // Q`}
-              aria-label="Argument line"
-              symbolizationKey={symbolizationKey}
+        <FormulaField
+          ref={inputRef}
+          value={argumentLine}
+          onValueChange={handleArgumentChange}
+          placeholder={`e.g. P ${symbols.conditional} Q / P // Q`}
+          aria-label="Argument line"
+          symbolizationKey={symbolizationKey}
+          includeQuantifiers={false}
+          extraInsertButtons={[{ insert: '/' }, { insert: '//' }]}
+          logicSystem={logicSystem}
+        />
+        {!isPhone && (
+          <Box sx={{ mt: 1 }}>
+            <SymbolButtonRow
+              inputRef={inputRef}
+              onValueChange={handleArgumentChange}
               includeQuantifiers={false}
-              extraInsertButtons={[{ insert: '/' }, { insert: '//' }]}
               logicSystem={logicSystem}
             />
-          ) : (
-            <>
-              <Box
-                ref={inputContainerRef}
-                sx={{ width: '100%', minHeight: 56, display: 'flex', alignItems: 'center' }}
-              />
-              <Box sx={{ mt: 1 }}>
-                <SymbolButtonRow
-                  inputRef={inputRef}
-                  onValueChange={handleArgumentChange}
-                  includeQuantifiers={false}
-                  logicSystem={logicSystem}
-                />
-              </Box>
-            </>
-          )}
-        </Box>
-        {parseStatus.ok && tableProof && (
-          <TruthTableEditor
-            key={argumentLine}
-            proof={tableProof}
-            savedState={tableState}
-            onStateChange={(next) => {
-              setTableState(next)
-              updateState({ tableState: next })
-            }}
-            hideActions
-            suppressReveal={status === 'correct' || attemptCount < maxAttempts || showSolution}
-            embedded
-            parentStatus={status}
-            parentAttemptCount={attemptCount}
-            parentAttemptLimit={maxAttempts}
-          />
+          </Box>
         )}
-      </Stack>
+      </Box>
+      {parseStatus.ok && tableProof && (
+        <TruthTableEditor
+          key={argumentLine}
+          proof={tableProof}
+          savedState={tableState}
+          onStateChange={(next) => {
+            setTableState(next)
+            updateState({ tableState: next })
+          }}
+          hideActions
+          suppressReveal={status === 'correct' || attemptCount < maxAttempts || showSolution}
+          embedded
+          parentStatus={status}
+          parentAttemptCount={attemptCount}
+          parentAttemptLimit={maxAttempts}
+        />
+      )}
       <SolutionReveal show={showSolution && Boolean(answerProof)}>
         <Typography variant="body2" sx={{ mb: 1, fontWeight: 600 }}>
           Argument line
