@@ -11,54 +11,12 @@ import SymbolButtonRow from '../../../ui/logic-engine/SymbolButtonRow.jsx'
 import TruthTableEditor from '../../truth-table/TruthTableEditor.jsx'
 import { buildTruthTableSubmissionData } from '../../truth-table/truthTableUi.js'
 import getFormulaClass from '@logic-app/logic-engine/symbolic/formula.js'
+import { parseArgumentLine } from '@logic-app/logic-engine/argumentLine.js'
 import { useProblemChecker } from '../../../../hooks/useProblemChecker.js'
 import { getNotation, getSymbols } from '../../../../lib/logicSystems.js'
 import { normalizeIndexedSymbols } from '../../../../lib/indexedSymbols.js'
 import { parseSymbolizationKeyFromPrompt } from './symbolizationKeyboard.js'
-
-const parseArgumentLine = (line) => {
-  if (!line || typeof line !== 'string') {
-    return { error: 'Enter the argument as a single line.' }
-  }
-  const parts = line.split('//')
-  if (parts.length !== 2) {
-    return { error: 'Use "//" to separate premises from the conclusion.' }
-  }
-  const premisesPart = parts[0].trim()
-  const conclusion = parts[1].trim()
-  if (!premisesPart) {
-    return { error: 'Enter at least one premise before "//".' }
-  }
-  if (!conclusion) {
-    return { error: 'Enter a conclusion after "//".' }
-  }
-  const premises = premisesPart
-    .split('/')
-    .map((premise) => premise.trim())
-    .filter(Boolean)
-  if (premises.length === 0) {
-    return { error: 'Enter at least one premise before "//".' }
-  }
-  return { premises, conclusion }
-}
-
-// Resolve expected argument (premises + conclusion) from snapshot/answer for solution reveal
-function resolveExpectedAnswer(answer) {
-  if (!answer) return null
-  if (answer.argument || answer.argumentLine) {
-    const parsed = parseArgumentLine(answer.argument ?? answer.argumentLine)
-    return parsed.error ? null : parsed
-  }
-  if (Array.isArray(answer.premises) && answer.conclusion != null) {
-    return { premises: answer.premises, conclusion: answer.conclusion }
-  }
-  if (Array.isArray(answer.translations) && Number.isInteger(answer.index)) {
-    const conclusion = answer.translations[answer.index] ?? ''
-    const premises = answer.translations.filter((_, idx) => idx !== answer.index)
-    return premises.length && conclusion ? { premises, conclusion } : null
-  }
-  return null
-}
+import { formatArgumentLine, getExpectedArgument } from './argumentAnswer.js'
 
 export default function ComboTranslationTruthTable({
   proof,
@@ -150,7 +108,7 @@ export default function ComboTranslationTruthTable({
   }, [parseStatus.ok, parseStatus.parsed, proof])
 
   const expectedAnswer = useMemo(
-    () => resolveExpectedAnswer(proof?.answer ?? snapshot?.answer),
+    () => getExpectedArgument(proof?.answer ?? snapshot?.answer),
     [proof?.answer, snapshot?.answer]
   )
   const answerProof = useMemo(() => {
@@ -210,9 +168,7 @@ export default function ComboTranslationTruthTable({
   const isLocked = problemChecker.isLocked
 
   const showSolution = attemptCount >= maxAttempts && status !== 'correct' && expectedAnswer != null
-  const answerArgumentLine = expectedAnswer
-    ? expectedAnswer.premises.join(' / ') + ' // ' + expectedAnswer.conclusion
-    : ''
+  const answerArgumentLine = expectedAnswer ? formatArgumentLine(expectedAnswer) : ''
 
   const handleArgumentChange = (value) => {
     setArgumentLine(value)

@@ -9,6 +9,7 @@ import FormulaField from '../inputs/FormulaField.jsx'
 import SymbolButtonRow from '../../../ui/logic-engine/SymbolButtonRow.jsx'
 import ProofEditor from '../../ProofEditor.jsx'
 import getFormulaClass from '@logic-app/logic-engine/symbolic/formula.js'
+import { parseArgumentLine } from '@logic-app/logic-engine/argumentLine.js'
 import { useProblemChecker } from '../../../../hooks/useProblemChecker.js'
 import { getNotation, getSymbols } from '../../../../lib/logicSystems.js'
 import {
@@ -24,53 +25,14 @@ import {
   parseSymbolizationKeyFromPrompt,
   promptImpliesPredicateLogic,
 } from './symbolizationKeyboard.js'
-
-const parseArgumentLine = (line) => {
-  if (!line || typeof line !== 'string') {
-    return { error: 'Enter the argument as a single line.' }
-  }
-  const parts = line.split('//')
-  if (parts.length !== 2) {
-    return { error: 'Use "//" to separate premises from the conclusion.' }
-  }
-  const premisesPart = parts[0].trim()
-  const conclusion = parts[1].trim()
-  if (!premisesPart) {
-    return { error: 'Enter at least one premise before "//".' }
-  }
-  if (!conclusion) {
-    return { error: 'Enter a conclusion after "//".' }
-  }
-  const premises = premisesPart
-    .split('/')
-    .map((premise) => premise.trim())
-    .filter(Boolean)
-  if (premises.length === 0) {
-    return { error: 'Enter at least one premise before "//".' }
-  }
-  return { premises, conclusion }
-}
+import { formatArgumentLine, getExpectedArgument, unwrapAnswer } from './argumentAnswer.js'
 
 function getAnswerFormulas(source) {
-  if (!source) return []
-  if (typeof source === 'string') {
-    const parsed = parseArgumentLine(source)
-    return parsed.error ? [] : [...parsed.premises, parsed.conclusion]
-  }
-  const answer = source.answer || source
-  if (answer !== source) return getAnswerFormulas(answer)
-  if (answer.argument || answer.argumentLine) {
-    const parsed = parseArgumentLine(answer.argument ?? answer.argumentLine)
-    return parsed.error ? [] : [...parsed.premises, parsed.conclusion]
-  }
-  if (Array.isArray(answer.premises) && answer.conclusion != null) {
-    return [...answer.premises, answer.conclusion]
-  }
-  if (Array.isArray(answer.translations)) {
-    return answer.translations.filter(Boolean)
-  }
-
-  return []
+  const expected = getExpectedArgument(source)
+  if (expected) return [...expected.premises, expected.conclusion]
+  // translation lists without a conclusion index still supply keyboard letters
+  const translations = unwrapAnswer(source)?.translations
+  return Array.isArray(translations) ? translations.filter(Boolean) : []
 }
 
 function firstWithFormulas(...candidates) {
@@ -81,27 +43,8 @@ function firstWithFormulas(...candidates) {
 }
 
 function getAnswerArgumentLine(source) {
-  if (!source) return ''
-  if (typeof source === 'string') {
-    return parseArgumentLine(source).error ? '' : source
-  }
-  const answer = source.answer || source
-  if (answer !== source) return getAnswerArgumentLine(answer)
-  if (answer.argument || answer.argumentLine) {
-    const line = answer.argument ?? answer.argumentLine
-    return parseArgumentLine(line).error ? '' : line
-  }
-  if (Array.isArray(answer.premises) && answer.conclusion != null) {
-    return `${answer.premises.join(' / ')} // ${answer.conclusion}`
-  }
-  if (Array.isArray(answer.translations) && Number.isInteger(answer.index)) {
-    const conclusion = answer.translations[answer.index] ?? ''
-    const premises = answer.translations.filter((_, index) => index !== answer.index)
-    return premises.length > 0 && conclusion
-      ? `${premises.join(' / ')} // ${conclusion}`
-      : ''
-  }
-  return ''
+  const expected = getExpectedArgument(source)
+  return expected ? formatArgumentLine(expected) : ''
 }
 
 function getArgumentKeyboardConfig(
