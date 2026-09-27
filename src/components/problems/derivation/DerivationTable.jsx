@@ -114,6 +114,9 @@ export default function DerivationTable({
   isInstructorView = false,
   onEditQuestion,
   problemLabel,
+  status,
+  message,
+  onCloseStatus,
   hideActions = false,
   fixedLines = null,
 }) {
@@ -1094,7 +1097,8 @@ export default function DerivationTable({
     [canOpenFullScreen, onOpenFullScreen]
   )
 
-  const Wrapper = isFullScreen || hideActions ? Box : ProblemFrame
+  const usesProblemFrame = !isFullScreen && !hideActions
+  const Wrapper = usesProblemFrame ? ProblemFrame : Box
   const wrapperSx = isFullScreen
     ? {
         py: 2,
@@ -1125,6 +1129,19 @@ export default function DerivationTable({
         totalQuestions,
       })
     : null
+  const actionButtons = (
+    <ProblemSetButtons
+      onCheck={handleSubmit}
+      onStartOver={handleStartOver}
+      isChecking={isChecking}
+      isDisabled={submitDisabled}
+      align="flex-start"
+      attemptCount={attemptCount}
+      attemptLimit={attemptLimit}
+      sx={isFullScreen ? { mt: 1 } : undefined}
+      scoreLabel={scoreLabel}
+    />
+  )
 
   return (
     <Stack
@@ -1144,14 +1161,18 @@ export default function DerivationTable({
           : undefined
       }
     >
-      <Wrapper {...(isFullScreen || hideActions ? { sx: wrapperSx } : {
+      <Wrapper {...(usesProblemFrame ? {
         expandForContent: true,
         problemLabel,
         prompt: proof.description,
         promptSx: { fontSize: DERIVATION_PROMPT_FONT_SIZE },
         isInstructorView,
         onEditQuestion,
-      })}>
+        status,
+        message,
+        onCloseStatus,
+        actionNode: actionButtons,
+      } : { sx: wrapperSx })}>
         {isPhone && !isFullScreen && canOpenFullScreen ? (
           <Box
             component="button"
@@ -1420,34 +1441,22 @@ export default function DerivationTable({
         )}
 
       </Wrapper>
-      {/* fullscreen: sticky button row at bottom; non-fullscreen: normal flow */}
-      {!hideActions && (
+      {/* fullscreen keeps a sticky button row outside the frame */}
+      {isFullScreen && !hideActions && (
         <Box
           sx={{
             mt: 1,
-            ...(isFullScreen && {
-              flexShrink: 0,
-              pl: 2,
-              pr: 0,
-              pt: 1.5,
-              pb: 2,
-              bgcolor: 'background.paper',
-              borderTop: 1,
-              borderColor: 'divider',
-            }),
+            flexShrink: 0,
+            pl: 2,
+            pr: 0,
+            pt: 1.5,
+            pb: 2,
+            bgcolor: 'background.paper',
+            borderTop: 1,
+            borderColor: 'divider',
           }}
         >
-          <ProblemSetButtons
-            onCheck={handleSubmit}
-            onStartOver={handleStartOver}
-            isChecking={isChecking}
-            isDisabled={submitDisabled}
-            align="flex-start"
-            attemptCount={attemptCount}
-            attemptLimit={attemptLimit}
-            sx={{ mt: 1 }}
-            scoreLabel={scoreLabel}
-          />
+          {actionButtons}
         </Box>
       )}
     </Stack>

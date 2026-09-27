@@ -8,7 +8,6 @@ import {
 import { useTheme } from '@mui/material/styles'
 import InstructorQuestionEditor from '../InstructorQuestionEditor.jsx'
 import ProofEditor from '../ProofEditor.jsx'
-import StatusBanner, { isTerminalStatus } from '../../ui/StatusBanner.jsx'
 import ProblemSetButtons from '../mui/frame/ProblemSetButtons.jsx'
 import FormulaField from '../mui/inputs/FormulaField.jsx'
 import SymbolButtonRow from '../../ui/logic-engine/SymbolButtonRow.jsx'
@@ -199,83 +198,28 @@ export default function ProofArgumentExtraction({
     || !hasEveryCitation(derivationState, premises, fixedLines)
 
   return (
-    <Stack spacing={3} sx={{ width: '100%' }}>
-      <ProblemFrame
-        expandForContent
-        problemLabel={problemLabel}
-        prompt={prompt}
-        isInstructorView={isInstructorView}
-        onEditQuestion={() => editorRef.current?.open?.()}
-      >
-        <Stack spacing={2.5}>
-          <ProofEditor
-            key={derivationKey}
-            proof={derivationProof}
-            savedState={derivationState}
-            onStateChange={handleDerivationChange}
-            onProofComplete={() => {}}
-            isAssignmentLocked={isAssignmentLocked}
-            fixedLines={fixedLines}
-            hideActions
-            logicSystem={logicSystem}
-          />
-
-          <Box sx={{ width: '100%', maxWidth: '34rem' }}>
-            <Typography variant="body2" sx={{ mb: 1, fontWeight: 600 }}>
-              Corresponding argument
-            </Typography>
-            <FormulaField
-              ref={argumentInputRef}
-              value={argumentLine}
-              onValueChange={handleArgumentChange}
-              aria-label="Corresponding argument"
-              placeholder="e.g. P, Q ∴ R"
-              symbolizationKey={argumentKeyboardConfig.symbolizationKey}
-              includeQuantifiers={argumentKeyboardConfig.isPredicateMode}
-              extraInsertButtons={ARGUMENT_SEPARATOR_BUTTONS}
-              predicateLetters={argumentKeyboardConfig.isPredicateMode
-                ? argumentKeyboardConfig.predicateLetters
-                : undefined}
-              constantLetters={argumentKeyboardConfig.isPredicateMode
-                ? argumentKeyboardConfig.constantLetters
-                : undefined}
-              variableLetters={argumentKeyboardConfig.isPredicateMode
-                ? argumentKeyboardConfig.variableLetters
-                : undefined}
-              allowTherefore
-              logicSystem={logicSystem}
-            />
-            {!isPhone && (
-              <Box sx={{ mt: 0.75 }}>
-                <SymbolButtonRow
-                  inputRef={argumentInputRef}
-                  onValueChange={handleArgumentChange}
-                  includeQuantifiers={argumentKeyboardConfig.isPredicateMode}
-                  extraInsertButtons={ARGUMENT_SEPARATOR_BUTTONS}
-                  logicSystem={logicSystem}
-                />
-              </Box>
-            )}
-          </Box>
-        </Stack>
-      </ProblemFrame>
-
-      {isTerminalStatus(status) && (
-        <StatusBanner status={status} message={message} onClose={() => setMessage('')} />
-      )}
-
-      <ProblemSetButtons
-        onCheck={handleCheck}
-        onStartOver={handleStartOver}
-        isChecking={isChecking}
-        isDisabled={submitDisabled}
-        align="flex-start"
-        attemptCount={attemptCount}
-        attemptLimit={maxAttempts}
-        isInstructorView={isInstructorView}
-      />
-
-      {isInstructorView && (
+    <ProblemFrame
+      expandForContent
+      problemLabel={problemLabel}
+      prompt={prompt}
+      isInstructorView={isInstructorView}
+      onEditQuestion={() => editorRef.current?.open?.()}
+      status={status}
+      message={message}
+      onCloseStatus={() => setMessage('')}
+      actionNode={
+        <ProblemSetButtons
+          onCheck={handleCheck}
+          onStartOver={handleStartOver}
+          isChecking={isChecking}
+          isDisabled={submitDisabled}
+          align="flex-start"
+          attemptCount={attemptCount}
+          attemptLimit={maxAttempts}
+          isInstructorView={isInstructorView}
+        />
+      }
+      editorNode={isInstructorView ? (
         <InstructorQuestionEditor
           ref={editorRef}
           proof={proof}
@@ -284,7 +228,59 @@ export default function ProofArgumentExtraction({
           trigger="none"
           logicSystem={logicSystem}
         />
-      )}
-    </Stack>
+      ) : null}
+    >
+      <Stack spacing={2.5}>
+        <ProofEditor
+          key={derivationKey}
+          proof={derivationProof}
+          savedState={derivationState}
+          onStateChange={handleDerivationChange}
+          onProofComplete={() => {}}
+          isAssignmentLocked={isAssignmentLocked}
+          fixedLines={fixedLines}
+          hideActions
+          logicSystem={logicSystem}
+        />
+
+        <Box sx={{ width: '100%', maxWidth: '34rem' }}>
+          <Typography variant="body2" sx={{ mb: 1, fontWeight: 600 }}>
+            Corresponding argument
+          </Typography>
+          <FormulaField
+            ref={argumentInputRef}
+            value={argumentLine}
+            onValueChange={handleArgumentChange}
+            aria-label="Corresponding argument"
+            placeholder="e.g. P, Q ∴ R"
+            symbolizationKey={argumentKeyboardConfig.symbolizationKey}
+            includeQuantifiers={argumentKeyboardConfig.isPredicateMode}
+            extraInsertButtons={ARGUMENT_SEPARATOR_BUTTONS}
+            predicateLetters={argumentKeyboardConfig.isPredicateMode
+              ? argumentKeyboardConfig.predicateLetters
+              : undefined}
+            constantLetters={argumentKeyboardConfig.isPredicateMode
+              ? argumentKeyboardConfig.constantLetters
+              : undefined}
+            variableLetters={argumentKeyboardConfig.isPredicateMode
+              ? argumentKeyboardConfig.variableLetters
+              : undefined}
+            allowTherefore
+            logicSystem={logicSystem}
+          />
+          {!isPhone && (
+            <Box sx={{ mt: 0.75 }}>
+              <SymbolButtonRow
+                inputRef={argumentInputRef}
+                onValueChange={handleArgumentChange}
+                includeQuantifiers={argumentKeyboardConfig.isPredicateMode}
+                extraInsertButtons={ARGUMENT_SEPARATOR_BUTTONS}
+                logicSystem={logicSystem}
+              />
+            </Box>
+          )}
+        </Box>
+      </Stack>
+    </ProblemFrame>
   )
 }

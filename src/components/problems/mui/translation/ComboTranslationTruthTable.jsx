@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Box, Stack, Typography } from '@mui/material'
 import InstructorQuestionEditor from '../../InstructorQuestionEditor.jsx'
-import StatusBanner, { isTerminalStatus } from '../../../ui/StatusBanner.jsx'
+import SolutionReveal from '../../SolutionReveal.jsx'
 import { useTheme, useMediaQuery } from '@mui/material'
 import getSyntax from '@logic-app/logic-engine/symbolic/libsyntax.js'
 import ProblemFrame from '../frame/ProblemFrame.jsx'
@@ -273,125 +273,109 @@ export default function ComboTranslationTruthTable({
   }
 
   return (
-    <Stack spacing={3} sx={{ px: 0, width: '100%' }}>
-      <ProblemFrame
-        expandForContent
-        problemLabel={problemLabel}
-        prompt={promptText}
-        promptSx={{ whiteSpace: 'pre-line' }}
-        isInstructorView={isInstructorView && Boolean(proof)}
-        onEditQuestion={openEdit}
-      >
-        <Stack spacing={3}>
-          <Typography variant="body2" color="text.secondary">
-            Enter the argument as a single line, then complete the truth table and classify it.
-          </Typography>
-          <Box>
-            <Typography variant="body2" sx={{ mb: 1, fontWeight: 600 }}>
-              Argument line
-            </Typography>
-            {isPhone ? (
-              <MobileLogicInput
-                value={argumentLine}
-                onChange={handleArgumentChange}
-                placeholder={`e.g. P ${symbols.conditional} Q / P // Q`}
-                aria-label="Argument line"
-                symbolizationKey={symbolizationKey}
-                includeQuantifiers={false}
-                extraInsertButtons={[{ insert: '/' }, { insert: '//' }]}
-                logicSystem={logicSystem}
-              />
-            ) : (
-              <>
-                <Box
-                  ref={inputContainerRef}
-                  sx={{ width: '100%', minHeight: 56, display: 'flex', alignItems: 'center' }}
-                />
-                <Box sx={{ mt: 1 }}>
-                  <SymbolButtonRow
-                    inputRef={inputRef}
-                    onValueChange={handleArgumentChange}
-                    includeQuantifiers={false}
-                    logicSystem={logicSystem}
-                  />
-                </Box>
-              </>
-            )}
-          </Box>
-          {parseStatus.ok && tableProof && (
-            <TruthTableEditor
-              key={argumentLine}
-              proof={tableProof}
-              savedState={tableState}
-              onStateChange={(next) => {
-                setTableState(next)
-                updateState({ tableState: next })
-              }}
-              hideActions
-              suppressReveal={status === 'correct' || attemptCount < maxAttempts || showSolution}
-              embedded
-              parentStatus={status}
-              parentAttemptCount={attemptCount}
-              parentAttemptLimit={maxAttempts}
-            />
-          )}
-        </Stack>
-      </ProblemFrame>
-
-      {isTerminalStatus(status) && (
-        <StatusBanner
-          status={status}
-          message={message}
-          onClose={() => setMessage('')}
+    <ProblemFrame
+      expandForContent
+      problemLabel={problemLabel}
+      prompt={promptText}
+      promptSx={{ whiteSpace: 'pre-line' }}
+      isInstructorView={isInstructorView && Boolean(proof)}
+      onEditQuestion={openEdit}
+      status={status}
+      message={message}
+      onCloseStatus={() => setMessage('')}
+      actionNode={
+        <ProblemSetButtons
+          onCheck={handleCheck}
+          onStartOver={handleStartOver}
+          isChecking={isChecking}
+          isDisabled={
+            !parseStatus.ok ||
+            isLocked ||
+            isAssignmentLocked
+          }
+          align="flex-start"
+          attemptCount={attemptCount}
+          attemptLimit={maxAttempts}
+          isInstructorView={isInstructorView}
         />
-      )}
-
-      {showSolution && answerProof && (
-        <Box className="logic-engine" sx={{ width: '100%' }}>
-          <Box className="logic-problem-card" sx={{ borderColor: 'primary.main', borderWidth: 1, borderStyle: 'solid' }}>
-            <Stack spacing={2} sx={{ p: 2 }}>
-              <Typography variant="h6" component="h2" sx={{ fontWeight: 600, color: 'primary.main' }}>
-                Correct Answer
-              </Typography>
-              <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                Argument line
-              </Typography>
-              <Typography component="div" sx={{ fontFamily: 'var(--app-font-mono)', fontSize: '1rem' }}>
-                {answerArgumentLine}
-              </Typography>
-              <TruthTableEditor
-                proof={answerProof}
-                savedState={null}
-                hideActions
-                suppressReveal={false}
-                embedded
-                solutionOnly
-                parentStatus={status}
-                parentAttemptCount={attemptCount}
-                parentAttemptLimit={maxAttempts}
-              />
-            </Stack>
-          </Box>
-        </Box>
-      )}
-
-      <ProblemSetButtons
-        onCheck={handleCheck}
-        onStartOver={handleStartOver}
-        isChecking={isChecking}
-        isDisabled={
-          !parseStatus.ok ||
-          isLocked ||
-          isAssignmentLocked
-        }
-        align="flex-start"
-        attemptCount={attemptCount}
-        attemptLimit={maxAttempts}
-        isInstructorView={isInstructorView}
-      />
-      {isInstructorView && proof && (
+      }
+      editorNode={isInstructorView && proof ? (
         <InstructorQuestionEditor ref={editorRef} proof={proof} isInstructorView onSaved={onQuestionSaved} trigger="none" logicSystem={logicSystem} />
-      )}
-    </Stack>
+      ) : null}
+    >
+      <Stack spacing={3}>
+        <Typography variant="body2" color="text.secondary">
+          Enter the argument as a single line, then complete the truth table and classify it.
+        </Typography>
+        <Box>
+          <Typography variant="body2" sx={{ mb: 1, fontWeight: 600 }}>
+            Argument line
+          </Typography>
+          {isPhone ? (
+            <MobileLogicInput
+              value={argumentLine}
+              onChange={handleArgumentChange}
+              placeholder={`e.g. P ${symbols.conditional} Q / P // Q`}
+              aria-label="Argument line"
+              symbolizationKey={symbolizationKey}
+              includeQuantifiers={false}
+              extraInsertButtons={[{ insert: '/' }, { insert: '//' }]}
+              logicSystem={logicSystem}
+            />
+          ) : (
+            <>
+              <Box
+                ref={inputContainerRef}
+                sx={{ width: '100%', minHeight: 56, display: 'flex', alignItems: 'center' }}
+              />
+              <Box sx={{ mt: 1 }}>
+                <SymbolButtonRow
+                  inputRef={inputRef}
+                  onValueChange={handleArgumentChange}
+                  includeQuantifiers={false}
+                  logicSystem={logicSystem}
+                />
+              </Box>
+            </>
+          )}
+        </Box>
+        {parseStatus.ok && tableProof && (
+          <TruthTableEditor
+            key={argumentLine}
+            proof={tableProof}
+            savedState={tableState}
+            onStateChange={(next) => {
+              setTableState(next)
+              updateState({ tableState: next })
+            }}
+            hideActions
+            suppressReveal={status === 'correct' || attemptCount < maxAttempts || showSolution}
+            embedded
+            parentStatus={status}
+            parentAttemptCount={attemptCount}
+            parentAttemptLimit={maxAttempts}
+          />
+        )}
+      </Stack>
+      <SolutionReveal show={showSolution && Boolean(answerProof)}>
+        <Typography variant="body2" sx={{ mb: 1, fontWeight: 600 }}>
+          Argument line
+        </Typography>
+        <Typography component="div" sx={{ mb: 2, fontFamily: 'var(--app-font-mono)', fontSize: '1rem' }}>
+          {answerArgumentLine}
+        </Typography>
+        <TruthTableEditor
+          proof={answerProof}
+          savedState={null}
+          hideActions
+          suppressReveal={false}
+          embedded
+          solutionOnly
+          parentStatus={status}
+          parentAttemptCount={attemptCount}
+          parentAttemptLimit={maxAttempts}
+        />
+      </SolutionReveal>
+    </ProblemFrame>
   )
 }

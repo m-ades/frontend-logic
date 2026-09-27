@@ -4,7 +4,6 @@ import { Alert, Box, IconButton, Stack, Typography } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close'
 import InstructorQuestionEditor from '../../InstructorQuestionEditor.jsx'
 import SolutionReveal from '../../SolutionReveal.jsx'
-import StatusBanner, { isTerminalStatus } from '../../../ui/StatusBanner.jsx'
 import { useTheme, useMediaQuery } from '@mui/material'
 import ProblemFrame from '../frame/ProblemFrame.jsx'
 import ProblemSetButtons from '../frame/ProblemSetButtons.jsx'
@@ -497,83 +496,90 @@ export default function ComboTranslationDerivation({
   return (
     <>
       {fullScreenOverlay}
-      <Stack spacing={3} sx={{ px: 0, width: '100%' }}>
-        <ProblemFrame
-          expandForContent
-          problemLabel={problemLabel}
-          prompt={promptText}
-          promptSx={{ whiteSpace: 'pre-line' }}
-          isInstructorView={isInstructorView && Boolean(proof)}
-          onEditQuestion={openEdit}
-        >
-          <Stack spacing={3}>
-            <Typography variant="body2" color="text.secondary">
-              Enter the argument as a single line, then build a derivation for it.
-            </Typography>
-            <Box>
-              <Typography variant="body2" sx={{ mb: 1, fontWeight: 600 }}>
-                Argument line
-              </Typography>
-              <Typography variant="body2" sx={{ mb: 1, color: 'text.secondary', fontSize: '0.875rem' }}>
-                Use "/" for separate premises and "//" for the conclusion. Example: A {symbols.conditional} B / A // B.
-              </Typography>
-              {isPhone ? (
-                <MobileLogicInput
-                  value={argumentLine}
-                  onChange={handleArgumentChange}
-                  onBlur={handleArgumentBlur}
-                  placeholder={`e.g. A ${symbols.conditional} B / A // B`}
-                  aria-label="Argument line"
-                  includeQuantifiers
-                  symbolizationKey={argumentKeyboardConfig.symbolizationKey}
-                  extraInsertButtons={[{ insert: '/' }, { insert: '//' }]}
-                  predicateLetters={argumentKeyboardConfig.isPredicateMode ? argumentKeyboardConfig.predicateLetters : undefined}
-                  constantLetters={argumentKeyboardConfig.isPredicateMode ? argumentKeyboardConfig.constantLetters : undefined}
-                  variableLetters={argumentKeyboardConfig.isPredicateMode ? argumentKeyboardConfig.variableLetters : undefined}
-                  logicSystem={logicSystem}
-                />
-              ) : (
-                <>
-                  <FormulaInputField
-                    value={argumentLine}
-                    onValueChange={handleArgumentChange}
-                    onBlur={handleArgumentBlur}
-                    formulaInputRef={inputRef}
-                    notation={notation}
-                  />
-                  <Box sx={{ mt: 1 }}>
-                    <SymbolButtonRow
-                      inputRef={inputRef}
-                      onValueChange={handleArgumentChange}
-                      logicSystem={logicSystem}
-                    />
-                  </Box>
-                </>
-              )}
-            </Box>
-
-            {parseStatus.ok && derivationProps && (!fullScreenOpen || !isPhone) && (
-              <DerivationTable
-                key={argumentLine}
-                {...derivationProps}
-                isFullScreen={false}
-              />
-            )}
-          </Stack>
-        </ProblemFrame>
-
-        {!parseStatus.ok && parseStatus.reason && (
-          <Alert severity="info">{parseStatus.reason}</Alert>
-        )}
-
-        {isTerminalStatus(status) && (
-          <StatusBanner
-            status={status}
-            message={message}
-            onClose={() => setMessage('')}
+      <ProblemFrame
+        expandForContent
+        problemLabel={problemLabel}
+        prompt={promptText}
+        promptSx={{ whiteSpace: 'pre-line' }}
+        isInstructorView={isInstructorView && Boolean(proof)}
+        onEditQuestion={openEdit}
+        status={status}
+        message={message}
+        onCloseStatus={() => setMessage('')}
+        actionNode={
+          <ProblemSetButtons
+            onCheck={handleCheck}
+            onStartOver={handleStartOver}
+            isChecking={isChecking}
+            isDisabled={!parseStatus.ok || isLocked || isAssignmentLocked || !hasStartedDerivationLine}
+            align="flex-start"
+            attemptCount={attemptCount}
+            attemptLimit={maxAttempts}
+            isInstructorView={isInstructorView}
           />
-        )}
+        }
+        editorNode={isInstructorView && proof ? (
+          <InstructorQuestionEditor ref={editorRef} proof={proof} isInstructorView onSaved={onQuestionSaved} trigger="none" logicSystem={logicSystem} />
+        ) : null}
+      >
+        <Stack spacing={3}>
+          <Typography variant="body2" color="text.secondary">
+            Enter the argument as a single line, then build a derivation for it.
+          </Typography>
+          <Box>
+            <Typography variant="body2" sx={{ mb: 1, fontWeight: 600 }}>
+              Argument line
+            </Typography>
+            <Typography variant="body2" sx={{ mb: 1, color: 'text.secondary', fontSize: '0.875rem' }}>
+              Use "/" for separate premises and "//" for the conclusion. Example: A {symbols.conditional} B / A // B.
+            </Typography>
+            {isPhone ? (
+              <MobileLogicInput
+                value={argumentLine}
+                onChange={handleArgumentChange}
+                onBlur={handleArgumentBlur}
+                placeholder={`e.g. A ${symbols.conditional} B / A // B`}
+                aria-label="Argument line"
+                includeQuantifiers
+                symbolizationKey={argumentKeyboardConfig.symbolizationKey}
+                extraInsertButtons={[{ insert: '/' }, { insert: '//' }]}
+                predicateLetters={argumentKeyboardConfig.isPredicateMode ? argumentKeyboardConfig.predicateLetters : undefined}
+                constantLetters={argumentKeyboardConfig.isPredicateMode ? argumentKeyboardConfig.constantLetters : undefined}
+                variableLetters={argumentKeyboardConfig.isPredicateMode ? argumentKeyboardConfig.variableLetters : undefined}
+                logicSystem={logicSystem}
+              />
+            ) : (
+              <>
+                <FormulaInputField
+                  value={argumentLine}
+                  onValueChange={handleArgumentChange}
+                  onBlur={handleArgumentBlur}
+                  formulaInputRef={inputRef}
+                  notation={notation}
+                />
+                <Box sx={{ mt: 1 }}>
+                  <SymbolButtonRow
+                    inputRef={inputRef}
+                    onValueChange={handleArgumentChange}
+                    logicSystem={logicSystem}
+                  />
+                </Box>
+              </>
+            )}
+          </Box>
 
+          {!parseStatus.ok && parseStatus.reason && (
+            <Alert severity="info">{parseStatus.reason}</Alert>
+          )}
+
+          {parseStatus.ok && derivationProps && (!fullScreenOpen || !isPhone) && (
+            <DerivationTable
+              key={argumentLine}
+              {...derivationProps}
+              isFullScreen={false}
+            />
+          )}
+        </Stack>
         <SolutionReveal show={showSolution}>
           <Typography variant="body2" sx={{ mb: 1, fontWeight: 600 }}>
             Argument line
@@ -582,21 +588,7 @@ export default function ComboTranslationDerivation({
             {answerArgumentLine}
           </Typography>
         </SolutionReveal>
-
-        <ProblemSetButtons
-          onCheck={handleCheck}
-          onStartOver={handleStartOver}
-          isChecking={isChecking}
-          isDisabled={!parseStatus.ok || isLocked || isAssignmentLocked || !hasStartedDerivationLine}
-          align="flex-start"
-          attemptCount={attemptCount}
-          attemptLimit={maxAttempts}
-          isInstructorView={isInstructorView}
-        />
-        {isInstructorView && proof && (
-          <InstructorQuestionEditor ref={editorRef} proof={proof} isInstructorView onSaved={onQuestionSaved} trigger="none" logicSystem={logicSystem} />
-        )}
-      </Stack>
+      </ProblemFrame>
     </>
   )
 }
