@@ -66,6 +66,7 @@ import {
   FITCH_LINE_WIDTH,
   RULE_INPUT_MODE_KEY,
   applyInsertion,
+  arrowShortcutBeforeCaret,
   getDerivationScoreLabel,
   getFitchLineColor,
   getQuantifierButtonsFromFormulas,
@@ -840,9 +841,8 @@ export default function DerivationTable({
       return
     }
     if (!hasModifier && (key === '>' || key === '→' || key === '⇒' || key === '⊃')) {
-      const hyphenMatch = value.slice(0, start).match(/-+$/)
-      const replaceBefore = hyphenMatch ? hyphenMatch[0].length : 0
-      insertSymbol(symbols.conditional, replaceBefore)
+      const { connective, replaceBefore } = arrowShortcutBeforeCaret(value.slice(0, start))
+      insertSymbol(symbols[connective], replaceBefore)
       return
     }
     if (!hasModifier && key === '=' && start > 0 && value[start - 1] === '=') {
