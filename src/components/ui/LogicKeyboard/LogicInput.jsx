@@ -36,6 +36,8 @@ export default function LogicInput({
   const [isFocused, setIsFocused] = useState(false)
   const [cursorAnnouncement, setCursorAnnouncement] = useState('')
   const lastAnnouncedCursorRef = useRef(-1)
+  const containerRef = useRef(null)
+  const caretRef = useRef(null)
 
   const isControlledCursor = controlledCursor !== undefined
   const cursorPosition = isControlledCursor ? controlledCursor : internalCursor
@@ -73,6 +75,20 @@ export default function LogicInput({
     const pos = clampedCursor
     setCursorAnnouncement(total === 0 ? 'Empty. Position 0.' : `Position ${pos} of ${total}.`)
   }, [isFocused, clampedCursor, len])
+
+  // fields that scroll sideways instead of wrapping follow the caret
+  useEffect(() => {
+    const container = containerRef.current
+    const caret = caretRef.current
+    if (!isFocused || !container || !caret) return
+    const box = container.getBoundingClientRect()
+    const mark = caret.getBoundingClientRect()
+    if (mark.left < box.left) {
+      container.scrollLeft -= box.left - mark.left
+    } else if (mark.right > box.right) {
+      container.scrollLeft += mark.right - box.right
+    }
+  }, [isFocused, clampedCursor, value])
 
   const handleContainerClick = useCallback(
     (e) => {
@@ -173,6 +189,7 @@ export default function LogicInput({
 
   return (
     <Box
+      ref={containerRef}
       role="textbox"
       aria-label={ariaLabel}
       aria-multiline={false}
@@ -226,6 +243,7 @@ export default function LogicInput({
         <Box key={i} component="span" sx={{ display: 'contents' }}>
           {i === clampedCursor && isFocused ? (
             <Box
+              ref={caretRef}
               component="span"
               aria-hidden
               sx={{
