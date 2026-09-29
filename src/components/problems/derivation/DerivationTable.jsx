@@ -15,6 +15,7 @@ import { alpha } from '@mui/material/styles'
 import PromptText from '../../ui/PromptText.jsx'
 import ProblemSetButtons from '../mui/frame/ProblemSetButtons.jsx'
 import { useMobileLogicKeyboardEnabled } from '../../ui/LogicKeyboard/index.js'
+import FormulaInput from '../../ui/logic-engine/formula-input.js'
 import { getDerivationCheckerForLogicSystem } from '@logic-app/logic-engine/checkers/derivation-by-logic-system.js'
 import { canonicalizeFormula } from '@logic-app/logic-engine/symbolic/formula.js'
 import getSyntax from '@logic-app/logic-engine/symbolic/libsyntax.js'
@@ -65,8 +66,6 @@ import {
   DERIVATION_PROMPT_FONT_SIZE,
   FITCH_LINE_WIDTH,
   RULE_INPUT_MODE_KEY,
-  applyInsertion,
-  arrowShortcutBeforeCaret,
   getDerivationScoreLabel,
   getFitchLineColor,
   getQuantifierButtonsFromFormulas,
@@ -475,6 +474,11 @@ export default function DerivationTable({
     const normalized = inputType.startsWith('delete')
       ? raw
       : normalizeFormulaForDisplay(raw)
+    setFormulaText(index, el, raw, normalized)
+  }
+
+  // keeps the caret after the same text once display normalization pads the formula
+  const setFormulaText = (index, el, raw, normalized) => {
     handleLineChange(index, 'formula', normalized)
     if (normalized === raw || typeof el?.selectionStart !== 'number') return
     const nextCursor = normalizeFormulaForDisplay(raw.slice(0, el.selectionStart)).length
@@ -805,62 +809,14 @@ export default function DerivationTable({
       }
       return
     }
-    const key = event.key
+    // typed symbol shortcuts come from the same handler as every other formula field
+    if (event.key.length !== 1) return
     const value = el.value ?? ''
-    const stored = getStoredSelection(index, value.length)
-    const start = typeof el.selectionStart === 'number' ? el.selectionStart : stored.start
-    const end = typeof el.selectionEnd === 'number' ? el.selectionEnd : stored.end
-    const hasModifier = event.ctrlKey || event.metaKey || event.altKey
-
-    const insertSymbol = (symbol, replaceBefore = 0) => {
-      event.preventDefault()
-      const caret = start
-      if (typeof el.setRangeText === 'function') {
-        const replaceStart = Math.max(0, start - replaceBefore)
-        const replaceEnd = end
-        el.setRangeText(symbol, replaceStart, replaceEnd, 'end')
-        const nextValue = el.value ?? ''
-        handleLineChange(index, 'formula', nextValue)
-        const nextCursor = Math.max(0, caret - replaceBefore) + symbol.length
-        setStoredSelection(index, nextCursor)
-        setTimeout(() => el.setSelectionRange(nextCursor, nextCursor), 0)
-        return
-      }
-      const { nextValue, nextCursor } = applyInsertion(value, start, end, symbol, replaceBefore)
-      handleLineChange(index, 'formula', nextValue)
-      setStoredSelection(index, nextCursor)
-      setTimeout(() => el.setSelectionRange(nextCursor, nextCursor), 0)
-    }
-
-    if (!hasModifier && (key === '&' || key === '^' || key === '.' || key === '*' || key === '•' || key === '·' || key === '∧')) {
-      insertSymbol(symbols.and)
-      return
-    }
-    if (!hasModifier && (key === 'v' || key === '∨')) {
-      insertSymbol('∨')
-      return
-    }
-    if (!hasModifier && (key === '>' || key === '→' || key === '⇒' || key === '⊃')) {
-      const { connective, replaceBefore } = arrowShortcutBeforeCaret(value.slice(0, start))
-      insertSymbol(symbols[connective], replaceBefore)
-      return
-    }
-    if (!hasModifier && key === '=' && start > 0 && value[start - 1] === '=') {
-      insertSymbol(symbols.biconditional, 1)
-      return
-    }
-    if (!hasModifier && (key === 'l' || key === 'L')) {
-      const textWithKey = value.slice(0, start) + key.toLowerCase()
-      if (/all$/i.test(textWithKey)) {
-        insertSymbol('∀', 2) // replace only 'al' so ~all → ~∀
-      }
-      return
-    }
-    if (!hasModifier && (key === 'e' || key === 'E')) {
-      const textWithKey = value.slice(0, start) + key.toLowerCase()
-      if (/some$/i.test(textWithKey)) {
-        insertSymbol('∃', 3) // replace only 'som' so ~some → ~∃
-      }
+    FormulaInput.attach(el, notation)
+    FormulaInput.keydown.call(el, event)
+    // a handled shortcut edits the field without an input event so sync it here
+    if (event.defaultPrevented && (el.value ?? '') !== value) {
+      setFormulaText(index, el, el.value, normalizeFormulaForDisplay(el.value))
     }
   }
 

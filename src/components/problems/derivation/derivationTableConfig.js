@@ -89,30 +89,6 @@ export const getSymbolButtons = (symbols, syntax) => [
   { label: '[  ]', pair: '[]' },
 ]
 
-/*
-picks the connective for a typed > and how much of the ascii arrow before it to replace
-shafts match the engine's ascii arrows so <=> and => land like <-> and ->
-*/
-export function arrowShortcutBeforeCaret(textBeforeCaret) {
-  const text = String(textBeforeCaret ?? '')
-  const biconditional = text.match(/<(?:[-–]*|=)$/)
-  if (biconditional) {
-    return { connective: 'biconditional', replaceBefore: biconditional[0].length }
-  }
-  const shaft = text.match(/(?:[-–]*|=)$/)
-  return { connective: 'conditional', replaceBefore: shaft[0].length }
-}
-
-export function applyInsertion(value, selectionStart, selectionEnd, insertText, replaceBefore = 0) {
-  const start = selectionStart ?? value.length
-  const end = selectionEnd ?? start
-  const before = value.slice(0, Math.max(0, start - replaceBefore))
-  return {
-    nextValue: before + insertText + value.slice(end),
-    nextCursor: before.length + insertText.length,
-  }
-}
-
 export function getDerivationScoreLabel({
   attemptCount,
   attemptLimit,

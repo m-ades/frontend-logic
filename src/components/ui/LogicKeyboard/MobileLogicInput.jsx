@@ -364,14 +364,8 @@ export default function MobileLogicInput({
     const setDesktopInputRef = (node) => {
       desktopInputRef.current = node
       if (node) {
-        node.syntax = syntax
-        node.notation = notation
-        node.symbols = symbols
+        FormulaInput.attach(node, notation)
         node.symbolcat = symbolcat
-        node.inputfix = FormulaInput.formatForDisplay
-        node.autoChange = FormulaInput.autoChange
-        node.insertHere = FormulaInput.insertHere
-        node.insOp = FormulaInput.insOp
         node.enterHook = (event) => {
           flushSync(() => syncDesktopValue(node.value ?? ''))
           onEnterKey?.(event)
