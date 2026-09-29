@@ -17,6 +17,11 @@ export function getExpectedArgument(source) {
   return !expected.error && expected.premises.length > 0 && expected.conclusion ? expected : null
 }
 
+// the engine marks bad formulas with wellformed instead of throwing
+export function isWellformedArgument({ premises, conclusion }, Formula) {
+  return [...premises, conclusion].every((text) => Formula.from(text).wellformed)
+}
+
 export function formatArgumentLine({ premises, conclusion }) {
   return `${premises.join(' / ')} // ${conclusion}`
 }

@@ -1,8 +1,10 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
+import getFormulaClass from '@logic-app/logic-engine/symbolic/formula.js'
 import {
   formatArgumentLine,
   getExpectedArgument,
+  isWellformedArgument,
 } from '../src/components/problems/mui/translation/argumentAnswer.js'
 
 const expected = { premises: ['P', 'Q'], conclusion: 'R' }
@@ -21,4 +23,11 @@ test('rejects incomplete arguments', () => {
 
 test('formats an argument as a single line', () => {
   assert.equal(formatArgumentLine(expected), 'P / Q // R')
+})
+
+test('flags an argument with a malformed formula', () => {
+  const Formula = getFormulaClass('hurley')
+  assert.equal(isWellformedArgument({ premises: ['P > Q', 'P'], conclusion: 'Q' }, Formula), true)
+  assert.equal(isWellformedArgument({ premises: ['P >', 'P'], conclusion: 'Q' }, Formula), false)
+  assert.equal(isWellformedArgument({ premises: ['P'], conclusion: 'Q (' }, Formula), false)
 })

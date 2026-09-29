@@ -19,7 +19,7 @@ import {
   normalizeIndexedSymbols,
 } from '../../../../lib/indexedSymbols.js'
 import { parseSymbolizationKeyFromPrompt } from './symbolizationKeyboard.js'
-import { formatArgumentLine, getExpectedArgument } from './argumentAnswer.js'
+import { formatArgumentLine, getExpectedArgument, isWellformedArgument } from './argumentAnswer.js'
 
 export default function ComboTranslationTruthTable({
   proof,
@@ -91,13 +91,10 @@ export default function ComboTranslationTruthTable({
     if (parsed.error) {
       return { ok: false, reason: parsed.error, parsed: null }
     }
-    try {
-      parsed.premises.forEach((premise) => Formula.from(premise))
-      Formula.from(parsed.conclusion)
-      return { ok: true, reason: '', parsed }
-    } catch {
+    if (!isWellformedArgument(parsed, Formula)) {
       return { ok: false, reason: 'Fix the argument line before building the table.', parsed: null }
     }
+    return { ok: true, reason: '', parsed }
   }, [Formula, argumentLine])
 
   const tableProof = useMemo(() => {

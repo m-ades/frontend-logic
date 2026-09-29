@@ -25,7 +25,12 @@ import {
   parseSymbolizationKeyFromPrompt,
   promptImpliesPredicateLogic,
 } from './symbolizationKeyboard.js'
-import { formatArgumentLine, getExpectedArgument, unwrapAnswer } from './argumentAnswer.js'
+import {
+  formatArgumentLine,
+  getExpectedArgument,
+  isWellformedArgument,
+  unwrapAnswer,
+} from './argumentAnswer.js'
 
 function getAnswerFormulas(source) {
   const expected = getExpectedArgument(source)
@@ -194,16 +199,10 @@ export default function ComboTranslationDerivation({
     if (parsed.error) {
       return { ok: false, reason: parsed.error, parsed: null }
     }
-    try {
-      const formulas = parsed.premises.map((premise) => Formula.from(premise))
-      formulas.push(Formula.from(parsed.conclusion))
-      if (formulas.some((formula) => !formula.wellformed)) {
-        return { ok: false, reason: 'Fix the argument line before starting the derivation.', parsed: null }
-      }
-      return { ok: true, reason: '', parsed }
-    } catch {
+    if (!isWellformedArgument(parsed, Formula)) {
       return { ok: false, reason: 'Fix the argument line before starting the derivation.', parsed: null }
     }
+    return { ok: true, reason: '', parsed }
   }, [Formula, argumentLine])
 
   const argumentKeyboardConfig = useMemo(
