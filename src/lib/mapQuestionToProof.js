@@ -5,7 +5,7 @@ import {
   normalizeLogicSystem,
 } from './logicSystems.js'
 
-import { getCompositeSubquestions, isMultiSelectSubquestion } from '@logic-app/logic-engine/multiple-choice-utils.js'
+import { getCompositeSubquestions, getStandaloneAnswerKey, isMultiSelectSubquestion } from '@logic-app/logic-engine/multiple-choice-utils.js'
 
 export const normalizeType = (snapshot) => (
   snapshot?.type || snapshot?.problemType || snapshot?.logic_problem_type || 'derivation'
@@ -160,7 +160,7 @@ export const mapQuestionToProof = (question, assignment, index, logicSystem = DE
       ...proofBase,
       type: 'multiple-choice',
       multipleChoice: normalizedMultipleChoice,
-      answer: hasSubquestions ? null : (snapshot.answerIndices ?? snapshot.answerIndex ?? snapshot.answer),
+      answer: hasSubquestions ? null : getStandaloneAnswerKey(snapshot),
     }
   }
 
