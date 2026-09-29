@@ -22,6 +22,7 @@ for (const logicSystem of ['hurley', 'fitch']) {
     assert.equal(pressGreaterThan('P<–', logicSystem), `P${biconditional}`)
     assert.equal(pressGreaterThan('P<', logicSystem), `P${biconditional}`)
     assert.equal(pressGreaterThan('~(P<-', logicSystem), `~(P${biconditional}`)
+    assert.equal(pressGreaterThan('P<=', logicSystem), `P${biconditional}`)
   })
 
   test(`${logicSystem} keeps -> and --> as a conditional`, () => {
@@ -30,10 +31,13 @@ for (const logicSystem of ['hurley', 'fitch']) {
     assert.equal(pressGreaterThan('P–', logicSystem), `P${conditional}`)
     assert.equal(pressGreaterThan('P', logicSystem), `P${conditional}`)
     assert.equal(pressGreaterThan('', logicSystem), conditional)
+    assert.equal(pressGreaterThan('P=', logicSystem), `P${conditional}`)
   })
 
   test(`${logicSystem} only consumes an arrow that touches the caret`, () => {
     assert.equal(pressGreaterThan('P<Q-', logicSystem), `P<Q${conditional}`)
     assert.equal(pressGreaterThan('(P<-Q) ', logicSystem), `(P<-Q) ${conditional}`)
+    assert.equal(pressGreaterThan('a=b', logicSystem), `a=b${conditional}`)
+    assert.equal(pressGreaterThan('P-=', logicSystem), `P-${conditional}`)
   })
 }

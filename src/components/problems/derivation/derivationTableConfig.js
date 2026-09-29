@@ -89,14 +89,18 @@ export const getSymbolButtons = (symbols, syntax) => [
   { label: '[  ]', pair: '[]' },
 ]
 
-// picks the connective for a typed > and how much of the ascii arrow before it to replace
+/*
+picks the connective for a typed > and how much of the ascii arrow before it to replace
+shafts match the engine's ascii arrows so <=> and => land like <-> and ->
+*/
 export function arrowShortcutBeforeCaret(textBeforeCaret) {
-  const biconditional = String(textBeforeCaret ?? '').match(/<[-–]*$/)
+  const text = String(textBeforeCaret ?? '')
+  const biconditional = text.match(/<(?:[-–]*|=)$/)
   if (biconditional) {
     return { connective: 'biconditional', replaceBefore: biconditional[0].length }
   }
-  const hyphens = String(textBeforeCaret ?? '').match(/[-–]*$/)
-  return { connective: 'conditional', replaceBefore: hyphens[0].length }
+  const shaft = text.match(/(?:[-–]*|=)$/)
+  return { connective: 'conditional', replaceBefore: shaft[0].length }
 }
 
 export function applyInsertion(value, selectionStart, selectionEnd, insertText, replaceBefore = 0) {
