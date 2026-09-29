@@ -32,6 +32,9 @@ test('picks the connective and how much ascii arrow a typed > replaces', () => {
   assert.deepEqual(arrowShortcutBeforeCaret('P<–'), { op: 'IFF', replaceBefore: 2 })
   assert.deepEqual(arrowShortcutBeforeCaret('P<='), { op: 'IFF', replaceBefore: 2 })
   assert.deepEqual(arrowShortcutBeforeCaret('P<'), { op: 'IFF', replaceBefore: 1 })
+  // derivation lines pad = like identity as it is typed
+  assert.deepEqual(arrowShortcutBeforeCaret('P< = '), { op: 'IFF', replaceBefore: 4 })
+  assert.deepEqual(arrowShortcutBeforeCaret('P = '), { op: 'IFTHEN', replaceBefore: 2 })
   assert.deepEqual(arrowShortcutBeforeCaret('P--'), { op: 'IFTHEN', replaceBefore: 2 })
   assert.deepEqual(arrowShortcutBeforeCaret('P='), { op: 'IFTHEN', replaceBefore: 1 })
   assert.deepEqual(arrowShortcutBeforeCaret('P-='), { op: 'IFTHEN', replaceBefore: 1 })
@@ -43,14 +46,14 @@ for (const notation of ['calgary', 'hurley']) {
   const { IFF, IFTHEN, NOT, AND } = FormulaInput.attach({}, notation).symbols
 
   test(`${notation} turns every ascii biconditional into one connective`, () => {
-    for (const typed of ['P<-', 'P<--', 'P<–', 'P<=', 'P<', 'P <-']) {
+    for (const typed of ['P<-', 'P<--', 'P<–', 'P<=', 'P< = ', 'P<', 'P <-']) {
       assert.equal(press(typed, '>', notation).value, `P ${IFF} `, typed)
     }
     assert.equal(press('~(P<-', '>', notation).value, `~(P ${IFF} `)
   })
 
   test(`${notation} turns every ascii conditional into one connective`, () => {
-    for (const typed of ['P-', 'P--', 'P–', 'P=', 'P']) {
+    for (const typed of ['P-', 'P--', 'P–', 'P=', 'P = ', 'P']) {
       assert.equal(press(typed, '>', notation).value, `P ${IFTHEN} `, typed)
     }
     assert.equal(press('', '>', notation).value, ` ${IFTHEN} `)

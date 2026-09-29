@@ -14,14 +14,15 @@ import { displayIndexedSymbolsForNotation } from '../../../lib/indexedSymbols.js
 /*
 picks the connective for a typed > and how much ascii arrow before the caret it replaces
 shafts match the engine's ascii arrows so <=> and => land like <-> and ->
+an = may already be padded like identity since fields that prettify as you type space it out
 */
 export function arrowShortcutBeforeCaret(textBeforeCaret) {
     const text = String(textBeforeCaret ?? '');
-    const biconditional = text.match(/<(?:[-–]*|=)$/);
+    const biconditional = text.match(/<(?:[-–]*|\s*=\s*)$/);
     if (biconditional) {
         return { op: 'IFF', replaceBefore: biconditional[0].length };
     }
-    const shaft = text.match(/(?:[-–]*|=)$/);
+    const shaft = text.match(/(?:[-–]*|=\s*)$/);
     return { op: 'IFTHEN', replaceBefore: shaft[0].length };
 }
 
