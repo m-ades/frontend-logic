@@ -135,14 +135,13 @@ export function parseSymbolizationKeyFromPrompt(promptText, allowIndexedSymbols 
     .replace(/<[^>]+>/g, ' ')
     .replace(/&nbsp;/gi, ' ')
   const keyMatch = text.match(/symbolization key\s*:?\s*([\s\S]*)/i)
-  if (!keyMatch) return []
-  if (!allowIndexedSymbols) {
-    return Array.from(keyMatch[1].matchAll(/\b[A-Za-z]+\s*[=:]/g))
-      .map((match) => match[0])
-  }
-  return Array.from(
-    keyMatch[1].matchAll(
-      /\b[A-Za-z](?:_[1-9][0-9]*|[₁-₉][₀-₉]*)?(?:\([^)]*\))?\s*[=:]/g
-    )
-  ).map((match) => normalizeIndexedSymbols(match[0]))
+  const symbol = allowIndexedSymbols
+    ? String.raw`[A-Za-z](?:_[1-9][0-9]*|[₁-₉][₀-₉]*)?(?:\([^)]*\))?`
+    : '[A-Za-z]+'
+  // without a key heading only whole "X = ..." lines count as entries
+  const pattern = keyMatch
+    ? new RegExp(String.raw`\b${symbol}\s*[=:]`, 'g')
+    : new RegExp(String.raw`^\s*${symbol}\s*=`, 'gm')
+  const entries = Array.from((keyMatch ? keyMatch[1] : text).matchAll(pattern), (match) => match[0].trim())
+  return allowIndexedSymbols ? entries.map(normalizeIndexedSymbols) : entries
 }

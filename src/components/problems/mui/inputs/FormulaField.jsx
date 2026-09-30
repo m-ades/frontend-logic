@@ -9,6 +9,7 @@ import { getNotation } from '../../../../lib/logicSystems.js'
 const FormulaField = forwardRef(function FormulaField({
   value,
   onValueChange,
+  onBlur,
   readOnly = false,
   onEnterKey,
   placeholder = '',
@@ -38,6 +39,7 @@ const FormulaField = forwardRef(function FormulaField({
       <MobileLogicInput
         value={value}
         onChange={(nextValue) => onValueChange?.(nextValue)}
+        onBlur={onBlur}
         disabled={readOnly}
         inputRef={ref}
         placeholder={placeholder}
@@ -58,7 +60,12 @@ const FormulaField = forwardRef(function FormulaField({
     <TextField
       fullWidth
       value={value}
-      onChange={(event) => onValueChange?.(event.target.value)}
+      onChange={(event) => {
+        // shows indexed symbols as subscripts while typing
+        FormulaInput.input.call(event.target)
+        onValueChange?.(event.target.value)
+      }}
+      onBlur={onBlur}
       onKeyDown={(event) => {
         if (readOnly) return
         if (event.key === 'Enter' && onEnterKey) {

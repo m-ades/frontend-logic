@@ -1,75 +1,25 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { Box, Stack, Typography, Tooltip } from '@mui/material'
-import EditIcon from '@mui/icons-material/Edit'
+import { Box, Typography } from '@mui/material'
 import InstructorQuestionEditor from '../../InstructorQuestionEditor.jsx'
-import StatusBanner, { isTerminalStatus } from '../../../ui/StatusBanner.jsx'
+import SolutionReveal from '../../SolutionReveal.jsx'
 import { useTheme, useMediaQuery } from '@mui/material'
 import getSyntax from '@logic-app/logic-engine/symbolic/libsyntax.js'
-import { DEFAULT_QUESTION_CARD_MIN_HEIGHT } from '../frame/ProblemFrame.jsx'
+import ProblemFrame from '../frame/ProblemFrame.jsx'
 import ProblemSetButtons from '../frame/ProblemSetButtons.jsx'
-import FormulaInput from '../../../ui/logic-engine/formula-input.js'
+import FormulaField from '../inputs/FormulaField.jsx'
 import SymbolButtonRow from '../../../ui/logic-engine/SymbolButtonRow.jsx'
-import { MobileLogicInput } from '../../../ui/LogicKeyboard/index.js'
 import TruthTableEditor from '../../truth-table/TruthTableEditor.jsx'
 import { buildTruthTableSubmissionData } from '../../truth-table/truthTableUi.js'
 import getFormulaClass from '@logic-app/logic-engine/symbolic/formula.js'
+import { parseArgumentLine } from '@logic-app/logic-engine/argumentLine.js'
 import { useProblemChecker } from '../../../../hooks/useProblemChecker.js'
-import PromptText from '../../../ui/PromptText.jsx'
 import { getNotation, getSymbols } from '../../../../lib/logicSystems.js'
-import { normalizeIndexedSymbols } from '../../../../lib/indexedSymbols.js'
-
-/** Extract symbolization key lines from prompt text (e.g. "E = ...\\nL = ..."). Used for mobile keyboard variable letters. */
-function parseSymbolizationKeyFromPrompt(promptText) {
-  if (!promptText || typeof promptText !== 'string') return []
-  return promptText
-    .split(/\r?\n/)
-    .map((line) => line.trim())
-    .filter((line) => /^[A-Za-z]+\s*=/.test(line))
-}
-
-const parseArgumentLine = (line) => {
-  if (!line || typeof line !== 'string') {
-    return { error: 'Enter the argument as a single line.' }
-  }
-  const parts = line.split('//')
-  if (parts.length !== 2) {
-    return { error: 'Use "//" to separate premises from the conclusion.' }
-  }
-  const premisesPart = parts[0].trim()
-  const conclusion = parts[1].trim()
-  if (!premisesPart) {
-    return { error: 'Enter at least one premise before "//".' }
-  }
-  if (!conclusion) {
-    return { error: 'Enter a conclusion after "//".' }
-  }
-  const premises = premisesPart
-    .split('/')
-    .map((premise) => premise.trim())
-    .filter(Boolean)
-  if (premises.length === 0) {
-    return { error: 'Enter at least one premise before "//".' }
-  }
-  return { premises, conclusion }
-}
-
-// Resolve expected argument (premises + conclusion) from snapshot/answer for solution reveal
-function resolveExpectedAnswer(answer) {
-  if (!answer) return null
-  if (answer.argument || answer.argumentLine) {
-    const parsed = parseArgumentLine(answer.argument ?? answer.argumentLine)
-    return parsed.error ? null : parsed
-  }
-  if (Array.isArray(answer.premises) && answer.conclusion != null) {
-    return { premises: answer.premises, conclusion: answer.conclusion }
-  }
-  if (Array.isArray(answer.translations) && Number.isInteger(answer.index)) {
-    const conclusion = answer.translations[answer.index] ?? ''
-    const premises = answer.translations.filter((_, idx) => idx !== answer.index)
-    return premises.length && conclusion ? { premises, conclusion } : null
-  }
-  return null
-}
+import {
+  displayIndexedSymbolsForNotation,
+  normalizeIndexedSymbols,
+} from '../../../../lib/indexedSymbols.js'
+import { parseSymbolizationKeyFromPrompt } from './symbolizationKeyboard.js'
+import { formatArgumentLine, getExpectedArgument, isWellformedArgument } from './argumentAnswer.js'
 
 export default function ComboTranslationTruthTable({
   proof,
@@ -81,6 +31,7 @@ export default function ComboTranslationTruthTable({
   isAssignmentLocked = false,
   isInstructorView = false,
   onQuestionSaved,
+  problemLabel,
   logicSystem,
 }) {
   const theme = useTheme()
@@ -95,60 +46,21 @@ export default function ComboTranslationTruthTable({
   const snapshot = proof?.comboTranslationTruthTable || proof?.snapshot || {}
   const promptText = snapshot?.prompt || proof?.description || ''
   const symbolizationKey = useMemo(
-    () => parseSymbolizationKeyFromPrompt(promptText),
-    [promptText]
+    () => parseSymbolizationKeyFromPrompt(promptText, allowIndexedSymbols),
+    [allowIndexedSymbols, promptText]
   )
-  const [argumentLine, setArgumentLine] = useState(savedState?.argumentLine ?? '')
+  // saved lines come back with ascii indices so show them in display form
+  const [argumentLine, setArgumentLine] = useState(
+    () => displayIndexedSymbolsForNotation(savedState?.argumentLine ?? '', notation)
+  )
   const [tableState, setTableState] = useState(savedState?.tableState ?? null)
   const inputRef = useRef(null)
-  const inputContainerRef = useRef(null)
-
-  useEffect(() => {
-    if (isPhone) return
-    const container = inputContainerRef.current
-    if (!container) return
-    const inp = FormulaInput.getnew({ notation })
-    inputRef.current = inp
-    Object.assign(inp.style, {
-      width: '100%',
-      padding: theme.spacing(1.5),
-      border: `1px solid ${theme.palette.divider}`,
-      borderRadius: theme.shape.borderRadius,
-      fontSize: '1rem',
-      fontFamily: 'var(--app-font-mono)',
-      backgroundColor: theme.palette.background.paper,
-      color: theme.palette.text.primary,
-    })
-    container.appendChild(inp)
-    inp.value = inp.inputfix(argumentLine ?? '')
-    const onInput = () => {
-      setArgumentLine(inp.value)
-      setTableState(null)
-      updateState({ argumentLine: inp.value, tableState: null })
-    }
-    inp.addEventListener('input', onInput)
-    inp.addEventListener('change', onInput)
-    return () => {
-      inp.removeEventListener('input', onInput)
-      inp.removeEventListener('change', onInput)
-      if (inp.parentNode) inp.parentNode.removeChild(inp)
-      inputRef.current = null
-    }
-  }, [theme, isPhone, notation])
-
-  useEffect(() => {
-    if (isPhone) return
-    const inp = inputRef.current
-    if (!inp || argumentLine === undefined || inp.value === argumentLine) return
-    if (document.activeElement === inp) return
-    inp.value = inp.inputfix(argumentLine)
-  }, [argumentLine, isPhone])
 
   useEffect(() => {
     if (savedState?.argumentLine !== undefined) {
-      setArgumentLine(savedState.argumentLine)
+      setArgumentLine(displayIndexedSymbolsForNotation(savedState.argumentLine, notation))
     }
-  }, [savedState?.argumentLine])
+  }, [notation, savedState?.argumentLine])
 
   const updateState = (updates) => {
     const state = { argumentLine, tableState, ...updates }
@@ -179,13 +91,10 @@ export default function ComboTranslationTruthTable({
     if (parsed.error) {
       return { ok: false, reason: parsed.error, parsed: null }
     }
-    try {
-      parsed.premises.forEach((premise) => Formula.from(premise))
-      Formula.from(parsed.conclusion)
-      return { ok: true, reason: '', parsed }
-    } catch {
+    if (!isWellformedArgument(parsed, Formula)) {
       return { ok: false, reason: 'Fix the argument line before building the table.', parsed: null }
     }
+    return { ok: true, reason: '', parsed }
   }, [Formula, argumentLine])
 
   const tableProof = useMemo(() => {
@@ -202,7 +111,7 @@ export default function ComboTranslationTruthTable({
   }, [parseStatus.ok, parseStatus.parsed, proof])
 
   const expectedAnswer = useMemo(
-    () => resolveExpectedAnswer(proof?.answer ?? snapshot?.answer),
+    () => getExpectedArgument(proof?.answer ?? snapshot?.answer),
     [proof?.answer, snapshot?.answer]
   )
   const answerProof = useMemo(() => {
@@ -243,7 +152,6 @@ export default function ComboTranslationTruthTable({
     resetInput: () => {
       setArgumentLine('')
       setTableState(null)
-      if (inputRef.current) inputRef.current.value = ''
       updateState({ argumentLine: '', tableState: null })
     },
     onStateChange: updateState,
@@ -263,9 +171,7 @@ export default function ComboTranslationTruthTable({
   const isLocked = problemChecker.isLocked
 
   const showSolution = attemptCount >= maxAttempts && status !== 'correct' && expectedAnswer != null
-  const answerArgumentLine = expectedAnswer
-    ? expectedAnswer.premises.join(' / ') + ' // ' + expectedAnswer.conclusion
-    : ''
+  const answerArgumentLine = expectedAnswer ? formatArgumentLine(expectedAnswer) : ''
 
   const handleArgumentChange = (value) => {
     setArgumentLine(value)
@@ -274,132 +180,101 @@ export default function ComboTranslationTruthTable({
   }
 
   return (
-    <Stack spacing={3} sx={{ px: 0, width: '100%' }}>
-      <Box className="logic-engine" sx={{ width: '100%' }}>
-        <Box className="logic-problem-card" sx={{ minHeight: DEFAULT_QUESTION_CARD_MIN_HEIGHT }}>
-          <Stack spacing={3} sx={{ p: { xs: 2, md: 2 } }}>
-            {isInstructorView && proof && (
-              <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-                <Tooltip title="Edit prompt">
-                  <Box component="span" onClick={openEdit} role="button" aria-label="Edit question" sx={{ display: 'inline-flex', alignItems: 'center', cursor: 'pointer', color: 'text.secondary', '&:hover': { opacity: 0.8 } }}>
-                    <EditIcon fontSize="small" />
-                  </Box>
-                </Tooltip>
-              </Box>
-            )}
-            {promptText && (
-              <PromptText content={promptText} sx={{ whiteSpace: 'pre-line' }} />
-            )}
-            <Typography variant="body2" color="text.secondary">
-              Enter the argument as a single line, then complete the truth table and classify it.
-            </Typography>
-            <Box>
-              <Typography variant="body2" sx={{ mb: 1, fontWeight: 600 }}>
-                Argument line
-              </Typography>
-              {isPhone ? (
-                <MobileLogicInput
-                  value={argumentLine}
-                  onChange={handleArgumentChange}
-                  placeholder={`e.g. P ${symbols.conditional} Q / P // Q`}
-                  aria-label="Argument line"
-                  symbolizationKey={symbolizationKey}
-                  includeQuantifiers={false}
-                  extraInsertButtons={[{ insert: '/' }, { insert: '//' }]}
-                  logicSystem={logicSystem}
-                />
-              ) : (
-                <>
-                  <Box
-                    ref={inputContainerRef}
-                    sx={{ width: '100%', minHeight: 56, display: 'flex', alignItems: 'center' }}
-                  />
-                  <Box sx={{ mt: 1 }}>
-                    <SymbolButtonRow
-                      inputRef={inputRef}
-                      onValueChange={handleArgumentChange}
-                      includeQuantifiers={false}
-                      logicSystem={logicSystem}
-                    />
-                  </Box>
-                </>
-              )}
-            </Box>
-            {parseStatus.ok && tableProof && (
-              <TruthTableEditor
-                key={argumentLine}
-                proof={tableProof}
-                savedState={tableState}
-                onStateChange={(next) => {
-                  setTableState(next)
-                  updateState({ tableState: next })
-                }}
-                hideActions
-                suppressReveal={status === 'correct' || attemptCount < maxAttempts || showSolution}
-                embedded
-                parentStatus={status}
-                parentAttemptCount={attemptCount}
-                parentAttemptLimit={maxAttempts}
-              />
-            )}
-          </Stack>
-        </Box>
+    <ProblemFrame
+      expandForContent
+      problemLabel={problemLabel}
+      prompt={promptText}
+      promptSx={{ whiteSpace: 'pre-line' }}
+      isInstructorView={isInstructorView && Boolean(proof)}
+      onEditQuestion={openEdit}
+      status={status}
+      message={message}
+      onCloseStatus={() => setMessage('')}
+      actionNode={
+        <ProblemSetButtons
+          onCheck={handleCheck}
+          onStartOver={handleStartOver}
+          isChecking={isChecking}
+          isDisabled={
+            !parseStatus.ok ||
+            isLocked ||
+            isAssignmentLocked
+          }
+          align="flex-start"
+          attemptCount={attemptCount}
+          attemptLimit={maxAttempts}
+          isInstructorView={isInstructorView}
+        />
+      }
+      editorNode={isInstructorView && proof ? (
+        <InstructorQuestionEditor ref={editorRef} proof={proof} isInstructorView onSaved={onQuestionSaved} trigger="none" logicSystem={logicSystem} />
+      ) : null}
+    >
+      <Typography variant="body2" color="text.secondary">
+        Enter the argument as a single line, then complete the truth table and classify it.
+      </Typography>
+      <Box>
+        <Typography variant="body2" sx={{ mb: 1, fontWeight: 600 }}>
+          Argument line
+        </Typography>
+        <FormulaField
+          ref={inputRef}
+          value={argumentLine}
+          onValueChange={handleArgumentChange}
+          placeholder={`e.g. P ${symbols.conditional} Q / P // Q`}
+          aria-label="Argument line"
+          symbolizationKey={symbolizationKey}
+          includeQuantifiers={false}
+          extraInsertButtons={[{ insert: '/' }, { insert: '//' }]}
+          logicSystem={logicSystem}
+        />
+        {!isPhone && (
+          <Box sx={{ mt: 1 }}>
+            <SymbolButtonRow
+              inputRef={inputRef}
+              onValueChange={handleArgumentChange}
+              includeQuantifiers={false}
+              logicSystem={logicSystem}
+            />
+          </Box>
+        )}
       </Box>
-
-      {isTerminalStatus(status) && (
-        <StatusBanner
-          status={status}
-          message={message}
-          onClose={() => setMessage('')}
+      {parseStatus.ok && tableProof && (
+        <TruthTableEditor
+          key={argumentLine}
+          proof={tableProof}
+          savedState={tableState}
+          onStateChange={(next) => {
+            setTableState(next)
+            updateState({ tableState: next })
+          }}
+          hideActions
+          suppressReveal={status === 'correct' || attemptCount < maxAttempts || showSolution}
+          embedded
+          parentStatus={status}
+          parentAttemptCount={attemptCount}
+          parentAttemptLimit={maxAttempts}
         />
       )}
-
-      {showSolution && answerProof && (
-        <Box className="logic-engine" sx={{ width: '100%' }}>
-          <Box className="logic-problem-card" sx={{ borderColor: 'primary.main', borderWidth: 1, borderStyle: 'solid' }}>
-            <Stack spacing={2} sx={{ p: 2 }}>
-              <Typography variant="h6" component="h2" sx={{ fontWeight: 600, color: 'primary.main' }}>
-                Correct Answer
-              </Typography>
-              <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                Argument line
-              </Typography>
-              <Typography component="div" sx={{ fontFamily: 'var(--app-font-mono)', fontSize: '1rem' }}>
-                {answerArgumentLine}
-              </Typography>
-              <TruthTableEditor
-                proof={answerProof}
-                savedState={null}
-                hideActions
-                suppressReveal={false}
-                embedded
-                solutionOnly
-                parentStatus={status}
-                parentAttemptCount={attemptCount}
-                parentAttemptLimit={maxAttempts}
-              />
-            </Stack>
-          </Box>
-        </Box>
-      )}
-
-      <ProblemSetButtons
-        onCheck={handleCheck}
-        onStartOver={handleStartOver}
-        isChecking={isChecking}
-        isDisabled={
-          !parseStatus.ok ||
-          isLocked ||
-          isAssignmentLocked
-        }
-        align="flex-start"
-        attemptCount={attemptCount}
-        attemptLimit={maxAttempts}
-        isInstructorView={isInstructorView}
-      />
-      {isInstructorView && proof && (
-        <InstructorQuestionEditor ref={editorRef} proof={proof} isInstructorView onSaved={onQuestionSaved} trigger="none" logicSystem={logicSystem} />
-      )}
-    </Stack>
+      <SolutionReveal show={showSolution && Boolean(answerProof)}>
+        <Typography variant="body2" sx={{ mb: 1, fontWeight: 600 }}>
+          Argument line
+        </Typography>
+        <Typography component="div" sx={{ mb: 2, fontFamily: 'var(--app-font-mono)', fontSize: '1rem' }}>
+          {answerArgumentLine}
+        </Typography>
+        <TruthTableEditor
+          proof={answerProof}
+          savedState={null}
+          hideActions
+          suppressReveal={false}
+          embedded
+          solutionOnly
+          parentStatus={status}
+          parentAttemptCount={attemptCount}
+          parentAttemptLimit={maxAttempts}
+        />
+      </SolutionReveal>
+    </ProblemFrame>
   )
 }

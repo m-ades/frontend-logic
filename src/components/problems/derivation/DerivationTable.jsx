@@ -8,11 +8,8 @@ import {
   TableContainer,
   TableRow,
   Typography,
-  Tooltip,
 } from '@mui/material'
-import EditIcon from '@mui/icons-material/Edit'
 import { alpha } from '@mui/material/styles'
-import PromptText from '../../ui/PromptText.jsx'
 import ProblemSetButtons from '../mui/frame/ProblemSetButtons.jsx'
 import { useMobileLogicKeyboardEnabled } from '../../ui/LogicKeyboard/index.js'
 import FormulaInput from '../../ui/logic-engine/formula-input.js'
@@ -78,7 +75,7 @@ import DerivationFormulaCell from './DerivationFormulaCell.jsx'
 import DerivationHeader from './DerivationHeader.jsx'
 import DerivationJustificationCell from './DerivationJustificationCell.jsx'
 import DerivationKeyboardRow from './DerivationKeyboardRow.jsx'
-import DerivationCard from './DerivationCard.jsx'
+import ProblemFrame from '../mui/frame/ProblemFrame.jsx'
 import useDerivationAutoCheck from './useDerivationAutoCheck.js'
 
 function applyLineChange(lines, index, field, value) {
@@ -116,6 +113,10 @@ export default function DerivationTable({
   currentQuestionScore,
   isInstructorView = false,
   onEditQuestion,
+  problemLabel,
+  status,
+  message,
+  onCloseStatus,
   hideActions = false,
   fixedLines = null,
 }) {
@@ -1052,7 +1053,8 @@ export default function DerivationTable({
     [canOpenFullScreen, onOpenFullScreen]
   )
 
-  const Wrapper = isFullScreen || hideActions ? Box : DerivationCard
+  const usesProblemFrame = !isFullScreen && !hideActions
+  const Wrapper = usesProblemFrame ? ProblemFrame : Box
   const wrapperSx = isFullScreen
     ? {
         py: 2,
@@ -1083,6 +1085,19 @@ export default function DerivationTable({
         totalQuestions,
       })
     : null
+  const actionButtons = (
+    <ProblemSetButtons
+      onCheck={handleSubmit}
+      onStartOver={handleStartOver}
+      isChecking={isChecking}
+      isDisabled={submitDisabled}
+      align="flex-start"
+      attemptCount={attemptCount}
+      attemptLimit={attemptLimit}
+      sx={isFullScreen ? { mt: 1 } : undefined}
+      scoreLabel={scoreLabel}
+    />
+  )
 
   return (
     <Stack
@@ -1102,27 +1117,18 @@ export default function DerivationTable({
           : undefined
       }
     >
-      <Wrapper sx={wrapperSx}>
-        {isInstructorView && onEditQuestion && !isFullScreen && !hideActions && (
-          <Box sx={{ mb: 2, display: 'flex', justifyContent: 'flex-end' }}>
-            <Tooltip title="Edit question">
-              <Box
-                component="span"
-                onClick={onEditQuestion}
-                role="button"
-                aria-label="Edit question"
-                sx={{ display: 'inline-flex', alignItems: 'center', cursor: 'pointer', color: 'text.secondary', '&:hover': { opacity: 0.8 } }}
-              >
-                <EditIcon fontSize="small" />
-              </Box>
-            </Tooltip>
-          </Box>
-        )}
-        {proof.description && !isFullScreen && !hideActions && (
-          <Box sx={{ mb: 2, display: 'flex', alignItems: 'flex-start', gap: 0.5 }}>
-            <PromptText content={proof.description} sx={{ fontSize: DERIVATION_PROMPT_FONT_SIZE, flex: 1 }} />
-          </Box>
-        )}
+      <Wrapper {...(usesProblemFrame ? {
+        expandForContent: true,
+        problemLabel,
+        prompt: proof.description,
+        promptSx: { fontSize: DERIVATION_PROMPT_FONT_SIZE },
+        isInstructorView,
+        onEditQuestion,
+        status,
+        message,
+        onCloseStatus,
+        actionNode: actionButtons,
+      } : { sx: wrapperSx })}>
         {isPhone && !isFullScreen && canOpenFullScreen ? (
           <Box
             component="button"
@@ -1391,34 +1397,22 @@ export default function DerivationTable({
         )}
 
       </Wrapper>
-      {/* fullscreen: sticky button row at bottom; non-fullscreen: normal flow */}
-      {!hideActions && (
+      {/* fullscreen keeps a sticky button row outside the frame */}
+      {isFullScreen && !hideActions && (
         <Box
           sx={{
             mt: 1,
-            ...(isFullScreen && {
-              flexShrink: 0,
-              pl: 2,
-              pr: 0,
-              pt: 1.5,
-              pb: 2,
-              bgcolor: 'background.paper',
-              borderTop: 1,
-              borderColor: 'divider',
-            }),
+            flexShrink: 0,
+            pl: 2,
+            pr: 0,
+            pt: 1.5,
+            pb: 2,
+            bgcolor: 'background.paper',
+            borderTop: 1,
+            borderColor: 'divider',
           }}
         >
-          <ProblemSetButtons
-            onCheck={handleSubmit}
-            onStartOver={handleStartOver}
-            isChecking={isChecking}
-            isDisabled={submitDisabled}
-            align="flex-start"
-            attemptCount={attemptCount}
-            attemptLimit={attemptLimit}
-            sx={{ mt: 1 }}
-            scoreLabel={scoreLabel}
-          />
+          {actionButtons}
         </Box>
       )}
     </Stack>

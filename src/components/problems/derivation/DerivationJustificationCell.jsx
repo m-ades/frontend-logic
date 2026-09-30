@@ -16,8 +16,8 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle'
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
 import DerivationFormulaText from './DerivationFormulaText.jsx'
 import {
-  DERIVATION_JUSTIFICATION_WIDTH_SM,
-  DERIVATION_JUSTIFICATION_WIDTH_XS,
+  DERIVATION_CITATION_WIDTH,
+  DERIVATION_JUSTIFICATION_WIDTH,
   DERIVATION_LINE_FONT_SIZE,
   DERIVATION_RULE_WIDTH_DESKTOP,
   DERIVATION_RULE_WIDTH_MOBILE,
@@ -28,11 +28,15 @@ import {
   isDerivationFieldReadOnly,
 } from './derivationUtils.js'
 
-const justificationWidth = {
-  width: { xs: DERIVATION_JUSTIFICATION_WIDTH_XS, sm: DERIVATION_JUSTIFICATION_WIDTH_SM },
-  maxWidth: { xs: DERIVATION_JUSTIFICATION_WIDTH_XS, sm: DERIVATION_JUSTIFICATION_WIDTH_SM },
-  minWidth: { xs: DERIVATION_JUSTIFICATION_WIDTH_XS, sm: DERIVATION_JUSTIFICATION_WIDTH_SM },
-}
+// font size here only makes ch resolve against the line font
+const lineFontWidth = (width) => ({
+  fontSize: DERIVATION_LINE_FONT_SIZE,
+  width,
+  maxWidth: width,
+  minWidth: width,
+})
+const justificationWidth = lineFontWidth(DERIVATION_JUSTIFICATION_WIDTH)
+const citationWidth = lineFontWidth(DERIVATION_CITATION_WIDTH)
 
 export default function DerivationJustificationCell({
   activeFormulaIndex,
@@ -137,9 +141,7 @@ export default function DerivationJustificationCell({
                   inputRef={registerInput}
                   sx={{
                     order: usesNestedSubderivations ? -1 : -2,
-                    width: '7ch',
-                    maxWidth: '7ch',
-                    minWidth: '7ch',
+                    ...citationWidth,
                     '& .MuiInputBase-input': { fontSize: DERIVATION_LINE_FONT_SIZE, py: 0.5 },
                   }}
                 />

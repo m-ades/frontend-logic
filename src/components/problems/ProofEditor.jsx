@@ -1,7 +1,6 @@
 import { useEffect, useState, useCallback, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import { Box, IconButton, Stack, useMediaQuery, useTheme } from '@mui/material'
-import StatusBanner from '../ui/StatusBanner.jsx'
 import CloseIcon from '@mui/icons-material/Close'
 import DerivationTable from './derivation/DerivationTable.jsx'
 import InstructorQuestionEditor from './InstructorQuestionEditor.jsx'
@@ -174,6 +173,9 @@ export default function ProofEditor({
             setAttemptLimit={setAttemptLimit}
             setStatusBanner={setStatusBanner}
             setIsChecking={setIsChecking}
+            status={statusBanner.status}
+            message={statusBanner.message}
+            onCloseStatus={() => setStatusBanner({ status: 'unanswered', message: '' })}
             isAssignmentLocked={isAssignmentLocked}
             isMobile={isMobile}
             isPhone={isPhone}
@@ -200,15 +202,6 @@ export default function ProofEditor({
           onSaved={onQuestionSaved}
           trigger="none"
           logicSystem={logicSystem}
-        />
-      )}
-
-      {StatusBanner.isTerminalStatus(statusBanner.status) && (
-        <StatusBanner
-          status={statusBanner.status}
-          message={statusBanner.message}
-          onClose={() => setStatusBanner({ status: 'unanswered', message: '' })}
-          sx={{ mt: -1 }}
         />
       )}
       </Stack>
