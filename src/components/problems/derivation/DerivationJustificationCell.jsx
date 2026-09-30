@@ -1,6 +1,5 @@
 import {
   Badge,
-  Box,
   Chip,
   FormControl,
   IconButton,
@@ -55,6 +54,8 @@ const justificationSize = growWithText(DERIVATION_JUSTIFICATION_MIN_WIDTH)
 const citationSize = growWithText(DERIVATION_CITATION_MIN_WIDTH)
 // browsers only draw the ellipsis once the field loses focus
 const lineInputSx = { fontSize: DERIVATION_LINE_FONT_SIZE, py: 0.5, textOverflow: 'ellipsis' }
+// a 2px outline matches the delete icon's stroke weight since chrome floors fractional borders
+const dischargeChipSx = { borderRadius: 1, '&.MuiChip-outlined': { borderWidth: '2px' } }
 
 export default function DerivationJustificationCell({
   activeFormulaIndex,
@@ -119,12 +120,20 @@ export default function DerivationJustificationCell({
         pl: 0.5,
         verticalAlign: 'middle',
         ...(isFullScreen ? { width: '50%', minWidth: 0 } : { width: 'auto', whiteSpace: 'nowrap' }),
-        '& .line-delete': {
-          // phones don't have real hover, so reveal by active line there instead
-          opacity: isPhone ? Number(activeFormulaIndex === lineIndex) : 0,
-          transition: 'opacity 120ms ease',
+        '& .line-action': { transition: 'opacity 120ms ease' },
+        '& .line-action:focus-visible': { opacity: 1 },
+        '@media (hover: hover)': {
+          '& .line-action': { opacity: 0 },
+          '&:hover .line-action': { opacity: 1 },
         },
-        ...(!isPhone && { '&:hover .line-delete': { opacity: 1 } }),
+        /*
+        touch screens can't hover so only the line being edited shows its actions
+        hidden ones stop taking taps so a line can't be deleted blind
+        */
+        '@media (hover: none)': isActiveLine ? {} : {
+          '& .line-action': { opacity: 0, pointerEvents: 'none' },
+          '& .line-discharge': { display: 'none' },
+        },
       }}
     >
       {isPremise ? (
@@ -250,38 +259,36 @@ export default function DerivationJustificationCell({
               <CancelIcon fontSize="small" color="error" />
             )}
             {showDischargeControl && (
-              // skip the reserved width on phone - it was pushing delete off the clipped fullscreen viewport
-              <Box sx={{ minWidth: isPhone ? 0 : '4.5rem', display: 'flex', alignItems: 'center' }}>
-                {isActiveLine && (
-                  <Tooltip title={dischargeAction}>
-                    {isPhone ? (
-                      // a bare symbol stays beside the justification instead of wrapping under it
-                      <IconButton
-                        onClick={onToggleDischarge}
-                        size="small"
-                        color={isDischarged ? 'primary' : 'default'}
-                        aria-label={`${dischargeAction} on line ${lineIndex + 1}`}
-                        aria-pressed={Boolean(isDischarged)}
-                      >
-                        <Badge badgeContent={isDischarged > 1 ? isDischarged : 0} color="primary">
-                          <ArrowLeftIcon fontSize="small" />
-                        </Badge>
-                      </IconButton>
-                    ) : (
-                      <Chip
-                        label={dischargeLabel}
-                        onClick={onToggleDischarge}
-                        size="small"
-                        clickable
-                        color={isDischarged ? 'primary' : 'default'}
-                        variant={isDischarged ? 'filled' : 'outlined'}
-                        aria-label={`${dischargeAction} on line ${lineIndex + 1}`}
-                        sx={{ borderRadius: 1 }}
-                      />
-                    )}
-                  </Tooltip>
+              <Tooltip title={dischargeAction}>
+                {isPhone ? (
+                  // a bare symbol stays beside the justification instead of wrapping under it
+                  <IconButton
+                    onClick={onToggleDischarge}
+                    size="small"
+                    color={isDischarged ? 'primary' : 'default'}
+                    aria-label={`${dischargeAction} on line ${lineIndex + 1}`}
+                    aria-pressed={Boolean(isDischarged)}
+                    className="line-action line-discharge"
+                  >
+                    <Badge badgeContent={isDischarged > 1 ? isDischarged : 0} color="primary">
+                      <ArrowLeftIcon fontSize="small" />
+                    </Badge>
+                  </IconButton>
+                ) : (
+                  <Chip
+                    label={dischargeLabel}
+                    onClick={onToggleDischarge}
+                    size="small"
+                    clickable
+                    color={isDischarged ? 'primary' : 'default'}
+                    variant={isDischarged ? 'filled' : 'outlined'}
+                    aria-label={`${dischargeAction} on line ${lineIndex + 1}`}
+                    aria-pressed={Boolean(isDischarged)}
+                    className="line-action line-discharge"
+                    sx={dischargeChipSx}
+                  />
                 )}
-              </Box>
+              </Tooltip>
             )}
             {!line.readOnly && !line.formulaReadOnly && (
               <Tooltip title="Delete line">
@@ -289,7 +296,7 @@ export default function DerivationJustificationCell({
                   onClick={onDelete}
                   size="small"
                   aria-label={`Delete line ${lineIndex + 1}`}
-                  className="line-delete"
+                  className="line-action"
                 >
                   <DeleteOutlineIcon />
                 </IconButton>
