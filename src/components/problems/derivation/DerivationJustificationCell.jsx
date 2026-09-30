@@ -16,8 +16,9 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle'
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
 import DerivationFormulaText from './DerivationFormulaText.jsx'
 import {
-  DERIVATION_CITATION_WIDTH,
-  DERIVATION_JUSTIFICATION_WIDTH,
+  DERIVATION_CITATION_MIN_WIDTH,
+  DERIVATION_JUSTIFICATION_MAX_WIDTH,
+  DERIVATION_JUSTIFICATION_MIN_WIDTH,
   DERIVATION_LINE_FONT_SIZE,
   DERIVATION_RULE_WIDTH_DESKTOP,
   DERIVATION_RULE_WIDTH_MOBILE,
@@ -28,15 +29,27 @@ import {
   isDerivationFieldReadOnly,
 } from './derivationUtils.js'
 
-// font size here only makes ch resolve against the line font
-const lineFontWidth = (width) => ({
-  fontSize: DERIVATION_LINE_FONT_SIZE,
-  width,
-  maxWidth: width,
-  minWidth: width,
+/*
+a hidden copy of the text in data-text sizes the field so it widens instead of scrolling
+the input itself is one character wide so only that copy and the minimum set the width
+*/
+const growWithText = (minWidth) => ({
+  display: 'inline-grid',
+  minWidth,
+  maxWidth: DERIVATION_JUSTIFICATION_MAX_WIDTH,
+  '&::after': {
+    content: 'attr(data-text) " "',
+    gridArea: '1 / 1',
+    height: 0,
+    overflow: 'hidden',
+    visibility: 'hidden',
+    whiteSpace: 'pre',
+    fontSize: DERIVATION_LINE_FONT_SIZE,
+  },
+  '& > .MuiInputBase-root': { gridArea: '1 / 1', minWidth: 0 },
 })
-const justificationWidth = lineFontWidth(DERIVATION_JUSTIFICATION_WIDTH)
-const citationWidth = lineFontWidth(DERIVATION_CITATION_WIDTH)
+const justificationSize = growWithText(DERIVATION_JUSTIFICATION_MIN_WIDTH)
+const citationSize = growWithText(DERIVATION_CITATION_MIN_WIDTH)
 
 export default function DerivationJustificationCell({
   activeFormulaIndex,
@@ -83,6 +96,10 @@ export default function DerivationJustificationCell({
   const ruleOptions = selectedRule && !allowedRules.some((rule) => (
     rule.toLowerCase() === selectedRule.toLowerCase()
   )) ? [selectedRule, ...allowedRules] : allowedRules
+  const citationText = citationDraft ?? formatJustificationLines(line.justification)
+  const typedPlaceholder = lineIndex === premisesCount
+    ? (usesNestedSubderivations ? 'Rule & line(s)' : 'line(s) and rule')
+    : ''
   const requestFullScreen = (event) => {
     if (justificationReadOnly) return
     onRequestFullScreen(event)
@@ -127,7 +144,8 @@ export default function DerivationJustificationCell({
                 <TextField
                   variant="standard"
                   placeholder="Line(s)"
-                  value={citationDraft ?? formatJustificationLines(line.justification)}
+                  value={citationText}
+                  data-text={citationText || 'Line(s)'}
                   onFocus={onActivate}
                   onPointerDown={requestFullScreen}
                   onChange={(event) => onCitationChange(event.target.value)}
@@ -136,12 +154,13 @@ export default function DerivationJustificationCell({
                   InputProps={{ disableUnderline: true, readOnly: justificationReadOnly }}
                   inputProps={{
                     autoComplete: 'off',
+                    size: 1,
                     'aria-label': `Referenced line numbers for line ${lineIndex + 1}`,
                   }}
                   inputRef={registerInput}
                   sx={{
                     order: usesNestedSubderivations ? -1 : -2,
-                    ...citationWidth,
+                    ...citationSize,
                     '& .MuiInputBase-input': { fontSize: DERIVATION_LINE_FONT_SIZE, py: 0.5 },
                   }}
                 />
@@ -150,7 +169,7 @@ export default function DerivationJustificationCell({
                 <FormControl
                   variant="standard"
                   sx={omitsCitations
-                    ? justificationWidth
+                    ? { minWidth: DERIVATION_JUSTIFICATION_MIN_WIDTH }
                     : {
                         order: usesNestedSubderivations ? -2 : -1,
                         minWidth: isFullScreen || isMobile
@@ -188,20 +207,19 @@ export default function DerivationJustificationCell({
           ) : (
             <TextField
               variant="standard"
-              placeholder={lineIndex === premisesCount
-                ? (usesNestedSubderivations ? 'Rule & line(s)' : 'line(s) and rule')
-                : ''}
+              placeholder={typedPlaceholder}
               value={line.justification}
+              data-text={line.justification || typedPlaceholder}
               onFocus={onActivate}
               onPointerDown={requestFullScreen}
               onChange={onJustificationChange}
               onKeyDown={onKeyDown}
               onBlur={(event) => onTypedCommit(event.target.value)}
               InputProps={{ readOnly: justificationReadOnly }}
-              inputProps={{ autoComplete: 'off', 'aria-label': `Justification for line ${lineIndex + 1}` }}
+              inputProps={{ autoComplete: 'off', size: 1, 'aria-label': `Justification for line ${lineIndex + 1}` }}
               inputRef={registerInput}
               sx={{
-                ...justificationWidth,
+                ...justificationSize,
                 '& .MuiInputBase-input': { fontSize: DERIVATION_LINE_FONT_SIZE, py: 0.5 },
                 '& .MuiInput-root:before, & .MuiInput-root:after': {
                   right: 'auto',
