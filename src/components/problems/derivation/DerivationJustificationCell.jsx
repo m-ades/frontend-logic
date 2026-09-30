@@ -1,4 +1,5 @@
 import {
+  Badge,
   Box,
   Chip,
   FormControl,
@@ -14,6 +15,7 @@ import {
 import CancelIcon from '@mui/icons-material/Cancel'
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
+import ArrowLeftIcon from '@mui/icons-material/ArrowLeft'
 import DerivationFormulaText from './DerivationFormulaText.jsx'
 import {
   DERIVATION_CITATION_MIN_WIDTH,
@@ -96,6 +98,8 @@ export default function DerivationJustificationCell({
   const ruleOptions = selectedRule && !allowedRules.some((rule) => (
     rule.toLowerCase() === selectedRule.toLowerCase()
   )) ? [selectedRule, ...allowedRules] : allowedRules
+  // full screen phones fill the space beside the controls and squeeze before anything wraps
+  const phoneShrink = isPhone && isFullScreen ? { minWidth: 0, flex: '1 1 auto' } : null
   const citationText = citationDraft ?? formatJustificationLines(line.justification)
   const typedPlaceholder = lineIndex === premisesCount
     ? (usesNestedSubderivations ? 'Rule & line(s)' : 'line(s) and rule')
@@ -137,7 +141,7 @@ export default function DerivationJustificationCell({
           )}
         </Stack>
       ) : (
-        <Stack direction="row" alignItems="center" sx={{ flexWrap: isPhone ? 'wrap' : 'nowrap', gap: 0, minWidth: 0 }}>
+        <Stack direction="row" alignItems="center" sx={{ flexWrap: 'nowrap', gap: 0, minWidth: 0 }}>
           {useRuleDropdown ? (
             <>
               {!omitsCitations && (
@@ -161,6 +165,7 @@ export default function DerivationJustificationCell({
                   sx={{
                     order: usesNestedSubderivations ? -1 : -2,
                     ...citationSize,
+                    ...phoneShrink,
                     '& .MuiInputBase-input': { fontSize: DERIVATION_LINE_FONT_SIZE, py: 0.5 },
                   }}
                 />
@@ -220,6 +225,7 @@ export default function DerivationJustificationCell({
               inputRef={registerInput}
               sx={{
                 ...justificationSize,
+                ...phoneShrink,
                 '& .MuiInputBase-input': { fontSize: DERIVATION_LINE_FONT_SIZE, py: 0.5 },
                 '& .MuiInput-root:before, & .MuiInput-root:after': {
                   right: 'auto',
@@ -233,7 +239,7 @@ export default function DerivationJustificationCell({
             />
           )}
 
-          <Stack direction="row" alignItems="center" spacing={0.75} sx={{ ml: 0.75 }}>
+          <Stack direction="row" alignItems="center" spacing={isPhone ? 0.25 : 0.75} sx={{ ml: isPhone ? 0.5 : 0.75, flexShrink: 0 }}>
             {autoCheckEnabled && autoCheckStatus === 'ok' && (
               <CheckCircleIcon fontSize="small" sx={{ color: 'primary.main' }} />
             )}
@@ -245,16 +251,31 @@ export default function DerivationJustificationCell({
               <Box sx={{ minWidth: isPhone ? 0 : '4.5rem', display: 'flex', alignItems: 'center' }}>
                 {isActiveLine && (
                   <Tooltip title={dischargeAction}>
-                    <Chip
-                      label={dischargeLabel}
-                      onClick={onToggleDischarge}
-                      size="small"
-                      clickable
-                      color={isDischarged ? 'primary' : 'default'}
-                      variant={isDischarged ? 'filled' : 'outlined'}
-                      aria-label={`${dischargeAction} on line ${lineIndex + 1}`}
-                      sx={{ borderRadius: 1 }}
-                    />
+                    {isPhone ? (
+                      // a bare symbol stays beside the justification instead of wrapping under it
+                      <IconButton
+                        onClick={onToggleDischarge}
+                        size="small"
+                        color={isDischarged ? 'primary' : 'default'}
+                        aria-label={`${dischargeAction} on line ${lineIndex + 1}`}
+                        aria-pressed={Boolean(isDischarged)}
+                      >
+                        <Badge badgeContent={isDischarged > 1 ? isDischarged : 0} color="primary">
+                          <ArrowLeftIcon fontSize="small" />
+                        </Badge>
+                      </IconButton>
+                    ) : (
+                      <Chip
+                        label={dischargeLabel}
+                        onClick={onToggleDischarge}
+                        size="small"
+                        clickable
+                        color={isDischarged ? 'primary' : 'default'}
+                        variant={isDischarged ? 'filled' : 'outlined'}
+                        aria-label={`${dischargeAction} on line ${lineIndex + 1}`}
+                        sx={{ borderRadius: 1 }}
+                      />
+                    )}
                   </Tooltip>
                 )}
               </Box>
