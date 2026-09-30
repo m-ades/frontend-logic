@@ -247,17 +247,20 @@ export default class FormulaInput {
 
         // tab/shift-tab can be assigned a special role, as in derivations
         if (e.key == 'Tab') {
-            e.preventDefault();
             // prettify the result
             this.value = this.inputfix(this.value);
             if (e.shiftKey && this.shiftTabHook) {
+                e.preventDefault();
                 this.shiftTabHook(e);
                 return;
             }
             if (this.tabHook) {
+                e.preventDefault();
                 this.tabHook(e);
                 return;
             }
+            // without a hook tab moves focus like it does in any other field
+            return;
         }
 
         // arrows/shift arrows can be given special actions as in derivations

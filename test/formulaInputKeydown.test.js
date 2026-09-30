@@ -71,4 +71,22 @@ for (const notation of ['calgary', 'hurley']) {
     assert.equal(press('P', '.', notation).value, `P ${AND} `)
     assert.equal(press('', '~', notation, { ctrlKey: true, altKey: true }).value, NOT)
   })
+
+  test(`${notation} lets tab leave the field and tidies what was typed`, () => {
+    assert.deepEqual(press('P&Q', 'Tab', notation), { value: `P ${AND} Q`, prevented: false })
+    assert.deepEqual(press('P&Q', 'Tab', notation, { shiftKey: true }), { value: `P ${AND} Q`, prevented: false })
+  })
 }
+
+test('tab still goes to a field that claims it with a hook', () => {
+  const field = fakeField('P', 'calgary')
+  const calls = []
+  field.tabHook = () => calls.push('tab')
+  field.shiftTabHook = () => calls.push('shift tab')
+  let prevented = 0
+  for (const shiftKey of [false, true]) {
+    FormulaInput.keydown.call(field, { key: 'Tab', shiftKey, preventDefault() { prevented += 1 } })
+  }
+  assert.deepEqual(calls, ['tab', 'shift tab'])
+  assert.equal(prevented, 2)
+})
