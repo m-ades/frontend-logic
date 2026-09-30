@@ -11,6 +11,21 @@ import getSyntax from '@logic-app/logic-engine/symbolic/libsyntax.js';
 import { addelem, htmlEscape } from '../../../lib/logic-engine/common.js';
 import { displayIndexedSymbolsForNotation } from '../../../lib/indexedSymbols.js';
 
+/*
+picks the connective for a typed > and how much ascii arrow before the caret it replaces
+shafts match the engine's ascii arrows so <=> and => land like <-> and ->
+an = may already be padded like identity since fields that prettify as you type space it out
+*/
+export function arrowShortcutBeforeCaret(textBeforeCaret) {
+    const text = String(textBeforeCaret ?? '');
+    const biconditional = text.match(/<(?:[-–]*|\s*=\s*)$/);
+    if (biconditional) {
+        return { op: 'IFF', replaceBefore: biconditional[0].length };
+    }
+    const shaft = text.match(/(?:[-–]*|=\s*)$/);
+    return { op: 'IFTHEN', replaceBefore: shaft[0].length };
+}
+
 export default class FormulaInput {
 
     static formatForDisplay(value) {
@@ -142,6 +157,20 @@ export default class FormulaInput {
         }
     }
 
+    // lets an input rendered by react use the static handlers, which read their state from this
+    static attach(input, notation, { allowTherefore = false } = {}) {
+        const syntax = getSyntax(notation);
+        input.syntax = syntax;
+        input.notation = syntax.notationname;
+        input.symbols = syntax.symbols;
+        input.inputfix = FormulaInput.formatForDisplay;
+        input.autoChange = FormulaInput.autoChange;
+        input.insertHere = FormulaInput.insertHere;
+        input.insOp = FormulaInput.insOp;
+        input.allowTherefore = allowTherefore;
+        return input;
+    }
+
     // create a new formula input and return it
     static getnew(options = {}) {
 
@@ -169,17 +198,7 @@ export default class FormulaInput {
             }
         });
 
-        // add the static functions
-        elem.insOp = FormulaInput.insOp;
-        elem.insertHere = FormulaInput.insertHere;
-        elem.autoChange = FormulaInput.autoChange;
-
-        // attach syntax, symbols and inputfix
-        const syntax = getSyntax(options.notation);
-        elem.syntax = syntax;
-        elem.notation = syntax.notationname;
-        elem.symbols = syntax.symbols;
-        elem.inputfix = FormulaInput.formatForDisplay;
+        FormulaInput.attach(elem, options.notation, options);
 
         // attach a symbolwidget
         elem.symbolwidget = makeSymbolWidget();
@@ -228,17 +247,20 @@ export default class FormulaInput {
 
         // tab/shift-tab can be assigned a special role, as in derivations
         if (e.key == 'Tab') {
-            e.preventDefault();
             // prettify the result
             this.value = this.inputfix(this.value);
             if (e.shiftKey && this.shiftTabHook) {
+                e.preventDefault();
                 this.shiftTabHook(e);
                 return;
             }
             if (this.tabHook) {
+                e.preventDefault();
                 this.tabHook(e);
                 return;
             }
+            // without a hook tab moves focus like it does in any other field
+            return;
         }
 
         // arrows/shift arrows can be given special actions as in derivations
@@ -283,6 +305,9 @@ export default class FormulaInput {
         // other changes only apply when the field can actually be edited
         if (this.readOnly) { return; }
 
+        // ctrl and cmd chords stay browser shortcuts; ctrl with alt is altgr typing a character
+        if ((e.ctrlKey || e.metaKey) && !e.altKey) { return; }
+
         // block extra spaces
         if (e.key == ' ') {
             if (/\s$/.test(this.value.substr(0,this.selectionStart))) {
@@ -308,17 +333,12 @@ export default class FormulaInput {
         if (e.key == '>' || e.key == '→' || e.key == '⇒' ||
             e.key == '⊃') {
             e.preventDefault();
-
-            // if there is soemthing of the form <-- before > make
-            // it a biconditional
-            if (/<-*$/.test(this.value.substr(0,this.selectionStart))) {
-                this.autoChange(/\s*<[=-]*$/,'','',/^\s*/,'');
-                this.insOp('IFF');
-            } else {
-                // o/w remove preceding hyphens and equals signs for -->
-                this.autoChange(/\s*[=-]*$/,'','',/^\s*/,'');
-                this.insOp('IFTHEN');
-            }
+            const { op, replaceBefore } = arrowShortcutBeforeCaret(
+                this.value.substr(0, this.selectionStart));
+            // drop the ascii arrow typed so far and insOp puts the spacing back
+            this.autoChange(new RegExp('\\s*[\\s\\S]{' + replaceBefore + '}$'),
+                '', '', /^\s*/, '');
+            this.insOp(op);
             return;
         }
 

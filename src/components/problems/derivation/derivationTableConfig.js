@@ -89,16 +89,6 @@ export const getSymbolButtons = (symbols, syntax) => [
   { label: '[  ]', pair: '[]' },
 ]
 
-export function applyInsertion(value, selectionStart, selectionEnd, insertText, replaceBefore = 0) {
-  const start = selectionStart ?? value.length
-  const end = selectionEnd ?? start
-  const before = value.slice(0, Math.max(0, start - replaceBefore))
-  return {
-    nextValue: before + insertText + value.slice(end),
-    nextCursor: before.length + insertText.length,
-  }
-}
-
 export function getDerivationScoreLabel({
   attemptCount,
   attemptLimit,

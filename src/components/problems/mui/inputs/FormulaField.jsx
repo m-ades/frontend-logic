@@ -3,7 +3,6 @@ import { TextField, useMediaQuery } from '@mui/material'
 import { useTheme } from '@mui/material/styles'
 import MobileLogicInput from '../../../ui/LogicKeyboard/MobileLogicInput.jsx'
 import FormulaInput from '../../../ui/logic-engine/formula-input.js'
-import getSyntax from '@logic-app/logic-engine/symbolic/libsyntax.js'
 import { getNotation } from '../../../../lib/logicSystems.js'
 
 // shared formula field for symbolic inputs
@@ -27,21 +26,11 @@ const FormulaField = forwardRef(function FormulaField({
   const theme = useTheme()
   const isPhone = useMediaQuery(theme.breakpoints.down('sm'))
   const notation = getNotation(logicSystem)
-  const syntax = getSyntax(notation)
   const registerInput = useCallback((input) => {
-    if (input) {
-      input.syntax = syntax
-      input.notation = notation
-      input.symbols = syntax.symbols
-      input.inputfix = FormulaInput.formatForDisplay
-      input.autoChange = FormulaInput.autoChange
-      input.insertHere = FormulaInput.insertHere
-      input.insOp = FormulaInput.insOp
-      input.allowTherefore = allowTherefore
-    }
+    if (input) FormulaInput.attach(input, notation, { allowTherefore })
     if (typeof ref === 'function') ref(input)
     else if (ref) ref.current = input
-  }, [allowTherefore, notation, ref, syntax])
+  }, [allowTherefore, notation, ref])
 
   if (isPhone) {
     // on phones route back through the existing custom keyboard path

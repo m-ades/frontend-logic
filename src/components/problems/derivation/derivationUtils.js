@@ -123,16 +123,6 @@ export function formulasEqualNormally(a, b, normalizeForFallback, notation) {
   }
 }
 
-export const applyInsertion = (value, selectionStart, selectionEnd, insertText, replaceBefore = 0) => {
-  const start = selectionStart ?? value.length
-  const end = selectionEnd ?? start
-  const before = value.slice(0, Math.max(0, start - replaceBefore))
-  const after = value.slice(end)
-  const nextValue = before + insertText + after
-  const nextCursor = before.length + insertText.length
-  return { nextValue, nextCursor }
-}
-
 export const formatRuleName = (rule) => {
   return formatDerivationRuleName(rule)
 }
