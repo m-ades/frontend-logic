@@ -4,9 +4,9 @@ import InstructorQuestionEditor from '../../InstructorQuestionEditor.jsx'
 import { useTheme, useMediaQuery } from '@mui/material'
 import ProblemFrame from '../frame/ProblemFrame.jsx'
 import ProblemSetButtons from '../frame/ProblemSetButtons.jsx'
-import FormulaInput from '../../../ui/logic-engine/formula-input.js'
+import FormulaField from '../inputs/FormulaField.jsx'
 import SymbolButtonRow from '../../../ui/logic-engine/SymbolButtonRow.jsx'
-import { MobileLogicInput, getVariableLettersOnly } from '../../../ui/LogicKeyboard/index.js'
+import { getVariableLettersOnly } from '../../../ui/LogicKeyboard/index.js'
 import { useProblemChecker } from '../../../../hooks/useProblemChecker.js'
 import SolutionReveal from '../../SolutionReveal.jsx'
 import RichText from '../../../ui/RichText.jsx'
@@ -58,112 +58,6 @@ function resolveTranslationText(rawPrompt, explicitSentence) {
     prompt: instructionHtml,
     sentence: legacySentence,
   }
-}
-
-function FormulaInputField({ value, onValueChange, onBlur, fieldReadOnly, formulaInputRef, onEnterKey, ariaLabel, notation }) {
-  const theme = useTheme()
-  const containerRef = useRef(null)
-  const changeHandlerRef = useRef(null)
-
-  useEffect(() => {
-    if (!containerRef.current) return
-    if (!formulaInputRef.current) {
-      // enables the fitch therefore shortcut for translation answer lines
-      const formulaInput = FormulaInput.getnew({ notation, allowTherefore: true })
-      formulaInputRef.current = formulaInput
-      formulaInput.style.width = '100%'
-      formulaInput.style.padding = theme.spacing(1.5)
-      formulaInput.style.border = `1px solid ${theme.palette.divider}`
-      formulaInput.style.borderRadius = theme.shape.borderRadius
-      formulaInput.style.fontSize = '1rem'
-      formulaInput.style.fontFamily = 'var(--app-font-mono)'
-      formulaInput.style.backgroundColor = theme.palette.background.paper
-      formulaInput.style.color = theme.palette.text.primary
-      formulaInput.setAttribute('aria-label', ariaLabel || 'Formula input')
-      formulaInput.setAttribute('placeholder', ariaLabel || 'Formula input')
-      containerRef.current.appendChild(formulaInput)
-    } else if (!containerRef.current.contains(formulaInputRef.current)) {
-      containerRef.current.appendChild(formulaInputRef.current)
-    }
-    return () => {
-      if (formulaInputRef.current) {
-        if (changeHandlerRef.current) {
-          formulaInputRef.current.removeEventListener('input', changeHandlerRef.current)
-          formulaInputRef.current.removeEventListener('change', changeHandlerRef.current)
-          changeHandlerRef.current = null
-        }
-        if (formulaInputRef.current.parentNode) {
-          formulaInputRef.current.parentNode.removeChild(formulaInputRef.current)
-        }
-        formulaInputRef.current = null
-      }
-    }
-  }, [ariaLabel, formulaInputRef, notation, theme])
-
-  useEffect(() => {
-    if (!formulaInputRef.current) return
-    formulaInputRef.current.setAttribute('aria-label', ariaLabel || 'Formula input')
-  }, [ariaLabel, formulaInputRef])
-
-  useEffect(() => {
-    const formulaInput = formulaInputRef.current
-    if (!formulaInput) return
-    formulaInput.readOnly = fieldReadOnly
-    if (changeHandlerRef.current) {
-      formulaInput.removeEventListener('input', changeHandlerRef.current)
-      formulaInput.removeEventListener('change', changeHandlerRef.current)
-      changeHandlerRef.current = null
-    }
-    if (!fieldReadOnly && onValueChange) {
-      const handleChange = () => {
-        if (fieldReadOnly) return
-        const nextValue = formulaInput.value
-        onValueChange(nextValue)
-      }
-      changeHandlerRef.current = handleChange
-      formulaInput.addEventListener('input', handleChange)
-      formulaInput.addEventListener('change', handleChange)
-    }
-    return () => {
-      if (changeHandlerRef.current) {
-        formulaInput.removeEventListener('input', changeHandlerRef.current)
-        formulaInput.removeEventListener('change', changeHandlerRef.current)
-        changeHandlerRef.current = null
-      }
-    }
-  }, [fieldReadOnly, onValueChange, formulaInputRef])
-
-  useEffect(() => {
-    if (formulaInputRef.current && value !== undefined && formulaInputRef.current.value !== value) {
-      formulaInputRef.current.value = value
-    }
-  }, [value, formulaInputRef])
-
-  useEffect(() => {
-    const formulaInput = formulaInputRef.current
-    if (!formulaInput || !onEnterKey) return
-    const handleKeyDown = (e) => {
-      if (e.key === 'Enter') {
-        e.preventDefault()
-        onEnterKey()
-      }
-    }
-    formulaInput.addEventListener('keydown', handleKeyDown)
-    return () => formulaInput.removeEventListener('keydown', handleKeyDown)
-  }, [formulaInputRef, onEnterKey])
-
-  return (
-    <Box
-      ref={containerRef}
-      onBlur={onBlur}
-      sx={{
-        width: '100%',
-        minHeight: '56px',
-        display: 'flex',
-        alignItems: 'center'
-      }}
-    />
-  )
 }
 
 export default function SymbolicTranslation({
@@ -221,7 +115,6 @@ export default function SymbolicTranslation({
     () => displayAnswer(savedState?.ans || '')
   )
   const formulaInputRef = useRef(null)
-  const solutionInputRef = useRef(null)
   const hasHydratedRef = useRef(false)
   const saveTimerRef = useRef(null)
   const lastSavedValueRef = useRef(null)
@@ -296,9 +189,6 @@ export default function SymbolicTranslation({
     isDisabled: () => !isCompleteTranslationAnswer(inputValue, notation),
     resetInput: () => {
       setInputValue('')
-      if (formulaInputRef.current) {
-        formulaInputRef.current.value = ''
-      }
       lastSavedValueRef.current = ''
     },
     onStateChange: (state) => {
@@ -400,77 +290,60 @@ export default function SymbolicTranslation({
       {legacyLegend && (
         <RichText content={legacyLegend} variant="body2" sx={{ mb: 1, color: 'text.secondary' }} />
       )}
-      {isPhone ? (
-        <MobileLogicInput
-          value={inputValue}
-          onChange={(value) => {
-            if (readOnly) return
-            setInputValue(value)
-            scheduleStateSave(value)
-          }}
-          onBlur={() => applyCanonicalValue(inputValue)}
-          disabled={readOnly}
-          placeholder={hasMultipleStatements
-            ? (hasConclusion
-                ? (notation === 'calgary'
-                    ? 'e.g. P, Q ∴ R'
-                    : 'e.g. P / Q // R')
-                : (notation === 'calgary'
-                    ? `e.g. P ${symbols.and} Q, ${symbols.not}R`
-                    : `e.g. P ${symbols.and} Q / ${symbols.not}R`))
-            : `e.g. P ${symbols.and} Q`}
-          aria-label="Formula translation"
-          symbolizationKey={symbolizationKey}
-          includeQuantifiers={isPredicate}
-          onEnterKey={!readOnly && !hideActions ? handleCheck : undefined}
-          predicateLetters={isPredicate ? predicateLetters : undefined}
-          constantLetters={isPredicate ? constantLetters : undefined}
-          variableLetters={isPredicate ? variableLetters : undefined}
-          logicSystem={logicSystem}
-          extraInsertButtons={mobileSeparatorButtons}
-        />
-      ) : (
-        <>
-          <FormulaInputField
-            value={inputValue}
+      <FormulaField
+        ref={formulaInputRef}
+        value={inputValue}
+        onValueChange={(value) => {
+          if (readOnly) return
+          setInputValue(value)
+          scheduleStateSave(value)
+        }}
+        onBlur={() => applyCanonicalValue(inputValue)}
+        readOnly={readOnly}
+        onEnterKey={!readOnly && !hideActions ? handleCheck : undefined}
+        placeholder={hasMultipleStatements
+          ? (hasConclusion
+              ? (notation === 'calgary'
+                  ? 'e.g. P, Q ∴ R'
+                  : 'e.g. P / Q // R')
+              : (notation === 'calgary'
+                  ? `e.g. P ${symbols.and} Q, ${symbols.not}R`
+                  : `e.g. P ${symbols.and} Q / ${symbols.not}R`))
+          : `e.g. P ${symbols.and} Q`}
+        aria-label="Your translation"
+        symbolizationKey={symbolizationKey}
+        includeQuantifiers={isPredicate}
+        extraInsertButtons={mobileSeparatorButtons}
+        allowTherefore
+        predicateLetters={isPredicate ? predicateLetters : undefined}
+        constantLetters={isPredicate ? constantLetters : undefined}
+        variableLetters={isPredicate ? variableLetters : undefined}
+        logicSystem={logicSystem}
+      />
+      {!isPhone && (
+        <Box sx={{ mt: 1 }}>
+          <SymbolButtonRow
+            inputRef={formulaInputRef}
+            disabled={readOnly}
+            includeQuantifiers={isPredicate}
+            showBackspace={false}
             onValueChange={(value) => {
               if (readOnly) return
               setInputValue(value)
               scheduleStateSave(value)
             }}
-            onBlur={(event) => applyCanonicalValue(event.target.value)}
-            fieldReadOnly={readOnly}
-            formulaInputRef={formulaInputRef}
-            onEnterKey={!readOnly && !hideActions ? handleCheck : undefined}
-            ariaLabel="Your translation"
-            notation={notation}
+            logicSystem={logicSystem}
+            extraInsertButtons={[...letterInsertButtons, ...separatorButtons]}
           />
-          <Box sx={{ mt: 1 }}>
-            <SymbolButtonRow
-              inputRef={formulaInputRef}
-              disabled={readOnly}
-              includeQuantifiers={isPredicate}
-              showBackspace={false}
-              onValueChange={(value) => {
-                if (readOnly) return
-                setInputValue(value)
-                scheduleStateSave(value)
-              }}
-              logicSystem={logicSystem}
-              extraInsertButtons={[...letterInsertButtons, ...separatorButtons]}
-            />
-          </Box>
-        </>
+        </Box>
       )}
       {!suppressReveal && (
         <SolutionReveal show={showSolution}>
-          <FormulaInputField
+          <FormulaField
             value={displayAnswer(answer ?? '')}
-            onValueChange={null}
-            fieldReadOnly
-            formulaInputRef={solutionInputRef}
-            ariaLabel="Correct translation"
-            notation={notation}
+            readOnly
+            aria-label="Correct translation"
+            logicSystem={logicSystem}
           />
         </SolutionReveal>
       )}
