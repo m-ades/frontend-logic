@@ -87,6 +87,8 @@ export function removeRuleKeys(source, keys) {
 
 export const ALLOW_RULE_KEYS = ['allow', 'allowed']
 export const DISALLOW_RULE_KEYS = ['disallow', 'disallowed', 'deny', 'forbid', 'forbidden']
+export const REQUIRE_ALL_KEYS = ['require', 'required', 'necessary']
+export const REQUIRE_ANY_KEYS = ['requireAny', 'requiredAny']
 export const RULE_AVAILABILITY_MODES = new Set(['all', 'only', 'except'])
 
 export function getRuleAvailabilityMode(ruleset, logicSystem = DEFAULT_LOGIC_SYSTEM) {
@@ -127,6 +129,17 @@ export function normalizeDerivationRuleset(ruleset, logicSystem = DEFAULT_LOGIC_
   if (require.length) normalized.require = require
   if (requireAny.length) normalized.requireAny = requireAny
   return Object.keys(normalized).length ? normalized : null
+}
+
+// the update api deep merges snapshots so empty lists are what clear rules an earlier save stored
+export function buildRulesetPatch(ruleset, logicSystem = DEFAULT_LOGIC_SYSTEM) {
+  return {
+    allow: [],
+    disallow: [],
+    require: [],
+    requireAny: [],
+    ...normalizeDerivationRuleset(ruleset, logicSystem),
+  }
 }
 
 export function validateDerivationRuleset(ruleset, logicSystem = DEFAULT_LOGIC_SYSTEM) {

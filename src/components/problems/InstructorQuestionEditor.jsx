@@ -255,7 +255,7 @@ function InstructorQuestionEditorInner({
       if (proof.type === 'single-row-truth-table') {
         delete mergedSnapshot.singleRowTruthTable
       }
-      if (isDerivationProblemType(proof.type)) {
+      if (isDerivationProblemType(proof.type) || proof.type === 'proof-argument-extraction') {
         const rulesetLogicSystem = proof.type === 'derivation-hurley' ? 'hurley' : activeLogicSystem
         const rulesetError = validateDerivationRuleset(editValue.ruleset ?? question_snapshot.ruleset, rulesetLogicSystem)
         if (rulesetError) {
