@@ -108,6 +108,8 @@ export default function MobileLogicInput({
   onBlur,
   onCursorChange,
   inputRef,
+  // input sx overrides only the custom keyboard text field appearance
+  inputSx,
   disabled,
   placeholder,
   'aria-label': ariaLabel,
@@ -450,6 +452,7 @@ export default function MobileLogicInput({
           disabled={disabled}
           placeholder={placeholder}
           aria-label={ariaLabel}
+          sx={inputSx}
         />
       </Box>
       {showPanel && typeof document !== 'undefined'
