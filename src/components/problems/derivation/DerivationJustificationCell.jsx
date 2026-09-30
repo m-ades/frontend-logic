@@ -37,6 +37,8 @@ the input itself is one character wide so only that copy and the minimum set the
 */
 const growWithText = (minWidth) => ({
   display: 'inline-grid',
+  // font size here makes ch resolve against the line font and the hidden copy inherits it
+  fontSize: DERIVATION_LINE_FONT_SIZE,
   minWidth,
   maxWidth: DERIVATION_JUSTIFICATION_MAX_WIDTH,
   '&::after': {
@@ -46,12 +48,13 @@ const growWithText = (minWidth) => ({
     overflow: 'hidden',
     visibility: 'hidden',
     whiteSpace: 'pre',
-    fontSize: DERIVATION_LINE_FONT_SIZE,
   },
   '& > .MuiInputBase-root': { gridArea: '1 / 1', minWidth: 0 },
 })
 const justificationSize = growWithText(DERIVATION_JUSTIFICATION_MIN_WIDTH)
 const citationSize = growWithText(DERIVATION_CITATION_MIN_WIDTH)
+// browsers only draw the ellipsis once the field loses focus
+const lineInputSx = { fontSize: DERIVATION_LINE_FONT_SIZE, py: 0.5, textOverflow: 'ellipsis' }
 
 export default function DerivationJustificationCell({
   activeFormulaIndex,
@@ -141,7 +144,7 @@ export default function DerivationJustificationCell({
           )}
         </Stack>
       ) : (
-        <Stack direction="row" alignItems="center" sx={{ flexWrap: 'nowrap', gap: 0, minWidth: 0 }}>
+        <Stack direction="row" alignItems="center" sx={{ flexWrap: 'nowrap', columnGap: isPhone ? 0.5 : 0.75, minWidth: 0 }}>
           {useRuleDropdown ? (
             <>
               {!omitsCitations && (
@@ -166,7 +169,7 @@ export default function DerivationJustificationCell({
                     order: usesNestedSubderivations ? -1 : -2,
                     ...citationSize,
                     ...phoneShrink,
-                    '& .MuiInputBase-input': { fontSize: DERIVATION_LINE_FONT_SIZE, py: 0.5 },
+                    '& .MuiInputBase-input': lineInputSx,
                   }}
                 />
               )}
@@ -174,7 +177,7 @@ export default function DerivationJustificationCell({
                 <FormControl
                   variant="standard"
                   sx={omitsCitations
-                    ? { minWidth: DERIVATION_JUSTIFICATION_MIN_WIDTH }
+                    ? { fontSize: DERIVATION_LINE_FONT_SIZE, minWidth: DERIVATION_JUSTIFICATION_MIN_WIDTH }
                     : {
                         order: usesNestedSubderivations ? -2 : -1,
                         minWidth: isFullScreen || isMobile
@@ -226,7 +229,7 @@ export default function DerivationJustificationCell({
               sx={{
                 ...justificationSize,
                 ...phoneShrink,
-                '& .MuiInputBase-input': { fontSize: DERIVATION_LINE_FONT_SIZE, py: 0.5 },
+                '& .MuiInputBase-input': lineInputSx,
                 '& .MuiInput-root:before, & .MuiInput-root:after': {
                   right: 'auto',
                   width: '75%',
@@ -239,7 +242,7 @@ export default function DerivationJustificationCell({
             />
           )}
 
-          <Stack direction="row" alignItems="center" spacing={isPhone ? 0.25 : 0.75} sx={{ ml: isPhone ? 0.5 : 0.75, flexShrink: 0 }}>
+          <Stack direction="row" alignItems="center" spacing={isPhone ? 0.25 : 0.75} sx={{ flexShrink: 0 }}>
             {autoCheckEnabled && autoCheckStatus === 'ok' && (
               <CheckCircleIcon fontSize="small" sx={{ color: 'primary.main' }} />
             )}
