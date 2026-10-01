@@ -7,6 +7,8 @@ import {
   useCoursesDispatch,
   useCoursesState,
   initializeCourses,
+  isCourseDataLoaded,
+  loadCourseData,
   resetCourses,
 } from "../../context/CoursesContext";
 import { clearStoredUser, fetchJson } from "../../utils/api.js";
@@ -52,7 +54,8 @@ function AppShell({ children }) {
   const authDispatch = useAuthDispatch();
   const coursesDispatch = useCoursesDispatch();
   const coursesState = useCoursesState();
-  const { error: coursesError, initialized } = coursesState;
+  const { error: coursesError, initialized, activeCourseId } = coursesState;
+  const activeCourseLoaded = !activeCourseId || isCourseDataLoaded(coursesState, activeCourseId);
   const [isAccountSettingsOpen, setIsAccountSettingsOpen] = useState(false);
   const [textSize, setTextSize] = useState(readTextSize);
 
@@ -61,6 +64,12 @@ function AppShell({ children }) {
       initializeCourses(coursesDispatch);
     }
   }, [user?.role, user?.id, initialized, coursesDispatch]);
+
+  useEffect(() => {
+    if (initialized && !activeCourseLoaded) {
+      loadCourseData(coursesDispatch, activeCourseId);
+    }
+  }, [initialized, activeCourseLoaded, activeCourseId, coursesDispatch]);
 
   useEffect(() => {
     applyTextSize(textSize);
@@ -92,7 +101,7 @@ function AppShell({ children }) {
     user,
   });
   const textbookRoute = /\/textbook(?:-links)?(?:\/|$)/.test(location.pathname);
-  const pageContent = !initialized && !coursesError
+  const pageContent = (!initialized || !activeCourseLoaded) && !coursesError
     ? <LoadingSpinner label="Loading course..." />
     : textbookRoute && !isTextbookAvailable(logicSystem)
     ? <Navigate to="/dashboard" replace />
