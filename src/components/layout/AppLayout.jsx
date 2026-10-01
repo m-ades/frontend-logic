@@ -1,5 +1,6 @@
 import { Navigate, useNavigate, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { Alert, Button } from "@mui/material";
 import StudentSidebarStructure from "./StudentSidebarStructure.jsx";
 import InstructorSidebarStructure from "./InstructorSidebarStructure.jsx";
 import { useAuthState, useAuthDispatch, logout } from "../../context/AuthContext";
@@ -7,7 +8,6 @@ import {
   useCoursesDispatch,
   useCoursesState,
   initializeCourses,
-  isCourseDataLoaded,
   loadCourseData,
   resetCourses,
 } from "../../context/CoursesContext";
@@ -55,8 +55,9 @@ function AppShell({ children }) {
   const coursesDispatch = useCoursesDispatch();
   const coursesState = useCoursesState();
   const { error: coursesError, initialized, activeCourseId } = coursesState;
-  const activeCourseLoaded = !activeCourseId || isCourseDataLoaded(coursesState, activeCourseId);
-  const activeCourseRole = coursesState.courses.find((course) => course.id === activeCourseId)?.role ?? null;
+  const activeCourse = coursesState.courses.find((course) => course.id === activeCourseId);
+  const activeCourseRole = activeCourse?.role ?? null;
+  const courseStatus = activeCourseId ? coursesState.courseStatus[activeCourseId] : "loaded";
   const [isAccountSettingsOpen, setIsAccountSettingsOpen] = useState(false);
   const [textSize, setTextSize] = useState(readTextSize);
 
@@ -67,10 +68,10 @@ function AppShell({ children }) {
   }, [user?.role, user?.id, initialized, coursesDispatch]);
 
   useEffect(() => {
-    if (initialized && !activeCourseLoaded && !coursesError) {
+    if (initialized && !courseStatus) {
       loadCourseData(coursesDispatch, activeCourseId, activeCourseRole);
     }
-  }, [initialized, activeCourseLoaded, activeCourseId, activeCourseRole, coursesError, coursesDispatch]);
+  }, [initialized, courseStatus, activeCourseId, activeCourseRole, coursesDispatch]);
 
   useEffect(() => {
     applyTextSize(textSize);
@@ -90,7 +91,6 @@ function AppShell({ children }) {
     ? InstructorSidebarStructure
     : StudentSidebarStructure;
   const sidebarStructure = baseSidebarStructure;
-  const activeCourse = coursesState.courses.find((course) => course.id === coursesState.activeCourseId);
   const logicSystem = activeCourse?.logicSystem ?? activeCourse?.logic_system;
 
   const routeKind = isInstructorRoute ? "instructor" : "student";
@@ -102,8 +102,24 @@ function AppShell({ children }) {
     user,
   });
   const textbookRoute = /\/textbook(?:-links)?(?:\/|$)/.test(location.pathname);
-  const pageContent = (!initialized || !activeCourseLoaded) && !coursesError
+  const waitingForCourse = initialized
+    ? courseStatus !== "loaded" && courseStatus !== "error"
+    : !coursesError;
+  const pageContent = waitingForCourse
     ? <LoadingSpinner label="Loading course..." />
+    : courseStatus === "error"
+    ? (
+      <Alert
+        severity="error"
+        action={(
+          <Button color="inherit" size="small" onClick={() => loadCourseData(coursesDispatch, activeCourseId, activeCourseRole)}>
+            Retry
+          </Button>
+        )}
+      >
+        Failed to load this course.
+      </Alert>
+    )
     : textbookRoute && !isTextbookAvailable(logicSystem)
     ? <Navigate to="/dashboard" replace />
     : children;

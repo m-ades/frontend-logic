@@ -356,6 +356,7 @@ const initialState = {
   assignmentsByCourse: {},
   practicesByCourse: {},
   gradebookByCourse: {},
+  courseStatus: {},
   loading: false,
   error: null,
   initialized: false,
@@ -376,9 +377,8 @@ function coursesReducer(state, action) {
     case "SET_ERROR":
       return { ...state, error: action.payload, loading: false };
 
-    // a stale error would stop the newly active course from loading
     case "SET_ACTIVE_COURSE":
-      return { ...state, activeCourseId: action.payload, error: null };
+      return { ...state, activeCourseId: action.payload };
 
     case "SET_COURSES":
       return {
@@ -386,12 +386,18 @@ function coursesReducer(state, action) {
         courses: action.payload,
       };
 
-    // initialized only covers the course list so check isCourseDataLoaded for course data
+    // initialized only covers the course list so check courseStatus for course data
     case "FINISH_INITIALIZATION":
       return {
         ...state,
         loading: false,
         initialized: true,
+      };
+
+    case "SET_COURSE_STATUS":
+      return {
+        ...state,
+        courseStatus: { ...state.courseStatus, [action.courseId]: action.status },
       };
 
     case "SET_COURSE_DATA":
@@ -400,6 +406,7 @@ function coursesReducer(state, action) {
         assignmentsByCourse: { ...state.assignmentsByCourse, [action.courseId]: action.assignments },
         practicesByCourse: { ...state.practicesByCourse, [action.courseId]: action.practices },
         gradebookByCourse: { ...state.gradebookByCourse, [action.courseId]: action.gradebook },
+        courseStatus: { ...state.courseStatus, [action.courseId]: "loaded" },
       };
 
     case "SET_ASSIGNMENTS":
@@ -554,11 +561,6 @@ export function useActiveCourse() {
   };
 }
 
-export function isCourseDataLoaded(state, courseId) {
-  return [state.assignmentsByCourse, state.practicesByCourse, state.gradebookByCourse]
-    .every((byCourse) => byCourse[courseId] !== undefined);
-}
-
 // ============================================================================
 // SYNCHRONOUS ACTION CREATORS
 // ============================================================================
@@ -578,8 +580,6 @@ let coursesEpoch = 0;
 
 export function resetCourses(dispatch) {
   coursesEpoch += 1;
-  initializeCourses.inFlight = null;
-  assignmentsListCache.clear();
   dispatch({ type: "RESET_COURSES_STATE" });
 }
 
@@ -645,11 +645,7 @@ export async function addNewCourse(dispatch, courseData) {
 
     // Add course to state (creator is always instructor)
     dispatch({ type: "ADD_COURSE", payload: { ...newCourse, role: "instructor" } });
-
-    // Initialize empty data for the new course
-    dispatch({ type: "SET_ASSIGNMENTS", courseId: newCourse.id, payload: [] });
-    dispatch({ type: "SET_PRACTICES", courseId: newCourse.id, payload: [] });
-    dispatch({ type: "SET_GRADEBOOK", courseId: newCourse.id, payload: [] });
+    dispatch({ type: "SET_COURSE_DATA", courseId: newCourse.id, assignments: [], practices: [], gradebook: [] });
 
     dispatch({ type: "SET_LOADING", payload: false });
 
@@ -765,9 +761,7 @@ export async function initializeCourses(dispatch) {
       dispatch({ type: "SET_ERROR", payload: error.message });
       console.error("Failed to initialize courses:", error);
     } finally {
-      if (epoch === coursesEpoch) {
-        initializeCourses.inFlight = null;
-      }
+      initializeCourses.inFlight = null;
     }
   })();
 
@@ -777,6 +771,7 @@ export async function initializeCourses(dispatch) {
 // Load data for a specific course
 export async function loadCourseData(dispatch, courseId, courseRole) {
   const epoch = coursesEpoch;
+  dispatch({ type: "SET_COURSE_STATUS", courseId, status: "loading" });
   try {
     const [{ assignments, practices }, gradebook] = await Promise.all([
       fetchCourseAssignmentsAndPractices(courseId),
@@ -788,7 +783,7 @@ export async function loadCourseData(dispatch, courseId, courseRole) {
     dispatch({ type: "SET_COURSE_DATA", courseId, assignments, practices, gradebook });
   } catch (error) {
     if (epoch !== coursesEpoch) return;
-    dispatch({ type: "SET_ERROR", payload: error.message });
+    dispatch({ type: "SET_COURSE_STATUS", courseId, status: "error" });
     console.error(`Failed to load data for course ${courseId}:`, error);
   }
 }
