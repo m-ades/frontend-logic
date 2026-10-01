@@ -7,6 +7,8 @@ import { normalizeJustificationForDisplay } from '../derivation/derivationUtils.
 import { displayFormulaInput, normalizeFormulaInputs } from './formulaHelpers.js'
 import { FormulaListEditor } from './FormulaListEditor.jsx'
 import { typeKey } from './snapshotUtils.js'
+import { buildRulesetPatch } from './ruleHelpers.js'
+import { DerivationRulesetFields } from './DerivationRulesetFields.jsx'
 
 export function buildProofArgumentExtractionSnapshot(proof, edited, existing, logicSystem = DEFAULT_LOGIC_SYSTEM) {
   const snapshot = proof.questionSnapshot || proof.snapshot || {}
@@ -27,6 +29,7 @@ export function buildProofArgumentExtractionSnapshot(proof, edited, existing, lo
       ?? proof.assumptionScopes
       ?? snapshot.assumptionScopes
       ?? [],
+    ruleset: buildRulesetPatch(edited.ruleset ?? proof.ruleset ?? snapshot.ruleset ?? e.ruleset, logicSystem),
   }
 }
 
@@ -116,6 +119,11 @@ export function ProofArgumentExtractionEditorForm({ proof, value, onChange, logi
         lines={lines}
         premiseCount={premises.length}
         onChange={(next) => update({ assumptionScopes: next })}
+      />
+      <DerivationRulesetFields
+        ruleset={value.ruleset ?? proof?.ruleset ?? snapshot.ruleset}
+        logicSystem={logicSystem}
+        onChange={(next) => update({ ruleset: next })}
       />
     </Stack>
   )
