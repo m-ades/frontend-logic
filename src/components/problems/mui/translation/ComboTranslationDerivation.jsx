@@ -328,6 +328,7 @@ export default function ComboTranslationDerivation({
             <SymbolButtonRow
               inputRef={inputRef}
               onValueChange={handleArgumentChange}
+              showBackspace={false}
               logicSystem={logicSystem}
             />
           </Box>

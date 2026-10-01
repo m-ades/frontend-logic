@@ -274,6 +274,7 @@ export default function ProofArgumentExtraction({
                 inputRef={argumentInputRef}
                 onValueChange={handleArgumentChange}
                 includeQuantifiers={argumentKeyboardConfig.isPredicateMode}
+                showBackspace={false}
                 extraInsertButtons={ARGUMENT_SEPARATOR_BUTTONS}
                 logicSystem={logicSystem}
               />
