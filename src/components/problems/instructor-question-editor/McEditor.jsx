@@ -13,6 +13,7 @@ import {
 } from '@mui/material'
 import AddIcon from '@mui/icons-material/Add'
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
+import { hasNonEmptyAnswerIndices } from '@logic-app/logic-engine/multiple-choice-utils.js'
 import { typeKey } from './snapshotUtils.js'
 
 export function buildMcSnapshot(proof, edited, existing) {
@@ -38,9 +39,10 @@ export function buildMcSnapshot(proof, edited, existing) {
     if (Array.isArray(edited.answerIndices) && edited.answerIndices.length > 1) {
       patch.multiSelect = true
       patch.answerIndices = edited.answerIndices
-      patch.answerIndex = undefined
     } else {
       patch.answerIndex = Number(edited.answerIndices?.[0] ?? answerIndex)
+      // a saved answer list outranks answerIndex so keep it in step
+      if (hasNonEmptyAnswerIndices(e)) patch.answerIndices = [patch.answerIndex]
     }
   }
   return patch

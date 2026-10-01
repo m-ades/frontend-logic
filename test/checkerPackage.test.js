@@ -5,7 +5,11 @@ import { computeTruthTableAnswer } from '@logic-app/logic-engine/truthTableAnswe
 import { mapQuestionToProof } from '../src/lib/mapQuestionToProof.js';
 
 test('local standalone choices accept correct selections with empty composite fields', async () => {
-  for (const [answer, correct, incorrect] of [[{ answerIndex: 1 }, 1, 0], [{ answerIndices: [0, 2] }, [2, 0], [0]]]) {
+  for (const [answer, correct, incorrect] of [
+    [{ answerIndex: 1 }, 1, 0],
+    [{ answerIndices: [0, 2] }, [2, 0], [0]],
+    [{ answerIndex: 0, multiSelect: true, answerIndices: [1, 2] }, [2, 1], [0]],
+  ]) {
     const proof = mapQuestionToProof({
       id: 1,
       question_snapshot: { type: 'multiple-choice', choices: ['a', 'b', 'c'], ...answer },
