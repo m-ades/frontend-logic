@@ -44,6 +44,7 @@ import GradeBreakdown from "./GradeBreakdown";
 import { formatEasternDateTime } from "../../../utils/easternTime.js";
 import { useAppRuntime } from "../../../hooks/useAppRuntime.js";
 import { excludeNonStudents } from "../../../utils/GradebookUtils.js";
+import { hasInstructorAccess } from "../../../utils/auth.js";
 
 // Helper functions
 function getLetterGrade(grade) {
@@ -390,7 +391,7 @@ export default function AssignmentDetailModal({ open, onClose, assignmentId }) {
         {activeTab === 1 && (
           <StudentSubmissionsTable
             students={studentSubmissions}
-            onView={activeCourse?.role === "instructor" || user?.is_system_admin ? setSelectedStudent : undefined}
+            onView={hasInstructorAccess(user, activeCourse?.role) ? setSelectedStudent : undefined}
           />
         )}
       </DialogContent>

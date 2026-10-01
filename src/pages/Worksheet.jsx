@@ -725,23 +725,28 @@ function RealWorksheetContent() {
         })
       })
 
+      const worksheetsWithProofs = worksheetData.filter((worksheet) => worksheet.proofs.length)
       const draftMap = new Map()
-      try {
-        const drafts = await fetchJson('/api/assignment-drafts')
-        drafts.forEach((draft) => {
-          if (draft.user_id !== activeUserId) return
-          if (!questionIds.has(draft.assignment_question_id)) return
-          draftMap.set(draft.assignment_question_id, draft.draft_data)
+      // no await so drafts and submissions load side by side
+      const draftsLoaded = Promise.all(
+        worksheetsWithProofs.map(async (worksheet) => {
+          try {
+            const drafts = await fetchJson(`/api/assignment-drafts?assignmentId=${worksheet.id}`)
+            drafts.forEach((draft) => {
+              if (draft.user_id !== activeUserId) return
+              if (!questionIds.has(draft.assignment_question_id)) return
+              draftMap.set(draft.assignment_question_id, draft.draft_data)
+            })
+          } catch (err) {
+            // ignore draft load errors for now
+          }
         })
-      } catch (err) {
-        // ignore draft load errors for now
-      }
+      )
 
       const submissionMap = new Map()
       const correctQuestionIds = new Set()
       const attemptCountMap = new Map()
       const scoreByQuestion = new Map()
-      const worksheetsWithProofs = worksheetData.filter((worksheet) => worksheet.proofs.length)
       await Promise.all(
         worksheetsWithProofs.map(async (worksheet) => {
           try {
@@ -771,6 +776,7 @@ function RealWorksheetContent() {
           }
         })
       )
+      await draftsLoaded
 
       const initialStates = {}
       questionIds.forEach((questionId) => {
