@@ -24,6 +24,7 @@ import { getStudentAverage, formatStudentDisplayName } from "../../../utils/Grad
 import StudentProfileModal from "../StudentProfileModal";
 import StudentSubmissionDialog from "./StudentSubmissionDialog.jsx";
 import { useAppRuntime } from "../../../hooks/useAppRuntime.js";
+import { hasInstructorAccess } from "../../../utils/auth.js";
 
 function splitAssignmentTitle(name = "") {
   const trimmed = String(name || "").trim();
@@ -50,7 +51,7 @@ export default function GradebookTable({
   const { courses, activeCourseId } = courseState;
   const activeCourse = courses.find((c) => c.id === activeCourseId);
   const gradingScale = activeCourse?.gradingScale || getDefaultGradingScale();
-  const isInstructor = activeCourse?.role === "instructor" || Boolean(user?.is_system_admin);
+  const isInstructor = hasInstructorAccess(user, activeCourse?.role);
 
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [profileModalOpen, setProfileModalOpen] = useState(false);

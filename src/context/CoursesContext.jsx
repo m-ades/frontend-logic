@@ -2,7 +2,7 @@ import { createContext, useContext, useReducer } from "react";
 import { fetchJson, getStoredUser } from "../utils/api.js";
 import { DEFAULT_LOGIC_SYSTEM, normalizeLogicSystem } from "../lib/logicSystems.js";
 import { sortAssignmentsBySubchapter } from "../utils/assignmentSort.js";
-import { isInstructorRole } from "../utils/auth.js";
+import { hasInstructorAccess } from "../utils/auth.js";
 import { excludeNonStudents } from "../utils/GradebookUtils.js";
 import {
   parseDueDateAsEastern,
@@ -775,13 +775,14 @@ export async function initializeCourses(dispatch) {
 }
 
 // Load data for a specific course
-export async function loadCourseData(dispatch, courseId) {
+export async function loadCourseData(dispatch, courseId, courseRole) {
   const epoch = coursesEpoch;
   try {
-    const isInstructor = isInstructorRole(getStoredUser()?.role);
     const [{ assignments, practices }, gradebook] = await Promise.all([
       fetchCourseAssignmentsAndPractices(courseId),
-      isInstructor ? fetchCourseGradebook(courseId) : Promise.resolve([]),
+      hasInstructorAccess(getStoredUser(), courseRole)
+        ? fetchCourseGradebook(courseId)
+        : Promise.resolve([]),
     ]);
     if (epoch !== coursesEpoch) return;
     dispatch({ type: "SET_COURSE_DATA", courseId, assignments, practices, gradebook });

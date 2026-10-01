@@ -56,6 +56,7 @@ function AppShell({ children }) {
   const coursesState = useCoursesState();
   const { error: coursesError, initialized, activeCourseId } = coursesState;
   const activeCourseLoaded = !activeCourseId || isCourseDataLoaded(coursesState, activeCourseId);
+  const activeCourseRole = coursesState.courses.find((course) => course.id === activeCourseId)?.role ?? null;
   const [isAccountSettingsOpen, setIsAccountSettingsOpen] = useState(false);
   const [textSize, setTextSize] = useState(readTextSize);
 
@@ -67,9 +68,9 @@ function AppShell({ children }) {
 
   useEffect(() => {
     if (initialized && !activeCourseLoaded && !coursesError) {
-      loadCourseData(coursesDispatch, activeCourseId);
+      loadCourseData(coursesDispatch, activeCourseId, activeCourseRole);
     }
-  }, [initialized, activeCourseLoaded, activeCourseId, coursesError, coursesDispatch]);
+  }, [initialized, activeCourseLoaded, activeCourseId, activeCourseRole, coursesError, coursesDispatch]);
 
   useEffect(() => {
     applyTextSize(textSize);
