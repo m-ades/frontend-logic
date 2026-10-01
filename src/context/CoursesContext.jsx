@@ -117,6 +117,9 @@ const mapAssignmentRecord = (assignment) => {
     isPublished: !assignment.is_locked,
     isLocked: assignment.is_locked,
     groupQuestionsByType: assignment.group_questions_by_type ?? false,
+    ...(assignment.completions === undefined
+      ? {}
+      : { completions: Number(assignment.completions) || 0 }),
   };
 };
 
