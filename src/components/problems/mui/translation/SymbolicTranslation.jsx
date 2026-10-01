@@ -151,14 +151,15 @@ export default function SymbolicTranslation({
             : []))
     : []
   const variableLetters = isPredicate ? ST_PREDICATE_VARIABLES : []
-  const letterInsertButtons = allowIndexedSymbols
+  // plain letters are typeable so desktop only gets subscripted ones
+  const indexedLetterButtons = allowIndexedSymbols
     ? (isPredicate
         ? [...predicateLetters, ...constantLetters, ...variableLetters]
         : getVariableLettersOnly(symbolizationKey)
-      ).map((letter) => {
-        const displayLetter = displayIndexedSymbolsForNotation(letter, notation)
-        return { insert: displayLetter, label: displayLetter }
-      })
+      )
+        .map((letter) => displayIndexedSymbolsForNotation(letter, notation))
+        .filter((letter) => /[₀-₉]/.test(letter))
+        .map((letter) => ({ insert: letter, label: letter }))
     : []
 
   const scheduleStateSave = useCallback((nextValue) => {
@@ -333,7 +334,7 @@ export default function SymbolicTranslation({
               scheduleStateSave(value)
             }}
             logicSystem={logicSystem}
-            extraInsertButtons={[...letterInsertButtons, ...separatorButtons]}
+            extraInsertButtons={[...indexedLetterButtons, ...separatorButtons]}
           />
         </Box>
       )}

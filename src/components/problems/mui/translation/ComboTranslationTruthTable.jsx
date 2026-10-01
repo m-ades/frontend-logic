@@ -234,6 +234,7 @@ export default function ComboTranslationTruthTable({
               inputRef={inputRef}
               onValueChange={handleArgumentChange}
               includeQuantifiers={false}
+              showBackspace={false}
               logicSystem={logicSystem}
             />
           </Box>
