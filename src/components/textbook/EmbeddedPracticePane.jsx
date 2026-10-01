@@ -115,7 +115,7 @@ export default function EmbeddedPracticePane({
             `/api/assignments/${selectedId}?userId=${encodeURIComponent(userId || '')}`,
             { signal: controller.signal },
           ),
-          fetchJson('/api/assignment-drafts', { signal: controller.signal })
+          fetchJson(`/api/assignment-drafts?assignmentId=${selectedId}`, { signal: controller.signal })
             .catch((error) => {
               if (error?.name === 'AbortError') throw error
               return []
