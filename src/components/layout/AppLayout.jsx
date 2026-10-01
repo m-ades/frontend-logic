@@ -66,10 +66,10 @@ function AppShell({ children }) {
   }, [user?.role, user?.id, initialized, coursesDispatch]);
 
   useEffect(() => {
-    if (initialized && !activeCourseLoaded) {
+    if (initialized && !activeCourseLoaded && !coursesError) {
       loadCourseData(coursesDispatch, activeCourseId);
     }
-  }, [initialized, activeCourseLoaded, activeCourseId, coursesDispatch]);
+  }, [initialized, activeCourseLoaded, activeCourseId, coursesError, coursesDispatch]);
 
   useEffect(() => {
     applyTextSize(textSize);
