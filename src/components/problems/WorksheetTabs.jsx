@@ -39,6 +39,7 @@ export default function WorksheetTabs({
   isOverdue,
   isInstructorView = false,
   canGrantAttempts = isInstructorView,
+  canSubmitWhileLocked = false,
   onQuestionSaved,
   onQuestionCreated,
   logicSystem,
@@ -79,7 +80,7 @@ export default function WorksheetTabs({
             gradeLabel={gradeLabel}
             policySummary={policySummary}
             isOverdue={isOverdue}
-            isAssignmentLocked={worksheet.isLocked ?? false}
+            isAssignmentLocked={!canSubmitWhileLocked && (worksheet.isLocked ?? false)}
             isInstructorView={isInstructorView}
             canGrantAttempts={canGrantAttempts}
             onQuestionSaved={onQuestionSaved}
