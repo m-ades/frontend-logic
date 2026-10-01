@@ -14,6 +14,7 @@ import { sortAssignmentsBySubchapter } from '../utils/assignmentSort.js'
 import { displayScoreForProof } from '../utils/problemHelpers.js'
 import { useCoursesState } from '../context/CoursesContext.jsx'
 import { useAppRuntime } from '../hooks/useAppRuntime.js'
+import { hasStaffAccess } from '../utils/auth.js'
 import { DEFAULT_LOGIC_SYSTEM, isDerivationProblemType, normalizeLogicSystem } from '../lib/logicSystems.js'
 import { mapQuestionToProof, logicSystemForQuestionType } from '../lib/mapQuestionToProof.js'
 import WorksheetTextbookSplit from '../components/textbook/WorksheetTextbookSplit.jsx'
@@ -241,7 +242,7 @@ function RealWorksheetContent() {
   const [currentDueAt, setCurrentDueAt] = useState(null)
   const [questionScores, setQuestionScores] = useState({})
   const { activeCourseId, courses } = useCoursesState()
-  const { assignmentPath, assignmentsPath, isInstructor } = useAppRuntime()
+  const { assignmentPath, assignmentsPath, isInstructor, user } = useAppRuntime()
   const courseId = activeCourseId ?? API_CONFIG.courseId
   const courseIdForApi = activeCourseId ?? null
   const activeCourse = useMemo(
@@ -1113,6 +1114,7 @@ function RealWorksheetContent() {
             policySummary={policySummary}
             isOverdue={isOverdue}
             isInstructorView={isInstructor}
+            canSubmitWhileLocked={hasStaffAccess(user, activeCourse?.role)}
             onQuestionSaved={currentWorksheet?.id ? (qId) => refreshQuestionSolutions(currentWorksheet.id, qId) : undefined}
             onQuestionCreated={handleQuestionCreated}
             logicSystem={courseLogicSystem}
