@@ -19,9 +19,10 @@ export const DERIVATION_FORMULA_MIN_WIDTH = '15.625rem'
 export const DERIVATION_FORMULA_WIDTH = '21.875rem'
 export const DERIVATION_RULE_WIDTH_MOBILE = '4.375rem'
 export const DERIVATION_RULE_WIDTH_DESKTOP = '5.46875rem'
-// line font ch widths that fit "↔I 10-14, 15-20" and its citations without scrolling
-export const DERIVATION_JUSTIFICATION_WIDTH = '13ch'
-export const DERIVATION_CITATION_WIDTH = '10.5ch'
+// justification fields start at their original widths and grow with their text up to the cap
+export const DERIVATION_JUSTIFICATION_MIN_WIDTH = { xs: 'calc(7ch + 4.375rem)', sm: 'calc(7ch + 5.46875rem)' }
+export const DERIVATION_CITATION_MIN_WIDTH = '7ch'
+export const DERIVATION_JUSTIFICATION_MAX_WIDTH = '18rem'
 export const DERIVATION_INDENT_STEP_REM = 0.75
 export const DERIVATION_INDENT_STEP = '0.75rem'
 export const FITCH_LINE_WIDTH = '1px'

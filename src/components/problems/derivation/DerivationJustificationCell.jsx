@@ -1,5 +1,5 @@
 import {
-  Box,
+  Badge,
   Chip,
   FormControl,
   IconButton,
@@ -14,10 +14,12 @@ import {
 import CancelIcon from '@mui/icons-material/Cancel'
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
+import ArrowLeftIcon from '@mui/icons-material/ArrowLeft'
 import DerivationFormulaText from './DerivationFormulaText.jsx'
 import {
-  DERIVATION_CITATION_WIDTH,
-  DERIVATION_JUSTIFICATION_WIDTH,
+  DERIVATION_CITATION_MIN_WIDTH,
+  DERIVATION_JUSTIFICATION_MAX_WIDTH,
+  DERIVATION_JUSTIFICATION_MIN_WIDTH,
   DERIVATION_LINE_FONT_SIZE,
   DERIVATION_RULE_WIDTH_DESKTOP,
   DERIVATION_RULE_WIDTH_MOBILE,
@@ -28,15 +30,32 @@ import {
   isDerivationFieldReadOnly,
 } from './derivationUtils.js'
 
-// font size here only makes ch resolve against the line font
-const lineFontWidth = (width) => ({
+/*
+a hidden copy of the text in data-text sizes the field so it widens instead of scrolling
+the input itself is one character wide so only that copy and the minimum set the width
+*/
+const growWithText = (minWidth) => ({
+  display: 'inline-grid',
+  // font size here makes ch resolve against the line font and the hidden copy inherits it
   fontSize: DERIVATION_LINE_FONT_SIZE,
-  width,
-  maxWidth: width,
-  minWidth: width,
+  minWidth,
+  maxWidth: DERIVATION_JUSTIFICATION_MAX_WIDTH,
+  '&::after': {
+    content: 'attr(data-text) " "',
+    gridArea: '1 / 1',
+    height: 0,
+    overflow: 'hidden',
+    visibility: 'hidden',
+    whiteSpace: 'pre',
+  },
+  '& > .MuiInputBase-root': { gridArea: '1 / 1', minWidth: 0 },
 })
-const justificationWidth = lineFontWidth(DERIVATION_JUSTIFICATION_WIDTH)
-const citationWidth = lineFontWidth(DERIVATION_CITATION_WIDTH)
+const justificationSize = growWithText(DERIVATION_JUSTIFICATION_MIN_WIDTH)
+const citationSize = growWithText(DERIVATION_CITATION_MIN_WIDTH)
+// browsers only draw the ellipsis once the field loses focus
+const lineInputSx = { fontSize: DERIVATION_LINE_FONT_SIZE, py: 0.5, textOverflow: 'ellipsis' }
+// a 2px outline matches the delete icon's stroke weight since chrome floors fractional borders
+const dischargeChipSx = { borderRadius: 1, '&.MuiChip-outlined': { borderWidth: '2px' } }
 
 export default function DerivationJustificationCell({
   activeFormulaIndex,
@@ -83,6 +102,12 @@ export default function DerivationJustificationCell({
   const ruleOptions = selectedRule && !allowedRules.some((rule) => (
     rule.toLowerCase() === selectedRule.toLowerCase()
   )) ? [selectedRule, ...allowedRules] : allowedRules
+  // full screen phones fill the space beside the controls and squeeze before anything wraps
+  const phoneShrink = isPhone && isFullScreen ? { minWidth: 0, flex: '1 1 auto' } : null
+  const citationText = citationDraft ?? formatJustificationLines(line.justification)
+  const typedPlaceholder = lineIndex === premisesCount
+    ? (usesNestedSubderivations ? 'Rule & line(s)' : 'line(s) and rule')
+    : ''
   const requestFullScreen = (event) => {
     if (justificationReadOnly) return
     onRequestFullScreen(event)
@@ -95,12 +120,20 @@ export default function DerivationJustificationCell({
         pl: 0.5,
         verticalAlign: 'middle',
         ...(isFullScreen ? { width: '50%', minWidth: 0 } : { width: 'auto', whiteSpace: 'nowrap' }),
-        '& .line-delete': {
-          // phones don't have real hover, so reveal by active line there instead
-          opacity: isPhone ? Number(activeFormulaIndex === lineIndex) : 0,
-          transition: 'opacity 120ms ease',
+        '& .line-action': { transition: 'opacity 120ms ease' },
+        '& .line-action:focus-visible': { opacity: 1 },
+        '@media (hover: hover)': {
+          '& .line-action': { opacity: 0 },
+          '&:hover .line-action': { opacity: 1 },
         },
-        ...(!isPhone && { '&:hover .line-delete': { opacity: 1 } }),
+        /*
+        touch screens can't hover so only the line being edited shows its actions
+        hidden ones stop taking taps so a line can't be deleted blind
+        */
+        '@media (hover: none)': isActiveLine ? {} : {
+          '& .line-action': { opacity: 0, pointerEvents: 'none' },
+          '& .line-discharge': { display: 'none' },
+        },
       }}
     >
       {isPremise ? (
@@ -120,14 +153,15 @@ export default function DerivationJustificationCell({
           )}
         </Stack>
       ) : (
-        <Stack direction="row" alignItems="center" sx={{ flexWrap: isPhone ? 'wrap' : 'nowrap', gap: 0, minWidth: 0 }}>
+        <Stack direction="row" alignItems="center" sx={{ flexWrap: 'nowrap', columnGap: isPhone ? 0.5 : 0.75, minWidth: 0 }}>
           {useRuleDropdown ? (
             <>
               {!omitsCitations && (
                 <TextField
                   variant="standard"
                   placeholder="Line(s)"
-                  value={citationDraft ?? formatJustificationLines(line.justification)}
+                  value={citationText}
+                  data-text={citationText || 'Line(s)'}
                   onFocus={onActivate}
                   onPointerDown={requestFullScreen}
                   onChange={(event) => onCitationChange(event.target.value)}
@@ -136,13 +170,15 @@ export default function DerivationJustificationCell({
                   InputProps={{ disableUnderline: true, readOnly: justificationReadOnly }}
                   inputProps={{
                     autoComplete: 'off',
+                    size: 1,
                     'aria-label': `Referenced line numbers for line ${lineIndex + 1}`,
                   }}
                   inputRef={registerInput}
                   sx={{
                     order: usesNestedSubderivations ? -1 : -2,
-                    ...citationWidth,
-                    '& .MuiInputBase-input': { fontSize: DERIVATION_LINE_FONT_SIZE, py: 0.5 },
+                    ...citationSize,
+                    ...phoneShrink,
+                    '& .MuiInputBase-input': lineInputSx,
                   }}
                 />
               )}
@@ -150,7 +186,7 @@ export default function DerivationJustificationCell({
                 <FormControl
                   variant="standard"
                   sx={omitsCitations
-                    ? justificationWidth
+                    ? { fontSize: DERIVATION_LINE_FONT_SIZE, minWidth: DERIVATION_JUSTIFICATION_MIN_WIDTH }
                     : {
                         order: usesNestedSubderivations ? -2 : -1,
                         minWidth: isFullScreen || isMobile
@@ -188,21 +224,21 @@ export default function DerivationJustificationCell({
           ) : (
             <TextField
               variant="standard"
-              placeholder={lineIndex === premisesCount
-                ? (usesNestedSubderivations ? 'Rule & line(s)' : 'line(s) and rule')
-                : ''}
+              placeholder={typedPlaceholder}
               value={line.justification}
+              data-text={line.justification || typedPlaceholder}
               onFocus={onActivate}
               onPointerDown={requestFullScreen}
               onChange={onJustificationChange}
               onKeyDown={onKeyDown}
               onBlur={(event) => onTypedCommit(event.target.value)}
               InputProps={{ readOnly: justificationReadOnly }}
-              inputProps={{ autoComplete: 'off', 'aria-label': `Justification for line ${lineIndex + 1}` }}
+              inputProps={{ autoComplete: 'off', size: 1, 'aria-label': `Justification for line ${lineIndex + 1}` }}
               inputRef={registerInput}
               sx={{
-                ...justificationWidth,
-                '& .MuiInputBase-input': { fontSize: DERIVATION_LINE_FONT_SIZE, py: 0.5 },
+                ...justificationSize,
+                ...phoneShrink,
+                '& .MuiInputBase-input': lineInputSx,
                 '& .MuiInput-root:before, & .MuiInput-root:after': {
                   right: 'auto',
                   width: '75%',
@@ -215,7 +251,7 @@ export default function DerivationJustificationCell({
             />
           )}
 
-          <Stack direction="row" alignItems="center" spacing={0.75} sx={{ ml: 0.75 }}>
+          <Stack direction="row" alignItems="center" spacing={isPhone ? 0.25 : 0.75} sx={{ flexShrink: 0 }}>
             {autoCheckEnabled && autoCheckStatus === 'ok' && (
               <CheckCircleIcon fontSize="small" sx={{ color: 'primary.main' }} />
             )}
@@ -223,23 +259,36 @@ export default function DerivationJustificationCell({
               <CancelIcon fontSize="small" color="error" />
             )}
             {showDischargeControl && (
-              // skip the reserved width on phone - it was pushing delete off the clipped fullscreen viewport
-              <Box sx={{ minWidth: isPhone ? 0 : '4.5rem', display: 'flex', alignItems: 'center' }}>
-                {isActiveLine && (
-                  <Tooltip title={dischargeAction}>
-                    <Chip
-                      label={dischargeLabel}
-                      onClick={onToggleDischarge}
-                      size="small"
-                      clickable
-                      color={isDischarged ? 'primary' : 'default'}
-                      variant={isDischarged ? 'filled' : 'outlined'}
-                      aria-label={`${dischargeAction} on line ${lineIndex + 1}`}
-                      sx={{ borderRadius: 1 }}
-                    />
-                  </Tooltip>
+              <Tooltip title={dischargeAction}>
+                {isPhone ? (
+                  // a bare symbol stays beside the justification instead of wrapping under it
+                  <IconButton
+                    onClick={onToggleDischarge}
+                    size="small"
+                    color={isDischarged ? 'primary' : 'default'}
+                    aria-label={`${dischargeAction} on line ${lineIndex + 1}`}
+                    aria-pressed={Boolean(isDischarged)}
+                    className="line-action line-discharge"
+                  >
+                    <Badge badgeContent={isDischarged > 1 ? isDischarged : 0} color="primary">
+                      <ArrowLeftIcon fontSize="small" />
+                    </Badge>
+                  </IconButton>
+                ) : (
+                  <Chip
+                    label={dischargeLabel}
+                    onClick={onToggleDischarge}
+                    size="small"
+                    clickable
+                    color={isDischarged ? 'primary' : 'default'}
+                    variant={isDischarged ? 'filled' : 'outlined'}
+                    aria-label={`${dischargeAction} on line ${lineIndex + 1}`}
+                    aria-pressed={Boolean(isDischarged)}
+                    className="line-action line-discharge"
+                    sx={dischargeChipSx}
+                  />
                 )}
-              </Box>
+              </Tooltip>
             )}
             {!line.readOnly && !line.formulaReadOnly && (
               <Tooltip title="Delete line">
@@ -247,7 +296,7 @@ export default function DerivationJustificationCell({
                   onClick={onDelete}
                   size="small"
                   aria-label={`Delete line ${lineIndex + 1}`}
-                  className="line-delete"
+                  className="line-action"
                 >
                   <DeleteOutlineIcon />
                 </IconButton>
