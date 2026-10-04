@@ -17,3 +17,13 @@ export function formatNumber(value) {
   const rounded = roundNumber(value);
   return rounded === null ? '—' : String(rounded);
 }
+
+// formats minutes as seconds under a minute and whole minutes otherwise with a dash for missing values
+export function formatMinutes(value) {
+  const minutes = numberOrNull(value);
+  if (minutes === null) return '—';
+  const seconds = Math.round(minutes * 60);
+  if (seconds < 60) return `${seconds} sec`;
+  const rounded = Math.round(minutes);
+  return `${rounded} min${rounded === 1 ? '' : 's'}`;
+}

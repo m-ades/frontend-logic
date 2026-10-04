@@ -1,4 +1,4 @@
-import { roundNumber, formatNumber } from "../../utils/numberUtils.js";
+import { roundNumber, formatNumber, formatMinutes } from "../../utils/numberUtils.js";
 import { calculateGradeDistribution } from "../../utils/gradingUtils.js";
 import { Box, Typography, Alert, LinearProgress, useTheme } from "@mui/material";
 import { useEffect, useMemo, useState } from "react";
@@ -154,6 +154,7 @@ export default function InstructorDashboard() {
         avgAttempts: stats?.avg_attempt ?? null,
         medianMinutesPerQuestion,
         avgMinutesPerQuestion,
+        difficultyLabel: stats?.difficulty_label ?? null,
         submissions,
         totalStudents,
         dueDate: formatEasternDateTime(assignment.dueDate, assignment.dueTime) ?? "—",
@@ -322,7 +323,7 @@ export default function InstructorDashboard() {
           Time-on-task by category
         </Typography>
         <Typography variant="body2" color="text.secondary" mb={2}>
-          Average active minutes students spend, grouped by assignment category.
+          Median time a student spends on one question, grouped by question type.
         </Typography>
         {timeByCategory.length === 0 ? (
           <Alert severity="info">
@@ -342,11 +343,7 @@ export default function InstructorDashboard() {
                 <li key={item.key || item.category || item.label}>
                   <Typography variant="body2">
                     <strong>{item.label || item.category || item.key}:</strong>{" "}
-                    {typeof item.avg_minutes === "number"
-                      ? `${Math.round(item.avg_minutes)} mins`
-                      : typeof item.avgMinutes === "number"
-                      ? `${Math.round(item.avgMinutes)} mins`
-                      : "—"}
+                    {formatMinutes(item.median_minutes)}
                   </Typography>
                 </li>
               ))}

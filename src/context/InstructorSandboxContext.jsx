@@ -299,7 +299,7 @@ export function InstructorSandboxProvider({ children }) {
           label: assignment.chapter && assignment.subchapter
             ? `${formatChapterLabel(assignment.chapter, logicSystem)}, ${formatSubchapterLabel(assignment.subchapter, '', logicSystem)}`
             : formatChapterLabel(assignment.chapter, logicSystem),
-          avg_minutes: 8 + Number(assignment.chapter || 1) * 2,
+          median_minutes: 8 + Number(assignment.chapter || 1) * 2,
         }))
 
         return [courseId, {

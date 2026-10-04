@@ -1,4 +1,4 @@
-import { roundNumber, formatNumber, numberOrNull } from "../../../utils/numberUtils.js";
+import { roundNumber, formatNumber, numberOrNull, formatMinutes } from "../../../utils/numberUtils.js";
 import { useEffect, useState } from "react";
 import {
   Dialog,
@@ -65,7 +65,7 @@ function getGradeColor(grade) {
   return "error";
 }
 
-export default function AssignmentDetailModal({ open, onClose, assignmentId }) {
+export default function AssignmentDetailModal({ open, onClose, assignmentId, medianMinutesPerQuestion }) {
   const theme = useTheme();
   const [activeTab, setActiveTab] = useState(0);
   const [selectedStudent, setSelectedStudent] = useState(null);
@@ -103,17 +103,8 @@ export default function AssignmentDetailModal({ open, onClose, assignmentId }) {
     (student) => student.lateSubmissions?.[assignment.id]
   ).length;
 
-  // Time-on-task analytics (backend-provided if available)
-  const avgMinutesPerQuestion =
-    typeof assignment.avgMinutesPerQuestion === "number"
-      ? assignment.avgMinutesPerQuestion
-      : typeof assignment.avg_minutes_per_question === "number"
-      ? assignment.avg_minutes_per_question
-      : null;
-  const avgMinutesLabel =
-    avgMinutesPerQuestion != null
-      ? `${Math.round(avgMinutesPerQuestion)} min${Math.round(avgMinutesPerQuestion) === 1 ? "" : "s"} / question`
-      : "—";
+  const medianMinutesLabel =
+    medianMinutesPerQuestion != null ? `${formatMinutes(medianMinutesPerQuestion)} / question` : "—";
 
   // Calculate grade distribution
   const gradeDistribution = [
@@ -240,7 +231,7 @@ export default function AssignmentDetailModal({ open, onClose, assignmentId }) {
               )}
             </Box>
             <Typography variant="body2" color="text.secondary">
-              Due: {formatEasternDateTime(assignment.dueDate, assignment.dueTime) ?? "—"} • Avg time: {avgMinutesLabel}
+              Due: {formatEasternDateTime(assignment.dueDate, assignment.dueTime) ?? "—"} • Median time: {medianMinutesLabel}
             </Typography>
           </Box>
           <IconButton onClick={onClose} size="small">

@@ -1,4 +1,4 @@
-import { roundNumber, formatNumber } from "../../../utils/numberUtils.js";
+import { roundNumber, formatNumber, formatMinutes } from "../../../utils/numberUtils.js";
 import { useState } from "react";
 import {
   Box,
@@ -356,7 +356,7 @@ export const AssignmentOverviewTable = ({
                       </Box>
                     </TableCell>
                     <TableCell align="center">
-                      <MuiTooltip title="Average attempts per student">
+                      <MuiTooltip title="Average attempts per question per student">
                         <Typography variant="body2" color="text.secondary">
                           {assignment.avgAttempts !== null && assignment.avgAttempts !== undefined
                             ? formatNumber(assignment.avgAttempts)
@@ -381,11 +381,7 @@ export const AssignmentOverviewTable = ({
                     <TableCell align="center">
                       <MuiTooltip title="Median minutes per question for this assignment">
                         <Typography variant="body2" color="text.secondary">
-                          {assignment.medianMinutesPerQuestion != null
-                            ? `${Math.round(assignment.medianMinutesPerQuestion)} min${
-                                Math.round(assignment.medianMinutesPerQuestion) === 1 ? "" : "s"
-                              }`
-                            : "—"}
+                          {formatMinutes(assignment.medianMinutesPerQuestion)}
                         </Typography>
                       </MuiTooltip>
                     </TableCell>
@@ -394,13 +390,13 @@ export const AssignmentOverviewTable = ({
                         <MuiTooltip
                           title={
                             assignment.difficultyLabel === "too_easy"
-                              ? "Students finish quickly with high correctness; good as a warm-up."
+                              ? "Faster than similar questions in this course with high correctness; good as a warm-up."
                               : assignment.difficultyLabel === "balanced"
                               ? "Time and correctness are in a healthy range for practice."
                               : assignment.difficultyLabel === "too_hard"
-                              ? "Students spend a long time with low correctness; consider revising or scaffolding."
+                              ? "Low correctness without rushing compared with similar questions; consider revising or scaffolding."
                               : assignment.difficultyLabel === "confusing"
-                              ? "Short time but low correctness; wording or concepts may be unclear."
+                              ? "Faster than similar questions but low correctness; wording or concepts may be unclear."
                               : ""
                           }
                         >
@@ -457,6 +453,10 @@ export const AssignmentOverviewTable = ({
         open={modalOpen}
         onClose={handleModalClose}
         assignmentId={selectedAssignmentId}
+        medianMinutesPerQuestion={
+          assignmentsWithMetrics.find((assignment) => assignment.id === selectedAssignmentId)
+            ?.medianMinutesPerQuestion
+        }
       />
     </>
   );

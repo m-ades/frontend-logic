@@ -1,4 +1,4 @@
-import { roundNumber, formatNumber, numberOrNull } from "../utils/numberUtils.js";
+import { roundNumber, formatNumber, numberOrNull, formatMinutes } from "../utils/numberUtils.js";
 import { Link } from 'react-router-dom'
 import { useEffect, useMemo, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
@@ -401,13 +401,11 @@ export default function Dashboard() {
   const activityStats = useMemo(() => {
     const median = analytics.time.median_minutes_per_question ?? analytics.time.avg_minutes_per_question
     const p75 = analytics.time.p75_minutes_per_question
-    const medianLabel = median != null ? `${Math.round(median)} mins` : '—'
+    const medianLabel = formatMinutes(median)
     const rangeLabel =
       median != null && p75 != null
-        ? `${Math.round(median)}–${Math.round(p75)} mins`
-        : median != null
-        ? `${Math.round(median)} mins`
-        : '—'
+        ? `${formatMinutes(median)}–${formatMinutes(p75)}`
+        : medianLabel
     const cohortMedian = analytics.time.cohort_median_minutes_per_question
     const relativeToCohort =
       median != null && cohortMedian != null && cohortMedian > 0
