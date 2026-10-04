@@ -230,7 +230,6 @@ export function SandboxProvider({ children }) {
       time: {
         ...classroomAnalytics.time,
         median_minutes_per_question: medianMinutes,
-        avg_minutes_per_question: medianMinutes,
         p75_minutes_per_question: p75Minutes,
       },
       submissionCount,

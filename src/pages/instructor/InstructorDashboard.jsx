@@ -133,16 +133,6 @@ export default function InstructorDashboard() {
       const submissions = totalStudents
         ? Math.min(submissionsRaw, totalStudents)
         : submissionsRaw;
-      const medianMinutesPerQuestion =
-        typeof stats?.median_minutes_per_question === "number"
-          ? stats.median_minutes_per_question
-          : typeof stats?.median_minutes === "number"
-          ? stats.median_minutes
-          : null;
-      const avgMinutesPerQuestion =
-        typeof stats?.avg_minutes_per_question === "number"
-          ? stats.avg_minutes_per_question
-          : null;
       const dueAtValue = assignment.dueAt
         || (assignment.dueDate
           ? `${assignment.dueDate}T${assignment.dueTime || "23:59:59"}`
@@ -152,9 +142,8 @@ export default function InstructorDashboard() {
         ...assignment,
         average,
         avgAttempts: stats?.avg_attempt ?? null,
-        medianMinutesPerQuestion,
-        avgMinutesPerQuestion,
-        difficultyLabel: stats?.difficulty_label ?? null,
+        medianMinutesPerQuestion: stats?.median_minutes_per_question ?? null,
+        firstTryCorrectRate: stats?.first_try_correct_rate ?? null,
         submissions,
         totalStudents,
         dueDate: formatEasternDateTime(assignment.dueDate, assignment.dueTime) ?? "—",

@@ -287,7 +287,6 @@ export function InstructorSandboxProvider({ children }) {
             students_submitted: students.filter((student) => Boolean(student.submittedAssignments?.[assignment.id])).length,
             avg_score: grades.length > 0 ? average(grades) : null,
             avg_attempt: average(attempts),
-            avg_minutes_per_question: 8 + questionCount * 2,
             median_minutes_per_question: 6 + questionCount * 2,
           }
         })

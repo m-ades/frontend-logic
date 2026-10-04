@@ -1,4 +1,4 @@
-import { roundNumber, formatNumber, formatMinutes } from "../../../utils/numberUtils.js";
+import { roundNumber, formatNumber, formatMinutes, numberOrNull } from "../../../utils/numberUtils.js";
 import { useState } from "react";
 import {
   Box,
@@ -79,14 +79,8 @@ export const AssignmentOverviewTable = ({
       ).length;
 
     const avgAttempts = assignment.avgAttempts ?? null;
-    const medianMinutesPerQuestion =
-      typeof assignment.medianMinutesPerQuestion === "number"
-        ? assignment.medianMinutesPerQuestion
-        : typeof assignment.avgMinutesPerQuestion === "number"
-        ? assignment.avgMinutesPerQuestion
-        : null;
-
-    const difficultyLabel = assignment.difficultyLabel || assignment.difficulty_label || null;
+    const medianMinutesPerQuestion = numberOrNull(assignment.medianMinutesPerQuestion);
+    const firstTryCorrectRate = numberOrNull(assignment.firstTryCorrectRate);
 
     return {
       ...assignment,
@@ -99,7 +93,7 @@ export const AssignmentOverviewTable = ({
       avgAttempts,
       totalStudents,
       medianMinutesPerQuestion,
-      difficultyLabel,
+      firstTryCorrectRate,
     };
   });
 
@@ -274,7 +268,7 @@ export const AssignmentOverviewTable = ({
                   align="center"
                   sx={{ fontWeight: 600, fontSize: 13 }}
                 >
-                  Difficulty
+                  First-Try Correct
                 </TableCell>
               </TableRow>
             </TableHead>
@@ -386,50 +380,13 @@ export const AssignmentOverviewTable = ({
                       </MuiTooltip>
                     </TableCell>
                     <TableCell align="center">
-                      {assignment.difficultyLabel ? (
-                        <MuiTooltip
-                          title={
-                            assignment.difficultyLabel === "too_easy"
-                              ? "Faster than similar questions in this course with high correctness; good as a warm-up."
-                              : assignment.difficultyLabel === "balanced"
-                              ? "Time and correctness are in a healthy range for practice."
-                              : assignment.difficultyLabel === "too_hard"
-                              ? "Low correctness without rushing compared with similar questions; consider revising or scaffolding."
-                              : assignment.difficultyLabel === "confusing"
-                              ? "Faster than similar questions but low correctness; wording or concepts may be unclear."
-                              : ""
-                          }
-                        >
-                          <Chip
-                            label={
-                              assignment.difficultyLabel === "too_easy"
-                                ? "Quick & Easy"
-                                : assignment.difficultyLabel === "balanced"
-                                ? "Balanced"
-                                : assignment.difficultyLabel === "too_hard"
-                                ? "High Struggle"
-                                : assignment.difficultyLabel === "confusing"
-                                ? "Confusing"
-                                : assignment.difficultyLabel
-                            }
-                            size="small"
-                            color={
-                              assignment.difficultyLabel === "too_easy"
-                                ? "success"
-                                : assignment.difficultyLabel === "balanced"
-                                ? "primary"
-                                : assignment.difficultyLabel === "too_hard"
-                                ? "error"
-                                : "warning"
-                            }
-                            sx={{ minWidth: 80 }}
-                          />
-                        </MuiTooltip>
-                      ) : (
+                      <MuiTooltip title="Share of first submissions that were correct, not counting auto-submitted drafts">
                         <Typography variant="body2" color="text.secondary">
-                          —
+                          {assignment.firstTryCorrectRate != null
+                            ? `${formatNumber(assignment.firstTryCorrectRate * 100)}%`
+                            : "—"}
                         </Typography>
-                      )}
+                      </MuiTooltip>
                     </TableCell>
                   </TableRow>
                 );

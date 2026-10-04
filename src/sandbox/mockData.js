@@ -769,7 +769,6 @@ export const getSandboxClassroomAnalytics = () => {
       })),
     },
     time: {
-      avg_minutes_per_question: 7.8,
       median_minutes_per_question: 6.5,
       p75_minutes_per_question: 9.8,
       cohort_median_minutes_per_question: 7.2,
