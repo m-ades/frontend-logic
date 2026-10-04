@@ -201,6 +201,7 @@ const buildTruthTableState = (lefts, right, data) => {
 }
 
 const QUESTION_SESSION_TRACKING_ENABLED = true
+const QUESTION_IDLE_TIMEOUT_MS = 90_000
 
 function RealWorksheetContent() {
   const { worksheetId, assignmentId } = useParams()
@@ -376,11 +377,13 @@ function RealWorksheetContent() {
 
         if (activeSessionId && (!desiredQuestionId || desiredQuestionId !== activeQuestionId)) {
           const closingSessionId = activeSessionId
+          // cap at the idle window so a sleeping laptop or frozen timer isn't counted as work
+          const endedAt = Math.min(Date.now(), (lastActivityRef.current ?? Date.now()) + QUESTION_IDLE_TIMEOUT_MS)
           try {
             await fetchJson(`/api/question-sessions/${closingSessionId}`, {
               method: 'PUT',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ ended_at: new Date().toISOString() }),
+              body: JSON.stringify({ ended_at: new Date(endedAt).toISOString() }),
             })
           } catch (err) {
             // ignore for now
@@ -394,6 +397,9 @@ function RealWorksheetContent() {
         }
 
         if (!activeSessionId && desiredQuestionId && activeUserId) {
+          const startedAt = Date.now()
+          // opening a question counts as activity so the end cap never lands before the start
+          lastActivityRef.current = startedAt
           try {
             const session = await fetchJson('/api/question-sessions', {
               method: 'POST',
@@ -401,7 +407,7 @@ function RealWorksheetContent() {
               body: JSON.stringify({
                 assignment_question_id: desiredQuestionId,
                 user_id: activeUserId,
-                started_at: new Date().toISOString(),
+                started_at: new Date(startedAt).toISOString(),
               }),
             })
             questionSessionId.current = session?.id ?? null
@@ -447,8 +453,6 @@ function RealWorksheetContent() {
   useEffect(() => {
     if (typeof window === 'undefined' || typeof document === 'undefined') return undefined
 
-    const IDLE_TIMEOUT_MS = 90_000
-
     const clearIdleTimeout = () => {
       if (idleTimeoutIdRef.current) {
         clearTimeout(idleTimeoutIdRef.current)
@@ -462,7 +466,7 @@ function RealWorksheetContent() {
       idleTimeoutIdRef.current = setTimeout(() => {
         desiredQuestionSessionQuestionIdRef.current = null
         syncQuestionSession()
-      }, IDLE_TIMEOUT_MS)
+      }, QUESTION_IDLE_TIMEOUT_MS)
     }
     scheduleIdleTimeoutRef.current = scheduleIdleTimeout
 
