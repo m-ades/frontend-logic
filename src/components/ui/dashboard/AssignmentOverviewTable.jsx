@@ -25,6 +25,13 @@ import { formatEasternDateTime } from "../../../utils/easternTime.js";
 import { useAppRuntime } from "../../../hooks/useAppRuntime.js";
 import { excludeNonStudents } from "../../../utils/GradebookUtils.js";
 
+const difficultyPresentation = {
+  too_easy: { label: "Too easy", color: "info" },
+  too_hard: { label: "Too hard", color: "error" },
+  confusing: { label: "Confusing", color: "warning" },
+  balanced: { label: "Balanced", color: "success" },
+};
+
 /**
  * renders assignment analytics and preserves explicit empty summary metrics
  */
@@ -268,6 +275,12 @@ export const AssignmentOverviewTable = ({
                   align="center"
                   sx={{ fontWeight: 600, fontSize: 13 }}
                 >
+                  Difficulty
+                </TableCell>
+                <TableCell
+                  align="center"
+                  sx={{ fontWeight: 600, fontSize: 13 }}
+                >
                   First-Try Correct
                 </TableCell>
               </TableRow>
@@ -380,6 +393,19 @@ export const AssignmentOverviewTable = ({
                       </MuiTooltip>
                     </TableCell>
                     <TableCell align="center">
+                      {difficultyPresentation[assignment.difficultyLabel] ? (
+                        <Chip
+                          label={difficultyPresentation[assignment.difficultyLabel].label}
+                          size="small"
+                          color={difficultyPresentation[assignment.difficultyLabel].color}
+                        />
+                      ) : (
+                        <Typography variant="body2" color="text.secondary">
+                          —
+                        </Typography>
+                      )}
+                    </TableCell>
+                    <TableCell align="center">
                       <MuiTooltip title="Share of first submissions that were correct, not counting auto-submitted drafts">
                         <Typography variant="body2" color="text.secondary">
                           {assignment.firstTryCorrectRate != null
@@ -393,7 +419,7 @@ export const AssignmentOverviewTable = ({
               })}
               {assignmentsWithMetrics.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={8} align="center" sx={{ py: 4 }}>
+                  <TableCell colSpan={11} align="center" sx={{ py: 4 }}>
                     <Typography variant="body2" color="text.secondary">
                       No assignments yet
                     </Typography>

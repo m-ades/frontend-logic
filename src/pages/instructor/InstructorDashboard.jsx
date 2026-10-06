@@ -133,6 +133,9 @@ export default function InstructorDashboard() {
       const submissions = totalStudents
         ? Math.min(submissionsRaw, totalStudents)
         : submissionsRaw;
+      const lateSubmissions = studentsForAssignments.filter(
+        (student) => Boolean(student.lateSubmissions?.[assignment.id])
+      ).length;
       const dueAtValue = assignment.dueAt
         || (assignment.dueDate
           ? `${assignment.dueDate}T${assignment.dueTime || "23:59:59"}`
@@ -143,12 +146,13 @@ export default function InstructorDashboard() {
         average,
         avgAttempts: stats?.avg_attempt ?? null,
         medianMinutesPerQuestion: stats?.median_minutes_per_question ?? null,
+        difficultyLabel: stats?.difficulty_label ?? null,
         firstTryCorrectRate: stats?.first_try_correct_rate ?? null,
         submissions,
         totalStudents,
         dueDate: formatEasternDateTime(assignment.dueDate, assignment.dueTime) ?? "—",
         dueAt,
-        lateSubmissions: null,
+        lateSubmissions,
       };
     });
   }, [
