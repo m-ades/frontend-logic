@@ -94,6 +94,16 @@ function LegacyRoleRedirect() {
 }
 
 function AppRoutes() {
+  const studentSandboxRoutes = [
+    { path: "/sandbox/student/courses", PageComponent: Courses },
+    { path: "/sandbox/student/dashboard", PageComponent: Dashboard },
+    { path: "/sandbox/student/assignments", PageComponent: Assignments },
+    { path: "/sandbox/student/practice", PageComponent: Practice },
+    { path: "/sandbox/student/textbook", PageComponent: TextbookHubPage },
+    { path: "/sandbox/student/textbook/:chapter", PageComponent: TextbookChapterPage },
+    { path: "/sandbox/student/grades", PageComponent: Grades },
+    { path: "/sandbox/student/assignment/:assignmentId", PageComponent: Worksheet },
+  ];
   const instructorSandboxRoutes = [
     { path: "/sandbox/instructor/courses", PageComponent: Courses },
     { path: "/sandbox/instructor/dashboard", PageComponent: InstructorDashboard },
@@ -114,70 +124,7 @@ function AppRoutes() {
       <Route element={<SandboxProviders />}>
         <Route path="/sandbox" element={<Navigate to="/sandbox/student/dashboard" replace />} />
         <Route path="/sandbox/student" element={<Navigate to="/sandbox/student/dashboard" replace />} />
-        <Route
-          path="/sandbox/student/courses"
-          element={(
-            <SandboxLayout>
-              <Courses />
-            </SandboxLayout>
-          )}
-        />
-        <Route
-          path="/sandbox/student/dashboard"
-          element={(
-            <SandboxLayout>
-              <Dashboard />
-            </SandboxLayout>
-          )}
-        />
-        <Route
-          path="/sandbox/student/assignments"
-          element={(
-            <SandboxLayout>
-              <Assignments />
-            </SandboxLayout>
-          )}
-        />
-        <Route
-          path="/sandbox/student/practice"
-          element={(
-            <SandboxLayout>
-              <Practice />
-            </SandboxLayout>
-          )}
-        />
-        <Route
-          path="/sandbox/student/textbook"
-          element={(
-            <SandboxLayout>
-              <TextbookHubPage />
-            </SandboxLayout>
-          )}
-        />
-        <Route
-          path="/sandbox/student/textbook/:chapter"
-          element={(
-            <SandboxLayout>
-              <TextbookChapterPage />
-            </SandboxLayout>
-          )}
-        />
-        <Route
-          path="/sandbox/student/grades"
-          element={(
-            <SandboxLayout>
-              <Grades />
-            </SandboxLayout>
-          )}
-        />
-        <Route
-          path="/sandbox/student/assignment/:assignmentId"
-          element={(
-            <SandboxLayout>
-              <Worksheet />
-            </SandboxLayout>
-          )}
-        />
+        {renderRouteGroup(studentSandboxRoutes, SandboxLayout)}
       </Route>
 
       <Route element={<InstructorSandboxProviders />}>
