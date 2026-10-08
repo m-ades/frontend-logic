@@ -5,6 +5,9 @@
  * A practice widget only appears when a resolved link exists for the current chapter.
  */
 
+import { getTextbookManifest } from './textbookCatalog.js'
+import { entryForKey, keyForSlug } from './textbookKeys.js'
+
 export const TEXTBOOK_LINKS_STORAGE_KEY = 'logicapp_textbook_practice_links_v1'
 
 /**
@@ -115,6 +118,19 @@ function writeAllOverrides(map, storageScope = 'local') {
   }
 }
 
+/*
+purpose links follow a chapter's identity, not its BookML filename
+contract textbookKey wins; textbookSlug is kept for links written before keys
+*/
+function resolveLinkKey(raw, slug) {
+  if (raw.textbookKey || raw.textbook_key) return String(raw.textbookKey || raw.textbook_key)
+  return keyForSlug(getTextbookManifest().entries, slug) || null
+}
+
+function slugForLinkKey(key, fallbackSlug) {
+  return entryForKey(getTextbookManifest().entries, key)?.slug || fallbackSlug
+}
+
 export function createLinkId() {
   return `link-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`
 }
@@ -131,9 +147,14 @@ export function normalizeLink(raw = {}) {
   const matchChapter = raw.match?.chapter ?? raw.chapter ?? null
   const matchSubchapter = raw.match?.subchapter ?? raw.subchapter ?? null
 
+  const textbookKey = resolveLinkKey(raw, textbookSlug)
+
   return {
     id: String(raw.id || createLinkId()),
-    textbookSlug,
+    textbookKey,
+    // Re-resolved from the key so a renumbered export still points at the
+    // chapter the instructor chose.
+    textbookSlug: textbookKey ? slugForLinkKey(textbookKey, textbookSlug) : textbookSlug,
     sectionId: raw.sectionId || raw.section_id || null,
     practiceId,
     match:

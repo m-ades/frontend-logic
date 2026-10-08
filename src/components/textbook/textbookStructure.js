@@ -6,17 +6,15 @@
  * legacy part files remain on disk but are not textbook destinations
  */
 
-import textbookInventory from './textbookInventory.json'
-import textbookManifest from './textbookManifest.json'
-import { buildTextbookTocTree, listTextbookNavItems } from './textbookCatalog.js'
-import { stripNumberPrefix } from './textbookTitles.js'
+import bundledInventory from './textbookInventory.json' with { type: 'json' }
+import {
+  buildTextbookTocTree,
+  getTextbookManifest,
+  listTextbookNavItems,
+} from './textbookCatalog.js'
+import { entryForKey, keyForSlug } from './textbookKeys.js'
 
 export const TEXTBOOK_STRUCTURE_STORAGE_KEY = 'logicapp_textbook_structure_v1'
-
-const ROMAN = [
-  '', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X',
-  'XI', 'XII', 'XIII', 'XIV', 'XV', 'XVI', 'XVII', 'XVIII', 'XIX', 'XX',
-]
 
 const DIVIDER_KINDS = new Set(['part', 'backmatter'])
 
@@ -78,20 +76,39 @@ function defaultFile(raw, kind) {
   return `${raw.slug}.html`
 }
 
+/*
+purpose identity is the catalog key, not the BookML filename
+contract rows written before keys existed are backfilled from the active catalog
+*/
+function resolveNodeKey(raw) {
+  if (raw.key) return String(raw.key)
+  return keyForSlug(getTextbookManifest().entries, raw.slug) || null
+}
+
 export function normalizeStructureNode(raw = {}) {
   const kind = raw.kind || 'chapter'
   const navigable = defaultNavigable(kind, raw.navigable)
   return {
     id: String(raw.id || createStructureNodeId()),
+    key: resolveNodeKey(raw),
     slug: String(raw.slug || ''),
     file: defaultFile(raw, kind),
     kind,
-    displayTitle: stripNumberPrefix(raw.displayTitle || raw.title || raw.pageTitle || raw.slug || ''),
+    // Book entries take their label from the catalog at render time; this only
+    // has to hold up for instructor-created sections, which have no book entry.
+    displayTitle: String(raw.displayTitle || raw.title || raw.pageTitle || raw.slug || ''),
     parentId: raw.parentId ?? null,
     sortIndex: Number.isFinite(Number(raw.sortIndex)) ? Number(raw.sortIndex) : 0,
     hidden: Boolean(raw.hidden),
     navigable,
   }
+}
+
+/** The book's own label for a node, or the stored one for a custom section. */
+export function labelForNode(node) {
+  if (!node) return ''
+  const entry = entryForKey(getTextbookManifest().entries, node.key)
+  return entry?.title || node.displayTitle || node.slug || ''
 }
 
 /**
@@ -105,6 +122,7 @@ export function createSectionDivider({
   const id = createStructureNodeId()
   return normalizeStructureNode({
     id,
+    key: `section/${id.replace(/^tn-/, '')}`,
     slug: `section-${id.replace(/^tn-/, '')}`,
     file: null,
     kind: isDividerKind(kind) ? kind : 'part',
@@ -127,10 +145,11 @@ export function seedStructureFromBundle() {
   const pushNode = (item, parentId, sortIndex) => {
     const node = normalizeStructureNode({
       id: createStructureNodeId(),
+      key: item.key || null,
       slug: item.slug,
       file: item.file || `${item.slug}.html`,
       kind: item.kind,
-      displayTitle: stripNumberPrefix(item.pageTitle || item.title || item.label || item.slug),
+      displayTitle: item.title || item.pageTitle || item.label || item.slug,
       parentId,
       sortIndex,
       hidden: false,
@@ -151,8 +170,14 @@ export function seedStructureFromBundle() {
   return nodes
 }
 
+/*
+purpose the file list instructors reconcile their course structure against
+contract follows the active catalog so a republished bundle adds and drops files
+*/
 export function getTextbookInventory() {
-  return textbookInventory
+  const catalog = getTextbookManifest()
+  if (!Array.isArray(catalog.files) || catalog.files.length === 0) return bundledInventory
+  return { assetBase: catalog.assetBase, files: catalog.files }
 }
 
 export function readCourseStructure(courseId, storageScope = 'local') {
@@ -242,46 +267,21 @@ export function readingOrder(tree = [], { includeHidden = false, navigableOnly =
   return order
 }
 
-export function assignDynamicNumbers(tree = [], { includeHidden = false } = {}) {
-  let partCount = 0
-  let chapterCount = 0
-
-  const mapNode = (node) => {
-    if (!includeHidden && node.hidden) {
-      return {
-        ...node,
-        number: null,
-        label: node.displayTitle,
-        children: (node.children || []).map(mapNode),
-      }
-    }
-
-    let number = null
-    let label = node.displayTitle
-
-    if (isDividerKind(node.kind)) {
-      if (!node.parentId) {
-        partCount += 1
-        number = ROMAN[partCount] || String(partCount)
-        label = node.kind === 'backmatter'
-          ? node.displayTitle
-          : `Part ${number} ${node.displayTitle}`
-      }
-    } else if (node.kind === 'chapter' || node.kind === 'appendix') {
-      chapterCount += 1
-      number = String(chapterCount)
-      label = `${number} ${node.displayTitle}`
-    } else {
-      label = node.displayTitle
-    }
-
-    return {
-      ...node,
-      number,
-      label,
-      children: (node.children || []).map(mapNode),
-    }
-  }
+/**
+ * Attach the label each node shows in the table of contents.
+ *
+ * The label is the book's own — "12 Semantic concepts" — never a number
+ * recomputed from position. A chapter's heading and every LaTeXML
+ * cross-reference in the prose carry the book's numbering, so a TOC that
+ * renumbered by position would contradict the page it links to. Reordering
+ * changes reading order; it does not renumber the book.
+ */
+export function assignTocLabels(tree = []) {
+  const mapNode = (node) => ({
+    ...node,
+    label: labelForNode(node),
+    children: (node.children || []).map(mapNode),
+  })
 
   return (tree || []).map(mapNode)
 }
@@ -344,34 +344,68 @@ export function resolveNavigableSlug(nodes, slug) {
  * Merge disk inventory into existing structure.
  * Keeps titles/order for known slugs; appends new files; preserves custom dividers.
  */
-export function mergeInventory(existingNodes = [], inventoryFiles = textbookInventory.files) {
+/**
+ * Reconcile a course structure against the published file list.
+ *
+ * Matching is by key, so a chapter that BookML renumbered from Ch13 to Ch12
+ * keeps its position, visibility and practice links — only its filename moves.
+ * A key that is gone is reported rather than silently dropped, so the instructor
+ * can say whether it was deleted or retitled.
+ */
+export function mergeInventory(existingNodes = [], inventoryFiles = getTextbookInventory().files) {
   const existing = existingNodes.map(normalizeStructureNode)
-  const bySlug = new Map(existing.map((node) => [node.slug, node]))
-  const inventorySlugs = new Set((inventoryFiles || []).map((file) => file.slug))
+  const files = inventoryFiles || []
+  const byKey = new Map(files.filter((file) => file.key).map((file) => [file.key, file]))
+  const bySlug = new Map(files.map((file) => [file.slug, file]))
 
-  const next = existing
-    .filter((node) => {
-      if (inventorySlugs.has(node.slug)) return true
-      // Preserve instructor-created / non-inventory dividers
-      if (isDividerKind(node.kind) && !isNavigableNode(node)) return true
-      return false
-    })
-    .map((node) => {
-      // Never promote dividers to navigable via stale stored JSON
-      if (isDividerKind(node.kind)) {
-        return normalizeStructureNode({ ...node, navigable: false })
-      }
-      return node
-    })
+  // Where the file list carries keys, a keyed node is matched only by key:
+  // falling back to the filename would re-attach it to whichever chapter BookML
+  // renumbered into that slot, which is the failure this is here to prevent.
+  // A file list from before keys existed still matches by filename.
+  const inventoryHasKeys = byKey.size > 0
+  const matchFor = (node) =>
+    (inventoryHasKeys && node.key ? byKey.get(node.key) : bySlug.get(node.slug)) || null
 
-  const present = new Set(next.map((node) => node.slug))
+  const kept = []
+  const missing = []
+
+  for (const node of existing) {
+    // Instructor-created sections have no file and are never reconciled away.
+    if (isDividerKind(node.kind) && !isNavigableNode(node) && !node.file) {
+      kept.push(node)
+      continue
+    }
+
+    const match = matchFor(node)
+    if (!match) {
+      missing.push(node)
+      continue
+    }
+
+    kept.push(
+      normalizeStructureNode({
+        ...node,
+        // Follow the file wherever the export moved it.
+        key: match.key || node.key,
+        slug: match.slug,
+        file: match.file,
+        kind: match.kind,
+        navigable: isDividerKind(match.kind) ? false : node.navigable,
+      }),
+    )
+  }
+
+  const claimed = new Set(kept.map((node) => node.key || node.slug))
+  const added = files.filter((file) => !claimed.has(file.key || file.slug))
+
+  const next = [...kept]
   let appendIndex = next.filter((node) => !node.parentId).length
 
-  for (const file of inventoryFiles || []) {
-    if (present.has(file.slug)) continue
+  for (const file of added) {
     next.push(
       normalizeStructureNode({
         id: createStructureNodeId(),
+        key: file.key,
         slug: file.slug,
         file: file.file,
         kind: file.kind,
@@ -398,12 +432,13 @@ export function mergeInventory(existingNodes = [], inventoryFiles = textbookInve
       })
   }
 
-  const missing = existing.filter(
-    (node) =>
-      !inventorySlugs.has(node.slug) &&
-      !(isDividerKind(node.kind) && !isNavigableNode(node)),
-  )
-  return { nodes: next, missing, added: (inventoryFiles || []).filter((f) => !bySlug.has(f.slug)) }
+  return { nodes: next, missing, added }
+}
+
+/** True when the structure already matches the published file list. */
+export function isInventoryInSync(nodes, inventoryFiles) {
+  const { missing, added } = mergeInventory(nodes, inventoryFiles)
+  return missing.length === 0 && added.length === 0
 }
 
 export function canHaveChildren(kind) {
@@ -417,7 +452,7 @@ export function canBeChildOf(childKind, parentKind) {
 }
 
 export function listNumberedFlat(nodes, { includeHidden = true } = {}) {
-  const tree = assignDynamicNumbers(nodesToTree(nodes, { includeHidden }), { includeHidden })
+  const tree = assignTocLabels(nodesToTree(nodes, { includeHidden }))
   const flat = []
   const walk = (list, depth = 0) => {
     for (const node of list) {
@@ -434,7 +469,7 @@ export function listNavigableNumberedFlat(nodes, { includeHidden = false } = {})
 }
 
 export function getBundleDefaultSlug() {
-  return textbookManifest.defaultSlug || 'Ch1'
+  return getTextbookManifest().defaultSlug || 'Ch1'
 }
 
 export function getManifestNavFallback() {

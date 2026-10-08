@@ -1,29 +1,74 @@
-import textbookManifest from './textbookManifest.json'
+import bundledManifest from './textbookManifest.json' with { type: 'json' }
+import { isUsableTextbookCatalog } from './bookmlCatalog.js'
 
-const aliasMap = {
-  ...(textbookManifest.slugAliases || {}),
+// HuLA-side conveniences; they are not part of any bundle.
+const BUILT_IN_ALIASES = {
   'chapter-1': 'Ch1',
   preface: 'Chx1',
   cover: 'index',
 }
 
+/*
+purpose the catalog is swapped once a remote bundle loads
+contract the bundled manifest stays the synchronous fallback so nothing renders empty
+*/
+let activeCatalog = bundledManifest
+
+export function setActiveTextbookCatalog(catalog) {
+  if (!isUsableTextbookCatalog(catalog)) return false
+  activeCatalog = catalog
+  return true
+}
+
+export function resetActiveTextbookCatalog() {
+  activeCatalog = bundledManifest
+}
+
+export function getBundledTextbookManifest() {
+  return bundledManifest
+}
+
 export function getTextbookManifest() {
-  return textbookManifest
+  return activeCatalog
+}
+
+export function getTextbookAssetBase() {
+  return activeCatalog.assetBase || bundledManifest.assetBase
+}
+
+function getAliasMap() {
+  return { ...(activeCatalog.slugAliases || {}), ...BUILT_IN_ALIASES }
+}
+
+function getCoverEntry() {
+  const entries = activeCatalog.entries || []
+  return {
+    key: 'cover',
+    slug: 'index',
+    file: 'index.html',
+    title: 'Cover & contents',
+    pageTitle: 'Cover & contents',
+    kind: 'cover',
+    partSlug: null,
+    prev: null,
+    next: entries[0]?.slug || null,
+  }
 }
 
 export function normalizeTextbookSlug(rawSlug) {
   if (rawSlug === undefined) {
-    return textbookManifest.defaultSlug || 'Ch1'
+    return activeCatalog.defaultSlug || 'Ch1'
   }
   if (typeof rawSlug !== 'string') return null
 
   const trimmed = rawSlug.trim()
   if (!trimmed) return null
+  const aliasMap = getAliasMap()
   if (aliasMap[trimmed]) return aliasMap[trimmed]
   if (aliasMap[trimmed.toLowerCase()]) return aliasMap[trimmed.toLowerCase()]
 
   // Accept case variants of known slugs (Linux-safe canonical casing).
-  const entries = textbookManifest.entries || []
+  const entries = activeCatalog.entries || []
   const exact = entries.find((entry) => entry.slug === trimmed)
   if (exact) return exact.slug
 
@@ -40,18 +85,8 @@ export function normalizeTextbookSlug(rawSlug) {
 
 export function getTextbookEntry(slug) {
   const normalized = normalizeTextbookSlug(slug)
-  if (normalized === 'index') {
-    return {
-      slug: 'index',
-      file: 'index.html',
-      title: 'Cover & contents',
-      pageTitle: 'Cover & contents',
-      kind: 'cover',
-      prev: null,
-      next: 'Chx1',
-    }
-  }
-  const entries = textbookManifest.entries || []
+  if (normalized === 'index') return getCoverEntry()
+  const entries = activeCatalog.entries || []
   return entries.find((entry) => entry.slug === normalized) || null
 }
 
@@ -74,21 +109,9 @@ export function getTextbookNeighbors(slug) {
 }
 
 export function listTextbookNavItems() {
-  const cover = {
-    slug: 'index',
-    file: 'index.html',
-    title: 'Cover & contents',
-    pageTitle: 'Cover & contents',
-    kind: 'cover',
-    label: 'Cover & contents',
-    partSlug: null,
-    prev: null,
-    next: 'Chx1',
-    hasPracticeExercises: false,
-    hasMath: false,
-  }
+  const cover = { ...getCoverEntry(), label: 'Cover & contents' }
 
-  const entries = (textbookManifest.entries || []).map((entry) => ({
+  const entries = (activeCatalog.entries || []).map((entry) => ({
     ...entry,
     label: entry.pageTitle || entry.title,
   }))
@@ -134,8 +157,6 @@ export function buildTextbookTocTree() {
 export function resolveTextbookAssetUrl(slug) {
   const normalized = normalizeTextbookSlug(slug)
   if (!normalized) return null
-  if (normalized === 'index') {
-    return `${textbookManifest.assetBase}/index.html`
-  }
-  return `${textbookManifest.assetBase}/${normalized}.html`
+  const file = getTextbookEntry(normalized)?.file || `${normalized}.html`
+  return `${getTextbookAssetBase()}/${file}`
 }

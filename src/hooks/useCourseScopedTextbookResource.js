@@ -17,7 +17,11 @@ export function createCourseScopedTextbookResource({
   const apiPath = (courseId) => `/api/courses/${courseId}/${resourceName}`
   const normalizeValues = (values) => (values || []).map(normalize)
 
-  return function useCourseScopedTextbookResource() {
+  /*
+  purpose defaultsToken lets a caller recompute defaults when their source changes
+  contract pass a stable value; identity changes re-seed from getDefaults()
+  */
+  return function useCourseScopedTextbookResource(defaultsToken = null) {
     const runtime = useAppRuntime()
     const queryClient = useQueryClient()
     const isSandbox = Boolean(runtime?.isSandbox)
@@ -126,7 +130,7 @@ export function createCourseScopedTextbookResource({
         return normalizeValues(resourceQuery.data[responseField])
       }
       return normalizeValues(getDefaults())
-    }, [isSandbox, sandboxOverrides, resourceQuery.data, resourceQuery.isError])
+    }, [isSandbox, sandboxOverrides, resourceQuery.data, resourceQuery.isError, defaultsToken])
 
     const save = useCallback(
       async (nextValues) => {

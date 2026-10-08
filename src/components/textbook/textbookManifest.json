@@ -1,14 +1,14 @@
 {
   "bookTitle": "forall x: Calgary",
-  "version": "Fall 2025 (2026-07-18)",
+  "version": "Fall 2025 (2026-07-18 8642250)",
   "defaultSlug": "Ch1",
   "assetBase": "/textbook-assets",
   "stylesheets": [
     "/textbook-assets/LaTeXML.css",
     "/textbook-assets/ltx-book.css",
+    "/textbook-assets/bmluser/colors.gitbook-forallxyyc-html.css",
     "/textbook-assets/forallxyyc.css",
-    "/textbook-assets/fitchml.css",
-    "/textbook-assets/bmluser/colors.gitbook-forallxyyc-html.css"
+    "/textbook-assets/fitchml.css"
   ],
   "entries": [
     {
@@ -20,8 +20,7 @@
       "prev": "index",
       "next": "Pt1",
       "pageTitle": "Preface",
-      "hasPracticeExercises": false,
-      "hasMath": true
+      "key": "preface/preface"
     },
     {
       "slug": "Pt1",
@@ -32,8 +31,7 @@
       "prev": "Chx1",
       "next": "Ch1",
       "pageTitle": "Part I Key notions of logic",
-      "hasPracticeExercises": false,
-      "hasMath": false
+      "key": "part/key-notions-of-logic"
     },
     {
       "slug": "Ch1",
@@ -44,8 +42,7 @@
       "prev": "Pt1",
       "next": "Ch2",
       "pageTitle": "Chapter 1 Arguments",
-      "hasPracticeExercises": true,
-      "hasMath": false
+      "key": "chapter/key-notions-of-logic/arguments"
     },
     {
       "slug": "Ch2",
@@ -56,8 +53,7 @@
       "prev": "Ch1",
       "next": "Ch3",
       "pageTitle": "Chapter 2 The scope of logic",
-      "hasPracticeExercises": true,
-      "hasMath": true
+      "key": "chapter/key-notions-of-logic/the-scope-of-logic"
     },
     {
       "slug": "Ch3",
@@ -68,8 +64,7 @@
       "prev": "Ch2",
       "next": "Pt2",
       "pageTitle": "Chapter 3 Other logical notions",
-      "hasPracticeExercises": true,
-      "hasMath": false
+      "key": "chapter/key-notions-of-logic/other-logical-notions"
     },
     {
       "slug": "Pt2",
@@ -80,8 +75,7 @@
       "prev": "Ch3",
       "next": "Ch4",
       "pageTitle": "Part II Truth-functional logic",
-      "hasPracticeExercises": false,
-      "hasMath": false
+      "key": "part/truth-functional-logic"
     },
     {
       "slug": "Ch4",
@@ -92,8 +86,7 @@
       "prev": "Pt2",
       "next": "Ch5",
       "pageTitle": "Chapter 4 First steps to symbolization",
-      "hasPracticeExercises": false,
-      "hasMath": true
+      "key": "chapter/truth-functional-logic/first-steps-to-symbolization"
     },
     {
       "slug": "Ch5",
@@ -104,8 +97,7 @@
       "prev": "Ch4",
       "next": "Ch6",
       "pageTitle": "Chapter 5 Connectives",
-      "hasPracticeExercises": true,
-      "hasMath": true
+      "key": "chapter/truth-functional-logic/connectives"
     },
     {
       "slug": "Ch6",
@@ -116,8 +108,7 @@
       "prev": "Ch5",
       "next": "Ch7",
       "pageTitle": "Chapter 6 Sentences of TFL",
-      "hasPracticeExercises": true,
-      "hasMath": true
+      "key": "chapter/truth-functional-logic/sentences-of-tfl"
     },
     {
       "slug": "Ch7",
@@ -128,8 +119,7 @@
       "prev": "Ch6",
       "next": "Ch8",
       "pageTitle": "Chapter 7 Ambiguity",
-      "hasPracticeExercises": true,
-      "hasMath": true
+      "key": "chapter/truth-functional-logic/ambiguity"
     },
     {
       "slug": "Ch8",
@@ -140,8 +130,7 @@
       "prev": "Ch7",
       "next": "Pt3",
       "pageTitle": "Chapter 8 Use and mention",
-      "hasPracticeExercises": false,
-      "hasMath": true
+      "key": "chapter/truth-functional-logic/use-and-mention"
     },
     {
       "slug": "Pt3",
@@ -152,8 +141,7 @@
       "prev": "Ch8",
       "next": "Ch9",
       "pageTitle": "Part III Truth tables",
-      "hasPracticeExercises": false,
-      "hasMath": false
+      "key": "part/truth-tables"
     },
     {
       "slug": "Ch9",
@@ -164,8 +152,7 @@
       "prev": "Pt3",
       "next": "Ch10",
       "pageTitle": "Chapter 9 Characteristic truth tables",
-      "hasPracticeExercises": false,
-      "hasMath": true
+      "key": "chapter/truth-tables/characteristic-truth-tables"
     },
     {
       "slug": "Ch10",
@@ -176,8 +163,7 @@
       "prev": "Ch9",
       "next": "Ch11",
       "pageTitle": "Chapter 10 Truth-functional connectives",
-      "hasPracticeExercises": false,
-      "hasMath": true
+      "key": "chapter/truth-tables/truth-functional-connectives"
     },
     {
       "slug": "Ch11",
@@ -188,8 +174,7 @@
       "prev": "Ch10",
       "next": "Ch12",
       "pageTitle": "Chapter 11 Complete truth tables",
-      "hasPracticeExercises": true,
-      "hasMath": true
+      "key": "chapter/truth-tables/complete-truth-tables"
     },
     {
       "slug": "Ch12",
@@ -200,8 +185,7 @@
       "prev": "Ch11",
       "next": "Ch13",
       "pageTitle": "Chapter 12 Semantic concepts",
-      "hasPracticeExercises": true,
-      "hasMath": true
+      "key": "chapter/truth-tables/semantic-concepts"
     },
     {
       "slug": "Ch13",
@@ -212,8 +196,7 @@
       "prev": "Ch12",
       "next": "Ch14",
       "pageTitle": "Chapter 13 Limitations of TFL",
-      "hasPracticeExercises": false,
-      "hasMath": true
+      "key": "chapter/truth-tables/limitations-of-tfl"
     },
     {
       "slug": "Ch14",
@@ -224,8 +207,7 @@
       "prev": "Ch13",
       "next": "Ch15",
       "pageTitle": "Chapter 14 Truth table shortcuts",
-      "hasPracticeExercises": true,
-      "hasMath": true
+      "key": "chapter/truth-tables/truth-table-shortcuts"
     },
     {
       "slug": "Ch15",
@@ -236,8 +218,7 @@
       "prev": "Ch14",
       "next": "Pt4",
       "pageTitle": "Chapter 15 Partial truth tables",
-      "hasPracticeExercises": true,
-      "hasMath": true
+      "key": "chapter/truth-tables/partial-truth-tables"
     },
     {
       "slug": "Pt4",
@@ -248,8 +229,7 @@
       "prev": "Ch15",
       "next": "Ch16",
       "pageTitle": "Part IV Natural deduction for TFL",
-      "hasPracticeExercises": false,
-      "hasMath": false
+      "key": "part/natural-deduction-for-tfl"
     },
     {
       "slug": "Ch16",
@@ -260,8 +240,7 @@
       "prev": "Pt4",
       "next": "Ch17",
       "pageTitle": "Chapter 16 The very idea of natural deduction",
-      "hasPracticeExercises": false,
-      "hasMath": true
+      "key": "chapter/natural-deduction-for-tfl/the-very-idea-of-natural-deduction"
     },
     {
       "slug": "Ch17",
@@ -272,8 +251,7 @@
       "prev": "Ch16",
       "next": "Ch18",
       "pageTitle": "Chapter 17 Basic rules for TFL",
-      "hasPracticeExercises": true,
-      "hasMath": true
+      "key": "chapter/natural-deduction-for-tfl/basic-rules-for-tfl"
     },
     {
       "slug": "Ch18",
@@ -284,8 +262,7 @@
       "prev": "Ch17",
       "next": "Ch19",
       "pageTitle": "Chapter 18 Constructing proofs",
-      "hasPracticeExercises": true,
-      "hasMath": true
+      "key": "chapter/natural-deduction-for-tfl/constructing-proofs"
     },
     {
       "slug": "Ch19",
@@ -296,8 +273,7 @@
       "prev": "Ch18",
       "next": "Ch20",
       "pageTitle": "Chapter 19 Additional rules for TFL",
-      "hasPracticeExercises": true,
-      "hasMath": true
+      "key": "chapter/natural-deduction-for-tfl/additional-rules-for-tfl"
     },
     {
       "slug": "Ch20",
@@ -308,8 +284,7 @@
       "prev": "Ch19",
       "next": "Ch21",
       "pageTitle": "Chapter 20 Proof-theoretic concepts",
-      "hasPracticeExercises": true,
-      "hasMath": true
+      "key": "chapter/natural-deduction-for-tfl/proof-theoretic-concepts"
     },
     {
       "slug": "Ch21",
@@ -320,8 +295,7 @@
       "prev": "Ch20",
       "next": "Ch22",
       "pageTitle": "Chapter 21 Derived rules",
-      "hasPracticeExercises": true,
-      "hasMath": true
+      "key": "chapter/natural-deduction-for-tfl/derived-rules"
     },
     {
       "slug": "Ch22",
@@ -332,8 +306,7 @@
       "prev": "Ch21",
       "next": "Pt5",
       "pageTitle": "Chapter 22 Soundness and completeness",
-      "hasPracticeExercises": true,
-      "hasMath": true
+      "key": "chapter/natural-deduction-for-tfl/soundness-and-completeness"
     },
     {
       "slug": "Pt5",
@@ -344,8 +317,7 @@
       "prev": "Ch22",
       "next": "Ch23",
       "pageTitle": "Part V First-order logic",
-      "hasPracticeExercises": false,
-      "hasMath": false
+      "key": "part/first-order-logic"
     },
     {
       "slug": "Ch23",
@@ -356,8 +328,7 @@
       "prev": "Pt5",
       "next": "Ch24",
       "pageTitle": "Chapter 23 Building blocks of FOL",
-      "hasPracticeExercises": false,
-      "hasMath": true
+      "key": "chapter/first-order-logic/building-blocks-of-fol"
     },
     {
       "slug": "Ch24",
@@ -368,8 +339,7 @@
       "prev": "Ch23",
       "next": "Ch25",
       "pageTitle": "Chapter 24 Sentences with one quantifier",
-      "hasPracticeExercises": true,
-      "hasMath": true
+      "key": "chapter/first-order-logic/sentences-with-one-quantifier"
     },
     {
       "slug": "Ch25",
@@ -380,8 +350,7 @@
       "prev": "Ch24",
       "next": "Ch26",
       "pageTitle": "Chapter 25 Multiple generality",
-      "hasPracticeExercises": true,
-      "hasMath": true
+      "key": "chapter/first-order-logic/multiple-generality"
     },
     {
       "slug": "Ch26",
@@ -392,8 +361,7 @@
       "prev": "Ch25",
       "next": "Ch27",
       "pageTitle": "Chapter 26 Identity",
-      "hasPracticeExercises": true,
-      "hasMath": true
+      "key": "chapter/first-order-logic/identity"
     },
     {
       "slug": "Ch27",
@@ -404,8 +372,7 @@
       "prev": "Ch26",
       "next": "Ch28",
       "pageTitle": "Chapter 27 Sentences of FOL",
-      "hasPracticeExercises": true,
-      "hasMath": true
+      "key": "chapter/first-order-logic/sentences-of-fol"
     },
     {
       "slug": "Ch28",
@@ -416,8 +383,7 @@
       "prev": "Ch27",
       "next": "Ch29",
       "pageTitle": "Chapter 28 Definite descriptions",
-      "hasPracticeExercises": true,
-      "hasMath": true
+      "key": "chapter/first-order-logic/definite-descriptions"
     },
     {
       "slug": "Ch29",
@@ -428,8 +394,7 @@
       "prev": "Ch28",
       "next": "Pt6",
       "pageTitle": "Chapter 29 Ambiguity",
-      "hasPracticeExercises": true,
-      "hasMath": true
+      "key": "chapter/first-order-logic/ambiguity"
     },
     {
       "slug": "Pt6",
@@ -440,8 +405,7 @@
       "prev": "Ch29",
       "next": "Ch30",
       "pageTitle": "Part VI Interpretations",
-      "hasPracticeExercises": false,
-      "hasMath": false
+      "key": "part/interpretations"
     },
     {
       "slug": "Ch30",
@@ -452,8 +416,7 @@
       "prev": "Pt6",
       "next": "Ch31",
       "pageTitle": "Chapter 30 Extensionality",
-      "hasPracticeExercises": false,
-      "hasMath": true
+      "key": "chapter/interpretations/extensionality"
     },
     {
       "slug": "Ch31",
@@ -464,8 +427,7 @@
       "prev": "Ch30",
       "next": "Ch32",
       "pageTitle": "Chapter 31 Truth in FOL",
-      "hasPracticeExercises": true,
-      "hasMath": true
+      "key": "chapter/interpretations/truth-in-fol"
     },
     {
       "slug": "Ch32",
@@ -476,8 +438,7 @@
       "prev": "Ch31",
       "next": "Ch33",
       "pageTitle": "Chapter 32 Semantic concepts",
-      "hasPracticeExercises": true,
-      "hasMath": true
+      "key": "chapter/interpretations/semantic-concepts"
     },
     {
       "slug": "Ch33",
@@ -488,8 +449,7 @@
       "prev": "Ch32",
       "next": "Ch34",
       "pageTitle": "Chapter 33 Using interpretations",
-      "hasPracticeExercises": true,
-      "hasMath": true
+      "key": "chapter/interpretations/using-interpretations"
     },
     {
       "slug": "Ch34",
@@ -500,8 +460,7 @@
       "prev": "Ch33",
       "next": "Ch35",
       "pageTitle": "Chapter 34 Reasoning about interpretations",
-      "hasPracticeExercises": false,
-      "hasMath": true
+      "key": "chapter/interpretations/reasoning-about-interpretations"
     },
     {
       "slug": "Ch35",
@@ -512,8 +471,7 @@
       "prev": "Ch34",
       "next": "Pt7",
       "pageTitle": "Chapter 35 Properties of relations",
-      "hasPracticeExercises": true,
-      "hasMath": true
+      "key": "chapter/interpretations/properties-of-relations"
     },
     {
       "slug": "Pt7",
@@ -524,8 +482,7 @@
       "prev": "Ch35",
       "next": "Ch36",
       "pageTitle": "Part VII Natural deduction for FOL",
-      "hasPracticeExercises": false,
-      "hasMath": false
+      "key": "part/natural-deduction-for-fol"
     },
     {
       "slug": "Ch36",
@@ -536,8 +493,7 @@
       "prev": "Pt7",
       "next": "Ch37",
       "pageTitle": "Chapter 36 Basic rules for FOL",
-      "hasPracticeExercises": true,
-      "hasMath": true
+      "key": "chapter/natural-deduction-for-fol/basic-rules-for-fol"
     },
     {
       "slug": "Ch37",
@@ -548,8 +504,7 @@
       "prev": "Ch36",
       "next": "Ch38",
       "pageTitle": "Chapter 37 Proofs with quantifiers",
-      "hasPracticeExercises": true,
-      "hasMath": true
+      "key": "chapter/natural-deduction-for-fol/proofs-with-quantifiers"
     },
     {
       "slug": "Ch38",
@@ -560,8 +515,7 @@
       "prev": "Ch37",
       "next": "Ch39",
       "pageTitle": "Chapter 38 Conversion of quantifiers",
-      "hasPracticeExercises": true,
-      "hasMath": true
+      "key": "chapter/natural-deduction-for-fol/conversion-of-quantifiers"
     },
     {
       "slug": "Ch39",
@@ -572,8 +526,7 @@
       "prev": "Ch38",
       "next": "Ch40",
       "pageTitle": "Chapter 39 Rules for identity",
-      "hasPracticeExercises": true,
-      "hasMath": true
+      "key": "chapter/natural-deduction-for-fol/rules-for-identity"
     },
     {
       "slug": "Ch40",
@@ -584,8 +537,7 @@
       "prev": "Ch39",
       "next": "Ch41",
       "pageTitle": "Chapter 40 Derived rules",
-      "hasPracticeExercises": true,
-      "hasMath": true
+      "key": "chapter/natural-deduction-for-fol/derived-rules"
     },
     {
       "slug": "Ch41",
@@ -596,8 +548,7 @@
       "prev": "Ch40",
       "next": "Pt8",
       "pageTitle": "Chapter 41 Proofs and semantics",
-      "hasPracticeExercises": false,
-      "hasMath": true
+      "key": "chapter/natural-deduction-for-fol/proofs-and-semantics"
     },
     {
       "slug": "Pt8",
@@ -608,8 +559,7 @@
       "prev": "Ch41",
       "next": "Ch42",
       "pageTitle": "Part VIII Modal logic",
-      "hasPracticeExercises": false,
-      "hasMath": false
+      "key": "part/modal-logic"
     },
     {
       "slug": "Ch42",
@@ -620,8 +570,7 @@
       "prev": "Pt8",
       "next": "Ch43",
       "pageTitle": "Chapter 42 Introducing modal logic",
-      "hasPracticeExercises": false,
-      "hasMath": true
+      "key": "chapter/modal-logic/introducing-modal-logic"
     },
     {
       "slug": "Ch43",
@@ -632,8 +581,7 @@
       "prev": "Ch42",
       "next": "Ch44",
       "pageTitle": "Chapter 43 Natural deduction for ML",
-      "hasPracticeExercises": true,
-      "hasMath": true
+      "key": "chapter/modal-logic/natural-deduction-for-ml"
     },
     {
       "slug": "Ch44",
@@ -644,8 +592,7 @@
       "prev": "Ch43",
       "next": "Pt9",
       "pageTitle": "Chapter 44 Semantics for ML",
-      "hasPracticeExercises": true,
-      "hasMath": true
+      "key": "chapter/modal-logic/semantics-for-ml"
     },
     {
       "slug": "Pt9",
@@ -656,8 +603,7 @@
       "prev": "Ch44",
       "next": "Ch45",
       "pageTitle": "Part IX Metatheory",
-      "hasPracticeExercises": false,
-      "hasMath": false
+      "key": "part/metatheory"
     },
     {
       "slug": "Ch45",
@@ -668,8 +614,7 @@
       "prev": "Pt9",
       "next": "Ch46",
       "pageTitle": "Chapter 45 Normal forms",
-      "hasPracticeExercises": true,
-      "hasMath": true
+      "key": "chapter/metatheory/normal-forms"
     },
     {
       "slug": "Ch46",
@@ -680,8 +625,7 @@
       "prev": "Ch45",
       "next": "Ch47",
       "pageTitle": "Chapter 46 Functional completeness",
-      "hasPracticeExercises": false,
-      "hasMath": true
+      "key": "chapter/metatheory/functional-completeness"
     },
     {
       "slug": "Ch47",
@@ -692,8 +636,7 @@
       "prev": "Ch46",
       "next": "Ch48",
       "pageTitle": "Chapter 47 Proving equivalences",
-      "hasPracticeExercises": true,
-      "hasMath": true
+      "key": "chapter/metatheory/proving-equivalences"
     },
     {
       "slug": "Ch48",
@@ -704,8 +647,7 @@
       "prev": "Ch47",
       "next": "Ptx1",
       "pageTitle": "Chapter 48 Soundness",
-      "hasPracticeExercises": true,
-      "hasMath": true
+      "key": "chapter/metatheory/soundness"
     },
     {
       "slug": "Ptx1",
@@ -716,8 +658,7 @@
       "prev": "Ch48",
       "next": "A1",
       "pageTitle": "Appendices",
-      "hasPracticeExercises": false,
-      "hasMath": false
+      "key": "backmatter/appendices"
     },
     {
       "slug": "A1",
@@ -728,8 +669,7 @@
       "prev": "Ptx1",
       "next": "A2",
       "pageTitle": "Appendix A Symbolic notation",
-      "hasPracticeExercises": false,
-      "hasMath": true
+      "key": "appendix/appendices/a-symbolic-notation"
     },
     {
       "slug": "A2",
@@ -740,8 +680,7 @@
       "prev": "A1",
       "next": "A3",
       "pageTitle": "Appendix B Alternative proof systems",
-      "hasPracticeExercises": false,
-      "hasMath": true
+      "key": "appendix/appendices/b-alternative-proof-systems"
     },
     {
       "slug": "A3",
@@ -752,8 +691,7 @@
       "prev": "A2",
       "next": "A4",
       "pageTitle": "Appendix C Quick reference",
-      "hasPracticeExercises": false,
-      "hasMath": true
+      "key": "appendix/appendices/quick-reference"
     },
     {
       "slug": "A4",
@@ -764,8 +702,7 @@
       "prev": "A3",
       "next": "Ptx2",
       "pageTitle": "Appendix D Notes on accessibility",
-      "hasPracticeExercises": false,
-      "hasMath": true
+      "key": "appendix/appendices/notes-on-accessibility"
     },
     {
       "slug": "Ptx2",
@@ -776,8 +713,7 @@
       "prev": "A4",
       "next": "A1a",
       "pageTitle": "Solutions to selected exercices",
-      "hasPracticeExercises": false,
-      "hasMath": false
+      "key": "backmatter/solutions-to-selected-exercices"
     },
     {
       "slug": "A1a",
@@ -788,8 +724,7 @@
       "prev": "Ptx2",
       "next": "A2a",
       "pageTitle": "Solutions to Chapter 1 Arguments",
-      "hasPracticeExercises": false,
-      "hasMath": false
+      "key": "appendix/solutions-to-selected-exercices/arguments"
     },
     {
       "slug": "A2a",
@@ -800,8 +735,7 @@
       "prev": "A1a",
       "next": "A3a",
       "pageTitle": "Solutions to Chapter 2 The scope of logic",
-      "hasPracticeExercises": false,
-      "hasMath": false
+      "key": "appendix/solutions-to-selected-exercices/the-scope-of-logic"
     },
     {
       "slug": "A3a",
@@ -812,8 +746,7 @@
       "prev": "A2a",
       "next": "A5",
       "pageTitle": "Solutions to Chapter 3 Other logical notions",
-      "hasPracticeExercises": false,
-      "hasMath": true
+      "key": "appendix/solutions-to-selected-exercices/other-logical-notions"
     },
     {
       "slug": "A5",
@@ -824,8 +757,7 @@
       "prev": "A3a",
       "next": "A6",
       "pageTitle": "Solutions to Chapter 5 Connectives",
-      "hasPracticeExercises": false,
-      "hasMath": true
+      "key": "appendix/solutions-to-selected-exercices/connectives"
     },
     {
       "slug": "A6",
@@ -836,8 +768,7 @@
       "prev": "A5",
       "next": "A7",
       "pageTitle": "Solutions to Chapter 6 Sentences of TFL",
-      "hasPracticeExercises": false,
-      "hasMath": true
+      "key": "appendix/solutions-to-selected-exercices/sentences-of-tfl"
     },
     {
       "slug": "A7",
@@ -848,8 +779,7 @@
       "prev": "A6",
       "next": "A11",
       "pageTitle": "Solutions to Chapter 7 Ambiguity",
-      "hasPracticeExercises": false,
-      "hasMath": true
+      "key": "appendix/solutions-to-selected-exercices/ambiguity"
     },
     {
       "slug": "A11",
@@ -860,8 +790,7 @@
       "prev": "A7",
       "next": "A12",
       "pageTitle": "Solutions to Chapter 11 Complete truth tables",
-      "hasPracticeExercises": false,
-      "hasMath": true
+      "key": "appendix/solutions-to-selected-exercices/complete-truth-tables"
     },
     {
       "slug": "A12",
@@ -872,8 +801,7 @@
       "prev": "A11",
       "next": "A14",
       "pageTitle": "Solutions to Chapter 12 Semantic concepts",
-      "hasPracticeExercises": false,
-      "hasMath": true
+      "key": "appendix/solutions-to-selected-exercices/semantic-concepts"
     },
     {
       "slug": "A14",
@@ -884,8 +812,7 @@
       "prev": "A12",
       "next": "A15",
       "pageTitle": "Solutions to Chapter 14 Truth table shortcuts",
-      "hasPracticeExercises": false,
-      "hasMath": true
+      "key": "appendix/solutions-to-selected-exercices/truth-table-shortcuts"
     },
     {
       "slug": "A15",
@@ -896,8 +823,7 @@
       "prev": "A14",
       "next": "A17",
       "pageTitle": "Solutions to Chapter 15 Partial truth tables",
-      "hasPracticeExercises": false,
-      "hasMath": true
+      "key": "appendix/solutions-to-selected-exercices/partial-truth-tables"
     },
     {
       "slug": "A17",
@@ -908,8 +834,7 @@
       "prev": "A15",
       "next": "A19",
       "pageTitle": "Solutions to Chapter 17 Basic rules for TFL",
-      "hasPracticeExercises": false,
-      "hasMath": true
+      "key": "appendix/solutions-to-selected-exercices/basic-rules-for-tfl"
     },
     {
       "slug": "A19",
@@ -920,8 +845,7 @@
       "prev": "A17",
       "next": "A20",
       "pageTitle": "Solutions to Chapter 19 Additional rules for TFL",
-      "hasPracticeExercises": false,
-      "hasMath": true
+      "key": "appendix/solutions-to-selected-exercices/additional-rules-for-tfl"
     },
     {
       "slug": "A20",
@@ -932,8 +856,7 @@
       "prev": "A19",
       "next": "A21",
       "pageTitle": "Solutions to Chapter 20 Proof-theoretic concepts",
-      "hasPracticeExercises": false,
-      "hasMath": true
+      "key": "appendix/solutions-to-selected-exercices/proof-theoretic-concepts"
     },
     {
       "slug": "A21",
@@ -944,8 +867,7 @@
       "prev": "A20",
       "next": "A22",
       "pageTitle": "Solutions to Chapter 21 Derived rules",
-      "hasPracticeExercises": false,
-      "hasMath": true
+      "key": "appendix/solutions-to-selected-exercices/derived-rules"
     },
     {
       "slug": "A22",
@@ -956,8 +878,7 @@
       "prev": "A21",
       "next": "A24",
       "pageTitle": "Solutions to Chapter 22 Soundness and completeness",
-      "hasPracticeExercises": true,
-      "hasMath": true
+      "key": "appendix/solutions-to-selected-exercices/soundness-and-completeness"
     },
     {
       "slug": "A24",
@@ -968,8 +889,7 @@
       "prev": "A22",
       "next": "A25",
       "pageTitle": "Solutions to Chapter 24 Sentences with one quantifier",
-      "hasPracticeExercises": false,
-      "hasMath": true
+      "key": "appendix/solutions-to-selected-exercices/sentences-with-one-quantifier"
     },
     {
       "slug": "A25",
@@ -980,8 +900,7 @@
       "prev": "A24",
       "next": "A26",
       "pageTitle": "Solutions to Chapter 25 Multiple generality",
-      "hasPracticeExercises": false,
-      "hasMath": true
+      "key": "appendix/solutions-to-selected-exercices/multiple-generality"
     },
     {
       "slug": "A26",
@@ -992,8 +911,7 @@
       "prev": "A25",
       "next": "A27",
       "pageTitle": "Solutions to Chapter 26 Identity",
-      "hasPracticeExercises": false,
-      "hasMath": true
+      "key": "appendix/solutions-to-selected-exercices/identity"
     },
     {
       "slug": "A27",
@@ -1004,8 +922,7 @@
       "prev": "A26",
       "next": "A28",
       "pageTitle": "Solutions to Chapter 27 Sentences of FOL",
-      "hasPracticeExercises": false,
-      "hasMath": true
+      "key": "appendix/solutions-to-selected-exercices/sentences-of-fol"
     },
     {
       "slug": "A28",
@@ -1016,8 +933,7 @@
       "prev": "A27",
       "next": "A29",
       "pageTitle": "Solutions to Chapter 28 Definite descriptions",
-      "hasPracticeExercises": false,
-      "hasMath": true
+      "key": "appendix/solutions-to-selected-exercices/definite-descriptions"
     },
     {
       "slug": "A29",
@@ -1028,8 +944,7 @@
       "prev": "A28",
       "next": "A31",
       "pageTitle": "Solutions to Chapter 29 Ambiguity",
-      "hasPracticeExercises": true,
-      "hasMath": true
+      "key": "appendix/solutions-to-selected-exercices/ambiguity-2"
     },
     {
       "slug": "A31",
@@ -1040,8 +955,7 @@
       "prev": "A29",
       "next": "A32",
       "pageTitle": "Solutions to Chapter 31 Truth in FOL",
-      "hasPracticeExercises": false,
-      "hasMath": true
+      "key": "appendix/solutions-to-selected-exercices/truth-in-fol"
     },
     {
       "slug": "A32",
@@ -1052,8 +966,7 @@
       "prev": "A31",
       "next": "A33",
       "pageTitle": "Solutions to Chapter 32 Semantic concepts",
-      "hasPracticeExercises": false,
-      "hasMath": true
+      "key": "appendix/solutions-to-selected-exercices/semantic-concepts-2"
     },
     {
       "slug": "A33",
@@ -1064,8 +977,7 @@
       "prev": "A32",
       "next": "A35",
       "pageTitle": "Solutions to Chapter 33 Using Interpretations",
-      "hasPracticeExercises": false,
-      "hasMath": true
+      "key": "appendix/solutions-to-selected-exercices/using-interpretations"
     },
     {
       "slug": "A35",
@@ -1076,8 +988,7 @@
       "prev": "A33",
       "next": "A36",
       "pageTitle": "Solutions to Chapter 35 Properties of relations",
-      "hasPracticeExercises": false,
-      "hasMath": true
+      "key": "appendix/solutions-to-selected-exercices/properties-of-relations"
     },
     {
       "slug": "A36",
@@ -1088,8 +999,7 @@
       "prev": "A35",
       "next": "A38",
       "pageTitle": "Solutions to Chapter 36 Basic rules for FOL",
-      "hasPracticeExercises": false,
-      "hasMath": true
+      "key": "appendix/solutions-to-selected-exercices/basic-rules-for-fol"
     },
     {
       "slug": "A38",
@@ -1100,8 +1010,7 @@
       "prev": "A36",
       "next": "A39",
       "pageTitle": "Solutions to Chapter 38 Conversion of quantifiers",
-      "hasPracticeExercises": false,
-      "hasMath": true
+      "key": "appendix/solutions-to-selected-exercices/conversion-of-quantifiers"
     },
     {
       "slug": "A39",
@@ -1112,8 +1021,7 @@
       "prev": "A38",
       "next": "A40",
       "pageTitle": "Solutions to Chapter 39 Rules for identity",
-      "hasPracticeExercises": false,
-      "hasMath": true
+      "key": "appendix/solutions-to-selected-exercices/rules-for-identity"
     },
     {
       "slug": "A40",
@@ -1124,8 +1032,7 @@
       "prev": "A39",
       "next": "A43",
       "pageTitle": "Solutions to Chapter 40 Derived rules",
-      "hasPracticeExercises": false,
-      "hasMath": true
+      "key": "appendix/solutions-to-selected-exercices/derived-rules-2"
     },
     {
       "slug": "A43",
@@ -1136,8 +1043,7 @@
       "prev": "A40",
       "next": "A44",
       "pageTitle": "Solutions to Chapter 43 Natural deduction for ML",
-      "hasPracticeExercises": false,
-      "hasMath": true
+      "key": "appendix/solutions-to-selected-exercices/natural-deduction-for-ml"
     },
     {
       "slug": "A44",
@@ -1148,8 +1054,7 @@
       "prev": "A43",
       "next": "A45",
       "pageTitle": "Solutions to Chapter 44 Semantics for ML",
-      "hasPracticeExercises": false,
-      "hasMath": true
+      "key": "appendix/solutions-to-selected-exercices/semantics-for-ml"
     },
     {
       "slug": "A45",
@@ -1160,8 +1065,7 @@
       "prev": "A44",
       "next": "A47",
       "pageTitle": "Solutions to Chapter 45 Normal forms",
-      "hasPracticeExercises": false,
-      "hasMath": true
+      "key": "appendix/solutions-to-selected-exercices/normal-forms"
     },
     {
       "slug": "A47",
@@ -1172,13 +1076,8 @@
       "prev": "A45",
       "next": null,
       "pageTitle": "Solutions to Chapter 47 Proving equivalences",
-      "hasPracticeExercises": false,
-      "hasMath": true
+      "key": "appendix/solutions-to-selected-exercices/proving-equivalences"
     }
   ],
-  "slugAliases": {
-    "chapter-1": "Ch1",
-    "preface": "Chx1",
-    "index": "index"
-  }
+  "slugAliases": {}
 }

@@ -1,10 +1,10 @@
 import { useCallback, useMemo } from 'react'
 import { createCourseScopedTextbookResource } from '@/hooks/useCourseScopedTextbookResource.js'
+import { useTextbookCatalog } from '@/hooks/useTextbookCatalog.js'
 import {
-  assignDynamicNumbers,
+  assignTocLabels,
   clearCourseStructure,
   createSectionDivider,
-  getCourseStructureNodes,
   getNeighborsFromStructure,
   getTextbookInventory,
   listNavigableNumberedFlat,
@@ -33,25 +33,43 @@ const useStructureResource = createCourseScopedTextbookResource({
  * Live mode uses the API; sandbox keeps sessionStorage.
  */
 export function useTextbookStructure() {
+  // Defaults are seeded from the active catalog, so a course with no overrides
+  // has to re-seed once a remote bundle replaces the shipped manifest.
+  const { catalog, isReady: catalogReady, isLoading: catalogLoading } = useTextbookCatalog()
+
   const {
     courseId,
     storageScope,
     isSandbox,
-    isLoading,
+    isLoading: structureLoading,
     isError,
-    values: nodes,
+    values: storedNodes,
     hasOverrides,
     usingDefaults,
     save: saveStructure,
     reset: resetToBundle,
-  } = useStructureResource()
+  } = useStructureResource(catalog)
+
+  const isLoading = structureLoading || catalogLoading
+
+  /*
+  purpose keep the course structure in step with the published bundle
+  contract reconciliation is continuous and in memory; it persists on the next save
+  */
+  const reconciled = useMemo(() => {
+    if (!catalogReady) return { nodes: storedNodes, missing: [], added: [] }
+    return mergeInventory(storedNodes, getTextbookInventory().files)
+  }, [storedNodes, catalogReady, catalog])
+
+  const nodes = reconciled.nodes
+  const pendingSync = useMemo(
+    () => ({ missing: reconciled.missing, added: reconciled.added }),
+    [reconciled],
+  )
 
   const tree = useMemo(() => nodesToTree(nodes, { includeHidden: true }), [nodes])
   const visibleTree = useMemo(() => nodesToTree(nodes, { includeHidden: false }), [nodes])
-  const numberedTree = useMemo(
-    () => assignDynamicNumbers(visibleTree, { includeHidden: false }),
-    [visibleTree],
-  )
+  const numberedTree = useMemo(() => assignTocLabels(visibleTree), [visibleTree])
   const numberedFlat = useMemo(
     () => listNumberedFlat(nodes, { includeHidden: true }),
     [nodes],
@@ -64,16 +82,6 @@ export function useTextbookStructure() {
     () => listNavigableNumberedFlat(nodes, { includeHidden: false }),
     [nodes],
   )
-
-  const syncFiles = useCallback(async () => {
-    const inventory = getTextbookInventory()
-    const current = isSandbox
-      ? getCourseStructureNodes(courseId, storageScope)
-      : nodes
-    const { nodes: merged, missing, added } = mergeInventory(current, inventory.files)
-    await saveStructure(merged)
-    return { nodes: merged, missing, added }
-  }, [isSandbox, courseId, storageScope, nodes, saveStructure])
 
   const getNeighbors = useCallback(
     (slug) => getNeighborsFromStructure(nodes, slug),
@@ -98,6 +106,8 @@ export function useTextbookStructure() {
     courseId,
     storageScope,
     isSandbox,
+    catalog,
+    catalogReady,
     isLoading,
     isError,
     nodes,
@@ -109,9 +119,9 @@ export function useTextbookStructure() {
     navigableFlat,
     hasOverrides,
     usingDefaults,
+    pendingSync,
     saveStructure,
     resetToBundle,
-    syncFiles,
     getNeighbors,
     resolveSlug,
     addSection,

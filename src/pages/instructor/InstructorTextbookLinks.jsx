@@ -29,7 +29,6 @@ import {
   Delete as DeleteIcon,
   Edit as EditIcon,
   RestartAlt as ResetIcon,
-  Sync as SyncIcon,
 } from '@mui/icons-material'
 import { useSearchParams } from 'react-router-dom'
 import { useAppRuntime } from '@/hooks/useAppRuntime.js'
@@ -436,7 +435,7 @@ export default function InstructorTextbookLinks() {
     hasOverrides,
     saveStructure,
     resetToBundle,
-    syncFiles,
+    pendingSync,
   } = useTextbookStructure()
 
   const tab = Math.max(0, TEXTBOOK_TABS.indexOf(searchParams.get('tab')))
@@ -461,26 +460,10 @@ export default function InstructorTextbookLinks() {
     [navigableFlat],
   )
 
-  const handleSync = async () => {
-    try {
-      const { added, missing } = await syncFiles()
-      const parts = []
-      if (added.length) parts.push(`added ${added.length}`)
-      if (missing.length) parts.push(`dropped ${missing.length} missing files`)
-      showFlash(
-        parts.length
-          ? `Synced (${parts.join('; ')}).`
-          : 'Already in sync with the inventory.',
-      )
-    } catch (error) {
-      showFlash(error?.message || 'Failed to sync structure.', 'error')
-    }
-  }
-
   const handleResetStructure = async () => {
     try {
       await resetToBundle()
-      showFlash('Reset to bundle defaults.')
+      showFlash('Reset to the published order.')
     } catch (error) {
       showFlash(error?.message || 'Failed to reset structure.', 'error')
     }
@@ -511,7 +494,7 @@ export default function InstructorTextbookLinks() {
             Textbook
           </Typography>
           <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5, maxWidth: 40 * 16 }}>
-            Set chapter order and titles for this course, and link chapters to practice.
+            Set reading order and visibility for this course, and link chapters to practice. Titles and numbering come from the published textbook.
           </Typography>
         </Box>
       </Stack>
@@ -555,32 +538,39 @@ export default function InstructorTextbookLinks() {
             sx={{ mb: 2 }}
           >
             <Typography variant="body2" color="text.secondary" sx={{ maxWidth: 36 * 16 }}>
-              Parts are section labels only—not pages. Drag chapters to reorder.
-              {hasOverrides ? ' Edits saved for this course.' : ' Showing bundle defaults.'}
+              Sections are labels only—not pages. Drag chapters to set reading order;
+              numbering and titles stay as the textbook publishes them.
+              {hasOverrides ? ' Order saved for this course.' : ' Showing the published order.'}
             </Typography>
             <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
-              <Tooltip title="After a new BookML drop, run generate-textbook-inventory.mjs, then sync">
-                <Button
-                  variant="outlined"
-                  startIcon={<SyncIcon />}
-                  onClick={handleSync}
-                  aria-label="Sync textbook structure from bundle inventory"
-                >
-                  Sync from bundle
-                </Button>
-              </Tooltip>
-              <Tooltip title="Discard course edits and restore the seeded TOC">
+              <Tooltip title="Discard course edits and restore the published order">
                 <Button
                   variant="outlined"
                   startIcon={<ResetIcon />}
                   onClick={handleResetStructure}
-                  aria-label="Reset structure to bundle defaults"
+                  aria-label="Reset structure to the published order"
                 >
-                  Reset to bundle
+                  Reset to published order
                 </Button>
               </Tooltip>
             </Stack>
           </Stack>
+
+          {(pendingSync.added.length > 0 || pendingSync.missing.length > 0) && (
+            <Alert severity="info" sx={{ mb: 2 }}>
+              {[
+                pendingSync.added.length
+                  ? `${pendingSync.added.length} new chapter${pendingSync.added.length === 1 ? '' : 's'} from the latest publish ${pendingSync.added.length === 1 ? 'is' : 'are'} at the end of the list`
+                  : null,
+                pendingSync.missing.length
+                  ? `${pendingSync.missing.length} chapter${pendingSync.missing.length === 1 ? '' : 's'} (${pendingSync.missing.map((node) => node.displayTitle || node.slug).join(', ')}) ${pendingSync.missing.length === 1 ? 'is' : 'are'} no longer published — ${pendingSync.missing.length === 1 ? 'it was' : 'they were'} removed or retitled`
+                  : null,
+              ]
+                .filter(Boolean)
+                .join('. ')}
+              . Reordering or saving any change stores this.
+            </Alert>
+          )}
 
           <TextbookStructureEditor
             key={activeCourseId}

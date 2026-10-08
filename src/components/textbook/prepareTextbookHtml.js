@@ -1,5 +1,8 @@
-// static assets use a separate path from application routes
-const ASSET_BASE = '/textbook-assets'
+import { LOCAL_TEXTBOOK_BASE } from './textbookSource.js'
+
+// static assets use a separate path from application routes; a remote bundle
+// supplies an absolute origin here instead
+const ASSET_BASE = LOCAL_TEXTBOOK_BASE
 
 const TEXTBOOK_HTML_FILE = /^[A-Za-z0-9][A-Za-z0-9_-]*\.html(?:#.*)?$/i
 
@@ -53,7 +56,7 @@ export function extractTextbookBody(fullHtml) {
 }
 
 // keeps chapter navigation in the app and other files under the asset path
-export function rewriteTextbookUrls(html, { linkBase = '/textbook' } = {}) {
+export function rewriteTextbookUrls(html, { linkBase = '/textbook', assetBase = ASSET_BASE } = {}) {
   if (typeof html !== 'string') return ''
 
   const parser = new DOMParser()
@@ -64,7 +67,7 @@ export function rewriteTextbookUrls(html, { linkBase = '/textbook' } = {}) {
   root.querySelectorAll('[href]').forEach((el) => {
     const href = el.getAttribute('href')
     if (href == null) return
-    const next = rewriteHref(href, linkBase)
+    const next = rewriteHref(href, linkBase, assetBase)
     if (next !== href) el.setAttribute('href', next)
     if (next.startsWith('http://') || next.startsWith('https://') || next.startsWith('mailto:')) {
       el.setAttribute('target', '_blank')
@@ -75,7 +78,7 @@ export function rewriteTextbookUrls(html, { linkBase = '/textbook' } = {}) {
   root.querySelectorAll('[src]').forEach((el) => {
     const src = el.getAttribute('src')
     if (src == null) return
-    const next = rewriteAssetSrc(src)
+    const next = rewriteAssetSrc(src, assetBase)
     if (next !== src) el.setAttribute('src', next)
   })
 
@@ -83,13 +86,13 @@ export function rewriteTextbookUrls(html, { linkBase = '/textbook' } = {}) {
   root.querySelectorAll('[data-src]').forEach((el) => {
     const src = el.getAttribute('data-src')
     if (!src) return
-    el.setAttribute('data-src', rewriteAssetSrc(src))
+    el.setAttribute('data-src', rewriteAssetSrc(src, assetBase))
   })
 
   return root.innerHTML
 }
 
-export function rewriteHref(href, linkBase) {
+export function rewriteHref(href, linkBase, assetBase = ASSET_BASE) {
   const trimmed = href.trim()
   if (!trimmed || trimmed === '#') return trimmed
 
@@ -117,10 +120,10 @@ export function rewriteHref(href, linkBase) {
   }
 
   // Bare relative asset (pdf, png, …)
-  return rewriteAssetSrc(trimmed)
+  return rewriteAssetSrc(trimmed, assetBase)
 }
 
-export function rewriteAssetSrc(src) {
+export function rewriteAssetSrc(src, assetBase = ASSET_BASE) {
   const trimmed = src.trim()
   if (
     !trimmed ||
@@ -133,7 +136,7 @@ export function rewriteAssetSrc(src) {
     return trimmed
   }
   const cleaned = trimmed.replace(/^\.\//, '')
-  return `${ASSET_BASE}/${cleaned}`
+  return `${String(assetBase).replace(/\/+$/, '')}/${cleaned}`
 }
 
 /**
@@ -182,9 +185,9 @@ export function injectPracticeWidgetSlots(html, slug) {
  * Full pipeline: extract → rewrite URLs.
  * Practice widgets are attached via course link metadata (not HTML slots).
  */
-export function prepareTextbookHtml(fullHtml, { linkBase = '/textbook' } = {}) {
+export function prepareTextbookHtml(fullHtml, { linkBase = '/textbook', assetBase = ASSET_BASE } = {}) {
   const body = extractTextbookBody(fullHtml)
-  return rewriteTextbookUrls(body, { linkBase })
+  return rewriteTextbookUrls(body, { linkBase, assetBase })
 }
 
 export { ASSET_BASE }

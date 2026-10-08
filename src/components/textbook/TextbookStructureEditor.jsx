@@ -36,7 +36,7 @@ import {
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import {
-  assignDynamicNumbers,
+  assignTocLabels,
   canBeChildOf,
   canHaveChildren,
   createSectionDivider,
@@ -68,7 +68,6 @@ function KindBadge({ kind }) {
 function StructureRow({
   node,
   depth,
-  numberPreview,
   onRename,
   onRenameCommit,
   onToggleHidden,
@@ -79,6 +78,8 @@ function StructureRow({
   dense = false,
 }) {
   const divider = isDividerKind(node.kind) || !isNavigableNode(node)
+  // Book entries come from the published bundle; sections are HuLA's own.
+  const isCustomSection = divider && !node.file
 
   return (
     <Box
@@ -112,33 +113,30 @@ function StructureRow({
 
       {expandControl}
 
-      {numberPreview ? (
-        <Typography
-          variant="caption"
-          sx={{
-            minWidth: 1.75 * 16,
-            fontWeight: 700,
-            color: 'text.secondary',
-            fontVariantNumeric: 'tabular-nums',
-          }}
-        >
-          {numberPreview}
-        </Typography>
-      ) : (
-        <Box sx={{ minWidth: 1.75 * 16 }} />
-      )}
-
       <KindBadge kind={node.kind} />
 
-      <TextField
-        size="small"
-        value={node.displayTitle}
-        onChange={(event) => onRename(node.id, event.target.value)}
-        onBlur={onRenameCommit}
-        aria-label={`Display title for ${node.slug}`}
-        sx={{ flexGrow: 1, minWidth: 0 }}
-        inputProps={{ sx: { fontSize: '0.875rem', py: 0.75 } }}
-      />
+      {isCustomSection ? (
+        <TextField
+          size="small"
+          value={node.displayTitle}
+          onChange={(event) => onRename(node.id, event.target.value)}
+          onBlur={onRenameCommit}
+          aria-label={`Name for ${node.displayTitle || 'section'}`}
+          sx={{ flexGrow: 1, minWidth: 0 }}
+          inputProps={{ sx: { fontSize: '0.875rem', py: 0.75 } }}
+        />
+      ) : (
+        // The book owns its titles and numbers: the chapter heading and every
+        // cross-reference in the prose use them, so the TOC has to agree.
+        <Typography
+          variant="body2"
+          sx={{ flexGrow: 1, minWidth: 0, py: 0.75 }}
+          noWrap
+          title={node.label || node.displayTitle}
+        >
+          {node.label || node.displayTitle}
+        </Typography>
+      )}
 
       <Typography
         variant="caption"
@@ -160,21 +158,19 @@ function StructureRow({
         </IconButton>
       </Tooltip>
 
-      <Tooltip
-        title={
-          divider
-            ? 'Remove section (chapters move up a level)'
-            : 'Remove from structure (file stays on disk)'
-        }
-      >
-        <IconButton
-          size="small"
-          onClick={() => onRemove(node.id)}
-          aria-label={`Remove ${node.slug} from structure`}
-        >
-          <DeleteIcon fontSize="small" />
-        </IconButton>
-      </Tooltip>
+      {isCustomSection ? (
+        <Tooltip title="Delete section (chapters move up a level)">
+          <IconButton
+            size="small"
+            onClick={() => onRemove(node.id)}
+            aria-label={`Delete section ${node.displayTitle || node.slug}`}
+          >
+            <DeleteIcon fontSize="small" />
+          </IconButton>
+        </Tooltip>
+      ) : (
+        <Box sx={{ width: 34 }} />
+      )}
     </Box>
   )
 }
@@ -311,7 +307,7 @@ export default function TextbookStructureEditor({ nodes, onChange }) {
   )
   const tree = useMemo(() => nodesToTree(editableNodes, { includeHidden: true }), [editableNodes])
   const numbered = useMemo(
-    () => assignDynamicNumbers(tree, { includeHidden: true }),
+    () => assignTocLabels(tree),
     [tree],
   )
 
@@ -416,7 +412,9 @@ export default function TextbookStructureEditor({ nodes, onChange }) {
   const handleRemove = (id) => {
     const current = applyTitleDrafts(nodesRef.current, titleDraftsRef.current)
     const target = current.find((node) => node.id === id)
-    if (!target) return
+    // Only HuLA's own sections can be deleted; a published chapter is hidden,
+    // never removed, because the next reconcile would bring it straight back.
+    if (!target || target.file) return
     const next = current
       .filter((node) => node.id !== id)
       .map((node) =>
@@ -513,7 +511,6 @@ export default function TextbookStructureEditor({ nodes, onChange }) {
             <SortableRow
               node={node}
               depth={depth}
-              numberPreview={node.number}
               onRename={handleRename}
               onRenameCommit={flushRename}
               onToggleHidden={handleToggleHidden}
@@ -553,7 +550,6 @@ export default function TextbookStructureEditor({ nodes, onChange }) {
           key={node.id}
           node={node}
           depth={depth}
-          numberPreview={node.number}
           onRename={handleRename}
           onRenameCommit={flushRename}
           onToggleHidden={handleToggleHidden}
@@ -625,7 +621,6 @@ export default function TextbookStructureEditor({ nodes, onChange }) {
               <StructureRow
                 node={activeNode}
                 depth={0}
-                numberPreview={null}
                 onRename={() => {}}
                 onRenameCommit={() => {}}
                 onToggleHidden={() => {}}

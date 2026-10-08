@@ -8,7 +8,9 @@ import TextbookLinkedPractices from '@/components/textbook/TextbookLinkedPractic
 import { prepareTextbookHtml } from '@/components/textbook/prepareTextbookHtml.js'
 import { ensureTextbookStyles } from '@/components/textbook/textbookAssets.js'
 import { ensureMathJax, typesetMath } from '@/lib/mathJax.js'
+import { useTextbookCatalog } from '@/hooks/useTextbookCatalog.js'
 import {
+  getTextbookAssetBase,
   normalizeTextbookSlug,
   resolveTextbookAssetUrl,
 } from '@/components/textbook/textbookCatalog.js'
@@ -48,6 +50,8 @@ export default function TextbookReader({
   resolveInternalSlug = null,
 }) {
   const navigate = useNavigate()
+  // Chapter URLs depend on the active catalog, so wait for it before fetching.
+  const { catalog, isReady: catalogReady } = useTextbookCatalog()
   const containerRef = useRef(null)
   const onMetaChangeRef = useRef(onMetaChange)
   const [content, setContent] = useState(null)
@@ -66,11 +70,13 @@ export default function TextbookReader({
   }, [])
 
   useEffect(() => {
+    if (!catalogReady) return
     ensureTextbookStyles()
     ensureMathJax().catch(() => {})
-  }, [])
+  }, [catalogReady, catalog])
 
   useEffect(() => {
+    if (!catalogReady) return undefined
     if (!slug) {
       setContent(null)
       setError('No chapter specified.')
@@ -109,7 +115,10 @@ export default function TextbookReader({
         const rawHtml = await response.text()
         if (cancelled) return
 
-        const prepared = prepareTextbookHtml(rawHtml, { linkBase })
+        const prepared = prepareTextbookHtml(rawHtml, {
+          linkBase,
+          assetBase: getTextbookAssetBase(),
+        })
         const safe = sanitizeTextbookHtml(prepared)
         setContent(safe)
 
@@ -132,7 +141,7 @@ export default function TextbookReader({
       cancelled = true
       controller.abort()
     }
-  }, [slug, linkBase, reloadToken])
+  }, [slug, linkBase, reloadToken, catalogReady, catalog])
 
   useEffect(() => {
     if (!content || !containerRef.current) return undefined
