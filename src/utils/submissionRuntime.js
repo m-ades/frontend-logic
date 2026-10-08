@@ -2,6 +2,14 @@ import { fetchJson, getActiveUserId } from './api.js'
 import { getSubmissionScore } from './problemHelpers.js'
 import { trackSave } from './savesInFlight.js'
 
+export const ASSIGNMENT_SUBMISSION_EVENT = 'assignment-submission'
+
+// the worksheet listens for this to sync attempts and scores across problems
+export function announceAssignmentSubmission(detail) {
+  if (typeof window === 'undefined') return
+  window.dispatchEvent(new CustomEvent(ASSIGNMENT_SUBMISSION_EVENT, { detail }))
+}
+
 export const isSandboxRuntime = () => (
   typeof window !== 'undefined' && window.location.pathname.startsWith('/sandbox')
 )

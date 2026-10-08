@@ -4,7 +4,7 @@
  */
 import { useState, useEffect } from 'react'
 import { localCheck } from '../lib/logic-engine/common.js'
-import { buildPersistedSubmissionState, shouldUseApiValidation, submitApiValidation } from '../utils/submissionRuntime.js'
+import { announceAssignmentSubmission, buildPersistedSubmissionState, shouldUseApiValidation, submitApiValidation } from '../utils/submissionRuntime.js'
 
 export function useProblemChecker({
   answer,
@@ -62,18 +62,13 @@ export function useProblemChecker({
           status: successstatus,
           rawScore,
         }))
-        if (typeof window !== 'undefined') {
-          const score = rawScore
-          window.dispatchEvent(new CustomEvent('assignment-submission', {
-            detail: {
-              assignmentQuestionId,
-              attempt,
-              attemptLimit: nextAttemptLimit,
-              isCorrect: successstatus === 'correct',
-              score,
-            },
-          }))
-        }
+        announceAssignmentSubmission({
+          assignmentQuestionId,
+          attempt,
+          attemptLimit: nextAttemptLimit,
+          isCorrect: successstatus === 'correct',
+          score: rawScore,
+        })
         if (successstatus === 'correct') {
           setStatus('correct')
           setMessage('Correct!')
