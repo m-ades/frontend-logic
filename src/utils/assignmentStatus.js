@@ -1,4 +1,4 @@
-import { parseDueDateAsEastern } from "./easternTime.js";
+import { formatEasternFromIso, parseDueDateAsEastern } from "./easternTime.js";
 import { projectPublicationState } from "./publicationPolicy.js";
 
 /**
@@ -65,4 +65,17 @@ export function enhanceItems(
 
     return enhanced;
   });
+}
+
+// labels a student extension only when it actually moves the original due time
+export function getExtensionDueLabel(assignment, extensionDueAt) {
+  if (!extensionDueAt) return null;
+  const originalDue = assignment?.dueAt
+    ? new Date(assignment.dueAt)
+    : parseDueDateAsEastern(assignment?.dueDate, assignment?.dueTime || "23:59");
+  const originalTs = originalDue?.getTime();
+  const extendedTs = Date.parse(extensionDueAt);
+  if (!Number.isFinite(originalTs) || !Number.isFinite(extendedTs)) return null;
+  if (Math.abs(extendedTs - originalTs) < 1000) return null;
+  return formatEasternFromIso(extensionDueAt, { includeTime: true }) ?? null;
 }
