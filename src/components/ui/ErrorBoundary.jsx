@@ -2,7 +2,7 @@
 // throws a runtime error/bad render/crashes
 
 import React from 'react'
-import { Box, Typography, Button } from '@mui/material'
+import { Alert, Box, Typography, Button } from '@mui/material'
 
 class ErrorBoundary extends React.Component {
   constructor(props) {
@@ -18,7 +18,33 @@ class ErrorBoundary extends React.Component {
     console.error('Error caught by boundary:', error, errorInfo)
   }
 
+  // clears an error that was already showing once the reset key moves
+  componentDidUpdate(prevProps, prevState) {
+    if (prevState.hasError && this.state.hasError && prevProps.resetKey !== this.props.resetKey) {
+      this.setState({ hasError: false, error: null })
+    }
+  }
+
   render() {
+    if (this.state.hasError && this.props.scoped) {
+      return (
+        <Alert
+          severity="error"
+          sx={{ m: 2 }}
+          action={(
+            <Button color="inherit" size="small" onClick={() => this.setState({ hasError: false, error: null })}>
+              Try again
+            </Button>
+          )}
+        >
+          {this.props.message ?? 'This section failed to load.'}
+          <Typography variant="caption" component="div">
+            {this.state.error?.toString()}
+          </Typography>
+        </Alert>
+      )
+    }
+
     if (this.state.hasError) {
       return (
         <Box sx={{ p: 4, textAlign: 'center' }}>

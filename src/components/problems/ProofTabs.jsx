@@ -6,6 +6,7 @@ import CancelIcon from '@mui/icons-material/Cancel'
 import WarningAmberIcon from '@mui/icons-material/WarningAmber'
 import AddIcon from '@mui/icons-material/Add'
 import ProofEditor from './ProofEditor.jsx'
+import ErrorBoundary from '../ui/ErrorBoundary.jsx'
 import LogicProblem from './LogicProblem.jsx'
 import TruthTableEditor from './truth-table/TruthTableEditor.jsx'
 import { ProblemNavigationContext } from './ProblemNavigationContext.jsx'
@@ -652,6 +653,7 @@ function ProofTabs({
                   )}
                   <Box sx={{ minWidth: 0 }}>
                     <div ref={el => { if (el) proofRefs.current[proof.id] = el }}>
+                      <ErrorBoundary scoped message="This problem failed to load. Other problems still work.">
                       {(() => {
                         const savedState = getSavedProofState(proof.id)
                         // the proof carries the course system
@@ -736,6 +738,7 @@ function ProofTabs({
                           />
                         )
                       })()}
+                      </ErrorBoundary>
                     </div>
                   </Box>
                 </Stack>
