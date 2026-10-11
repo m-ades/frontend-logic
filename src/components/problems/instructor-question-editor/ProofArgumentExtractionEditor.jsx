@@ -105,6 +105,7 @@ export function ProofArgumentExtractionEditorForm({ proof, value, onChange, logi
         values={premises}
         onChange={updatePremises}
         placeholder="Premise"
+        allowEmpty
       />
       <FormulaListEditor
         label="Lines after the premises"

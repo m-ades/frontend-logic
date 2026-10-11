@@ -252,7 +252,7 @@ export default function ProofArgumentExtraction({
             value={argumentLine}
             onValueChange={handleArgumentChange}
             aria-label="Corresponding argument"
-            placeholder="e.g. P, Q ∴ R"
+            placeholder={premises.length > 0 ? 'e.g. P, Q ∴ R' : 'e.g. ∴ R'}
             symbolizationKey={argumentKeyboardConfig.symbolizationKey}
             includeQuantifiers={argumentKeyboardConfig.isPredicateMode}
             extraInsertButtons={ARGUMENT_SEPARATOR_BUTTONS}

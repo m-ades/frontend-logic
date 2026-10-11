@@ -13,8 +13,10 @@ export function FormulaListEditor({
   secondaryValues,
   secondaryLabel,
   secondaryPlaceholder,
+  allowEmpty = false,
 }) {
-  const list = Array.isArray(values) && values.length ? values : ['']
+  // lists that may be empty show no rows rather than a blank one that looks required
+  const list = Array.isArray(values) && (values.length || allowEmpty) ? values : ['']
   const hasSecondaryValues = Array.isArray(secondaryValues)
   const secondaryList = hasSecondaryValues
     ? list.map((_, index) => String(secondaryValues[index] ?? ''))

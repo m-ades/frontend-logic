@@ -232,7 +232,7 @@ function ProofTabs({
     if (type === 'proof-argument-extraction') {
       return {
         ...base,
-        premises: [''],
+        premises: [],
         lines: [''],
       }
     }

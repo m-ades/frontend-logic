@@ -1186,7 +1186,7 @@ export default function DerivationTable({
             }}
           >
             <TableBody>
-            {!usesNestedSubderivations && premises.length === 0 && proof?.conclusion && (
+            {!usesNestedSubderivations && !isFixedProof && premises.length === 0 && proof?.conclusion && (
               <TableRow
                 key="conclusion-row"
                 sx={{
