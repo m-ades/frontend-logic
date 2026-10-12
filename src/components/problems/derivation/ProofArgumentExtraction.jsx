@@ -11,6 +11,7 @@ import ProofEditor from '../ProofEditor.jsx'
 import ProblemSetButtons from '../mui/frame/ProblemSetButtons.jsx'
 import FormulaField from '../mui/inputs/FormulaField.jsx'
 import SymbolButtonRow from '../../ui/logic-engine/SymbolButtonRow.jsx'
+import { THEREFORE_SEPARATOR_BUTTONS } from '../../ui/logic-engine/symbolButtons.js'
 import { useProblemChecker } from '../../../hooks/useProblemChecker.js'
 import { getNotation } from '../../../lib/logicSystems.js'
 import getFormulaClass from '@logic-app/logic-engine/symbolic/formula.js'
@@ -23,10 +24,6 @@ import {
 import { extractLines } from './derivationUtils.js'
 import { getFormulaKeyboardConfig } from '../mui/translation/symbolizationKeyboard.js'
 import ProblemFrame from '../mui/frame/ProblemFrame.jsx'
-
-const ARGUMENT_SEPARATOR_BUTTONS = [
-  { insert: ' ∴ ', label: '∴' },
-]
 
 function getQuestionLines(snapshot, logicSystem) {
   const formulas = Array.isArray(snapshot?.lines) ? snapshot.lines : []
@@ -255,7 +252,7 @@ export default function ProofArgumentExtraction({
             placeholder={premises.length > 0 ? 'e.g. P, Q ∴ R' : 'e.g. ∴ R'}
             symbolizationKey={argumentKeyboardConfig.symbolizationKey}
             includeQuantifiers={argumentKeyboardConfig.isPredicateMode}
-            extraInsertButtons={ARGUMENT_SEPARATOR_BUTTONS}
+            extraInsertButtons={THEREFORE_SEPARATOR_BUTTONS.mobile}
             predicateLetters={argumentKeyboardConfig.isPredicateMode
               ? argumentKeyboardConfig.predicateLetters
               : undefined}
@@ -275,7 +272,7 @@ export default function ProofArgumentExtraction({
                 onValueChange={handleArgumentChange}
                 includeQuantifiers={argumentKeyboardConfig.isPredicateMode}
                 showBackspace={false}
-                extraInsertButtons={ARGUMENT_SEPARATOR_BUTTONS}
+                extraInsertButtons={THEREFORE_SEPARATOR_BUTTONS.desktop}
                 logicSystem={logicSystem}
               />
             </Box>

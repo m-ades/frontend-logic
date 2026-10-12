@@ -6,6 +6,7 @@ import ProblemFrame from '../frame/ProblemFrame.jsx'
 import ProblemSetButtons from '../frame/ProblemSetButtons.jsx'
 import FormulaField from '../inputs/FormulaField.jsx'
 import SymbolButtonRow from '../../../ui/logic-engine/SymbolButtonRow.jsx'
+import { SLASH_SEPARATOR_BUTTONS, THEREFORE_SEPARATOR_BUTTONS } from '../../../ui/logic-engine/symbolButtons.js'
 import { getVariableLettersOnly } from '../../../ui/LogicKeyboard/index.js'
 import { useProblemChecker } from '../../../../hooks/useProblemChecker.js'
 import SolutionReveal from '../../SolutionReveal.jsx'
@@ -102,13 +103,8 @@ export default function SymbolicTranslation({
   const expectedAnswer = parseTranslationAnswer(answer, notation)
   const hasMultipleStatements = expectedAnswer.statements.length > 1
   const hasConclusion = expectedAnswer.hasConclusion
-  const separatorButtons = notation === 'calgary'
-    ? [{ insert: ' ∴ ', label: '∴' }]
-    : [{ insert: '/' }, { insert: '//' }]
   // separator keys must remain available when the answer key is hidden
-  const mobileSeparatorButtons = notation === 'calgary'
-    ? [...separatorButtons, { insert: ',', label: ',' }]
-    : separatorButtons
+  const separatorButtons = notation === 'calgary' ? THEREFORE_SEPARATOR_BUTTONS : SLASH_SEPARATOR_BUTTONS
   const allowIndexedSymbols = notation === 'calgary'
   const openEdit = () => editorRef.current?.open?.()
   const [inputValue, setInputValue] = useState(
@@ -314,7 +310,7 @@ export default function SymbolicTranslation({
         aria-label="Your translation"
         symbolizationKey={symbolizationKey}
         includeQuantifiers={isPredicate}
-        extraInsertButtons={mobileSeparatorButtons}
+        extraInsertButtons={separatorButtons.mobile}
         allowTherefore
         predicateLetters={isPredicate ? predicateLetters : undefined}
         constantLetters={isPredicate ? constantLetters : undefined}
@@ -334,7 +330,7 @@ export default function SymbolicTranslation({
               scheduleStateSave(value)
             }}
             logicSystem={logicSystem}
-            extraInsertButtons={[...indexedLetterButtons, ...separatorButtons]}
+            extraInsertButtons={[...indexedLetterButtons, ...separatorButtons.desktop]}
           />
         </Box>
       )}

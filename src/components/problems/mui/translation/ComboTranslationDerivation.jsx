@@ -7,6 +7,7 @@ import ProblemFrame from '../frame/ProblemFrame.jsx'
 import ProblemSetButtons from '../frame/ProblemSetButtons.jsx'
 import FormulaField from '../inputs/FormulaField.jsx'
 import SymbolButtonRow from '../../../ui/logic-engine/SymbolButtonRow.jsx'
+import { SLASH_SEPARATOR_BUTTONS } from '../../../ui/logic-engine/symbolButtons.js'
 import ProofEditor from '../../ProofEditor.jsx'
 import getFormulaClass from '@logic-app/logic-engine/symbolic/formula.js'
 import { parseArgumentLine } from '@logic-app/logic-engine/argumentLine.js'
@@ -317,7 +318,7 @@ export default function ComboTranslationDerivation({
           placeholder={`e.g. A ${symbols.conditional} B / A // B`}
           aria-label="Argument line"
           symbolizationKey={argumentKeyboardConfig.symbolizationKey}
-          extraInsertButtons={[{ insert: '/' }, { insert: '//' }]}
+          extraInsertButtons={SLASH_SEPARATOR_BUTTONS.mobile}
           predicateLetters={argumentKeyboardConfig.isPredicateMode ? argumentKeyboardConfig.predicateLetters : undefined}
           constantLetters={argumentKeyboardConfig.isPredicateMode ? argumentKeyboardConfig.constantLetters : undefined}
           variableLetters={argumentKeyboardConfig.isPredicateMode ? argumentKeyboardConfig.variableLetters : undefined}

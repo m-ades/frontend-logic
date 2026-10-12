@@ -8,6 +8,7 @@ import ProblemFrame from '../frame/ProblemFrame.jsx'
 import ProblemSetButtons from '../frame/ProblemSetButtons.jsx'
 import FormulaField from '../inputs/FormulaField.jsx'
 import SymbolButtonRow from '../../../ui/logic-engine/SymbolButtonRow.jsx'
+import { SLASH_SEPARATOR_BUTTONS } from '../../../ui/logic-engine/symbolButtons.js'
 import TruthTableEditor from '../../truth-table/TruthTableEditor.jsx'
 import { buildTruthTableSubmissionData } from '../../truth-table/truthTableUi.js'
 import getFormulaClass from '@logic-app/logic-engine/symbolic/formula.js'
@@ -225,7 +226,7 @@ export default function ComboTranslationTruthTable({
           aria-label="Argument line"
           symbolizationKey={symbolizationKey}
           includeQuantifiers={false}
-          extraInsertButtons={[{ insert: '/' }, { insert: '//' }]}
+          extraInsertButtons={SLASH_SEPARATOR_BUTTONS.mobile}
           logicSystem={logicSystem}
         />
         {!isPhone && (
