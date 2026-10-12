@@ -11,10 +11,11 @@ import ProofEditor from '../ProofEditor.jsx'
 import ProblemSetButtons from '../mui/frame/ProblemSetButtons.jsx'
 import FormulaField from '../mui/inputs/FormulaField.jsx'
 import SymbolButtonRow from '../../ui/logic-engine/SymbolButtonRow.jsx'
-import { THEREFORE_SEPARATOR_BUTTONS } from '../../ui/logic-engine/symbolButtons.js'
+import { getProofSymbolButtons, THEREFORE_SEPARATOR_BUTTONS } from '../../ui/logic-engine/symbolButtons.js'
 import { useProblemChecker } from '../../../hooks/useProblemChecker.js'
-import { getNotation } from '../../../lib/logicSystems.js'
+import { getNotation, getSymbols } from '../../../lib/logicSystems.js'
 import getFormulaClass from '@logic-app/logic-engine/symbolic/formula.js'
+import getSyntax from '@logic-app/logic-engine/symbolic/libsyntax.js'
 import { parseExtractionArgument } from '@logic-app/logic-engine/proofArgumentExtractionArgument.js'
 import {
   getAssumptionDepths,
@@ -119,6 +120,20 @@ export default function ProofArgumentExtraction({
       notation === 'calgary'
     ) ?? { isPredicateMode: false, symbolizationKey: [] }
   ), [fixedLines, notation, premises])
+  // the argument row offers the same special symbols as the derivation above it
+  const argumentSymbolButtons = useMemo(() => {
+    const proofSymbols = getProofSymbolButtons({
+      symbols: getSymbols(logicSystem),
+      syntax: getSyntax(notation),
+      allowIndexedSymbols: notation === 'calgary',
+      premises,
+      conclusion,
+    })
+    return {
+      desktop: [...proofSymbols, ...THEREFORE_SEPARATOR_BUTTONS.desktop],
+      mobile: [...proofSymbols, ...THEREFORE_SEPARATOR_BUTTONS.mobile],
+    }
+  }, [conclusion, logicSystem, notation, premises])
   const [argumentLine, setArgumentLine] = useState(savedState?.argumentLine ?? '')
   const [derivationState, setDerivationState] = useState(() => getSavedDerivationState(savedState))
 
@@ -252,7 +267,7 @@ export default function ProofArgumentExtraction({
             placeholder={premises.length > 0 ? 'e.g. P, Q ∴ R' : 'e.g. ∴ R'}
             symbolizationKey={argumentKeyboardConfig.symbolizationKey}
             includeQuantifiers={argumentKeyboardConfig.isPredicateMode}
-            extraInsertButtons={THEREFORE_SEPARATOR_BUTTONS.mobile}
+            extraInsertButtons={argumentSymbolButtons.mobile}
             predicateLetters={argumentKeyboardConfig.isPredicateMode
               ? argumentKeyboardConfig.predicateLetters
               : undefined}
@@ -272,7 +287,7 @@ export default function ProofArgumentExtraction({
                 onValueChange={handleArgumentChange}
                 includeQuantifiers={argumentKeyboardConfig.isPredicateMode}
                 showBackspace={false}
-                extraInsertButtons={THEREFORE_SEPARATOR_BUTTONS.desktop}
+                extraInsertButtons={argumentSymbolButtons.desktop}
                 logicSystem={logicSystem}
               />
             </Box>
