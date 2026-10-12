@@ -20,6 +20,7 @@ import { isMultiSelectSubquestion, getSingleSelectAnswerIndex } from '@logic-app
 import { displayFormulaInput, normalizeArgumentInput } from './formulaHelpers.js'
 import FormulaTextField from '../mui/inputs/FormulaTextField.jsx'
 import { typeKey } from './snapshotUtils.js'
+import { removeChoiceFromAnswers } from './choiceAnswers.js'
 
 export function buildIndirectTruthTableSnapshot(proof, edited, existing, logicSystem = DEFAULT_LOGIC_SYSTEM) {
   const itt = proof.indirectTruthTable || {}
@@ -104,8 +105,10 @@ export function IndirectTruthTableEditorForm({ proof, value, onChange, logicSyst
         <Typography variant="subtitle2" sx={{ mb: 1 }}>Questions</Typography>
         {(questions.length ? questions : [{ prompt: '', choices: [], answerIndex: 0 }]).map((q, qIdx) => {
           const isMultiSelect = isMultiSelectSubquestion(q)
-          const answerIndex = getSingleSelectAnswerIndex(q) ?? 0
-          const answerIndices = isMultiSelect ? (q.answerIndices ?? []) : [answerIndex]
+          const answerIndex = getSingleSelectAnswerIndex(q)
+          const answerIndices = isMultiSelect
+            ? (q.answerIndices ?? [])
+            : (answerIndex === null ? [] : [answerIndex])
           return (
             <Box key={qIdx} sx={{ mb: 2, p: 1, border: '1px solid', borderColor: 'divider', borderRadius: 1 }}>
               <TextField
@@ -130,14 +133,13 @@ export function IndirectTruthTableEditorForm({ proof, value, onChange, logicSyst
                     fullWidth
                     placeholder={`Choice ${cIdx + 1}`}
                   />
-                  <IconButton size="small" onClick={() => updateQuestion(qIdx, {
-                    choices: (q.choices || []).filter((_, i) => i !== cIdx),
-                    ...(isMultiSelect ? {
-                      answerIndices: answerIndices.filter((i) => i !== cIdx).map((i) => i > cIdx ? i - 1 : i),
-                    } : {
-                      answerIndex: answerIndex === cIdx ? 0 : answerIndex > cIdx ? answerIndex - 1 : answerIndex,
-                    }),
-                  })} aria-label={`Remove choice ${cIdx + 1}`}>
+                  <IconButton size="small" onClick={() => {
+                    const nextAnswers = removeChoiceFromAnswers(answerIndices, cIdx)
+                    updateQuestion(qIdx, {
+                      choices: (q.choices || []).filter((_, i) => i !== cIdx),
+                      ...(isMultiSelect ? { answerIndices: nextAnswers } : { answerIndex: nextAnswers[0] ?? null }),
+                    })
+                  }} aria-label={`Remove choice ${cIdx + 1}`}>
                     <DeleteOutlineIcon />
                   </IconButton>
                 </Stack>
@@ -150,7 +152,7 @@ export function IndirectTruthTableEditorForm({ proof, value, onChange, logicSyst
                     onChange={(e) => updateQuestion(qIdx, {
                       multiSelect: e.target.checked,
                       answerIndices: e.target.checked ? answerIndices : [],
-                      answerIndex: e.target.checked ? null : (answerIndices[0] ?? 0),
+                      answerIndex: e.target.checked ? null : (answerIndices[0] ?? null),
                     })}
                   />
                 )}
@@ -161,7 +163,7 @@ export function IndirectTruthTableEditorForm({ proof, value, onChange, logicSyst
                 <Select
                   multiple={isMultiSelect}
                   labelId={`itt-answer-${qIdx}`}
-                  value={isMultiSelect ? answerIndices : answerIndex}
+                  value={isMultiSelect ? answerIndices : (answerIndex ?? '')}
                   label={isMultiSelect ? 'Correct answers' : 'Correct answer'}
                   onChange={(e) => updateQuestion(qIdx, isMultiSelect
                     ? { answerIndices: e.target.value }

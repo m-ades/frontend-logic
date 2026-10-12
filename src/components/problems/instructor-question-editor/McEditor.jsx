@@ -13,8 +13,13 @@ import {
 } from '@mui/material'
 import AddIcon from '@mui/icons-material/Add'
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
-import { hasNonEmptyAnswerIndices } from '@logic-app/logic-engine/multiple-choice-utils.js'
+import {
+  getSingleSelectAnswerIndex,
+  hasNonEmptyAnswerIndices,
+  normalizeAnswerIndices,
+} from '@logic-app/logic-engine/multiple-choice-utils.js'
 import { typeKey } from './snapshotUtils.js'
+import { findQuestionWithoutAnswer, hasAnswerKey, removeChoiceFromAnswers } from './choiceAnswers.js'
 
 export function buildMcSnapshot(proof, edited, existing) {
   const mc = proof.multipleChoice || {}
@@ -28,7 +33,7 @@ export function buildMcSnapshot(proof, edited, existing) {
       ...(sq && typeof sq === 'object' ? sq : {}),
       prompt: sq?.prompt ?? '',
       choices: Array.isArray(sq?.choices) ? sq.choices : [],
-      answerIndex: Number(sq?.answerIndex ?? sq?.answer ?? 0),
+      answerIndex: getSingleSelectAnswerIndex(sq),
     }))
   } else if (Array.isArray(e.subquestions) && e.subquestions.length > 0) {
     patch.subquestions = e.subquestions.map((sq, i) =>
@@ -36,16 +41,33 @@ export function buildMcSnapshot(proof, edited, existing) {
     )
   } else {
     patch.choices = choices
-    if (Array.isArray(edited.answerIndices) && edited.answerIndices.length > 1) {
+    // blank boxes and answers past the last choice can never be picked so they stay out of the key
+    const answers = normalizeAnswerIndices(
+      Array.isArray(edited.answerIndices) ? edited.answerIndices : [answerIndex],
+      choices.length
+    )
+    if (answers.length > 1) {
       patch.multiSelect = true
-      patch.answerIndices = edited.answerIndices
+      patch.answerIndices = answers
     } else {
-      patch.answerIndex = Number(edited.answerIndices?.[0] ?? answerIndex)
-      // a saved answer list outranks answerIndex so keep it in step
-      if (hasNonEmptyAnswerIndices(e)) patch.answerIndices = [patch.answerIndex]
+      patch.answerIndex = answers[0] ?? null
+      // one answer box makes the question single choice again
+      if (hasNonEmptyAnswerIndices(e) || e.multiSelect) {
+        patch.multiSelect = false
+        patch.answerIndices = []
+      }
     }
   }
   return patch
+}
+
+// reads the builder patch because deepMerge keeps an old answerIndex when the new one is null
+export function getMcAnswerError(patch) {
+  if (Array.isArray(patch.subquestions)) {
+    const missing = findQuestionWithoutAnswer(patch.subquestions)
+    return missing === -1 ? '' : `Select a correct answer for subquestion ${missing + 1}`
+  }
+  return hasAnswerKey(patch) ? '' : 'Select a correct answer'
 }
 
 export function McEditorForm({ proof, value, onChange }) {
@@ -56,7 +78,8 @@ export function McEditorForm({ proof, value, onChange }) {
   const choices = value.choices ?? mc.choices ?? []
   const prompt = value.prompt ?? mc.prompt ?? proof?.description ?? ''
   const answerIndex = value.answerIndex ?? proof?.answer ?? 0
-  const answerIndices = Array.isArray(value.answerIndices) ? value.answerIndices : [Number(answerIndex)]
+  const answerIndices = (Array.isArray(value.answerIndices) ? value.answerIndices : [answerIndex])
+    .map((answer) => (answer == null || answer === '' ? null : Number(answer)))
 
   const setChoices = (next) => onChange({ ...value, choices: next })
   const setPrompt = (v) => onChange({ ...value, prompt: v })
@@ -79,11 +102,10 @@ export function McEditorForm({ proof, value, onChange }) {
   }
   const removeSubquestionChoice = (qIdx, cIdx) => {
     const q = subquestions[qIdx] || {}
-    const nextChoices = (Array.isArray(q.choices) ? q.choices : []).filter((_, i) => i !== cIdx)
-    const nextAnswerIndex = Number(q.answerIndex ?? q.answer ?? 0)
+    const [answerIndex = null] = removeChoiceFromAnswers([getSingleSelectAnswerIndex(q)], cIdx)
     updateSubquestion(qIdx, {
-      choices: nextChoices,
-      answerIndex: nextChoices.length === 0 ? 0 : Math.min(nextAnswerIndex, nextChoices.length - 1),
+      choices: (Array.isArray(q.choices) ? q.choices : []).filter((_, i) => i !== cIdx),
+      answerIndex,
     })
   }
   const updateSubquestionChoice = (qIdx, cIdx, text) => {
@@ -94,7 +116,15 @@ export function McEditorForm({ proof, value, onChange }) {
   }
 
   const addChoice = () => setChoices([...choices, ''])
-  const removeChoice = (idx) => setChoices(choices.filter((_, i) => i !== idx))
+  const removeChoice = (idx) => {
+    const nextAnswers = removeChoiceFromAnswers(answerIndices, idx)
+    onChange({
+      ...value,
+      choices: choices.filter((_, i) => i !== idx),
+      answerIndices: nextAnswers.length > 0 ? nextAnswers : [null],
+    })
+  }
+  const setAnswerIndices = (next) => onChange({ ...value, answerIndices: next })
   const updateChoice = (idx, text) => {
     const next = [...choices]
     next[idx] = text
@@ -117,7 +147,7 @@ export function McEditorForm({ proof, value, onChange }) {
           <Typography variant="subtitle2" sx={{ mb: 1 }}>Subquestions</Typography>
           {subquestions.map((subq, qIdx) => {
             const subChoices = Array.isArray(subq?.choices) && subq.choices.length > 0 ? subq.choices : ['']
-            const subAnswerIndex = Number(subq?.answerIndex ?? subq?.answer ?? 0)
+            const subAnswerIndex = getSingleSelectAnswerIndex(subq)
             return (
               <Box key={qIdx} sx={{ mb: 2, p: 1, border: '1px solid', borderColor: 'divider', borderRadius: 1 }}>
                 <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1 }}>
@@ -157,7 +187,7 @@ export function McEditorForm({ proof, value, onChange }) {
                 <FormControl fullWidth size="small">
                   <InputLabel>Correct answer</InputLabel>
                   <Select
-                    value={String(Math.max(0, Math.min(subAnswerIndex, subChoices.length - 1)))}
+                    value={subAnswerIndex !== null && subAnswerIndex < subChoices.length ? String(subAnswerIndex) : ''}
                     label="Correct answer"
                     onChange={(e) => updateSubquestion(qIdx, { answerIndex: Number(e.target.value) })}
                   >
@@ -211,27 +241,35 @@ export function McEditorForm({ proof, value, onChange }) {
         </Button>
       </Box>
       {answerIndices.map((selectedAnswer, answerNumber) => (
-        <FormControl key={answerNumber} fullWidth size="small">
-          <InputLabel>Correct answer</InputLabel>
-          <Select
-            value={String(selectedAnswer)}
-            label="Correct answer"
-            onChange={(e) => onChange({
-              ...value,
-              answerIndices: answerIndices.map((answer, index) => (
+        <Stack key={answerNumber} direction="row" alignItems="center" spacing={1}>
+          <FormControl fullWidth size="small">
+            <InputLabel>Correct answer</InputLabel>
+            <Select
+              value={Number.isInteger(selectedAnswer) && selectedAnswer < choices.length ? String(selectedAnswer) : ''}
+              label="Correct answer"
+              onChange={(e) => setAnswerIndices(answerIndices.map((answer, index) => (
                 index === answerNumber ? Number(e.target.value) : answer
-              )),
-            })}
-          >
-            {choices.map((_, idx) => (
-              <MenuItem key={idx} value={String(idx)}>
-                Choice {idx + 1}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
+              )))}
+            >
+              {choices.map((_, idx) => (
+                <MenuItem key={idx} value={String(idx)}>
+                  Choice {idx + 1}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+          {answerIndices.length > 1 && (
+            <IconButton
+              size="small"
+              onClick={() => setAnswerIndices(answerIndices.filter((_, index) => index !== answerNumber))}
+              aria-label={`Remove correct answer ${answerNumber + 1}`}
+            >
+              <DeleteOutlineIcon />
+            </IconButton>
+          )}
+        </Stack>
       ))}
-      <Button size="small" onClick={() => onChange({ ...value, answerIndices: [...answerIndices, 0] })}>
+      <Button size="small" onClick={() => setAnswerIndices([...answerIndices, null])}>
         Add answer
       </Button>
       <Box>
