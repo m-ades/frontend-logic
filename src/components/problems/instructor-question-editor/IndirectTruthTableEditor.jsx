@@ -18,6 +18,7 @@ import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
 import { DEFAULT_LOGIC_SYSTEM } from '../../../lib/logicSystems.js'
 import { isMultiSelectSubquestion, getSingleSelectAnswerIndex } from '@logic-app/logic-engine/multiple-choice-utils.js'
 import { displayFormulaInput, normalizeArgumentInput } from './formulaHelpers.js'
+import FormulaTextField from '../mui/inputs/FormulaTextField.jsx'
 import { typeKey } from './snapshotUtils.js'
 
 export function buildIndirectTruthTableSnapshot(proof, edited, existing, logicSystem = DEFAULT_LOGIC_SYSTEM) {
@@ -70,14 +71,15 @@ export function IndirectTruthTableEditorForm({ proof, value, onChange, logicSyst
         <Typography variant="subtitle2" sx={{ mb: 1 }}>Premises</Typography>
         {(premises.length ? premises : ['']).map((line, idx) => (
           <Stack key={idx} direction="row" alignItems="center" spacing={1} sx={{ mb: 1 }}>
-            <TextField
+            <FormulaTextField
               size="small"
               value={line}
-              onChange={(e) => {
+              onValueChange={(formula) => {
                 const next = [...(premises.length ? premises : [''])]
-                next[idx] = displayFormulaInput(e.target.value, logicSystem)
+                next[idx] = displayFormulaInput(formula, logicSystem)
                 setPremises(next)
               }}
+              logicSystem={logicSystem}
               fullWidth
               placeholder={`Premise ${idx + 1}`}
             />
@@ -90,10 +92,11 @@ export function IndirectTruthTableEditorForm({ proof, value, onChange, logicSyst
           Add premise
         </Button>
       </Box>
-      <TextField
+      <FormulaTextField
         label="Conclusion"
         value={conclusion}
-        onChange={(e) => setArgument({ conclusion: displayFormulaInput(e.target.value, logicSystem) })}
+        onValueChange={(next) => setArgument({ conclusion: displayFormulaInput(next, logicSystem) })}
+        logicSystem={logicSystem}
         fullWidth
         variant="outlined"
       />
