@@ -3,17 +3,7 @@
 // removals clear citations covering the removed line and shift later references
 // invalid changes leave a normalized copy unchanged
 import { justParse } from '@logic-app/logic-engine/justification-parse.js'
-
-function formatJustification({ nums, ranges, citedrules }, rulesFirst) {
-  const references = [
-    ...nums.map(String),
-    ...ranges.map(([start, end]) => `${start}–${end}`),
-  ].join(', ')
-  const rules = citedrules.join(', ')
-  return rulesFirst
-    ? [rules, references].filter(Boolean).join(' ')
-    : [references, rules].filter(Boolean).join(' ')
-}
+import { formatJustification } from '@logic-app/logic-engine/justification-format.js'
 
 function rangeContainsLine([start, end], lineNumber) {
   if (start === lineNumber || end === lineNumber) return true
@@ -59,6 +49,6 @@ export function rebaseProofJustifications(
         shiftReference(end, lineNumber, operation),
       ]),
       citedrules: parsed.citedrules,
-    }, rulesFirst)
+    }, { rulesFirst })
   })
 }

@@ -1,6 +1,7 @@
 import { formatDerivationRuleName } from '../../../lib/derivationRules.js'
 import getFormulaClass from '@logic-app/logic-engine/symbolic/formula.js'
 import { justParse } from '@logic-app/logic-engine/justification-parse.js'
+import { formatJustification } from '@logic-app/logic-engine/justification-format.js'
 import {
   getIndexedLowerSymbols,
   getIndexedUpperSymbols,
@@ -127,19 +128,10 @@ export const formatRuleName = (rule) => {
   return formatDerivationRuleName(rule)
 }
 
-export const formatJustificationParts = (nums, ranges, citedrules, options = {}) => {
-  const formattedRules = citedrules.map((rule) => formatRuleName(rule))
-  const refs = nums.map((n) => n.toString())
-  if (ranges.length > 0) {
-    refs.push(...ranges.map(([s, e]) => `${s}–${e}`))
-  }
-  const refsText = refs.join(', ')
-  const rulesText = formattedRules.join(', ')
-  if (options.rulesFirst) {
-    return [rulesText, refsText].filter(Boolean).join(' ')
-  }
-  return [refsText, rulesText].filter(Boolean).join(' ')
-}
+export const formatJustificationParts = (nums, ranges, citedrules, options = {}) => formatJustification(
+  { nums, ranges, citedrules: citedrules.map(formatRuleName) },
+  options
+)
 
 export const formatJustificationDisplay = (value, options = {}) => {
   if (!value) return ''
