@@ -32,13 +32,15 @@ export default function DerivationKeyboardRow({
   return (
     <TableRow sx={{ '& td': { verticalAlign: 'middle', py: isMobile ? 0.25 : 0.5 } }}>
       <TableCell sx={{ width: numberWidth, minWidth: isFullScreen || isMobile ? numberWidth : undefined, borderBottom: 'none', px: 0.5, textAlign: 'center' }}>
-        <Tooltip title="New line">
-          <span style={{ display: 'inline-flex' }}>
-            <IconButton onClick={onAddLine} size="small" aria-label="Add line" disabled={!canAddLine}>
-              <SubdirectoryArrowRightIcon />
-            </IconButton>
-          </span>
-        </Tooltip>
+        {onAddLine && (
+          <Tooltip title="New line">
+            <span style={{ display: 'inline-flex' }}>
+              <IconButton onClick={onAddLine} size="small" aria-label="Add line" disabled={!canAddLine}>
+                <SubdirectoryArrowRightIcon />
+              </IconButton>
+            </span>
+          </Tooltip>
+        )}
       </TableCell>
       <TableCell sx={{ borderBottom: 'none', pl: 0.5 }} colSpan={2}>
         <Stack direction="row" alignItems="center" sx={{ overflowX: isFullScreen ? 'hidden' : 'auto', overflowY: 'hidden', py: 0.5, WebkitOverflowScrolling: 'touch' }}>

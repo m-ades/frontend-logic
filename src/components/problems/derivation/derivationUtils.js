@@ -13,11 +13,23 @@ import {
 const CONSTANT_POOL = 'abcdefghijklmnopqrstuvw'.split('')
 export const PREDICATE_VARIABLES = ['x', 'y', 'z']
 
+// provided is the describeProvidedJustification result fixed proof lines carry
 export function isDerivationFieldReadOnly(line, field) {
   if (!line || line.readOnly) return true
   if (field === 'formula') return Boolean(line.formulaReadOnly)
-  if (field === 'justification') return Boolean(line.justificationReadOnly)
+  if (field === 'justification') return Boolean(line.provided?.isComplete)
+  if (field === 'citations') return Boolean(line.provided?.isComplete || line.provided?.hasCitations)
+  if (field === 'rule') return Boolean(line.provided?.isComplete || line.provided?.hasRule)
   return false
+}
+
+// the fixed part of a partly provided justification, or null when the student owns all or none of it
+export function getProvidedJustificationPart(line) {
+  const provided = line?.provided
+  if (!provided || provided.isComplete) return null
+  if (provided.hasCitations) return 'citations'
+  if (provided.hasRule) return 'rule'
+  return null
 }
 
 export function getLeftPart(line) {

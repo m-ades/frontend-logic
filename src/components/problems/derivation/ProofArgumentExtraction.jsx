@@ -22,7 +22,8 @@ import {
   getAssumptionRuleRequirements,
   parseAssumptionScopes,
 } from '@logic-app/logic-engine/proofArgumentExtractionScopes.js'
-import { extractLines } from './derivationUtils.js'
+import { mergeProvidedJustification } from '@logic-app/logic-engine/proofArgumentExtractionJustifications.js'
+import { extractLines, getJustificationMeta } from './derivationUtils.js'
 import { getFormulaKeyboardConfig } from '../mui/translation/symbolizationKeyboard.js'
 import ProblemFrame from '../mui/frame/ProblemFrame.jsx'
 
@@ -49,12 +50,14 @@ function getQuestionLines(snapshot, logicSystem) {
   }))
 }
 
-function hasEveryCitation(derivationState, premises, fixedLines) {
+// every line needs a formula and a rule, whichever parts the author left for the student
+function isProofFilledIn(derivationState, premises, fixedLines) {
   const proofLines = extractLines(derivationState, premises)
-  return fixedLines.map((line, index) => (
-    line.justification
-    || String(proofLines[premises.length + index]?.justification ?? '').trim()
-  )).every(Boolean)
+  return fixedLines.every((line, index) => {
+    const entered = proofLines[premises.length + index]
+    return Boolean(line.formula || String(entered?.formula ?? '').trim())
+      && getJustificationMeta(mergeProvidedJustification(line.justification, entered?.justification)).hasRule
+  })
 }
 
 function hasArgumentShape(value, premiseCount, Formula) {
@@ -78,8 +81,10 @@ function getSavedDerivationState(savedState) {
   return null
 }
 
-// prems are fixed premises and lines are fixed derived formulas with the conclusion last
-// student state owns only citations and argument text while the backend owns every formula
+/*
+prems are fixed premises and lines are the derived formulas with the conclusion last
+the student owns blank formulas, missing justification parts and the argument text
+*/
 export default function ProofArgumentExtraction({
   proof,
   onStateChange,
@@ -185,7 +190,7 @@ export default function ProofArgumentExtraction({
       onComplete,
       isDisabled: () => (
         !hasArgumentShape(argumentLine, premises.length, Formula)
-        || !hasEveryCitation(derivationState, premises, fixedLines)
+        || !isProofFilledIn(derivationState, premises, fixedLines)
       ),
       resetInput: resetInputs,
       onStateChange: handleCheckerStateChange,
@@ -207,7 +212,7 @@ export default function ProofArgumentExtraction({
   const submitDisabled = isLocked
     || isAssignmentLocked
     || !hasArgumentShape(argumentLine, premises.length, Formula)
-    || !hasEveryCitation(derivationState, premises, fixedLines)
+    || !isProofFilledIn(derivationState, premises, fixedLines)
 
   return (
     <ProblemFrame

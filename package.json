@@ -17,7 +17,7 @@
     "@emotion/styled": "^11.14.1",
     "@fontsource/geist-sans": "^5.2.5",
     "@js-temporal/polyfill": "^0.5.1",
-    "@logic-app/logic-engine": "file:vendor/logic-engine-e063789e9265729c5a992e4c5d825e7a8c6ca0a8.tgz",
+    "@logic-app/logic-engine": "file:vendor/logic-engine-9b34616f21e570acf404cbaf21eb112d4ddc2816.tgz",
     "@mui/icons-material": "^7.3.5",
     "@mui/material": "^7.3.5",
     "@mui/styles": "^5.15.14",

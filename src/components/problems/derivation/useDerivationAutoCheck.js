@@ -5,6 +5,7 @@ import {
   buildSubmission,
   getJustificationMeta,
   getOpenAssumptionDepths,
+  getProvidedJustificationPart,
   getRuleFromJustification,
   isResolvedConclusionLine,
 } from './derivationUtils.js'
@@ -12,6 +13,12 @@ import { AUTO_CHECK_STORAGE_KEY } from './derivationTableConfig.js'
 
 const EMPTY_AUTO_CHECK = { perLine: {}, rows: [] }
 const EMPTY_NOTICE = { index: null, message: '', tone: 'error' }
+
+// a provided rule alone doesn't count as the student starting the line
+const hasEnteredJustification = (line) => {
+  const { hasLines, hasRule } = getJustificationMeta(line?.justification)
+  return getProvidedJustificationPart(line) === 'rule' ? hasLines : hasRule
+}
 
 const getRequiredRuleError = (line, rule) => {
   if (!rule || !Array.isArray(line?.requiredRules) || line.requiredRules.includes(rule)) {
@@ -114,10 +121,10 @@ export default function useDerivationAutoCheck({
           const line = linesSnapshot[index]
           rule = getRuleFromJustification(line?.justification || '').toUpperCase()
           isAssumption = activeAssumptionRules.has(rule)
-          const fixedRuleEntered = line?.formulaReadOnly
-            && getJustificationMeta(line.justification).hasRule
+          const fixedRuleEntered = line?.formulaReadOnly && hasEnteredJustification(line)
           if (!lineIsComplete(index) && !isAssumption && !fixedRuleEntered) {
-            if (usesNestedSubderivations || !INDENT_END_RULES.has(rule)) return
+            const awaitsRange = !usesNestedSubderivations && INDENT_END_RULES.has(rule)
+            if (!awaitsRange || getProvidedJustificationPart(line) === 'rule') return
           }
         }
       }
@@ -175,7 +182,7 @@ export default function useDerivationAutoCheck({
         return
       }
       const hasError = Object.keys(lineErrors).some((category) => category !== 'dependency')
-      if (line.formulaReadOnly && hasError) {
+      if (line.formulaReadOnly && hasError && hasEnteredJustification(line)) {
         perLine[index] = 'error'
         return
       }

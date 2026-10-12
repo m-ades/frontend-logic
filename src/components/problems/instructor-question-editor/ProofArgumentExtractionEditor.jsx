@@ -108,14 +108,14 @@ export function ProofArgumentExtractionEditorForm({ proof, value, onChange, logi
         allowEmpty
       />
       <FormulaListEditor
-        label="Lines after the premises"
+        label="Lines after the premises (leave a formula blank for the student to write)"
         logicSystem={logicSystem}
         values={lines}
         secondaryValues={justifications}
         onChange={updateLines}
         placeholder="Line"
         secondaryLabel="Provided justification"
-        secondaryPlaceholder="Leave blank for the student"
+        secondaryPlaceholder="Rule, line(s), both, or blank"
       />
       <AssumptionScopesEditor
         scopes={assumptionScopes}

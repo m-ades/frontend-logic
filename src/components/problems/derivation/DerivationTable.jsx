@@ -28,6 +28,10 @@ import {
 } from '../../../lib/derivationRules.js'
 import { getRulesetRestrictions } from '@logic-app/logic-engine/checkers/derivation-rule-restrictions.js'
 import { justParse } from '@logic-app/logic-engine/justification-parse.js'
+import {
+  describeProvidedJustification,
+  mergeProvidedJustification,
+} from '@logic-app/logic-engine/proofArgumentExtractionJustifications.js'
 import { displayIndexedSymbolsForNotation } from '../../../lib/indexedSymbols.js'
 import { logicStatementsToTex } from '../../../lib/logicTex.js'
 import { buildPersistedSubmissionState, shouldUseApiValidation, submitApiValidation } from '../../../utils/submissionRuntime.js'
@@ -50,6 +54,7 @@ import {
   getOpenAssumptionDepths,
   getPredicateLettersFromKey,
   getPropositionalLettersFromFormulas,
+  getProvidedJustificationPart,
   getRuleFromJustification,
   isDerivationFieldReadOnly,
   isPredicateLogicKey,
@@ -200,13 +205,18 @@ export default function DerivationTable({
       return [
         ...premiseLines,
         ...normalizedFixedLines.map((line, index) => ({
-          formula: line.formula,
-          justification: line.justification
-            || restoredLines[premises.length + index]?.justification
-            || '',
+          // a blank formula is the student's to write
+          formula: line.formula || normalizeFormulaForDisplay(
+            normalizeFormulaForCheck(restoredLines[premises.length + index]?.formula ?? '')
+          ),
+          justification: mergeProvidedJustification(
+            line.justification,
+            restoredLines[premises.length + index]?.justification,
+            { rulesFirst: usesNestedSubderivations }
+          ),
           readOnly: false,
-          formulaReadOnly: true,
-          justificationReadOnly: Boolean(line.justification),
+          formulaReadOnly: Boolean(line.formula),
+          provided: describeProvidedJustification(line.justification, activeLogicSystem),
           scopeDepth: line.scopeDepth,
           startsScope: line.startsScope,
           requiredRules: line.requiredRules,
@@ -217,7 +227,14 @@ export default function DerivationTable({
       ...premiseLines,
       { formula: '', justification: '', readOnly: false },
     ]
-  }, [normalizeFormulaForCheck, normalizeFormulaForDisplay, normalizedFixedLines, premises])
+  }, [
+    activeLogicSystem,
+    normalizeFormulaForCheck,
+    normalizeFormulaForDisplay,
+    normalizedFixedLines,
+    premises,
+    usesNestedSubderivations,
+  ])
   const initialLines = useMemo(() => {
     const fromState = extractLines(savedState, premises)
     if (isFixedProof) return buildFreshLines(fromState)
@@ -475,17 +492,17 @@ export default function DerivationTable({
     setFormulaText(index, el, raw, normalized)
   }
 
-  // keeps the caret after the same text once display normalization pads the formula
+  // keeps the caret after the same text once display normalization rewrites a field
+  const restoreCaret = (index, el, raw, normalized, normalize, refs) => {
+    if (normalized === raw || typeof el?.selectionStart !== 'number') return
+    const nextCursor = normalize(raw.slice(0, el.selectionStart)).length
+    setStoredSelection(index, nextCursor)
+    window.setTimeout(() => refs.current[index]?.setSelectionRange?.(nextCursor, nextCursor), 0)
+  }
+
   const setFormulaText = (index, el, raw, normalized) => {
     handleLineChange(index, 'formula', normalized)
-    if (normalized === raw || typeof el?.selectionStart !== 'number') return
-    const nextCursor = normalizeFormulaForDisplay(raw.slice(0, el.selectionStart)).length
-    setStoredSelection(index, nextCursor)
-    window.setTimeout(() => {
-      if (formulaRefs.current[index] && typeof formulaRefs.current[index].setSelectionRange === 'function') {
-        formulaRefs.current[index].setSelectionRange(nextCursor, nextCursor)
-      }
-    }, 0)
+    restoreCaret(index, el, raw, normalized, normalizeFormulaForDisplay, formulaRefs)
   }
 
   const handleJustificationChange = (event, index) => {
@@ -494,14 +511,24 @@ export default function DerivationTable({
     const raw = el?.value ?? ''
     const normalized = normalizeJustificationForDisplay(raw)
     handleLineChange(index, 'justification', normalized)
-    if (normalized === raw || typeof el?.selectionStart !== 'number') return
-    const nextCursor = normalizeJustificationForDisplay(raw.slice(0, el.selectionStart)).length
-    setStoredSelection(index, nextCursor)
-    window.setTimeout(() => {
-      if (justRefs.current[index] && typeof justRefs.current[index].setSelectionRange === 'function') {
-        justRefs.current[index].setSelectionRange(nextCursor, nextCursor)
-      }
-    }, 0)
+    restoreCaret(index, el, raw, normalized, normalizeJustificationForDisplay, justRefs)
+  }
+
+  // the typed rule field of a line whose line(s) were provided holds only the rule
+  const handleRuleTextChange = (event, index) => {
+    const line = lines[index]
+    if (isDerivationFieldReadOnly(line, 'rule')) return
+    const el = event.target
+    const raw = el?.value ?? ''
+    const rule = getRuleFromJustification(raw)
+    handleLineChange(index, 'justification', applyRuleToJustification(line.justification, rule, {
+      rulesFirst: usesNestedSubderivations,
+    }))
+    restoreCaret(index, el, raw, rule, getRuleFromJustification, justRefs)
+  }
+
+  const handleRuleTextCommit = (index) => {
+    handleLineCommit(index, 'justification', lines[index]?.justification ?? '')
   }
 
   const commitLines = useCallback((updater, clearNoticeIndex = null) => {
@@ -541,7 +568,7 @@ export default function DerivationTable({
   })
 
   const handleCitationChange = (index, line, raw) => {
-    if (isDerivationFieldReadOnly(line, 'justification')) return
+    if (isDerivationFieldReadOnly(line, 'citations')) return
     setLineDrafts((previous) => ({ ...previous, [index]: raw }))
     handleLineChange(index, 'justification', applyLinesToJustification(line.justification, raw, {
       rulesFirst: usesNestedSubderivations,
@@ -549,6 +576,7 @@ export default function DerivationTable({
   }
 
   const handleCitationCommit = (index, line, raw) => {
+    if (isDerivationFieldReadOnly(line, 'citations')) return
     handleLineCommit(index, 'justification', applyLinesToJustification(line.justification, raw, {
       rulesFirst: usesNestedSubderivations,
     }))
@@ -565,18 +593,18 @@ export default function DerivationTable({
   }
 
   const handleRuleChange = (index, line, selectedRule) => {
-    if (isDerivationFieldReadOnly(line, 'justification')) return
+    if (isDerivationFieldReadOnly(line, 'rule')) return
     const upperRule = selectedRule.toUpperCase()
     const currentJustification = index in lineDrafts
       ? applyLinesToJustification(line.justification, lineDrafts[index], {
         rulesFirst: usesNestedSubderivations,
       })
       : line.justification
-    const nextValue = activeAssumptionRules.has(upperRule)
-      ? applyRuleToJustification('', selectedRule, { rulesFirst: usesNestedSubderivations })
-      : applyRuleToJustification(currentJustification, selectedRule, {
-        rulesFirst: usesNestedSubderivations,
-      })
+    // an assumption cites nothing so its line(s) clear, unless the author provided them
+    const keepsCitations = !activeAssumptionRules.has(upperRule) || isDerivationFieldReadOnly(line, 'citations')
+    const nextValue = applyRuleToJustification(keepsCitations ? currentJustification : '', selectedRule, {
+      rulesFirst: usesNestedSubderivations,
+    })
 
     commitLines((previous) => {
       let nextLines = applyLineChange(previous, index, 'justification', nextValue)
@@ -631,7 +659,7 @@ export default function DerivationTable({
       if (targetIdx < premises.length) return
       commitLines((prev) => {
         const line = prev[targetIdx]
-        if (isDerivationFieldReadOnly(line, 'justification')) return prev
+        if (isDerivationFieldReadOnly(line, 'citations')) return prev
         const { nums, ranges, citedrules } = justParse(String(line.justification || ''))
         const hasLineNum = nums.includes(clickedLineNum)
         const nextNums = hasLineNum
@@ -818,7 +846,8 @@ export default function DerivationTable({
     }
   }
 
-  const handleJustKeyDown = async (event, index) => {
+  // part is rule for the typed rule field, which has already applied its text to the line
+  const handleJustKeyDown = async (event, index, part) => {
     if (isDerivationFieldReadOnly(lines[index], 'justification')) return
     if (event.key === 'ArrowLeft' && !event.ctrlKey && !event.metaKey && !event.altKey) {
       const el = event.target
@@ -831,9 +860,11 @@ export default function DerivationTable({
     }
     if (event.key === 'Enter') {
       event.preventDefault()
-      const formatted = applyLinesToJustification(lines[index]?.justification, event.target.value, {
-        rulesFirst: usesNestedSubderivations,
-      })
+      const formatted = part === 'rule'
+        ? lines[index]?.justification ?? ''
+        : applyLinesToJustification(lines[index]?.justification, event.target.value, {
+          rulesFirst: usesNestedSubderivations,
+        })
       const nextLines = applyLineChange(lines, index, 'justification', formatted)
       setLines(nextLines)
       emitState(nextLines)
@@ -862,7 +893,7 @@ export default function DerivationTable({
         addLine()
         setTimeout(() => focusFormula(nextIndex), 0)
       } else {
-        if (isFixedProof) {
+        if (isFixedProof && isDerivationFieldReadOnly(lines[nextIndex], 'formula')) {
           focusJustification(nextIndex)
         } else {
           focusFormula(nextIndex)
@@ -889,6 +920,8 @@ export default function DerivationTable({
     }
   }
 
+  // fixed proofs only need symbol keys when a formula is left for the student
+  const hasEditableFormula = lines.some((line) => !isDerivationFieldReadOnly(line, 'formula'))
   const hasStartedLine = lines.some((line) => (
     !line.readOnly && (
       String(line.justification || '').trim()
@@ -999,7 +1032,8 @@ export default function DerivationTable({
     const field = target.field
     const inputEl = field === 'justification' ? justRefs.current[targetIdx] : formulaRefs.current[targetIdx]
 
-    if (field === 'justification' && useRuleDropdown) {
+    // symbol buttons don't write into split justification fields
+    if (field === 'justification' && (useRuleDropdown || getProvidedJustificationPart(lines[targetIdx]))) {
       inputEl?.focus()
       return
     }
@@ -1326,6 +1360,7 @@ export default function DerivationTable({
                   assumptionRules={activeAssumptionRules}
                   autoCheckEnabled={autoCheckEnabled}
                   autoCheckStatus={autoCheckState.perLine[idx]}
+                  canDelete={!isFixedProof}
                   canDischargeMore={dischargeStatusByLine[idx] < dischargeOpenCountByLine[idx]}
                   citationDraft={lineDrafts[idx]}
                   conclusion={isFixedProof ? '' : conclusionTargetText}
@@ -1345,7 +1380,7 @@ export default function DerivationTable({
                   onDelete={() => deleteLine(idx)}
                   onInsert={(insert) => handleSymbolInsert({ insert })}
                   onJustificationChange={(event) => handleJustificationChange(event, idx)}
-                  onKeyDown={(event) => handleJustKeyDown(event, idx)}
+                  onKeyDown={(event, part) => handleJustKeyDown(event, idx, part)}
                   onRequestFullScreen={(event) => {
                     if (!canOpenFullScreen) return
                     event.preventDefault()
@@ -1353,6 +1388,8 @@ export default function DerivationTable({
                     handleInputRequestFullScreen(idx, 'justification')
                   }}
                   onRuleChange={(rule) => handleRuleChange(idx, line, rule)}
+                  onRuleTextChange={(event) => handleRuleTextChange(event, idx)}
+                  onRuleTextCommit={() => handleRuleTextCommit(idx)}
                   onToggleDischarge={() => handleToggleDischarge(idx)}
                   onTypedCommit={(raw) => handleTypedJustificationCommit(idx, raw)}
                   persistentUnderline={isFixedProof}
@@ -1365,14 +1402,14 @@ export default function DerivationTable({
               </TableRow>
               )
             })}
-            {!isFixedProof && (
+            {(!isFixedProof || hasEditableFormula) && (
               <DerivationKeyboardRow
                 canAddLine={canAddLine}
                 isFullScreen={isFullScreen}
                 isMobile={isMobile}
                 isPhone={isPhone}
                 mobileLogicKeyboardEnabled={mobileLogicKeyboardEnabled}
-                onAddLine={addLine}
+                onAddLine={isFixedProof ? undefined : addLine}
                 onInsert={handleSymbolInsert}
                 symbolButtons={symbolButtons}
               />

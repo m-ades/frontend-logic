@@ -22,6 +22,7 @@ import {
   getJustificationRule,
   parseAssumptionScopes,
 } from '@logic-app/logic-engine/proofArgumentExtractionScopes.js'
+import { findEmptyProofLine } from '@logic-app/logic-engine/proofArgumentExtractionJustifications.js'
 import { getInstructorProblemTypeLabel, isInstructorProblemType } from '../../lib/instructorProblemTypes.js'
 import { getSingleSelectAnswerIndex } from '@logic-app/logic-engine/multiple-choice-utils.js'
 import { findQuestionWithoutAnswer } from './instructor-question-editor/choiceAnswers.js'
@@ -274,8 +275,15 @@ function InstructorQuestionEditorInner({
       }
       if (proof.type === 'proof-argument-extraction') {
         const lines = Array.isArray(mergedSnapshot.lines) ? mergedSnapshot.lines : []
-        if (lines.length === 0 || lines.some((formula) => !String(formula || '').trim())) {
-          setError('Add at least one complete proof line')
+        if (lines.length === 0) {
+          setError('Add at least one proof line')
+          setSaving(false)
+          return
+        }
+        // any formula, the conclusion included, may be left for students but never a whole line
+        const emptyLine = findEmptyProofLine(lines, mergedSnapshot.justifications ?? [])
+        if (emptyLine >= 0) {
+          setError(`Give line ${emptyLine + 1} a formula or a provided justification`)
           setSaving(false)
           return
         }
