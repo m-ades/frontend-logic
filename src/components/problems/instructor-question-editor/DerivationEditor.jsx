@@ -59,6 +59,7 @@ export function DerivationEditorForm({ proof, value, onChange, logicSystem = DEF
           premises: next.map((formula) => displayFormulaInput(formula, activeLogicSystem)),
         })}
         placeholder="Premise"
+        allowEmpty
       />
       <FormulaTextField
         label="Conclusion"

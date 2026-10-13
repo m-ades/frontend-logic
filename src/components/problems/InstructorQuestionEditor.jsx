@@ -264,15 +264,16 @@ function InstructorQuestionEditorInner({
           setSaving(false)
           return
         }
-      }
-      if (proof.type === 'proof-argument-extraction') {
+        // zero premises is a theorem but a blank premise row is unfinished
         const premises = Array.isArray(mergedSnapshot.prems) ? mergedSnapshot.prems : []
-        const lines = Array.isArray(mergedSnapshot.lines) ? mergedSnapshot.lines : []
-        if (premises.length === 0 || premises.some((formula) => !String(formula || '').trim())) {
-          setError('Add at least one complete premise')
+        if (premises.some((formula) => !String(formula || '').trim())) {
+          setError('Complete or remove each blank premise')
           setSaving(false)
           return
         }
+      }
+      if (proof.type === 'proof-argument-extraction') {
+        const lines = Array.isArray(mergedSnapshot.lines) ? mergedSnapshot.lines : []
         if (lines.length === 0 || lines.some((formula) => !String(formula || '').trim())) {
           setError('Add at least one complete proof line')
           setSaving(false)

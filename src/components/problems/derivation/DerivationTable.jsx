@@ -65,7 +65,6 @@ import {
   RULE_INPUT_MODE_KEY,
   getDerivationScoreLabel,
   getFitchLineColor,
-  getQuantifierButtonsFromFormulas,
   getSymbolButtons,
   parseRulesetRules,
 } from './derivationTableConfig.js'
@@ -77,6 +76,7 @@ import DerivationJustificationCell from './DerivationJustificationCell.jsx'
 import DerivationKeyboardRow from './DerivationKeyboardRow.jsx'
 import ProblemFrame from '../mui/frame/ProblemFrame.jsx'
 import useDerivationAutoCheck from './useDerivationAutoCheck.js'
+import { getProofSymbolButtons } from '../../ui/logic-engine/symbolButtons.js'
 
 function applyLineChange(lines, index, field, value) {
   const line = lines[index]
@@ -283,11 +283,13 @@ export default function DerivationTable({
     const premises = Array.isArray(proof?.premises) ? proof.premises : []
     const conclusion = proof?.conclusion ?? proof?.conc ?? ''
     const formulaText = [...premises, conclusion].filter(Boolean).map(String).join(' ')
-    const extraSymbolButtons = [
-      { label: symbols.falsum, insert: symbols.falsum },
-      ...(allowIndexedSymbols ? [{ label: 'x₂', insert: '_' }] : []),
-      ...getQuantifierButtonsFromFormulas(premises, conclusion, syntax),
-    ]
+    const extraSymbolButtons = getProofSymbolButtons({
+      symbols,
+      syntax,
+      allowIndexedSymbols,
+      premises,
+      conclusion,
+    })
 
     const isPredicate = isPredicateLogicKey(key, allowIndexedSymbols) || /[∀∃]/.test(formulaText) || /[A-Z][a-z]/.test(formulaText) || /[A-Z](?:_[1-9][0-9]*|[₁-₉][₀-₉]*)?\s*\(/.test(formulaText)
 
@@ -329,16 +331,11 @@ export default function DerivationTable({
       extraSymbolButtons,
     }
   }, [allowIndexedSymbols, proof, symbols.falsum, syntax])
-  const symbolButtons = useMemo(() => {
-    const baseSymbolButtons = getSymbolButtons(symbols, syntax)
-    const extraSymbolButtons = derivationKeyboardConfig.extraSymbolButtons || []
-    if (extraSymbolButtons.length === 0) return baseSymbolButtons
-    return [
-      ...baseSymbolButtons.slice(0, 7),
-      ...extraSymbolButtons,
-      ...baseSymbolButtons.slice(7),
-    ]
-  }, [derivationKeyboardConfig.extraSymbolButtons, symbols, syntax])
+  // special symbols follow the brackets like every other symbol row
+  const symbolButtons = useMemo(() => [
+    ...getSymbolButtons(symbols, syntax),
+    ...(derivationKeyboardConfig.extraSymbolButtons || []),
+  ], [derivationKeyboardConfig.extraSymbolButtons, symbols, syntax])
   const isLineCompleteForCheck = useCallback((line) => {
     if (!line) return false
     const formulaFilled = (line.formula || '').trim().length > 0
@@ -1186,7 +1183,7 @@ export default function DerivationTable({
             }}
           >
             <TableBody>
-            {!usesNestedSubderivations && premises.length === 0 && proof?.conclusion && (
+            {!usesNestedSubderivations && !isFixedProof && premises.length === 0 && proof?.conclusion && (
               <TableRow
                 key="conclusion-row"
                 sx={{

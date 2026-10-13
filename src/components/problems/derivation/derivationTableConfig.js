@@ -1,10 +1,6 @@
 import { formatNumber } from "../../../utils/numberUtils.js";
 import { alpha } from '@mui/material/styles'
 import { formatDerivationRuleName } from '../../../lib/derivationRules.js'
-import {
-  displayIndexedSymbolsForNotation,
-  normalizeIndexedSymbols,
-} from '../../../lib/indexedSymbols.js'
 
 export const AUTO_CHECK_STORAGE_KEY = 'logic-app:autocheck-enabled'
 export const RULE_INPUT_MODE_KEY = 'logic-app:derivation-rule-input-mode'
@@ -49,32 +45,6 @@ export function parseRulesetRules(value, derivationRuleLookup) {
   }
 
   return { rules, hasEntries }
-}
-
-export function getQuantifierButtonsFromFormulas(premises, conclusion, syntax) {
-  const text = [...(Array.isArray(premises) ? premises : []), conclusion]
-    .filter(Boolean)
-    .join(' ')
-  const seen = new Set([
-    syntax.mkquantifier('x', syntax.symbols.FORALL),
-    syntax.mkquantifier('x', syntax.symbols.EXISTS),
-  ])
-  const buttons = []
-
-  for (const [, variable] of normalizeIndexedSymbols(text).matchAll(/[∀∃]([s-z](?:_[1-9][0-9]*)?)/g)) {
-    for (const quantifier of [syntax.symbols.FORALL, syntax.symbols.EXISTS]) {
-      const insert = displayIndexedSymbolsForNotation(
-        syntax.mkquantifier(variable, quantifier),
-        syntax.notationname
-      )
-      if (!seen.has(insert)) {
-        seen.add(insert)
-        buttons.push({ label: insert, insert })
-      }
-    }
-  }
-
-  return buttons
 }
 
 export const getSymbolButtons = (symbols, syntax) => [

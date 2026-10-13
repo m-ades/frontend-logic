@@ -80,8 +80,10 @@ export function logicFormulaToTex(formula) {
 export function logicStatementsToTex(statements, isArgument = false) {
   if (!Array.isArray(statements) || statements.length === 0) return ''
   const formulas = statements.map(logicFormulaToTex)
-  if (isArgument && formulas.length > 1) {
-    return String.raw`${formulas.slice(0, -1).join(String.raw`,\quad `)}\quad\therefore\quad ${formulas.at(-1)}`
+  if (isArgument) {
+    // a zero premise argument still shows its therefore sign
+    const premises = formulas.slice(0, -1).join(String.raw`,\quad `)
+    return String.raw`${premises ? String.raw`${premises}\quad` : ''}\therefore\quad ${formulas.at(-1)}`
   }
   return formulas.join(String.raw`,\quad `)
 }
