@@ -2,6 +2,7 @@ import * as React from 'react'
 import { Stack, TextField } from '@mui/material'
 import { DEFAULT_LOGIC_SYSTEM, getSymbols } from '../../../lib/logicSystems.js'
 import { displayFormulaInput, normalizeFormulaInput } from './formulaHelpers.js'
+import FormulaTextField from '../mui/inputs/FormulaTextField.jsx'
 import { typeKey } from './snapshotUtils.js'
 
 export function buildComboSnapshot(proof, edited, existing, comboTypeKey, logicSystem = DEFAULT_LOGIC_SYSTEM) {
@@ -42,10 +43,11 @@ export function ComboTruthTableEditorForm({ proof, value, onChange, logicSystem 
   return (
     <Stack spacing={2}>
       <TextField label="Prompt" multiline minRows={2} value={prompt} onChange={(e) => onChange({ ...value, prompt: e.target.value })} fullWidth variant="outlined" />
-      <TextField
+      <FormulaTextField
         label="Expected argument"
         value={argumentLine}
-        onChange={(e) => onChange({ ...value, argumentLine: displayFormulaInput(e.target.value, logicSystem) })}
+        onValueChange={(next) => onChange({ ...value, argumentLine: displayFormulaInput(next, logicSystem) })}
+        logicSystem={logicSystem}
         fullWidth
         variant="outlined"
         placeholder={`P ${symbols.conditional} Q / P // Q`}

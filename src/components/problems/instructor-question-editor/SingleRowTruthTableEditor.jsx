@@ -8,6 +8,7 @@ import TruthTableGrid from '../truth-table/TruthTableGrid.jsx'
 import { TruthValueButton } from '../truth-table/TruthTableControls.jsx'
 import { buildAlignedTruthTableHeader, normalizeTruthTableCellValue } from '../truth-table/truthTableUi.js'
 import { displayFormulaInput, normalizeFormulaInput } from './formulaHelpers.js'
+import FormulaTextField from '../mui/inputs/FormulaTextField.jsx'
 import { typeKey } from './snapshotUtils.js'
 
 /*
@@ -131,7 +132,7 @@ export function SingleRowTruthTableEditorForm({ proof, value, onChange, logicSys
   }
   return (
     <Stack spacing={2}>
-      <TextField label="Statement" value={statement} onChange={(e) => onChange({ ...value, statement: displayFormulaInput(e.target.value, logicSystem), row: null, interpretation: {} })} fullWidth variant="outlined" />
+      <FormulaTextField label="Statement" value={statement} onValueChange={(next) => onChange({ ...value, statement: displayFormulaInput(next, logicSystem), row: null, interpretation: {} })} logicSystem={logicSystem} fullWidth variant="outlined" />
       <Box>
         <Typography variant="subtitle2" sx={{ mb: 0.5 }}>Truth values</Typography>
         {headerTokens.length === 0 ? (

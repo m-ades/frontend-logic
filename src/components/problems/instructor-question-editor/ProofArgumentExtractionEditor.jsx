@@ -101,12 +101,14 @@ export function ProofArgumentExtractionEditorForm({ proof, value, onChange, logi
       />
       <FormulaListEditor
         label="Premises"
+        logicSystem={logicSystem}
         values={premises}
         onChange={updatePremises}
         placeholder="Premise"
       />
       <FormulaListEditor
         label="Lines after the premises"
+        logicSystem={logicSystem}
         values={lines}
         secondaryValues={justifications}
         onChange={updateLines}

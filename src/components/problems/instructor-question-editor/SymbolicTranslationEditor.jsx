@@ -5,6 +5,7 @@ import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
 import { DEFAULT_LOGIC_SYSTEM, getNotation, getSymbols } from '../../../lib/logicSystems.js'
 import { displayIndexedSymbolsForNotation } from '../../../lib/indexedSymbols.js'
 import { displayTranslationAnswerInput, normalizeTranslationAnswerInput } from './formulaHelpers.js'
+import FormulaTextField from '../mui/inputs/FormulaTextField.jsx'
 import { typeKey } from './snapshotUtils.js'
 
 export function buildSymbolicTranslationSnapshot(proof, edited, existing, logicSystem = DEFAULT_LOGIC_SYSTEM) {
@@ -48,7 +49,7 @@ export function SymbolicTranslationEditorForm({ proof, value, onChange, logicSys
         ))}
         <Button size="small" startIcon={<AddIcon />} onClick={() => onChange({ ...value, symbolizationKey: [...keyList, ''] })}>Add line</Button>
       </Box>
-      <TextField label="Correct answer" value={answer} onChange={(e) => onChange({ ...value, answer: displayTranslationAnswerInput(e.target.value, logicSystem) })} fullWidth variant="outlined" placeholder={getNotation(logicSystem) === 'calgary' ? 'e.g. P, Q ∴ R' : `e.g. P / Q // ${symbols.not}R`} />
+      <FormulaTextField label="Correct answer" value={answer} onValueChange={(next) => onChange({ ...value, answer: displayTranslationAnswerInput(next, logicSystem) })} logicSystem={logicSystem} allowTherefore fullWidth variant="outlined" placeholder={getNotation(logicSystem) === 'calgary' ? 'e.g. P, Q ∴ R' : `e.g. P / Q // ${symbols.not}R`} />
     </Stack>
   )
 }

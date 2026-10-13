@@ -2,6 +2,7 @@ import * as React from 'react'
 import { Stack, TextField } from '@mui/material'
 import { DEFAULT_LOGIC_SYSTEM, normalizeLogicSystem } from '../../../lib/logicSystems.js'
 import { displayFormulaInput, normalizeFormulaInput, normalizeFormulaInputs } from './formulaHelpers.js'
+import FormulaTextField from '../mui/inputs/FormulaTextField.jsx'
 import { FormulaListEditor } from './FormulaListEditor.jsx'
 import { typeKey } from './snapshotUtils.js'
 import { buildRulesetPatch } from './ruleHelpers.js'
@@ -52,16 +53,18 @@ export function DerivationEditorForm({ proof, value, onChange, logicSystem = DEF
       />
       <FormulaListEditor
         label="Premises"
+        logicSystem={activeLogicSystem}
         values={premsList}
         onChange={(next) => update({
           premises: next.map((formula) => displayFormulaInput(formula, activeLogicSystem)),
         })}
         placeholder="Premise"
       />
-      <TextField
+      <FormulaTextField
         label="Conclusion"
         value={conclusion}
-        onChange={(e) => update({ conclusion: displayFormulaInput(e.target.value, activeLogicSystem) })}
+        onValueChange={(next) => update({ conclusion: displayFormulaInput(next, activeLogicSystem) })}
+        logicSystem={activeLogicSystem}
         fullWidth
         variant="outlined"
       />

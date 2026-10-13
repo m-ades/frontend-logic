@@ -1,9 +1,8 @@
-import { forwardRef, useCallback } from 'react'
-import { TextField, useMediaQuery } from '@mui/material'
+import { forwardRef } from 'react'
+import { useMediaQuery } from '@mui/material'
 import { useTheme } from '@mui/material/styles'
 import MobileLogicInput from '../../../ui/LogicKeyboard/MobileLogicInput.jsx'
-import FormulaInput from '../../../ui/logic-engine/formula-input.js'
-import { getNotation } from '../../../../lib/logicSystems.js'
+import FormulaTextField from './FormulaTextField.jsx'
 
 // shared formula field for symbolic inputs
 const FormulaField = forwardRef(function FormulaField({
@@ -26,12 +25,6 @@ const FormulaField = forwardRef(function FormulaField({
 }, ref) {
   const theme = useTheme()
   const isPhone = useMediaQuery(theme.breakpoints.down('sm'))
-  const notation = getNotation(logicSystem)
-  const registerInput = useCallback((input) => {
-    if (input) FormulaInput.attach(input, notation, { allowTherefore })
-    if (typeof ref === 'function') ref(input)
-    else if (ref) ref.current = input
-  }, [allowTherefore, notation, ref])
 
   if (isPhone) {
     // on phones route back through the existing custom keyboard path
@@ -57,35 +50,22 @@ const FormulaField = forwardRef(function FormulaField({
   }
 
   return (
-    <TextField
+    <FormulaTextField
+      ref={ref}
       fullWidth
       value={value}
-      onChange={(event) => {
-        // shows indexed symbols as subscripts while typing
-        FormulaInput.input.call(event.target)
-        onValueChange?.(event.target.value)
-      }}
+      onValueChange={onValueChange}
       onBlur={onBlur}
       onKeyDown={(event) => {
-        if (readOnly) return
-        if (event.key === 'Enter' && onEnterKey) {
-          event.preventDefault()
-          onEnterKey()
-          return
-        }
-        FormulaInput.keydown.call(event.target, event)
-        if (event.target.value !== value) {
-          onValueChange?.(event.target.value)
-        }
+        if (readOnly || event.key !== 'Enter' || !onEnterKey) return
+        event.preventDefault()
+        onEnterKey()
       }}
+      logicSystem={logicSystem}
+      allowTherefore={allowTherefore}
+      readOnly={readOnly}
       placeholder={placeholder}
-      inputRef={registerInput}
-      InputProps={{ readOnly }}
-      inputProps={{
-        autoComplete: 'off',
-        spellCheck: false,
-        'aria-label': ariaLabel || placeholder || 'Formula input',
-      }}
+      inputProps={{ 'aria-label': ariaLabel || placeholder || 'Formula input' }}
       sx={{
         '& .MuiInputBase-input': {
           fontFamily: 'var(--app-font-mono)',

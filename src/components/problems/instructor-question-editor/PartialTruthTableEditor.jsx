@@ -7,6 +7,7 @@ import TruthTableGrid from '../truth-table/TruthTableGrid.jsx'
 import { TruthValueButton } from '../truth-table/TruthTableControls.jsx'
 import { tokenizeTruthTableHeader } from '../truth-table/truthTableUi.js'
 import { displayFormulaInput, normalizeFormulaInput } from './formulaHelpers.js'
+import FormulaTextField from '../mui/inputs/FormulaTextField.jsx'
 import { typeKey } from './snapshotUtils.js'
 
 export function buildPartialTruthTableSnapshot(proof, edited, existing, logicSystem = DEFAULT_LOGIC_SYSTEM) {
@@ -51,14 +52,15 @@ export function PartialTruthTableEditorForm({ proof, value, onChange, logicSyste
   const tables = [{ tokens: headerTokens, headerTokens, rows: [row] }]
   return (
     <Stack spacing={2}>
-      <TextField
+      <FormulaTextField
         label="Statement"
         value={statement}
-        onChange={(e) => onChange({
+        onValueChange={(next) => onChange({
           ...value,
-          statement: displayFormulaInput(e.target.value, logicSystem),
+          statement: displayFormulaInput(next, logicSystem),
           row: [],
         })}
+        logicSystem={logicSystem}
         fullWidth
         variant="outlined"
       />

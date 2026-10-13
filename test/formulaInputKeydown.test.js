@@ -43,7 +43,7 @@ test('picks the connective and how much ascii arrow a typed > replaces', () => {
 })
 
 for (const notation of ['calgary', 'hurley']) {
-  const { IFF, IFTHEN, NOT, AND } = FormulaInput.attach({}, notation).symbols
+  const { IFF, IFTHEN, NOT, AND, FALSUM } = FormulaInput.attach({}, notation).symbols
 
   test(`${notation} turns every ascii biconditional into one connective`, () => {
     for (const typed of ['P<-', 'P<--', 'P<–', 'P<=', 'P< = ', 'P<', 'P <-']) {
@@ -57,6 +57,11 @@ for (const notation of ['calgary', 'hurley']) {
       assert.equal(press(typed, '>', notation).value, `P ${IFTHEN} `, typed)
     }
     assert.equal(press('', '>', notation).value, ` ${IFTHEN} `)
+  })
+
+  test(`${notation} reads # and a doubled X as falsum`, () => {
+    assert.equal(press('P ' + IFTHEN + ' ', '#', notation).value, `P ${IFTHEN} ${FALSUM}`)
+    assert.equal(press('X', 'X', notation).value, ` ${FALSUM}`)
   })
 
   test(`${notation} only consumes an arrow that touches the caret`, () => {

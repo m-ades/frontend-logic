@@ -23,12 +23,13 @@ import {
   parseAssumptionScopes,
 } from '@logic-app/logic-engine/proofArgumentExtractionScopes.js'
 import { getInstructorProblemTypeLabel, isInstructorProblemType } from '../../lib/instructorProblemTypes.js'
-import { isMultiSelectSubquestion } from '@logic-app/logic-engine/multiple-choice-utils.js'
+import { getSingleSelectAnswerIndex } from '@logic-app/logic-engine/multiple-choice-utils.js'
+import { findQuestionWithoutAnswer } from './instructor-question-editor/choiceAnswers.js'
 import { deepMerge } from './instructor-question-editor/snapshotUtils.js'
 import { validateQuestionSnapshotFormulas } from './instructor-question-editor/snapshotValidation.js'
 import { validateDerivationRuleset } from './instructor-question-editor/ruleHelpers.js'
 import { AttemptLimitField } from './instructor-question-editor/AttemptLimitField.jsx'
-import { McEditorForm, buildMcSnapshot } from './instructor-question-editor/McEditor.jsx'
+import { McEditorForm, buildMcSnapshot, getMcAnswerError } from './instructor-question-editor/McEditor.jsx'
 import { TruthTableEditorForm, buildTruthTableSnapshot } from './instructor-question-editor/TruthTableEditor.jsx'
 import { IndirectTruthTableEditorForm, buildIndirectTruthTableSnapshot } from './instructor-question-editor/IndirectTruthTableEditor.jsx'
 import { NonClassicalTruthTableEditorForm, buildNonClassicalTruthTableSnapshot } from './instructor-question-editor/NonClassicalTruthTableEditor.jsx'
@@ -84,7 +85,7 @@ function InstructorQuestionEditorInner({
           ...(subq && typeof subq === 'object' ? subq : {}),
           prompt: subq?.prompt ?? '',
           choices: Array.isArray(subq?.choices) ? [...subq.choices] : [],
-          answerIndex: Number(subq?.answerIndex ?? subq?.answer ?? 0),
+          answerIndex: getSingleSelectAnswerIndex(subq),
         }))
       }
     }
@@ -310,14 +311,18 @@ function InstructorQuestionEditorInner({
         return
       }
       if (proof.type === 'indirect-truth-table' || proof.type === 'nonclassical-truth-table') {
-        const missingAnswer = (mergedSnapshot.questions ?? []).findIndex((question) => (
-          isMultiSelectSubquestion(question) && !question.answerIndices?.length
-        ))
+        const missingAnswer = findQuestionWithoutAnswer(mergedSnapshot.questions)
         if (missingAnswer !== -1) {
           setError(`Select a correct answer for question ${missingAnswer + 1}`)
           setSaving(false)
           return
         }
+      }
+      const answerError = proof.type === 'multiple-choice' ? getMcAnswerError(question_snapshot) : ''
+      if (answerError) {
+        setError(answerError)
+        setSaving(false)
+        return
       }
       const attemptLimit = editValue.attemptLimit
 
