@@ -1,6 +1,7 @@
 import { formatDerivationRuleName } from '../../../lib/derivationRules.js'
 import getFormulaClass from '@logic-app/logic-engine/symbolic/formula.js'
 import { justParse } from '@logic-app/logic-engine/justification-parse.js'
+import { formatJustification } from '@logic-app/logic-engine/justification-format.js'
 import {
   getIndexedLowerSymbols,
   getIndexedUpperSymbols,
@@ -12,11 +13,23 @@ import {
 const CONSTANT_POOL = 'abcdefghijklmnopqrstuvw'.split('')
 export const PREDICATE_VARIABLES = ['x', 'y', 'z']
 
+// provided is the describeProvidedJustification result fixed proof lines carry
 export function isDerivationFieldReadOnly(line, field) {
   if (!line || line.readOnly) return true
   if (field === 'formula') return Boolean(line.formulaReadOnly)
-  if (field === 'justification') return Boolean(line.justificationReadOnly)
+  if (field === 'justification') return Boolean(line.provided?.isComplete)
+  if (field === 'citations') return Boolean(line.provided?.isComplete || line.provided?.hasCitations)
+  if (field === 'rule') return Boolean(line.provided?.isComplete || line.provided?.hasRule)
   return false
+}
+
+// the fixed part of a partly provided justification, or null when the student owns all or none of it
+export function getProvidedJustificationPart(line) {
+  const provided = line?.provided
+  if (!provided || provided.isComplete) return null
+  if (provided.hasCitations) return 'citations'
+  if (provided.hasRule) return 'rule'
+  return null
 }
 
 export function getLeftPart(line) {
@@ -127,19 +140,10 @@ export const formatRuleName = (rule) => {
   return formatDerivationRuleName(rule)
 }
 
-export const formatJustificationParts = (nums, ranges, citedrules, options = {}) => {
-  const formattedRules = citedrules.map((rule) => formatRuleName(rule))
-  const refs = nums.map((n) => n.toString())
-  if (ranges.length > 0) {
-    refs.push(...ranges.map(([s, e]) => `${s}–${e}`))
-  }
-  const refsText = refs.join(', ')
-  const rulesText = formattedRules.join(', ')
-  if (options.rulesFirst) {
-    return [rulesText, refsText].filter(Boolean).join(' ')
-  }
-  return [refsText, rulesText].filter(Boolean).join(' ')
-}
+export const formatJustificationParts = (nums, ranges, citedrules, options = {}) => formatJustification(
+  { nums, ranges, citedrules: citedrules.map(formatRuleName) },
+  options
+)
 
 export const formatJustificationDisplay = (value, options = {}) => {
   if (!value) return ''

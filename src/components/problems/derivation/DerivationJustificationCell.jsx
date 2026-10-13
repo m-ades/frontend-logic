@@ -26,13 +26,14 @@ import {
 } from './derivationTableConfig.js'
 import {
   formatJustificationLines,
+  getProvidedJustificationPart,
   getRuleFromJustification,
   isDerivationFieldReadOnly,
 } from './derivationUtils.js'
 
 /*
 a hidden copy of the text in data-text sizes the field so it widens instead of scrolling
-the input itself is one character wide so only that copy and the minimum set the width
+the input itself adds no width so only that copy and the minimum set the width
 */
 const growWithText = (minWidth) => ({
   display: 'inline-grid',
@@ -48,10 +49,11 @@ const growWithText = (minWidth) => ({
     visibility: 'hidden',
     whiteSpace: 'pre',
   },
-  '& > .MuiInputBase-root': { gridArea: '1 / 1', minWidth: 0 },
+  '& > .MuiInputBase-root': { gridArea: '1 / 1', width: 0, minWidth: '100%' },
 })
 const justificationSize = growWithText(DERIVATION_JUSTIFICATION_MIN_WIDTH)
 const citationSize = growWithText(DERIVATION_CITATION_MIN_WIDTH)
+const hugTextSize = growWithText(0)
 // browsers only draw the ellipsis once the field loses focus
 const lineInputSx = { fontSize: DERIVATION_LINE_FONT_SIZE, py: 0.5, textOverflow: 'ellipsis' }
 // a 2px outline matches the delete icon's stroke weight since chrome floors fractional borders
@@ -63,6 +65,7 @@ export default function DerivationJustificationCell({
   assumptionRules,
   autoCheckEnabled,
   autoCheckStatus,
+  canDelete,
   canDischargeMore,
   citationDraft,
   conclusion,
@@ -81,6 +84,8 @@ export default function DerivationJustificationCell({
   onKeyDown,
   onRequestFullScreen,
   onRuleChange,
+  onRuleTextChange,
+  onRuleTextCommit,
   onToggleDischarge,
   onTypedCommit,
   persistentUnderline = false,
@@ -92,7 +97,14 @@ export default function DerivationJustificationCell({
 }) {
   const selectedRule = getRuleFromJustification(line.justification)
   const justificationReadOnly = isDerivationFieldReadOnly(line, 'justification')
-  const omitsCitations = assumptionRules.has(selectedRule.toUpperCase())
+  const citationsReadOnly = isDerivationFieldReadOnly(line, 'citations')
+  // a partly provided line splits so its fixed part reads beside the part the student enters
+  const providedPart = getProvidedJustificationPart(line)
+  const showsSplitFields = useRuleDropdown || Boolean(providedPart)
+  const showsCitations = providedPart === 'citations' || !assumptionRules.has(selectedRule.toUpperCase())
+  const citationOrder = usesNestedSubderivations ? -1 : -2
+  const ruleOrder = usesNestedSubderivations ? -2 : -1
+  const ruleWidth = isFullScreen || isMobile ? DERIVATION_RULE_WIDTH_MOBILE : DERIVATION_RULE_WIDTH_DESKTOP
   const isActiveLine = activeFormulaIndex === lineIndex
   const dischargeLabel = isDischarged > 1 ? `Discharged ×${isDischarged}` : isDischarged ? 'Discharged' : 'Discharge'
   const dischargeAction = !isDischarged ? 'Discharge subproof here'
@@ -104,6 +116,9 @@ export default function DerivationJustificationCell({
   )) ? [selectedRule, ...allowedRules] : allowedRules
   // full screen phones fill the space beside the controls and squeeze before anything wraps
   const phoneShrink = isPhone && isFullScreen ? { minWidth: 0, flex: '1 1 auto' } : null
+  // typed split fields hug their text so the pair reads like one typed justification
+  const citationFieldSize = useRuleDropdown ? { ...citationSize, ...phoneShrink } : hugTextSize
+  const ruleFieldSize = useRuleDropdown ? { ...growWithText(ruleWidth), ...phoneShrink } : hugTextSize
   const citationText = citationDraft ?? formatJustificationLines(line.justification)
   const typedPlaceholder = lineIndex === premisesCount
     ? (usesNestedSubderivations ? 'Rule & line(s)' : 'line(s) and rule')
@@ -111,6 +126,16 @@ export default function DerivationJustificationCell({
   const requestFullScreen = (event) => {
     if (justificationReadOnly) return
     onRequestFullScreen(event)
+  }
+  const typedUnderlineSx = {
+    '& .MuiInput-root:before, & .MuiInput-root:after': {
+      right: 'auto',
+      width: showsSplitFields ? '100%' : '75%',
+      opacity: persistentUnderline ? 1 : 0,
+    },
+    'tr:focus-within & .MuiInput-root:before, tr:focus-within & .MuiInput-root:after': {
+      opacity: persistentUnderline || !justificationReadOnly ? 1 : 0,
+    },
   }
 
   return (
@@ -154,9 +179,9 @@ export default function DerivationJustificationCell({
         </Stack>
       ) : (
         <Stack direction="row" alignItems="center" sx={{ flexWrap: 'nowrap', columnGap: isPhone ? 0.5 : 0.75, minWidth: 0 }}>
-          {useRuleDropdown ? (
+          {showsSplitFields ? (
             <>
-              {!omitsCitations && (
+              {showsCitations && (
                 <TextField
                   variant="standard"
                   placeholder="Line(s)"
@@ -167,32 +192,56 @@ export default function DerivationJustificationCell({
                   onChange={(event) => onCitationChange(event.target.value)}
                   onKeyDown={onKeyDown}
                   onBlur={(event) => onCitationCommit(event.target.value)}
-                  InputProps={{ disableUnderline: true, readOnly: justificationReadOnly }}
+                  InputProps={{ disableUnderline: useRuleDropdown || citationsReadOnly, readOnly: citationsReadOnly }}
                   inputProps={{
                     autoComplete: 'off',
                     size: 1,
-                    'aria-label': `Referenced line numbers for line ${lineIndex + 1}`,
+                    'aria-label': providedPart === 'citations'
+                      ? `Provided line numbers for line ${lineIndex + 1}`
+                      : `Referenced line numbers for line ${lineIndex + 1}`,
                   }}
-                  inputRef={registerInput}
+                  inputRef={providedPart === 'citations' ? undefined : registerInput}
                   sx={{
-                    order: usesNestedSubderivations ? -1 : -2,
-                    ...citationSize,
-                    ...phoneShrink,
+                    order: citationOrder,
+                    ...citationFieldSize,
                     '& .MuiInputBase-input': lineInputSx,
+                    ...(!useRuleDropdown && !citationsReadOnly && typedUnderlineSx),
                   }}
                 />
               )}
-              {ruleOptions.length > 0 && (
+              {providedPart === 'rule' || !useRuleDropdown ? (
+                <TextField
+                  variant="standard"
+                  placeholder="Rule"
+                  value={selectedRule}
+                  data-text={selectedRule || 'Rule'}
+                  onFocus={onActivate}
+                  onPointerDown={requestFullScreen}
+                  onChange={onRuleTextChange}
+                  onKeyDown={(event) => onKeyDown(event, 'rule')}
+                  onBlur={onRuleTextCommit}
+                  InputProps={{ disableUnderline: providedPart === 'rule', readOnly: providedPart === 'rule' }}
+                  inputProps={{
+                    autoComplete: 'off',
+                    size: 1,
+                    'aria-label': providedPart === 'rule'
+                      ? `Provided rule for line ${lineIndex + 1}`
+                      : `Rule for line ${lineIndex + 1}`,
+                  }}
+                  inputRef={providedPart === 'rule' ? undefined : registerInput}
+                  sx={{
+                    order: ruleOrder,
+                    ...ruleFieldSize,
+                    '& .MuiInputBase-input': lineInputSx,
+                    ...(providedPart !== 'rule' && typedUnderlineSx),
+                  }}
+                />
+              ) : ruleOptions.length > 0 && (
                 <FormControl
                   variant="standard"
-                  sx={omitsCitations
-                    ? { fontSize: DERIVATION_LINE_FONT_SIZE, minWidth: DERIVATION_JUSTIFICATION_MIN_WIDTH }
-                    : {
-                        order: usesNestedSubderivations ? -2 : -1,
-                        minWidth: isFullScreen || isMobile
-                          ? DERIVATION_RULE_WIDTH_MOBILE
-                          : DERIVATION_RULE_WIDTH_DESKTOP,
-                      }}
+                  sx={showsCitations
+                    ? { order: ruleOrder, minWidth: ruleWidth }
+                    : { fontSize: DERIVATION_LINE_FONT_SIZE, minWidth: DERIVATION_JUSTIFICATION_MIN_WIDTH }}
                 >
                   <Select
                     value={selectedRule}
@@ -200,11 +249,12 @@ export default function DerivationJustificationCell({
                     displayEmpty
                     disableUnderline
                     inputProps={{ 'aria-label': `Rule for line ${lineIndex + 1}` }}
+                    inputRef={providedPart === 'citations' ? registerInput : undefined}
                     onFocus={onActivate}
                     onChange={(event) => onRuleChange(String(event.target.value || ''))}
                     renderValue={(value) => value || 'Rule'}
                     sx={{
-                      width: omitsCitations ? '100%' : undefined,
+                      width: showsCitations ? undefined : '100%',
                       '& .MuiSelect-select, & .MuiInputBase-input': {
                         fontSize: DERIVATION_LINE_FONT_SIZE,
                         py: 0.5,
@@ -239,14 +289,7 @@ export default function DerivationJustificationCell({
                 ...justificationSize,
                 ...phoneShrink,
                 '& .MuiInputBase-input': lineInputSx,
-                '& .MuiInput-root:before, & .MuiInput-root:after': {
-                  right: 'auto',
-                  width: '75%',
-                  opacity: persistentUnderline ? 1 : 0,
-                },
-                'tr:focus-within & .MuiInput-root:before, tr:focus-within & .MuiInput-root:after': {
-                  opacity: persistentUnderline || !justificationReadOnly ? 1 : 0,
-                },
+                ...typedUnderlineSx,
               }}
             />
           )}
@@ -290,7 +333,7 @@ export default function DerivationJustificationCell({
                 )}
               </Tooltip>
             )}
-            {!line.readOnly && !line.formulaReadOnly && (
+            {canDelete && !line.readOnly && (
               <Tooltip title="Delete line">
                 <IconButton
                   onClick={onDelete}

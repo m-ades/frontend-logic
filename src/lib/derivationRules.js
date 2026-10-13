@@ -1,5 +1,4 @@
-import getHurleyRuleset from '@logic-app/logic-engine/checkers/rules/hurley-rules.js'
-import getForallxRuleset from '@logic-app/logic-engine/checkers/rules/forallx-rules.js'
+import { getDerivationRulesForLogicSystem } from '@logic-app/logic-engine/checkers/derivation-by-logic-system.js'
 import getSyntax, { normalizeRuleSymbolName } from '@logic-app/logic-engine/symbolic/libsyntax.js'
 import { DEFAULT_LOGIC_SYSTEM, getDerivationProblemType } from './logicSystems.js'
 
@@ -54,8 +53,8 @@ function getRuleNames(ruleset, options = {}) {
 }
 
 const DERIVATION_RULES_BY_TYPE = {
-  'derivation-hurley': getRuleNames(getHurleyRuleset()),
-  'derivation-calgary': getRuleNames(getForallxRuleset('calgary', 'calgary'), {
+  'derivation-hurley': getRuleNames(getDerivationRulesForLogicSystem('hurley')),
+  'derivation-calgary': getRuleNames(getDerivationRulesForLogicSystem('fitch'), {
     includeHiddenAssumptions: true,
   }),
 }
