@@ -67,6 +67,16 @@ export const mobileKeyBaseSx = {
     ['background-color', 'border-color', 'transform', 'box-shadow'],
     { duration: 120 }
   ),
+  /*
+  a phone held sideways only has ~390px of height, and the panel is pinned to
+  the bottom of it. shrink the keys there so the proof above stays readable;
+  ~32px matches the key height ios itself uses in landscape.
+  */
+  '@media (max-height: 480px)': {
+    py: 0.3,
+    fontSize: '0.95rem',
+    minHeight: 34,
+  },
   '@media (prefers-reduced-motion: reduce)': {
     transition: 'none',
     '&:active': { transform: 'none' },
@@ -105,6 +115,7 @@ export const mobileKeyWellSx = (kind = 'letters') => {
   return {
     width: '100%',
     p: 0.65,
+    '@media (max-height: 480px)': { p: 0.35 },
     borderRadius: 2.5,
     border: '1px solid',
     borderColor: (theme) => alpha(theme.palette.divider, theme.palette.mode === 'dark' ? 0.9 : 1),

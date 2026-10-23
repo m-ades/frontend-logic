@@ -14,6 +14,7 @@ import InstructorQuestionEditor from './InstructorQuestionEditor.jsx'
 import { getDerivationProblemType, isDerivationProblemType } from '../../lib/logicSystems.js'
 import { instructorProblemTypes } from '../../lib/instructorProblemTypes.js'
 import QuestionAttemptOverrideDialog from '../ui/assignments/QuestionAttemptOverrideDialog.jsx'
+import useIsPhone from '../../hooks/useIsPhone.js'
 
 function TabPanel(props) {
   const { children, value, index, direction, isMobile, ...other } = props;
@@ -114,7 +115,7 @@ function ProofTabs({
 }) {
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
-  const isPhone = useMediaQuery(theme.breakpoints.down('sm')) // fullscreen layout only on phones
+  const isPhone = useIsPhone() // fullscreen layout only on phones
   const desktopStickyTop = 0
   const desktopSidebarMaxHeight = `min(calc(100dvh - ${theme.spacing(8)}), 650px)`
   const proofRefs = React.useRef({})

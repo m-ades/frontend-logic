@@ -2,7 +2,6 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { createPortal, flushSync } from 'react-dom'
 import { Box, Button, Stack, TextField } from '@mui/material'
 import { alpha } from '@mui/material/styles'
-import { useTheme, useMediaQuery } from '@mui/material'
 import BackspaceOutlined from '@mui/icons-material/BackspaceOutlined'
 import ChevronLeft from '@mui/icons-material/ChevronLeft'
 import ChevronRight from '@mui/icons-material/ChevronRight'
@@ -19,6 +18,7 @@ import {
 import getSyntax from '@logic-app/logic-engine/symbolic/libsyntax.js'
 import { getNotation } from '../../../lib/logicSystems.js'
 import { displayIndexedSymbolsForNotation } from '../../../lib/indexedSymbols.js'
+import useIsPhone from '../../../hooks/useIsPhone.js'
 
 const DEFAULT_LETTERS = ['P', 'Q', 'R', 'S', 'T']
 const DESKTOP_KEYBOARD_ON_MOBILE_KEY = 'logicapp_desktop_keyboard_on_mobile'
@@ -124,8 +124,7 @@ export default function MobileLogicInput({
   logicSystem,
   children,
 }) {
-  const theme = useTheme()
-  const isPhone = useMediaQuery(theme.breakpoints.down('sm'))
+  const isPhone = useIsPhone()
   const mobileLogicKeyboardEnabled = useMobileLogicKeyboardEnabled()
 
   const [cursorPosition, setCursorPosition] = useState(0)
@@ -520,10 +519,19 @@ export default function MobileLogicInput({
                   opacity: 0.45,
                   mx: 'auto',
                   mb: 0.85,
+                  '@media (max-height: 480px)': { mb: 0.4 },
                   position: 'relative',
                 }}
               />
-              <Stack spacing={1} sx={{ width: '100%', position: 'relative' }}>
+              <Stack
+                spacing={1}
+                sx={{
+                  width: '100%',
+                  position: 'relative',
+                  // tighter stacking when the phone is sideways
+                  '@media (max-height: 480px)': { gap: 0.5 },
+                }}
+              >
                 <Box role="group" aria-label="Connectives and grouping" sx={mobileKeyWellSx('operators')}>
                   <SymbolButtonRow
                     inputRef={facadeRef}
