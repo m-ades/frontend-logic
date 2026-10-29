@@ -4,6 +4,7 @@ import { Box, IconButton, Stack, useMediaQuery, useTheme } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close'
 import DerivationTable from './derivation/DerivationTable.jsx'
 import InstructorQuestionEditor from './InstructorQuestionEditor.jsx'
+import useIsPhone from '../../hooks/useIsPhone.js'
 
 export default function ProofEditor({
   proof,
@@ -30,7 +31,7 @@ export default function ProofEditor({
   const editorRef = useRef(null)
   const openEdit = () => editorRef.current?.open?.()
   const isMobile = useMediaQuery(theme.breakpoints.down('md')) // compact layout: phone + tablet
-  const isPhone = useMediaQuery(theme.breakpoints.down('sm')) // fullscreen only on phones
+  const isPhone = useIsPhone() // fullscreen only on phones
   const [internalOpen, setInternalOpen] = useState(false)
   const [internalFocus, setInternalFocus] = useState(null)
   const isControlled = typeof onOpenFullScreenProp === 'function'
