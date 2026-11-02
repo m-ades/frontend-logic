@@ -8,25 +8,14 @@ import {
   mobileKeyWellSx,
 } from '../logic-engine/mobileKeyStyles.js'
 
-/*
-digits-only keyboard for line citations on phones.
-
-the citation field only ever takes line numbers, ranges and separators, but it
-is a plain text input, so ios offered the full qwerty keyboard and kept flipping
-back to letters between digits. this panel replaces it; the field is marked
-inputMode="none" by the caller so the native keyboard stays down.
-
-the separators match what justification formatting emits: ', ' between numbers
-and an en dash inside a range (the parser also accepts a plain hyphen).
-*/
-
 const DIGIT_ROWS = [
   ['1', '2', '3', '4', '5'],
   ['6', '7', '8', '9', '0'],
 ]
 
-export const CITATION_RANGE_DASH = '–'
-export const CITATION_SEPARATOR = ', '
+// same separators justification formatting writes
+const CITATION_RANGE_DASH = '–'
+const CITATION_SEPARATOR = ', '
 
 export default function LineCitationKeypad({ open, inputRef, value, onChange }) {
   if (!open || typeof document === 'undefined') return null
@@ -56,19 +45,18 @@ export default function LineCitationKeypad({ open, inputRef, value, onChange }) 
   }
   const done = () => inputRef.current?.blur()
 
-  const key = (label, ariaLabel, onClick, kind = 'letter', sx) => (
+  const key = (content, ariaLabel, onClick, kind = 'letter') => (
     <Button
-      key={label}
+      key={ariaLabel}
       type="button"
       variant="text"
       disableRipple
       disableElevation
-      onMouseDown={hold}
       onClick={onClick}
       aria-label={ariaLabel}
-      sx={[...getMobileKeySx(kind), ...(sx ? [sx] : [])]}
+      sx={getMobileKeySx(kind)}
     >
-      {label}
+      {content}
     </Button>
   )
 
@@ -115,18 +103,7 @@ export default function LineCitationKeypad({ open, inputRef, value, onChange }) 
           <Box sx={mobileKeyGridSx(4)}>
             {key(',', 'Insert comma separator', () => insert(CITATION_SEPARATOR), 'nav')}
             {key(CITATION_RANGE_DASH, 'Insert range dash', () => insert(CITATION_RANGE_DASH), 'nav')}
-            <Button
-              type="button"
-              variant="text"
-              disableRipple
-              disableElevation
-              onMouseDown={hold}
-              onClick={backspace}
-              aria-label="Backspace"
-              sx={getMobileKeySx('backspace')}
-            >
-              <BackspaceOutlined fontSize="small" />
-            </Button>
+            {key(<BackspaceOutlined fontSize="small" />, 'Backspace', backspace, 'backspace')}
             {key('Done', 'Close line number keyboard', done, 'constant')}
           </Box>
         </Box>

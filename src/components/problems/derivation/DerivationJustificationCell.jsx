@@ -122,10 +122,7 @@ export default function DerivationJustificationCell({
   // typed split fields hug their text so the pair reads like one typed justification
   const citationFieldSize = useRuleDropdown ? { ...citationSize, ...phoneShrink } : hugTextSize
 
-  /*
-  line citations are digits and separators only, so phones get the dedicated
-  keypad instead of the native qwerty keyboard (see LineCitationKeypad).
-  */
+  // citations are digits and separators only, so phones get a keypad instead of qwerty
   const citationKeypadEnabled = isPhone && mobileKeyboardEnabled && !citationsReadOnly
   const [citationKeypadOpen, setCitationKeypadOpen] = useState(false)
   const citationInputRef = useRef(null)
@@ -218,7 +215,7 @@ export default function DerivationJustificationCell({
                     autoComplete: 'off',
                     size: 1,
                     // keeps the native keyboard down while the keypad is in charge
-                    ...(citationKeypadEnabled ? { inputMode: 'none' } : {}),
+                    inputMode: citationKeypadEnabled ? 'none' : undefined,
                     'aria-label': providedPart === 'citations'
                       ? `Provided line numbers for line ${lineIndex + 1}`
                       : `Referenced line numbers for line ${lineIndex + 1}`,
@@ -372,8 +369,7 @@ export default function DerivationJustificationCell({
         </Stack>
       )}
       <LineCitationKeypad
-        // a rotation can widen the viewport past the phone breakpoint while the
-        // keypad is up; drop it rather than leave it over a native-keyboard field
+        // closes if a rotation leaves the phone layout while it's up
         open={citationKeypadOpen && citationKeypadEnabled}
         inputRef={citationInputRef}
         value={citationText}
