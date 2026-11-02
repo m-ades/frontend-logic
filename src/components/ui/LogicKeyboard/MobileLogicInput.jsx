@@ -525,6 +525,7 @@ export default function MobileLogicInput({
               />
               <Stack
                 spacing={1}
+                useFlexGap
                 sx={{
                   width: '100%',
                   position: 'relative',
