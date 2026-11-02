@@ -129,5 +129,6 @@ export async function fetchJson(path, options = {}) {
     requestError.status = res.status;
     throw requestError;
   }
+  if (res.status === 204) return null;
   return normalizeLogicTextData(await res.json());
 }
