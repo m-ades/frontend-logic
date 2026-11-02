@@ -2,7 +2,6 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { Box, Typography } from '@mui/material'
 import InstructorQuestionEditor from '../../InstructorQuestionEditor.jsx'
 import SolutionReveal from '../../SolutionReveal.jsx'
-import { useTheme, useMediaQuery } from '@mui/material'
 import getSyntax from '@logic-app/logic-engine/symbolic/libsyntax.js'
 import ProblemFrame from '../frame/ProblemFrame.jsx'
 import ProblemSetButtons from '../frame/ProblemSetButtons.jsx'
@@ -21,6 +20,7 @@ import {
 } from '../../../../lib/indexedSymbols.js'
 import { parseSymbolizationKeyFromPrompt } from './symbolizationKeyboard.js'
 import { formatArgumentLine, getExpectedArgument, isWellformedArgument } from './argumentAnswer.js'
+import useIsPhone from '../../../../hooks/useIsPhone.js'
 
 export default function ComboTranslationTruthTable({
   proof,
@@ -35,8 +35,7 @@ export default function ComboTranslationTruthTable({
   problemLabel,
   logicSystem,
 }) {
-  const theme = useTheme()
-  const isPhone = useMediaQuery(theme.breakpoints.down('sm'))
+  const isPhone = useIsPhone()
   const editorRef = useRef(null)
   const openEdit = () => editorRef.current?.open?.()
   const notation = getNotation(logicSystem)

@@ -3,9 +3,7 @@ import {
   Box,
   Stack,
   Typography,
-  useMediaQuery,
 } from '@mui/material'
-import { useTheme } from '@mui/material/styles'
 import InstructorQuestionEditor from '../InstructorQuestionEditor.jsx'
 import ProofEditor from '../ProofEditor.jsx'
 import ProblemSetButtons from '../mui/frame/ProblemSetButtons.jsx'
@@ -26,6 +24,7 @@ import { mergeProvidedJustification } from '@logic-app/logic-engine/proofArgumen
 import { extractLines, getJustificationMeta } from './derivationUtils.js'
 import { getFormulaKeyboardConfig } from '../mui/translation/symbolizationKeyboard.js'
 import ProblemFrame from '../mui/frame/ProblemFrame.jsx'
+import useIsPhone from '../../../hooks/useIsPhone.js'
 
 function getQuestionLines(snapshot, logicSystem) {
   const formulas = Array.isArray(snapshot?.lines) ? snapshot.lines : []
@@ -98,8 +97,7 @@ export default function ProofArgumentExtraction({
   problemLabel,
   logicSystem,
 }) {
-  const theme = useTheme()
-  const isPhone = useMediaQuery(theme.breakpoints.down('sm'))
+  const isPhone = useIsPhone()
   const editorRef = useRef(null)
   const argumentInputRef = useRef(null)
   const [resetVersion, setResetVersion] = useState(0)

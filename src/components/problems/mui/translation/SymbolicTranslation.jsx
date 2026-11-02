@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { Box, Typography } from '@mui/material'
 import InstructorQuestionEditor from '../../InstructorQuestionEditor.jsx'
-import { useTheme, useMediaQuery } from '@mui/material'
 import ProblemFrame from '../frame/ProblemFrame.jsx'
 import ProblemSetButtons from '../frame/ProblemSetButtons.jsx'
 import FormulaField from '../inputs/FormulaField.jsx'
@@ -23,6 +22,7 @@ import {
 } from './symbolizationKeyboard.js'
 import { getNotation, getSymbols } from '../../../../lib/logicSystems.js'
 import { displayIndexedSymbolsForNotation } from '../../../../lib/indexedSymbols.js'
+import useIsPhone from '../../../../hooks/useIsPhone.js'
 import {
   isCompleteTranslationAnswer,
   mapTranslationAnswer,
@@ -79,8 +79,7 @@ export default function SymbolicTranslation({
   problemLabel,
   logicSystem,
 }) {
-  const theme = useTheme()
-  const isPhone = useMediaQuery(theme.breakpoints.down('sm'))
+  const isPhone = useIsPhone()
   const editorRef = useRef(null)
   const notation = getNotation(logicSystem)
   const symbols = getSymbols(logicSystem)

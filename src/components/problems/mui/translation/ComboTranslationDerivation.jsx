@@ -2,7 +2,6 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Alert, Box, Typography } from '@mui/material'
 import InstructorQuestionEditor from '../../InstructorQuestionEditor.jsx'
 import SolutionReveal from '../../SolutionReveal.jsx'
-import { useTheme, useMediaQuery } from '@mui/material'
 import ProblemFrame from '../frame/ProblemFrame.jsx'
 import ProblemSetButtons from '../frame/ProblemSetButtons.jsx'
 import FormulaField from '../inputs/FormulaField.jsx'
@@ -26,6 +25,7 @@ import {
   parseSymbolizationKeyFromPrompt,
   promptImpliesPredicateLogic,
 } from './symbolizationKeyboard.js'
+import useIsPhone from '../../../../hooks/useIsPhone.js'
 import {
   formatArgumentLine,
   getExpectedArgument,
@@ -128,8 +128,7 @@ export default function ComboTranslationDerivation({
   problemLabel,
   logicSystem,
 }) {
-  const theme = useTheme()
-  const isPhone = useMediaQuery(theme.breakpoints.down('sm'))
+  const isPhone = useIsPhone()
   const editorRef = useRef(null)
   const openEdit = () => editorRef.current?.open?.()
   const notation = getNotation(logicSystem)
