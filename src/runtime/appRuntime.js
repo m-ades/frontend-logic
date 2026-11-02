@@ -65,6 +65,21 @@ const buildPracticePayload = (formData, courseId, overrides = {}) => {
 
 export function createAppRuntime({ coursesDispatch, coursesState, routeKind, user }) {
   const runtimePaths = buildRuntimePaths(routeKind);
+  const refreshAssignments = async (courseId) => coursesDispatch({
+    type: "SET_ASSIGNMENTS", courseId, payload: await fetchCourseAssignments(courseId),
+  });
+  const refreshPractices = async (courseId) => coursesDispatch({
+    type: "SET_PRACTICES", courseId, payload: await fetchCoursePractices(courseId),
+  });
+  const copyAssignment = async (refresh, assignmentId, courseId) => {
+    await fetchJson(`/api/assignments/${assignmentId}/copy`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ course_id: courseId }),
+    });
+    // a failed refresh shouldn't look like a failed copy or a retry makes a second one
+    await refresh(courseId).catch((error) => console.error("Failed to refresh after copy", error));
+  };
   const runtimeCourseActions = {
     initializeCourses: async () => initializeCourses(coursesDispatch),
     setActiveCourse: (courseId) => setActiveCourse(coursesDispatch, courseId),
@@ -116,29 +131,8 @@ export function createAppRuntime({ coursesDispatch, coursesState, routeKind, use
       const refreshed = await fetchCourseAssignments(courseId);
       coursesDispatch({ type: "SET_ASSIGNMENTS", courseId, payload: refreshed });
     },
-    duplicateAssignment: async (courseId, assignment) => {
-      await fetchJson("/api/assignments", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          course_id: courseId,
-          kind: "assignment",
-          title: `${assignment.name} (Copy)`,
-          description: assignment.description || null,
-          is_locked: true,
-          group_questions_by_type: Boolean(assignment.groupQuestionsByType),
-          chapter: assignment.chapter || 1,
-          subchapter: assignment.subchapter || "",
-          due_date: assignment.dueDate
-            ? toIsoDateTime(assignment.dueDate, assignment.dueTime || "23:59")
-            : null,
-          late_window_days: assignment.lateWindowDays,
-          late_penalty_percent: assignment.latePenaltyPercent,
-        }),
-      });
-      const refreshed = await fetchCourseAssignments(courseId);
-      coursesDispatch({ type: "SET_ASSIGNMENTS", courseId, payload: refreshed });
-    },
+    duplicateAssignment: (courseId, assignment) => copyAssignment(refreshAssignments, assignment.id, courseId),
+    importAssignment: (courseId, assignmentId) => copyAssignment(refreshAssignments, assignmentId, courseId),
     deleteAssignment: async (courseId, assignmentId) => {
       await fetchJson(`/api/assignments/${assignmentId}`, { method: "DELETE" });
       const refreshed = await fetchCourseAssignments(courseId);
@@ -190,27 +184,8 @@ export function createAppRuntime({ coursesDispatch, coursesState, routeKind, use
       const refreshed = await fetchCoursePractices(courseId);
       coursesDispatch({ type: "SET_PRACTICES", courseId, payload: refreshed });
     },
-    duplicatePractice: async (courseId, practice) => {
-      await fetchJson("/api/assignments", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          course_id: courseId,
-          kind: "practice",
-          title: `${practice.name} (Copy)`,
-          description: practice.description || null,
-          is_locked: true,
-          group_questions_by_type: Boolean(practice.groupQuestionsByType),
-          chapter: practice.chapter || 1,
-          subchapter: practice.subchapter || 1,
-          due_date: null,
-          late_window_days: null,
-          late_penalty_percent: null,
-        }),
-      });
-      const refreshed = await fetchCoursePractices(courseId);
-      coursesDispatch({ type: "SET_PRACTICES", courseId, payload: refreshed });
-    },
+    duplicatePractice: (courseId, practice) => copyAssignment(refreshPractices, practice.id, courseId),
+    importPractice: (courseId, practiceId) => copyAssignment(refreshPractices, practiceId, courseId),
     deletePractice: async (courseId, practiceId) => {
       await fetchJson(`/api/assignments/${practiceId}`, { method: "DELETE" });
       const refreshed = await fetchCoursePractices(courseId);
@@ -305,6 +280,8 @@ export function createAppRuntime({ coursesDispatch, coursesState, routeKind, use
       const rows = await fetchJson(`/api/instructor/assignments/${id}/submissions?summary=true`);
       return Array.isArray(rows) ? rows : [];
     },
+    getCourseAssignments: fetchCourseAssignments,
+    getCoursePractices: fetchCoursePractices,
     getAssignmentQuestions: async (assignmentId) => {
       const id = Number(assignmentId);
       if (!Number.isInteger(id) || id <= 0) return [];

@@ -11,7 +11,7 @@ import {
   DialogActions,
   TextField,
 } from "@mui/material";
-import { Plus } from "lucide-react";
+import { Import, Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import {
   calculateAssignmentAverage,
@@ -24,6 +24,7 @@ import AssignmentContextMenu from "../../components/ui/AssignmentContextMenu";
 import ClasswideExtensionDialog from "../../components/ui/assignments/ClasswideExtensionDialog";
 import AssignmentExtensionsDialog from "../../components/ui/assignments/AssignmentExtensionsDialog";
 import AssignmentSubmissionsDialog from "../../components/ui/assignments/AssignmentSubmissionsDialog";
+import ImportAssignmentDialog from "../../components/ui/assignments/ImportAssignmentDialog";
 import { sortAssignmentsBySubchapter } from "../../utils/assignmentSort.js";
 import {
   getStatusColor,
@@ -31,6 +32,7 @@ import {
   enhanceItems,
 } from "../../utils/assignmentStatus";
 import { useAppRuntime } from "../../hooks/useAppRuntime.js";
+import { hasInstructorAccess } from "../../utils/auth.js";
 import {
   getCurrentEasternDate,
   toEasternIso,
@@ -54,6 +56,7 @@ export default function InstructorAssignments() {
     courseActions,
     assignmentPath,
     isSandbox,
+    user,
   } = useAppRuntime();
   const { activeCourseId, assignmentsByCourse, gradebookByCourse, courses } = courseState;
   const navigate = useNavigate();
@@ -85,9 +88,11 @@ export default function InstructorAssignments() {
   const [classwideError, setClasswideError] = useState("");
   const [submissionsAssignment, setSubmissionsAssignment] = useState(null);
   const [submissionsOpen, setSubmissionsOpen] = useState(false);
+  const [importOpen, setImportOpen] = useState(false);
 
   // Get current course data
   const activeCourse = courses.find((c) => c.id === activeCourseId);
+  const canImport = !isSandbox && hasInstructorAccess(user, activeCourse?.role);
   const assignments = sortAssignmentsBySubchapter(assignmentsByCourse[activeCourseId] || []);
   const gradebook = gradebookByCourse[activeCourseId] || [];
   const gradebookStudentsOnly = excludeNonStudents(gradebook);
@@ -353,14 +358,34 @@ export default function InstructorAssignments() {
             {activeCourse?.code} - Create and manage course assignments
           </Typography>
         </Box>
-        <Button
-          variant="contained"
-          startIcon={<Plus size={20} />}
-          onClick={handleCreateOpen}
-          sx={{ width: { xs: "100%", sm: "auto" } }}
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: { xs: "column", sm: "row" },
+            gap: 1,
+            width: { xs: "100%", sm: "auto" },
+          }}
         >
-          Create Assignment
-        </Button>
+          {canImport && (
+            <Button
+              variant="outlined"
+              startIcon={<Import size={20} />}
+              onClick={(event) => {
+                event.currentTarget.blur();
+                setImportOpen(true);
+              }}
+            >
+              Import Assignment
+            </Button>
+          )}
+          <Button
+            variant="contained"
+            startIcon={<Plus size={20} />}
+            onClick={handleCreateOpen}
+          >
+            Create Assignment
+          </Button>
+        </Box>
       </Box>
 
       {/* Table */}
@@ -408,6 +433,10 @@ export default function InstructorAssignments() {
         // keep the assignment so the title stays put during the close animation
         onClose={() => setSubmissionsOpen(false)}
       />
+
+      {canImport && (
+        <ImportAssignmentDialog open={importOpen} onClose={() => setImportOpen(false)} />
+      )}
 
       {/* Create Dialog */}
       <AssignmentFormDialog
