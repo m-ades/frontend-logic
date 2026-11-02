@@ -78,7 +78,7 @@ export default function LineCitationKeypad({ open, onInsert, onBackspace, onDone
         borderTopRightRadius: 16,
       }}
     >
-      <Stack spacing={0.75} sx={{ '@media (max-height: 480px)': { gap: 0.5 } }}>
+      <Stack spacing={0.75} useFlexGap sx={{ '@media (max-height: 480px)': { gap: 0.5 } }}>
         <Box role="group" aria-label="Digits" sx={mobileKeyWellSx('letters')}>
           <Stack spacing={0.5}>
             {DIGIT_ROWS.map((row) => (
