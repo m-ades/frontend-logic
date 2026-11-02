@@ -87,8 +87,8 @@ export default function ProofEditor({
 
   if (!proof) return null
 
-  // fullscreen overlay: mobile only (non-mobile has no fullscreen option)
-  const fullScreenOverlay = isMobile && fullScreenOpen && typeof document !== 'undefined' && createPortal(
+  // fullscreen overlay: phones only, same check that opens it
+  const fullScreenOverlay = isPhone && fullScreenOpen && typeof document !== 'undefined' && createPortal(
     <Box
       sx={{
         position: 'fixed',
