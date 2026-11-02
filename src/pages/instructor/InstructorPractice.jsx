@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { Box, Typography, Button, Alert } from "@mui/material";
 import PsychologyIcon from "@mui/icons-material/Psychology";
-import { Plus } from "lucide-react";
+import { Import, Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import AssignmentTable from "../../components/ui/AssignmentTable";
 import AssignmentFormDialog from "../../components/ui/AssignmentFormDialog";
 import AssignmentContextMenu from "../../components/ui/AssignmentContextMenu";
+import ImportAssignmentDialog from "../../components/ui/assignments/ImportAssignmentDialog";
 import { sortAssignmentsBySubchapter } from "../../utils/assignmentSort.js";
 import {
   getStatusColor,
@@ -13,6 +14,7 @@ import {
   enhanceItems,
 } from "../../utils/assignmentStatus";
 import { useAppRuntime } from "../../hooks/useAppRuntime.js";
+import { hasInstructorAccess } from "../../utils/auth.js";
 
 const INITIAL_FORM_DATA = {
   name: "",
@@ -34,6 +36,8 @@ export default function InstructorPractice() {
     courseActions,
     assignmentPath,
     practicePath,
+    isSandbox,
+    user,
   } = useAppRuntime();
   const { activeCourseId, practicesByCourse, courses } = courseState;
   const navigate = useNavigate();
@@ -45,9 +49,11 @@ export default function InstructorPractice() {
   const [menuAnchor, setMenuAnchor] = useState(null);
   const [menuPractice, setMenuPractice] = useState(null);
   const [formData, setFormData] = useState(INITIAL_FORM_DATA);
+  const [importOpen, setImportOpen] = useState(false);
 
   // Get current course data
   const activeCourse = courses.find((c) => c.id === activeCourseId);
+  const canImport = !isSandbox && hasInstructorAccess(user, activeCourse?.role);
   const practices = sortAssignmentsBySubchapter(practicesByCourse[activeCourseId] || []);
   const enhancedPractices = enhanceItems(practices, activeCourse, [], true);
 
@@ -196,14 +202,34 @@ export default function InstructorPractice() {
             towards grades
           </Typography>
         </Box>
-        <Button
-          variant="contained"
-          startIcon={<Plus size={20} />}
-          onClick={handleCreateOpen}
-          sx={{ width: { xs: "100%", sm: "auto" } }}
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: { xs: "column", sm: "row" },
+            gap: 1,
+            width: { xs: "100%", sm: "auto" },
+          }}
         >
-          Create Practice
-        </Button>
+          {canImport && (
+            <Button
+              variant="outlined"
+              startIcon={<Import size={20} />}
+              onClick={(event) => {
+                event.currentTarget.blur();
+                setImportOpen(true);
+              }}
+            >
+              Import Practice
+            </Button>
+          )}
+          <Button
+            variant="contained"
+            startIcon={<Plus size={20} />}
+            onClick={handleCreateOpen}
+          >
+            Create Practice
+          </Button>
+        </Box>
       </Box>
 
       {/* Table */}
@@ -241,6 +267,10 @@ export default function InstructorPractice() {
         onDuplicate={handleDuplicate}
         onDelete={handleDelete}
       />
+
+      {canImport && (
+        <ImportAssignmentDialog open={importOpen} onClose={() => setImportOpen(false)} kind="practice" />
+      )}
 
       {/* Create Dialog */}
       <AssignmentFormDialog
