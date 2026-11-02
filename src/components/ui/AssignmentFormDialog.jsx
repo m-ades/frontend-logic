@@ -31,8 +31,14 @@ export default function AssignmentFormDialog({
   const isCreate = mode === "create";
   const hasPublishDate = Boolean(formData.publishDate);
   const publication = hasPublishDate ? buildPublicationPayload(formData) : null;
-  const hasValidPublishTime = !hasPublishDate || publication !== null;
-  const hasFutureSchedule = publication?.is_locked === true;
+  const publishTimeError = !hasPublishDate
+    ? undefined
+    : !publication
+    ? "Choose an unambiguous New York time"
+    : !publication.is_locked
+    ? "This time has already passed"
+    : undefined;
+  const hasValidPublishTime = !publishTimeError;
   const hasValidDueTime = !formData.dueDate || Boolean(toEasternIso(
     formData.dueDate,
     formData.dueTime || "23:59"
@@ -96,139 +102,40 @@ export default function AssignmentFormDialog({
             />
           </Stack>
 
-          <Box>
-            <Typography
-              variant="subtitle2"
-              color="text.secondary"
-              sx={{ mb: 1 }}
-            >
-              Scheduled publication
-            </Typography>
-            <Stack direction="row" spacing={2}>
-              <TextField
-                label="Date"
-                type="date"
-                fullWidth
-                value={formData.publishDate || ""}
-                onChange={(e) => {
-                  const publishDate = e.target.value;
-                  const publishTime = formData.publishTime || "00:00";
-                  const nextPublication = publishDate
-                    ? buildPublicationPayload({ publishDate, publishTime })
-                    : null;
-                  setFormData({
-                    ...formData,
-                    publishDate,
-                    ...(nextPublication ? { isLocked: nextPublication.is_locked } : {}),
-                  });
-                }}
-                InputLabelProps={{ shrink: true }}
-              />
-              <TextField
-                label="Time"
-                type="time"
-                fullWidth
-                value={formData.publishTime || "00:00"}
-                error={!hasValidPublishTime}
-                helperText={!hasValidPublishTime ? "Choose an unambiguous New York time" : undefined}
-                onChange={(e) => {
-                  const publishTime = e.target.value;
-                  const nextPublication = formData.publishDate
-                    ? buildPublicationPayload({ publishDate: formData.publishDate, publishTime })
-                    : null;
-                  setFormData({
-                    ...formData,
-                    publishTime,
-                    ...(nextPublication ? { isLocked: nextPublication.is_locked } : {}),
-                  });
-                }}
-                InputLabelProps={{ shrink: true }}
-              />
-            </Stack>
-            <Typography
-              variant="caption"
-              color="text.secondary"
-              sx={{ mt: 0.5, display: "block" }}
-            >
-              Optional New York time
-            </Typography>
-          </Box>
-
-          <Box>
-            <Typography
-              variant="subtitle2"
-              color="text.secondary"
-              sx={{ mb: 1 }}
-            >
-              {isPractice ? "Due Date & Time (Optional)" : "Due Date & Time"}
-            </Typography>
-            <Stack direction="row" spacing={2}>
-              <TextField
-                label="Date"
-                type="date"
-                fullWidth
-                value={formData.dueDate}
-                onChange={(e) =>
-                  setFormData({ ...formData, dueDate: e.target.value })
-                }
-                InputLabelProps={{ shrink: true }}
-              />
-              <TextField
-                label="Time"
-                type="time"
-                fullWidth
-                value={formData.dueTime || "23:59"}
-                error={!hasValidDueTime}
-                helperText={!hasValidDueTime ? "Choose an unambiguous New York time" : undefined}
-                onChange={(e) =>
-                  setFormData({ ...formData, dueTime: e.target.value })
-                }
-                InputLabelProps={{ shrink: true }}
-              />
-            </Stack>
-            {isPractice && (
+          {!isPractice && (
+            <Box>
               <Typography
-                variant="caption"
+                variant="subtitle2"
                 color="text.secondary"
-                sx={{ mt: 0.5, display: "block" }}
+                sx={{ mb: 1 }}
               >
-                Practice assignments can be completed after due date
+                Due Date & Time
               </Typography>
-            )}
-          </Box>
-
-          {isPractice && (
-            <>
-              <FormControlLabel
-                control={
-                  <Switch
-                    checked={formData.allowRetakes}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        allowRetakes: e.target.checked,
-                      })
-                    }
-                  />
-                }
-                label="Allow unlimited retakes"
-              />
-
-              <FormControlLabel
-                control={
-                  <Switch
-                    checked={formData.showSolutions}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        showSolutions: e.target.checked,
-                      })
-                    }
-                  />
-                }
-                label="Show solutions after attempts exhausted"
-              />
-            </>
+              <Stack direction="row" spacing={2}>
+                <TextField
+                  label="Date"
+                  type="date"
+                  fullWidth
+                  value={formData.dueDate}
+                  onChange={(e) =>
+                    setFormData({ ...formData, dueDate: e.target.value })
+                  }
+                  InputLabelProps={{ shrink: true }}
+                />
+                <TextField
+                  label="Time (New York)"
+                  type="time"
+                  fullWidth
+                  value={formData.dueTime || "23:59"}
+                  error={!hasValidDueTime}
+                  helperText={!hasValidDueTime ? "Choose an unambiguous New York time" : undefined}
+                  onChange={(e) =>
+                    setFormData({ ...formData, dueTime: e.target.value })
+                  }
+                  InputLabelProps={{ shrink: true }}
+                />
+              </Stack>
+            </Box>
           )}
 
           <Box>
@@ -260,19 +167,47 @@ export default function AssignmentFormDialog({
             control={
               <Switch
                 checked={formData.isLocked}
-                disabled={hasFutureSchedule}
-                onChange={(e) => {
-                  const isLocked = e.target.checked;
-                  setFormData({
-                    ...formData,
-                    isLocked,
-                    ...(isLocked ? { publishDate: "", publishTime: "00:00" } : {}),
-                  });
-                }}
+                onChange={(e) => setFormData({
+                  ...formData,
+                  isLocked: e.target.checked,
+                  publishDate: "",
+                  publishTime: "00:00",
+                })}
               />
             }
             label="Lock assignment"
           />
+          {formData.isLocked && (
+            <Box>
+              <Typography
+                variant="subtitle2"
+                color="text.secondary"
+                sx={{ mb: 1 }}
+              >
+                Scheduled Publication (Optional)
+              </Typography>
+              <Stack direction="row" spacing={2}>
+                <TextField
+                  label="Date"
+                  type="date"
+                  fullWidth
+                  value={formData.publishDate || ""}
+                  onChange={(e) => setFormData({ ...formData, publishDate: e.target.value })}
+                  InputLabelProps={{ shrink: true }}
+                />
+                <TextField
+                  label="Time (New York)"
+                  type="time"
+                  fullWidth
+                  value={formData.publishTime || "00:00"}
+                  error={Boolean(publishTimeError)}
+                  helperText={publishTimeError}
+                  onChange={(e) => setFormData({ ...formData, publishTime: e.target.value })}
+                  InputLabelProps={{ shrink: true }}
+                />
+              </Stack>
+            </Box>
+          )}
         </Stack>
       </DialogContent>
       <DialogActions>

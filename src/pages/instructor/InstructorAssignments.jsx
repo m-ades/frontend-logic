@@ -149,7 +149,8 @@ export default function InstructorAssignments() {
 
     setFormData({
       name: assignment.name,
-      publishDate: assignment.publishDate || "",
+      //  locked items keep a schedule
+      publishDate: assignment.isLocked ? assignment.publishDate || "" : "",
       publishTime: assignment.publishTime || "00:00",
       dueDate: assignment.dueDate || getCurrentEasternDate(),
       dueTime: assignment.dueTime || "23:59",
@@ -406,8 +407,8 @@ export default function InstructorAssignments() {
           description: "Create your first assignment to get started",
           buttonText: "Create Assignment",
         }}
-        getStatusColor={(item) => getStatusColor(item, false)}
-        getStatusText={(item) => getStatusText(item, false)}
+        getStatusColor={getStatusColor}
+        getStatusText={getStatusText}
       />
 
       {/* Context Menu */}
