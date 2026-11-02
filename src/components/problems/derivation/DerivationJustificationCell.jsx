@@ -18,7 +18,6 @@ import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
 import ArrowLeftIcon from '@mui/icons-material/ArrowLeft'
 import DerivationFormulaText from './DerivationFormulaText.jsx'
 import LineCitationKeypad from '../../ui/LogicKeyboard/LineCitationKeypad.jsx'
-import { useMobileLogicKeyboardEnabled } from '../../ui/LogicKeyboard/MobileLogicInput.jsx'
 import {
   DERIVATION_CITATION_MIN_WIDTH,
   DERIVATION_JUSTIFICATION_MAX_WIDTH,
@@ -78,6 +77,7 @@ export default function DerivationJustificationCell({
   isPhone,
   line,
   lineIndex,
+  mobileKeyboardEnabled,
   onActivate,
   onCitationChange,
   onCitationCommit,
@@ -126,7 +126,6 @@ export default function DerivationJustificationCell({
   line citations are digits and separators only, so phones get the dedicated
   keypad instead of the native qwerty keyboard (see LineCitationKeypad).
   */
-  const mobileKeyboardEnabled = useMobileLogicKeyboardEnabled()
   const citationKeypadEnabled = isPhone && mobileKeyboardEnabled && !citationsReadOnly
   const [citationKeypadOpen, setCitationKeypadOpen] = useState(false)
   const citationInputRef = useRef(null)

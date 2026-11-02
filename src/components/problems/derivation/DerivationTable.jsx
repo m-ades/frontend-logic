@@ -1370,6 +1370,7 @@ export default function DerivationTable({
                   isPhone={isPhone}
                   line={line}
                   lineIndex={idx}
+                  mobileKeyboardEnabled={mobileLogicKeyboardEnabled}
                   onActivate={() => {
                     if (isDerivationFieldReadOnly(line, 'justification')) return
                     setActiveFormulaIndex(idx)
