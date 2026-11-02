@@ -28,11 +28,33 @@ const DIGIT_ROWS = [
 export const CITATION_RANGE_DASH = '–'
 export const CITATION_SEPARATOR = ', '
 
-export default function LineCitationKeypad({ open, onInsert, onBackspace, onDone }) {
+export default function LineCitationKeypad({ open, inputRef, value, onChange }) {
   if (!open || typeof document === 'undefined') return null
 
   // keep focus (and the caret) in the citation field while a key is pressed
   const hold = (event) => event.preventDefault()
+
+  const replace = (from, to, text) => {
+    const caret = from + text.length
+    onChange(value.slice(0, from) + text + value.slice(to))
+    // the controlled rerender jumps the caret to the end, so put it back
+    requestAnimationFrame(() => inputRef.current?.setSelectionRange(caret, caret))
+  }
+  const selection = () => {
+    const input = inputRef.current
+    const start = input?.selectionStart ?? value.length
+    return [start, input?.selectionEnd ?? start]
+  }
+  const insert = (text) => {
+    const [start, end] = selection()
+    replace(start, end, text)
+  }
+  const backspace = () => {
+    const [start, end] = selection()
+    if (start === end && start === 0) return
+    replace(start === end ? start - 1 : start, end, '')
+  }
+  const done = () => inputRef.current?.blur()
 
   const key = (label, ariaLabel, onClick, kind = 'letter', sx) => (
     <Button
@@ -83,7 +105,7 @@ export default function LineCitationKeypad({ open, onInsert, onBackspace, onDone
           <Stack spacing={0.5}>
             {DIGIT_ROWS.map((row) => (
               <Box key={row.join('')} sx={mobileKeyGridSx(5)}>
-                {row.map((digit) => key(digit, `Insert ${digit}`, () => onInsert(digit)))}
+                {row.map((digit) => key(digit, `Insert ${digit}`, () => insert(digit)))}
               </Box>
             ))}
           </Stack>
@@ -91,21 +113,21 @@ export default function LineCitationKeypad({ open, onInsert, onBackspace, onDone
 
         <Box role="group" aria-label="Separators and editing" sx={mobileKeyWellSx('nav')}>
           <Box sx={mobileKeyGridSx(4)}>
-            {key(',', 'Insert comma separator', () => onInsert(CITATION_SEPARATOR), 'nav')}
-            {key(CITATION_RANGE_DASH, 'Insert range dash', () => onInsert(CITATION_RANGE_DASH), 'nav')}
+            {key(',', 'Insert comma separator', () => insert(CITATION_SEPARATOR), 'nav')}
+            {key(CITATION_RANGE_DASH, 'Insert range dash', () => insert(CITATION_RANGE_DASH), 'nav')}
             <Button
               type="button"
               variant="text"
               disableRipple
               disableElevation
               onMouseDown={hold}
-              onClick={onBackspace}
+              onClick={backspace}
               aria-label="Backspace"
               sx={getMobileKeySx('backspace')}
             >
               <BackspaceOutlined fontSize="small" />
             </Button>
-            {key('Done', 'Close line number keyboard', onDone, 'constant')}
+            {key('Done', 'Close line number keyboard', done, 'constant')}
           </Box>
         </Box>
       </Stack>

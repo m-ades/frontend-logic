@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import {
   Badge,
   Chip,
@@ -129,47 +129,9 @@ export default function DerivationJustificationCell({
   const citationKeypadEnabled = isPhone && mobileKeyboardEnabled && !citationsReadOnly
   const [citationKeypadOpen, setCitationKeypadOpen] = useState(false)
   const citationInputRef = useRef(null)
-  const citationOwnerRef = providedPart === 'citations' ? undefined : registerInput
-  const setCitationInputRef = useCallback((node) => {
+  const setCitationInputRef = (node) => {
     citationInputRef.current = node
-    if (typeof citationOwnerRef === 'function') citationOwnerRef(node)
-    else if (citationOwnerRef) citationOwnerRef.current = node
-  }, [citationOwnerRef])
-
-  // edits go through the caret so a correction mid-citation lands where it should
-  const citationSelection = () => {
-    const input = citationInputRef.current
-    const text = citationText ?? ''
-    const start = input?.selectionStart ?? text.length
-    const end = input?.selectionEnd ?? start
-    return { text, start, end }
-  }
-
-  const restoreCaret = (position) => {
-    requestAnimationFrame(() => {
-      const input = citationInputRef.current
-      if (!input) return
-      input.setSelectionRange(position, position)
-    })
-  }
-
-  const handleCitationKeyInsert = (insert) => {
-    const { text, start, end } = citationSelection()
-    onCitationChange(text.slice(0, start) + insert + text.slice(end))
-    restoreCaret(start + insert.length)
-  }
-
-  const handleCitationKeyBackspace = () => {
-    const { text, start, end } = citationSelection()
-    if (start === end && start === 0) return
-    const from = start === end ? start - 1 : start
-    onCitationChange(text.slice(0, from) + text.slice(end))
-    restoreCaret(from)
-  }
-
-  const closeCitationKeypad = () => {
-    setCitationKeypadOpen(false)
-    citationInputRef.current?.blur()
+    if (providedPart !== 'citations') registerInput?.(node)
   }
   const ruleFieldSize = useRuleDropdown ? { ...growWithText(ruleWidth), ...phoneShrink } : hugTextSize
   const citationText = citationDraft ?? formatJustificationLines(line.justification)
@@ -413,9 +375,9 @@ export default function DerivationJustificationCell({
         // a rotation can widen the viewport past the phone breakpoint while the
         // keypad is up; drop it rather than leave it over a native-keyboard field
         open={citationKeypadOpen && citationKeypadEnabled}
-        onInsert={handleCitationKeyInsert}
-        onBackspace={handleCitationKeyBackspace}
-        onDone={closeCitationKeypad}
+        inputRef={citationInputRef}
+        value={citationText}
+        onChange={onCitationChange}
       />
     </TableCell>
   )
