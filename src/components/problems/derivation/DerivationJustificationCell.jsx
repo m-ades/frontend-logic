@@ -1,3 +1,4 @@
+import { useRef, useState } from 'react'
 import {
   Badge,
   Chip,
@@ -16,6 +17,7 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle'
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
 import ArrowLeftIcon from '@mui/icons-material/ArrowLeft'
 import DerivationFormulaText from './DerivationFormulaText.jsx'
+import LineCitationKeypad from '../../ui/LogicKeyboard/LineCitationKeypad.jsx'
 import {
   DERIVATION_CITATION_MIN_WIDTH,
   DERIVATION_JUSTIFICATION_MAX_WIDTH,
@@ -75,6 +77,7 @@ export default function DerivationJustificationCell({
   isPhone,
   line,
   lineIndex,
+  mobileKeyboardEnabled,
   onActivate,
   onCitationChange,
   onCitationCommit,
@@ -118,6 +121,15 @@ export default function DerivationJustificationCell({
   const phoneShrink = isPhone && isFullScreen ? { minWidth: 0, flex: '1 1 auto' } : null
   // typed split fields hug their text so the pair reads like one typed justification
   const citationFieldSize = useRuleDropdown ? { ...citationSize, ...phoneShrink } : hugTextSize
+
+  // citations are digits and separators only, so phones get a keypad instead of qwerty
+  const citationKeypadEnabled = isPhone && mobileKeyboardEnabled && !citationsReadOnly
+  const [citationKeypadOpen, setCitationKeypadOpen] = useState(false)
+  const citationInputRef = useRef(null)
+  const setCitationInputRef = (node) => {
+    citationInputRef.current = node
+    if (providedPart !== 'citations') registerInput?.(node)
+  }
   const ruleFieldSize = useRuleDropdown ? { ...growWithText(ruleWidth), ...phoneShrink } : hugTextSize
   const citationText = citationDraft ?? formatJustificationLines(line.justification)
   const typedPlaceholder = lineIndex === premisesCount
@@ -187,20 +199,28 @@ export default function DerivationJustificationCell({
                   placeholder="Line(s)"
                   value={citationText}
                   data-text={citationText || 'Line(s)'}
-                  onFocus={onActivate}
+                  onFocus={(event) => {
+                    onActivate?.(event)
+                    if (citationKeypadEnabled) setCitationKeypadOpen(true)
+                  }}
                   onPointerDown={requestFullScreen}
                   onChange={(event) => onCitationChange(event.target.value)}
                   onKeyDown={onKeyDown}
-                  onBlur={(event) => onCitationCommit(event.target.value)}
+                  onBlur={(event) => {
+                    setCitationKeypadOpen(false)
+                    onCitationCommit(event.target.value)
+                  }}
                   InputProps={{ disableUnderline: useRuleDropdown || citationsReadOnly, readOnly: citationsReadOnly }}
                   inputProps={{
                     autoComplete: 'off',
                     size: 1,
+                    // keeps the native keyboard down while the keypad is in charge
+                    inputMode: citationKeypadEnabled ? 'none' : undefined,
                     'aria-label': providedPart === 'citations'
                       ? `Provided line numbers for line ${lineIndex + 1}`
                       : `Referenced line numbers for line ${lineIndex + 1}`,
                   }}
-                  inputRef={providedPart === 'citations' ? undefined : registerInput}
+                  inputRef={setCitationInputRef}
                   sx={{
                     order: citationOrder,
                     ...citationFieldSize,
@@ -348,6 +368,13 @@ export default function DerivationJustificationCell({
           </Stack>
         </Stack>
       )}
+      <LineCitationKeypad
+        // closes if a rotation leaves the phone layout while it's up
+        open={citationKeypadOpen && citationKeypadEnabled}
+        inputRef={citationInputRef}
+        value={citationText}
+        onChange={onCitationChange}
+      />
     </TableCell>
   )
 }
