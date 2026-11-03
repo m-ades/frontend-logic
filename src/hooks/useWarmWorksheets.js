@@ -1,6 +1,6 @@
 import { useQueries } from '@tanstack/react-query'
 import { fetchJson, getActiveUserId } from '@/utils/api.js'
-import { draftSavesSettled } from '@/hooks/useproofstate.js'
+import { savesSettled } from '@/utils/savesInFlight.js'
 
 // short since saved answers can change on another device after a prefetch
 const WORKSHEET_FRESH_MS = 60 * 1000
@@ -8,8 +8,8 @@ const WORKSHEET_FRESH_MS = 60 * 1000
 export const worksheetQuery = (assignmentId, userId) => ({
   queryKey: ['worksheet', assignmentId, userId],
   queryFn: async () => {
-    // a draft still saving from a visit just left has to land before it is read back
-    await draftSavesSettled()
+    // a draft or check still saving from a visit just left has to land before it is read back
+    await savesSettled()
     const [detail, drafts, submissions] = await Promise.all([
       fetchJson(`/api/assignments/${assignmentId}?userId=${userId}`),
       // saved work is best effort so a failed load opens blank

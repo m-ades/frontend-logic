@@ -1,12 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { fetchJson, getActiveUserId } from '../utils/api.js'
-
-// draft saves still on their way so a fresh load of the same work can wait for them
-const draftSavesInFlight = new Set()
-
-export function draftSavesSettled() {
-  return Promise.allSettled(draftSavesInFlight)
-}
+import { trackSave } from '../utils/savesInFlight.js'
 
 export function useProofState({ userId = getActiveUserId() } = {}) {
   const [savedProofStates, setSavedProofStates] = useState({})
@@ -24,7 +18,7 @@ export function useProofState({ userId = getActiveUserId() } = {}) {
       delete saveTimersRef.current[assignmentQuestionId]
     }
     pendingDraftsRef.current.delete(assignmentQuestionId)
-    const save = fetchJson('/api/assignment-drafts', {
+    return trackSave(fetchJson('/api/assignment-drafts', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -32,11 +26,7 @@ export function useProofState({ userId = getActiveUserId() } = {}) {
         user_id: userId,
         draft_data: draftData,
       }),
-    })
-    draftSavesInFlight.add(save)
-    const forget = () => draftSavesInFlight.delete(save)
-    save.then(forget, forget)
-    return save
+    }))
   }
 
   const scheduleDraftSave = (assignmentQuestionId, draftData) => {
