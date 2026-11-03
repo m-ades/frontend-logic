@@ -1,6 +1,7 @@
 import { createContext, useContext, useReducer } from "react";
 import { fetchJson, getStoredUser } from "../utils/api.js";
 import { queryClient } from "../queryClient.js";
+import { draftSavesSettled } from "../hooks/useproofstate.js";
 import { DEFAULT_LOGIC_SYSTEM, normalizeLogicSystem } from "../lib/logicSystems.js";
 import { sortAssignmentsBySubchapter } from "../utils/assignmentSort.js";
 import { hasInstructorAccess } from "../utils/auth.js";
@@ -162,6 +163,8 @@ const WORKSHEET_FRESH_MS = 60 * 1000;
 export const worksheetQuery = (assignmentId, userId) => ({
   queryKey: ["worksheet", assignmentId, userId],
   queryFn: async () => {
+    // a draft still saving from a visit just left has to land before it is read back
+    await draftSavesSettled();
     const [detail, drafts, submissions] = await Promise.all([
       fetchJson(`/api/assignments/${assignmentId}?userId=${userId}`),
       // saved work is best effort so a failed load opens blank
