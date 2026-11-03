@@ -1,5 +1,6 @@
 import { Navigate, useNavigate, useLocation } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { Alert, Button } from "@mui/material";
 import StudentSidebarStructure from "./StudentSidebarStructure.jsx";
 import InstructorSidebarStructure from "./InstructorSidebarStructure.jsx";
@@ -10,9 +11,12 @@ import {
   initializeCourses,
   loadCourseData,
   resetCourses,
+  courseAssignmentsQuery,
+  worksheetQuery,
 } from "../../context/CoursesContext";
-import { clearStoredUser, fetchJson } from "../../utils/api.js";
+import { clearStoredUser, fetchJson, getActiveUserId } from "../../utils/api.js";
 import { isInstructorRole } from "../../utils/auth.js";
+import { getUpcomingAssignments } from "../../utils/assignmentStatus.js";
 import { AppRuntimeProvider } from "../../context/AppRuntimeContext.jsx";
 import { createAppRuntime } from "../../runtime/appRuntime.js";
 import ShellFrame from "./ShellFrame.jsx";
@@ -60,6 +64,8 @@ function AppShell({ children }) {
   const courseStatus = activeCourseId ? coursesState.courseStatus[activeCourseId] : "loaded";
   const [isAccountSettingsOpen, setIsAccountSettingsOpen] = useState(false);
   const [textSize, setTextSize] = useState(readTextSize);
+  const queryClient = useQueryClient();
+  const prefetchedCourseIdRef = useRef(null);
 
   useEffect(() => {
     if (user?.role && user?.id && !initialized) {
@@ -94,6 +100,18 @@ function AppShell({ children }) {
   const logicSystem = activeCourse?.logicSystem ?? activeCourse?.logic_system;
 
   const routeKind = isInstructorRoute ? "instructor" : "student";
+
+  // students mostly land and head for their next assignment so warm it once per class
+  useEffect(() => {
+    if (routeKind !== "student" || courseStatus !== "loaded" || !activeCourseId) return;
+    if (prefetchedCourseIdRef.current === activeCourseId) return;
+    prefetchedCourseIdRef.current = activeCourseId;
+    const assignments = queryClient.getQueryData(courseAssignmentsQuery(activeCourseId).queryKey);
+    const [nextAssignment] = getUpcomingAssignments(assignments ?? []);
+    if (nextAssignment) {
+      queryClient.prefetchQuery(worksheetQuery(nextAssignment.id, getActiveUserId()));
+    }
+  }, [routeKind, courseStatus, activeCourseId, queryClient]);
 
   const runtimeValue = createAppRuntime({
     coursesDispatch,

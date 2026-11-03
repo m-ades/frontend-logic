@@ -8,6 +8,7 @@ import { formatDateTime } from '../utils/formatting.js'
 import { parseDueDateAsEastern } from '../utils/easternTime.js'
 import { compareSubchapterLabels, sortAssignmentsBySubchapter } from '../utils/assignmentSort.js'
 import { formatChapterLabel, formatSubchapterLabel } from '../utils/chapterLabels.js'
+import { getUpcomingAssignments } from '../utils/assignmentStatus.js'
 import { getActiveUserId } from '../utils/api.js'
 import { courseAssignmentsQuery } from '../context/CoursesContext.jsx'
 import { useAppRuntime } from '../hooks/useAppRuntime.js'
@@ -140,23 +141,15 @@ export default function Assignments() {
     [sandbox, courseIdForApi, gradedAssignments, logicSystem]
   )
 
-  const completedAssignments = useMemo(() => {
-    const ids = gradedAssignments
-      .map((assignment) => {
-        const completedFlag =
-          assignment.completed === true ||
-          assignment.completed === 'true' ||
-          assignment.completed === 1 ||
-          assignment.completed === 't'
-        if (completedFlag) return assignment.id
-        const questionCount = Number(assignment.question_count) || 0
-        const answeredCount = Number(assignment.answered_count) || 0
-        if (questionCount === 0) return null
-        return answeredCount === questionCount ? assignment.id : null
-      })
-      .filter(Boolean)
-    return new Set(ids)
-  }, [gradedAssignments])
+  const completedAssignments = useMemo(
+    () => new Set(gradedAssignments.filter((assignment) => assignment.completed).map((assignment) => assignment.id)),
+    [gradedAssignments]
+  )
+
+  const upcomingAssignments = useMemo(
+    () => new Set(getUpcomingAssignments(gradedAssignments).map((assignment) => assignment.id)),
+    [gradedAssignments]
+  )
 
   const getCompletionStatus = useCallback(
     (activityId) => completedAssignments.has(activityId),
@@ -176,24 +169,10 @@ export default function Assignments() {
   }, [])
 
   const filteredStructure = useMemo(() => {
-    const now = new Date()
-    const startOfDay = new Date(now)
-    startOfDay.setHours(0, 0, 0, 0)
-    const twoWeeksOut = new Date(startOfDay)
-    twoWeeksOut.setDate(twoWeeksOut.getDate() + 14)
     const predicate = (activity) => {
       switch (tabValue) {
-        case 0: {
-          if (activity.isLocked) return false
-          if (!activity.dueDate) return false
-          const deadline = parseDueDateAsEastern(activity.dueDate, activity.dueTime)
-          if (!deadline) return false
-          return (
-            deadline >= startOfDay &&
-            deadline <= twoWeeksOut &&
-            !getCompletionStatus(activity.id)
-          )
-        }
+        case 0:
+          return upcomingAssignments.has(activity.id)
         case 2:
           return getCompletionStatus(activity.id)
         default:
@@ -201,7 +180,7 @@ export default function Assignments() {
       }
     }
     return filterStructure(courseStructure, predicate)
-  }, [courseStructure, filterStructure, getCompletionStatus, tabValue])
+  }, [courseStructure, filterStructure, getCompletionStatus, tabValue, upcomingAssignments])
 
   const handleTabChange = (e, newValue) => {
     setTabValue(newValue)
