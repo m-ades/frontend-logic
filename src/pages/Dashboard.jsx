@@ -131,6 +131,8 @@ export default function Dashboard() {
   const isLoadingAnalytics = sandbox
     ? false
     : ((analyticsQuery.isPending && !!courseIdForApi) || (gradebookQuery.isPending && !!courseIdForApi))
+  // upcoming only needs the student request so it skips waiting on the slower class wide one
+  const isLoadingUpcoming = sandbox ? false : (analyticsQuery.isPending && !!courseIdForApi)
   const analyticsError = sandbox ? false : analyticsQuery.isError
   const gradebookError = sandbox ? false : gradebookQuery.isError
 
@@ -613,11 +615,11 @@ export default function Dashboard() {
                 <Typography variant="body2" color="text.secondary">
                   Unable to load upcoming assignments.
                 </Typography>
-              ) : !isLoadingAnalytics && assignmentStats.upcomingList.length === 0 ? (
+              ) : !isLoadingUpcoming && assignmentStats.upcomingList.length === 0 ? (
                 <Typography variant="body2" color="text.secondary">
                   No upcoming assignments
                 </Typography>
-              ) : isLoadingAnalytics ? (
+              ) : isLoadingUpcoming ? (
                 <LinearProgress sx={{ mt: 1 }} />
               ) : (
                 assignmentStats.upcomingList.map((assignment) => (
