@@ -35,6 +35,7 @@ import LeaderboardIcon from '@mui/icons-material/Leaderboard'
 import { formatDateTime } from '../utils/formatting.js'
 import { API_CONFIG, fetchJson, getActiveUserId } from '../utils/api.js'
 import { isInstructorRole } from '../utils/auth.js'
+import { gradebookSummaryQuery, studentDashboardQuery } from '../context/CoursesContext.jsx'
 import ThemedCard from '../components/ui/ThemedCard.jsx'
 import { useAppRuntime } from '../hooks/useAppRuntime.js'
 
@@ -116,16 +117,12 @@ export default function Dashboard() {
   const userId = sandbox ? runtimeUser.id : getActiveUserId()
 
   const analyticsQuery = useQuery({
-    queryKey: ['analytics-student', userId, courseIdForApi],
-    queryFn: () =>
-      fetchJson(`/api/analytics/student-dashboard?userId=${userId}&courseId=${courseIdForApi}`),
+    ...studentDashboardQuery(userId, courseIdForApi),
     enabled: !sandbox && !!courseIdForApi && !!userId,
   })
 
   const gradebookQuery = useQuery({
-    queryKey: ['gradebook-summary', courseIdForApi],
-    queryFn: () =>
-      fetchJson(`/api/analytics/gradebook-summary?courseId=${courseIdForApi}`).catch(() => null),
+    ...gradebookSummaryQuery(courseIdForApi),
     enabled: !sandbox && !!courseIdForApi,
   })
 

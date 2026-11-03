@@ -146,6 +146,16 @@ export const courseAssignmentsQuery = (courseId) => ({
   queryFn: () => fetchJson(`/api/courses/${courseId}/assignments`),
 });
 
+export const studentDashboardQuery = (userId, courseId) => ({
+  queryKey: ["analytics-student", userId, courseId],
+  queryFn: () => fetchJson(`/api/analytics/student-dashboard?userId=${userId}&courseId=${courseId}`),
+});
+
+export const gradebookSummaryQuery = (courseId) => ({
+  queryKey: ["gradebook-summary", courseId],
+  queryFn: () => fetchJson(`/api/analytics/gradebook-summary?courseId=${courseId}`).catch(() => null),
+});
+
 // short since saved answers can change on another device after a prefetch
 const WORKSHEET_FRESH_MS = 60 * 1000;
 
