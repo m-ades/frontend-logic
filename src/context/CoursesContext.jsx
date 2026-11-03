@@ -1,7 +1,6 @@
 import { createContext, useContext, useReducer } from "react";
 import { fetchJson, getStoredUser } from "../utils/api.js";
 import { queryClient } from "../queryClient.js";
-import { draftSavesSettled } from "../hooks/useproofstate.js";
 import { DEFAULT_LOGIC_SYSTEM, normalizeLogicSystem } from "../lib/logicSystems.js";
 import { sortAssignmentsBySubchapter } from "../utils/assignmentSort.js";
 import { hasInstructorAccess } from "../utils/auth.js";
@@ -155,27 +154,6 @@ export const studentDashboardQuery = (userId, courseId) => ({
 export const gradebookSummaryQuery = (courseId) => ({
   queryKey: ["gradebook-summary", courseId],
   queryFn: () => fetchJson(`/api/analytics/gradebook-summary?courseId=${courseId}`).catch(() => null),
-});
-
-// short since saved answers can change on another device after a prefetch
-const WORKSHEET_FRESH_MS = 60 * 1000;
-
-export const worksheetQuery = (assignmentId, userId) => ({
-  queryKey: ["worksheet", assignmentId, userId],
-  queryFn: async () => {
-    // a draft still saving from a visit just left has to land before it is read back
-    await draftSavesSettled();
-    const [detail, drafts, submissions] = await Promise.all([
-      fetchJson(`/api/assignments/${assignmentId}?userId=${userId}`),
-      // saved work is best effort so a failed load opens blank
-      fetchJson(`/api/assignment-drafts?assignmentId=${assignmentId}`).catch(() => []),
-      fetchJson(`/api/assignments/${assignmentId}/submissions?userId=${userId}`).catch(() => []),
-    ]);
-    return { detail, drafts, submissions };
-  },
-  staleTime: WORKSHEET_FRESH_MS,
-  // copies kept warm on a page refresh as they go stale so opening one never waits
-  refetchInterval: WORKSHEET_FRESH_MS,
 });
 
 // always refetches but fills the cache the student pages read

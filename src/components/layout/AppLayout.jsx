@@ -1,5 +1,5 @@
 import { Navigate, useNavigate, useLocation } from "react-router-dom";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Alert, Button } from "@mui/material";
 import StudentSidebarStructure from "./StudentSidebarStructure.jsx";
@@ -64,7 +64,6 @@ function AppShell({ children }) {
   const [isAccountSettingsOpen, setIsAccountSettingsOpen] = useState(false);
   const [textSize, setTextSize] = useState(readTextSize);
   const queryClient = useQueryClient();
-  const prefetchedCourseIdRef = useRef(null);
 
   useEffect(() => {
     if (user?.role && user?.id && !initialized) {
@@ -100,11 +99,9 @@ function AppShell({ children }) {
 
   const routeKind = isInstructorRoute ? "instructor" : "student";
 
-  // once per class a student landing on the dashboard gets its data alongside the course load
+  // a student landing on the dashboard gets its data alongside the course load
   useEffect(() => {
     if (routeKind !== "student" || !activeCourseId || location.pathname !== "/dashboard") return;
-    if (prefetchedCourseIdRef.current === activeCourseId) return;
-    prefetchedCourseIdRef.current = activeCourseId;
     const userId = getActiveUserId();
     queryClient.prefetchQuery(studentDashboardQuery(userId, activeCourseId));
     queryClient.prefetchQuery(gradebookSummaryQuery(activeCourseId));

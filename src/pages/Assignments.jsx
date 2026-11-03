@@ -8,7 +8,6 @@ import { formatDateTime } from '../utils/formatting.js'
 import { parseDueDateAsEastern } from '../utils/easternTime.js'
 import { compareSubchapterLabels, sortAssignmentsBySubchapter } from '../utils/assignmentSort.js'
 import { formatChapterLabel, formatSubchapterLabel } from '../utils/chapterLabels.js'
-import { getUpcomingAssignments } from '../utils/assignmentStatus.js'
 import { getActiveUserId } from '../utils/api.js'
 import { courseAssignmentsQuery } from '../context/CoursesContext.jsx'
 import { useAppRuntime } from '../hooks/useAppRuntime.js'
@@ -147,10 +146,19 @@ export default function Assignments() {
     [gradedAssignments]
   )
 
-  const upcomingAssignments = useMemo(
-    () => new Set(getUpcomingAssignments(gradedAssignments).map((assignment) => assignment.id)),
-    [gradedAssignments]
-  )
+  const upcomingAssignments = useMemo(() => {
+    const startOfDay = new Date()
+    startOfDay.setHours(0, 0, 0, 0)
+    const twoWeeksOut = new Date(startOfDay)
+    twoWeeksOut.setDate(twoWeeksOut.getDate() + 14)
+    return new Set(gradedAssignments
+      .filter((assignment) => {
+        if (assignment.is_locked || assignment.completed) return false
+        const deadline = parseDueDateAsEastern(assignment.due_at ?? assignment.due_date)
+        return deadline && deadline >= startOfDay && deadline <= twoWeeksOut
+      })
+      .map((assignment) => assignment.id))
+  }, [gradedAssignments])
   useWarmWorksheets(sandbox ? [] : [...upcomingAssignments])
 
   const getCompletionStatus = useCallback(

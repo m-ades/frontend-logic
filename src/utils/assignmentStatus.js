@@ -31,29 +31,6 @@ export function getStatusText(item, isPractice = false) {
   return "Active";
 }
 
-// the student upcoming tab, unlocked unfinished work due within two weeks, soonest first
-export function getUpcomingAssignments(assignments) {
-  const startOfDay = new Date();
-  startOfDay.setHours(0, 0, 0, 0);
-  const twoWeeksOut = new Date(startOfDay);
-  twoWeeksOut.setDate(twoWeeksOut.getDate() + 14);
-  return assignments
-    .map((assignment) => ({
-      assignment,
-      deadline: parseDueDateAsEastern(assignment.due_at ?? assignment.due_date),
-    }))
-    .filter(({ assignment, deadline }) => (
-      assignment.kind !== "practice"
-      && !assignment.is_locked
-      && !assignment.completed
-      && deadline
-      && deadline >= startOfDay
-      && deadline <= twoWeeksOut
-    ))
-    .sort((a, b) => a.deadline - b.deadline)
-    .map(({ assignment }) => assignment);
-}
-
 /**
  * Enhance items with calculated data
  * @param {Array} items - Array of assignments or practices
