@@ -8,7 +8,8 @@ import { formatDateTime } from '../utils/formatting.js'
 import { parseDueDateAsEastern } from '../utils/easternTime.js'
 import { compareSubchapterLabels, sortAssignmentsBySubchapter } from '../utils/assignmentSort.js'
 import { formatChapterLabel, formatSubchapterLabel } from '../utils/chapterLabels.js'
-import { fetchJson, getActiveUserId } from '../utils/api.js'
+import { getActiveUserId } from '../utils/api.js'
+import { courseAssignmentsQuery } from '../context/CoursesContext.jsx'
 import { useAppRuntime } from '../hooks/useAppRuntime.js'
 import { useActiveLogicSystem } from '../hooks/useActiveLogicSystem.js'
 
@@ -118,8 +119,7 @@ export default function Assignments() {
   }, [readStoredTab])
 
   const assignmentsQuery = useQuery({
-    queryKey: ['course-assignments', courseIdForApi],
-    queryFn: () => fetchJson(`/api/courses/${courseIdForApi}/assignments`),
+    ...courseAssignmentsQuery(courseIdForApi),
     enabled: !sandbox && !!courseIdForApi,
     refetchOnMount: 'always',
   })
