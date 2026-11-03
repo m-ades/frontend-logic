@@ -13,6 +13,7 @@ import { getActiveUserId } from '../utils/api.js'
 import { courseAssignmentsQuery } from '../context/CoursesContext.jsx'
 import { useAppRuntime } from '../hooks/useAppRuntime.js'
 import { useActiveLogicSystem } from '../hooks/useActiveLogicSystem.js'
+import { useWarmWorksheets } from '../hooks/useWarmWorksheets.js'
 
 const buildCourseStructure = (assignments, sectionTitle, logicSystem) => {
   const chapters = new Map()
@@ -150,6 +151,7 @@ export default function Assignments() {
     () => new Set(getUpcomingAssignments(gradedAssignments).map((assignment) => assignment.id)),
     [gradedAssignments]
   )
+  useWarmWorksheets(sandbox ? [] : [...upcomingAssignments])
 
   const getCompletionStatus = useCallback(
     (activityId) => completedAssignments.has(activityId),

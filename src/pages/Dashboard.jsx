@@ -38,6 +38,7 @@ import { isInstructorRole } from '../utils/auth.js'
 import { gradebookSummaryQuery, studentDashboardQuery } from '../context/CoursesContext.jsx'
 import ThemedCard from '../components/ui/ThemedCard.jsx'
 import { useAppRuntime } from '../hooks/useAppRuntime.js'
+import { useWarmWorksheets } from '../hooks/useWarmWorksheets.js'
 
 const formatPercent = (value) => (value === null || value === undefined ? '—' : `${formatNumber(value)}%`)
 
@@ -363,6 +364,7 @@ export default function Dashboard() {
   }, [analytics.performance.avg_attempt, analytics.submissionCount])
 
   const assignmentStats = analytics.assignments || emptyAnalytics.assignments
+  useWarmWorksheets(sandbox ? [] : assignmentStats.upcomingList.map((assignment) => assignment.id))
 
   const [useFullScale, setUseFullScale] = useState(false)
 

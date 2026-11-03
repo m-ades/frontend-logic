@@ -11,14 +11,11 @@ import {
   initializeCourses,
   loadCourseData,
   resetCourses,
-  courseAssignmentsQuery,
   gradebookSummaryQuery,
   studentDashboardQuery,
-  worksheetQuery,
 } from "../../context/CoursesContext";
 import { clearStoredUser, fetchJson, getActiveUserId } from "../../utils/api.js";
 import { isInstructorRole } from "../../utils/auth.js";
-import { getUpcomingAssignments } from "../../utils/assignmentStatus.js";
 import { AppRuntimeProvider } from "../../context/AppRuntimeContext.jsx";
 import { createAppRuntime } from "../../runtime/appRuntime.js";
 import ShellFrame from "./ShellFrame.jsx";
@@ -103,27 +100,14 @@ function AppShell({ children }) {
 
   const routeKind = isInstructorRoute ? "instructor" : "student";
 
-  // once per class a landing student gets dashboard data alongside the course load, then their next assignment
+  // once per class a student landing on the dashboard gets its data alongside the course load
   useEffect(() => {
-    if (routeKind !== "student" || !activeCourseId) return;
+    if (routeKind !== "student" || !activeCourseId || location.pathname !== "/dashboard") return;
     if (prefetchedCourseIdRef.current === activeCourseId) return;
     prefetchedCourseIdRef.current = activeCourseId;
     const userId = getActiveUserId();
-    const dashboardLoaded = location.pathname === "/dashboard"
-      ? Promise.all([
-        queryClient.prefetchQuery(studentDashboardQuery(userId, activeCourseId)),
-        queryClient.prefetchQuery(gradebookSummaryQuery(activeCourseId)),
-      ])
-      : null;
-    Promise.all([queryClient.ensureQueryData(courseAssignmentsQuery(activeCourseId)), dashboardLoaded])
-      .then(([assignments]) => {
-        const [nextAssignment] = getUpcomingAssignments(assignments);
-        if (nextAssignment) {
-          queryClient.prefetchQuery(worksheetQuery(nextAssignment.id, userId));
-        }
-      })
-      // a failed course load already shows its own error
-      .catch(() => {});
+    queryClient.prefetchQuery(studentDashboardQuery(userId, activeCourseId));
+    queryClient.prefetchQuery(gradebookSummaryQuery(activeCourseId));
   }, [routeKind, activeCourseId, location.pathname, queryClient]);
 
   const runtimeValue = createAppRuntime({

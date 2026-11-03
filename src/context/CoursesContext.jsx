@@ -174,6 +174,8 @@ export const worksheetQuery = (assignmentId, userId) => ({
     return { detail, drafts, submissions };
   },
   staleTime: WORKSHEET_FRESH_MS,
+  // copies kept warm on a page refresh as they go stale so opening one never waits
+  refetchInterval: WORKSHEET_FRESH_MS,
 });
 
 // always refetches but fills the cache the student pages read
