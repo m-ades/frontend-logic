@@ -103,7 +103,7 @@ function AppShell({ children }) {
   useEffect(() => {
     if (routeKind !== "student" || !activeCourseId || location.pathname !== "/dashboard") return;
     const userId = getActiveUserId();
-    queryClient.prefetchQuery(studentDashboardQuery(userId, activeCourseId));
+    queryClient.prefetchQuery({ ...studentDashboardQuery(userId, activeCourseId), retry: 3 });
     queryClient.prefetchQuery(gradebookSummaryQuery(activeCourseId));
   }, [routeKind, activeCourseId, location.pathname, queryClient]);
 
