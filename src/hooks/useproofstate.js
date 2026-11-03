@@ -6,6 +6,7 @@ export function useProofState({ userId = getActiveUserId() } = {}) {
   const [savedProofStates, setSavedProofStates] = useState({})
   const saveTimersRef = useRef({})
   const pendingDraftsRef = useRef(new Map())
+  const unmountedRef = useRef(false)
 
   const initializeSavedProofStates = (initialStates) => {
     setSavedProofStates((prev) => ({ ...prev, ...initialStates }))
@@ -31,6 +32,10 @@ export function useProofState({ userId = getActiveUserId() } = {}) {
 
   const scheduleDraftSave = (assignmentQuestionId, draftData) => {
     if (!assignmentQuestionId) return
+    if (unmountedRef.current) {
+      saveDraftNow(assignmentQuestionId, draftData).catch(() => {})
+      return
+    }
     if (saveTimersRef.current[assignmentQuestionId]) {
       clearTimeout(saveTimersRef.current[assignmentQuestionId])
     }
@@ -44,11 +49,15 @@ export function useProofState({ userId = getActiveUserId() } = {}) {
     }, 500)
   }
 
-  // leaving sends waiting saves now so the next load of this work includes them
-  useEffect(() => () => {
-    pendingDraftsRef.current.forEach((draftData, assignmentQuestionId) => {
-      saveDraftNow(assignmentQuestionId, draftData).catch(() => {})
-    })
+  // leaving sends waiting saves now and editors flush after this so theirs go straight out too
+  useEffect(() => {
+    unmountedRef.current = false
+    return () => {
+      unmountedRef.current = true
+      pendingDraftsRef.current.forEach((draftData, assignmentQuestionId) => {
+        saveDraftNow(assignmentQuestionId, draftData).catch(() => {})
+      })
+    }
   }, [])
 
   const handleProofStateChange = (proofId, state, meta = {}) => {

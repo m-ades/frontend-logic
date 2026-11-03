@@ -112,6 +112,7 @@ export default function SymbolicTranslation({
   const formulaInputRef = useRef(null)
   const hasHydratedRef = useRef(false)
   const saveTimerRef = useRef(null)
+  const pendingSaveRef = useRef(null)
   const lastSavedValueRef = useRef(null)
   const rawPrompt = problem?.prompt || problem?.question_snapshot?.prompt || ''
   const explicitSentence = problem?.sentence || problem?.question_snapshot?.sentence || ''
@@ -163,11 +164,13 @@ export default function SymbolicTranslation({
     if (saveTimerRef.current) {
       clearTimeout(saveTimerRef.current)
     }
-    saveTimerRef.current = setTimeout(() => {
+    pendingSaveRef.current = () => {
+      saveTimerRef.current = null
       if (lastSavedValueRef.current === canonical) return
       lastSavedValueRef.current = canonical
       onStateChange({ ans: canonical })
-    }, 200)
+    }
+    saveTimerRef.current = setTimeout(pendingSaveRef.current, 200)
   }, [normalizeAnswer, onStateChange])
   const applyCanonicalValue = useCallback((value) => {
     if (readOnly) return
@@ -213,7 +216,7 @@ export default function SymbolicTranslation({
   useEffect(() => () => {
     if (saveTimerRef.current) {
       clearTimeout(saveTimerRef.current)
-      saveTimerRef.current = null
+      pendingSaveRef.current()
     }
   }, [])
 
