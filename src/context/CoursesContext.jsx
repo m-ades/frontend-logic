@@ -146,6 +146,23 @@ export const courseAssignmentsQuery = (courseId) => ({
   queryFn: () => fetchJson(`/api/courses/${courseId}/assignments`),
 });
 
+// short since saved answers can change on another device after a prefetch
+const WORKSHEET_FRESH_MS = 60 * 1000;
+
+export const worksheetQuery = (assignmentId, userId) => ({
+  queryKey: ["worksheet", assignmentId, userId],
+  queryFn: async () => {
+    const [detail, drafts, submissions] = await Promise.all([
+      fetchJson(`/api/assignments/${assignmentId}?userId=${userId}`),
+      // saved work is best effort so a failed load opens blank
+      fetchJson(`/api/assignment-drafts?assignmentId=${assignmentId}`).catch(() => []),
+      fetchJson(`/api/assignments/${assignmentId}/submissions?userId=${userId}`).catch(() => []),
+    ]);
+    return { detail, drafts, submissions };
+  },
+  staleTime: WORKSHEET_FRESH_MS,
+});
+
 // always refetches but fills the cache the student pages read
 function fetchCourseAssignmentsList(courseId) {
   return queryClient.fetchQuery({ ...courseAssignmentsQuery(courseId), staleTime: 0 });

@@ -10,9 +10,8 @@ import { useProofState } from '../hooks/useproofstate.js'
 import { useWorksheetMetrics } from '../hooks/useWorksheetMetrics.js'
 import { formatEasternFromIso } from '../utils/easternTime.js'
 import { API_CONFIG, fetchJson, getActiveUserId } from '../utils/api.js'
-import { sortAssignmentsBySubchapter } from '../utils/assignmentSort.js'
 import { displayScoreForProof } from '../utils/problemHelpers.js'
-import { useCoursesState } from '../context/CoursesContext.jsx'
+import { useCoursesState, worksheetQuery } from '../context/CoursesContext.jsx'
 import { useAppRuntime } from '../hooks/useAppRuntime.js'
 import { hasStaffAccess } from '../utils/auth.js'
 import { DEFAULT_LOGIC_SYSTEM, isDerivationProblemType, normalizeLogicSystem } from '../lib/logicSystems.js'
@@ -713,71 +712,46 @@ function RealWorksheetContent() {
   useEffect(() => {
     let isMounted = true
 
-    const loadSavedStates = async (worksheetData) => {
+    const loadSavedStates = (worksheet, drafts, submissions) => {
       const questionIds = new Set()
       const proofMeta = {}
 
-      worksheetData.forEach((worksheet) => {
-        worksheet.proofs.forEach((proof) => {
-          if (proof.questionId) {
-            questionIds.add(proof.questionId)
-            proofMeta[proof.questionId] = proof
-          }
-        })
+      worksheet.proofs.forEach((proof) => {
+        if (proof.questionId) {
+          questionIds.add(proof.questionId)
+          proofMeta[proof.questionId] = proof
+        }
       })
 
-      const worksheetsWithProofs = worksheetData.filter((worksheet) => worksheet.proofs.length)
       const draftMap = new Map()
-      // no await so drafts and submissions load side by side
-      const draftsLoaded = Promise.all(
-        worksheetsWithProofs.map(async (worksheet) => {
-          try {
-            const drafts = await fetchJson(`/api/assignment-drafts?assignmentId=${worksheet.id}`)
-            drafts.forEach((draft) => {
-              if (draft.user_id !== activeUserId) return
-              if (!questionIds.has(draft.assignment_question_id)) return
-              draftMap.set(draft.assignment_question_id, draft.draft_data)
-            })
-          } catch (err) {
-            // ignore draft load errors for now
-          }
-        })
-      )
+      drafts.forEach((draft) => {
+        if (draft.user_id !== activeUserId) return
+        if (!questionIds.has(draft.assignment_question_id)) return
+        draftMap.set(draft.assignment_question_id, draft.draft_data)
+      })
 
       const submissionMap = new Map()
       const correctQuestionIds = new Set()
       const attemptCountMap = new Map()
       const scoreByQuestion = new Map()
-      await Promise.all(
-        worksheetsWithProofs.map(async (worksheet) => {
-          try {
-            const submissions = await fetchJson(
-              `/api/assignments/${worksheet.id}/submissions?userId=${activeUserId}`
-            )
-            submissions.forEach((submission) => {
-              const questionId = Number(submission.assignment_question_id)
-              const existing = submissionMap.get(questionId)
-              if (!existing || new Date(submission.submitted_at) > new Date(existing.submitted_at)) {
-                submissionMap.set(questionId, submission)
-              }
-              if (submission.is_correct) {
-                correctQuestionIds.add(questionId)
-              }
-              const currentAttempt = attemptCountMap.get(questionId) || 0
-              if (submission.attempt > currentAttempt) {
-                attemptCountMap.set(questionId, submission.attempt)
-              }
-              const s = Number(submission.score)
-              if (Number.isFinite(s)) {
-                scoreByQuestion.set(questionId, Math.max(s, scoreByQuestion.get(questionId) ?? 0))
-              }
-            })
-          } catch (err) {
-            // ignore submission load errors for now
-          }
-        })
-      )
-      await draftsLoaded
+      submissions.forEach((submission) => {
+        const questionId = Number(submission.assignment_question_id)
+        const existing = submissionMap.get(questionId)
+        if (!existing || new Date(submission.submitted_at) > new Date(existing.submitted_at)) {
+          submissionMap.set(questionId, submission)
+        }
+        if (submission.is_correct) {
+          correctQuestionIds.add(questionId)
+        }
+        const currentAttempt = attemptCountMap.get(questionId) || 0
+        if (submission.attempt > currentAttempt) {
+          attemptCountMap.set(questionId, submission.attempt)
+        }
+        const s = Number(submission.score)
+        if (Number.isFinite(s)) {
+          scoreByQuestion.set(questionId, Math.max(s, scoreByQuestion.get(questionId) ?? 0))
+        }
+      })
 
       const initialStates = {}
       questionIds.forEach((questionId) => {
@@ -914,32 +888,32 @@ function RealWorksheetContent() {
       return { attemptCountMap, completedProofIds, scoreByQuestion }
     }
 
-    const loadWorksheetDetails = async (assignmentId, assignmentMeta) => {
-    const response = await fetchJson(
-      `/api/assignments/${assignmentId}?userId=${activeUserId}`
-    )
-    const questions = response.questions || []
-    const policy = response.policy || null
-    const assignmentInfo = response.assignment
-      || assignmentMeta
-      || { id: assignmentId, title: 'Assignment' }
-    const originalDueAt = assignmentInfo.due_at ?? assignmentInfo.due_date ?? null
-    const effectiveDueAt = policy?.due_at ?? originalDueAt
-    const worksheet = {
-      id: assignmentInfo.id,
-      title: assignmentInfo.title,
-      kind: assignmentInfo.kind ?? assignmentMeta?.kind,
-      due_at: effectiveDueAt,
-      original_due_at: originalDueAt,
-      policy,
-      isLocked: assignmentInfo.is_locked ?? false,
-      groupQuestionsByType: assignmentInfo.group_questions_by_type ?? false,
-      hasLoadedDetails: true,
-      proofs: questions.map((question, idx) =>
-        mapQuestionToProof(question, assignmentInfo, idx, courseLogicSystem)
-      ),
-    }
-      const { attemptCountMap, completedProofIds, scoreByQuestion } = await loadSavedStates([worksheet])
+    const loadWorksheetDetails = async (assignmentId) => {
+      const query = worksheetQuery(assignmentId, activeUserId)
+      const { detail, drafts, submissions } = await queryClient.fetchQuery(query)
+      // a prefetched copy is single use so coming back later reloads saved answers
+      queryClient.removeQueries({ queryKey: query.queryKey })
+      const assignmentInfo = detail.assignment
+      // another class's assignment would map under this class's logic system
+      if (Number(assignmentInfo?.course_id) !== Number(courseIdForApi)) return null
+      const questions = detail.questions || []
+      const policy = detail.policy || null
+      const originalDueAt = assignmentInfo.due_at ?? assignmentInfo.due_date ?? null
+      const effectiveDueAt = policy?.due_at ?? originalDueAt
+      const worksheet = {
+        id: assignmentInfo.id,
+        title: assignmentInfo.title,
+        kind: assignmentInfo.kind,
+        due_at: effectiveDueAt,
+        original_due_at: originalDueAt,
+        policy,
+        isLocked: assignmentInfo.is_locked ?? false,
+        groupQuestionsByType: assignmentInfo.group_questions_by_type ?? false,
+        proofs: questions.map((question, idx) =>
+          mapQuestionToProof(question, assignmentInfo, idx, courseLogicSystem)
+        ),
+      }
+      const { attemptCountMap, completedProofIds, scoreByQuestion } = loadSavedStates(worksheet, drafts, submissions)
       setCompletedProofs(completedProofIds)
       if (scoreByQuestion?.size) {
         setQuestionScores((prev) => ({
@@ -961,54 +935,11 @@ function RealWorksheetContent() {
       setIsLoading(true)
       try {
         if (!courseIdForApi) return
-        const targetAssignmentId = Number.isFinite(worksheetIdNum) ? worksheetIdNum : null
-        const currentWorksheets = worksheetsRef.current
-
-        if (currentWorksheets.length && targetAssignmentId) {
-          const existingIndex = currentWorksheets.findIndex((worksheet) => worksheet.id === targetAssignmentId)
-          if (existingIndex !== -1) {
-            const existing = currentWorksheets[existingIndex]
-            if (existing.hasLoadedDetails || existing.proofs.length) {
-              if (isMounted) {
-                setIsLoading(false)
-              }
-              return
-            }
-            setIsLoading(true)
-            const loaded = await loadWorksheetDetails(targetAssignmentId, existing)
-            if (isMounted) {
-              setWorksheets((prev) => prev.map((worksheet, idx) => (
-                idx === existingIndex ? loaded : worksheet
-              )))
-              setIsLoading(false)
-            }
-            return
-          }
-        }
-
-        setIsLoading(true)
-        const assignments = await fetchJson(`/api/courses/${courseIdForApi}/assignments`)
-        const orderedAssignments = sortAssignmentsBySubchapter(assignments || [])
-        const fallbackAssignmentId = targetAssignmentId || orderedAssignments?.[0]?.id
-        if (!fallbackAssignmentId) {
-          if (isMounted) {
-            setWorksheets([])
-            setIsLoading(false)
-          }
-          return
-        }
-        const assignmentMeta = orderedAssignments.find((assignment) => assignment.id === fallbackAssignmentId)
-        const loadedWorksheet = await loadWorksheetDetails(fallbackAssignmentId, assignmentMeta)
-        const worksheetData = orderedAssignments?.length
-          ? orderedAssignments.map((assignment) => (
-            assignment.id === fallbackAssignmentId
-              ? loadedWorksheet
-              : { id: assignment.id, title: assignment.title, proofs: [], hasLoadedDetails: false }
-          ))
-          : [loadedWorksheet]
-
+        // reruns like a logic system change keep the loaded worksheet
+        if (worksheetsRef.current.some((worksheet) => worksheet.id === worksheetIdNum)) return
+        const loadedWorksheet = await loadWorksheetDetails(worksheetIdNum)
         if (isMounted) {
-          setWorksheets(worksheetData)
+          setWorksheets(loadedWorksheet ? [loadedWorksheet] : [])
         }
       } catch (error) {
         if (isMounted) {
