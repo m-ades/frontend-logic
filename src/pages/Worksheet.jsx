@@ -912,7 +912,7 @@ function RealWorksheetContent() {
           const notAvailable = error?.status === 403 || error?.status === 404
           setLoadError(notAvailable
             ? 'This assignment is not available.'
-            : 'Failed to load assignments.')
+            : 'Failed to load this assignment.')
           setWorksheet(null)
         }
       } finally {

@@ -19,8 +19,6 @@ export const worksheetQuery = (assignmentId, userId) => ({
     return { detail, drafts, submissions }
   },
   staleTime: WORKSHEET_FRESH_MS,
-  // copies kept warm on a page refresh as they go stale so opening one never waits
-  refetchInterval: WORKSHEET_FRESH_MS,
 })
 
 // keeps these assignments loaded while the page shows so opening one is instant
@@ -29,6 +27,7 @@ export function useWarmWorksheets(assignmentIds) {
   useQueries({
     queries: assignmentIds.map((assignmentId) => ({
       ...worksheetQuery(assignmentId, userId),
+      refetchInterval: WORKSHEET_FRESH_MS,
       retry: false,
       notifyOnChangeProps: [],
     })),

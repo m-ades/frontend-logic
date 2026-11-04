@@ -129,11 +129,9 @@ export default function Dashboard() {
 
   const analyticsData = sandbox ? sandboxData.dashboardAnalytics : analyticsQuery.data
   const gradebookResponse = sandbox ? sandboxData.dashboardGradebookSummary : gradebookQuery.data
-  const isLoadingAnalytics = sandbox
-    ? false
-    : ((analyticsQuery.isPending && !!courseIdForApi) || (gradebookQuery.isPending && !!courseIdForApi))
   // upcoming only needs the student request so it skips waiting on the slower class wide one
-  const isLoadingUpcoming = sandbox ? false : (analyticsQuery.isPending && !!courseIdForApi)
+  const isLoadingUpcoming = !sandbox && !!courseIdForApi && analyticsQuery.isPending
+  const isLoadingAnalytics = isLoadingUpcoming || (!sandbox && !!courseIdForApi && gradebookQuery.isPending)
   const analyticsError = sandbox ? false : analyticsQuery.isError
   const gradebookError = sandbox ? false : gradebookQuery.isError
 
