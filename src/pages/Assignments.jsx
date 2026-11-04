@@ -5,7 +5,7 @@ import ActivityAccordion from '../components/ui/ActivityAccordion.jsx'
 import ActivityRow from '../components/ui/ActivityRow.jsx'
 import { ACTIVITY_TYPES } from '../placeholder/courseActivities.js'
 import { formatDateTime } from '../utils/formatting.js'
-import { parseDueDateAsEastern } from '../utils/easternTime.js'
+import { daysUntilDue, parseDueDateAsEastern } from '../utils/easternTime.js'
 import { compareSubchapterLabels, sortAssignmentsBySubchapter } from '../utils/assignmentSort.js'
 import { formatChapterLabel, formatSubchapterLabel } from '../utils/chapterLabels.js'
 import { getActiveUserId } from '../utils/api.js'
@@ -35,6 +35,7 @@ const buildCourseStructure = (assignments, sectionTitle, logicSystem) => {
       isLocked: assignment.is_locked ?? assignment.isLocked ?? false,
       questionCount: Number(assignment.question_count) || 0,
       answeredCount: Number(assignment.answered_count) || 0,
+      completed: Boolean(assignment.completed),
     })
     chapterEntry.set(subLabel, items)
     chapters.set(chapterLabel, chapterEntry)
@@ -141,30 +142,17 @@ export default function Assignments() {
     [sandbox, courseIdForApi, gradedAssignments, logicSystem]
   )
 
-  const completedAssignments = useMemo(
-    () => new Set(gradedAssignments.filter((assignment) => assignment.completed).map((assignment) => assignment.id)),
-    [gradedAssignments]
-  )
-
-  const upcomingAssignments = useMemo(() => {
-    const startOfDay = new Date()
-    startOfDay.setHours(0, 0, 0, 0)
-    const twoWeeksOut = new Date(startOfDay)
-    twoWeeksOut.setDate(twoWeeksOut.getDate() + 14)
-    return new Set(gradedAssignments
+  const upcomingAssignments = useMemo(
+    () => new Set(gradedAssignments
       .filter((assignment) => {
         if (assignment.is_locked || assignment.completed) return false
-        const deadline = parseDueDateAsEastern(assignment.due_at ?? assignment.due_date)
-        return deadline && deadline >= startOfDay && deadline <= twoWeeksOut
+        const days = daysUntilDue(assignment.due_at ?? assignment.due_date)
+        return days !== null && days >= 0 && days < 14
       })
-      .map((assignment) => assignment.id))
-  }, [gradedAssignments])
-  useWarmWorksheets(sandbox ? [] : [...upcomingAssignments])
-
-  const getCompletionStatus = useCallback(
-    (activityId) => completedAssignments.has(activityId),
-    [completedAssignments]
+      .map((assignment) => assignment.id)),
+    [gradedAssignments]
   )
+  useWarmWorksheets(sandbox ? [] : [...upcomingAssignments])
 
   const filterStructure = useCallback((structure, predicate) => {
     return structure.map((chapter) => {
@@ -184,13 +172,13 @@ export default function Assignments() {
         case 0:
           return upcomingAssignments.has(activity.id)
         case 2:
-          return getCompletionStatus(activity.id)
+          return activity.completed
         default:
           return true
       }
     }
     return filterStructure(courseStructure, predicate)
-  }, [courseStructure, filterStructure, getCompletionStatus, tabValue, upcomingAssignments])
+  }, [courseStructure, filterStructure, tabValue, upcomingAssignments])
 
   const handleTabChange = (e, newValue) => {
     setTabValue(newValue)
@@ -210,7 +198,7 @@ export default function Assignments() {
       : null
     const totalQuestions = Number(activity.questionCount) || 0
     const completedQuestions = Math.min(Number(activity.answeredCount) || 0, totalQuestions)
-    const isCompleted = getCompletionStatus(activity.id)
+    const isCompleted = activity.completed
     const isPastDue = Boolean(
       activity.dueDate && !isCompleted && parseDueDateAsEastern(activity.dueDate, activity.dueTime) < new Date()
     )
