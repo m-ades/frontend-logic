@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'react'
-import { useParams, useNavigate, useLocation } from 'react-router-dom'
+import { useParams, useLocation } from 'react-router-dom'
 import { useQueryClient } from '@tanstack/react-query'
 import { Box } from '@mui/material'
 import LoadingSpinner from '../components/ui/LoadingSpinner.jsx'
@@ -40,8 +40,7 @@ function SandboxWorksheetContent() {
   const updateQuestionState = worksheetStore?.updateQuestionState ?? (() => undefined)
   const markQuestionComplete = worksheetStore?.markQuestionComplete ?? (() => undefined)
 
-  const worksheets = useMemo(() => (assignment ? [{ ...assignment, proofs: assignment.proofs || [] }] : []), [assignment])
-  const currentWorksheet = worksheets[0]
+  const currentWorksheet = useMemo(() => (assignment ? { ...assignment, proofs: assignment.proofs || [] } : null), [assignment])
   const total = currentWorksheet?.proofs?.length || 0
   const backTarget = location?.state?.returnTo || assignmentsPath
 
@@ -99,18 +98,13 @@ function SandboxWorksheetContent() {
     <WorksheetLayout
       subtitle={currentWorksheet.title || currentWorksheet.name || "Assignment"}
       backTo={backTarget}
-      worksheets={worksheets}
-      currentWorksheetIndex={0}
-      onWorksheetIndexChange={() => {}}
       completedProofs={completedProofs}
       isOverdue={isOverdue}
       isLocked={currentWorksheet.isLocked ?? currentWorksheet.is_locked ?? false}
       showPolicyInfo
     >
       <WorksheetTabs
-        worksheets={worksheets}
-        currentWorksheetIndex={0}
-        onWorksheetIndexChange={() => {}}
+        worksheet={currentWorksheet}
         currentProofIndex={currentProofIndex}
         onProofIndexChange={setCurrentProofIndex}
         completedProofs={completedProofs}
@@ -152,28 +146,23 @@ function worksheetViewReducer(state, action) {
       : { ...state, currentProofIndex: nextIndex }
   }
 
-  if (action.type === 'set-worksheets') {
-    const nextWorksheets = typeof action.update === 'function'
-      ? action.update(state.worksheets)
+  if (action.type === 'set-worksheet') {
+    const nextWorksheet = typeof action.update === 'function'
+      ? action.update(state.worksheet)
       : action.update
-    if (nextWorksheets === state.worksheets) return state
+    if (nextWorksheet === state.worksheet) return state
 
-    const activeWorksheetId = action.activeWorksheetId
-    const previousWorksheet = state.worksheets.find(
-      (worksheet) => Number(worksheet.id) === Number(activeWorksheetId)
-    )
-    const selectedProofId = previousWorksheet?.proofs?.[state.currentProofIndex]?.id
-    const nextWorksheet = nextWorksheets.find(
-      (worksheet) => Number(worksheet.id) === Number(activeWorksheetId)
-    )
+    const selectedProofId = Number(nextWorksheet?.id) === Number(state.worksheet?.id)
+      ? state.worksheet.proofs[state.currentProofIndex]?.id
+      : null
     const selectedIndex = selectedProofId == null
       ? -1
-      : nextWorksheet?.proofs?.findIndex((proof) => proof.id === selectedProofId) ?? -1
+      : nextWorksheet.proofs.findIndex((proof) => proof.id === selectedProofId)
     const currentProofIndex = selectedIndex >= 0
       ? selectedIndex
-      : clampIndex(state.currentProofIndex, nextWorksheet?.proofs?.length ?? 0)
+      : clampIndex(state.currentProofIndex, nextWorksheet?.proofs.length ?? 0)
 
-    return { worksheets: nextWorksheets, currentProofIndex }
+    return { worksheet: nextWorksheet, currentProofIndex }
   }
 
   return state
@@ -215,34 +204,27 @@ const QUESTION_SESSION_TRACKING_ENABLED = true
 
 function RealWorksheetContent() {
   const { worksheetId, assignmentId } = useParams()
-  const navigate = useNavigate()
   const location = useLocation()
   const queryClient = useQueryClient()
-  const currentWorksheetIdRef = useRef(null)
+  const currentWorksheetRef = useRef(null)
   const restoredQuestionIndexForAssignmentRef = useRef(null)
-  const [{ currentProofIndex, worksheets }, dispatchWorksheetView] = useReducer(
+  const [{ currentProofIndex, worksheet }, dispatchWorksheetView] = useReducer(
     worksheetViewReducer,
-    { currentProofIndex: 0, worksheets: [] }
+    { currentProofIndex: 0, worksheet: null }
   )
   const setCurrentProofIndex = useCallback((update) => {
     dispatchWorksheetView({ type: 'set-proof-index', update })
   }, [])
-  const setWorksheets = useCallback((update) => {
-    dispatchWorksheetView({
-      type: 'set-worksheets',
-      update,
-      activeWorksheetId: currentWorksheetIdRef.current,
-    })
+  const setWorksheet = useCallback((update) => {
+    dispatchWorksheetView({ type: 'set-worksheet', update })
   }, [])
-  const worksheetsRef = useRef(worksheets)
-  worksheetsRef.current = worksheets
   const [isLoading, setIsLoading] = useState(true)
   const [settledRequestKey, setSettledRequestKey] = useState(null)
   const [loadError, setLoadError] = useState('')
   const [currentDueAt, setCurrentDueAt] = useState(null)
   const [questionScores, setQuestionScores] = useState({})
   const { activeCourseId, courses } = useCoursesState()
-  const { assignmentPath, assignmentsPath, isInstructor, user } = useAppRuntime()
+  const { assignmentsPath, isInstructor, user } = useAppRuntime()
   const courseId = activeCourseId ?? API_CONFIG.courseId
   const courseIdForApi = activeCourseId ?? null
   const activeCourse = useMemo(
@@ -293,12 +275,8 @@ function RealWorksheetContent() {
     }
   }, [])
 
-  const currentWorksheetIndex = useMemo(
-    () => worksheets.findIndex((w) => w.id === worksheetIdNum),
-    [worksheets, worksheetIdNum]
-  )
-  const currentWorksheet = worksheets[currentWorksheetIndex]
-  currentWorksheetIdRef.current = currentWorksheet?.id ?? null
+  const currentWorksheet = worksheet?.id === worksheetIdNum ? worksheet : null
+  currentWorksheetRef.current = currentWorksheet
   const currentProof = currentWorksheet?.proofs[currentProofIndex]
   const total = currentWorksheet?.proofs.length || 0
   const worksheetDueAt = currentWorksheet?.due_at
@@ -343,22 +321,16 @@ function RealWorksheetContent() {
 
   useEffect(() => {
     // course data can arrive after proofs are mapped
-    setWorksheets((prev) => {
+    setWorksheet((prev) => {
+      if (!prev) return prev
       let didChange = false
-      const next = prev.map((worksheet) => {
-        let worksheetChanged = false
-        const proofs = worksheet.proofs || []
-        const nextProofs = proofs.map((proof) => {
-          const proofLogicSystem = logicSystemForQuestionType(proof.type, courseLogicSystem)
-          if (proof.logicSystem === proofLogicSystem) return proof
-          worksheetChanged = true
-          return { ...proof, logicSystem: proofLogicSystem }
-        })
-        if (!worksheetChanged) return worksheet
+      const proofs = prev.proofs.map((proof) => {
+        const proofLogicSystem = logicSystemForQuestionType(proof.type, courseLogicSystem)
+        if (proof.logicSystem === proofLogicSystem) return proof
         didChange = true
-        return { ...worksheet, proofs: nextProofs }
+        return { ...proof, logicSystem: proofLogicSystem }
       })
-      return didChange ? next : prev
+      return didChange ? { ...prev, proofs } : prev
     })
   }, [courseLogicSystem])
 
@@ -584,15 +556,15 @@ function RealWorksheetContent() {
         Number(question?.id ?? question?.assignment_question_id) === Number(questionId)
       ))
       if (!targetQuestion) {
-        setWorksheets((previous) => previous.map((worksheet) => {
-          if (Number(worksheet.id) !== Number(assignmentId)) return worksheet
-          const proofs = worksheet.proofs.filter(
+        setWorksheet((previous) => {
+          if (Number(previous?.id) !== Number(assignmentId)) return previous
+          const proofs = previous.proofs.filter(
             (proof) => Number(proof.questionId) !== Number(questionId)
           )
-          return proofs.length === worksheet.proofs.length
-            ? worksheet
-            : { ...worksheet, proofs }
-        }))
+          return proofs.length === previous.proofs.length
+            ? previous
+            : { ...previous, proofs }
+        })
         setQuestionScores((previous) => {
           const next = { ...previous }
           delete next[questionId]
@@ -610,9 +582,9 @@ function RealWorksheetContent() {
           }
         }
       }
-      setWorksheets((previous) => previous.map((worksheet) => {
-        if (Number(worksheet.id) !== Number(assignmentId)) return worksheet
-        const proofs = worksheet.proofs.map((proof, idx) => {
+      setWorksheet((previous) => {
+        if (Number(previous?.id) !== Number(assignmentId)) return previous
+        const proofs = previous.proofs.map((proof, idx) => {
           if (Number(proof.questionId) !== Number(questionId)) return proof
           const updated = mapQuestionToProof(targetQuestion, assignmentInfo, idx, courseLogicSystem)
           return {
@@ -622,8 +594,8 @@ function RealWorksheetContent() {
             attemptLimit: updated.attemptLimit ?? proof.attemptLimit,
           }
         })
-        return { ...worksheet, proofs }
-      }))
+        return { ...previous, proofs }
+      })
     } catch (err) {
       // ignore refresh errors
     } finally {
@@ -633,19 +605,16 @@ function RealWorksheetContent() {
 
   const handleQuestionCreated = useCallback((assignmentId, createdQuestion) => {
     if (!assignmentId || !createdQuestion) return
-    setWorksheets((previous) => previous.map((worksheet) => {
-      if (Number(worksheet.id) !== Number(assignmentId)) return worksheet
-      const exists = worksheet.proofs.some((proof) => Number(proof.questionId) === Number(createdQuestion.id))
-      if (exists) return worksheet
-      const nextProof = mapQuestionToProof(createdQuestion, worksheet, worksheet.proofs.length, courseLogicSystem)
-      return { ...worksheet, proofs: [...worksheet.proofs, nextProof] }
-    }))
-    if (Number(currentWorksheetIdRef.current) === Number(assignmentId)) {
-      const worksheet = worksheetsRef.current.find(
-        (item) => Number(item.id) === Number(assignmentId)
-      )
-      const nextIndex = worksheet?.proofs?.length ?? 0
-      setCurrentProofIndex(nextIndex)
+    setWorksheet((previous) => {
+      if (Number(previous?.id) !== Number(assignmentId)) return previous
+      const exists = previous.proofs.some((proof) => Number(proof.questionId) === Number(createdQuestion.id))
+      if (exists) return previous
+      const nextProof = mapQuestionToProof(createdQuestion, previous, previous.proofs.length, courseLogicSystem)
+      return { ...previous, proofs: [...previous.proofs, nextProof] }
+    })
+    const shown = currentWorksheetRef.current
+    if (Number(shown?.id) === Number(assignmentId)) {
+      setCurrentProofIndex(shown.proofs.length)
     }
   }, [courseLogicSystem, setCurrentProofIndex])
 
@@ -673,33 +642,28 @@ function RealWorksheetContent() {
       }
       if (Number.isFinite(questionId)) {
         // sync attempts
-        setWorksheets((prev) => {
+        setWorksheet((prev) => {
+          if (!prev) return prev
           let didUpdate = false
-          const next = prev.map((worksheet) => {
-            let proofUpdated = false
-            const nextProofs = worksheet.proofs.map((proof) => {
-              if (proof.questionId !== questionId) return proof
-              const attemptCount = Number.isFinite(detail.attempt)
-                ? detail.attempt
-                : (proof.attemptCount ?? 0) + 1
-              const attemptLimit = Number.isFinite(detail.attemptLimit)
-                ? detail.attemptLimit
-                : proof.attemptLimit
-              if (attemptCount === proof.attemptCount && attemptLimit === proof.attemptLimit) {
-                return proof
-              }
-              proofUpdated = true
-              return { ...proof, attemptCount, attemptLimit }
-            })
-            if (!proofUpdated) return worksheet
+          const proofs = prev.proofs.map((proof) => {
+            if (proof.questionId !== questionId) return proof
+            const attemptCount = Number.isFinite(detail.attempt)
+              ? detail.attempt
+              : (proof.attemptCount ?? 0) + 1
+            const attemptLimit = Number.isFinite(detail.attemptLimit)
+              ? detail.attemptLimit
+              : proof.attemptLimit
+            if (attemptCount === proof.attemptCount && attemptLimit === proof.attemptLimit) {
+              return proof
+            }
             didUpdate = true
-            return { ...worksheet, proofs: nextProofs }
+            return { ...proof, attemptCount, attemptLimit }
           })
-          return didUpdate ? next : prev
+          return didUpdate ? { ...prev, proofs } : prev
         })
       }
       if (reachedLimit && Number.isFinite(questionId)) {
-        const assignmentId = currentWorksheetIdRef.current
+        const assignmentId = currentWorksheetRef.current?.id
         if (assignmentId) {
           refreshQuestionSolutions(assignmentId, questionId)
         }
@@ -931,25 +895,25 @@ function RealWorksheetContent() {
       }
     }
 
-    const loadWorksheets = async () => {
+    const loadWorksheet = async () => {
       setLoadError('')
       setIsLoading(true)
       try {
         if (!courseIdForApi) return
         // reruns like a logic system change keep the loaded worksheet
-        if (worksheetsRef.current.some((worksheet) => worksheet.id === worksheetIdNum)) return
+        if (currentWorksheetRef.current) return
         const loadedWorksheet = await loadWorksheetDetails(worksheetIdNum)
         if (isMounted) {
-          setWorksheets(loadedWorksheet ? [loadedWorksheet] : [])
+          setWorksheet(loadedWorksheet)
         }
       } catch (error) {
         if (isMounted) {
-          console.warn('Failed to load worksheets', error)
+          console.warn('Failed to load worksheet', error)
           const notAvailable = error?.status === 403 || error?.status === 404
           setLoadError(notAvailable
             ? 'This assignment is not available.'
             : 'Failed to load assignments.')
-          setWorksheets([])
+          setWorksheet(null)
         }
       } finally {
         if (isMounted) {
@@ -959,21 +923,12 @@ function RealWorksheetContent() {
       }
     }
 
-    loadWorksheets()
+    loadWorksheet()
 
     return () => {
       isMounted = false
     }
   }, [activeUserId, courseId, courseLogicSystem, worksheetIdNum, worksheetRequestKey])
-
-  const handleWorksheetChange = (newIndex) => {
-    const newWorksheet = worksheets[newIndex]
-    if (newWorksheet) {
-      navigate(assignmentPath(newWorksheet.id), {
-        state: { returnTo: backTarget }
-      })
-    }
-  }
 
   const policySummary = useMemo(() => {
     if (!currentWorksheet?.policy) return []
@@ -1020,9 +975,6 @@ function RealWorksheetContent() {
         <WorksheetLayout
           subtitle={currentWorksheet.title || "Predicate Logic: Natural Deduction"}
           backTo={backTarget}
-          worksheets={worksheets}
-          currentWorksheetIndex={currentWorksheetIndex}
-          onWorksheetIndexChange={handleWorksheetChange}
           completedProofs={completedProofs}
           isOverdue={isOverdue}
           isLocked={currentWorksheet.isLocked ?? false}
@@ -1030,9 +982,7 @@ function RealWorksheetContent() {
         >
           <WorksheetTabs
             key={`worksheet-${currentWorksheet?.id ?? worksheetIdNum}`}
-            worksheets={worksheets}
-            currentWorksheetIndex={currentWorksheetIndex}
-            onWorksheetIndexChange={handleWorksheetChange}
+            worksheet={currentWorksheet}
             currentProofIndex={currentProofIndex}
             onProofIndexChange={setCurrentProofIndex}
             completedProofs={completedProofs}

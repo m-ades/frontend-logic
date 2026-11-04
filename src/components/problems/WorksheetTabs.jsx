@@ -3,28 +3,8 @@ import { Box, useTheme, useMediaQuery } from '@mui/material';
 import ProofTabs from './ProofTabs.jsx';
 import { updateRulebookForProblem, useLayoutDispatch } from '../../context/LayoutContext.jsx';
 
-function WorksheetTabPanel({ children, value, index, ...other }) {
-  return (
-    <div
-      role="tabpanel"
-      hidden={value !== index}
-      id={`worksheet-tabpanel-${index}`}
-      aria-labelledby={`worksheet-tab-${index}`}
-      {...other}
-    >
-      {value === index && (
-        <Box sx={{ width: '100%' }}>
-          {children}
-        </Box>
-      )}
-    </div>
-  );
-}
-
 export default function WorksheetTabs({
-  worksheets,
-  currentWorksheetIndex,
-  onWorksheetIndexChange,
+  worksheet,
   currentProofIndex,
   onProofIndexChange,
   completedProofs,
@@ -47,7 +27,7 @@ export default function WorksheetTabs({
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const layoutDispatch = useLayoutDispatch();
-  const activeProblemType = worksheets[currentWorksheetIndex]?.proofs?.[currentProofIndex]?.type ?? null;
+  const activeProblemType = worksheet.proofs[currentProofIndex]?.type ?? null;
 
   React.useEffect(() => {
     updateRulebookForProblem(layoutDispatch, activeProblemType);
@@ -57,40 +37,32 @@ export default function WorksheetTabs({
     updateRulebookForProblem(layoutDispatch, null);
   }, [layoutDispatch]);
 
-  const handleWorksheetChange = (e, newValue) => {
-    onWorksheetIndexChange(newValue);
-    onProofIndexChange(0);
-  };
-
   return (
     <Box sx={{ width: '100%', mt: 0 }}>
-      {worksheets.map((worksheet, idx) => (
-        <WorksheetTabPanel key={worksheet.id} value={currentWorksheetIndex} index={idx}>
-          <ProofTabs
-            proofs={worksheet.proofs}
-            currentProofIndex={currentProofIndex}
-            onProofIndexChange={onProofIndexChange}
-            completedProofs={completedProofs}
-            questionScores={questionScores}
-            onProofComplete={onProofComplete}
-            getSavedProofState={getSavedProofState}
-            handleProofStateChange={handleProofStateChange}
-            total={total}
-            completionPercent={completionPercent}
-            gradeLabel={gradeLabel}
-            policySummary={policySummary}
-            isOverdue={isOverdue}
-            isAssignmentLocked={!canSubmitWhileLocked && (worksheet.isLocked ?? false)}
-            isInstructorView={isInstructorView}
-            canGrantAttempts={canGrantAttempts}
-            onQuestionSaved={onQuestionSaved}
-            onQuestionCreated={onQuestionCreated}
-            assignmentId={worksheet.id}
-            logicSystem={logicSystem}
-            groupQuestionsByType={worksheet.groupQuestionsByType ?? false}
-          />
-        </WorksheetTabPanel>
-      ))}
+      <ProofTabs
+        key={worksheet.id}
+        proofs={worksheet.proofs}
+        currentProofIndex={currentProofIndex}
+        onProofIndexChange={onProofIndexChange}
+        completedProofs={completedProofs}
+        questionScores={questionScores}
+        onProofComplete={onProofComplete}
+        getSavedProofState={getSavedProofState}
+        handleProofStateChange={handleProofStateChange}
+        total={total}
+        completionPercent={completionPercent}
+        gradeLabel={gradeLabel}
+        policySummary={policySummary}
+        isOverdue={isOverdue}
+        isAssignmentLocked={!canSubmitWhileLocked && (worksheet.isLocked ?? false)}
+        isInstructorView={isInstructorView}
+        canGrantAttempts={canGrantAttempts}
+        onQuestionSaved={onQuestionSaved}
+        onQuestionCreated={onQuestionCreated}
+        assignmentId={worksheet.id}
+        logicSystem={logicSystem}
+        groupQuestionsByType={worksheet.groupQuestionsByType ?? false}
+      />
     </Box>
   );
 }
