@@ -4,7 +4,7 @@ import { Box, Typography } from '@mui/material'
 import ActivityAccordion from '../components/ui/ActivityAccordion.jsx'
 import ActivityRow from '../components/ui/ActivityRow.jsx'
 import { ACTIVITY_TYPES } from '../placeholder/courseActivities.js'
-import { fetchJson } from '../utils/api.js'
+import { courseAssignmentsQuery } from '../context/CoursesContext.jsx'
 import { compareSubchapterLabels, sortAssignmentsBySubchapter } from '../utils/assignmentSort.js'
 import { formatChapterLabel, formatSubchapterLabel } from '../utils/chapterLabels.js'
 import { useAppRuntime } from '../hooks/useAppRuntime.js'
@@ -60,6 +60,8 @@ const buildCourseStructure = (assignments, sectionTitle, logicSystem) => {
     }))
 }
 
+const selectPractices = (assignments) => assignments.filter((assignment) => assignment.kind === 'practice')
+
 export default function Practice() {
   const {
     isSandbox,
@@ -72,11 +74,8 @@ export default function Practice() {
   const courseIdForApi = isSandbox ? null : (activeCourseId ?? null)
 
   const practiceQuery = useQuery({
-    queryKey: ['course-practice', courseIdForApi],
-    queryFn: async () => {
-      const assignments = await fetchJson(`/api/courses/${courseIdForApi}/assignments`)
-      return assignments.filter((assignment) => assignment.kind === 'practice')
-    },
+    ...courseAssignmentsQuery(courseIdForApi),
+    select: selectPractices,
     enabled: !isSandbox && !!courseIdForApi,
     refetchOnMount: 'always',
   })
