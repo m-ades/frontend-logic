@@ -1,5 +1,6 @@
 import { createContext, useContext, useReducer } from "react";
 import { fetchJson, getStoredUser } from "../utils/api.js";
+import { queryClient } from "../queryClient.js";
 import { DEFAULT_LOGIC_SYSTEM, normalizeLogicSystem } from "../lib/logicSystems.js";
 import { sortAssignmentsBySubchapter } from "../utils/assignmentSort.js";
 import { hasInstructorAccess } from "../utils/auth.js";
@@ -140,26 +141,24 @@ export async function fetchInstructorCourses() {
   return (courses || []).map((course, index) => mapCourseRecord(course, index));
 }
 
-const assignmentsListCache = new Map();
+export const courseAssignmentsQuery = (courseId) => ({
+  queryKey: ["course-assignments", courseId],
+  queryFn: () => fetchJson(`/api/courses/${courseId}/assignments`),
+});
 
-async function fetchCourseAssignmentsList(courseId) {
-  const cached = getAssignmentsListCache(courseId);
-  if (cached) {
-    return cached;
-  }
-  const promise = fetchJson(`/api/courses/${courseId}/assignments`)
-    .finally(() => {
-      assignmentsListCache.delete(courseId);
-    });
-  assignmentsListCache.set(courseId, promise);
-  return promise;
-}
+export const studentDashboardQuery = (userId, courseId) => ({
+  queryKey: ["analytics-student", userId, courseId],
+  queryFn: () => fetchJson(`/api/analytics/student-dashboard?userId=${userId}&courseId=${courseId}`),
+});
 
-function getAssignmentsListCache(courseId) {
-  if (!assignmentsListCache.has(courseId)) {
-    return null;
-  }
-  return assignmentsListCache.get(courseId);
+export const gradebookSummaryQuery = (courseId) => ({
+  queryKey: ["gradebook-summary", courseId],
+  queryFn: () => fetchJson(`/api/analytics/gradebook-summary?courseId=${courseId}`).catch(() => null),
+});
+
+// always refetches but fills the cache the student pages read
+function fetchCourseAssignmentsList(courseId) {
+  return queryClient.fetchQuery({ ...courseAssignmentsQuery(courseId), staleTime: 0 });
 }
 
 export async function fetchCourseAssignments(courseId) {

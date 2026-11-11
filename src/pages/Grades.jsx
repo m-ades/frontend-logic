@@ -8,6 +8,7 @@ import LoadingSpinner from '../components/ui/LoadingSpinner.jsx'
 import { formatDateTime } from '../utils/formatting.js'
 import { API_CONFIG, fetchJson, getActiveUserId } from '../utils/api.js'
 import { sortAssignmentsBySubchapter } from '../utils/assignmentSort.js'
+import { courseAssignmentsQuery } from '../context/CoursesContext.jsx'
 import { useAppRuntime } from '../hooks/useAppRuntime.js'
 
 function NoRowsOverlay() {
@@ -28,8 +29,7 @@ export default function Grades() {
   const userId = isSandbox ? user.id : getActiveUserId()
 
   const assignmentsQuery = useQuery({
-    queryKey: ['course-assignments', courseIdForApi],
-    queryFn: () => fetchJson(`/api/courses/${courseIdForApi}/assignments`),
+    ...courseAssignmentsQuery(courseIdForApi),
     enabled: !isSandbox && !!courseIdForApi,
   })
 

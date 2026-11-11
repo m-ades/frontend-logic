@@ -1,5 +1,6 @@
 import { fetchJson, getActiveUserId } from './api.js'
 import { getSubmissionScore } from './problemHelpers.js'
+import { trackSave } from './savesInFlight.js'
 
 export const isSandboxRuntime = () => (
   typeof window !== 'undefined' && window.location.pathname.startsWith('/sandbox')
@@ -30,7 +31,7 @@ export const buildPersistedSubmissionState = ({
 })
 
 export async function submitApiValidation({ assignmentQuestionId, submissionData }) {
-  const response = await fetchJson('/api/validate/submission', {
+  const response = await trackSave(fetchJson('/api/validate/submission', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
@@ -38,7 +39,7 @@ export async function submitApiValidation({ assignmentQuestionId, submissionData
       user_id: getActiveUserId(),
       submission_data: submissionData,
     }),
-  })
+  }))
   const validation = response?.validation || {}
   const successstatus = validation.successstatus || 'incorrect'
   const score = getSubmissionScore(response)

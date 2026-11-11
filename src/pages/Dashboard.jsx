@@ -35,8 +35,10 @@ import LeaderboardIcon from '@mui/icons-material/Leaderboard'
 import { formatDateTime } from '../utils/formatting.js'
 import { API_CONFIG, fetchJson, getActiveUserId } from '../utils/api.js'
 import { isInstructorRole } from '../utils/auth.js'
+import { gradebookSummaryQuery, studentDashboardQuery } from '../context/CoursesContext.jsx'
 import ThemedCard from '../components/ui/ThemedCard.jsx'
 import { useAppRuntime } from '../hooks/useAppRuntime.js'
+import { useWarmWorksheets } from '../hooks/useWarmWorksheets.js'
 
 const formatPercent = (value) => (value === null || value === undefined ? '—' : `${formatNumber(value)}%`)
 
@@ -116,24 +118,20 @@ export default function Dashboard() {
   const userId = sandbox ? runtimeUser.id : getActiveUserId()
 
   const analyticsQuery = useQuery({
-    queryKey: ['analytics-student', userId, courseIdForApi],
-    queryFn: () =>
-      fetchJson(`/api/analytics/student-dashboard?userId=${userId}&courseId=${courseIdForApi}`),
+    ...studentDashboardQuery(userId, courseIdForApi),
     enabled: !sandbox && !!courseIdForApi && !!userId,
   })
 
   const gradebookQuery = useQuery({
-    queryKey: ['gradebook-summary', courseIdForApi],
-    queryFn: () =>
-      fetchJson(`/api/analytics/gradebook-summary?courseId=${courseIdForApi}`).catch(() => null),
+    ...gradebookSummaryQuery(courseIdForApi),
     enabled: !sandbox && !!courseIdForApi,
   })
 
   const analyticsData = sandbox ? sandboxData.dashboardAnalytics : analyticsQuery.data
   const gradebookResponse = sandbox ? sandboxData.dashboardGradebookSummary : gradebookQuery.data
-  const isLoadingAnalytics = sandbox
-    ? false
-    : ((analyticsQuery.isPending && !!courseIdForApi) || (gradebookQuery.isPending && !!courseIdForApi))
+  // upcoming only needs the student request so it skips waiting on the slower class wide one
+  const isLoadingUpcoming = !sandbox && !!courseIdForApi && analyticsQuery.isPending
+  const isLoadingAnalytics = isLoadingUpcoming || (!sandbox && !!courseIdForApi && gradebookQuery.isPending)
   const analyticsError = sandbox ? false : analyticsQuery.isError
   const gradebookError = sandbox ? false : gradebookQuery.isError
 
@@ -364,6 +362,7 @@ export default function Dashboard() {
   }, [analytics.performance.avg_attempt, analytics.submissionCount])
 
   const assignmentStats = analytics.assignments || emptyAnalytics.assignments
+  useWarmWorksheets(sandbox ? [] : assignmentStats.upcomingList.map((assignment) => assignment.id))
 
   const [useFullScale, setUseFullScale] = useState(false)
 
@@ -616,11 +615,11 @@ export default function Dashboard() {
                 <Typography variant="body2" color="text.secondary">
                   Unable to load upcoming assignments.
                 </Typography>
-              ) : !isLoadingAnalytics && assignmentStats.upcomingList.length === 0 ? (
+              ) : !isLoadingUpcoming && assignmentStats.upcomingList.length === 0 ? (
                 <Typography variant="body2" color="text.secondary">
                   No upcoming assignments
                 </Typography>
-              ) : isLoadingAnalytics ? (
+              ) : isLoadingUpcoming ? (
                 <LinearProgress sx={{ mt: 1 }} />
               ) : (
                 assignmentStats.upcomingList.map((assignment) => (

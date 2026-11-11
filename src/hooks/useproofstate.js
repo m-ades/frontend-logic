@@ -1,9 +1,11 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { fetchJson, getActiveUserId } from '../utils/api.js'
+import { trackSave } from '../utils/savesInFlight.js'
 
 export function useProofState({ userId = getActiveUserId() } = {}) {
   const [savedProofStates, setSavedProofStates] = useState({})
-  const saveTimersRef = useRef({})
+  const pendingSavesRef = useRef(new Map())
+  const unmountedRef = useRef(false)
 
   const initializeSavedProofStates = (initialStates) => {
     setSavedProofStates((prev) => ({ ...prev, ...initialStates }))
@@ -11,11 +13,9 @@ export function useProofState({ userId = getActiveUserId() } = {}) {
 
   const saveDraftNow = async (assignmentQuestionId, draftData) => {
     if (!assignmentQuestionId) return null
-    if (saveTimersRef.current[assignmentQuestionId]) {
-      clearTimeout(saveTimersRef.current[assignmentQuestionId])
-      delete saveTimersRef.current[assignmentQuestionId]
-    }
-    return fetchJson('/api/assignment-drafts', {
+    clearTimeout(pendingSavesRef.current.get(assignmentQuestionId)?.timer)
+    pendingSavesRef.current.delete(assignmentQuestionId)
+    return trackSave(fetchJson('/api/assignment-drafts', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -23,22 +23,32 @@ export function useProofState({ userId = getActiveUserId() } = {}) {
         user_id: userId,
         draft_data: draftData,
       }),
-    })
+    }))
   }
 
   const scheduleDraftSave = (assignmentQuestionId, draftData) => {
     if (!assignmentQuestionId) return
-    if (saveTimersRef.current[assignmentQuestionId]) {
-      clearTimeout(saveTimersRef.current[assignmentQuestionId])
+    if (unmountedRef.current) {
+      saveDraftNow(assignmentQuestionId, draftData).catch(() => {})
+      return
     }
-    saveTimersRef.current[assignmentQuestionId] = setTimeout(async () => {
-      try {
-        await saveDraftNow(assignmentQuestionId, draftData)
-      } catch {
-        // ignore autosave errors
-      }
+    clearTimeout(pendingSavesRef.current.get(assignmentQuestionId)?.timer)
+    const timer = setTimeout(() => {
+      saveDraftNow(assignmentQuestionId, draftData).catch(() => {})
     }, 500)
+    pendingSavesRef.current.set(assignmentQuestionId, { timer, draftData })
   }
+
+  // leaving sends waiting saves now and editors flush after this so theirs go straight out too
+  useEffect(() => {
+    unmountedRef.current = false
+    return () => {
+      unmountedRef.current = true
+      pendingSavesRef.current.forEach(({ draftData }, assignmentQuestionId) => {
+        saveDraftNow(assignmentQuestionId, draftData).catch(() => {})
+      })
+    }
+  }, [])
 
   const handleProofStateChange = (proofId, state, meta = {}) => {
     if (meta.assignmentQuestionId && meta.immediate) {

@@ -1,5 +1,6 @@
 import { Navigate, useNavigate, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { Alert, Button } from "@mui/material";
 import StudentSidebarStructure from "./StudentSidebarStructure.jsx";
 import InstructorSidebarStructure from "./InstructorSidebarStructure.jsx";
@@ -10,8 +11,10 @@ import {
   initializeCourses,
   loadCourseData,
   resetCourses,
+  gradebookSummaryQuery,
+  studentDashboardQuery,
 } from "../../context/CoursesContext";
-import { clearStoredUser, fetchJson } from "../../utils/api.js";
+import { clearStoredUser, fetchJson, getActiveUserId } from "../../utils/api.js";
 import { isInstructorRole } from "../../utils/auth.js";
 import { AppRuntimeProvider } from "../../context/AppRuntimeContext.jsx";
 import { createAppRuntime } from "../../runtime/appRuntime.js";
@@ -60,6 +63,7 @@ function AppShell({ children }) {
   const courseStatus = activeCourseId ? coursesState.courseStatus[activeCourseId] : "loaded";
   const [isAccountSettingsOpen, setIsAccountSettingsOpen] = useState(false);
   const [textSize, setTextSize] = useState(readTextSize);
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     if (user?.role && user?.id && !initialized) {
@@ -94,6 +98,14 @@ function AppShell({ children }) {
   const logicSystem = activeCourse?.logicSystem ?? activeCourse?.logic_system;
 
   const routeKind = isInstructorRoute ? "instructor" : "student";
+
+  // a student landing on the dashboard gets its data alongside the course load
+  useEffect(() => {
+    if (routeKind !== "student" || !activeCourseId || location.pathname !== "/dashboard") return;
+    const userId = getActiveUserId();
+    queryClient.prefetchQuery({ ...studentDashboardQuery(userId, activeCourseId), retry: 3 });
+    queryClient.prefetchQuery(gradebookSummaryQuery(activeCourseId));
+  }, [routeKind, activeCourseId, location.pathname, queryClient]);
 
   const runtimeValue = createAppRuntime({
     coursesDispatch,

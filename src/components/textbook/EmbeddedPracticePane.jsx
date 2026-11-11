@@ -77,11 +77,10 @@ export default function EmbeddedPracticePane({
   }, [isSandbox, isInstructor, worksheetStore, selectedId])
 
   const assignment = isSandbox ? sandboxAssignment : liveAssignment
-  const worksheets = useMemo(
-    () => (assignment ? [{ ...assignment, proofs: assignment.proofs || [] }] : []),
+  const currentWorksheet = useMemo(
+    () => (assignment ? { ...assignment, proofs: assignment.proofs || [] } : null),
     [assignment],
   )
-  const currentWorksheet = worksheets[0]
   const total = currentWorksheet?.proofs?.length || 0
 
   useAssignmentSession(isSandbox ? null : currentWorksheet?.id, activeUserId)
@@ -313,9 +312,7 @@ export default function EmbeddedPracticePane({
         )}
         {currentWorksheet && (
           <WorksheetTabs
-            worksheets={worksheets}
-            currentWorksheetIndex={0}
-            onWorksheetIndexChange={() => {}}
+            worksheet={currentWorksheet}
             currentProofIndex={currentProofIndex}
             onProofIndexChange={setCurrentProofIndex}
             completedProofs={completedProofs}
