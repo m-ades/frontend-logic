@@ -24,7 +24,6 @@ const buildCourseStructure = (assignments, sectionTitle, logicSystem) => {
       id: assignment.id,
       title: assignment.title,
       description: assignment.description || '',
-      dueDate: assignment.due_at ?? assignment.due_date,
       type: ACTIVITY_TYPES.PRACTICE,
       worksheet: { id: assignment.id, proofs: [] },
       questionCount: Number(assignment.question_count) || Number(assignment.proofs?.length) || 0,
