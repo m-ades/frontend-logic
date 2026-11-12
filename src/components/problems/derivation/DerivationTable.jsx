@@ -47,15 +47,12 @@ import {
   normalizeJustificationForDisplay,
 } from './derivationUtils.js'
 import {
-  DERIVATION_FULLSCREEN_ACTION_BAR_SX,
-  DERIVATION_FULLSCREEN_STACK_SX,
+  DERIVATION_FORMULA_MIN_WIDTH,
+  DERIVATION_FORMULA_WIDTH,
   DERIVATION_PROMPT_FONT_SIZE,
   RULE_INPUT_MODE_KEY,
   getDerivationKeyboardConfig,
   getDerivationRowSx,
-  getDerivationTableContainerSx,
-  getDerivationTableSx,
-  getDerivationWrapperSx,
   getDerivationScoreLabel,
   getSymbolButtons,
   parseRulesetRules,
@@ -74,6 +71,72 @@ import useDerivationInputTracking from './useDerivationInputTracking.js'
 import useDerivationProof from './useDerivationProof.js'
 
 const LINE_GATE_MESSAGE = 'Re-check current line to move onto the next line.'
+
+const DERIVATION_FULLSCREEN_STACK_SX = {
+  flex: 1,
+  minHeight: 0,
+  minWidth: 0,
+  width: '100%',
+  maxWidth: '100%',
+  display: 'flex',
+  flexDirection: 'column',
+  overflow: 'hidden',
+}
+
+const DERIVATION_FULLSCREEN_ACTION_BAR_SX = {
+  mt: 1,
+  flexShrink: 0,
+  pl: 2,
+  pr: 0,
+  pt: 1.5,
+  pb: 2,
+  bgcolor: 'background.paper',
+  borderTop: 1,
+  borderColor: 'divider',
+}
+
+function getDerivationWrapperSx({ isFullScreen, hideActions }) {
+  if (isFullScreen) {
+    return {
+      py: 2,
+      pl: 0,
+      pr: 0,
+      position: 'relative',
+      flex: 1,
+      minHeight: 0,
+      minWidth: 0,
+      width: '100%',
+      maxWidth: '100%',
+      display: 'flex',
+      flexDirection: 'column',
+      boxSizing: 'border-box',
+      overflowY: 'auto',
+      overflowX: 'hidden',
+    }
+  }
+  return hideActions ? { p: 0, position: 'relative', width: '100%' } : undefined
+}
+
+// fullscreen drops the extra padding and lets the table fill the overlay
+const getDerivationTableContainerSx = (isFullScreen) => ({
+  width: '100%',
+  ...(isFullScreen
+    ? { overflowX: 'hidden', overflow: 'visible', padding: 0, margin: 0 }
+    : { overflowX: 'auto', overflowY: 'hidden', WebkitOverflowScrolling: 'touch' }),
+})
+
+// fullscreen pins the layout and drops right padding on the last column
+const getDerivationTableSx = ({ isFullScreen, isMobile }) => ({
+  '& .MuiTableRow-root': { height: 'auto' },
+  ...(isFullScreen
+    ? {
+        tableLayout: 'fixed',
+        width: '100%',
+        '& td:last-child': { paddingRight: '0 !important' },
+        '& .MuiTableCell-root:last-child': { paddingRight: '0 !important' },
+      }
+    : { width: 'auto', minWidth: isMobile ? DERIVATION_FORMULA_MIN_WIDTH : DERIVATION_FORMULA_WIDTH }),
+})
 
 function applyLineChange(lines, index, field, value) {
   const line = lines[index]
@@ -817,7 +880,6 @@ export default function DerivationTable({
             {!usesNestedSubderivations && !isFixedProof && premises.length === 0 && proof?.conclusion && (
               <DerivationConclusionRow
                 key="conclusion-row"
-                isCompact={isFullScreen || isMobile}
                 isFullScreen={isFullScreen}
                 isMobile={isMobile}
                 onInsert={(insert) => insertSymbol({ insert })}
@@ -838,8 +900,8 @@ export default function DerivationTable({
               return (
               <TableRow key={`line-${idx}`} sx={getDerivationRowSx(isMobile)}>
                 <DerivationLineNumberCell
-                  isCompact={isFullScreen || isMobile}
                   isFullScreen={isFullScreen}
+                  isMobile={isMobile}
                   lineNumber={idx + 1}
                   onCite={() => handleRowNumberClick(idx + 1)}
                   showsFitchLine={usesNestedSubderivations}

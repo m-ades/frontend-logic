@@ -7,8 +7,8 @@ import {
 } from './derivationTableConfig.js'
 
 export default function DerivationLineNumberCell({
-  isCompact,
   isFullScreen,
+  isMobile,
   lineNumber,
   onCite,
   showsFitchLine,
@@ -16,7 +16,7 @@ export default function DerivationLineNumberCell({
   return (
     <TableCell
       sx={{
-        ...getDerivationNumberCellWidthSx(isCompact),
+        ...getDerivationNumberCellWidthSx(isFullScreen || isMobile),
         borderBottom: 'none',
         px: 0.5,
         textAlign: 'center',
