@@ -194,6 +194,7 @@ export default function useStudentDeadlinePolicies({
       setExtraLateDays,
       setLatePenaltyWaived,
     },
+    // named after the extension popover's props so the modal can spread them
     extension: {
       anchorEl: extensionAnchorEl,
       assignmentName: extensionPopoverAssignment?.name,
@@ -201,11 +202,11 @@ export default function useStudentDeadlinePolicies({
       error: extensionError,
       saving: extensionSaving,
       time: extensionTime,
-      close: closeExtension,
-      save: saveExtension,
-      select: selectExtensionAssignment,
-      setDate: setExtensionDate,
-      setTime: setExtensionTime,
+      onClose: closeExtension,
+      onDateChange: setExtensionDate,
+      onSave: saveExtension,
+      onTimeChange: setExtensionTime,
     },
+    selectExtensionAssignment,
   };
 }

@@ -37,7 +37,7 @@ export default function StudentProfileModal({
   const { courses, activeCourseId } = courseState;
   const activeCourse = courses.find((c) => c.id === activeCourseId);
   const gradingScale = activeCourse?.gradingScale || getDefaultGradingScale();
-  const { deadlineMap, accommodation, extension } = useStudentDeadlinePolicies({
+  const { deadlineMap, accommodation, extension, selectExtensionAssignment } = useStudentDeadlinePolicies({
     open,
     student,
     assignments,
@@ -193,22 +193,10 @@ export default function StudentProfileModal({
           canEditAccommodations={canEditAccommodations}
           deadlineMap={deadlineMap}
           gradingScale={gradingScale}
-          onSelectAssignment={extension.select}
+          onSelectAssignment={selectExtensionAssignment}
         />
       </DialogContent>
-      <ExtensionPopover
-        anchorEl={extension.anchorEl}
-        anchorHorizontal="left"
-        assignmentName={extension.assignmentName}
-        date={extension.date}
-        error={extension.error}
-        onClose={extension.close}
-        onDateChange={extension.setDate}
-        onSave={extension.save}
-        onTimeChange={extension.setTime}
-        saving={extension.saving}
-        time={extension.time}
-      />
+      <ExtensionPopover {...extension} anchorHorizontal="left" />
       <AccommodationPopover accommodation={accommodation} studentName={student?.username} />
     </Dialog>
   );
