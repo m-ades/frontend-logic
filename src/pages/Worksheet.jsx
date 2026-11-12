@@ -241,6 +241,7 @@ function RealWorksheetContent() {
   const desiredQuestionSessionQuestionIdRef = useRef(null)
   const questionSessionSyncRef = useRef(Promise.resolve())
   const lastActivityRef = useRef(null)
+  const staleSessionEndRef = useRef(null)
   const idleTimeoutIdRef = useRef(null)
   const scheduleIdleTimeoutRef = useRef(() => {})
   const activeUserId = getActiveUserId()
@@ -374,11 +375,13 @@ function RealWorksheetContent() {
         const desiredQuestionId = desiredQuestionSessionQuestionIdRef.current || null
         const activeSessionId = questionSessionId.current
         const activeQuestionId = questionSessionQuestionIdRef.current || null
+        const staleEnd = staleSessionEndRef.current
 
-        if (activeSessionId && (!desiredQuestionId || desiredQuestionId !== activeQuestionId)) {
+        if (activeSessionId && (staleEnd !== null || !desiredQuestionId || desiredQuestionId !== activeQuestionId)) {
           const closingSessionId = activeSessionId
+          staleSessionEndRef.current = null
           // cap at the idle window so a sleeping laptop or frozen timer isn't counted as work
-          const endedAt = Math.min(Date.now(), (lastActivityRef.current ?? Date.now()) + QUESTION_IDLE_TIMEOUT_MS)
+          const endedAt = staleEnd ?? Math.min(Date.now(), (lastActivityRef.current ?? Date.now()) + QUESTION_IDLE_TIMEOUT_MS)
           try {
             await fetchJson(`/api/question-sessions/${closingSessionId}`, {
               method: 'PUT',
@@ -400,6 +403,7 @@ function RealWorksheetContent() {
           const startedAt = Date.now()
           // opening a question counts as activity so the end cap never lands before the start
           lastActivityRef.current = startedAt
+          staleSessionEndRef.current = null
           try {
             const session = await fetchJson('/api/question-sessions', {
               method: 'POST',
@@ -471,7 +475,13 @@ function RealWorksheetContent() {
     scheduleIdleTimeoutRef.current = scheduleIdleTimeout
 
     const handleActivity = () => {
-      lastActivityRef.current = Date.now()
+      const now = Date.now()
+      // timers pause while a laptop sleeps so a session can outlive its idle window, close it at the cap
+      if (questionSessionId.current && now - (lastActivityRef.current ?? now) > QUESTION_IDLE_TIMEOUT_MS) {
+        staleSessionEndRef.current = lastActivityRef.current + QUESTION_IDLE_TIMEOUT_MS
+        syncQuestionSession()
+      }
+      lastActivityRef.current = now
       /*
       an idle timeout (or a failed create) can leave no active session while
       the user is still on a question. keystrokes/clicks/scroll resume it -
