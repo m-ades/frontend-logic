@@ -26,10 +26,10 @@ import { useAppRuntime } from "../../../hooks/useAppRuntime.js";
 import { excludeNonStudents } from "../../../utils/GradebookUtils.js";
 
 const difficultyPresentation = {
-  too_easy: { label: "Too easy", color: "info" },
-  too_hard: { label: "Too hard", color: "error" },
-  confusing: { label: "Confusing", color: "warning" },
-  balanced: { label: "Balanced", color: "success" },
+  too_easy: { label: "Too easy", color: "info", hint: "Students finish quickly with high correctness; good as a warm-up." },
+  too_hard: { label: "Too hard", color: "error", hint: "Students spend a long time with low correctness; consider revising or scaffolding." },
+  confusing: { label: "Confusing", color: "warning", hint: "Short time but low correctness; wording or concepts may be unclear." },
+  balanced: { label: "Balanced", color: "success", hint: "Time and correctness are in a healthy range for practice." },
 };
 
 /**
@@ -77,14 +77,6 @@ export const AssignmentOverviewTable = ({
           )
         : 0);
 
-    const lateSubmissions =
-      assignment.lateSubmissions ??
-      gradebookStudentsOnly.filter(
-        (student) =>
-          Boolean(student.submittedAssignments?.[assignmentId]) &&
-          student.lateSubmissions?.[assignmentId]
-      ).length;
-
     const avgAttempts = assignment.avgAttempts ?? null;
     const medianMinutesPerQuestion = numberOrNull(assignment.medianMinutesPerQuestion);
     const firstTryCorrectRate = numberOrNull(assignment.firstTryCorrectRate);
@@ -96,7 +88,6 @@ export const AssignmentOverviewTable = ({
       dueTime: assignment.dueTime || assignment.due_time,
       submissions,
       average,
-      lateSubmissions,
       avgAttempts,
       totalStudents,
       medianMinutesPerQuestion,
@@ -394,11 +385,13 @@ export const AssignmentOverviewTable = ({
                     </TableCell>
                     <TableCell align="center">
                       {difficultyPresentation[assignment.difficultyLabel] ? (
-                        <Chip
-                          label={difficultyPresentation[assignment.difficultyLabel].label}
-                          size="small"
-                          color={difficultyPresentation[assignment.difficultyLabel].color}
-                        />
+                        <MuiTooltip title={difficultyPresentation[assignment.difficultyLabel].hint}>
+                          <Chip
+                            label={difficultyPresentation[assignment.difficultyLabel].label}
+                            size="small"
+                            color={difficultyPresentation[assignment.difficultyLabel].color}
+                          />
+                        </MuiTooltip>
                       ) : (
                         <Typography variant="body2" color="text.secondary">
                           —

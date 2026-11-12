@@ -32,6 +32,8 @@ const optionalLogicSystemFields = (value) => {
   return raw === undefined ? {} : logicSystemFields(raw)
 }
 
+const SANDBOX_DIFFICULTY_LABELS = ['balanced', 'too_easy', 'balanced', 'confusing', 'too_hard']
+
 const average = (values) => (
   values.length > 0 ? values.reduce((sum, value) => sum + value, 0) / values.length : 0
 )
@@ -274,7 +276,7 @@ export function InstructorSandboxProvider({ children }) {
     Object.fromEntries(
       Object.entries(courseState.assignmentsByCourse || {}).map(([courseId, assignments]) => {
         const students = excludeNonStudents(courseState.gradebookByCourse?.[courseId] || [])
-        const assignmentStats = (assignments || []).map((assignment) => {
+        const assignmentStats = (assignments || []).map((assignment, index) => {
           const grades = students
             .map((student) => Number(student.grades?.[assignment.id]))
             .filter((value) => Number.isFinite(value))
@@ -287,7 +289,9 @@ export function InstructorSandboxProvider({ children }) {
             students_submitted: students.filter((student) => Boolean(student.submittedAssignments?.[assignment.id])).length,
             avg_score: grades.length > 0 ? average(grades) : null,
             avg_attempt: average(attempts),
+            first_try_correct_rate: grades.length > 0 ? average(grades) / 125 : null,
             median_minutes_per_question: 6 + questionCount * 2,
+            difficulty_label: SANDBOX_DIFFICULTY_LABELS[index % SANDBOX_DIFFICULTY_LABELS.length],
           }
         })
 
