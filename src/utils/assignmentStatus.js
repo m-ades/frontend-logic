@@ -76,6 +76,7 @@ export function getExtensionDueLabel(assignment, extensionDueAt) {
   const originalTs = originalDue?.getTime();
   const extendedTs = Date.parse(extensionDueAt);
   if (!Number.isFinite(originalTs) || !Number.isFinite(extendedTs)) return null;
-  if (Math.abs(extendedTs - originalTs) < 1000) return null;
+  // the popover saves whole minutes so a gap under a minute is the due time itself
+  if (Math.abs(extendedTs - originalTs) < 60_000) return null;
   return formatEasternFromIso(extensionDueAt, { includeTime: true }) ?? null;
 }
