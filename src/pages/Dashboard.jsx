@@ -397,19 +397,15 @@ export default function Dashboard() {
     return [low, high]
   }, [mainChartData, useFullScale])
 
-  const activityStats = useMemo(() => [
-    {
-      label: 'Typical time per question',
-      value: formatMinutes(analytics.time.median_minutes_per_question),
-      subtext: 'Median (recent)',
-    },
-    {
-      label: '3 in 4 questions take under',
-      value: formatMinutes(analytics.time.p75_minutes_per_question),
-      subtext: '75th percentile',
-    },
-    { label: 'Submissions', value: `${analytics.submissionCount}`, subtext: 'Total' },
-  ], [
+  const activityStats = useMemo(() => {
+    const median = formatMinutes(analytics.time.median_minutes_per_question)
+    const p75 = formatMinutes(analytics.time.p75_minutes_per_question)
+    return [
+      { label: 'Typical time per question', value: median, subtext: 'Median (recent)' },
+      { label: 'Most questions fall in', value: median === p75 ? median : `${median}–${p75}`, subtext: 'Median–75th percentile' },
+      { label: 'Submissions', value: `${analytics.submissionCount}`, subtext: 'Total' },
+    ]
+  }, [
     analytics.submissionCount,
     analytics.time.median_minutes_per_question,
     analytics.time.p75_minutes_per_question,
