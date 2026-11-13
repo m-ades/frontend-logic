@@ -135,7 +135,7 @@ export default function ComboTranslationDerivation({
   const symbols = getSymbols(logicSystem)
   const allowIndexedSymbols = notation === 'calgary'
   const Formula = useMemo(() => getFormulaClass(notation), [notation])
-  const canonicalizeArgumentLine = useCallback((value) => {
+  const tidyArgumentLine = useCallback((value) => {
     // saved lines come back with ascii indices so even partial lines need display form
     const displayed = displayIndexedSymbolsForNotation(value, notation)
     const parsed = parseArgumentLine(value)
@@ -145,8 +145,8 @@ export default function ComboTranslationDerivation({
     if (premises.some((formula) => !formula.wellformed) || !conclusion.wellformed) {
       return displayed
     }
-    const canonical = `${premises.map((formula) => formula.normal).join(' / ')} // ${conclusion.normal}`
-    return displayIndexedSymbolsForNotation(canonical, notation)
+    const tidied = `${premises.map((formula) => formula.display).join(' / ')} // ${conclusion.display}`
+    return displayIndexedSymbolsForNotation(tidied, notation)
   }, [Formula, notation])
   const snapshot = proof?.comboTranslationDerivation || proof?.snapshot || proof?.questionSnapshot || proof?.question_snapshot || proof || {}
   const promptText = snapshot?.prompt || proof?.description || ''
@@ -163,19 +163,19 @@ export default function ComboTranslationDerivation({
   ) ?? proof?.answer ?? snapshot?.answer
   const answerArgumentLine = useMemo(() => {
     const line = getAnswerArgumentLine(answer)
-    return line ? canonicalizeArgumentLine(line) : ''
-  }, [answer, canonicalizeArgumentLine])
+    return line ? tidyArgumentLine(line) : ''
+  }, [answer, tidyArgumentLine])
   const [argumentLine, setArgumentLine] = useState(
-    () => canonicalizeArgumentLine(savedState?.argumentLine ?? '')
+    () => tidyArgumentLine(savedState?.argumentLine ?? '')
   )
   const [derivationState, setDerivationState] = useState(savedState?.derivationState ?? null)
   const inputRef = useRef(null)
 
   useEffect(() => {
     if (savedState?.argumentLine !== undefined) {
-      setArgumentLine(canonicalizeArgumentLine(savedState.argumentLine))
+      setArgumentLine(tidyArgumentLine(savedState.argumentLine))
     }
-  }, [canonicalizeArgumentLine, savedState?.argumentLine])
+  }, [tidyArgumentLine, savedState?.argumentLine])
 
   useEffect(() => {
     setDerivationState(savedState?.derivationState ?? null)
@@ -263,8 +263,8 @@ export default function ComboTranslationDerivation({
     updateState({ argumentLine: value, derivationState: null })
   }
   const handleArgumentBlur = () => {
-    const canonical = canonicalizeArgumentLine(argumentLine)
-    if (canonical !== argumentLine) handleArgumentChange(canonical)
+    const tidied = tidyArgumentLine(argumentLine)
+    if (tidied !== argumentLine) handleArgumentChange(tidied)
   }
 
   const handleDerivationChange = (state) => {

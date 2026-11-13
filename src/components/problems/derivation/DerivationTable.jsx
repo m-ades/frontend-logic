@@ -202,9 +202,9 @@ export default function DerivationTable({
     conclusionTargetText,
     initialLines,
     isFixedProof,
-    normalizeFormulaForCheck,
     normalizeFormulaForDisplay,
     premises,
+    tidyTypedFormula,
   } = useDerivationProof({
     activeLogicSystem,
     fixedLines,
@@ -321,14 +321,14 @@ export default function DerivationTable({
     linesSnapshot,
     proof?.conclusion,
     premises,
-    normalizeFormulaForCheck,
+    tidyTypedFormula,
     normalizeJustification,
     {
       nestedSubderivations: usesNestedSubderivations,
       assumptionRules: activeAssumptionRules,
       canonicalScopes: usesFixedScopeNesting,
     }
-  ), [activeAssumptionRules, premises, proof?.conclusion, normalizeFormulaForCheck, normalizeJustification, usesFixedScopeNesting, usesNestedSubderivations])
+  ), [activeAssumptionRules, premises, proof?.conclusion, tidyTypedFormula, normalizeJustification, usesFixedScopeNesting, usesNestedSubderivations])
 
   const emitState = useCallback((linesSnapshot, options = {}) => {
     const submission = buildCurrentSubmission(linesSnapshot)
@@ -354,7 +354,7 @@ export default function DerivationTable({
     checkDerivation,
     isLineComplete: isLineCompleteForCheck,
     lines,
-    normalizeFormula: normalizeFormulaForCheck,
+    normalizeFormula: tidyTypedFormula,
     normalizeJustification,
     notation,
     pendingFocusRef,
@@ -638,7 +638,7 @@ export default function DerivationTable({
     if (!el) return
     if (event.key === 'Enter') {
       event.preventDefault()
-      const normalized = normalizeFormulaForCheck(el.value)
+      const normalized = tidyTypedFormula(el.value)
       handleLineCommit(index, 'formula', normalized)
       focusJustification(index)
       return
@@ -917,7 +917,7 @@ export default function DerivationTable({
                   mobileKeyboardEnabled={mobileLogicKeyboardEnabled}
                   onActivate={() => activateFormula(idx)}
                   onChange={(event) => handleFormulaChange(event, idx)}
-                  onCommit={(value) => handleLineCommit(idx, 'formula', normalizeFormulaForCheck(value))}
+                  onCommit={(value) => handleLineCommit(idx, 'formula', tidyTypedFormula(value))}
                   onCursorChange={(event) => trackFormulaCursor(idx, event)}
                   onInsert={(insert) => insertSymbol({ insert })}
                   onKeyDown={(event) => handleFormulaKeyDown(event, idx)}
