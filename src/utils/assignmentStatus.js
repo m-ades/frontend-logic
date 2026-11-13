@@ -5,14 +5,14 @@ import { projectPublicationState } from "./publicationPolicy.js";
  * Get status color for an assignment or practice
  * Due dates are compared in Eastern time so Feb 1 means end of Feb 1 Eastern.
  */
-export function getStatusColor(item, isPractice = false) {
+export function getStatusColor(item) {
   const now = new Date();
   const publication = projectPublicationState(item, now);
   const dueDate = item.dueDate ? parseDueDateAsEastern(item.dueDate, item.dueTime) : null;
 
   if (publication.isLocked && publication.publishAt) return "info";
   if (publication.isLocked) return "default";
-  if (dueDate && dueDate < now) return isPractice ? "info" : "error";
+  if (dueDate && dueDate < now) return "error";
   return "success";
 }
 
@@ -20,14 +20,14 @@ export function getStatusColor(item, isPractice = false) {
  * Get status text for an assignment or practice
  * Due dates are compared in Eastern time.
  */
-export function getStatusText(item, isPractice = false) {
+export function getStatusText(item) {
   const now = new Date();
   const publication = projectPublicationState(item, now);
   const dueDate = item.dueDate ? parseDueDateAsEastern(item.dueDate, item.dueTime) : null;
 
   if (publication.isLocked && publication.publishAt) return "Scheduled";
   if (publication.isLocked) return "Locked";
-  if (dueDate && dueDate < now) return isPractice ? "Available" : "Past Due";
+  if (dueDate && dueDate < now) return "Past Due";
   return "Active";
 }
 
@@ -57,8 +57,6 @@ export function enhanceItems(
     if (isPractice) {
       enhanced.attempts = item.attempts || 0;
       enhanced.completions = item.completions || 0;
-      enhanced.allowRetakes = item.allowRetakes ?? true;
-      enhanced.showSolutions = item.showSolutions ?? true;
     } else {
       enhanced.totalPoints = item.totalPoints || 100;
     }

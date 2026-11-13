@@ -368,8 +368,6 @@ export function InstructorSandboxProvider({ children }) {
     question_count: previousItem?.questionCount || previousItem?.question_count || previousItem?.proofs?.length || 0,
     lateWindowDays: previousItem?.lateWindowDays ?? 3,
     latePenaltyPercent: previousItem?.latePenaltyPercent ?? 10,
-    allowRetakes: kind === 'practice' ? (formData.allowRetakes ?? previousItem?.allowRetakes ?? true) : undefined,
-    showSolutions: kind === 'practice' ? (formData.showSolutions ?? previousItem?.showSolutions ?? true) : undefined,
     proofs: previousItem?.proofs ? previousItem.proofs.map((proof) => ({ ...proof })) : [],
   })
 

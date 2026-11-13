@@ -7,7 +7,6 @@ const addDays = (date, days) => {
 const now = new Date()
 const SANDBOX_SESSION_START_KEY = 'logicapp_sandbox_started_at_v2'
 const ASSIGNMENT_DAY_OFFSETS = [0, 3, 7]
-const PRACTICE_DAY_OFFSETS = [3, 10, 17, 24]
 
 const cloneProofs = (proofs = []) => proofs.map((proof) => ({ ...proof }))
 
@@ -19,14 +18,6 @@ const cloneActivitiesWithOffsets = (items = [], offsets = []) => {
     proofs: cloneProofs(item.proofs),
   }))
 }
-
-const clonePracticesWithoutDueDates = (items = []) => (
-  items.map((item) => ({
-    ...item,
-    due_at: null,
-    proofs: cloneProofs(item.proofs),
-  }))
-)
 
 export const ensureSandboxSessionStart = () => {
   if (typeof window === 'undefined') return now
@@ -335,7 +326,6 @@ export const SANDBOX_PRACTICES = [
     description: '',
     chapter: 1,
     subchapter: '1.1',
-    due_at: addDays(now, 2),
     kind: 'practice',
     is_locked: false,
     total_points: 500,
@@ -469,7 +459,6 @@ export const SANDBOX_PRACTICES = [
     description: '',
     chapter: 1,
     subchapter: '1.2',
-    due_at: addDays(now, 4),
     kind: 'practice',
     is_locked: false,
     total_points: 500,
@@ -551,7 +540,6 @@ export const SANDBOX_PRACTICES = [
     description: '',
     chapter: 2,
     subchapter: '2.1',
-    due_at: addDays(now, 6),
     kind: 'practice',
     is_locked: false,
     total_points: 500,
@@ -620,7 +608,6 @@ export const SANDBOX_PRACTICES = [
     description: '',
     chapter: 2,
     subchapter: '2.2',
-    due_at: addDays(now, 8),
     kind: 'practice',
     is_locked: false,
     total_points: 500,
@@ -750,7 +737,7 @@ export const SANDBOX_PRACTICES = [
 ]
 
 export const getSandboxPractices = () => (
-  clonePracticesWithoutDueDates(SANDBOX_PRACTICES)
+  SANDBOX_PRACTICES.map((item) => ({ ...item, proofs: cloneProofs(item.proofs) }))
 )
 
 export const getSandboxClassroomAnalytics = () => {

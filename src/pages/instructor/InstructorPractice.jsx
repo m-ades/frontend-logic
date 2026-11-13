@@ -18,16 +18,12 @@ import { hasInstructorAccess } from "../../utils/auth.js";
 
 const INITIAL_FORM_DATA = {
   name: "",
-  dueDate: "",
-  dueTime: "23:59",
   publishDate: "",
   publishTime: "00:00",
   chapter: 1,
   subchapter: 1,
   isLocked: true,
   groupQuestionsByType: false,
-  allowRetakes: true,
-  showSolutions: true,
 };
 
 export default function InstructorPractice() {
@@ -91,16 +87,13 @@ export default function InstructorPractice() {
     setSelectedPractice(practice);
     setFormData({
       name: practice.name,
-      dueDate: practice.dueDate || "",
-      dueTime: practice.dueTime || "23:59",
-      publishDate: practice.publishDate || "",
+      // locked items keep a schedule
+      publishDate: practice.isLocked ? practice.publishDate || "" : "",
       publishTime: practice.publishTime || "00:00",
       chapter: practice.chapter || 1,
       subchapter: practice.subchapter || 1,
       isLocked: practice.isLocked ?? false,
       groupQuestionsByType: practice.groupQuestionsByType ?? false,
-      allowRetakes: practice.allowRetakes ?? true,
-      showSolutions: practice.showSolutions ?? true,
     });
     setEditDialogOpen(true);
     setMenuAnchor(null);
@@ -251,8 +244,8 @@ export default function InstructorPractice() {
             "Create your first practice assignment to help students learn",
           buttonText: "Create Practice",
         }}
-        getStatusColor={(item) => getStatusColor(item, true)}
-        getStatusText={(item) => getStatusText(item, true)}
+        getStatusColor={getStatusColor}
+        getStatusText={getStatusText}
       />
 
       {/* Context Menu */}

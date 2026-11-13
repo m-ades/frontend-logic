@@ -130,8 +130,6 @@ export const getInstructorSandboxPractices = () => getSandboxPractices().map((pr
     question_count: practice.proofs.length,
     isPublished: true,
     isLocked: false,
-    allowRetakes: true,
-    showSolutions: true,
     proofs: cloneProofs(`sandbox-practice-${index + 1}`, practice.proofs),
   }
 })
