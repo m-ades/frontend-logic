@@ -2,10 +2,7 @@ import { Box, IconButton, Stack, TableCell, TableRow, Tooltip } from '@mui/mater
 import SubdirectoryArrowRightIcon from '@mui/icons-material/SubdirectoryArrowRight'
 import { getInsertSymbolLabel } from '../../ui/logic-engine/LogicSymbol.jsx'
 import LogicSymbolKeyRow from '../../ui/logic-engine/LogicSymbolKeyRow.jsx'
-import {
-  DERIVATION_NUMBER_CELL_WIDTH_DESKTOP,
-  DERIVATION_NUMBER_CELL_WIDTH_MOBILE,
-} from './derivationTableConfig.js'
+import { getDerivationNumberCellWidthSx } from './derivationTableConfig.js'
 
 export default function DerivationKeyboardRow({
   canAddLine,
@@ -18,9 +15,6 @@ export default function DerivationKeyboardRow({
   symbolButtons,
 }) {
   const compactMobileKeyboard = isPhone && isFullScreen && mobileLogicKeyboardEnabled
-  const numberWidth = isFullScreen || isMobile
-    ? DERIVATION_NUMBER_CELL_WIDTH_MOBILE
-    : DERIVATION_NUMBER_CELL_WIDTH_DESKTOP
   const density = isPhone && isFullScreen ? 'touch' : isFullScreen ? 'compact' : 'standard'
   const rowButtons = symbolButtons.map(({ label, insert, pair }) => ({
     key: label,
@@ -31,7 +25,7 @@ export default function DerivationKeyboardRow({
 
   return (
     <TableRow sx={{ '& td': { verticalAlign: 'middle', py: isMobile ? 0.25 : 0.5 } }}>
-      <TableCell sx={{ width: numberWidth, minWidth: isFullScreen || isMobile ? numberWidth : undefined, borderBottom: 'none', px: 0.5, textAlign: 'center' }}>
+      <TableCell sx={{ ...getDerivationNumberCellWidthSx(isFullScreen || isMobile), borderBottom: 'none', px: 0.5, textAlign: 'center' }}>
         {onAddLine && (
           <Tooltip title="New line">
             <span style={{ display: 'inline-flex' }}>

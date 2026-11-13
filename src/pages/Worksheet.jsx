@@ -15,6 +15,7 @@ import { useCoursesState } from '../context/CoursesContext.jsx'
 import { worksheetQuery } from '../hooks/useWarmWorksheets.js'
 import { useAppRuntime } from '../hooks/useAppRuntime.js'
 import { hasStaffAccess } from '../utils/auth.js'
+import { ASSIGNMENT_SUBMISSION_EVENT } from '../utils/submissionRuntime.js'
 import { DEFAULT_LOGIC_SYSTEM, isDerivationProblemType, normalizeLogicSystem } from '../lib/logicSystems.js'
 import { mapQuestionToProof, logicSystemForQuestionType } from '../lib/mapQuestionToProof.js'
 import WorksheetTextbookSplit from '../components/textbook/WorksheetTextbookSplit.jsx'
@@ -670,8 +671,8 @@ function RealWorksheetContent() {
       }
       // sidebar total is local only.
     }
-    window.addEventListener('assignment-submission', handleSubmission)
-    return () => window.removeEventListener('assignment-submission', handleSubmission)
+    window.addEventListener(ASSIGNMENT_SUBMISSION_EVENT, handleSubmission)
+    return () => window.removeEventListener(ASSIGNMENT_SUBMISSION_EVENT, handleSubmission)
   }, [refreshQuestionSolutions, queryClient])
 
   useEffect(() => {

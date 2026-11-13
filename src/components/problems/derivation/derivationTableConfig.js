@@ -1,6 +1,15 @@
 import { formatNumber } from "../../../utils/numberUtils.js";
 import { alpha } from '@mui/material/styles'
 import { formatDerivationRuleName } from '../../../lib/derivationRules.js'
+import { getProofSymbolButtons } from '../../ui/logic-engine/symbolButtons.js'
+import {
+  PREDICATE_VARIABLES,
+  getConstantLettersFromFormulasAndKey,
+  getConstantLettersFromPrompt,
+  getPredicateLettersFromKey,
+  getPropositionalLettersFromFormulas,
+  isPredicateLogicKey,
+} from './derivationUtils.js'
 
 export const AUTO_CHECK_STORAGE_KEY = 'logic-app:autocheck-enabled'
 export const RULE_INPUT_MODE_KEY = 'logic-app:derivation-rule-input-mode'
@@ -9,8 +18,8 @@ export const DERIVATION_LINE_FONT_SIZE = '1.25rem'
 export const DERIVATION_PROMPT_FONT_SIZE = '1.171875rem'
 export const DERIVATION_CAPTION_FONT_SIZE = '0.875rem'
 export const DERIVATION_SMALL_FONT_SIZE = '0.8125rem'
-export const DERIVATION_NUMBER_CELL_WIDTH_MOBILE = '2.25rem'
-export const DERIVATION_NUMBER_CELL_WIDTH_DESKTOP = '2.5rem'
+const DERIVATION_NUMBER_CELL_WIDTH_MOBILE = '2.25rem'
+const DERIVATION_NUMBER_CELL_WIDTH_DESKTOP = '2.5rem'
 export const DERIVATION_FORMULA_MIN_WIDTH = '15.625rem'
 export const DERIVATION_FORMULA_WIDTH = '21.875rem'
 export const DERIVATION_RULE_WIDTH_MOBILE = '4.375rem'
@@ -27,6 +36,19 @@ export const getFitchLineColor = (theme) => alpha(
   theme.palette.text.primary,
   theme.palette.mode === 'dark' ? 0.52 : 0.42
 )
+
+export const getDerivationRowSx = (isMobile) => ({
+  '& td': {
+    py: isMobile ? 0.25 : 0.5,
+    position: 'relative',
+    verticalAlign: 'middle',
+  },
+})
+
+export const getDerivationNumberCellWidthSx = (isCompact) => ({
+  width: isCompact ? DERIVATION_NUMBER_CELL_WIDTH_MOBILE : DERIVATION_NUMBER_CELL_WIDTH_DESKTOP,
+  minWidth: isCompact ? DERIVATION_NUMBER_CELL_WIDTH_MOBILE : undefined,
+})
 
 export function parseRulesetRules(value, derivationRuleLookup) {
   const source = Array.isArray(value) ? value : String(value ?? '').split(/[,\s]+/g)
@@ -60,6 +82,63 @@ export const getSymbolButtons = (symbols, syntax) => [
   { label: '(  )', pair: '()' },
   { label: '[  ]', pair: '[]' },
 ]
+
+/*
+predicate mode shows predicate constant and variable rows
+propositional mode shows only sentence letters with no quantifiers
+*/
+export function getDerivationKeyboardConfig(proof, { symbols, syntax, allowIndexedSymbols }) {
+  const qSnap = proof?.questionSnapshot ?? proof?.snapshot ?? proof?.question_snapshot
+  const rawKey =
+    proof?.symbolizationKey ??
+    proof?.snapshot?.symbolizationKey ??
+    proof?.question_snapshot?.symbolizationKey ??
+    qSnap?.symbolizationKey ??
+    qSnap?.symbolization_key
+  const key = Array.isArray(rawKey) ? rawKey : []
+  const premises = Array.isArray(proof?.premises) ? proof.premises : []
+  const conclusion = proof?.conclusion ?? proof?.conc ?? ''
+  const formulaText = [...premises, conclusion].filter(Boolean).map(String).join(' ')
+  const extraSymbolButtons = getProofSymbolButtons({
+    symbols,
+    syntax,
+    allowIndexedSymbols,
+    premises,
+    conclusion,
+  })
+  const propositionalLetters = getPropositionalLettersFromFormulas(
+    premises,
+    conclusion,
+    allowIndexedSymbols
+  ) ?? []
+
+  const isPredicate = isPredicateLogicKey(key, allowIndexedSymbols) || /[∀∃]/.test(formulaText) || /[A-Z][a-z]/.test(formulaText) || /[A-Z](?:_[1-9][0-9]*|[₁-₉][₀-₉]*)?\s*\(/.test(formulaText)
+
+  if (!isPredicate) {
+    return {
+      isPredicateMode: false,
+      symbolizationKey: propositionalLetters,
+      extraSymbolButtons,
+    }
+  }
+
+  const keyText = key.map((line) => (typeof line === 'string' ? line : String(line ?? ''))).join(' ')
+  const textForConstants = [formulaText, keyText].filter(Boolean).join(' ') || ''
+  const constantsFromAnswer = getConstantLettersFromFormulasAndKey(formulaText, key, allowIndexedSymbols)
+  const constantLetters = [
+    ...constantsFromAnswer,
+    ...getConstantLettersFromPrompt(textForConstants, 3).filter((letter) => !constantsFromAnswer.includes(letter)),
+  ]
+  // prefer predicate letters from the key and fall back to uppercase letters in the formulas
+  const fromKey = getPredicateLettersFromKey(key, allowIndexedSymbols)
+  return {
+    isPredicateMode: true,
+    predicateLetters: fromKey.length > 0 ? fromKey : propositionalLetters,
+    constantLetters,
+    variableLetters: PREDICATE_VARIABLES,
+    extraSymbolButtons,
+  }
+}
 
 export function getDerivationScoreLabel({
   attemptCount,

@@ -34,6 +34,7 @@ import {
 } from './truthTableClassification.js'
 import PromptText from '../../ui/PromptText.jsx'
 import { tablesEqual, clearDebounce, scheduleDebouncedChange } from '../../../utils/tablePerf.js'
+import { announceAssignmentSubmission } from '../../../utils/submissionRuntime.js'
 import { getNotation } from '../../../lib/logicSystems.js'
 import { displayIndexedSymbolsForNotation } from '../../../lib/indexedSymbols.js'
 import { logicStatementsToTex } from '../../../lib/logicTex.js'
@@ -429,17 +430,13 @@ function TruthTableEditorContent({
           lastStatus: result.nextStatus,
           rawScore: result.score != null ? result.score : (result.isCorrect ? 100 : 0),
         })
-        if (typeof window !== 'undefined') {
-          window.dispatchEvent(new CustomEvent('assignment-submission', {
-            detail: {
-              assignmentQuestionId,
-              attempt: resp?.submission?.attempt,
-              attemptLimit: resp?.attempt_limit,
-              isCorrect: result.isCorrect,
-              score: result.score,
-            },
-          }))
-        }
+        announceAssignmentSubmission({
+          assignmentQuestionId,
+          attempt: resp?.submission?.attempt,
+          attemptLimit: resp?.attempt_limit,
+          isCorrect: result.isCorrect,
+          score: result.score,
+        })
         if (result.isCorrect) {
           setStatus('correct')
           setMessage(finalizeMessage(result.message, 'correct'))

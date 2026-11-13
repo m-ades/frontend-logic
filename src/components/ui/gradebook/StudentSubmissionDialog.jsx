@@ -8,7 +8,9 @@ import { useAppRuntime } from '../../../hooks/useAppRuntime.js'
 import { fetchCourseGradebook } from '../../../context/CoursesContext.jsx'
 import { fetchJson } from '../../../utils/api.js'
 import { formatEasternFromIso, splitEasternDateTime, toEasternIso } from '../../../utils/easternTime.js'
+import { getExtensionDueLabel } from '../../../utils/assignmentStatus.js'
 import { formatStudentDisplayName } from '../../../utils/GradebookUtils.js'
+import ExtensionPopover from '../ExtensionPopover.jsx'
 import SubmissionAnswer from './SubmissionAnswer.jsx'
 
 /*
@@ -50,14 +52,7 @@ export default function StudentSubmissionDialog({ student, assignment, onClose }
     queryFn: () => courseActions.getDeadlines?.(activeCourseId, student.id),
   })
   const deadlinePolicy = (deadlines || []).find((row) => row.assignment_id === assignment.id) || null
-  const extensionLabel = (() => {
-    if (!deadlinePolicy?.extension_due_at || !assignment.dueDate) return null
-    const originalTs = Date.parse(toEasternIso(assignment.dueDate, assignment.dueTime || '23:59'))
-    const extendedTs = Date.parse(deadlinePolicy.extension_due_at)
-    if (!Number.isFinite(originalTs) || !Number.isFinite(extendedTs)) return null
-    if (Math.abs(extendedTs - originalTs) < 1000) return null
-    return formatEasternFromIso(deadlinePolicy.extension_due_at, { includeTime: true })
-  })()
+  const extensionLabel = getExtensionDueLabel(assignment, deadlinePolicy?.extension_due_at)
 
   const [extensionAnchorEl, setExtensionAnchorEl] = useState(null)
   const [extensionDate, setExtensionDate] = useState('')
@@ -269,45 +264,18 @@ export default function StudentSubmissionDialog({ student, assignment, onClose }
       <DialogActions>
         <Button onClick={onClose}>Close</Button>
       </DialogActions>
-      <Popover
-        open={Boolean(extensionAnchorEl)}
+      <ExtensionPopover
         anchorEl={extensionAnchorEl}
+        assignmentName={assignment.name}
+        date={extensionDate}
+        error={extensionError}
         onClose={handleCloseExtension}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-        transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-        slotProps={{ paper: { sx: { p: 2, width: 320 } } }}
-      >
-        <Stack spacing={2}>
-          <Box>
-            <Typography variant="subtitle2" fontWeight={600}>Extension</Typography>
-            <Typography variant="caption" color="text.secondary">{assignment.name}</Typography>
-          </Box>
-          {extensionSaving && <LinearProgress />}
-          {extensionError && <Alert severity="error">{extensionError}</Alert>}
-          <TextField
-            label="New Due Date"
-            type="date"
-            value={extensionDate}
-            onChange={(e) => setExtensionDate(e.target.value)}
-            InputLabelProps={{ shrink: true }}
-            fullWidth
-          />
-          <TextField
-            label="New Due Time"
-            type="time"
-            value={extensionTime}
-            onChange={(e) => setExtensionTime(e.target.value)}
-            InputLabelProps={{ shrink: true }}
-            fullWidth
-          />
-          <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
-            <Button onClick={handleCloseExtension}>Cancel</Button>
-            <Button variant="contained" onClick={handleSaveExtension} disabled={extensionSaving}>
-              Save Extension
-            </Button>
-          </Box>
-        </Stack>
-      </Popover>
+        onDateChange={setExtensionDate}
+        onSave={handleSaveExtension}
+        onTimeChange={setExtensionTime}
+        saving={extensionSaving}
+        time={extensionTime}
+      />
       <Popover
         open={Boolean(attemptsAnchorEl)}
         anchorEl={attemptsAnchorEl}
