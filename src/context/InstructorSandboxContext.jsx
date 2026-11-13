@@ -288,7 +288,7 @@ export function InstructorSandboxProvider({ children }) {
             id: assignment.id,
             students_submitted: students.filter((student) => Boolean(student.submittedAssignments?.[assignment.id])).length,
             avg_score: grades.length > 0 ? average(grades) : null,
-            avg_attempt: average(attempts),
+            avg_attempt: average(attempts) / questionCount,
             first_try_correct_rate: grades.length > 0 ? average(grades) / 125 : null,
             median_minutes_per_question: 6 + questionCount * 2,
             difficulty_label: SANDBOX_DIFFICULTY_LABELS[index % SANDBOX_DIFFICULTY_LABELS.length],
