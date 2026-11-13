@@ -133,8 +133,10 @@ export default function InstructorDashboard() {
       const submissions = totalStudents
         ? Math.min(submissionsRaw, totalStudents)
         : submissionsRaw;
+      // a penalty can outlive reset submissions so only count students who submitted
       const lateSubmissions = studentsForAssignments.filter(
-        (student) => Boolean(student.lateSubmissions?.[assignment.id])
+        (student) => Boolean(student.submittedAssignments?.[assignment.id]) &&
+          Boolean(student.lateSubmissions?.[assignment.id])
       ).length;
       const dueAtValue = assignment.dueAt
         || (assignment.dueDate
