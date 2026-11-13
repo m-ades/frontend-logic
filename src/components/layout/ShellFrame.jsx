@@ -5,6 +5,8 @@ import Sidebar from "./Sidebar.jsx";
 import RulesReference from "../ui/RulesReference.jsx";
 import AccountSettingsDialog from "../ui/AccountSettingsDialog.jsx";
 import SkipLinks from "../ui/SkipLinks.jsx";
+import ErrorBoundary from "../ui/ErrorBoundary.jsx";
+import { useAppRuntime } from "../../hooks/useAppRuntime.js";
 import { useLayoutState } from "../../context/LayoutContext.jsx";
 
 export default function ShellFrame({
@@ -21,6 +23,7 @@ export default function ShellFrame({
   logicSystem,
 }) {
   const { isRulesReferenceOpen } = useLayoutState();
+  const { activeCourseId } = useAppRuntime();
   const mainContentRef = useRef(null);
   const theme = useTheme();
   const isLargeScreen = useMediaQuery(theme.breakpoints.up("lg"));
@@ -110,7 +113,14 @@ export default function ShellFrame({
               flexDirection: isImmersiveSplitRoute ? "column" : undefined,
             }}
           >
-            {children}
+            {/* a crashed page keeps the shell and recovers on navigation or a course switch */}
+            <ErrorBoundary
+              scoped
+              resetKey={`${location.pathname}|${activeCourseId}`}
+              message="This page failed to load."
+            >
+              {children}
+            </ErrorBoundary>
           </Box>
         </Box>
       </Box>
