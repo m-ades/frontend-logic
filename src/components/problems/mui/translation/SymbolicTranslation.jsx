@@ -5,7 +5,7 @@ import ProblemFrame from '../frame/ProblemFrame.jsx'
 import ProblemSetButtons from '../frame/ProblemSetButtons.jsx'
 import FormulaField from '../inputs/FormulaField.jsx'
 import SymbolButtonRow from '../../../ui/logic-engine/SymbolButtonRow.jsx'
-import { SLASH_SEPARATOR_BUTTONS, THEREFORE_SEPARATOR_BUTTONS } from '../../../ui/logic-engine/symbolButtons.js'
+import { IDENTITY_BUTTON, SLASH_SEPARATOR_BUTTONS, THEREFORE_SEPARATOR_BUTTONS } from '../../../ui/logic-engine/symbolButtons.js'
 import { useProblemChecker } from '../../../../hooks/useProblemChecker.js'
 import SolutionReveal from '../../SolutionReveal.jsx'
 import RichText from '../../../ui/RichText.jsx'
@@ -312,7 +312,7 @@ export default function SymbolicTranslation({
         aria-label="Your translation"
         symbolizationKey={symbolizationKey}
         includeQuantifiers={isPredicate}
-        extraInsertButtons={separatorButtons.mobile}
+        extraInsertButtons={isPredicate ? [IDENTITY_BUTTON, ...separatorButtons.mobile] : separatorButtons.mobile}
         allowTherefore
         predicateLetters={isPredicate ? predicateLetters : undefined}
         constantLetters={isPredicate ? constantLetters : undefined}

@@ -17,6 +17,9 @@ export const SLASH_SEPARATOR_BUTTONS = Object.freeze({
   mobile: SLASH_BUTTONS,
 })
 
+// the phone logic keyboard has no = key for identity either
+export const IDENTITY_BUTTON = Object.freeze({ insert: '=' })
+
 function getQuantifierButtonsFromFormulas(premises, conclusion, syntax) {
   const text = [...(Array.isArray(premises) ? premises : []), conclusion]
     .filter(Boolean)
