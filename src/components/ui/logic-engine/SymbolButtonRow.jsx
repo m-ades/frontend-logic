@@ -3,16 +3,6 @@ import { getNotation } from '../../../lib/logicSystems.js'
 import LogicSymbol, { getInsertSymbolLabel } from './LogicSymbol.jsx'
 import LogicSymbolKeyRow, { getLogicSymbolKeySx } from './LogicSymbolKeyRow.jsx'
 
-const FALLBACK_SYMBOLS = {
-  NOT: '~',
-  AND: '\u2022',
-  OR: '\u2228',
-  IFTHEN: '\u2283',
-  IFF: '\u2261',
-  FORALL: '\u2200',
-  EXISTS: '\u2203',
-}
-
 const BUTTONS = [
   { op: 'NOT' },
   { op: 'AND' },
@@ -39,19 +29,14 @@ export default function SymbolButtonRow({
   logicSystem,
 }) {
   const syntax = getSyntax(getNotation(logicSystem))
-  const symbols = syntax?.symbols || {}
-  const getQuantifierText = (op) => {
-    const sym = symbols?.[op] || FALLBACK_SYMBOLS[op] || op
-    return syntax?.mkquantifier?.('x', sym) ?? `${sym}x`
-  }
+  const getQuantifierText = (op) => syntax.mkquantifier('x', syntax.symbols[op])
 
   const resolveLabel = ({ op, quantifier = false, insert = null, pair = null, backspace = false, label }) => {
     if (backspace) return '←'
     if (label) return label
     if (insert) return insert
     if (pair) return `${pair[0]}  ${pair[1]}`
-    const sym = symbols?.[op] || FALLBACK_SYMBOLS[op] || op
-    return quantifier ? getQuantifierText(op) : sym
+    return quantifier ? getQuantifierText(op) : syntax.symbols[op]
   }
 
   // every key edits the formula field through its handle, whose own change event reaches the page
