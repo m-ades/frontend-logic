@@ -10,7 +10,7 @@ import { getVariableLettersOnly } from '../../../ui/LogicKeyboard/index.js'
 import { useProblemChecker } from '../../../../hooks/useProblemChecker.js'
 import SolutionReveal from '../../SolutionReveal.jsx'
 import RichText from '../../../ui/RichText.jsx'
-import { canonicalizeFormula } from '@logic-app/logic-engine/symbolic/formula.js'
+import { tidyFormula } from '@logic-app/logic-engine/symbolic/formula.js'
 import { sanitizeRichHtml } from '../../../../utils/sanitizeRichHtml.js'
 import {
   ST_PREDICATE_VARIABLES,
@@ -87,7 +87,7 @@ export default function SymbolicTranslation({
     (value) => mapTranslationAnswer(
       value,
       notation,
-      (statement) => canonicalizeFormula(statement, notation)
+      (statement) => tidyFormula(statement, notation)
     ),
     [notation]
   )
@@ -160,19 +160,19 @@ export default function SymbolicTranslation({
 
   const scheduleStateSave = useCallback((nextValue) => {
     if (!onStateChange) return
-    const canonical = normalizeAnswer(nextValue)
+    const tidied = normalizeAnswer(nextValue)
     if (saveTimerRef.current) {
       clearTimeout(saveTimerRef.current)
     }
     pendingSaveRef.current = () => {
       saveTimerRef.current = null
-      if (lastSavedValueRef.current === canonical) return
-      lastSavedValueRef.current = canonical
-      onStateChange({ ans: canonical })
+      if (lastSavedValueRef.current === tidied) return
+      lastSavedValueRef.current = tidied
+      onStateChange({ ans: tidied })
     }
     saveTimerRef.current = setTimeout(pendingSaveRef.current, 200)
   }, [normalizeAnswer, onStateChange])
-  const applyCanonicalValue = useCallback((value) => {
+  const applyTidiedValue = useCallback((value) => {
     if (readOnly) return
     const displayed = displayAnswer(value)
     setInputValue(displayed)
@@ -207,9 +207,9 @@ export default function SymbolicTranslation({
     if (hasHydratedRef.current) return
     if (savedState?.ans !== undefined) {
       hasHydratedRef.current = true
-      const canonical = normalizeAnswer(savedState.ans)
-      setInputValue(displayAnswer(canonical))
-      lastSavedValueRef.current = canonical
+      const tidied = normalizeAnswer(savedState.ans)
+      setInputValue(displayAnswer(tidied))
+      lastSavedValueRef.current = tidied
     }
   }, [displayAnswer, normalizeAnswer, savedState?.ans])
 
@@ -297,7 +297,7 @@ export default function SymbolicTranslation({
           setInputValue(value)
           scheduleStateSave(value)
         }}
-        onBlur={() => applyCanonicalValue(inputValue)}
+        onBlur={() => applyTidiedValue(inputValue)}
         readOnly={readOnly}
         onEnterKey={!readOnly && !hideActions ? handleCheck : undefined}
         placeholder={hasMultipleStatements

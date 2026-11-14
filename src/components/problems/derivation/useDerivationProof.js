@@ -1,5 +1,5 @@
 import { useCallback, useMemo } from 'react'
-import { canonicalizeFormula } from '@logic-app/logic-engine/symbolic/formula.js'
+import { tidyFormula } from '@logic-app/logic-engine/symbolic/formula.js'
 import {
   describeProvidedJustification,
   mergeProvidedJustification,
@@ -21,8 +21,8 @@ export default function useDerivationProof({
   syntax,
   usesNestedSubderivations,
 }) {
-  const normalizeFormulaForCheck = useCallback(
-    (value) => canonicalizeFormula(value, notation),
+  const tidyTypedFormula = useCallback(
+    (value) => tidyFormula(value, notation),
     [notation]
   )
   const normalizeFormulaForDisplay = useCallback(
@@ -37,8 +37,8 @@ export default function useDerivationProof({
     [notation, syntax]
   )
   const normalizeStoredFormula = useCallback(
-    (value) => normalizeFormulaForDisplay(normalizeFormulaForCheck(value)),
-    [normalizeFormulaForCheck, normalizeFormulaForDisplay]
+    (value) => normalizeFormulaForDisplay(tidyTypedFormula(value)),
+    [tidyTypedFormula, normalizeFormulaForDisplay]
   )
   const premises = useMemo(
     () => (Array.isArray(proof?.premises) ? proof.premises : []),
@@ -115,8 +115,8 @@ export default function useDerivationProof({
     conclusionTargetText: normalizedConclusion ? `// ${normalizedConclusion}` : '',
     initialLines,
     isFixedProof,
-    normalizeFormulaForCheck,
     normalizeFormulaForDisplay,
     premises,
+    tidyTypedFormula,
   }
 }
