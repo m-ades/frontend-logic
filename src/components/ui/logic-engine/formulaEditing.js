@@ -1,4 +1,4 @@
-import getSyntax, { closeBrackets, connectiveAliases, openBrackets } from '@logic-app/logic-engine/symbolic/libsyntax.js'
+import getSyntax, { closeBrackets, connectiveAliases, openBrackets, setBraces } from '@logic-app/logic-engine/symbolic/libsyntax.js'
 import { displayIndexedSymbolsForNotation } from '../../../lib/indexedSymbols.js'
 
 /*
@@ -111,7 +111,7 @@ export function formatIndices(text, caret, notation) {
 
 /*
 one pass over the brackets, read relative to the caret when one is given
-strays are closers that don't match the innermost open bracket
+strays are closers that don't match the innermost open bracket, plus any curly brace
 pending is the closers still owed, innermost first, shown greyed after the text with indices running on past its end
 pair is the bracket beside the caret and its partner, checking the one before the caret first
 scope is the innermost span around the caret through its closer, greyed counts the greyed closers it reaches
@@ -131,7 +131,7 @@ export function scanBrackets(text, caret = -1) {
       const opener = open.pop()
       partners.set(opener.at, at)
       partners.set(at, opener.at)
-    } else if (closeBrackets[text[at]]) {
+    } else if (closeBrackets[text[at]] || setBraces.includes(text[at])) {
       strays.push(at)
     }
   }
