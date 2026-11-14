@@ -67,7 +67,8 @@ for (const notation of ['calgary', 'hurley']) {
 
 test('brackets report what is still open, what tab closes and the pair and scope at the caret', () => {
   assert.equal(scanBrackets('[(A ∨ B) → C').pending, ']')
-  assert.equal(scanBrackets('{[(').pending, ')]}')
+  assert.equal(scanBrackets('[(').pending, ')]')
+  assert.deepEqual(scanBrackets('{A ∨ B}').strays, [0, 6])
   assert.equal(scanBrackets('(A ∨ B]').pending, ')')
   assert.equal(scanBrackets('((A', 3).closer, ')')
   assert.equal(scanBrackets('(A ∨ B)', 3).closer, '')
