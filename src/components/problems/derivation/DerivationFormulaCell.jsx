@@ -142,7 +142,7 @@ export default function DerivationFormulaCell({
           sx={{
             width: isFullScreen ? '100%' : { xs: '100%', md: DERIVATION_FORMULA_WIDTH },
             minWidth: isFullScreen ? 0 : undefined,
-            '& .MuiInputBase-input': { fontFamily: 'var(--app-font-sans)', fontSize: DERIVATION_LINE_FONT_SIZE, py: 0.5 },
+            '& .MuiInputBase-input': { fontSize: DERIVATION_LINE_FONT_SIZE, py: 0.5 },
           }}
         />
       )}

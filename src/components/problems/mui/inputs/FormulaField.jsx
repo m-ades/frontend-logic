@@ -6,13 +6,6 @@ import useIsPhone from '../../../../hooks/useIsPhone.js'
 import useMobileLogicKeyboardEnabled from '../../../../hooks/useMobileLogicKeyboardEnabled.js'
 import { getNotation } from '../../../../lib/logicSystems.js'
 
-const formulaFontSx = {
-  '& .MuiInputBase-input': {
-    fontFamily: 'var(--app-font-mono)',
-    fontSize: '1rem',
-  },
-}
-
 /*
 the formula field every problem, proof line and question editor uses
 its ref gets the editor's input like handle for symbol buttons and focus code
@@ -85,7 +78,7 @@ const FormulaField = forwardRef(function FormulaField({
           onEnterKey,
           onFormulaKeyDown,
         }}
-        sx={[formulaFontSx, ...(Array.isArray(sx) ? sx : [sx])]}
+        sx={sx}
       />
       {mobile && (
         <PhoneFormulaKeyboard
