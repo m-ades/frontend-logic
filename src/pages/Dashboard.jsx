@@ -1,4 +1,4 @@
-import { roundNumber, formatNumber, numberOrNull } from "../utils/numberUtils.js";
+import { roundNumber, formatNumber, numberOrNull, percentile } from "../utils/numberUtils.js";
 import { Link } from 'react-router-dom'
 import { useEffect, useMemo, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
@@ -25,14 +25,12 @@ import {
   YAxis,
   XAxis,
   Tooltip,
-  AreaChart,
-  Area,
 } from 'recharts'
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday'
 import TrendingUpIcon from '@mui/icons-material/TrendingUp'
-import BookIcon from '@mui/icons-material/Book'
+import AccessTimeIcon from '@mui/icons-material/AccessTime'
 import LeaderboardIcon from '@mui/icons-material/Leaderboard'
-import { formatDateTime } from '../utils/formatting.js'
+import { formatDateTime, formatMinutes } from '../utils/formatting.js'
 import { API_CONFIG, fetchJson, getActiveUserId } from '../utils/api.js'
 import { isInstructorRole } from '../utils/auth.js'
 import { gradebookSummaryQuery, studentDashboardQuery } from '../context/CoursesContext.jsx'
@@ -72,15 +70,12 @@ const shortAssignmentLabel = (title = '') => {
 
 const emptyAnalytics = {
   assignments: { upcoming: 0, pending: 0, overdue: 0, upcomingList: [] },
-  performance: { avg_score: null, avg_attempt: null, correct_rate: null, first_try_correct_rate: null },
-  time: {
-    avg_minutes_per_question: null,
-    median_minutes_per_question: null,
-    p75_minutes_per_question: null,
-  },
-  submissionCount: 0,
+  assignmentTimes: [],
   submittedAssignmentIds: [],
 }
+// quartiles from fewer finished assignments say nothing useful
+const MIN_ASSIGNMENTS_FOR_RANGE = 4
+const RECENT_TIME_COUNT = 4
 
 const defaultGradeOverview = {
   percent: null,
@@ -129,9 +124,9 @@ export default function Dashboard() {
 
   const analyticsData = sandbox ? sandboxData.dashboardAnalytics : analyticsQuery.data
   const gradebookResponse = sandbox ? sandboxData.dashboardGradebookSummary : gradebookQuery.data
-  // upcoming only needs the student request so it skips waiting on the slower class wide one
-  const isLoadingUpcoming = !sandbox && !!courseIdForApi && analyticsQuery.isPending
-  const isLoadingAnalytics = isLoadingUpcoming || (!sandbox && !!courseIdForApi && gradebookQuery.isPending)
+  // upcoming and time only need the student request so they skip waiting on the slower class wide one
+  const isLoadingStudent = !sandbox && !!courseIdForApi && analyticsQuery.isPending
+  const isLoadingAnalytics = isLoadingStudent || (!sandbox && !!courseIdForApi && gradebookQuery.isPending)
   const analyticsError = sandbox ? false : analyticsQuery.isError
   const gradebookError = sandbox ? false : gradebookQuery.isError
 
@@ -318,8 +313,9 @@ export default function Dashboard() {
     height: '100%',
     display: 'flex',
     flexDirection: 'column',
-    justifyContent: 'space-between',
     gap: 2,
+    // title stays on top and the body centers in the space left
+    '& > :last-child': { flex: 1, justifyContent: 'center' },
   }
 
   useEffect(() => {
@@ -352,14 +348,6 @@ export default function Dashboard() {
       isMounted = false
     }
   }, [courseIdForApi, dashboardMode])
-
-  const randomData = useMemo(() => {
-    const base = analytics.performance.avg_attempt || 1
-    const count = analytics.submissionCount || 1
-    return Array.from({ length: 10 }, (_, index) => ({
-      value: Math.round(base * 100 + count * 2 + index * 5),
-    }))
-  }, [analytics.performance.avg_attempt, analytics.submissionCount])
 
   const assignmentStats = analytics.assignments || emptyAnalytics.assignments
   useWarmWorksheets(sandbox ? [] : assignmentStats.upcomingList.map((assignment) => assignment.id))
@@ -398,32 +386,18 @@ export default function Dashboard() {
     return [low, high]
   }, [mainChartData, useFullScale])
 
-  const activityStats = useMemo(() => {
-    const median = analytics.time.median_minutes_per_question ?? analytics.time.avg_minutes_per_question
-    const p75 = analytics.time.p75_minutes_per_question
-    const medianLabel = median != null ? `${Math.round(median)} mins` : '—'
-    const rangeLabel =
-      median != null && p75 != null
-        ? `${Math.round(median)}–${Math.round(p75)} mins`
-        : median != null
-        ? `${Math.round(median)} mins`
-        : '—'
-    const cohortMedian = analytics.time.cohort_median_minutes_per_question
-    const relativeToCohort =
-      median != null && cohortMedian != null && cohortMedian > 0
-        ? median / cohortMedian
-        : null
-    return [
-      { label: 'Typical time per question', value: medianLabel, subtext: 'Median (recent)' },
-      { label: 'Most questions fall in', value: rangeLabel, subtext: 'Median–75th percentile' },
-      { label: 'Submissions', value: `${analytics.submissionCount}`, subtext: 'Total' },
-    ]
-  }, [
-    analytics.submissionCount,
-    analytics.time.cohort_median_minutes_per_question,
-    analytics.time.median_minutes_per_question,
-    analytics.time.p75_minutes_per_question,
-  ])
+  const assignmentTime = useMemo(() => {
+    const rows = analytics.assignmentTimes
+    const minutes = rows.map((row) => row.minutes)
+    return {
+      count: rows.length,
+      median: percentile(minutes, 0.5),
+      range: rows.length >= MIN_ASSIGNMENTS_FOR_RANGE
+        ? [percentile(minutes, 0.25), percentile(minutes, 0.75)]
+        : null,
+      recent: rows.slice(0, RECENT_TIME_COUNT),
+    }
+  }, [analytics.assignmentTimes])
 
   return (
     <Box sx={{ width: '100%' }}>
@@ -526,8 +500,8 @@ export default function Dashboard() {
                   }}
                 >
                   <Typography
-                    variant="caption"
-                    fontWeight="medium"
+                    variant="h6"
+                    component="div"
                     sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}
                   >
                     {formatNumber(releaseOverview.remainingPercent)}%
@@ -586,10 +560,10 @@ export default function Dashboard() {
                           bgcolor: `${item.color}.main`,
                         }}
                       />
-                      <Typography variant="caption" color="text.secondary">
+                      <Typography variant="body2" color="text.secondary">
                         {item.label}
                       </Typography>
-                      <Typography variant="caption" fontWeight="medium" sx={{ ml: 1 }}>
+                      <Typography variant="body2" fontWeight="medium" sx={{ ml: 1 }}>
                         {formatNumber(item.value)}%
                       </Typography>
                     </Box>
@@ -615,11 +589,11 @@ export default function Dashboard() {
                 <Typography variant="body2" color="text.secondary">
                   Unable to load upcoming assignments.
                 </Typography>
-              ) : !isLoadingUpcoming && assignmentStats.upcomingList.length === 0 ? (
+              ) : !isLoadingStudent && assignmentStats.upcomingList.length === 0 ? (
                 <Typography variant="body2" color="text.secondary">
                   No upcoming assignments
                 </Typography>
-              ) : isLoadingUpcoming ? (
+              ) : isLoadingStudent ? (
                 <LinearProgress sx={{ mt: 1 }} />
               ) : (
                 assignmentStats.upcomingList.map((assignment) => (
@@ -636,7 +610,7 @@ export default function Dashboard() {
                       <Typography variant="body2" fontWeight="medium">
                         {assignment.title}
                       </Typography>
-                      <Typography variant="caption" color="text.secondary">
+                      <Typography variant="body2" color="text.secondary">
                         Due {formatDateTime(assignment.due_at ?? assignment.due_date) || '—'}
                       </Typography>
                     </Box>
@@ -661,65 +635,65 @@ export default function Dashboard() {
         <ThemedCard sx={statCardSx}>
           <CardContent sx={statCardContentSx}>
             <Box display="flex" alignItems="center" mb={2}>
-              <BookIcon color="error" sx={{ mr: 1 }} />
+              <AccessTimeIcon color="error" sx={{ mr: 1 }} />
               <Typography variant="h6" component="h2">
-                Activity
+                Your Assignment Time
               </Typography>
             </Box>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
               {analyticsError ? (
                 <Typography variant="body2" color="text.secondary">
-                  Unable to load activity metrics.
+                  Unable to load assignment time.
                 </Typography>
-              ) : null}
-              {!analyticsError &&
-              analytics.time?.median_minutes_per_question != null &&
-              analytics.time?.cohort_median_minutes_per_question != null && (
+              ) : isLoadingStudent ? (
+                <LinearProgress sx={{ mt: 1 }} />
+              ) : assignmentTime.count === 0 ? (
                 <Typography variant="body2" color="text.secondary">
-                  Your typical time per question is{' '}
-                  {analytics.time.median_minutes_per_question != null &&
-                  analytics.time.cohort_median_minutes_per_question
-                    ? (() => {
-                        const ratio =
-                          analytics.time.median_minutes_per_question /
-                          analytics.time.cohort_median_minutes_per_question
-                        if (!Number.isFinite(ratio)) return 'similar to the class median.'
-                        if (ratio < 0.8) return 'faster than most classmates.'
-                        if (ratio > 1.25) return 'slightly slower than most classmates.'
-                        return 'similar to the class median.'
-                      })()
-                    : 'similar to the class median.'}
+                  Finish an assignment to see how long yours usually take.
                 </Typography>
+              ) : (
+                <>
+                  <Box>
+                    <Typography variant="body2" color="text.secondary" display="block">
+                      Usually takes you
+                    </Typography>
+                    <Typography variant="h3" component="div" fontWeight="medium">
+                      {formatMinutes(assignmentTime.median)}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      Based on {assignmentTime.count} finished assignment{assignmentTime.count === 1 ? '' : 's'}
+                    </Typography>
+                  </Box>
+                  {assignmentTime.range && (
+                    <Box>
+                      <Typography variant="body2" color="text.secondary" display="block">
+                        Typical range
+                      </Typography>
+                      <Typography variant="h6" component="div" fontWeight="medium">
+                        {formatMinutes(assignmentTime.range[0])} – {formatMinutes(assignmentTime.range[1])}
+                      </Typography>
+                    </Box>
+                  )}
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                    <Typography variant="body2" color="text.secondary">
+                      Recent
+                    </Typography>
+                    {assignmentTime.recent.map((row) => (
+                      <Box
+                        key={row.assignment_id}
+                        sx={{ display: 'flex', justifyContent: 'space-between', gap: 2 }}
+                      >
+                        <Typography variant="body1" sx={{ minWidth: 0 }}>
+                          {row.title}
+                        </Typography>
+                        <Typography variant="body1" fontWeight="medium" sx={{ flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>
+                          {formatMinutes(row.minutes)}
+                        </Typography>
+                      </Box>
+                    ))}
+                  </Box>
+                </>
               )}
-              {activityStats.map((item) => (
-                <Box key={item.label}>
-                  <Typography variant="caption" color="text.secondary" display="block">
-                    {item.label}
-                  </Typography>
-                  <Box display="flex" alignItems="baseline" gap={1}>
-                    <Typography variant="h6" component="div" fontWeight="medium">
-                      {item.value}
-                    </Typography>
-                    <Typography variant="caption" color="text.secondary">
-                      {item.subtext}
-                    </Typography>
-                  </Box>
-                  <Box role="img" aria-label={`${item.label} trend`}>
-                    <ResponsiveContainer width="100%" height={30} minWidth={0} minHeight={0}>
-                      <AreaChart data={randomData}>
-                        <Area
-                          type="monotone"
-                          dataKey="value"
-                          stroke={theme.palette.secondary.main}
-                          fill={theme.palette.secondary.light}
-                          strokeWidth={2}
-                          fillOpacity={0.3}
-                        />
-                      </AreaChart>
-                    </ResponsiveContainer>
-                  </Box>
-                </Box>
-              ))}
             </Box>
           </CardContent>
         </ThemedCard>

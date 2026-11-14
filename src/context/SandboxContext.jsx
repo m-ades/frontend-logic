@@ -35,11 +35,11 @@ const normalizeQuestionState = (value) => {
   return { ans: value }
 }
 
-const percentile = (values, ratio) => {
-  if (!Array.isArray(values) || values.length === 0) return null
-  const sorted = [...values].sort((a, b) => a - b)
-  const index = Math.max(0, Math.min(sorted.length - 1, Math.ceil(sorted.length * ratio) - 1))
-  return sorted[index]
+// rough match for the api's 10 minute break rule, gaps between edits over it don't count
+const WORK_BREAK_MS = 10 * 60000
+const addWorkTime = (previous, now) => {
+  const gap = now - Number(previous.lastTouchedAt)
+  return (Number(previous.activeMs) || 0) + (gap > 0 && gap <= WORK_BREAK_MS ? gap : 0)
 }
 
 const assignmentBaseScore = (assignment) => (
@@ -90,6 +90,7 @@ export function SandboxProvider({ children }) {
           attemptCount: Number(saved.attemptCount) || 0,
           lastStatus: saved.lastStatus ?? null,
           rawScore: Number.isFinite(Number(saved.rawScore)) ? Number(saved.rawScore) : null,
+          activeMs: Number(saved.activeMs) || 0,
           completedAt: numericTimestamp(saved.completedAt),
           lastTouchedAt: numericTimestamp(saved.lastTouchedAt),
         }
@@ -186,54 +187,26 @@ export function SandboxProvider({ children }) {
       .slice(0, 2)
     const gradedAssignments = grades.filter((grade) => grade.graded_at != null || grade.graded_by != null)
     const submittedAssignmentIds = gradedAssignments.map((grade) => grade.assignment_id)
-    const questionStates = Object.values(state.questionStates || {})
-    const attemptCounts = questionStates
-      .map((entry) => Number(entry?.attemptCount))
-      .filter((value) => Number.isFinite(value) && value > 0)
-    const avgAttempt = attemptCounts.length > 0
-      ? attemptCounts.reduce((sum, value) => sum + value, 0) / attemptCounts.length
-      : 0
-    const correctRate = metrics.totalQuestions > 0
-      ? metrics.completedQuestions / metrics.totalQuestions
-      : 0
-    const completedDurations = questionStates
-      .map((entry) => {
-        const startedAt = Number(entry?.startedAt)
-        const completedAt = Number(entry?.completedAt)
-        if (!Number.isFinite(startedAt) || !Number.isFinite(completedAt) || completedAt < startedAt) {
-          return null
-        }
-        return Math.max(1, (completedAt - startedAt) / 60000)
-      })
-      .filter((value) => Number.isFinite(value) && value > 0)
-    const medianMinutes = percentile(completedDurations, 0.5)
-    const p75Minutes = percentile(completedDurations, 0.75)
-    const submissionCount = questionStates
-      .filter((entry) => Number.isFinite(Number(entry?.completedAt)) || Number.isFinite(Number(entry?.attemptCount)))
-      .length
+    const finishedAssignments = assignments.filter((assignment) => (
+      !assignment.is_locked && assignment.proofs.length > 0 &&
+      assignment.proofs.every((proof) => proof.attemptCount > 0)
+    ))
+    const assignmentTimes = finishedAssignments
+      .map((assignment) => ({
+        assignment_id: assignment.id,
+        title: assignment.title,
+        minutes: assignment.proofs.reduce((sum, proof) => sum + proof.activeMs, 0) / 60000,
+        last_worked_at: assignment.submitted_at,
+      }))
+      .sort((a, b) => new Date(b.last_worked_at) - new Date(a.last_worked_at))
 
     return {
       assignments: {
         ...classroomAnalytics.assignments,
-        completed: grades.filter(({ Assignment: assignment }) => (
-          !assignment.is_locked && assignment.proofs.length > 0 &&
-          assignment.proofs.every((proof) => proof.attemptCount > 0)
-        )).length,
+        completed: finishedAssignments.length,
         upcomingList: dynamicUpcoming,
       },
-      performance: {
-        avg_score: metrics.averageScore / 100,
-        avg_attempt: avgAttempt,
-        correct_rate: correctRate,
-        first_try_correct_rate: correctRate > 0 ? Math.max(0, correctRate - 0.12) : 0,
-      },
-      time: {
-        ...classroomAnalytics.time,
-        median_minutes_per_question: medianMinutes,
-        avg_minutes_per_question: medianMinutes,
-        p75_minutes_per_question: p75Minutes,
-      },
-      submissionCount,
+      assignmentTimes,
       submittedAssignmentIds,
       assignmentGrades: grades.map((grade) => ({
         assignment_id: grade.assignment_id,
@@ -243,7 +216,7 @@ export function SandboxProvider({ children }) {
         Assignment: grade.Assignment,
       })),
     }
-  }, [assignmentsById, grades, metrics.averageScore, metrics.completedQuestions, metrics.totalQuestions, state.questionStates])
+  }, [assignments, assignmentsById, grades])
 
   const updateQuestionState = (questionId, nextState) => {
     setState((prev) => ({
@@ -259,6 +232,7 @@ export function SandboxProvider({ children }) {
             ...incoming,
             startedAt: previous.startedAt ?? now,
             lastTouchedAt: now,
+            activeMs: addWorkTime(previous, now),
           }
         })(),
       },
@@ -269,16 +243,19 @@ export function SandboxProvider({ children }) {
     setState((prev) => {
       const next = new Set(prev.completedQuestionIds || [])
       next.add(questionId)
+      const now = Date.now()
+      const previous = normalizeQuestionState(prev.questionStates?.[questionId] || {})
       return {
         ...prev,
         completedQuestionIds: Array.from(next),
         questionStates: {
           ...prev.questionStates,
           [questionId]: {
-            ...normalizeQuestionState(prev.questionStates?.[questionId] || {}),
-            startedAt: prev.questionStates?.[questionId]?.startedAt ?? Date.now(),
-            completedAt: prev.questionStates?.[questionId]?.completedAt ?? Date.now(),
-            lastTouchedAt: Date.now(),
+            ...previous,
+            startedAt: previous.startedAt ?? now,
+            completedAt: previous.completedAt ?? now,
+            lastTouchedAt: now,
+            activeMs: addWorkTime(previous, now),
           },
         },
       }
