@@ -14,29 +14,35 @@ export function arrowShortcutBeforeCaret(textBeforeCaret) {
   return { op: 'IFTHEN', replaceBefore: shaft[0].length }
 }
 
-/*
-a small text and caret buffer the shortcuts edit
-replaceAround rewrites the text touching the caret and drops the caret after what it inserted
-*/
+// a small text and caret buffer the shortcuts edit, every step works at the caret and leaves it after what went in
 function editBuffer(text, from, to, syntax) {
   let before = text.slice(0, from)
   let after = text.slice(to)
   const buffer = {
     get before() { return before },
     get prev() { return before.at(-1) },
-    replaceAround(findBefore, replaceBefore, insert = '', findAfter = null, replaceAfter = '') {
-      before = before.replace(findBefore, replaceBefore) + insert
-      if (findAfter) after = after.replace(findAfter, replaceAfter)
+    // a count of characters or a pattern's match
+    drop(end) {
+      before = typeof end === 'number' ? before.slice(0, before.length - end) : before.replace(end, '')
       return buffer
+    },
+    insert(insertion) {
+      before += insertion
+      return buffer
+    },
+    trimAfter() {
+      after = after.trimStart()
+      return buffer
+    },
+    replaceSpaces(insertion) {
+      before = before.trimEnd() + insertion
+      return buffer.trimAfter()
     },
     // binary connectives get one space each side and a repeat like the second half of && or || adds nothing
     operator(op) {
       const symbol = syntax.symbols[op]
-      if (syntax.symbolcat[op] < 2) {
-        before += symbol
-        return buffer
-      }
-      return buffer.replaceAround(/\s+$/, '', before.trimEnd().endsWith(symbol) ? ' ' : ` ${symbol} `, /^\s+/, '')
+      if (syntax.symbolcat[op] < 2) return buffer.insert(symbol)
+      return buffer.replaceSpaces(before.trimEnd().endsWith(symbol) ? ' ' : ` ${symbol} `)
     },
     result() { return { text: before + after, caret: before.length } },
   }
@@ -50,7 +56,7 @@ any character the engine reads as a connective becomes it, plus v for or, -> and
 export function typedEdit(text, from, to, key, { notation, allowTherefore = false } = {}) {
   const syntax = getSyntax(notation)
   const edit = editBuffer(text, from, to, syntax)
-  const { before } = edit
+  const { before, prev } = edit
   const aliased = connectiveAliases[key]
 
   // a second space in a row is dropped
@@ -58,44 +64,32 @@ export function typedEdit(text, from, to, key, { notation, allowTherefore = fals
   if (key === 'v' || key === '∨') return edit.operator('OR').result()
   if (aliased === 'IFTHEN') {
     const { op, replaceBefore } = arrowShortcutBeforeCaret(before)
-    return edit.replaceAround(new RegExp(`\\s*[\\s\\S]{${replaceBefore}}$`), '', '', /^\s*/, '').operator(op).result()
+    return edit.drop(replaceBefore).operator(op).result()
   }
   if (key === '=') {
-    if (/=\s*$/.test(before)) {
-      return edit.replaceAround(/\s*=\s*$/, '', '', /^\s*/, '').operator('IFF').result()
-    }
-    if (/\/$/.test(before)) return edit.replaceAround(/\s*\/$/, ' ', '≠ ', /^\s*/, '').result()
-    if (edit.prev === syntax.symbols.NOT) {
-      return edit.replaceAround(new RegExp(`\\s*${syntax.symbols.NOT}$`), ' ', '≠ ', /^\s*/, '').result()
-    }
+    if (/=\s*$/.test(before)) return edit.drop(/=\s*$/).operator('IFF').result()
+    if (prev === '/' || prev === syntax.symbols.NOT) return edit.drop(1).replaceSpaces(' ≠ ').result()
   }
   if (key === '.' && allowTherefore && syntax.notationname === 'calgary' && /:\s*$/.test(before)) {
-    return edit.replaceAround(/\s*:\s*$/, '', ' ∴ ', /^\s*/, '').result()
+    return edit.drop(/:\s*$/).replaceSpaces(' ∴ ').result()
   }
-  if (key === '&' && /&\s*$/.test(before)) {
-    return edit.replaceAround(/\s*&\s*$/, '').operator('AND').result()
-  }
+  if (key === '&' && /&\s*$/.test(before)) return edit.drop(/&\s*$/).operator('AND').result()
   if (aliased) return edit.operator(aliased).result()
   // calgary writes indices as P_1 so an underscore after a letter is not falsum there
   const startsIndex = key === '_' && syntax.notationname === 'calgary' && /[A-Za-z]$/.test(before)
   if (key === '_' && !startsIndex) return edit.operator('FALSUM').result()
-  if (key === 'X') {
-    return edit.prev === 'X' ? edit.replaceAround(/\s*X$/, '', ` ${syntax.symbols.FALSUM}`).result() : null
-  }
+  if (key === 'X') return prev === 'X' ? edit.drop(/\s*X$/).insert(` ${syntax.symbols.FALSUM}`).result() : null
   if (key === '/') {
-    if (/=\s*$/.test(before)) return edit.replaceAround(/\s*=\s*$/, ' ', '≠ ', /^\s*/, '').result()
-    if (edit.prev === '\\') return edit.replaceAround(/\\$/, '').operator('OR').result()
+    if (/=\s*$/.test(before)) return edit.drop(/=\s*$/).replaceSpaces(' ≠ ').result()
+    if (prev === '\\') return edit.drop(1).operator('OR').result()
     return null
   }
-  if (/^all$/i.test(before.slice(-2) + key) && /^[lL]$/.test(key)) {
-    return edit.replaceAround(/al$/i, '', '', /^\s*/, '').operator('FORALL').result()
-  }
-  if (/^some$/i.test(before.slice(-3) + key) && /^[eE]$/.test(key)) {
-    return edit.replaceAround(/som$/i, '', '', /^\s*/, '').operator('EXISTS').result()
-  }
+  if (/^all$/i.test(before.slice(-2) + key)) return edit.drop(2).trimAfter().operator('FORALL').result()
+  if (/^some$/i.test(before.slice(-3) + key)) return edit.drop(3).trimAfter().operator('EXISTS').result()
   // hyphens left before anything but a digit, ? or another hyphen were negations
-  if (edit.prev === '-' && !/[0-9?-]/.test(key)) {
-    return edit.replaceAround(/-+$/, (dashes) => syntax.symbols.NOT.repeat(dashes.length), key).result()
+  if (prev === '-' && !/[0-9?-]/.test(key)) {
+    const dashes = before.match(/-+$/)[0].length
+    return edit.drop(dashes).insert(syntax.symbols.NOT.repeat(dashes) + key).result()
   }
   return null
 }
