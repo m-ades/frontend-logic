@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { getProvidedJustificationPart, isDerivationFieldReadOnly } from './derivationUtils.js'
 
 /*
-tracks the active derivation input and its caret so keyboard buttons
+tracks the active derivation input so keyboard buttons
 and row number clicks land in the field the student was last editing
 */
 export default function useDerivationInputTracking({
@@ -14,10 +14,9 @@ export default function useDerivationInputTracking({
   onFieldChange,
 }) {
   const formulaRefs = useRef({})
+  const formulaRegisters = useRef({})
   const justRefs = useRef({})
-  const cursorPositionsRef = useRef({})
   const [activeFormulaIndex, setActiveFormulaIndex] = useState(null)
-  const activeKeyboardFormulaIndexRef = useRef(null)
   const lastFormulaIndexRef = useRef(null)
   const lastEditableIndexRef = useRef(null)
 
@@ -34,31 +33,11 @@ export default function useDerivationInputTracking({
     }
   }, [initialFocusLineIndex, initialFocusField])
 
-  const setStoredSelection = (index, start, end = start) => {
-    cursorPositionsRef.current[index] = { start, end }
-  }
-
-  const getStoredSelection = (index, fallbackLength) => {
-    const stored = cursorPositionsRef.current[index]
-    if (stored && typeof stored === 'object' && typeof stored.start === 'number') {
-      return {
-        start: stored.start,
-        end: typeof stored.end === 'number' ? stored.end : stored.start,
-      }
-    }
-    if (typeof stored === 'number') {
-      return { start: stored, end: stored }
-    }
-    return { start: fallbackLength, end: fallbackLength }
-  }
-
-  // keeps the caret after the same text once display normalization rewrites a field
-  const restoreCaret = (field, index, el, raw, normalized, normalize) => {
+  // keeps the caret after the same text once display normalization rewrites a justification
+  const restoreCaret = (index, el, raw, normalized, normalize) => {
     if (normalized === raw || typeof el?.selectionStart !== 'number') return
     const nextCursor = normalize(raw.slice(0, el.selectionStart)).length
-    setStoredSelection(index, nextCursor)
-    const refs = field === 'formula' ? formulaRefs : justRefs
-    window.setTimeout(() => refs.current[index]?.setSelectionRange?.(nextCursor, nextCursor), 0)
+    window.setTimeout(() => justRefs.current[index]?.setSelectionRange?.(nextCursor, nextCursor), 0)
   }
 
   const focusFormula = (index) => {
@@ -84,7 +63,6 @@ export default function useDerivationInputTracking({
 
   const activateFormula = (index) => {
     setActiveFormulaIndex(index)
-    activeKeyboardFormulaIndexRef.current = index
     lastFormulaIndexRef.current = index
     lastEditableIndexRef.current = index
   }
@@ -95,20 +73,8 @@ export default function useDerivationInputTracking({
     lastEditableIndexRef.current = index
   }
 
-  const trackFormulaCursor = (index, event) => {
-    lastFormulaIndexRef.current = index
-    lastEditableIndexRef.current = index
-    const target = event?.target
-    if (target && typeof target.selectionStart === 'number') {
-      const start = target.selectionStart
-      const end = typeof target.selectionEnd === 'number' ? target.selectionEnd : start
-      setStoredSelection(index, start, end)
-    }
-  }
-
   const getCitationTargetIndex = () => (
     activeFormulaIndex
-    ?? activeKeyboardFormulaIndexRef.current
     ?? lastFormulaIndexRef.current
     ?? premisesCount
   )
@@ -134,8 +100,8 @@ export default function useDerivationInputTracking({
           return { field: 'justification', index: Number(index) }
         }
       }
-      for (const [index, el] of Object.entries(formulaRefs.current)) {
-        if (el && activeElement === el
+      for (const [index, field] of Object.entries(formulaRefs.current)) {
+        if (field?.hasFocus
           && !isDerivationFieldReadOnly(lines[Number(index)], 'formula')) {
           return { field: 'formula', index: Number(index) }
         }
@@ -147,62 +113,46 @@ export default function useDerivationInputTracking({
       : { field: 'formula', index: fallbackIndex }
   }
 
-  const insertSymbol = ({ insert, pair }) => {
+  // formula fields and justification inputs both keep their selection while blurred, so buttons insert there
+  const insertSymbol = ({ insert, pair, op }) => {
     const target = resolveActiveInputTarget()
-    if (!target || target.index === -1 || target.index === null) return
-    const targetIdx = target.index
-    const field = target.field
-    const inputEl = field === 'justification' ? justRefs.current[targetIdx] : formulaRefs.current[targetIdx]
+    if (!target) return
+    const { field, index } = target
+    const inputEl = (field === 'justification' ? justRefs : formulaRefs).current[index]
+    if (!inputEl) return
 
     // symbol buttons don't write into split justification fields
-    if (field === 'justification' && (useRuleDropdown || getProvidedJustificationPart(lines[targetIdx]))) {
-      inputEl?.focus()
+    if (field === 'justification' && (useRuleDropdown || getProvidedJustificationPart(lines[index]))) {
+      inputEl.focus()
       return
     }
 
-    const current = lines[targetIdx]?.[field] || ''
-    const stored = getStoredSelection(targetIdx, current.length)
-    const activeFacade = field === 'formula' && targetIdx === activeKeyboardFormulaIndexRef.current && inputEl
-    const isFocused = typeof document !== 'undefined' && document.activeElement === inputEl
-    const useInputSelection = activeFacade || isFocused
-    const start = useInputSelection && typeof inputEl?.selectionStart === 'number' ? inputEl.selectionStart : stored.start
-    const end = useInputSelection && typeof inputEl?.selectionEnd === 'number' ? inputEl.selectionEnd : stored.end
-    const hasSelection = end > start
-    const [open, close] = pair ? pair.split('') : []
-    const insertText = pair
-      ? (hasSelection ? `${open}${current.slice(start, end)}${close}` : `${open}  ${close}`)
-      : insert
-    if (!insertText) return
-    const nextCursor = pair
-      ? (hasSelection ? start + insertText.length : start + open.length + 1)
-      : start + insertText.length
-    if (inputEl && typeof inputEl.setRangeText === 'function') {
-      inputEl.setRangeText(insertText, start, end, 'end')
-      onFieldChange(targetIdx, field, inputEl.value ?? '')
-      inputEl.focus()
-      setStoredSelection(targetIdx, nextCursor)
-      setTimeout(() => inputEl.setSelectionRange(nextCursor, nextCursor), 0)
-      return
+    // a formula field spaces connectives and wraps selections like its own keypad and reports its own change
+    if (field === 'formula') {
+      if (pair) inputEl.insertPair(pair)
+      else if (op) inputEl.insOp(op)
+      else inputEl.setRangeText(insert)
+    } else {
+      inputEl.setRangeText(insert ?? pair[0], inputEl.selectionStart, inputEl.selectionEnd, 'end')
+      onFieldChange(index, field, inputEl.value ?? '')
     }
-    const before = current.slice(0, start)
-    const after = current.slice(end)
-    onFieldChange(targetIdx, field, `${before}${insertText}${after}`)
-    setStoredSelection(targetIdx, nextCursor)
-    if (inputEl) {
-      inputEl.focus()
-      setTimeout(() => inputEl.setSelectionRange(nextCursor, nextCursor), 0)
-    }
+    inputEl.focus()
   }
 
-  // line indexes shift after a delete so stale element and caret entries must go
+  // line indexes shift after a delete so stale entries must go
   const resetInputRefs = () => {
     formulaRefs.current = {}
     justRefs.current = {}
-    cursorPositionsRef.current = {}
+    // fresh callbacks so every field registers again under its new index
+    formulaRegisters.current = {}
   }
 
-  const registerFormulaInput = (index) => (element) => {
-    if (element) formulaRefs.current[index] = element
+  // one stable callback per line so formula fields keep their handle across renders
+  const registerFormulaInput = (index) => {
+    formulaRegisters.current[index] ??= (field) => {
+      if (field) formulaRefs.current[index] = field
+    }
+    return formulaRegisters.current[index]
   }
 
   const registerJustificationInput = (index) => (element) => {
@@ -216,13 +166,10 @@ export default function useDerivationInputTracking({
     focusFormula,
     focusJustification,
     getCitationTargetIndex,
-    getStoredSelection,
     insertSymbol,
     registerFormulaInput,
     registerJustificationInput,
     resetInputRefs,
     restoreCaret,
-    setStoredSelection,
-    trackFormulaCursor,
   }
 }

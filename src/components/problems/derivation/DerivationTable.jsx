@@ -8,8 +8,7 @@ import {
   TableRow,
 } from '@mui/material'
 import ProblemSetButtons from '../mui/frame/ProblemSetButtons.jsx'
-import { useMobileLogicKeyboardEnabled } from '../../ui/LogicKeyboard/index.js'
-import FormulaInput from '../../ui/logic-engine/formula-input.js'
+import useMobileLogicKeyboardEnabled from '../../../hooks/useMobileLogicKeyboardEnabled.js'
 import { getDerivationCheckerForLogicSystem } from '@logic-app/logic-engine/checkers/derivation-by-logic-system.js'
 import getSyntax from '@logic-app/logic-engine/symbolic/libsyntax.js'
 import {
@@ -384,14 +383,11 @@ export default function DerivationTable({
     focusFormula,
     focusJustification,
     getCitationTargetIndex,
-    getStoredSelection,
     insertSymbol,
     registerFormulaInput,
     registerJustificationInput,
     resetInputRefs,
     restoreCaret,
-    setStoredSelection,
-    trackFormulaCursor,
   } = useDerivationInputTracking({
     initialFocusField: isFullScreen ? initialFocusField : null,
     initialFocusLineIndex: isFullScreen ? initialFocusLineIndex : null,
@@ -401,30 +397,13 @@ export default function DerivationTable({
     onFieldChange: handleLineChange,
   })
 
-  const handleFormulaChange = (event, index) => {
-    if (isDerivationFieldReadOnly(lines[index], 'formula')) return
-    const el = event.target
-    const raw = el?.value ?? ''
-    const inputType = event.nativeEvent?.inputType ?? ''
-    // Do not restore operator padding that the user is trying to erase.
-    const normalized = inputType.startsWith('delete')
-      ? raw
-      : normalizeFormulaForDisplay(raw)
-    setFormulaText(index, el, raw, normalized)
-  }
-
-  const setFormulaText = (index, el, raw, normalized) => {
-    handleLineChange(index, 'formula', normalized)
-    restoreCaret('formula', index, el, raw, normalized, normalizeFormulaForDisplay)
-  }
-
   const handleJustificationChange = (event, index) => {
     if (isDerivationFieldReadOnly(lines[index], 'justification')) return
     const el = event.target
     const raw = el?.value ?? ''
     const normalized = normalizeJustificationForDisplay(raw)
     handleLineChange(index, 'justification', normalized)
-    restoreCaret('justification', index, el, raw, normalized, normalizeJustificationForDisplay)
+    restoreCaret(index, el, raw, normalized, normalizeJustificationForDisplay)
   }
 
   // the typed rule field of a line whose line(s) were provided holds only the rule
@@ -437,7 +416,7 @@ export default function DerivationTable({
     handleLineChange(index, 'justification', applyRuleToJustification(line.justification, rule, {
       rulesFirst: usesNestedSubderivations,
     }))
-    restoreCaret('justification', index, el, raw, rule, getRuleFromJustification)
+    restoreCaret(index, el, raw, rule, getRuleFromJustification)
   }
 
   const handleRuleTextCommit = (index) => {
@@ -632,34 +611,19 @@ export default function DerivationTable({
     resetInputRefs()
   }
 
-  const handleFormulaKeyDown = (event, index) => {
+  // enter, or the right arrow once the formula's closers are all in, carries on to the justification
+  const handleFormulaKeyDown = (event, index, field) => {
     if (isDerivationFieldReadOnly(lines[index], 'formula')) return
-    const el = event.target
-    if (!el) return
     if (event.key === 'Enter') {
       event.preventDefault()
-      const normalized = tidyTypedFormula(el.value)
-      handleLineCommit(index, 'formula', normalized)
+      handleLineCommit(index, 'formula', tidyTypedFormula(field.value))
       focusJustification(index)
       return
     }
-    if (event.key === 'ArrowRight' && !event.ctrlKey && !event.metaKey && !event.altKey) {
-      const len = (el.value ?? '').length
-      const selEnd = typeof el.selectionEnd === 'number' ? el.selectionEnd : getStoredSelection(index, len).end
-      if (selEnd >= len) {
-        event.preventDefault()
-        focusJustification(index)
-      }
-      return
-    }
-    // typed symbol shortcuts come from the same handler as every other formula field
-    if (event.key.length !== 1) return
-    const value = el.value ?? ''
-    FormulaInput.attach(el, notation)
-    FormulaInput.keydown.call(el, event)
-    // a handled shortcut edits the field without an input event so sync it here
-    if (event.defaultPrevented && (el.value ?? '') !== value) {
-      setFormulaText(index, el, el.value, normalizeFormulaForDisplay(el.value))
+    const plain = !event.ctrlKey && !event.metaKey && !event.altKey
+    if (event.key === 'ArrowRight' && plain && field.selectionEnd >= field.value.length) {
+      event.preventDefault()
+      focusJustification(index)
     }
   }
 
@@ -914,18 +878,11 @@ export default function DerivationTable({
                   keyboardConfig={derivationKeyboardConfig}
                   line={line}
                   lineIndex={idx}
-                  mobileKeyboardEnabled={mobileLogicKeyboardEnabled}
                   onActivate={() => activateFormula(idx)}
-                  onChange={(event) => handleFormulaChange(event, idx)}
+                  onChange={(value) => handleLineChange(idx, 'formula', value)}
                   onCommit={(value) => handleLineCommit(idx, 'formula', tidyTypedFormula(value))}
-                  onCursorChange={(event) => trackFormulaCursor(idx, event)}
                   onInsert={(insert) => insertSymbol({ insert })}
-                  onKeyDown={(event) => handleFormulaKeyDown(event, idx)}
-                  onMobileChange={(value) => handleLineChange(idx, 'formula', normalizeFormulaForDisplay(value))}
-                  onMobileCursorChange={(position) => {
-                    const max = (line.formula ?? '').length
-                    setStoredSelection(idx, Math.max(0, Math.min(Number.isFinite(position) ? position : 0, max)))
-                  }}
+                  onKeyDown={(event, field) => handleFormulaKeyDown(event, idx, field)}
                   onRequestFullScreen={requestFullScreenFor(idx, 'formula')}
                   registerInput={registerFormulaInput(idx)}
                   showsDivider={showsFitchDivider}

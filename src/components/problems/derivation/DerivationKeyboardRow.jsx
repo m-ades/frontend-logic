@@ -16,11 +16,11 @@ export default function DerivationKeyboardRow({
 }) {
   const compactMobileKeyboard = isPhone && isFullScreen && mobileLogicKeyboardEnabled
   const density = isPhone && isFullScreen ? 'touch' : isFullScreen ? 'compact' : 'standard'
-  const rowButtons = symbolButtons.map(({ label, insert, pair }) => ({
+  const rowButtons = symbolButtons.map(({ label, insert, pair, op }) => ({
     key: label,
     label,
     ariaLabel: getInsertSymbolLabel({ insert, pair }),
-    payload: { insert, pair },
+    payload: { insert, pair, op },
   }))
 
   return (

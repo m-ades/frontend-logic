@@ -6,7 +6,6 @@ import ProblemSetButtons from '../frame/ProblemSetButtons.jsx'
 import FormulaField from '../inputs/FormulaField.jsx'
 import SymbolButtonRow from '../../../ui/logic-engine/SymbolButtonRow.jsx'
 import { SLASH_SEPARATOR_BUTTONS, THEREFORE_SEPARATOR_BUTTONS } from '../../../ui/logic-engine/symbolButtons.js'
-import { getVariableLettersOnly } from '../../../ui/LogicKeyboard/index.js'
 import { useProblemChecker } from '../../../../hooks/useProblemChecker.js'
 import SolutionReveal from '../../SolutionReveal.jsx'
 import RichText from '../../../ui/RichText.jsx'
@@ -17,6 +16,7 @@ import {
   getConstantLettersFromKey,
   getConstantLettersFromPromptAndKey,
   getPredicateLettersFromKey,
+  getVariableLettersOnly,
   isPredicateLogicKey,
   promptImpliesPredicateLogic,
 } from './symbolizationKeyboard.js'
@@ -326,11 +326,6 @@ export default function SymbolicTranslation({
             disabled={readOnly}
             includeQuantifiers={isPredicate}
             showBackspace={false}
-            onValueChange={(value) => {
-              if (readOnly) return
-              setInputValue(value)
-              scheduleStateSave(value)
-            }}
             logicSystem={logicSystem}
             extraInsertButtons={[...indexedLetterButtons, ...separatorButtons.desktop]}
           />

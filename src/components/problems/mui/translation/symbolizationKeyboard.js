@@ -72,6 +72,14 @@ export function getConstantLettersFromKey(symbolizationKey, allowIndexedSymbols 
   return result
 }
 
+const DEFAULT_SENTENCE_LETTERS = ['P', 'Q', 'R', 'S', 'T']
+
+// the letter from each "Symbol = definition" line of a key, or a few defaults
+export function getVariableLettersOnly(symbolizationKey) {
+  const letters = Array.isArray(symbolizationKey) ? symbolizationKey.map(getLeftPart).filter(Boolean) : []
+  return letters.length > 0 ? letters : DEFAULT_SENTENCE_LETTERS
+}
+
 export const ST_CONSTANT_POOL = 'abcdefghijklmnopqrstuvw'.split('') // exclude x,y,z
 export const ST_PREDICATE_VARIABLES = ['x', 'y', 'z']
 

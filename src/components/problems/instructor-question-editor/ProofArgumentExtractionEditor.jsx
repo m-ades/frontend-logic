@@ -4,7 +4,7 @@ import { DEFAULT_LOGIC_SYSTEM } from '../../../lib/logicSystems.js'
 import { rebaseProofJustifications } from '../../../lib/proofArgumentExtractionEdits.js'
 import AssumptionScopesEditor from '../derivation/AssumptionScopesEditor.jsx'
 import { normalizeJustificationForDisplay } from '../derivation/derivationUtils.js'
-import { displayFormulaInput, normalizeFormulaInputs } from './formulaHelpers.js'
+import { normalizeFormulaInputs } from './formulaHelpers.js'
 import { FormulaListEditor } from './FormulaListEditor.jsx'
 import { typeKey } from './snapshotUtils.js'
 import { buildRulesetPatch } from './ruleHelpers.js'
@@ -58,7 +58,7 @@ export function ProofArgumentExtractionEditorForm({ proof, value, onChange, logi
       return [scope]
     })
     update({
-      lines: nextLines.map((formula) => displayFormulaInput(formula, logicSystem)),
+      lines: nextLines,
       justifications: removedIndex == null
         ? displayedJustifications
         : rebaseProofJustifications(displayedJustifications, {
@@ -85,7 +85,7 @@ export function ProofArgumentExtractionEditorForm({ proof, value, onChange, logi
       })
     }
     update({
-      premises: nextPremises.map((formula) => displayFormulaInput(formula, logicSystem)),
+      premises: nextPremises,
       justifications: nextJustifications,
     })
   }

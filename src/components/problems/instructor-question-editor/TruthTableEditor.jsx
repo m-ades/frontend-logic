@@ -16,8 +16,8 @@ import {
 import AddIcon from '@mui/icons-material/Add'
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
 import { DEFAULT_LOGIC_SYSTEM } from '../../../lib/logicSystems.js'
-import { displayFormulaInput, normalizeFormulaInput, normalizeFormulaInputs } from './formulaHelpers.js'
-import FormulaTextField from '../mui/inputs/FormulaTextField.jsx'
+import { normalizeFormulaInput, normalizeFormulaInputs } from './formulaHelpers.js'
+import FormulaField from '../mui/inputs/FormulaField.jsx'
 import { deepMerge, typeKey } from './snapshotUtils.js'
 
 export function buildTruthTableSnapshot(proof, edited, existing, logicSystem = DEFAULT_LOGIC_SYSTEM) {
@@ -112,10 +112,10 @@ export function TruthTableEditorForm({ proof, value, onChange, logicSystem = DEF
       </FormControl>
 
       {kind === 'formula' && (
-        <FormulaTextField
+        <FormulaField
           label="Statement"
           value={statement}
-          onValueChange={(next) => update({ statement: displayFormulaInput(next, logicSystem) })}
+          onValueChange={(next) => update({ statement: next })}
           logicSystem={logicSystem}
           fullWidth
           variant="outlined"
@@ -127,13 +127,13 @@ export function TruthTableEditorForm({ proof, value, onChange, logicSystem = DEF
           <Typography variant="subtitle2" sx={{ mb: 1 }}>Statements</Typography>
           {statements.map((line, idx) => (
             <Stack key={idx} direction="row" alignItems="center" spacing={1} sx={{ mb: 1 }}>
-              <FormulaTextField
+              <FormulaField
                 size="small"
                 label={`Statement ${idx + 1}`}
                 value={line}
                 onValueChange={(formula) => {
                   const next = [...statements]
-                  next[idx] = displayFormulaInput(formula, logicSystem)
+                  next[idx] = formula
                   update({ statements: next })
                 }}
                 logicSystem={logicSystem}
@@ -164,12 +164,12 @@ export function TruthTableEditorForm({ proof, value, onChange, logicSystem = DEF
             <Typography variant="subtitle2" sx={{ mb: 1 }}>Premises</Typography>
             {(lefts.length ? lefts : ['']).map((line, idx) => (
               <Stack key={idx} direction="row" alignItems="center" spacing={1} sx={{ mb: 1 }}>
-                <FormulaTextField
+                <FormulaField
                   size="small"
                   value={line}
                   onValueChange={(formula) => {
                     const next = [...(lefts.length ? lefts : [''])]
-                    next[idx] = displayFormulaInput(formula, logicSystem)
+                    next[idx] = formula
                     update({ lefts: next })
                   }}
                   logicSystem={logicSystem}
@@ -196,10 +196,10 @@ export function TruthTableEditorForm({ proof, value, onChange, logicSystem = DEF
               Add premise
             </Button>
           </Box>
-          <FormulaTextField
+          <FormulaField
             label="Conclusion"
             value={right}
-            onValueChange={(next) => update({ right: displayFormulaInput(next, logicSystem) })}
+            onValueChange={(next) => update({ right: next })}
             logicSystem={logicSystem}
             fullWidth
             variant="outlined"

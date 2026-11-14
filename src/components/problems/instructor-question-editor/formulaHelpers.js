@@ -1,7 +1,6 @@
 import getFormulaClass from '@logic-app/logic-engine/symbolic/formula.js'
 import getSyntax from '@logic-app/logic-engine/symbolic/libsyntax.js'
 import { DEFAULT_LOGIC_SYSTEM, getNotation } from '../../../lib/logicSystems.js'
-import { displayIndexedSymbolsForNotation } from '../../../lib/indexedSymbols.js'
 import {
   mapTranslationAnswer,
   parseTranslationAnswer,
@@ -11,27 +10,11 @@ export function normalizeFormulaInput(value, logicSystem = DEFAULT_LOGIC_SYSTEM)
   return getSyntax(getNotation(logicSystem)).inputfix(String(value ?? '')).trim()
 }
 
-export function displayFormulaInput(value, logicSystem = DEFAULT_LOGIC_SYSTEM) {
-  const notation = getNotation(logicSystem)
-  return displayIndexedSymbolsForNotation(
-    getSyntax(notation).inputfix(String(value ?? '')),
-    notation
-  ).trim()
-}
-
 export function normalizeTranslationAnswerInput(value, logicSystem = DEFAULT_LOGIC_SYSTEM) {
   return mapTranslationAnswer(
     value,
     getNotation(logicSystem),
     (statement) => normalizeFormulaInput(statement, logicSystem)
-  )
-}
-
-export function displayTranslationAnswerInput(value, logicSystem = DEFAULT_LOGIC_SYSTEM) {
-  return mapTranslationAnswer(
-    value,
-    getNotation(logicSystem),
-    (statement) => displayFormulaInput(statement, logicSystem)
   )
 }
 

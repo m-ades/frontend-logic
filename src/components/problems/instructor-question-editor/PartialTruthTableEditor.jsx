@@ -6,8 +6,8 @@ import { DEFAULT_LOGIC_SYSTEM, getNotation } from '../../../lib/logicSystems.js'
 import TruthTableGrid from '../truth-table/TruthTableGrid.jsx'
 import { TruthValueButton } from '../truth-table/TruthTableControls.jsx'
 import { tokenizeTruthTableHeader } from '../truth-table/truthTableUi.js'
-import { displayFormulaInput, normalizeFormulaInput } from './formulaHelpers.js'
-import FormulaTextField from '../mui/inputs/FormulaTextField.jsx'
+import { normalizeFormulaInput } from './formulaHelpers.js'
+import FormulaField from '../mui/inputs/FormulaField.jsx'
 import { typeKey } from './snapshotUtils.js'
 
 export function buildPartialTruthTableSnapshot(proof, edited, existing, logicSystem = DEFAULT_LOGIC_SYSTEM) {
@@ -52,12 +52,12 @@ export function PartialTruthTableEditorForm({ proof, value, onChange, logicSyste
   const tables = [{ tokens: headerTokens, headerTokens, rows: [row] }]
   return (
     <Stack spacing={2}>
-      <FormulaTextField
+      <FormulaField
         label="Statement"
         value={statement}
         onValueChange={(next) => onChange({
           ...value,
-          statement: displayFormulaInput(next, logicSystem),
+          statement: next,
           row: [],
         })}
         logicSystem={logicSystem}

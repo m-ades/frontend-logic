@@ -287,7 +287,6 @@ export default function ProofArgumentExtraction({
             <Box sx={{ mt: 0.75 }}>
               <SymbolButtonRow
                 inputRef={argumentInputRef}
-                onValueChange={handleArgumentChange}
                 includeQuantifiers={argumentKeyboardConfig.isPredicateMode}
                 showBackspace={false}
                 extraInsertButtons={argumentSymbolButtons.desktop}

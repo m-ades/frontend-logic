@@ -1,8 +1,8 @@
 import * as React from 'react'
 import { Stack, TextField } from '@mui/material'
 import { DEFAULT_LOGIC_SYSTEM, getSymbols } from '../../../lib/logicSystems.js'
-import { displayFormulaInput, normalizeFormulaInput } from './formulaHelpers.js'
-import FormulaTextField from '../mui/inputs/FormulaTextField.jsx'
+import { normalizeFormulaInput } from './formulaHelpers.js'
+import FormulaField from '../mui/inputs/FormulaField.jsx'
 import { typeKey } from './snapshotUtils.js'
 
 export function buildComboSnapshot(proof, edited, existing, comboTypeKey, logicSystem = DEFAULT_LOGIC_SYSTEM) {
@@ -43,10 +43,10 @@ export function ComboTruthTableEditorForm({ proof, value, onChange, logicSystem 
   return (
     <Stack spacing={2}>
       <TextField label="Prompt" multiline minRows={2} value={prompt} onChange={(e) => onChange({ ...value, prompt: e.target.value })} fullWidth variant="outlined" />
-      <FormulaTextField
+      <FormulaField
         label="Expected argument"
         value={argumentLine}
-        onValueChange={(next) => onChange({ ...value, argumentLine: displayFormulaInput(next, logicSystem) })}
+        onValueChange={(next) => onChange({ ...value, argumentLine: next })}
         logicSystem={logicSystem}
         fullWidth
         variant="outlined"
