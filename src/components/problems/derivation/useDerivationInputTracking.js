@@ -33,12 +33,11 @@ export default function useDerivationInputTracking({
     }
   }, [initialFocusLineIndex, initialFocusField])
 
-  // keeps the caret after the same text once display normalization rewrites a field
-  const restoreCaret = (field, index, el, raw, normalized, normalize) => {
+  // keeps the caret after the same text once display normalization rewrites a justification
+  const restoreCaret = (index, el, raw, normalized, normalize) => {
     if (normalized === raw || typeof el?.selectionStart !== 'number') return
     const nextCursor = normalize(raw.slice(0, el.selectionStart)).length
-    const refs = field === 'formula' ? formulaRefs : justRefs
-    window.setTimeout(() => refs.current[index]?.setSelectionRange?.(nextCursor, nextCursor), 0)
+    window.setTimeout(() => justRefs.current[index]?.setSelectionRange?.(nextCursor, nextCursor), 0)
   }
 
   const focusFormula = (index) => {

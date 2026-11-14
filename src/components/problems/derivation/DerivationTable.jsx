@@ -403,7 +403,7 @@ export default function DerivationTable({
     const raw = el?.value ?? ''
     const normalized = normalizeJustificationForDisplay(raw)
     handleLineChange(index, 'justification', normalized)
-    restoreCaret('justification', index, el, raw, normalized, normalizeJustificationForDisplay)
+    restoreCaret(index, el, raw, normalized, normalizeJustificationForDisplay)
   }
 
   // the typed rule field of a line whose line(s) were provided holds only the rule
@@ -416,7 +416,7 @@ export default function DerivationTable({
     handleLineChange(index, 'justification', applyRuleToJustification(line.justification, rule, {
       rulesFirst: usesNestedSubderivations,
     }))
-    restoreCaret('justification', index, el, raw, rule, getRuleFromJustification)
+    restoreCaret(index, el, raw, rule, getRuleFromJustification)
   }
 
   const handleRuleTextCommit = (index) => {
