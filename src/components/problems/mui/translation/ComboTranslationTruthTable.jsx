@@ -232,7 +232,6 @@ export default function ComboTranslationTruthTable({
           <Box sx={{ mt: 1 }}>
             <SymbolButtonRow
               inputRef={inputRef}
-              onValueChange={handleArgumentChange}
               includeQuantifiers={false}
               showBackspace={false}
               logicSystem={logicSystem}

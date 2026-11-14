@@ -70,11 +70,11 @@ export function parseRulesetRules(value, derivationRuleLookup) {
 }
 
 export const getSymbolButtons = (symbols, syntax) => [
-  { label: symbols.not, insert: symbols.not },
-  { label: symbols.and, insert: symbols.and },
-  { label: symbols.or, insert: symbols.or },
-  { label: symbols.conditional, insert: symbols.conditional },
-  { label: symbols.biconditional, insert: symbols.biconditional },
+  { label: symbols.not, insert: symbols.not, op: 'NOT' },
+  { label: symbols.and, insert: symbols.and, op: 'AND' },
+  { label: symbols.or, insert: symbols.or, op: 'OR' },
+  { label: symbols.conditional, insert: symbols.conditional, op: 'IFTHEN' },
+  { label: symbols.biconditional, insert: symbols.biconditional, op: 'IFF' },
   ...[syntax.symbols.FORALL, syntax.symbols.EXISTS].map((quantifier) => {
     const symbol = syntax.mkquantifier('x', quantifier)
     return { label: symbol, insert: symbol }

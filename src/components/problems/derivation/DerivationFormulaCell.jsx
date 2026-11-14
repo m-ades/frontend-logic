@@ -1,5 +1,5 @@
-import { Box, TableCell, TextField } from '@mui/material'
-import { MobileLogicInput } from '../../ui/LogicKeyboard/index.js'
+import { Box, TableCell } from '@mui/material'
+import FormulaField from '../mui/inputs/FormulaField.jsx'
 import DerivationFormulaText from './DerivationFormulaText.jsx'
 import { isDerivationFieldReadOnly } from './derivationUtils.js'
 import {
@@ -20,15 +20,11 @@ export default function DerivationFormulaCell({
   keyboardConfig,
   line,
   lineIndex,
-  mobileKeyboardEnabled,
   onActivate,
   onChange,
   onCommit,
-  onCursorChange,
   onInsert,
   onKeyDown,
-  onMobileChange,
-  onMobileCursorChange,
   onRequestFullScreen,
   registerInput,
   showsDivider,
@@ -123,72 +119,30 @@ export default function DerivationFormulaCell({
             py: 0.5,
           }}
         />
-      ) : isPhone && mobileKeyboardEnabled ? (
-        <MobileLogicInput
-          value={line.formula ?? ''}
-          onChange={onMobileChange}
-          onFocus={onActivate}
-          disabled={formulaReadOnly}
-          onBlur={() => onCommit(line.formula ?? '')}
+      ) : (
+        <FormulaField
+          variant="standard"
           placeholder="Statement"
-          aria-label={`Formula line ${lineIndex + 1}`}
-          inputRef={registerInput}
-          inputSx={{
-            minHeight: 0,
-            px: 0,
-            py: 0.5,
-            border: 0,
-            borderRadius: 0,
-            boxShadow: 'none',
-            bgcolor: 'transparent',
-            fontFamily: 'var(--app-font-sans)',
-            fontSize: DERIVATION_LINE_FONT_SIZE,
-            lineHeight: '1.4375em',
-            display: 'block',
-            whiteSpace: 'pre',
-            overflowX: 'auto',
-            '& [data-char-index]': {
-              minWidth: 0,
-              minHeight: 0,
-              px: 0,
-            },
-          }}
-          onCursorChange={onMobileCursorChange}
+          aria-label={`Formula for line ${lineIndex + 1}`}
+          value={line.formula ?? ''}
+          onValueChange={onChange}
+          onFocus={onActivate}
+          onBlur={() => onCommit(line.formula ?? '')}
+          onFormulaKeyDown={onKeyDown}
+          onPointerDown={onRequestFullScreen}
+          ref={registerInput}
+          logicSystem={activeLogicSystem}
+          InputProps={{ disableUnderline: true }}
+          symbolizationKey={keyboardConfig.symbolizationKey}
           includeQuantifiers={keyboardConfig.isPredicateMode}
           extraInsertButtons={keyboardConfig.extraSymbolButtons}
           predicateLetters={keyboardConfig.isPredicateMode ? keyboardConfig.predicateLetters : undefined}
           constantLetters={keyboardConfig.isPredicateMode ? keyboardConfig.constantLetters : undefined}
           variableLetters={keyboardConfig.isPredicateMode ? keyboardConfig.variableLetters : undefined}
-          symbolizationKey={keyboardConfig.symbolizationKey}
-          logicSystem={activeLogicSystem}
-        />
-      ) : (
-        <TextField
-          variant="standard"
-          placeholder="Statement"
-          value={line.formula}
-          onChange={onChange}
-          onKeyDown={onKeyDown}
-          onPointerDown={onRequestFullScreen}
-          onClick={onCursorChange}
-          onMouseUp={onCursorChange}
-          onKeyUp={onCursorChange}
-          onSelect={onCursorChange}
-          onBlur={(event) => {
-            onCursorChange(event)
-            onCommit(event.target.value)
-          }}
-          InputProps={{ disableUnderline: true, readOnly: formulaReadOnly }}
-          inputProps={{ autoComplete: 'off', 'aria-label': `Formula for line ${lineIndex + 1}` }}
-          inputRef={registerInput}
-          onFocus={(event) => {
-            onActivate()
-            onCursorChange(event)
-          }}
           sx={{
             width: isFullScreen ? '100%' : { xs: '100%', md: DERIVATION_FORMULA_WIDTH },
             minWidth: isFullScreen ? 0 : undefined,
-            '& .MuiInputBase-input': { fontSize: DERIVATION_LINE_FONT_SIZE, py: 0.5 },
+            '& .MuiInputBase-input': { fontFamily: 'var(--app-font-sans)', fontSize: DERIVATION_LINE_FONT_SIZE, py: 0.5 },
           }}
         />
       )}

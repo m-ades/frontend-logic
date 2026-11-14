@@ -20,46 +20,19 @@ import {
 import { Visibility, VisibilityOff, Logout as LogoutIcon } from "@mui/icons-material";
 import { logout, useAuthDispatch, useAuthState } from "../../context/AuthContext.jsx";
 import { fetchJson } from "../../utils/api.js";
+import useMobileLogicKeyboardEnabled, { setMobileLogicKeyboardEnabled } from "../../hooks/useMobileLogicKeyboardEnabled.js";
 import {
   PASSWORD_POLICY,
   PASSWORD_POLICY_MESSAGE,
   isStrongPassword,
 } from "../../utils/passwords.js";
 
-const DESKTOP_KEYBOARD_ON_MOBILE_KEY = "logicapp_desktop_keyboard_on_mobile";
-const DESKTOP_KEYBOARD_ON_MOBILE_EVENT =
-  "logicapp_desktop_keyboard_on_mobile_change";
 const TEXT_SIZE_CHOICES = [
   { value: "smaller", label: "smaller" },
   { value: "default", label: "default" },
   { value: "larger", label: "larger" },
   { value: "largest", label: "largest" },
 ];
-
-const getDesktopKeyboardOnMobile = () => {
-  if (typeof window === "undefined") return false;
-
-  try {
-    return window.localStorage.getItem(DESKTOP_KEYBOARD_ON_MOBILE_KEY) === "true";
-  } catch {
-    return false;
-  }
-};
-
-const setDesktopKeyboardOnMobilePreference = (enabled) => {
-  if (typeof window === "undefined") return;
-
-  try {
-    window.localStorage.setItem(
-      DESKTOP_KEYBOARD_ON_MOBILE_KEY,
-      String(enabled)
-    );
-  } catch {
-    // ignore storage failures
-  }
-
-  window.dispatchEvent(new Event(DESKTOP_KEYBOARD_ON_MOBILE_EVENT));
-};
 
 const getPasswordCriteriaErrors = (password) => {
   const criteriaErrors = [];
@@ -113,9 +86,7 @@ export default function AccountSettingsDialog({
 }) {
   const { user } = useAuthState();
   const authDispatch = useAuthDispatch();
-  const [mobileKeyboardEnabled, setMobileKeyboardEnabled] = useState(
-    () => !getDesktopKeyboardOnMobile()
-  );
+  const mobileKeyboardEnabled = useMobileLogicKeyboardEnabled();
 
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -149,33 +120,8 @@ export default function AccountSettingsDialog({
       setLogoutSuccess(false);
       setLogoutError("");
       setLogoutDialogOpen(false);
-      return;
     }
-
-    setMobileKeyboardEnabled(!getDesktopKeyboardOnMobile());
   }, [open]);
-
-  useEffect(() => {
-    if (typeof window === "undefined") return undefined;
-
-    const handlePreferenceChange = () => {
-      setMobileKeyboardEnabled(!getDesktopKeyboardOnMobile());
-    };
-
-    window.addEventListener(
-      DESKTOP_KEYBOARD_ON_MOBILE_EVENT,
-      handlePreferenceChange
-    );
-    window.addEventListener("storage", handlePreferenceChange);
-
-    return () => {
-      window.removeEventListener(
-        DESKTOP_KEYBOARD_ON_MOBILE_EVENT,
-        handlePreferenceChange
-      );
-      window.removeEventListener("storage", handlePreferenceChange);
-    };
-  }, []);
 
   const calculatePasswordStrength = (password) => {
     if (!password || password.length < PASSWORD_POLICY.minLength) return 0;
@@ -595,11 +541,7 @@ export default function AccountSettingsDialog({
                 control={
                   <Switch
                     checked={mobileKeyboardEnabled}
-                    onChange={(event) => {
-                      const enabled = event.target.checked;
-                      setMobileKeyboardEnabled(enabled);
-                      setDesktopKeyboardOnMobilePreference(!enabled);
-                    }}
+                    onChange={(event) => setMobileLogicKeyboardEnabled(event.target.checked)}
                     color="primary"
                   />
                 }

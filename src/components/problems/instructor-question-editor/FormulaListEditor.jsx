@@ -2,7 +2,7 @@ import * as React from 'react'
 import { Box, Button, IconButton, Stack, TextField, Typography } from '@mui/material'
 import AddIcon from '@mui/icons-material/Add'
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
-import FormulaTextField from '../mui/inputs/FormulaTextField.jsx'
+import FormulaField from '../mui/inputs/FormulaField.jsx'
 
 export function FormulaListEditor({
   label,
@@ -35,7 +35,7 @@ export function FormulaListEditor({
           spacing={1}
           sx={{ mb: 1 }}
         >
-          <FormulaTextField
+          <FormulaField
             size="small"
             value={formula}
             onValueChange={(nextFormula) => {

@@ -1,8 +1,8 @@
 import * as React from 'react'
 import { FormControl, FormControlLabel, Radio, RadioGroup, Stack, Typography } from '@mui/material'
 import { DEFAULT_LOGIC_SYSTEM, getSymbols } from '../../../lib/logicSystems.js'
-import { displayFormulaInput, normalizeFormulaInput } from './formulaHelpers.js'
-import FormulaTextField from '../mui/inputs/FormulaTextField.jsx'
+import { normalizeFormulaInput } from './formulaHelpers.js'
+import FormulaField from '../mui/inputs/FormulaField.jsx'
 import { typeKey } from './snapshotUtils.js'
 
 export function buildEvaluateTruthSnapshot(proof, edited, existing, logicSystem = DEFAULT_LOGIC_SYSTEM) {
@@ -18,7 +18,7 @@ export function EvaluateTruthEditorForm({ proof, value, onChange, logicSystem = 
   const symbols = getSymbols(logicSystem)
   return (
     <Stack spacing={2}>
-      <FormulaTextField label="Statement" multiline minRows={1} value={statement} onValueChange={(next) => onChange({ ...value, statement: displayFormulaInput(next, logicSystem) })} logicSystem={logicSystem} fullWidth variant="outlined" placeholder={`e.g. P ${symbols.and} Q`} />
+      <FormulaField label="Statement" value={statement} onValueChange={(next) => onChange({ ...value, statement: next })} logicSystem={logicSystem} fullWidth variant="outlined" placeholder={`e.g. P ${symbols.and} Q`} />
       <FormControl>
         <Typography variant="subtitle2" sx={{ mb: 1 }}>Correct answer</Typography>
         <RadioGroup row value={answer ? 'true' : 'false'} onChange={(e) => onChange({ ...value, answer: e.target.value === 'true' })}>

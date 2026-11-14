@@ -1,12 +1,9 @@
 import { createPortal } from 'react-dom'
-import { Box, Button, Stack } from '@mui/material'
+import { Box, Stack } from '@mui/material'
 import { alpha } from '@mui/material/styles'
 import BackspaceOutlined from '@mui/icons-material/BackspaceOutlined'
-import {
-  getMobileKeySx,
-  mobileKeyGridSx,
-  mobileKeyWellSx,
-} from '../logic-engine/mobileKeyStyles.js'
+import { mobileKeyGridSx, mobileKeyWellSx } from '../logic-engine/mobileKeyStyles.js'
+import PhoneKey from './PhoneKey.jsx'
 
 const DIGIT_ROWS = [
   ['1', '2', '3', '4', '5'],
@@ -45,21 +42,6 @@ export default function LineCitationKeypad({ open, inputRef, value, onChange }) 
   }
   const done = () => inputRef.current?.blur()
 
-  const key = (content, ariaLabel, onClick, kind = 'letter') => (
-    <Button
-      key={ariaLabel}
-      type="button"
-      variant="text"
-      disableRipple
-      disableElevation
-      onClick={onClick}
-      aria-label={ariaLabel}
-      sx={getMobileKeySx(kind)}
-    >
-      {content}
-    </Button>
-  )
-
   return createPortal(
     <Box
       onMouseDown={hold}
@@ -93,7 +75,9 @@ export default function LineCitationKeypad({ open, inputRef, value, onChange }) 
           <Stack spacing={0.5}>
             {DIGIT_ROWS.map((row) => (
               <Box key={row.join('')} sx={mobileKeyGridSx(5)}>
-                {row.map((digit) => key(digit, `Insert ${digit}`, () => insert(digit)))}
+                {row.map((digit) => (
+                  <PhoneKey key={digit} label={`Insert ${digit}`} onClick={() => insert(digit)}>{digit}</PhoneKey>
+                ))}
               </Box>
             ))}
           </Stack>
@@ -101,10 +85,14 @@ export default function LineCitationKeypad({ open, inputRef, value, onChange }) 
 
         <Box role="group" aria-label="Separators and editing" sx={mobileKeyWellSx('nav')}>
           <Box sx={mobileKeyGridSx(4)}>
-            {key(',', 'Insert comma separator', () => insert(CITATION_SEPARATOR), 'nav')}
-            {key(CITATION_RANGE_DASH, 'Insert range dash', () => insert(CITATION_RANGE_DASH), 'nav')}
-            {key(<BackspaceOutlined fontSize="small" />, 'Backspace', backspace, 'backspace')}
-            {key('Done', 'Close line number keyboard', done, 'constant')}
+            <PhoneKey kind="nav" label="Insert comma separator" onClick={() => insert(CITATION_SEPARATOR)}>,</PhoneKey>
+            <PhoneKey kind="nav" label="Insert range dash" onClick={() => insert(CITATION_RANGE_DASH)}>
+              {CITATION_RANGE_DASH}
+            </PhoneKey>
+            <PhoneKey kind="backspace" label="Backspace" onClick={backspace}>
+              <BackspaceOutlined fontSize="small" />
+            </PhoneKey>
+            <PhoneKey kind="constant" label="Close line number keyboard" onClick={done}>Done</PhoneKey>
           </Box>
         </Box>
       </Stack>
