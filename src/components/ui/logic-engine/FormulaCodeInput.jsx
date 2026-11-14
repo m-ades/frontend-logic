@@ -3,7 +3,6 @@ import { Annotation, Compartment, EditorSelection, EditorState, Prec, Transactio
 import { Decoration, EditorView, ViewPlugin, WidgetType, keymap, placeholder as placeholderText } from '@codemirror/view'
 import { deleteCharBackward, history, historyKeymap, standardKeymap } from '@codemirror/commands'
 import { alpha, useTheme } from '@mui/material/styles'
-import getSyntax from '@logic-app/logic-engine/symbolic/libsyntax.js'
 import { diffChange, formatIndices, operatorEdit, scanBrackets, typedEdit } from './formulaEditing.js'
 
 // value updates coming from react, which skip onChange and the typing tidy up
@@ -165,7 +164,9 @@ const FormulaCodeInput = forwardRef(function FormulaCodeInput({
   mobile = false,
   onEnterKey,
   onFormulaKeyDown,
-  ...rest
+  'aria-label': ariaLabel,
+  'aria-describedby': ariaDescribedby,
+  'aria-invalid': ariaInvalid = false,
 }, ref) {
   const theme = useTheme()
   const hostRef = useRef(null)
@@ -176,14 +177,14 @@ const FormulaCodeInput = forwardRef(function FormulaCodeInput({
   latest.current = { notation, allowTherefore, readOnly: readOnly || disabled, onChange, onFocus, onBlur, onEnterKey, onFormulaKeyDown }
   const hint = useMemo(() => placeholderText(placeholder), [placeholder])
 
-  const ariaAttributes = Object.fromEntries(Object.entries(rest).filter(([name, attr]) => name.startsWith('aria-') && attr != null))
   const access = [
     EditorState.readOnly.of(readOnly || disabled),
     EditorView.editable.of(!readOnly && !disabled),
     EditorView.contentAttributes.of({
       'aria-multiline': 'false',
-      ...(id && !ariaAttributes['aria-label'] && { 'aria-labelledby': `${id}-label` }),
-      ...ariaAttributes,
+      'aria-invalid': String(ariaInvalid),
+      ...(ariaLabel ? { 'aria-label': ariaLabel } : id && { 'aria-labelledby': `${id}-label` }),
+      ...(ariaDescribedby && { 'aria-describedby': ariaDescribedby }),
       ...(mobile && { inputmode: 'none' }),
     }),
   ]
@@ -194,10 +195,8 @@ const FormulaCodeInput = forwardRef(function FormulaCodeInput({
       get value() { return view()?.state.doc.toString() ?? '' },
       get selectionStart() { return view()?.state.selection.main.from ?? 0 },
       get selectionEnd() { return view()?.state.selection.main.to ?? 0 },
-      get symbols() { return getSyntax(latest.current.notation).symbols },
       get hasFocus() { return view()?.hasFocus ?? false },
       focus() { view()?.focus() },
-      blur() { view()?.contentDOM.blur() },
       setSelectionRange(start, end = start) {
         const length = handle.value.length
         const clamp = (at) => Math.max(0, Math.min(at, length))
@@ -325,7 +324,7 @@ const FormulaCodeInput = forwardRef(function FormulaCodeInput({
   useLayoutEffect(() => {
     reconfigure(viewRef.current, compartments.current.access, access)
     // access only changes with these props
-  }, [readOnly, disabled, mobile, id, JSON.stringify(ariaAttributes)])
+  }, [readOnly, disabled, mobile, id, ariaLabel, ariaDescribedby, ariaInvalid])
 
   useLayoutEffect(() => {
     reconfigure(viewRef.current, compartments.current.theme, editorTheme(theme))
