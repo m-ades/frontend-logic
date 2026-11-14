@@ -204,6 +204,12 @@ const buildTruthTableState = (lefts, right, data) => {
 const QUESTION_SESSION_TRACKING_ENABLED = true
 const QUESTION_IDLE_TIMEOUT_MS = 90_000
 
+// the server keeps the clock so send how long ago the session ended, capped at the idle window so sleep isn't counted as work
+const questionSessionEndedMsAgo = (lastActivity, staleEnd) => {
+  const now = Date.now()
+  return now - (staleEnd ?? Math.min(now, (lastActivity ?? now) + QUESTION_IDLE_TIMEOUT_MS))
+}
+
 function RealWorksheetContent() {
   const { worksheetId, assignmentId } = useParams()
   const location = useLocation()
@@ -381,13 +387,11 @@ function RealWorksheetContent() {
         if (activeSessionId && (staleEnd !== null || !desiredQuestionId || desiredQuestionId !== activeQuestionId)) {
           const closingSessionId = activeSessionId
           staleSessionEndRef.current = null
-          // cap at the idle window so a sleeping laptop or frozen timer isn't counted as work
-          const endedAt = staleEnd ?? Math.min(Date.now(), (lastActivityRef.current ?? Date.now()) + QUESTION_IDLE_TIMEOUT_MS)
           try {
             await fetchJson(`/api/question-sessions/${closingSessionId}`, {
               method: 'PUT',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ ended_at: new Date(endedAt).toISOString() }),
+              body: JSON.stringify({ ended_ms_ago: questionSessionEndedMsAgo(lastActivityRef.current, staleEnd) }),
             })
           } catch (err) {
             // ignore for now
@@ -401,9 +405,8 @@ function RealWorksheetContent() {
         }
 
         if (!activeSessionId && desiredQuestionId && activeUserId) {
-          const startedAt = Date.now()
           // opening a question counts as activity so the end cap never lands before the start
-          lastActivityRef.current = startedAt
+          lastActivityRef.current = Date.now()
           staleSessionEndRef.current = null
           try {
             const session = await fetchJson('/api/question-sessions', {
@@ -412,7 +415,6 @@ function RealWorksheetContent() {
               body: JSON.stringify({
                 assignment_question_id: desiredQuestionId,
                 user_id: activeUserId,
-                started_at: new Date(startedAt).toISOString(),
               }),
             })
             questionSessionId.current = session?.id ?? null
@@ -535,7 +537,11 @@ function RealWorksheetContent() {
     const handlePageHide = () => {
       const activeSessionId = questionSessionId.current
       if (!activeSessionId || typeof navigator === 'undefined' || !navigator.sendBeacon) return
-      navigator.sendBeacon(`${API_CONFIG.baseUrl}/api/question-sessions/${activeSessionId}/close`)
+      const endedMsAgo = questionSessionEndedMsAgo(lastActivityRef.current, staleSessionEndRef.current)
+      navigator.sendBeacon(
+        `${API_CONFIG.baseUrl}/api/question-sessions/${activeSessionId}/close`,
+        new URLSearchParams({ ended_ms_ago: endedMsAgo })
+      )
     }
     window.addEventListener('pagehide', handlePageHide)
 
