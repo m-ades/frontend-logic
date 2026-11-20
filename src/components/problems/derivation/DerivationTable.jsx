@@ -228,7 +228,9 @@ export default function DerivationTable({
       return 'dropdown'
     }
   })
-  const useRuleDropdown = ruleInputMode === 'dropdown'
+  // a phone with the keypads types nothing, so the rule always gets its own field and keypad there
+  const phoneKeypads = isPhone && mobileLogicKeyboardEnabled
+  const useRuleDropdown = ruleInputMode === 'dropdown' || phoneKeypads
   const handleRuleInputModeChange = useCallback((_, value) => {
     if (value == null) return
     setRuleInputMode(value)
@@ -836,6 +838,7 @@ export default function DerivationTable({
           isFullScreen={isFullScreen}
           onRuleInputModeChange={handleRuleInputModeChange}
           ruleInputMode={ruleInputMode}
+          showRuleInputToggle={!phoneKeypads}
           showDerivationLabel={usesNestedSubderivations && !isFixedProof}
         />
         <TableContainer component={Box} sx={getDerivationTableContainerSx(isFullScreen)}>
@@ -904,6 +907,7 @@ export default function DerivationTable({
                   isPhone={isPhone}
                   line={line}
                   lineIndex={idx}
+                  logicSystem={activeLogicSystem}
                   mobileKeyboardEnabled={mobileLogicKeyboardEnabled}
                   onActivate={() => activateJustification(idx)}
                   onCitationChange={(raw) => handleCitationChange(idx, line, raw)}

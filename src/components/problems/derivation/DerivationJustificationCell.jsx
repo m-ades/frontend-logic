@@ -18,6 +18,7 @@ import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
 import ArrowLeftIcon from '@mui/icons-material/ArrowLeft'
 import DerivationFormulaText from './DerivationFormulaText.jsx'
 import LineCitationKeypad from '../../ui/LogicKeyboard/LineCitationKeypad.jsx'
+import RulesKeypad from '../../ui/LogicKeyboard/RulesKeypad.jsx'
 import {
   DERIVATION_CITATION_MIN_WIDTH,
   DERIVATION_JUSTIFICATION_MAX_WIDTH,
@@ -77,6 +78,7 @@ export default function DerivationJustificationCell({
   isPhone,
   line,
   lineIndex,
+  logicSystem,
   mobileKeyboardEnabled,
   onActivate,
   onCitationChange,
@@ -131,6 +133,15 @@ export default function DerivationJustificationCell({
     if (providedPart !== 'citations') registerInput?.(node)
   }
   const ruleFieldSize = useRuleDropdown ? { ...growWithText(ruleWidth), ...phoneShrink } : hugTextSize
+
+  // phones pick the rule from a keypad of the allowed rules rather than the dropdown menu
+  const rulesKeypadEnabled = isPhone && mobileKeyboardEnabled && !justificationReadOnly
+  const [rulesKeypadOpen, setRulesKeypadOpen] = useState(false)
+  const ruleFieldRef = useRef(null)
+  const pickRule = (rule) => {
+    onRuleChange(rule)
+    setRulesKeypadOpen(false)
+  }
   const citationText = citationDraft ?? formatJustificationLines(line.justification)
   const typedPlaceholder = lineIndex === premisesCount
     ? (usesNestedSubderivations ? 'Rule & line(s)' : 'line(s) and rule')
@@ -258,6 +269,7 @@ export default function DerivationJustificationCell({
                 />
               ) : ruleOptions.length > 0 && (
                 <FormControl
+                  ref={ruleFieldRef}
                   variant="standard"
                   sx={showsCitations
                     ? { order: ruleOrder, minWidth: ruleWidth }
@@ -271,7 +283,9 @@ export default function DerivationJustificationCell({
                     inputProps={{ 'aria-label': `Rule for line ${lineIndex + 1}` }}
                     inputRef={providedPart === 'citations' ? registerInput : undefined}
                     onFocus={onActivate}
+                    onBlur={() => setRulesKeypadOpen(false)}
                     onChange={(event) => onRuleChange(String(event.target.value || ''))}
+                    {...(rulesKeypadEnabled && { open: false, onOpen: () => setRulesKeypadOpen(true) })}
                     renderValue={(value) => value || 'Rule'}
                     sx={{
                       width: showsCitations ? undefined : '100%',
@@ -374,6 +388,16 @@ export default function DerivationJustificationCell({
         inputRef={citationInputRef}
         value={citationText}
         onChange={onCitationChange}
+      />
+      <RulesKeypad
+        open={rulesKeypadOpen && rulesKeypadEnabled}
+        anchorRef={ruleFieldRef}
+        rules={ruleOptions}
+        logicSystem={logicSystem}
+        selected={selectedRule}
+        onPick={pickRule}
+        onClear={() => pickRule('')}
+        onDone={() => setRulesKeypadOpen(false)}
       />
     </TableCell>
   )
