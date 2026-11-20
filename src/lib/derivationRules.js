@@ -75,3 +75,47 @@ export function getDerivationRuleLookup(logicSystem = DEFAULT_LOGIC_SYSTEM) {
   const type = getDerivationProblemType(logicSystem)
   return DERIVATION_RULE_LOOKUPS_BY_TYPE[type] ?? DERIVATION_RULE_LOOKUPS_BY_TYPE['derivation-hurley']
 }
+
+// the phone rules keypad lays a proof's allowed rules out in the families each textbook teaches them in
+const DERIVATION_RULE_GROUPS = {
+  'derivation-calgary': [
+    { key: 'introduction', label: 'Introduction rules', rules: ['∧I', '∨I', '→I', '↔I', '¬I', '∀I', '∃I', '=I'] },
+    { key: 'elimination', label: 'Elimination rules', rules: ['∧E', '∨E', '→E', '↔E', '¬E', '∀E', '∃E', '=E'] },
+    { key: 'basic', label: 'Assumption and basic rules', rules: ['AS', 'R', 'X', 'IP'] },
+    { key: 'derived', label: 'Derived rules', rules: ['DS', 'MT', 'DNE', 'LEM', 'DeM', 'CQ'] },
+  ],
+  'derivation-hurley': [
+    { key: 'implication', label: 'Rules of implication', rules: ['MP', 'MT', 'HS', 'DS', 'CD', 'Simp', 'Conj', 'Add'] },
+    { key: 'replacement', label: 'Rules of replacement', rules: ['DM', 'Com', 'Assoc', 'Dist', 'DN', 'Trans', 'Impl', 'Equiv', 'Exp', 'Taut'] },
+    { key: 'proof', label: 'Conditional and indirect proof', rules: ['ACP', 'CP', 'AIP', 'IP'] },
+    { key: 'predicate', label: 'Quantifier and identity rules', rules: ['UI', 'UG', 'EI', 'EG', 'QN', '=I', '=O'] },
+  ],
+}
+
+// rule names compare without case or the text style selector the symbol buttons' arrows carry
+const ruleKey = (rule) => String(rule ?? '').replace(/[︎️]/g, '').toLowerCase()
+
+export function isSameDerivationRule(a, b) {
+  return Boolean(a) && ruleKey(a) === ruleKey(b)
+}
+
+/*
+groups rules for the phone rules keypad, in textbook order within each group
+only the given rules appear, as given, empty groups are dropped, and any rule no group names goes in other at the end
+*/
+export function groupDerivationRules(rules, logicSystem = DEFAULT_LOGIC_SYSTEM) {
+  const given = [...new Set((Array.isArray(rules) ? rules : []).filter(Boolean))]
+  const byKey = new Map(given.map((rule) => [ruleKey(rule), rule]))
+  const placed = new Set()
+  const groups = []
+  for (const { key, label, rules: names } of DERIVATION_RULE_GROUPS[getDerivationProblemType(logicSystem)] ?? []) {
+    const present = names
+      .map((name) => byKey.get(ruleKey(name)))
+      .filter((rule) => rule && !placed.has(rule))
+    present.forEach((rule) => placed.add(rule))
+    if (present.length) groups.push({ key, label, rules: present })
+  }
+  const other = given.filter((rule) => !placed.has(rule))
+  if (other.length) groups.push({ key: 'other', label: 'Other rules', rules: other })
+  return groups
+}

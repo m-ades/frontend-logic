@@ -14,7 +14,10 @@ export default function DerivationHeader({
   onRuleInputModeChange,
   ruleInputMode,
   showDerivationLabel,
+  // the type or pick choice means nothing once phones pick rules from a keypad
+  showRuleInputToggle = true,
 }) {
+  const showsToggle = showRuleInputToggle && allowedRules.length > 0
   return (
     <>
       {argument?.text && (
@@ -37,18 +40,18 @@ export default function DerivationHeader({
         </Box>
       )}
 
-      {(showDerivationLabel || allowedRules.length > 0) && (
+      {(showDerivationLabel || showsToggle) && (
         <Box sx={{ mb: 1.5, ...(isFullScreen && { pl: 2 }) }}>
           {showDerivationLabel && (
             <Typography
               component="h3"
               variant="overline"
-              sx={{ mb: allowedRules.length > 0 ? 0.5 : 0, color: 'text.secondary', fontWeight: 700, lineHeight: 1.2 }}
+              sx={{ mb: showsToggle ? 0.5 : 0, color: 'text.secondary', fontWeight: 700, lineHeight: 1.2 }}
             >
               Derivation
             </Typography>
           )}
-          {allowedRules.length > 0 && (
+          {showsToggle && (
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
               <Typography variant="body2" sx={{ color: 'text.secondary' }}>
                 Rule input:
