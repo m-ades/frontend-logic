@@ -24,12 +24,16 @@ export default function SymbolButtonRow({
   includeQuantifiers = true,
   // the phone keypad keeps backspace on its nav row
   showBackspace = true,
+  // the phone keypad has its own variable keys, so its quantifiers go in bare and take any variable
+  bareQuantifiers = false,
   extraInsertButtons,
   centerButtons = false,
   logicSystem,
 }) {
   const syntax = getSyntax(getNotation(logicSystem))
-  const getQuantifierText = (op) => syntax.mkquantifier('x', syntax.symbols[op])
+  const getQuantifierText = (op) => (
+    bareQuantifiers ? syntax.symbols[op] : syntax.mkquantifier('x', syntax.symbols[op])
+  )
 
   const resolveLabel = ({ op, quantifier = false, insert = null, pair = null, backspace = false, label }) => {
     if (backspace) return '←'

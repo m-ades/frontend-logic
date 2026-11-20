@@ -1,9 +1,11 @@
+import { useState } from 'react'
 import { createPortal } from 'react-dom'
 import { Box, Stack } from '@mui/material'
 import { alpha } from '@mui/material/styles'
 import BackspaceOutlined from '@mui/icons-material/BackspaceOutlined'
 import { mobileKeyGridSx, mobileKeyWellSx } from '../logic-engine/mobileKeyStyles.js'
 import PhoneKey from './PhoneKey.jsx'
+import useKeyboardClearance from './useKeyboardClearance.js'
 
 const DIGIT_ROWS = [
   ['1', '2', '3', '4', '5'],
@@ -15,6 +17,9 @@ const CITATION_RANGE_DASH = '–'
 const CITATION_SEPARATOR = ', '
 
 export default function LineCitationKeypad({ open, inputRef, value, onChange }) {
+  const [panel, setPanel] = useState(null)
+  // a citation on a low line would otherwise sit under the pad along with the feedback below it
+  useKeyboardClearance({ open, panel, anchorRef: inputRef })
   if (!open || typeof document === 'undefined') return null
 
   // keep focus (and the caret) in the citation field while a key is pressed
@@ -44,6 +49,7 @@ export default function LineCitationKeypad({ open, inputRef, value, onChange }) 
 
   return createPortal(
     <Box
+      ref={setPanel}
       onMouseDown={hold}
       role="region"
       aria-label="Line number keyboard"
