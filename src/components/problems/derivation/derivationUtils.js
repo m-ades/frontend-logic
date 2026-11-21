@@ -151,10 +151,10 @@ export const formatJustificationDisplay = (value, options = {}) => {
   return formatJustificationParts(nums, ranges, citedrules, options)
 }
 
-// normalizes rule shortcuts while preserving incomplete citation input
-export const normalizeJustificationForDisplay = (value) => String(value ?? '').replace(/[^\s,]+/g, (token) => {
+// normalizes rule shortcuts while preserving incomplete citation input, a syntax adds the formula field's shortcuts like all and ->
+export const normalizeJustificationForDisplay = (value, syntax) => String(value ?? '').replace(/[^\s,]+/g, (token) => {
   if (/[0-9?]/.test(token)) return token
-  return formatRuleName(token)
+  return formatRuleName(syntax ? syntax.inputfix(token).replace(/\s/g, '') : token)
 })
 
 export const getJustificationMeta = (value) => {

@@ -195,6 +195,7 @@ export default function DerivationTable({
   const allDerivationRules = getDerivationRules(activeLogicSystem)
   const derivationRuleLookup = getDerivationRuleLookup(activeLogicSystem)
   const syntax = useMemo(() => getSyntax(notation), [notation])
+  const ruleShortcutSyntax = usesNestedSubderivations ? syntax : null
   const {
     argumentTarget,
     buildFreshLines,
@@ -401,9 +402,10 @@ export default function DerivationTable({
     if (isDerivationFieldReadOnly(lines[index], 'justification')) return
     const el = event.target
     const raw = el?.value ?? ''
-    const normalized = normalizeJustificationForDisplay(raw)
+    const normalize = (text) => normalizeJustificationForDisplay(text, ruleShortcutSyntax)
+    const normalized = normalize(raw)
     handleLineChange(index, 'justification', normalized)
-    restoreCaret(index, el, raw, normalized, normalizeJustificationForDisplay)
+    restoreCaret(index, el, raw, normalized, normalize)
   }
 
   // the typed rule field of a line whose line(s) were provided holds only the rule
@@ -412,11 +414,12 @@ export default function DerivationTable({
     if (isDerivationFieldReadOnly(line, 'rule')) return
     const el = event.target
     const raw = el?.value ?? ''
-    const rule = getRuleFromJustification(raw)
+    const normalize = (text) => getRuleFromJustification(normalizeJustificationForDisplay(text, ruleShortcutSyntax))
+    const rule = normalize(raw)
     handleLineChange(index, 'justification', applyRuleToJustification(line.justification, rule, {
       rulesFirst: usesNestedSubderivations,
     }))
-    restoreCaret(index, el, raw, rule, getRuleFromJustification)
+    restoreCaret(index, el, raw, rule, normalize)
   }
 
   const handleRuleTextCommit = (index) => {
